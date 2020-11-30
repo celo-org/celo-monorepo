@@ -51,6 +51,10 @@ interface AppEventsProperties {
     dollarBalance?: string
     goldBalance?: string
   }
+  [AppEvents.fetch_balance_error]: {
+    dollarBalance?: string
+    goldBalance?: string
+  }
 }
 
 interface HomeEventsProperties {

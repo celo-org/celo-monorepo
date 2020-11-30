@@ -17,6 +17,7 @@ import ErrorScreen from 'src/app/ErrorScreen'
 import { currentLanguageSelector } from 'src/app/reducers'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
+import BackupForceScreen from 'src/backup/BackupForceScreen'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackButton from 'src/components/BackButton'
@@ -374,6 +375,11 @@ const exchangeScreens = (Navigator: typeof Stack) => (
 
 const backupScreens = (Navigator: typeof Stack) => (
   <>
+    <Navigator.Screen
+      name={Screens.BackupForceScreen}
+      component={BackupForceScreen}
+      options={BackupForceScreen.navOptions}
+    />
     <Navigator.Screen
       name={Screens.BackupPhrase}
       component={BackupPhrase}

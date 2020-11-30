@@ -313,7 +313,13 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       // Start listening for manual and/or auto message inputs
       receiveMessageTask = yield takeEvery(
         Actions.RECEIVE_ATTESTATION_MESSAGE,
-        attestationCodeReceiver(attestationsWrapper, phoneHash, unverifiedMtwAddress, issuers, true)
+        attestationCodeReceiver(
+          attestationsWrapper,
+          phoneHashDetails,
+          unverifiedMtwAddress,
+          attestations,
+          true
+        )
       )
 
       if (!withoutRevealing) {
@@ -364,9 +370,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             Actions.RECEIVE_ATTESTATION_MESSAGE,
             attestationCodeReceiver(
               attestationsWrapper,
-              phoneHash,
+              phoneHashDetails,
               unverifiedMtwAddress,
-              issuers,
+              attestations,
               true
             )
           )

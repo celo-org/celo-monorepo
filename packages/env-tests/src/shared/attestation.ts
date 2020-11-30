@@ -7,6 +7,7 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
+import { AttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { sample } from 'lodash'
 import moment from 'moment'
@@ -85,12 +86,19 @@ export async function requestAttestationsFromIssuers(
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
-      const response = await attestations.revealPhoneNumberToIssuer(
+      const revealRequest: AttestationRequest = {
         phoneNumber,
         account,
-        attestation.issuer,
+        issuer: account,
+        salt: pepper,
+        smsRetrieverAppSig: undefined,
+        securityCodePrefix: undefined,
+        language: undefined,
+      }
+
+      const response = await attestations.revealPhoneNumberToIssuer(
         attestation.attestationServiceURL,
-        pepper
+        revealRequest
       )
       if (!response.ok) {
         return {
