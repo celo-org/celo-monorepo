@@ -32,6 +32,7 @@
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
   "paste": "Pegar",
+  "choose:": "Elige",
   "receivedPayment": "Pago recibido",
   "readOnlyState": "Modo de solo lectura: crea la clave de cuenta para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",

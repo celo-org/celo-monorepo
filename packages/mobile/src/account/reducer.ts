@@ -10,6 +10,7 @@ import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3
 export interface State {
   name: string | null
   e164PhoneNumber: string | null
+  picture: string | null
   defaultCountryCode: string | null
   contactDetails: UserContactDetails
   devModeActive: boolean
@@ -43,6 +44,7 @@ export interface UserContactDetails {
 export const initialState = {
   name: null,
   e164PhoneNumber: null,
+  picture: null,
   defaultCountryCode: null,
   contactDetails: {
     contactId: null,
@@ -109,6 +111,12 @@ export const reducer = (
         ...state,
         e164PhoneNumber: action.e164PhoneNumber,
         defaultCountryCode: action.countryCode,
+      }
+    case Actions.SET_PICTURE:
+      console.log('setting picture', action.picture)
+      return {
+        ...state,
+        picture: action.picture,
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
       const newClickCount = (state.devModeClickCount + 1) % 10

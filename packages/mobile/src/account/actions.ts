@@ -6,6 +6,7 @@ export enum Actions {
   CANCEL_CREATE_OR_RESTORE_ACCOUNT = 'ACCOUNT/CANCEL_CREATE_OR_RESTORE_ACCOUNT',
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
+  SET_PICTURE = 'ACCOUNT/SET_PICTURE',
   DEV_MODE_TRIGGER_CLICKED = 'ACCOUNT/NAME_CLICKED',
   PHOTOSNUX_CLICKED = 'ACCOUNT/PHOTOSNUX_CLICKED',
   SET_PINCODE = 'ACCOUNT/SET_PINCODE',
@@ -48,6 +49,11 @@ export interface SetPhoneNumberAction {
   type: Actions.SET_PHONE_NUMBER
   e164PhoneNumber: string
   countryCode: string
+}
+
+export interface SetPictureAction {
+  type: Actions.SET_PICTURE
+  picture: string
 }
 
 export interface DevModeTriggerClickedAction {
@@ -143,6 +149,7 @@ export type ActionTypes =
   | CancelCreateOrRestoreAccountAction
   | SetNameAction
   | SetPhoneNumberAction
+  | SetPictureAction
   | DevModeTriggerClickedAction
   | PhotosNUXClickedAction
   | SetPincodeAction
@@ -188,6 +195,7 @@ export function setName(name: string): SetNameAction {
     name,
   }
 }
+
 export function acceptTerms(): AcceptTermsAction {
   return {
     type: Actions.ACCEPT_TERMS,
@@ -199,6 +207,13 @@ export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): Se
     type: Actions.SET_PHONE_NUMBER,
     e164PhoneNumber,
     countryCode,
+  }
+}
+
+export function setPicture(picture: string): SetPictureAction {
+  return {
+    type: Actions.SET_PICTURE,
+    picture,
   }
 }
 

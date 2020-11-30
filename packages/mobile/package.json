@@ -109,6 +109,7 @@
     "react-native-gesture-handler": "^1.6.1",
     "react-native-geth": "https://github.com/celo-org/react-native-geth#5864c09",
     "react-native-google-safetynet": "https://github.com/celo-org/react-native-google-safetynet#8a0355f",
+    "react-native-image-crop-picker": "^0.35.1",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-keychain": "6.0.0",

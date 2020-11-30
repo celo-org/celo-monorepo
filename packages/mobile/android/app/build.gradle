@@ -165,6 +165,7 @@ android {
         resValue "string", "app_name", project.env.get("APP_DISPLAY_NAME")
         resValue "string", "build_config_package", "org.celo.mobile"
         missingDimensionStrategy 'react-native-camera', 'general'
+        vectorDrawables.useSupportLibrary = true
     }
     signingConfigs {
         release {

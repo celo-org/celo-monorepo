@@ -33,6 +33,7 @@ import {
   defaultCountryCodeSelector,
   e164NumberSelector,
   nameSelector,
+  pictureSelector,
   userContactDetailsSelector,
 } from 'src/account/selectors'
 import SettingsScreen from 'src/account/Settings'
@@ -142,6 +143,7 @@ function CustomDrawerItemList({
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
   const e164PhoneNumber = useSelector(e164NumberSelector)
+  const picture = useSelector(pictureSelector)
   const contactDetails = useSelector(userContactDetailsSelector)
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
   const dollarBalance = useSelector(stableTokenBalanceSelector)
@@ -167,7 +169,11 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
-        <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
+        <ContactCircle
+          thumbnailPath={picture || contactDetails.thumbnailPath}
+          name={null}
+          size={64}
+        />
         <Text style={styles.nameLabel}>{displayName}</Text>
         {e164PhoneNumber && (
           <PhoneNumberWithFlag

@@ -72,6 +72,8 @@
 	<string>Celo Wallet can import your contacts so you can transact with them.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Celo Wallet needs access to save your QR code to your photos.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+	<string>Celo Wallet needs access for you to choose a profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>

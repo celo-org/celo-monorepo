@@ -346,7 +346,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
         >
           <View
             accessible={true}
-            focusable={false}
+            focusable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
@@ -412,6 +412,29 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
                 >
                   +1
                 </Text>
+                <View
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "rotate": "0deg",
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    viewBox="0 0 16 16"
+                    width={16}
+                  >
+                    <path
+                      d="M3 6l5 5 5-5"
+                      stroke="#B4B9BD"
+                    />
+                  </svg>
+                </View>
               </View>
             </View>
           </View>
@@ -439,7 +462,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
               <TextInput
                 allowFontScaling={true}
                 countryCallingCode="+1"
-                editable={false}
+                editable={true}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -1368,7 +1391,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
         >
           <View
             accessible={true}
-            focusable={false}
+            focusable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
@@ -1434,6 +1457,29 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
                 >
                   +1
                 </Text>
+                <View
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "rotate": "0deg",
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    viewBox="0 0 16 16"
+                    width={16}
+                  >
+                    <path
+                      d="M3 6l5 5 5-5"
+                      stroke="#B4B9BD"
+                    />
+                  </svg>
+                </View>
               </View>
             </View>
           </View>
@@ -1461,7 +1507,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
               <TextInput
                 allowFontScaling={true}
                 countryCallingCode="+1"
-                editable={false}
+                editable={true}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -2390,7 +2436,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
         >
           <View
             accessible={true}
-            focusable={false}
+            focusable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
@@ -2456,6 +2502,29 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
                 >
                   +1
                 </Text>
+                <View
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "rotate": "0deg",
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    viewBox="0 0 16 16"
+                    width={16}
+                  >
+                    <path
+                      d="M3 6l5 5 5-5"
+                      stroke="#B4B9BD"
+                    />
+                  </svg>
+                </View>
               </View>
             </View>
           </View>
@@ -2483,7 +2552,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
               <TextInput
                 allowFontScaling={true}
                 countryCallingCode="+1"
-                editable={false}
+                editable={true}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -3412,7 +3481,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
         >
           <View
             accessible={true}
-            focusable={false}
+            focusable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
@@ -3478,6 +3547,29 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                 >
                   +1
                 </Text>
+                <View
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "rotate": "0deg",
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    viewBox="0 0 16 16"
+                    width={16}
+                  >
+                    <path
+                      d="M3 6l5 5 5-5"
+                      stroke="#B4B9BD"
+                    />
+                  </svg>
+                </View>
               </View>
             </View>
           </View>
@@ -3505,7 +3597,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
               <TextInput
                 allowFontScaling={true}
                 countryCallingCode="+1"
-                editable={false}
+                editable={true}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
