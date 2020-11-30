@@ -1,3 +1,44 @@
+{{- define "celo.blockscout.labels" -}}
+app: blockscout
+chart: blockscout
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "celo.blockscout-db-terminating-sidecar" -}}
+- name: cloudsql-proxy
+  image: gcr.io/cloudsql-docker/gce-proxy:1.11
+  command:
+  - /bin/sh
+  args:
+  - -c
+  - |
+    /cloud_sql_proxy \
+    -instances={{ .Values.blockscout.db.connection_name }}=tcp:5432 \
+    -credential_file=/secrets/cloudsql/credentials.json &
+    CHILD_PID=$!
+    (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; fi; sleep 1; done) &
+    wait $CHILD_PID
+    if [[ -f "/tmp/pod/main-terminated" ]]; then exit 0; fi
+  securityContext:
+    runAsUser: 2  # non-root user
+    allowPrivilegeEscalation: false
+  volumeMounts:
+  - name: blockscout-cloudsql-credentials
+    mountPath: /secrets/cloudsql
+    readOnly: true
+  - mountPath: /tmp/pod
+    name: tmp-pod
+    readOnly: true
+volumes:
+  - name: blockscout-cloudsql-credentials
+    secret:
+      defaultMode: 420
+      secretName: blockscout-cloudsql-credentials
+  - name: tmp-pod
+    emptyDir: {}
+{{- end -}}
+
 {{- define "celo.blockscout-db-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.16
