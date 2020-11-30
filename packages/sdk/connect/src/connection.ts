@@ -2,7 +2,6 @@ import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
-// @ts-ignore (web3 defined as peerDep)
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
 import { assertIsCeloProvider, CeloProvider } from './celo-provider'
