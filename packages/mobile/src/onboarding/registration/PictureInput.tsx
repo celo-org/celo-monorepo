@@ -33,7 +33,6 @@ function PictureInput({ picture, onPhotoChosen, backgroundColor }: Props) {
       // @ts-ignore
       onPhotoChosen(`data:${image.mime};base64,${image.data}`)
     } catch (e) {
-      console.log(e)
       Logger.error('Error while fetching image from picker', e)
     }
   }

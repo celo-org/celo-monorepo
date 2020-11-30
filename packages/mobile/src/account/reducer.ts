@@ -113,7 +113,6 @@ export const reducer = (
         defaultCountryCode: action.countryCode,
       }
     case Actions.SET_PICTURE:
-      console.log('setting picture', action.picture)
       return {
         ...state,
         picture: action.picture,
