@@ -48,6 +48,7 @@ if [ ! -z "$REPORT" ]; then
 fi
 
 git checkout -
+yarn build:ts
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
