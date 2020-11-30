@@ -123,9 +123,17 @@ async function jsonRpc(web3: Web3, method: string, params: string[]): Promise<an
   })
 }
 
-async function getSlashingInfo(web3: Web3, bn: number) {
+export interface Info {
+  inner: string
+  extra: string
+  sig: Buffer
+  bitmap: number
+}
+
+async function getSlashingInfo(web3: Web3, bn: number): Promise<Info> {
   const res = (await jsonRpc(web3, 'istanbul_getEpochValidatorSetData', [`0x${bn.toString(16)}`]))
     .result
+  console.info('json result', res)
   const info = {
     inner: '0x' + Buffer.from(res.bhhash, 'base64').toString('hex'),
     extra:
@@ -133,14 +141,9 @@ async function getSlashingInfo(web3: Web3, bn: number) {
       res.attempts.toString(16).padStart(2, '0') +
       Buffer.from(res.extraData, 'base64').toString('hex'),
     sig: Buffer.from(res.sig, 'base64'),
+    bitmap: res.bitmap,
   }
   return info
-}
-
-export interface Info {
-  inner: string
-  extra: string
-  sig: Buffer
 }
 
 async function makeHint(instance: SnarkEpochDataSlasher, { inner, extra }: Info) {
@@ -165,31 +168,65 @@ async function infoToData(instance: SnarkEpochDataSlasher, info: Info) {
   const hint = await makeHint(instance, info)
   const sig = uncompressSig(info.sig)
   // console.log(sig, info.sig)
-  const header = `0x${info.extra.substr(2)}${info.inner.substr(2)}${'1'.padStart(
-    64,
-    '0'
-  )}${sig.substr(2)}${hint.substr(2)}`
+  const header = `0x${info.extra.substr(2)}${info.inner.substr(2)}${info.bitmap
+    .toString(16)
+    .padStart(64, '0')}${sig.substr(2)}${hint.substr(2)}`
   return header
 }
 
 describe('snark slashing tests', function(this: any) {
+  const instances = [
+    {
+      name: 'validator0',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+    {
+      name: 'validator1',
+      validating: true,
+      syncmode: 'full',
+      port: 30305,
+      rpcport: 8547,
+    },
+    {
+      name: 'validator2',
+      validating: true,
+      syncmode: 'full',
+      port: 30307,
+      rpcport: 8549,
+    },
+    {
+      name: 'validator3',
+      validating: true,
+      syncmode: 'full',
+      port: 30309,
+      rpcport: 8551,
+    },
+  ]
+
   const gethConfig: GethRunConfig = {
     network: 'local',
     networkId: 1101,
     runPath: TMP_PATH,
     migrate: true,
-    instances: [
-      {
-        name: 'validator0',
-        validating: true,
-        syncmode: 'full',
-        port: 30311,
-        rpcport: 8545,
-      },
-    ],
+    instances,
+  }
+
+  const gethConfigDown1: GethRunConfig = {
+    ...gethConfig,
+    instances: [instances[0], instances[2], instances[3]],
+  }
+
+  const gethConfigDown2: GethRunConfig = {
+    ...gethConfig,
+    instances: instances.slice(0, 3),
   }
 
   const hooks: any = getHooks(gethConfig)
+  const hooks1: any = getHooks(gethConfigDown1)
+  const hooks2: any = getHooks(gethConfigDown2)
   let web3: Web3
   let kit: ContractKit
 
@@ -197,6 +234,7 @@ describe('snark slashing tests', function(this: any) {
   let info2: any
 
   before(async function(this: any) {
+    console.info('here')
     this.timeout(0)
     // Comment out the following line after a test run for a quick rerun.
     await hooks.before()
@@ -206,9 +244,23 @@ describe('snark slashing tests', function(this: any) {
     this.timeout(0)
     await hooks.after()
   })
-
+  /*
   const restart = async () => {
     await hooks.restart()
+    web3 = new Web3('http://localhost:8545')
+    kit = newKitFromWeb3(web3)
+    await sleep(1)
+  }
+*/
+  const restart1 = async () => {
+    await hooks1.restart()
+    web3 = new Web3('http://localhost:8545')
+    kit = newKitFromWeb3(web3)
+    await sleep(1)
+  }
+
+  const restart2 = async () => {
+    await hooks2.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
     await sleep(1)
@@ -217,10 +269,10 @@ describe('snark slashing tests', function(this: any) {
   describe('when running a network', () => {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
-      await restart()
+      await restart1()
     })
 
-    it('should get correct validator address using the precompile', async () => {
+    it('should get correct validator address using the precompile', async function(this: any) {
       this.timeout(0) // Disable test timeout
       await waitForBlock(web3, 350)
 
@@ -239,7 +291,7 @@ describe('snark slashing tests', function(this: any) {
   describe('test slashing for double signing with contractkit', () => {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
-      await restart()
+      await restart2()
     })
 
     it('slash for double signing with contractkit', async function(this: any) {
@@ -247,7 +299,7 @@ describe('snark slashing tests', function(this: any) {
       const slasher = await kit.contracts.getSnarkEpochDataSlasher()
       const slasher0 = await kit._web3Contracts.getSnarkEpochDataSlasher()
       const election = await kit.contracts.getElection()
-      await waitForBlock(web3, 340)
+      await waitForBlock(web3, 350)
 
       info2 = await getSlashingInfo(web3, 340)
 
@@ -262,11 +314,15 @@ describe('snark slashing tests', function(this: any) {
 
       const header = await infoToData(slasher0, info1)
       const other = await infoToData(slasher0, info2)
+      //"0x0100000080000044e6bd0a7d65bad7c6ed60883f2de140e9984ba6ba28019cc6667e5250c43800e4eabef9b0c7977a52d07976b806375400000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000007e146df7b894929b62ca9908687e4b7bcce6c0ceeedae9abc468948096b3b0600fdc4a957ca21d812ffa28578ce3ec0000000000000000000000000000000001696c3444d2e07abf9250bc3f8a39c3a35ee5f7e94597dfef7e60d99c8d6f8cdd1067c107df67a7266e7db390cd264900000000000000000000000000000000018be6d09213b7227c2686995e1a349d24de01f6602662c22a68dca69ba8e1f938fb20b333d6c0b9e5f381dbf148fc84000000000000000000000000000000000022537585b159c84a147f270e87149df544d7fca0ceb0ccf48a85891e606606de103c90fc293f469f153e240eb7037d"
+      console.info('header1', header)
+      // console.info("header2", await infoToData(slasher0, info2))
+      console.info('header2', other)
 
       const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
-      console.info(txRcpt)
+      console.info(txRcpt, txResult)
       assert.equal(txRcpt.status, true)
 
       // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld

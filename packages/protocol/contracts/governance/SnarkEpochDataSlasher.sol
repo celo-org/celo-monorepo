@@ -305,9 +305,10 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     for (uint256 i = 0; i < 150; i++) {
       if (bitmap & 1 == 1) {
         num++;
-        B12.G2Point memory public_key = getBLSPublicKey(blockNumber, i);
+        B12.G2Point memory public_key = getBLSPublicKey(blockNumber, i); // TODO: this might use too much memory
         if (!prev) {
           agg = public_key;
+          prev = true;
         } else {
           agg = CeloB12_377Lib.g2Add(agg, public_key);
         }
