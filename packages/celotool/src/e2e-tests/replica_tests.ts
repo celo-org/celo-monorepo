@@ -1,11 +1,8 @@
-// tslint:disable: no-console
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-import { DefaultRpcCaller, RpcCaller } from '@celo/contractkit/lib/utils/rpc-caller'
+import { BlockHeader } from '@celo/connect'
+import { DefaultRpcCaller, RpcCaller } from '@celo/connect/lib/utils/rpc-caller'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { BlockHeader } from 'web3-eth'
 import { privateKeyToPublicKey } from '../lib/generate_utils'
 import { getEnodeAddress, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'

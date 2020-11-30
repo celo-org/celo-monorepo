@@ -1,4 +1,5 @@
-import { Address, OdisUtils } from '@celo/contractkit'
+import { Address } from '@celo/base'
+import { OdisUtils } from '@celo/identity'
 import {
   DEFAULT_SYNC_MODE,
   DEFAULT_TESTNET,

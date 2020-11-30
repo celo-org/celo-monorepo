@@ -1,4 +1,5 @@
-import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { eqAddress } from '@celo/utils/src/address'

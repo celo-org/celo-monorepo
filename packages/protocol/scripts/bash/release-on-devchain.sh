@@ -12,38 +12,39 @@ source ./scripts/bash/utils.sh
 BRANCH=""
 NETWORK=""
 FORNO=""
+BUILD_DIR=""
+RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
-while getopts 'b:rl:' flag; do
+while getopts ':b:rl:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    d) BUILD_DIR="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-echo "- Checkout source code at $BRANCH"
-BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags 2>$LOG_FILE >> $LOG_FILE
-git checkout $BRANCH 2>$LOG_FILE >> $LOG_FILE
-echo "- Build contract artifacts"
-rm -rf build/contracts
-yarn build >> $LOG_FILE
-
-# TODO: Move to yarn build:sol after the next contract release.
-echo "- Create local network"
-yarn devchain generate-tar devchain.tar.gz >> $LOG_FILE
-rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-mv build/contracts $BUILD_DIR
+# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
+if [ -z "$BUILD_DIR" ]
+then
+    RE_BUILD_REPO="yes"
+    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+    # yarn test:generate-old-devchain-and-build -b $BRANCH -d $BUILD_DIR -l $LOG_FILE
+fi
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
-# Move back to branch from which we started
-git checkout -
-yarn build >> $LOG_FILE
+if [ -n "$RE_BUILD_REPO" ]
+then
+    # Move back to branch from which we started
+    git checkout -
+    yarn install >> $LOG_FILE
+    yarn build >> $LOG_FILE
+fi
 
 GANACHE_PID=
 if command -v lsof; then
