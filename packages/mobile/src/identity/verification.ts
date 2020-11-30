@@ -1,11 +1,11 @@
-import { CeloTransactionObject } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { CeloTransactionObject } from '@celo/connect'
 import {
   ActionableAttestation,
   AttestationsWrapper,
   getSecurityCodePrefix,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { AttestationRequest } from '@celo/utils/lib/io'
 import { retryAsync } from '@celo/utils/src/async'

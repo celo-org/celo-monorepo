@@ -1,18 +1,18 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
+import { Address, CeloTxObject } from '@celo/connect'
 import { retryTx, setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
-import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
-import { TransactionObject } from 'web3-eth'
 
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
-  tx: TransactionObject<T> | null,
+  tx: CeloTxObject<T> | null,
   privateKey: string,
   txArgs: any
 ) {

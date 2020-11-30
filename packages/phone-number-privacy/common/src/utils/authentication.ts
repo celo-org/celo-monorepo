@@ -1,7 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
-import { AuthenticationMethod } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'

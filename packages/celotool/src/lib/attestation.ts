@@ -1,9 +1,11 @@
-import { Address, CeloTransactionParams, ContractKit, OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { Address, CeloTransactionParams } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { OdisUtils } from '@celo/identity'
+import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { AttestationRequest } from '@celo/utils/lib/io'
