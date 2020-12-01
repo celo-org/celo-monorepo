@@ -19,7 +19,7 @@
 #import "RNSplashScreen.h"
 #import "ReactNativeConfig.h"
 
-//#if DEBUG
+#ifdef FB_SONARKIT_ENABLED
 //#import <FlipperKit/FlipperClient.h>
 //#import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
 //#import <FlipperKitUserDefaultsPlugin/FKUserDefaultsPlugin.h>
@@ -52,7 +52,7 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-//  #if DEBUG
+#ifdef FB_SONARKIT_ENABLED
 //    InitializeFlipper(application);
 //  #endif
   // Reset keychain on first run to clear existing Firebase credentials
