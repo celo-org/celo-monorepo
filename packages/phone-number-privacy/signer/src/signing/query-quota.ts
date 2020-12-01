@@ -43,11 +43,11 @@ export async function handleGetQuota(
 ) {
   Counters.requests.labels(Endpoints.GET_QUOTA).inc()
   const logger: Logger = response.locals.logger
-  logger.debug({ req: request.body }, 'Request received')
+  logger.info({ req: JSON.stringify(request.body) }, 'Request received')
   if (!request.body.sessionID) {
-    logger.warn({ req: request.body }, 'Request does not have sessionID')
+    logger.debug({ req: JSON.stringify(request.body) }, 'Request does not have sessionID')
   }
-  logger.info('Begin handleGetQuota')
+  logger.debug('Begin handleGetQuota')
   try {
     if (!isValidGetQuotaInput(request.body)) {
       respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
@@ -62,17 +62,18 @@ export async function handleGetQuota(
 
     const queryCount = await getRemainingQueryCount(logger, account, hashedPhoneNumber)
 
-    Counters.responses.labels(Endpoints.GET_QUOTA, '200').inc()
-
-    response.status(200).json({
+    const queryQuotaResponse = {
       success: true,
       version: getVersion(),
       performedQueryCount: queryCount.performedQueryCount,
       totalQuota: queryCount.totalQuota,
-    })
+    }
+
+    Counters.responses.labels(Endpoints.GET_QUOTA, '200').inc()
+    logger.info({ response: queryQuotaResponse }, 'Query quota retrieval success')
+    response.status(200).json(queryQuotaResponse)
   } catch (err) {
-    logger.error('Failed to get user quota')
-    logger.error({ err })
+    logger.error({ err }, 'Failed to get user quota')
     respondWithError(Endpoints.GET_QUOTA, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
@@ -93,7 +94,7 @@ export async function getRemainingQueryCount(
   account: string,
   hashedPhoneNumber?: string
 ): Promise<{ performedQueryCount: number; totalQuota: number }> {
-  logger.debug('Retrieving remaining query count')
+  logger.debug({ account }, 'Retrieving remaining query count')
   const [totalQuota, performedQueryCount] = await Promise.all([
     getQueryQuota(logger, account, hashedPhoneNumber),
     getPerformedQueryCount(account, logger),

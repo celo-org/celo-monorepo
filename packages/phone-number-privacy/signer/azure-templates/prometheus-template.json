@@ -37,8 +37,7 @@
       "osType": {
           "type": "string",
           "allowedValues": [
-              "Linux",
-              "Windows"
+              "Linux"
           ]
       },
       "numberCpuCores": {

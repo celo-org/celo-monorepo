@@ -20,16 +20,6 @@ export function respondWithError(
   blockNumber: number = -1,
   signature?: string
 ) {
-  const logger: Logger = res.locals.logger
-  if (err in WarningMessage) {
-    logger.info('Responding with warning')
-    logger.warn({ err, statusCode })
-  } else {
-    logger.info('Responding with error')
-    logger.error({ err, statusCode })
-  }
-  Counters.responses.labels(endpoint, statusCode.toString()).inc()
-
   const response: SignMessageResponseFailure = {
     success: false,
     version: getVersion(),
@@ -39,6 +29,15 @@ export function respondWithError(
     blockNumber,
     signature,
   }
-  logger.debug({ response })
+
+  const logger: Logger = res.locals.logger
+
+  if (err in WarningMessage) {
+    logger.warn({ err, statusCode, response }, 'Responding with warning')
+  } else {
+    logger.error({ err, statusCode, response }, 'Responding with error')
+  }
+
+  Counters.responses.labels(endpoint, statusCode.toString()).inc()
   res.status(statusCode).json(response)
 }

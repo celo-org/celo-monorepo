@@ -106,7 +106,7 @@ To see errors, execute a query like the following, which you can save for convin
 
 ### Metrics
 
-We use prometheus metrics to generate alerting and dashboards. For the most up to date on-call information please see the Runbook (TODO: add link).
+We use prometheus metrics to generate alerting and dashboards. For the most up to date on-call information please see the Runbook (https://docs.google.com/document/u/1/d/1fSN2_J-OHMr1TqAbj1_i5p7sFgBpZ9xsDIe9WeG4FV8/edit).
 
 ### Deploy the prometheus server and sidecar
 

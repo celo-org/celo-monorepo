@@ -41,15 +41,12 @@ export async function handleGetBlindedMessagePartialSig(
   Counters.requests.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG).inc()
 
   const logger: Logger = response.locals.logger
-  logger.debug({ req: request.body }, 'Request received')
+  logger.info({ req: JSON.stringify(request.body) }, 'Request received')
   if (!request.body.sessionID) {
-    logger.warn({ req: request.body }, 'Request does not have sessionID')
-  }
-  logger.info('Begin handleGetBlindedMessagePartialSig')
-
-  if (!request.body.sessionID) {
+    logger.debug({ req: JSON.stringify(request.body) }, 'Request does not have sessionID')
     Counters.signatureRequestsWithoutSessionID.inc()
   }
+  logger.debug('Begin handleGetBlindedMessagePartialSig')
 
   try {
     if (!isValidGetSignatureInput(request.body)) {
@@ -175,7 +172,8 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       signMessageResponse = signMessageResponseSuccess
     }
-    logger.debug('Signature retrieval success')
+    Counters.responses.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
+    logger.info({ response: signMessageResponse }, 'Signature retrieval success')
     response.json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
