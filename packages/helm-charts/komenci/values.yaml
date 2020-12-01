@@ -52,6 +52,7 @@ relayer:
     prometheusPort: 9090
   walletType: azure-hsm
   gasPriceUpdateIntervalMs: "1200000"
+  odisTimeoutMs: 10000
 
 onboarding:
   node_env: production
@@ -74,7 +75,7 @@ onboarding:
   relayer:
     host: alfajores-relayer
     port: 3000
-    rpcTimeoutMs: 7000
+    rpcTimeoutMs: 10000
   db:
     host: komenci-komenci-postgresql
     port: 5432
