@@ -28,8 +28,6 @@ export default RestoreAccountOnboarding = () => {
 
   it('Name and Picture', async () => {
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
-    // Unfortunate that this is needed :( Test is flaky otherwise
-    await sleep(2000)
     await element(by.id('NameAndPictureContinueButton')).tap()
   })
 

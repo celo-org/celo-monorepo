@@ -1,10 +1,12 @@
+import colors from '@celo/react-components/styles/colors'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Image, Platform, StyleSheet, Text } from 'react-native'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import ImagePicker from 'react-native-image-crop-picker'
 import OptionsChooser from 'src/components/OptionsChooser'
 import { Namespaces } from 'src/i18n'
+import Photo from 'src/icons/Photo'
 import Logger from 'src/utils/Logger'
 
 interface Props {
@@ -67,6 +69,9 @@ function PictureInput({ picture, onPhotoChosen, backgroundColor }: Props) {
         ) : (
           <Text style={styles.addPhoto}>{t('addPhoto')}</Text>
         )}
+        <View style={styles.photoIconContainer}>
+          <Photo />
+        </View>
       </TouchableOpacity>
       <OptionsChooser
         isVisible={showOptions}
@@ -90,6 +95,17 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoIconContainer: {
+    width: 32,
+    height: 32,
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    borderRadius: 16,
+    backgroundColor: colors.greenUI,
     justifyContent: 'center',
     alignItems: 'center',
   },
