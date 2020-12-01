@@ -38,12 +38,14 @@ function NameAndPicture({}: Props) {
   const onPressContinue = () => {
     dispatch(hideAlert())
 
-    if (cachedName === nameInput) {
+    const newName = nameInput.trim()
+
+    if (cachedName === newName) {
       goToNextScreen()
       return
     }
 
-    if (!nameInput) {
+    if (!newName) {
       dispatch(showError(ErrorMessages.MISSING_FULL_NAME))
       return
     }
@@ -52,7 +54,7 @@ function NameAndPicture({}: Props) {
     ValoraAnalytics.track(OnboardingEvents.name_and_picture_set, {
       includesPhoto: false,
     })
-    dispatch(setName(nameInput))
+    dispatch(setName(newName))
     goToNextScreen()
   }
 
@@ -83,7 +85,7 @@ function NameAndPicture({}: Props) {
           text={t('global:next')}
           size={BtnSizes.MEDIUM}
           type={BtnTypes.ONBOARDING}
-          disabled={!nameInput}
+          disabled={!nameInput.trim()}
           testID={'NameAndPictureContinueButton'}
         />
       </ScrollView>
