@@ -1,4 +1,4 @@
-# Module: "wrappers/ReleaseGold"
+# External module: "wrappers/ReleaseGold"
 
 ## Index
 

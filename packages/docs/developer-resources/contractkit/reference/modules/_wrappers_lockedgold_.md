@@ -1,4 +1,4 @@
-# Module: "wrappers/LockedGold"
+# External module: "wrappers/LockedGold"
 
 ## Index
 

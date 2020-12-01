@@ -1,4 +1,4 @@
-# Module: "wrappers/Election"
+# External module: "wrappers/Election"
 
 ## Index
 

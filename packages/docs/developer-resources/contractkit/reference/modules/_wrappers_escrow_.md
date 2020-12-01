@@ -1,4 +1,4 @@
-# Module: "wrappers/Escrow"
+# External module: "wrappers/Escrow"
 
 ## Index
 

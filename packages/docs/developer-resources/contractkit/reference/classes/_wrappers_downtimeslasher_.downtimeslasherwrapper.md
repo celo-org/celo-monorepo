@@ -4,7 +4,7 @@ Contract handling slashing for Validator downtime using intervals.
 
 ## Hierarchy
 
-  ↳ [BaseSlasher](_wrappers_baseslasher_.baseslasher.md)‹DowntimeSlasher›
+  ↳ [BaseSlasher](_wrappers_baseslasher_.baseslasher.md)‹[DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher)›
 
   ↳ **DowntimeSlasherWrapper**
 
@@ -45,18 +45,18 @@ Contract handling slashing for Validator downtime using intervals.
 
 ###  constructor
 
-\+ **new DowntimeSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: DowntimeSlasher): *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
+\+ **new DowntimeSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher)): *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L26)*
+*Defined in [wrappers/BaseWrapper.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | DowntimeSlasher |
+`contract` | [DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher) |
 
 **Returns:** *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
 
@@ -64,14 +64,16 @@ Name | Type |
 
 ###  eventTypes
 
-• **eventTypes**: *EventsEnum‹T›* = Object.keys(this.events).reduce<EventsEnum<T>>(
+• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L42)*
+*Defined in [wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+
+#### Type declaration:
 
 ___
 
@@ -81,7 +83,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+*Defined in [wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -93,7 +95,7 @@ ___
     solidityBytesToString
   )
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L73)*
+*Defined in [wrappers/DowntimeSlasher.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L73)*
 
 Calculates and returns the signature bitmap for the specified interval.
 Similar to the parentSealBitmap of every block (where you have which validators were
@@ -125,7 +127,7 @@ ___
 
 • **isBitmapSetForInterval**: *function* = proxyCall(this.contract.methods.isBitmapSetForInterval, unpackInterval)
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L122)*
+*Defined in [wrappers/DowntimeSlasher.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L122)*
 
 Shows if the user already called the `setBitmapForInterval` for
 the specific interval.
@@ -151,7 +153,7 @@ ___
 
 • **lastSlashedBlock**: *function* = proxyCall(this.contract.methods.lastSlashedBlock, undefined, valueToInt)
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L136)*
+*Defined in [wrappers/DowntimeSlasher.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L136)*
 
 #### Type declaration:
 
@@ -167,12 +169,14 @@ ___
 
 ###  methodIds
 
-• **methodIds**: *Record‹keyof T["methods"], string›* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
     (acc, method: Methods<T>) => {
       const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
 
       acc[method] =
-        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+        methodABI === undefined
+          ? '0x'
+          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
 
       return acc
     },
@@ -181,7 +185,9 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L47)*
+*Defined in [wrappers/BaseWrapper.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+
+#### Type declaration:
 
 ___
 
@@ -193,7 +199,7 @@ ___
     unpackInterval
   )
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L85)*
+*Defined in [wrappers/DowntimeSlasher.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L85)*
 
 Calculates and sets the signature bitmap for the specified interval.
 
@@ -205,7 +211,7 @@ Calculates and sets the signature bitmap for the specified interval.
 
 #### Type declaration:
 
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
@@ -219,7 +225,7 @@ ___
 
 • **slashableDowntime**: *function* = proxyCall(this.contract.methods.slashableDowntime, undefined, valueToInt)
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L37)*
+*Defined in [wrappers/DowntimeSlasher.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L37)*
 
 Returns slashable downtime in blocks.
 
@@ -251,7 +257,7 @@ ___
 
 *Inherited from [BaseSlasher](_wrappers_baseslasher_.baseslasher.md).[slashingIncentives](_wrappers_baseslasher_.baseslasher.md#slashingincentives)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseSlasher.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseSlasher.ts#L70)*
+*Defined in [wrappers/BaseSlasher.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseSlasher.ts#L69)*
 
 Returns slashing incentives.
 
@@ -275,7 +281,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [wrappers/BaseWrapper.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
 
 Contract address
 
@@ -287,7 +293,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[DowntimeSlasherConfig](../interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L42)*
+*Defined in [wrappers/DowntimeSlasher.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L42)*
 
 Returns current configuration parameters.
 
@@ -299,7 +305,7 @@ ___
 
 ▸ **getHumanReadableConfig**(): *Promise‹object›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L54)*
+*Defined in [wrappers/DowntimeSlasher.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L54)*
 
 **`dev`** Returns human readable configuration of the downtime slasher contract
 
@@ -311,11 +317,11 @@ ___
 
 ###  getPastEvents
 
-▸ **getPastEvents**(`event`: Events‹DowntimeSlasher›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+▸ **getPastEvents**(`event`: Events‹[DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher)›, `options`: PastEventOptions): *Promise‹EventLog[]›*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L36)*
+*Defined in [wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
@@ -323,7 +329,7 @@ Contract getPastEvents
 
 Name | Type |
 ------ | ------ |
-`event` | Events‹DowntimeSlasher› |
+`event` | Events‹[DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher)› |
 `options` | PastEventOptions |
 
 **Returns:** *Promise‹EventLog[]›*
@@ -334,7 +340,7 @@ ___
 
 ▸ **isBitmapSetForIntervals**(`intervals`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[]): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L129)*
+*Defined in [wrappers/DowntimeSlasher.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L129)*
 
 Shows if the user already called the `setBitmapForInterval` for intervals.
 
@@ -352,9 +358,9 @@ ___
 
 ###  slashValidator
 
-▸ **slashValidator**(`address`: [Address](../modules/_base_.md#address), `intervals`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[]): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **slashValidator**(`address`: Address, `intervals`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[]): *Promise‹any›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:170](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L170)*
+*Defined in [wrappers/DowntimeSlasher.ts:170](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L170)*
 
 Returns true if the validator did not sign any blocks for the specified overlapping or adjacent
 intervals.
@@ -363,10 +369,10 @@ intervals.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`address` | [Address](../modules/_base_.md#address) | Address of the validator account or signer. |
+`address` | Address | Address of the validator account or signer. |
 `intervals` | [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[] | A list of ordered intervals for which signature bitmaps have already been set.  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+**Returns:** *Promise‹any›*
 
 ___
 
@@ -374,7 +380,7 @@ ___
 
 ▸ **slashableDowntimeIntervalsBefore**(`block?`: undefined | number, `maximumLength`: number): *Promise‹[Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[]›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L98)*
+*Defined in [wrappers/DowntimeSlasher.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L98)*
 
 Calculates intervals which span `slashableDowntime` before provided block.
 
@@ -395,9 +401,9 @@ ___
 
 ###  wasValidatorDownForInterval
 
-▸ **wasValidatorDownForInterval**(`address`: [Address](../modules/_base_.md#address), `interval`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)): *Promise‹boolean›*
+▸ **wasValidatorDownForInterval**(`address`: Address, `interval`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)): *Promise‹any›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:143](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L143)*
+*Defined in [wrappers/DowntimeSlasher.ts:143](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L143)*
 
 Tests if the given validator or signer did not sign any blocks in the interval.
 
@@ -405,18 +411,18 @@ Tests if the given validator or signer did not sign any blocks in the interval.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`address` | [Address](../modules/_base_.md#address) | Address of the validator account or signer. |
+`address` | Address | Address of the validator account or signer. |
 `interval` | [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md) | First and last block of the interval.  |
 
-**Returns:** *Promise‹boolean›*
+**Returns:** *Promise‹any›*
 
 ___
 
 ###  wasValidatorDownForIntervals
 
-▸ **wasValidatorDownForIntervals**(`address`: [Address](../modules/_base_.md#address), `intervals`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[]): *Promise‹boolean›*
+▸ **wasValidatorDownForIntervals**(`address`: Address, `intervals`: [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[]): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L157)*
+*Defined in [wrappers/DowntimeSlasher.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DowntimeSlasher.ts#L157)*
 
 Returns true if the validator did not sign any blocks for the specified overlapping or adjacent
 intervals.
@@ -425,7 +431,7 @@ intervals.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`address` | [Address](../modules/_base_.md#address) | Address of the validator account or signer. |
+`address` | Address | Address of the validator account or signer. |
 `intervals` | [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)[] | - |
 
 **Returns:** *Promise‹boolean›*

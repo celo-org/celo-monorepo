@@ -1,4 +1,4 @@
-# Module: "wrappers/Accounts"
+# External module: "wrappers/Accounts"
 
 ## Index
 

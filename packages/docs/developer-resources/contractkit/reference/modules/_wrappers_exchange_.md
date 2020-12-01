@@ -1,4 +1,4 @@
-# Module: "wrappers/Exchange"
+# External module: "wrappers/Exchange"
 
 ## Index
 

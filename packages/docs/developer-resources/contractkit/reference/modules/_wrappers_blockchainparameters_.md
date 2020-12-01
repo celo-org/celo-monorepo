@@ -1,4 +1,4 @@
-# Module: "wrappers/BlockchainParameters"
+# External module: "wrappers/BlockchainParameters"
 
 ## Index
 
