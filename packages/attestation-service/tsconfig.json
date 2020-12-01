@@ -1,10 +1,10 @@
 {
-  "extends": "../typescript/tsconfig.library.json",
+  "extends": "@celo/typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
     "resolveJsonModule": true
   },
   "include": ["src", "types/", "index.d.ts"],
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../sdk/utils" }]
 }
