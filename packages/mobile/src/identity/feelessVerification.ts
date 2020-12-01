@@ -617,7 +617,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
   )
 
   if (!possibleMtwAddresses.length) {
-    Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'No possible MTWs found')
     return null
   }
 
