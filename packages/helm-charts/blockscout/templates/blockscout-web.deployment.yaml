@@ -6,7 +6,12 @@ metadata:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-web
 spec:
-  replicas: {{ .Values.blockscout.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 20%
+  replicas: 1
   selector:
     matchLabels:
       app: blockscout
