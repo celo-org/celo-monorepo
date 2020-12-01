@@ -6,7 +6,7 @@ import { BaseCommand } from '../../base'
 
 export default class GetAttestations extends BaseCommand {
   static description =
-    'Recovers the Valora old account and print out the key information. The old Valora app (in a beta state) generated the user address using a seed of 32 bytes, instead of 64 bytes. As the app fixed that, some old accounts were left with some funds. This command allows the user to recover those funds.'
+    "Looks up attestations associated with the provided phone number. If a pepper is not provided, it uses the --from account's balance to query the pepper."
 
   static flags = {
     ...BaseCommand.flags,
@@ -21,6 +21,10 @@ export default class GetAttestations extends BaseCommand {
     pepper: flags.string({
       required: false,
       description: 'ODIS phone number pepper',
+    }),
+    network: flags.string({
+      required: false,
+      description: 'The ODIS service to hit: mainnet, alfajores, alfajoresstaging',
     }),
   }
 
@@ -38,13 +42,14 @@ export default class GetAttestations extends BaseCommand {
       console.error('Must specify either --from or --pepper')
       return
     }
+    const network = res.flags.network
 
     const web3 = new Web3()
 
     // Get Phone number pepper
     // Needs a balance to perform query
     if (!pepper) {
-      pepper = await this.getPhoneNumberPepper(this.kit, phoneNumber, account!)
+      pepper = await this.getPhoneNumberPepper(this.kit, phoneNumber, account!, network)
       console.log('Pepper: ' + pepper)
     }
 
@@ -59,8 +64,10 @@ export default class GetAttestations extends BaseCommand {
   async getPhoneNumberPepper(
     kit: ContractKit,
     phoneNumber: string,
-    account: string
+    account: string,
+    network: string = 'mainnet'
   ): Promise<string> {
+    console.log('Using network: ' + network)
     const authSigner: AuthSigner = {
       authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
       contractKit: kit,
@@ -70,7 +77,7 @@ export default class GetAttestations extends BaseCommand {
       phoneNumber,
       account,
       authSigner,
-      OdisUtils.Query.getServiceContext()
+      OdisUtils.Query.getServiceContext(network)
     )
 
     return ret.pepper
