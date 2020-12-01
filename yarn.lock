@@ -2143,11 +2143,6 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/base@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.3.tgz#355199fe45d1f9e667ee66836a34e93828b3b5a5"
-  integrity sha512-3GeGcUHCzMxCpkBHywEuoXZp1VV+yN6uEHPowxGgH2VP++qO01HMw8G5J4wlP7jN5HFt3WsZaHWfIhor/irGKg==
-
 "@celo/base@1.0.0-beta3":
   version "1.0.0-beta3"
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.0.0-beta3.tgz#29c2acd54f7158c8e9ca9c567629b65cb5d6808d"
@@ -2188,41 +2183,6 @@
     web3-eth-abi "1.2.4"
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
-
-"@celo/contractkit@0.4.17":
-  version "0.4.17"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.17.tgz#b07d3d8a6976ee5d0f8f3a99d39539e3092ad8d3"
-  integrity sha512-+ILrGZg9O5B42qfnGZwjgPSI4usl+yK7Mue+ImtcvsMZEo7+iPAMSfY0srSbAAissZJCZQglOdO5iTHgnMcd9Q==
-  dependencies:
-    "@azure/identity" "^1.1.0"
-    "@azure/keyvault-keys" "^4.1.0"
-    "@azure/keyvault-secrets" "^4.1.0"
-    "@celo/base" "0.0.3"
-    "@celo/utils" "0.1.21"
-    "@ledgerhq/hw-app-eth" "^5.11.0"
-    "@ledgerhq/hw-transport" "^5.11.0"
-    "@types/asn1js" "^0.0.2"
-    asn1js "^2.0.26"
-    aws-sdk "^2.705.0"
-    bignumber.js "^9.0.0"
-    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
-    cross-fetch "3.0.4"
-    debug "^4.1.1"
-    elliptic "6.5.3"
-    eth-lib "^0.2.8"
-    ethereumjs-util "^5.2.0"
-    fp-ts "2.1.1"
-    inquirer "^7.0.5"
-    io-ts "2.0.1"
-    qrcode "^1.4.4"
-    secp256k1 "^4.0.0"
-    web3 "1.2.4"
-    web3-core "1.2.4"
-    web3-core-helpers "1.2.4"
-    web3-eth "1.2.4"
-    web3-eth-abi "1.2.4"
-    web3-eth-contract "1.2.4"
-    web3-utils "1.2.11"
 
 "@celo/contractkit@1.0.0-beta3":
   version "1.0.0-beta3"
@@ -2290,13 +2250,14 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/phone-number-privacy-common@1.0.20":
-  version "1.0.20"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.20.tgz#b12d774d00e7e3b2a5808dc05a7733b6d07b897d"
-  integrity sha512-1aRegFzRBYQlaEzCXbTbX7Ww+898ASCjiF1eljOw427lBXxcbw8SVxPeWjA5MTwcdld9zDBqPwg1rsRD6aMwFg==
+"@celo/phone-number-privacy-common@1.0.22":
+  version "1.0.22"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.22.tgz#acc8449df41459f11c92a78b9a14e573dfb49f26"
+  integrity sha512-m2UwETBtg2hvFbOVSYV+WfyJ/dHSj/XZSI3NVbeE9u+9m0idaNgwuNERbk5j1TWPaJ8vlw3XtZnEsr6TMYJBoA==
   dependencies:
-    "@celo/contractkit" "0.4.17"
-    "@celo/utils" "0.1.21"
+    "@celo/contractkit" "1.0.0-beta3"
+    "@celo/identity" "1.0.0-beta3"
+    "@celo/utils" "1.0.0-beta3"
     "@types/btoa" "^1.2.3"
     bignumber.js "^9.0.0"
     blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
@@ -2306,8 +2267,7 @@
     bunyan-gke-stackdriver "0.1.2"
     dotenv "^8.2.0"
     elliptic "6.5.3"
-    express "^4.17.1"
-    web3 "1.2.4"
+    web3 "1.3.0"
 
 "@celo/react-native-fast-crypto@^1.8.4":
   version "1.8.4"
@@ -2330,33 +2290,6 @@
     lodash "~4.17.19"
     minimist "~0.2.1"
     typechain "2.0.0"
-
-"@celo/utils@0.1.21":
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.21.tgz#820a3de80e2a6affaed2033e15ffead3bb3e0156"
-  integrity sha512-SByYSNvIg9X0m1xKFy5DYgE9CJ5lwgUHJEamwUHAe9mJdKrJftD2noTCc18xmkqF3X3Nyd7vArWJFaTT035T8A==
-  dependencies:
-    "@celo/base" "0.0.3"
-    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
-    bigi "^1.1.0"
-    bignumber.js "^9.0.0"
-    bip32 "2.0.5"
-    bip39 "3.0.2"
-    bls12377js "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6"
-    bn.js "4.11.8"
-    buffer-reverse "^1.0.1"
-    country-data "^0.0.31"
-    crypto-js "^3.1.9-1"
-    elliptic "^6.5.3"
-    ethereumjs-util "^5.2.0"
-    fp-ts "2.1.1"
-    google-libphonenumber "^3.2.4"
-    io-ts "2.0.1"
-    keccak256 "^1.0.0"
-    lodash "^4.17.14"
-    numeral "^2.0.6"
-    web3-eth-abi "1.2.4"
-    web3-utils "1.2.4"
 
 "@celo/utils@0.1.8":
   version "0.1.8"
@@ -36151,20 +36084,6 @@ web3-utils@1.2.1:
     ethjs-unit "0.1.6"
     number-to-bn "1.7.0"
     randomhex "0.1.5"
-    underscore "1.9.1"
-    utf8 "3.0.0"
-
-web3-utils@1.2.11:
-  version "1.2.11"
-  resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.2.11.tgz#af1942aead3fb166ae851a985bed8ef2c2d95a82"
-  integrity sha512-3Tq09izhD+ThqHEaWYX4VOT7dNPdZiO+c/1QMA0s5X2lDFKK/xHJb7cyTRRVzN2LvlHbR7baS1tmQhSua51TcQ==
-  dependencies:
-    bn.js "^4.11.9"
-    eth-lib "0.2.8"
-    ethereum-bloom-filters "^1.0.6"
-    ethjs-unit "0.1.6"
-    number-to-bn "1.7.0"
-    randombytes "^2.1.0"
     underscore "1.9.1"
     utf8 "3.0.0"
 
