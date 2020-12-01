@@ -53,6 +53,7 @@ function NameAndPicture({}: Props) {
       includesPhoto: false,
     })
     dispatch(setName(nameInput))
+    goToNextScreen()
   }
 
   const onPhotoChosen = (photoData: string) => {
