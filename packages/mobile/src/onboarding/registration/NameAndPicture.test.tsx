@@ -40,6 +40,9 @@ describe('NameAndPictureScreen', () => {
     )
 
     expect(getByTestId('NameAndPictureContinueButton').props.disabled).toBe(true)
+    // Just spaces counts as empty
+    fireEvent.changeText(getByTestId('NameEntry'), '    ')
+    expect(getByTestId('NameAndPictureContinueButton').props.disabled).toBe(true)
     fireEvent.changeText(getByTestId('NameEntry'), 'Some Name')
     expect(getByTestId('NameAndPictureContinueButton').props.disabled).toBe(false)
   })
