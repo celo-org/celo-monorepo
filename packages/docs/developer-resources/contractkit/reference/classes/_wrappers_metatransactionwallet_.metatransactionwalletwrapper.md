@@ -28,7 +28,6 @@ Class that wraps the MetaTransactionWallet
 * [nonce](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#nonce)
 * [setEip712DomainSeparator](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#seteip712domainseparator)
 * [setSigner](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#setsigner)
-* [transferERC20ToSigner](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#transfererc20tosigner)
 * [transferOwnership](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#transferownership)
 
 ### Accessors
@@ -70,7 +69,7 @@ Name | Type |
 
 • **_chainId**? : *undefined | number*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:190](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L190)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:185](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L185)*
 
 Get and cache the chain ID -- assume it's static for a kit instance
 
@@ -82,7 +81,7 @@ ___
 
 • **_signer**? : *[Address](../modules/_base_.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L202)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L197)*
 
 Get an cache the signer - it should be static for a Wallet instance
 
@@ -110,7 +109,7 @@ ___
 
 ###  eventTypes
 
-• **eventTypes**: *EventsEnum‹T›* = Object.keys(this.events).reduce<EventsEnum<T>>(
+• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
@@ -118,6 +117,8 @@ ___
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L42)*
+
+#### Type declaration:
 
 ___
 
@@ -195,7 +196,7 @@ ___
 
 ###  methodIds
 
-• **methodIds**: *Record‹keyof T["methods"], string›* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
     (acc, method: Methods<T>) => {
       const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
 
@@ -210,6 +211,8 @@ ___
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L47)*
+
+#### Type declaration:
 
 ___
 
@@ -238,7 +241,7 @@ ___
     this.contract.methods.setEip712DomainSeparator
   )
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L181)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L176)*
 
 #### Type declaration:
 
@@ -253,7 +256,7 @@ ___
     this.contract.methods.setSigner
   )
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L176)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L171)*
 
 #### Type declaration:
 
@@ -267,27 +270,6 @@ Name | Type |
 
 ___
 
-###  transferERC20ToSigner
-
-• **transferERC20ToSigner**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.transferERC20ToSigner
-  )
-
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L166)*
-
-#### Type declaration:
-
-▸ (`token`: [Address](../modules/_base_.md#address)): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`token` | [Address](../modules/_base_.md#address) |
-
-___
-
 ###  transferOwnership
 
 • **transferOwnership**: *function* = proxySend(
@@ -295,7 +277,7 @@ ___
     this.contract.methods.transferOwnership
   )
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L171)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L166)*
 
 #### Type declaration:
 
@@ -446,6 +428,6 @@ ___
 
 ▸ **signer**(): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:203](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L203)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:198](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L198)*
 
 **Returns:** *Promise‹string›*
