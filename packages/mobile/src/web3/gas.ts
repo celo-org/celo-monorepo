@@ -11,7 +11,9 @@ const GAS_PRICE_STALE_AFTER = 150000 // 15 seconds
 let gasPrice: BigNumber | null = null
 let gasPriceLastUpdated: number | null = null
 
-export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR) {
+export async function getGasPrice(
+  currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
+): Promise<BigNumber> {
   Logger.debug(`${TAG}/getGasPrice`, 'Getting gas price')
 
   try {
@@ -30,7 +32,7 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
   }
 }
 
-async function fetchGasPrice(currency: CURRENCY_ENUM) {
+async function fetchGasPrice(currency: CURRENCY_ENUM): Promise<BigNumber> {
   const contractKit = await getContractKitAsync()
   const [gasPriceMinimum, address] = await Promise.all([
     contractKit.contracts.getGasPriceMinimum(),

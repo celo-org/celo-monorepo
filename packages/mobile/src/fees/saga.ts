@@ -16,11 +16,13 @@ import { getGasPrice } from 'src/web3/gas'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'fees/saga'
+
+// TODO(victor): Deprecate this caching mechanism once offline calculation is standard.
 // Cache of the gas estimates for common tx types
 // Prevents us from having to recreate txs and estimate their gas each time
 const feeGasCache = new Map<FeeType, BigNumber>()
-// Just use default values here since it doesn't matter for fee estimation
 
+// Just use default values here since it doesn't matter for fee estimation
 const placeHolderAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 const placeholderSendTx: BasicTokenTransfer = {
   recipientAddress: placeHolderAddress,
@@ -108,10 +110,6 @@ function* getOrSetFee(feeType: FeeType, gasGetter: CallEffect) {
 
 export async function calculateFee(gas: BigNumber) {
   const gasPrice = await getGasPrice()
-  if (!gasPrice) {
-    throw new Error('Invalid gas price')
-  }
-
   const feeInWei = gas.multipliedBy(gasPrice)
   Logger.debug(`${TAG}/calculateFee`, `Calculated fee is: ${feeInWei.toString()}`)
   return feeInWei
