@@ -1,9 +1,9 @@
-import { OdisUtils } from '@celo/contractkit'
+import { OdisUtils } from '@celo/identity/lib/odis'
 import {
   AuthenticationMethod,
   ErrorMessages,
   SignMessageRequest,
-} from '@celo/contractkit/lib/identity/odis/query'
+} from '@celo/identity/lib/odis/query'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
 import {

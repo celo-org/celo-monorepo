@@ -1,5 +1,5 @@
-import { OdisUtils } from '@celo/contractkit'
-import { ErrorMessages } from '@celo/contractkit/lib/identity/odis/query'
+import { OdisUtils } from '@celo/identity/lib/odis'
+import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import 'isomorphic-fetch'
 import {
   ACCOUNT_ADDRESS,
