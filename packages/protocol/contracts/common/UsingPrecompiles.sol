@@ -154,7 +154,7 @@ contract UsingPrecompiles {
     bool success;
     (success, out) = VALIDATOR_BLS.staticcall(abi.encodePacked(index, blockNumber));
     require(success, "error calling validatorBLSPublicKeyFromSet precompile");
-    require(out.length == 192, "bad BLS public key length");
+    require(out.length == 256, "bad BLS public key length");
     return out;
   }
 

@@ -222,6 +222,36 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return q;
   }
 
+  function validatorBLSPublicKeyFromSet(uint256 index, uint256 blockNumber, bytes memory buffer)
+    public
+    view
+  {
+    bool success;
+    assembly {
+      mstore(add(0x20, buffer), index)
+      mstore(add(0x40, buffer), blockNumber)
+      success := staticcall(
+        gas,
+        235, /* 0xff - 20 */
+        add(0x20, buffer),
+        64,
+        add(0x20, buffer),
+        256
+      )
+    }
+    require(success, "error calling validatorBLSPublicKeyFromSet precompile");
+  }
+
+  function getBLSPublicKeyInplace(
+    uint256 blockNumber,
+    uint256 i,
+    B12.G2Point memory p,
+    bytes memory buffer
+  ) internal view {
+    validatorBLSPublicKeyFromSet(i, blockNumber, buffer);
+    B12.readG2(buffer, 0, p);
+  }
+
   function getBLSPublicKey(uint256 blockNumber, uint256 i)
     internal
     view
@@ -300,12 +330,17 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
       B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0)),
       B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0))
     );
+    B12.G2Point memory public_key = B12.G2Point(
+      B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0)),
+      B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0))
+    );
+    bytes memory buffer = new bytes(256);
     uint256 blockNumber = getEpochLastBlock(epoch);
     uint256 num = 0;
     for (uint256 i = 0; i < 150; i++) {
       if (bitmap & 1 == 1) {
         num++;
-        B12.G2Point memory public_key = getBLSPublicKey(blockNumber, i); // TODO: this might use too much memory
+        getBLSPublicKeyInplace(blockNumber, i, public_key, buffer);
         if (!prev) {
           agg = public_key;
           prev = true;

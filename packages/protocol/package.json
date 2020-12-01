@@ -48,7 +48,7 @@
     "@0x/subproviders": "^5.0.0",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#e933297",
     "@celo/utils": "0.1.22-dev",
-    "@celo/bls-sol": "git+https://github.com/mrsmkl/b12-sol.git#d753b41c8a3568c7ad87810075395bca37c5bc48",
+    "@celo/bls-sol": "git+https://github.com/mrsmkl/b12-sol.git#054a1361d850b52bb5ab9754bf79e131fa52a987",
     "@openzeppelin/upgrades": "^2.8.0",
     "@summa-tx/memview.sol": "^1.1.0",
     "apollo-client": "^2.4.13",

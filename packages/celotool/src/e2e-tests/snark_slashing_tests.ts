@@ -282,9 +282,19 @@ describe('snark slashing tests', function(this: any) {
       const validators = await kit._web3Contracts.getValidators()
       const addr = await contract.methods.validatorSignerAddressFromSet(0, 10).call()
       const blsPublicKey = await contract.methods.validatorBLSPublicKeyFromSet(0, 10).call()
-      const blsKey = await validators.methods.getValidatorBlsPublicKeyFromSigner(addr).call()
-      // console.info('addr', addr, 'bls', blsPublicKey, 'compressed', blsKey)
-      assert.equal(blsPublicKey.substr(0, 2 + 96 * 2 - 1), blsKey.substr(0, 2 + 96 * 2 - 1))
+      const compressed = await validators.methods.getValidatorBlsPublicKeyFromSigner(addr).call()
+      const uncompressed = uncompressSig(Buffer.from(compressed.substr(2), 'hex'))
+      console.info(
+        'addr',
+        addr,
+        'bls',
+        blsPublicKey,
+        'compressed',
+        compressed,
+        'uncompressed',
+        uncompressed
+      )
+      assert.equal(blsPublicKey, uncompressed)
     })
   })
 
