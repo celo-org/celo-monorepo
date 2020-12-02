@@ -161,7 +161,6 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string, 
     while (!serviceAccountEmail) {
       serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     }
-    serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     await execCmdWithExitOnFailure(
       `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
     )
@@ -290,7 +289,7 @@ export async function removeGrafanaHelmRelease() {
   )
   if (grafanaExists) {
     console.info('Removing grafana')
-    await removeGenericHelmChart(releaseName, kubeNamespace)
+    await removeGenericHelmChart(grafanaReleaseName, kubeNamespace)
   }
 }
 
