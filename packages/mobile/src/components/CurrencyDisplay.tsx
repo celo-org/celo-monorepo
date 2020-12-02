@@ -196,11 +196,16 @@ export default function CurrencyDisplay({
     // and have to involve a View, which prevents this type to be embedded into a Text node
     // see https://medium.com/@aaronmgdr/a-better-superscript-in-react-native-591b83db6caa
     const fontSize = size
-    const signStyle = { fontSize: Math.round(fontSize * BIG_SIGN_RATIO), color }
-    const symbolStyle = getBigSymbolStyle(fontSize, color)
+    const colorStr = color?.toString()
+    const signStyle = { fontSize: Math.round(fontSize * BIG_SIGN_RATIO), color: colorStr }
+    const symbolStyle = getBigSymbolStyle(fontSize, colorStr)
     const lineHeight = Math.round(fontSize * BIG_LINE_HEIGHT_RATIO)
-    const amountStyle = { fontSize, lineHeight, color }
-    const codeStyle = { fontSize: Math.round(fontSize * BIG_CODE_RATIO), lineHeight, color }
+    const amountStyle = { fontSize, lineHeight, color: colorStr }
+    const codeStyle = {
+      fontSize: Math.round(fontSize * BIG_CODE_RATIO),
+      lineHeight,
+      color: colorStr,
+    }
 
     return (
       <View style={[styles.bigContainer, style]} testID={testID}>

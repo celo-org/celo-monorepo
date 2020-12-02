@@ -1,4 +1,3 @@
-import interpolateColors from '@celo/react-components/components/interpolateColors'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -24,22 +23,22 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
   }
 
   const inputRange = values.map((_, i) => i)
-  const translateX = Animated.interpolate(position, {
+  const translateX = Animated.interpolateNode(position, {
     inputRange,
     outputRange: inputRange.map((i) => i * segmentWidth),
   })
 
   // TODO: color should be dependant on the style for the value
   // here it's assuming value at index 0 is green and index 1 (or above) is white
-  const color = interpolateColors(position, {
-    inputRange: [0.5, 1],
-    outputColorRange: [colors.greenUI, colors.light],
-  })
+  // const color = Animated.interpolateColors(position, {
+  //   inputRange: [0.5, 1],
+  //   outputColorRange: [colors.greenUI, colors.light],
+  // })
 
-  const colorInverted = interpolateColors(position, {
-    inputRange: [0.5, 1],
-    outputColorRange: [colors.light, colors.dark],
-  })
+  // const colorInverted = interpolateColors(position, {
+  //   inputRange: [0.5, 1],
+  //   outputColorRange: [colors.light, colors.dark],
+  // })
 
   const onLayout = ({
     nativeEvent: {
@@ -53,7 +52,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
   }
 
   return (
-    <Animated.View style={[styles.container, { borderColor: color }]} onLayout={onLayout}>
+    <Animated.View style={[styles.container, { borderColor: colors.greenUI }]} onLayout={onLayout}>
       {selectedIndex != null && !!segmentWidth && (
         <Animated.View
           style={[
@@ -61,7 +60,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
             {
               transform: [{ translateX }],
               width: segmentWidth,
-              backgroundColor: color,
+              backgroundColor: colors.greenUI,
             },
           ]}
         />
@@ -82,7 +81,9 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
         }
       >
         {/* Shows behind the mask, i.e. inside the text */}
-        <Animated.View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: color }} />
+        <Animated.View
+          style={{ ...StyleSheet.absoluteFillObject, backgroundColor: colors.greenUI }}
+        />
         {selectedIndex != null && !!segmentWidth && (
           <Animated.View
             style={[
@@ -90,7 +91,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
               {
                 transform: [{ translateX }],
                 width: segmentWidth,
-                backgroundColor: colorInverted,
+                backgroundColor: colors.light,
               },
             ]}
           />
@@ -98,12 +99,13 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
       </MaskedView>
       {values.map((value, index) => {
         const isFocused = index === selectedIndex
+        const state = { selected: isFocused }
         const onPress = () => handleChange(index)
         return (
           <Touchable
             key={value}
             accessibilityRole="button"
-            accessibilityStates={isFocused ? ['selected'] : []}
+            accessibilityState={state}
             accessibilityLabel={value}
             onPress={onPress}
             style={styles.value}

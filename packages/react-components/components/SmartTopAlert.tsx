@@ -141,11 +141,9 @@ function SmartTopAlert(props: Props) {
     <View style={styles.overflowContainer} testID={testID}>
       <TouchableWithoutFeedback onPress={onPress} testID="SmartTopAlertTouchable">
         <Animated.View
-          // @ts-ignore
           ref={animatedRef}
           style={[
             styles.container,
-            buttonMessage && styles.containerWithButton,
             isError && styles.containerError,
             {
               // TODO(jeanregisser): Handle case where SmartTopAlert are stacked and only the first one would need the inset
