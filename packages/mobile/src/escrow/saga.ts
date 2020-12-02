@@ -10,7 +10,7 @@ import { FetchError, TxError } from '@celo/komencikit/src/errors'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError, showErrorOrFallback } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { EscrowEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -379,11 +379,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_error, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
   }
 }
 
@@ -442,11 +438,7 @@ function* withdrawFromEscrow() {
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_error, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
   }
 }
 
@@ -498,11 +490,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     ValoraAnalytics.track(EscrowEvents.escrow_reclaim_error, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
     yield put(reclaimEscrowPaymentFailure(e))
     yield put(fetchSentEscrowPayments())
   }

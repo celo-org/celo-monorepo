@@ -1,7 +1,7 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -213,7 +213,7 @@ function* sendPaymentOrInviteSaga({
     navigateHome()
     yield put(sendPaymentOrInviteSuccess(amount))
   } catch (e) {
-    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
+    yield put(showErrorOrFallback(e, ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }
 }
