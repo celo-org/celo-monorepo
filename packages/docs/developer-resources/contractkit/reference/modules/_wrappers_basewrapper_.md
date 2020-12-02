@@ -1,4 +1,4 @@
-# External module: "wrappers/BaseWrapper"
+# Module: "wrappers/BaseWrapper"
 
 ## Index
 
@@ -64,7 +64,7 @@ ___
 
 ### `Const` bufferToSolidityBytes
 
-▸ **bufferToSolidityBytes**(`input`: Buffer): *string | number[]*
+▸ **bufferToSolidityBytes**(`input`: Buffer): *SolidityBytes*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L134)*
 
@@ -74,7 +74,7 @@ Name | Type |
 ------ | ------ |
 `input` | Buffer |
 
-**Returns:** *string | number[]*
+**Returns:** *SolidityBytes*
 
 ___
 
@@ -372,7 +372,7 @@ ___
 
 ### `Const` stringToSolidityBytes
 
-▸ **stringToSolidityBytes**(`input`: string): *string | number[]*
+▸ **stringToSolidityBytes**(`input`: string): *SolidityBytes*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L133)*
 
@@ -382,7 +382,7 @@ Name | Type |
 ------ | ------ |
 `input` | string |
 
-**Returns:** *string | number[]*
+**Returns:** *SolidityBytes*
 
 ___
 

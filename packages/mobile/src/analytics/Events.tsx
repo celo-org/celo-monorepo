@@ -8,6 +8,7 @@ export enum AppEvents {
   error_boundary = 'error_boundary',
   user_restart = 'user_restart',
   fetch_balance = 'fetch_balance',
+  fetch_balance_error = 'fetch_balance_error',
 }
 
 export enum HomeEvents {
@@ -94,9 +95,9 @@ export enum OnboardingEvents {
   invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
   invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
-  invite_redeem_skip_start = 'invite_redeem_skip_start',
-  invite_redeem_skip_complete = 'invite_redeem_skip_complete',
-  invite_redeem_skip_error = 'invite_redeem_skip_error',
+  initialize_account_start = 'initialize_account_start',
+  initialize_account_complete = 'initialize_account_complete',
+  initialize_account_error = 'initialize_account_error',
 
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
@@ -297,6 +298,7 @@ export enum CeloExchangeEvents {
 
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
+  spend_merchant_link = 'spend_merchant_link',
 }
 
 export enum GethEvents {

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source ./scripts/bash/utils.sh
+
 # Simulates a release of the current contracts against a target git ref on a local network
 #
 # Flags:
@@ -10,44 +12,46 @@ set -euo pipefail
 BRANCH=""
 NETWORK=""
 FORNO=""
+BUILD_DIR=""
+RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
-while getopts 'b:rl:' flag; do
+while getopts ':b:rl:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    d) BUILD_DIR="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-echo "- Checkout source code at $BRANCH"
-BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags 2>$LOG_FILE >> $LOG_FILE
-git checkout $BRANCH 2>$LOG_FILE >> $LOG_FILE
-echo "- Build contract artifacts"
-rm -rf build/contracts
-yarn build >> $LOG_FILE
-
-# TODO: Move to yarn build:sol after the next contract release.
-echo "- Create local network"
-yarn devchain generate-tar devchain.tar.gz >> $LOG_FILE
-rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-mv build/contracts $BUILD_DIR
+# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
+if [ -z "$BUILD_DIR" ]
+then
+    RE_BUILD_REPO="yes"
+    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+    # yarn test:generate-old-devchain-and-build -b $BRANCH -d $BUILD_DIR -l $LOG_FILE
+fi
 
 echo "- Run local network"
-# yarn devchain generate-tar devchain.tar.gz
-yarn devchain run-tar devchain.tar.gz >> $LOG_FILE &
-GANACHE_PID=$!
-echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
-echo "Waiting for ganache to start"
-# sleep 20
+if [ -n "$RE_BUILD_REPO" ]
+then
+    # Move back to branch from which we started
+    git checkout -
+    yarn install >> $LOG_FILE
+    yarn build >> $LOG_FILE
+fi
 
-# Move back to branch from which we started
-git checkout -
-yarn build >> $LOG_FILE
+GANACHE_PID=
+if command -v lsof; then
+    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+fi
+
 echo "- Verify bytecode of the network"
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts
 
@@ -64,4 +68,6 @@ yarn truffle exec --network development ./scripts/truffle/make-release.js --buil
 echo "- Verify release"
 yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
 
-kill $GANACHE_PID
+if [[ -n $GANACHE_PID ]]; then
+    kill $GANACHE_PID
+fi

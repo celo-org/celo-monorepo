@@ -59,7 +59,7 @@ export const reducer = (
     case Actions.SET_MTW_ADDRESS:
       return {
         ...state,
-        mtwAddress: action.address.toLowerCase(),
+        mtwAddress: action.address,
       }
     case Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE:
       return {

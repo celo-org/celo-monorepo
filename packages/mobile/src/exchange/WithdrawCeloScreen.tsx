@@ -8,6 +8,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/lib/parsing'
+import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
@@ -39,9 +40,9 @@ type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 const { decimalSeparator } = getNumberFormatSettings()
 const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 
-function WithdrawCeloScreen({ navigation }: Props) {
-  const [accountAddress, setAccountAddress] = useState('')
-  const [celoInput, setCeloToTransfer] = useState('')
+function WithdrawCeloScreen({ route }: Props) {
+  const [accountAddress, setAccountAddress] = useState(route.params?.recipientAddress ?? '')
+  const [celoInput, setCeloToTransfer] = useState(route.params?.amount?.toString() ?? '')
   const celoToTransfer = parseInputAmount(celoInput, decimalSeparator)
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
@@ -83,6 +84,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
       amount: celoToTransfer,
       recipientAddress: accountAddress,
       feeEstimate: feeEstimate || new BigNumber(0),
+      isCashOut: route.params?.isCashOut,
     })
   }
 
@@ -125,12 +127,18 @@ function WithdrawCeloScreen({ navigation }: Props) {
   )
 }
 
-WithdrawCeloScreen.navigationOptions = () => {
+WithdrawCeloScreen.navigationOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.WithdrawCeloScreen>
+}) => {
   return {
     ...headerWithBackButton,
     headerTitle: () => (
       <HeaderTitleWithBalance
-        title={i18n.t('exchangeFlow9:withdrawCelo')}
+        title={i18n.t(
+          route.params?.isCashOut ? 'fiatExchangeFlow:cashOut' : 'exchangeFlow9:withdrawCelo'
+        )}
         token={CURRENCY_ENUM.GOLD}
       />
     ),

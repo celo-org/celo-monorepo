@@ -20,7 +20,7 @@ export interface SetAccountAction {
 
 export interface SetMtwAddressAction {
   type: Actions.SET_MTW_ADDRESS
-  address: string
+  address: string | null
 }
 
 export interface SetAccountInWeb3KeystoreAction {
@@ -79,10 +79,10 @@ export const setAccount = (address: string): SetAccountAction => {
   }
 }
 
-export const setMtwAddress = (address: string): SetMtwAddressAction => {
+export const setMtwAddress = (address: string | null): SetMtwAddressAction => {
   return {
     type: Actions.SET_MTW_ADDRESS,
-    address: address.toLowerCase(),
+    address: address?.toLowerCase() ?? address,
   }
 }
 

@@ -54,6 +54,7 @@ export interface WithdrawCeloAction {
   type: Actions.WITHDRAW_CELO
   amount: BigNumber
   recipientAddress: string
+  isCashOut: boolean
 }
 
 export interface WithdrawCeloFailureAction {
@@ -109,10 +110,15 @@ export const exchangeTokens = (
   makerAmount,
 })
 
-export const withdrawCelo = (amount: BigNumber, recipientAddress: string): WithdrawCeloAction => ({
+export const withdrawCelo = (
+  amount: BigNumber,
+  recipientAddress: string,
+  isCashOut: boolean
+): WithdrawCeloAction => ({
   type: Actions.WITHDRAW_CELO,
   amount,
   recipientAddress,
+  isCashOut,
 })
 
 export const withdrawCeloFailed = (

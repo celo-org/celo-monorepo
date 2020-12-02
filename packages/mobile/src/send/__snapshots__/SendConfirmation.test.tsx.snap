@@ -4730,7 +4730,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                           }
                         }
                       >
-                        inviteDialog.title
+                        inviteAndSendDialog.title
                       </Text>
                       <Text
                         style={
@@ -4744,7 +4744,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                           }
                         }
                       >
-                        inviteDialog.body
+                        inviteAndSendDialog.body
                       </Text>
                     </View>
                   </RCTScrollView>
@@ -4774,7 +4774,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
-                      testID="InviteFriendModal/SecondaryAction"
+                      testID="InviteAndSendModal/SecondaryAction"
                     >
                       <Text
                         style={
@@ -4811,7 +4811,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
-                      testID="InviteFriendModal/PrimaryAction"
+                      testID="InviteAndSendModal/PrimaryAction"
                     >
                       <Text
                         style={
@@ -4828,7 +4828,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                           ]
                         }
                       >
-                        inviteDialog.button
+                        inviteAndSendDialog.button
                       </Text>
                     </View>
                   </View>
@@ -5412,7 +5412,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
             testID="ConfirmButton"
           >
             <Text
-              accessibilityLabel="global:send"
+              accessibilityLabel="inviteFlow11:sendAndInvite"
               style={
                 Object {
                   "color": "#FFFFFF",
@@ -5422,7 +5422,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                 }
               }
             >
-              global:send
+              inviteFlow11:sendAndInvite
             </Text>
           </View>
         </View>

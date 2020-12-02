@@ -4,7 +4,7 @@ Contract handling slashing for Validator double-signing
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹DoubleSigningSlasher›
+  ↳ [BaseSlasher](_wrappers_baseslasher_.baseslasher.md)‹DoubleSigningSlasher›
 
   ↳ **DoubleSigningSlasherWrapper**
 
@@ -55,7 +55,7 @@ Name | Type |
 
 ###  eventTypes
 
-• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
+• **eventTypes**: *EventsEnum‹T›* = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
@@ -63,8 +63,6 @@ Name | Type |
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L42)*
-
-#### Type declaration:
 
 ___
 
@@ -80,7 +78,7 @@ ___
 
 ###  methodIds
 
-• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+• **methodIds**: *Record‹keyof T["methods"], string›* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
     (acc, method: Methods<T>) => {
       const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
 
@@ -96,25 +94,26 @@ ___
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L47)*
 
-#### Type declaration:
-
 ___
 
 ###  slashingIncentives
 
-• **slashingIncentives**: *function* = proxyCall(this.contract.methods.slashingIncentives, undefined, (res): {
-    reward: BigNumber
-    penalty: BigNumber
-  } => ({
-    reward: valueToBigNumber(res.reward),
-    penalty: valueToBigNumber(res.penalty),
-  }))
+• **slashingIncentives**: *function* = proxyCall(
+    this.contract.methods.slashingIncentives,
+    undefined,
+    (res) => ({
+      reward: valueToBigNumber(res.reward),
+      penalty: valueToBigNumber(res.penalty),
+    })
+  )
 
-*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L22)*
+*Inherited from [BaseSlasher](_wrappers_baseslasher_.baseslasher.md).[slashingIncentives](_wrappers_baseslasher_.baseslasher.md#slashingincentives)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseSlasher.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseSlasher.ts#L70)*
 
 Returns slashing incentives.
 
-**`returns`** Rewards and penaltys for slashing.
+**`returns`** Rewards and penalties for slashing.
 
 #### Type declaration:
 
@@ -146,7 +145,7 @@ Contract address
 
 ▸ **getBlockNumberFromHeader**(`header`: string): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L35)*
+*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L15)*
 
 Parses block number out of header.
 
@@ -187,9 +186,9 @@ ___
 
 ▸ **slashSigner**(`signerAddress`: [Address](../modules/_base_.md#address), `headerA`: string, `headerB`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L68)*
+*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L38)*
 
-Slash a Validator for double-signing.
+Slash a Validator signer for double-signing.
 
 **Parameters:**
 
@@ -207,7 +206,7 @@ ___
 
 ▸ **slashValidator**(`validatorAddress`: [Address](../modules/_base_.md#address), `headerA`: string, `headerB`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L46)*
+*Defined in [packages/contractkit/src/wrappers/DoubleSigningSlasher.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L26)*
 
 Slash a Validator for double-signing.
 
@@ -215,7 +214,7 @@ Slash a Validator for double-signing.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`validatorAddress` | [Address](../modules/_base_.md#address) | - |
+`validatorAddress` | [Address](../modules/_base_.md#address) | Validator to slash. |
 `headerA` | string | First double signed block header. |
 `headerB` | string | Second double signed block header.  |
 

@@ -1,4 +1,4 @@
-# External module: "utils/rpc-caller"
+# Module: "utils/rpc-caller"
 
 ## Index
 

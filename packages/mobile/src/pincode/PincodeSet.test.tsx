@@ -21,7 +21,7 @@ describe('Pincode', () => {
     expect(toJSON()).toMatchSnapshot()
   })
 
-  it('navigates to the EnterInviteCode screen after successfully verifying', async () => {
+  it('navigates to the VerificationEducationScreen screen after successfully verifying', async () => {
     const { getByTestId, rerender } = render(
       <Provider store={mockStore}>
         <PincodeSet {...mockScreenProps} />
@@ -44,7 +44,7 @@ describe('Pincode', () => {
     mockPin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
     jest.runAllTimers()
     await flushMicrotasksQueue()
-    expect(mockScreenProps.navigation.navigate).toBeCalledWith(Screens.EnterInviteCode)
+    expect(mockScreenProps.navigation.navigate).toBeCalledWith(Screens.VerificationEducationScreen)
   })
 
   it("displays an error text when the pins don't match", async () => {

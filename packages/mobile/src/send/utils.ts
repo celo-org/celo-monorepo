@@ -193,6 +193,7 @@ export function* handleSendPaymentData(
         amount: new BigNumber(data.amount),
         recipientAddress: data.address.toLowerCase(),
         feeEstimate: new BigNumber(0),
+        isCashOut: false,
       })
     } else if (data.token === 'cUSD' || !data.token) {
       const currency = data.currencyCode

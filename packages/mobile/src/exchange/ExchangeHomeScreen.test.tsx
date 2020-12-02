@@ -40,7 +40,9 @@ describe('ExchangeHomeScreen', () => {
 
     jest.clearAllMocks()
     fireEvent.press(tree.getByTestId('WithdrawCELO'))
-    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.WithdrawCeloScreen)
+    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.WithdrawCeloScreen, {
+      isCashOut: false,
+    })
   })
 
   it('renders and behaves correctly for CP-DOTO restricted countries', () => {
@@ -67,6 +69,8 @@ describe('ExchangeHomeScreen', () => {
 
     // Check we can withdraw
     fireEvent.press(tree.getByTestId('WithdrawCELO'))
-    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.WithdrawCeloScreen)
+    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.WithdrawCeloScreen, {
+      isCashOut: false,
+    })
   })
 })

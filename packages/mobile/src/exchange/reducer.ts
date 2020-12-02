@@ -114,6 +114,7 @@ export const reducer = (
           ...persisted.history,
         },
         exchangeRatePair: initialState.exchangeRatePair,
+        isLoading: false,
       }
     }
 

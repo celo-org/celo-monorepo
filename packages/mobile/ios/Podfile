@@ -100,7 +100,7 @@ target "celo" do
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
   pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
 
-  pod 'Segment-Firebase'
+  pod 'Segment-Firebase', '~> 2.7.0'
 
   # RNPermissions
   permissions_path = '../../../node_modules/react-native-permissions/ios'

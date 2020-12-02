@@ -4,6 +4,36 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
+### Build-proposal
+
+Interactively build a governance proposal
+
+```
+USAGE
+  $ celocli governance:build-proposal
+
+OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --output=output                                (required) Path to output
+
+  --useLedger                                    Set it to use a ledger wallet
+
+EXAMPLE
+  build-proposal --output ./transactions.json
+```
+
+_See code: [packages/cli/src/commands/governance/build-proposal.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/build-proposal.ts)_
+
 ### Dequeue
 
 Try to dequeue governance proposal
@@ -205,10 +235,7 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
 
-  --interactive                                      Form proposal using an interactive prompt for Celo registry
-                                                     contracts and functions
-
-  --jsonTransactions=jsonTransactions                Path to json transactions
+  --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing

@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/connect'
 import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
@@ -381,10 +381,10 @@ function* celoToDollarAmount(amount: BigNumber) {
 function* withdrawCelo(action: WithdrawCeloAction) {
   let context: TransactionContext | null = null
   try {
-    const { recipientAddress, amount } = action
+    const { recipientAddress, amount, isCashOut } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
-    navigate(Screens.ExchangeHomeScreen)
+    navigate(isCashOut ? Screens.WalletHome : Screens.ExchangeHomeScreen)
 
     context = newTransactionContext(TAG, 'Withdraw CELO')
     yield put(

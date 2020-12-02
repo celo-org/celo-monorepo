@@ -20,6 +20,10 @@ import {
 } from 'src/identity/actions'
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
+import {
+  feelessFetchVerificationState,
+  feelessStartVerification,
+} from 'src/identity/feelessVerification'
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
@@ -101,7 +105,9 @@ function* handleFetchVerificationState(action: FetchVerificationState) {
 
 function* watchVerification() {
   yield takeLeading(Actions.FETCH_VERIFICATION_STATE, handleFetchVerificationState)
+  yield takeLatest(Actions.FEELESS_FETCH_VERIFICATION_STATE, feelessFetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
+  yield takeLatest(Actions.FEELESS_START_VERIFICATION, feelessStartVerification)
   yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
 

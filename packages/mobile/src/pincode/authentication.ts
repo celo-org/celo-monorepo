@@ -9,6 +9,7 @@ import { isValidAddress, normalizeAddress } from '@celo/utils/src/address'
 import { sha256 } from 'ethereumjs-util'
 import { generateSecureRandom } from 'react-native-securerandom'
 import { call, select } from 'redux-saga/effects'
+import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import { OnboardingEvents } from 'src/analytics/Events'
@@ -124,13 +125,20 @@ async function retrievePasswordHash(account: string) {
   return getCachedPasswordHash(account)
 }
 
+let passwordLock = false
+
 export async function getPassword(
   account: string,
   withVerification: boolean = true,
   storeHash: boolean = false
 ) {
+  while (passwordLock) {
+    await sleep(100)
+  }
+  passwordLock = true
   let password = getCachedPassword(account)
   if (password) {
+    passwordLock = false
     return password
   }
 
@@ -143,6 +151,7 @@ export async function getPassword(
   }
 
   setCachedPassword(account, password)
+  passwordLock = false
   return password
 }
 

@@ -4,10 +4,15 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { CeloTransactionObject, ContractKit, OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { Result } from '@celo/base'
+import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+import { OdisUtils } from '@celo/identity'
+import { AuthSigner } from '@celo/identity/lib/odis/query'
+import { FetchError, TxError } from '@celo/komencikit/src/errors'
+import { KomenciKit } from '@celo/komencikit/src/kit'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { compressedPubKey, deriveDek } from '@celo/utils/src/dataEncryptionKey'
@@ -117,6 +122,7 @@ function* sendUserFundedSetAccountTx(
 
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
+// pendingMtwAddress is only passed during feeless verification flow
 export function* registerAccountDek(walletAddress: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
@@ -186,6 +192,87 @@ export function* registerAccountDek(walletAddress: string) {
     // Registration will be re-attempted on next payment send
     Logger.error(`${TAG}@registerAccountDek`, 'Failure registering DEK', error)
   }
+}
+
+// Unlike normal DEK registration, registration via Komenci should be considered fatal. If there
+// is no on-chain mapping of accountAddresss => walletAddress, then senders will erroneously
+// send to MTW instead of EOA. A no-op if registration has already been done
+export function* registerWalletAndDekViaKomenci(
+  komenciKit: KomenciKit,
+  accountAddress: string,
+  walletAddress: string
+) {
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_start, { feeless: true })
+
+  Logger.debug(
+    `${TAG}@registerAccountDekViaKomenci`,
+    'Setting wallet address and public data encryption key'
+  )
+
+  yield call(getConnectedUnlockedAccount)
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked, { feeless: true })
+
+  const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+  if (!privateDataKey) {
+    throw new Error('No data key in store. Should never happen.')
+  }
+
+  const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+
+  const contractKit = yield call(getContractKit)
+  const accountsWrapper: AccountsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAccounts,
+  ])
+
+  const upToDate: boolean = yield call(
+    isAccountUpToDate,
+    accountsWrapper,
+    accountAddress,
+    walletAddress,
+    publicDataKey
+  )
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked, { feeless: true })
+
+  if (upToDate) {
+    Logger.debug(`${TAG}@registerAccountDekViaKomenci`, 'Address and DEK up to date, skipping.')
+    yield put(registerDataEncryptionKey())
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+      newRegistration: false,
+      feeless: true,
+    })
+    return
+  }
+
+  const accountName = ''
+
+  Logger.debug(
+    TAG,
+    '@registerAccountDekViaKomenci Passed params:',
+    accountAddress,
+    walletAddress,
+    publicDataKey
+  )
+
+  const setAccountResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+    [komenciKit, komenciKit.setAccount],
+    accountAddress,
+    accountName,
+    publicDataKey,
+    walletAddress
+  )
+
+  if (!setAccountResult.ok) {
+    Logger.debug(TAG, '@registerAccountDekViaKomenci Error:', setAccountResult.error.message)
+    throw setAccountResult.error
+  }
+
+  yield put(updateWalletToAccountAddress({ [walletAddress.toLowerCase()]: accountAddress }))
+  yield put(registerDataEncryptionKey())
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+    newRegistration: true,
+    feeless: true,
+  })
 }
 
 // Check if account address and DEK match what's in

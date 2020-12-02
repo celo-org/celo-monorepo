@@ -13,6 +13,7 @@ import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
 import ErrorBoundary from 'src/app/ErrorBoundary'
+import { isE2EEnv } from 'src/config'
 import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
@@ -21,12 +22,17 @@ import Logger from 'src/utils/Logger'
 enableScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
-YellowBox.ignoreWarnings([
+
+const ignoreWarnings = [
   'componentWillReceiveProps',
   'Remote debugger', // To avoid "Remote debugger in background tab" warning
   'cancelTouches', // rn-screens warning on iOS
   'Setting a timer', // warns about long setTimeouts which are actually saga timeouts
-])
+]
+if (isE2EEnv) {
+  ignoreWarnings.push('Overriding previous layout')
+}
+YellowBox.ignoreWarnings(ignoreWarnings)
 
 const { decimalSeparator, groupingSeparator } = getNumberFormatSettings()
 

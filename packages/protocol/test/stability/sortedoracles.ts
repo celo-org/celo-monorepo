@@ -1,15 +1,15 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
   matchAddress,
   matchAny,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
