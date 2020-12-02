@@ -523,7 +523,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the beneficiary address as the message.
+   *      key, with the ReleaseGold contract address as the message.
    */
   function authorizeVoteSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
@@ -545,7 +545,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the beneficiary address as the message.
+   *      key, with the ReleaseGold contract address as the message.
    */
   function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
@@ -568,7 +568,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param s Output value s of the ECDSA signature.
    * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the beneficiary address as the message.
+   *      key, with the ReleaseGold contract address as the message.
    */
   function authorizeValidatorSignerWithPublicKey(
     address payable signer,
@@ -596,7 +596,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 48 bytes.
    * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the beneficiary address as the message.
+   *      key, with the ReleaseGold contract address as the message.
    */
   function authorizeValidatorSignerWithKeys(
     address payable signer,
@@ -629,7 +629,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the beneficiary address as the message.
+   *      key, with the ReleaseGold contract address as the message.
    */
   function authorizeAttestationSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
