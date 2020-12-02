@@ -181,7 +181,7 @@ export async function getTransactionCount(...addresses: string[]): Promise<numbe
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
-          () => getContractKit().web3.eth.getTransactionCount(address),
+          () => getContractKit().connection.getTransactionCount(address),
           RETRY_COUNT,
           [],
           RETRY_DELAY_IN_MS

@@ -1,4 +1,5 @@
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
+import { Provider } from '@celo/connect/lib/types'
+import { stopProvider } from '@celo/connect/lib/utils/provider-utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
@@ -134,7 +135,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
             } while (response !== 'q' && response !== '\u0003' /* ctrl-c */)
           } finally {
             await subscription.unsubscribe()
-            await stopProvider(web3.currentProvider)
+            stopProvider(web3.currentProvider as Provider)
           }
         }
       } finally {
