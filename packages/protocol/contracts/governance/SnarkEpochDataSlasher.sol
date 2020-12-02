@@ -340,9 +340,18 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     for (uint256 i = 0; i < 150; i++) {
       if (bitmap & 1 == 1) {
         num++;
-        getBLSPublicKeyInplace(blockNumber, i, public_key, buffer);
+        // public_key = getBLSPublicKeyInplace(blockNumber, i, public_key, buffer);
+        public_key = getBLSPublicKey(blockNumber, i);
         if (!prev) {
-          agg = public_key;
+          agg.X.a.a = public_key.X.a.a;
+          agg.X.b.a = public_key.X.b.a;
+          agg.Y.a.a = public_key.Y.a.a;
+          agg.Y.b.a = public_key.Y.b.a;
+          agg.X.a.b = public_key.X.a.b;
+          agg.X.b.b = public_key.X.b.b;
+          agg.Y.a.b = public_key.Y.a.b;
+          agg.Y.b.b = public_key.Y.b.b;
+          // agg = public_key;
           prev = true;
         } else {
           agg = CeloB12_377Lib.g2Add(agg, public_key);

@@ -283,18 +283,20 @@ describe('snark slashing tests', function(this: any) {
       const addr = await contract.methods.validatorSignerAddressFromSet(0, 10).call()
       const blsPublicKey = await contract.methods.validatorBLSPublicKeyFromSet(0, 10).call()
       const compressed = await validators.methods.getValidatorBlsPublicKeyFromSigner(addr).call()
-      const uncompressed = uncompressSig(Buffer.from(compressed.substr(2), 'hex'))
+      const uncompressed = Buffer.from(
+        [...Buffer.from(compressed.substr(2, 94), 'hex')].reverse()
+      ).toString('hex')
       console.info(
         'addr',
         addr,
         'bls',
-        blsPublicKey,
+        blsPublicKey.substr(36, 94),
         'compressed',
         compressed,
         'uncompressed',
         uncompressed
       )
-      assert.equal(blsPublicKey, uncompressed)
+      assert.equal(blsPublicKey.substr(36, 94), uncompressed)
     })
   })
 
