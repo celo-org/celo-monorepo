@@ -34,7 +34,7 @@
   "promptConfirmRemovalModal": {
     "header": "Are you sure you want to reset Valora?",
     "body": "You will no longer be able to access your funds or your Account Key from this device. There's no way to recover your Account Key if you haven't written it down.",
-    "revke": "Revoke"
+    "resetNow": "Reset Now"
   },
   "promptConfirmRevokeModal": {
     "header": "Are you sure you want to revoke your Valora account?",

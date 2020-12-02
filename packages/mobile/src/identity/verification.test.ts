@@ -165,6 +165,7 @@ const mockAttestationsWrapperPartlyVerified = {
     completed: 2,
   })),
   getActionableAttestations: jest.fn(() => [mockActionableAttestations[0]]),
+  lookupAccountsForIdentifier: jest.fn(() => [mockAccount]),
 }
 
 const mockAccountsWrapper = {
