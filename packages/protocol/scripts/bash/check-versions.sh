@@ -34,6 +34,7 @@ BUILD_DIR_1=$(echo build/$(echo $OLD_BRANCH | sed -e 's/\//_/g'))
 git fetch --all --tags >> $LOG_FILE
 git checkout $OLD_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
+yarn install
 
 echo " - Build contract artifacts ..."
 # TODO: Move to yarn build:sol after the next contract release.
@@ -45,6 +46,7 @@ echo " - Checkout source code of new branch at $NEW_BRANCH"
 BUILD_DIR_2=$(echo build/$(echo $NEW_BRANCH | sed -e 's/\//_/g'))
 git checkout $NEW_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
+yarn install
 echo " - Build contract artifacts ..."
 yarn build:sol > $LOG_FILE
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2

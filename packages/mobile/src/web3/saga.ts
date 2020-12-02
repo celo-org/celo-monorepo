@@ -1,7 +1,8 @@
-import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { BlockHeader } from '@celo/connect'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { UnlockableWallet } from '@celo/wallet-base'
+import { RpcWalletErrors } from '@celo/wallet-rpc/src/rpc-wallet'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -36,7 +37,6 @@ import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector, mtwAddressSelector } from 'src/web3/selectors'
 import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
-import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'
 

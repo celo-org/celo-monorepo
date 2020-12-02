@@ -1,5 +1,5 @@
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
-import { ErrorMessages } from '@celo/contractkit/lib/identity/odis/query'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
+import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { logger } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import { queryOdisForSalt } from './query'

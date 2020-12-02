@@ -1,14 +1,11 @@
 /* tslint:disable:no-console */
-import Web3 from 'web3'
-
+import { ensureLeading0x, eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { ensureLeading0x, eqAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   FeeCurrencyWhitelistInstance,
@@ -17,6 +14,8 @@ import {
   SortedOraclesInstance,
   StableTokenInstance,
 } from 'types'
+import Web3 from 'web3'
+
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<any[]> => {

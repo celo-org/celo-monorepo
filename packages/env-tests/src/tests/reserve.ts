@@ -15,8 +15,8 @@ export function runReserveTest(context: EnvTestContext) {
     test('move funds from the Reserve to a custodian and back', async () => {
       const spender = await getKey(context.mnemonic, TestAccounts.ReserveSpender)
       const custodian = await getKey(context.mnemonic, TestAccounts.ReserveCustodian)
-      context.kit.addAccount(spender.privateKey)
-      context.kit.addAccount(custodian.privateKey)
+      context.kit.connection.addAccount(spender.privateKey)
+      context.kit.connection.addAccount(custodian.privateKey)
       const reserve = await context.kit.contracts.getReserve()
       const goldToken = await context.kit.contracts.getGoldToken()
 
