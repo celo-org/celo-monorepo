@@ -1,11 +1,8 @@
+import { ReadOnlyWallet } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
-import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
-import {
-  AddressValidation,
-  newLedgerWalletWithSetup,
-} from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { ReadOnlyWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
+import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
+import { LocalWallet } from '@celo/wallet-local'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -118,12 +115,13 @@ export abstract class BaseCommand extends Command {
 
   get kit() {
     if (!this._kit) {
-      this._kit = newKitFromWeb3(this.web3, this._wallet)
+      this._kit = newKitFromWeb3(this.web3)
+      this._kit.connection.wallet = this._wallet
     }
 
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
-      this._kit.addAccount(res.flags.privateKey)
+      this._kit.connection.addAccount(res.flags.privateKey)
     }
     return this._kit
   }
@@ -168,6 +166,8 @@ export abstract class BaseCommand extends Command {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
+    } else {
+      this._wallet = new LocalWallet()
     }
 
     if (res.flags.from) {
@@ -178,7 +178,10 @@ export abstract class BaseCommand extends Command {
       ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
       : getGasCurrency(this.config.configDir)
 
-    const setUsdGas = () => this.kit.setFeeCurrency(CeloContract.StableToken)
+    const setUsdGas = async () => {
+      await this.kit.setFeeCurrency(CeloContract.StableToken)
+      await this.kit.updateGasPriceInConnectionLayer(CeloContract.StableToken)
+    }
     if (gasCurrencyConfig === GasOptions.cUSD) {
       await setUsdGas()
     } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
@@ -191,7 +194,7 @@ export abstract class BaseCommand extends Command {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      stopProvider(this.web3.currentProvider)
+      this.kit.connection.stop()
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }
