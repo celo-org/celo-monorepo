@@ -66,7 +66,7 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 
 * More points are given to those who have performed an external security audit on their infrastructure over those who have self-audited.
 
-* If you are NOT ELECTED on Mainnet, you must be validating on Baklava testnet for at least 30 days. If you are ELECTED you must run validators and attestation service for at least one month (30 days) on  Mainnet.
+* If you are NOT ELECTED on Mainnet, you must be validating on Baklava testnet for at least 30 days. If you are ELECTED you must run validators and attestation service for at least one month (30 days) on  Mainnet. If you are ELECTED on mainnet but for less than 30 days, you must be validating on Baklava for 30 days at least.
 
 * Mission statement and community contributions may make a big difference in whether your application is approved or not.
 
