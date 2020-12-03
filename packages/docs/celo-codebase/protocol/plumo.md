@@ -36,9 +36,16 @@ In the case of the Plumo Ceremony, this collective computation will be a series 
 
 ## How to Contribute
 
-The Plumo Ceremony has not happened yet, and will run from late November 2020 to January 2021.
+The Plumo MPC setup is broken up into two phases:
 
-The ceremony will consist of multiple rounds of 6–10 contributors each running the Plumo setup for approximately 36 hours. While much of the activity is passive and involves simply running the computation continuously, contributors should not expect to use their machines for other intensive activies through the duration of the setup.
+* Phase 1 - Powers of Tau
+  - The output of this phase can be used for either Groth16 circuits up to the size of the phase, or universal proving systems such as PLONK and Marlin.
+* Phase 2 - Plumo circuit
+  - In this phase, the participants contribute to the Plumo circuit keys, which would be used by provers to create proofs and verifiers to verify them.
+
+Phase 1 will take place starting early December 2020, and continue until January 2021. It will consist of multiple rounds of 6–10 contributors each running the Plumo setup for approximately 36 hours. While much of the activity is passive and involves simply running the computation continuously, contributors should not expect to use their machines for other intensive activies through the duration of the setup.
+
+Phase 2 will commence roughly a month after Phase 1.
 
 Contributors will also receieve a gift for the time and efforts, and be recognized for their contributions to the Celo network.
 
@@ -58,14 +65,9 @@ You can run the contributor software locally or on cloud VMs, but desktop machin
 
 With these kind of machines, participiation in the setup should take around 30 hours, potentially a bit more or much less, depending on your specific hardware and internet connection.
 
-## Running the Setup
+## Running the Setup - Phase 1
 
-The Plumo MPC setup is broken up into two phases:
-
-* Phase 1 - Powers of Tau. The output of this phase can be used for either Groth16 circuits up to the size of the phase, or universal proving systems such as PLONK and Marlin.
-* Phase 2 - Plumo circuit. In this phase, the participants contribute to the Plumo circuit keys, which would be used by provers to create proofs and verifiers to verify them.
-
-We are currently going to run phase 1, and will later follow up with phase 2.
+The instructions below are for the first phase of the Plumo setup, Powers of Tau.
 
 ### Generate your address
 
@@ -85,9 +87,9 @@ cLabs is running the coordinator server, which has a list of approved participan
 
 * After receiving confirmation from cLabs, download the `contribute` binary from [here]https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-rc.1).
 * Run it in the same directory as the `plumo.keys` file as follows:
-    * Windows users:`contribute-windows --coordinator-url https://plumo-phase1.azurefd.net`
-    * macOS users:`./contribute-macos --coordinator-url https://plumo-phase1.azurefd.net`
-    * Linux users:`./contribute-linux --coordinator-url https://plumo-phase1.azurefd.net`
+    * Windows users: `contribute-windows --coordinator-url https://plumo-phase1.azurefd.net`
+    * macOS users: `./contribute-macos --coordinator-url https://plumo-phase1.azurefd.net`
+    * Linux users: `./contribute-linux --coordinator-url https://plumo-phase1.azurefd.net`
 * You will be asked for your passphrase - enter the same one from earlier. 
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
@@ -99,7 +101,7 @@ Once this is running, you can leave the machine running -- no direct action is n
 This section contains some common issues contributors may run into while running the setup software.
 
 **Permissions:**
-- You may need to change the permissions on both files to be able to run them. On Linux and macOS, you can run `chmod u+x generate-macos contribute-macos`.
+- You may need to change the permissions on both the `generate` and `contribute` files to be able to run them. For example, on macOS, you can run `chmod u+x generate-macos contribute-macos`.
 - On Windows, you might be presented with a warning that this program is from an unsigned developer. Click "run anyway" to continue.
 - On macOS, you might be shown a "permission denied" error. This is because it's a downloaded file and is by default in quarantine. You can remove it from quarantine by running `xattr -d com.apple.quarantine contribute-macos`. See here for more details: https://superuser.com/questions/526920/how-to-remove-quarantine-from-file-permissions-in-os-x. 
 
@@ -107,14 +109,13 @@ This section contains some common issues contributors may run into while running
 - Disable sleep - if your machine is automatically set to sleep or turn hard disks off, it's best to switch these options off.
 - Battery - it's best to connect the machine to an outlet, as the setup is computationally intensive and would drain a battery fast.
 
-If any of these happen, don't worry - stop and restart the contribution program and re-enter the passphrase to continue.
+If either of these happen, don't worry - stop and restart the contribution program and re-enter the passphrase to continue.
 
 **Network:**
-- If you have issues uploading your contributions, it could be that you have some other processes that are consuming your bandwidth. Make sure to kill any processes such as:
+- If you have issues uploading your contributions, it could be that you have some other processes that are consuming your bandwidth. Make sure to quit any processes such as:
     - A Nest or home camera uploading feeds
     - Torrenting / seeding any files
     - Backup services
-
 
 ## Additional Resources
 - [Plumo Paper](https://docs.zkproof.org/pages/standards/accepted-workshop3/proposal-plumo_celolightclient.pdf)
