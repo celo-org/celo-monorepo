@@ -22,6 +22,7 @@ export enum ErrorMessages {
   REPEAT_ATTESTATION_CODE = 'nuxVerification2:repeatVerificationCode',
   REVEAL_ATTESTATION_FAILURE = 'nuxVerification2:revealAttestationFailure',
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
+  CANT_VERIFY_REVOKED_ACCOUNT = 'nuxVerification2:cantVerifyRevokedAccount',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
   ADDRESS_LOOKUP_FAILURE = 'addressLookupFailure',
   ODIS_QUOTA_ERROR = 'odisQuotaError',
