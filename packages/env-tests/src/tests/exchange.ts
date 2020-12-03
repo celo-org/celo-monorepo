@@ -1,10 +1,10 @@
 import { sleep } from '@celo/base'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
-import { Context } from '../context'
+import { EnvTestContext } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runExchangeTest(context: Context) {
+export function runExchangeTest(context: EnvTestContext) {
   describe('Exchange Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
     beforeAll(async () => {
@@ -13,16 +13,16 @@ export function runExchangeTest(context: Context) {
 
     test('exchange cUSD for CELO', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.Exchange)
-      context.kit.addAccount(from.privateKey)
+      context.kit.connection.addAccount(from.privateKey)
       context.kit.defaultAccount = from.address
       const stableToken = await context.kit.contracts.getStableToken()
-      context.kit.defaultFeeCurrency = stableToken.address
+      context.kit.connection.defaultFeeCurrency = stableToken.address
       const goldToken = await context.kit.contracts.getGoldToken()
       const exchange = await context.kit.contracts.getExchange()
 
       const previousGoldBalance = await goldToken.balanceOf(from.address)
       const goldAmount = await exchange.quoteUsdSell(ONE)
-      logger.debug('quote selling cUSD', { rate: goldAmount.toString() })
+      logger.debug({ rate: goldAmount.toString() }, 'quote selling cUSD')
 
       const approveTx = await stableToken.approve(exchange.address, ONE.toString()).send()
       await approveTx.waitReceipt()
@@ -39,15 +39,18 @@ export function runExchangeTest(context: Context) {
       await sellTx.getHash()
       const receipt = await sellTx.waitReceipt()
 
-      logger.debug('Sold cUSD', { receipt })
+      logger.debug({ receipt }, 'Sold cUSD')
 
       // Sell more to receive at least 1 cUSD back
       const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(previousGoldBalance)
 
-      logger.debug('Loss to exchange', {
-        goldAmount: goldAmount.toString(),
-        goldAmountToSell: goldAmountToSell.toString(),
-      })
+      logger.debug(
+        {
+          goldAmount: goldAmount.toString(),
+          goldAmountToSell: goldAmountToSell.toString(),
+        },
+        'Loss to exchange'
+      )
 
       const approveGoldTx = await goldToken
         .approve(exchange.address, goldAmountToSell.toString())
@@ -65,7 +68,7 @@ export function runExchangeTest(context: Context) {
         .send()
       const sellGoldReceipt = await sellGoldTx.waitReceipt()
 
-      logger.debug('Sold CELO', { receipt: sellGoldReceipt })
+      logger.debug({ receipt: sellGoldReceipt }, 'Sold CELO')
     })
   })
 }

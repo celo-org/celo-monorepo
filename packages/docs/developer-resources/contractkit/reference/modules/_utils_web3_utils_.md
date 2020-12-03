@@ -1,4 +1,4 @@
-# External module: "utils/web3-utils"
+# Module: "utils/web3-utils"
 
 ## Index
 

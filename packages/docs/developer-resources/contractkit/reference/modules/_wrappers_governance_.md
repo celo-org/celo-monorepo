@@ -1,4 +1,4 @@
-# External module: "wrappers/Governance"
+# Module: "wrappers/Governance"
 
 ## Index
 

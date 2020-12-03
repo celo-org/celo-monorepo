@@ -5,7 +5,7 @@
  * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
  */
 
-import { trimLeading0x } from '@celo/base/lib/address'
+import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 
 const CONTRACT_METADATA_REGEXPS = [
   // 0.5.8
@@ -68,7 +68,7 @@ const PUSH20_OPCODE = '73'
 // the compiler's output contains a placeholder 0-address, while the onchain
 // bytecode has the correct address inserted.
 // Reference: https://solidity.readthedocs.io/en/v0.5.12/contracts.html#call-protection-for-libraries
-export const verifyLibraryPrefix = (bytecode: string, address: string) => {
+export const verifyAndStripLibraryPrefix = (bytecode: string, address = NULL_ADDRESS) => {
   if (bytecode.slice(2, 4) !== PUSH20_OPCODE) {
     throw new Error(`Library bytecode doesn't start with address load`)
   } else if (bytecode.slice(4, 4 + ADDRESS_LENGTH) !== trimLeading0x(address).toLowerCase()) {

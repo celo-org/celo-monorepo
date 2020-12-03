@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -7,7 +8,6 @@ import {
   assertRevert,
   matchAny,
   mineToNextEpoch,
-  NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -1100,7 +1100,7 @@ contract('Governance', (accounts: string[]) => {
         const [proposalIds] = await governance.getQueue()
         assert.notInclude(
           proposalIds.map((x) => x.toNumber()),
-          proposalId
+          proposalId.toNumber()
         )
       })
 

@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals'
-import { Context } from '../context'
+import { EnvTestContext } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runTransfercUSDTest(context: Context) {
+export function runTransfercUSDTest(context: EnvTestContext) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
     beforeAll(async () => {
@@ -12,28 +12,34 @@ export function runTransfercUSDTest(context: Context) {
     test('transfer cUSD', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
       const to = await getKey(context.mnemonic, TestAccounts.TransferTo)
-      context.kit.addAccount(from.privateKey)
-      context.kit.addAccount(to.privateKey)
+      context.kit.connection.addAccount(from.privateKey)
+      context.kit.connection.addAccount(to.privateKey)
       const stableToken = await context.kit.contracts.getStableToken()
-      context.kit.defaultFeeCurrency = stableToken.address
+      context.kit.connection.defaultFeeCurrency = stableToken.address
 
       const toBalanceBefore = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance Before', {
-        balance: toBalanceBefore.toString(),
-        account: to.address,
-      })
+      logger.debug(
+        {
+          balance: toBalanceBefore.toString(),
+          account: to.address,
+        },
+        'Get Balance Before'
+      )
 
       const receipt = await stableToken
         .transfer(to.address, ONE.toString())
         .sendAndWaitForReceipt({ from: from.address })
 
-      logger.debug('Transferred', { receipt })
+      logger.debug({ receipt }, 'Transferred')
 
       const toBalanceAfter = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance After', {
-        balance: toBalanceAfter.toString(),
-        account: to.address,
-      })
+      logger.debug(
+        {
+          balance: toBalanceAfter.toString(),
+          account: to.address,
+        },
+        'Get Balance After'
+      )
 
       expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
     })

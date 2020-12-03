@@ -81,7 +81,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   }, [])
 
   useEffect(() => {
-    if (status.isVerified) {
+    if (verificationState.status.isVerified || feelessVerificationState.status.isVerified) {
       dispatch(setNumberVerified(true))
     }
   }, [verificationState.status.isVerified, feelessVerificationState.status.isVerified])

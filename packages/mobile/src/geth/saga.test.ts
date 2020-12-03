@@ -1,10 +1,11 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlockUtils, StaticNodeUtils } from '@celo/network-utils'
 import GethBridge from 'react-native-geth'
 import { expectSaga } from 'redux-saga-test-plan'
 import { delay } from 'redux-saga/effects'
 import { setInitState } from 'src/geth/actions'
 import { InitializationState } from 'src/geth/reducer'
-import { _waitForGethInit, GETH_RETRY_DELAY, GethInitOutcomes, initGethSaga } from 'src/geth/saga'
+// tslint:disable-next-line: ordered-imports
+import { GethInitOutcomes, GETH_RETRY_DELAY, initGethSaga, _waitForGethInit } from 'src/geth/saga'
 import { createMockStore } from 'test/utils'
 
 describe(initGethSaga, () => {

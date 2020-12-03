@@ -15,9 +15,6 @@ USAGE
 OPTIONS
   -k, --privateKey=privateKey                    Use a private key to sign local transactions with
 
-  --jsonTransactions=jsonTransactions            (required) Path to json transactions (as input or as output when
-                                                 specifying --interactive
-
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -27,10 +24,12 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --output=output                                (required) Path to output
+
   --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
-  build-proposal --jsonTransactions ./transactions.json
+  build-proposal --output ./transactions.json
 ```
 
 _See code: [packages/cli/src/commands/governance/build-proposal.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/build-proposal.ts)_

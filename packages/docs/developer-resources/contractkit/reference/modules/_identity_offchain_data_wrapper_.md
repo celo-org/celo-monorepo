@@ -1,4 +1,4 @@
-# External module: "identity/offchain-data-wrapper"
+# Module: "identity/offchain-data-wrapper"
 
 ## Index
 

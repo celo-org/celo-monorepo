@@ -3,6 +3,7 @@ import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { PhoneNumberType, PhoneNumberUtil } from 'google-libphonenumber'
+import { shuffle } from 'lodash'
 import { Transaction } from 'sequelize'
 import {
   findAttestationByDeliveryId,
@@ -12,13 +13,14 @@ import {
   sequelize,
   SequelizeLogger,
 } from '../db'
-import { fetchEnv, fetchEnvOrDefault } from '../env'
+import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
 import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { MessageBirdSmsProvider } from './messagebird'
 import { NexmoSmsProvider } from './nexmo'
+import { TelekomSmsProvider } from './telekom'
 import { TwilioSmsProvider } from './twilio'
 
 // Maximum delivery attempts (including first) regardless of provider
@@ -82,6 +84,12 @@ export async function initializeSmsProviders(
       throw new Error(`Providers in SMS_PROVIDERS must be unique: dupe: ${configuredSmsProvider}`)
     }
     switch (configuredSmsProvider) {
+      case SmsProviderType.TELEKOM:
+        const telekomProvider = TelekomSmsProvider.fromEnv()
+        await telekomProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
+        smsProviders.push(telekomProvider)
+        smsProvidersByType[SmsProviderType.TELEKOM] = telekomProvider
+        break
       case SmsProviderType.MESSAGEBIRD:
         const messageBirdProvider = MessageBirdSmsProvider.fromEnv()
         await messageBirdProvider.initialize(
@@ -119,9 +127,12 @@ function smsProvidersFor(
     .split(',')
     .filter((t) => t != null && t !== '')
   let providers =
-    providersForRegion.length === 0
-      ? smsProviders
-      : providersForRegion.map((name) => smsProvidersByType[name])
+    providersForRegion.length > 0
+      ? providersForRegion.map((name) => smsProvidersByType[name])
+      : // Use default list of providers, possibly shuffled (per-country provider lists are never shuffled)
+      isYes(fetchEnvOrDefault('SMS_PROVIDERS_RANDOMIZED', '0'))
+      ? shuffle(smsProviders)
+      : smsProviders
   providers = providers.filter(
     (provider) => provider != null && provider.canServePhoneNumber(countryCode, phoneNumber)
   )

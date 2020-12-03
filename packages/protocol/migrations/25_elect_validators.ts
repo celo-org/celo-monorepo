@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
-import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { CeloTxObject } from '@celo/connect'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
@@ -11,8 +12,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
-import Web3, * as Web3Class from 'web3'
-import { TransactionObject } from 'web3-eth'
+import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 const bip39 = require('bip39')
@@ -39,7 +39,7 @@ let extraKeys = []
 
 async function sendTransaction<T>(
   web3: Web3,
-  tx: TransactionObject<T> | null,
+  tx: CeloTxObject<T> | null,
   privateKey: string,
   txArgs: any
 ) {
@@ -101,7 +101,7 @@ async function registerValidatorGroup(
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
-  const encryptionWeb3 = new (Web3Class as any)('http://localhost:8545')
+  const encryptionWeb3 = new Web3('http://localhost:8545')
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 

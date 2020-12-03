@@ -3,8 +3,8 @@ import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs = require('fs')
-import * as prompts from 'prompts'
+import fs from 'fs'
+import prompts from 'prompts'
 import {
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
@@ -167,17 +167,26 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
 
-  const releaseGoldTxHash = await _setInitialProxyImplementation(
-    web3,
-    releaseGoldInstance,
-    releaseGoldProxy,
-    'ReleaseGold',
-    {
-      from: fromAddress,
-      value: totalValue.toFixed(),
-    },
-    ...contractInitializationArgs
-  )
+  let releaseGoldTxHash
+  try {
+    releaseGoldTxHash = await _setInitialProxyImplementation(
+      web3,
+      releaseGoldInstance,
+      releaseGoldProxy,
+      'ReleaseGold',
+      {
+        from: fromAddress,
+        value: totalValue.toFixed(),
+      },
+      ...contractInitializationArgs
+    )
+  } catch (e) {
+    console.info(
+      'Something went wrong! Consider using the recover-funds.ts script with the below address'
+    )
+    console.info('ReleaseGoldProxy', releaseGoldProxy.address)
+    throw e
+  }
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await retryTx(proxiedReleaseGold.transferOwnership, [
     releaseGoldMultiSigProxy.address,
