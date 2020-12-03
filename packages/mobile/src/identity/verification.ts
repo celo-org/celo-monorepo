@@ -178,6 +178,8 @@ export function* fetchVerificationState(forceUnlockAccount?: boolean) {
       account
     )
 
+    console.log(phoneHashDetails, actionableAttestations, status)
+
     yield put(
       udpateVerificationState({
         phoneHashDetails,
