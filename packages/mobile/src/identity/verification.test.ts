@@ -43,7 +43,7 @@ import {
 import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount, UnlockResult } from 'src/web3/saga'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
 import {
@@ -57,9 +57,10 @@ import {
 
 const MockedAnalytics = ValoraAnalytics as any
 
+const mockUnlockAccountResult = UnlockResult.SUCCESS
 jest.mock('src/web3/saga', () => ({
   ...jest.requireActual('src/web3/saga'),
-  unlockAccount: jest.fn(async () => true),
+  unlockAccount: jest.fn(async () => mockUnlockAccountResult),
 }))
 
 const { unlockAccount } = require('src/web3/saga')
@@ -327,7 +328,7 @@ describe(startVerification, () => {
 describe(fetchVerificationState, () => {
   it('fetches unverified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
+    const unlockAccountMock = jest.fn(async () => UnlockResult.SUCCESS)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
@@ -373,7 +374,7 @@ describe(fetchVerificationState, () => {
 
   it('fetches partly verified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
+    const unlockAccountMock = jest.fn(async () => UnlockResult.SUCCESS)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
@@ -419,7 +420,7 @@ describe(fetchVerificationState, () => {
 
   it('fetches with forcing unlock account', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
+    const unlockAccountMock = jest.fn(async () => UnlockResult.SUCCESS)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState, true)
       .provide([
