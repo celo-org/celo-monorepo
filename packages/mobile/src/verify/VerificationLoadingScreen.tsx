@@ -110,7 +110,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
 
   const onPressLearnMore = () => {
     // TODO(erdal): getNode and scrollToEnd is missing
-    //scrollViewRef.current?.getNode().scrollToEnd({ animated: true })
+    // scrollViewRef.current?.getNode().scrollToEnd({ animated: true })
   }
 
   const items: CarouselItem[] = [
