@@ -104,7 +104,7 @@ export default function PlumoLanding() {
           desktopStyle={standardStyles.sectionMargin}
           mobileStyle={standardStyles.sectionMarginBottomMobile}
         >
-          <Cell span={Spans.full} style={isDesktop && standardStyles.centered}>
+          <Cell span={Spans.full} style={standardStyles.centered}>
             {isDesktop && <Image source={Outline} style={styles.phoneOutline} />}
             <FeatherPoint
               title={t('figureHeading1')}
@@ -124,31 +124,41 @@ export default function PlumoLanding() {
             />
           </Cell>
         </GridRow>
-        <GridRow>
-          <Cell span={Spans.full}>
-            <H2 style={textStyles.invert}>{t('mainHeader')}</H2>
+        <GridRow allStyle={standardStyles.centered}>
+          <Cell span={Spans.half}>
+            <H2 style={[textStyles.invert, textStyles.center]}>{t('mainHeader')}</H2>
           </Cell>
         </GridRow>
-        <GridRow mobileStyle={{ flexDirection: 'column' }} tabletStyle={{ flexWrap: 'wrap' }}>
+        <GridRow desktopStyle={{ flexDirection: 'column' }} allStyle={standardStyles.centered}>
           <Cell span={Spans.half}>
-            <Text style={[fonts.p, textStyles.invert, { paddingRight: 20 }]}>{t('mainBody1')}</Text>
+            <Text style={[fonts.p, textStyles.invert, textStyles.center]}>{t('mainBody1')}</Text>
           </Cell>
-          <Cell span={Spans.half}>
-            <Text style={[fonts.p, textStyles.heavy, textStyles.invert]}>{t('mainBody2')}</Text>
-            <Ul>
-              <Li style={textStyles.invert}>
+          <Cell span={Spans.half} style={standardStyles.centered}>
+            <Text
+              style={[
+                fonts.p,
+                textStyles.heavy,
+                textStyles.invert,
+                textStyles.center,
+                { maxWidth: 400, marginTop: 12 },
+              ]}
+            >
+              {t('mainBody2')}
+            </Text>
+            <Ul style={standardStyles.centered}>
+              <Li style={[textStyles.invert, textStyles.center]}>
                 {t('prizes.0.title')}{' '}
                 <Text style={textStyles.italic}> {t('prizes.0.amount')} </Text>
               </Li>
-              <Li style={textStyles.invert}>
+              <Li style={[textStyles.invert, textStyles.center]}>
                 {t('prizes.1.title')}{' '}
                 <Text style={textStyles.italic}> {t('prizes.1.amount')} </Text>
               </Li>
-              <Li style={textStyles.invert}>
+              <Li style={[textStyles.invert, textStyles.center]}>
                 {t('prizes.2.title')}{' '}
                 <Text style={textStyles.italic}> {t('prizes.2.amount')} </Text>
               </Li>
-              <Li style={textStyles.invert}>
+              <Li style={[textStyles.invert, textStyles.center]}>
                 {t('prizes.3.title')}{' '}
                 <Text style={textStyles.italic}> {t('prizes.3.amount')} </Text>
               </Li>
@@ -169,7 +179,9 @@ export default function PlumoLanding() {
           </Cell>
         </GridRow>
         <View style={styles.navbar}>
-          <LogoDarkBg height={30} />
+          <a href="/">
+            <LogoDarkBg height={30} />
+          </a>
           <Button href={PLUMO_FORM} text={t('navSignup')} kind={BTN.DARKNAV} target="_blank" />
         </View>
       </View>
