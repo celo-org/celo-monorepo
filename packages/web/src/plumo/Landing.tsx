@@ -1,7 +1,7 @@
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { H2 } from 'src/fonts/Fonts'
+import { H2, Li, Ul } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -21,6 +21,8 @@ import FeatherPoint from './FeatherPoint'
 
 const PLUMO_FORM =
   'https://docs.google.com/forms/d/e/1FAIpQLScZswraVVC91RwToo_9qm-1QzGrxp7yjVeM2wzdTbL5T_lAgQ/viewform'
+
+const MEDIUM_POST = 'https://medium.com/celoorg/the-plumo-ceremony-ac7649e9c8d8'
 
 export default function PlumoLanding() {
   const { t } = useTranslation('plumo')
@@ -88,7 +90,12 @@ export default function PlumoLanding() {
                 >
                   {t('coverSubtitle')}
                 </Text>
-                <Button kind={BTN.PRIMARY} href={PLUMO_FORM} text={t('coverBtn')} />
+                <Button
+                  kind={BTN.PRIMARY}
+                  href={MEDIUM_POST}
+                  text={t('coverBtn')}
+                  target="_blank"
+                />
               </View>
             </Cell>
           </GridRow>
@@ -122,12 +129,30 @@ export default function PlumoLanding() {
             <H2 style={textStyles.invert}>{t('mainHeader')}</H2>
           </Cell>
         </GridRow>
-        <GridRow>
+        <GridRow mobileStyle={{ flexDirection: 'column' }} tabletStyle={{ flexWrap: 'wrap' }}>
           <Cell span={Spans.half}>
-            <Text style={[fonts.p, textStyles.invert]}>{t('mainBody1')}</Text>
+            <Text style={[fonts.p, textStyles.invert, { paddingRight: 20 }]}>{t('mainBody1')}</Text>
           </Cell>
           <Cell span={Spans.half}>
-            <Text style={[fonts.p, textStyles.invert]}>{t('mainBody2')}</Text>
+            <Text style={[fonts.p, textStyles.heavy, textStyles.invert]}>{t('mainBody2')}</Text>
+            <Ul>
+              <Li style={textStyles.invert}>
+                {t('prizes.0.title')}{' '}
+                <Text style={textStyles.italic}> {t('prizes.0.amount')} </Text>
+              </Li>
+              <Li style={textStyles.invert}>
+                {t('prizes.1.title')}{' '}
+                <Text style={textStyles.italic}> {t('prizes.1.amount')} </Text>
+              </Li>
+              <Li style={textStyles.invert}>
+                {t('prizes.2.title')}{' '}
+                <Text style={textStyles.italic}> {t('prizes.2.amount')} </Text>
+              </Li>
+              <Li style={textStyles.invert}>
+                {t('prizes.3.title')}{' '}
+                <Text style={textStyles.italic}> {t('prizes.3.amount')} </Text>
+              </Li>
+            </Ul>
           </Cell>
         </GridRow>
         <GridRow
@@ -140,12 +165,12 @@ export default function PlumoLanding() {
             <H2 style={[textStyles.invert, textStyles.center, styles.ctaHeader]}>
               {t('ctaHeader')}
             </H2>
-            <Button kind={BTN.PRIMARY} href={PLUMO_FORM} text={t('ctaBtn')} />
+            <Button kind={BTN.PRIMARY} href={MEDIUM_POST} text={t('ctaBtn')} target="_blank" />
           </Cell>
         </GridRow>
         <View style={styles.navbar}>
           <LogoDarkBg height={30} />
-          <Button href={PLUMO_FORM} text={t('navSignup')} kind={BTN.DARKNAV} />
+          <Button href={PLUMO_FORM} text={t('navSignup')} kind={BTN.DARKNAV} target="_blank" />
         </View>
       </View>
     </>
