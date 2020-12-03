@@ -41,7 +41,7 @@ export function* revokeVerificationSaga() {
     const accountAddress: string = yield call(getAccountAddress)
     Logger.debug(
       TAG + '@revokeVerification',
-      `Checking for attestaions on ${mtwAddress ? 'MTW' : 'EOA'} account address ${accountAddress}`
+      `Checking for attestations on ${mtwAddress ? 'MTW' : 'EOA'} account address ${accountAddress}`
     )
 
     const contractKit: ContractKit = yield call(getContractKit)
