@@ -127,6 +127,8 @@ async function retrievePasswordHash(account: string) {
 }
 
 let passwordLock = false
+let lastPassword: string | null = null
+let lastError: any = null
 
 export async function getPassword(
   account: string,
@@ -135,6 +137,12 @@ export async function getPassword(
 ) {
   while (passwordLock) {
     await sleep(100)
+    if (lastPassword) {
+      return lastPassword
+    }
+    if (lastError) {
+      throw lastError
+    }
   }
   passwordLock = true
   try {
@@ -153,10 +161,17 @@ export async function getPassword(
     }
 
     setCachedPassword(account, password)
-    passwordLock = false
+    lastPassword = password
     return password
+  } catch (error) {
+    lastError = error
+    throw error
   } finally {
-    passwordLock = false
+    setTimeout(() => {
+      passwordLock = false
+      lastPassword = null
+      lastError = null
+    }, 500)
   }
 }
 
@@ -199,7 +214,6 @@ export async function requestPincodeInput(withVerification = true, shouldNavigat
       withVerification,
     })
   })
-  console.log('ASD', pin)
 
   if (shouldNavigateBack) {
     navigateBack()
