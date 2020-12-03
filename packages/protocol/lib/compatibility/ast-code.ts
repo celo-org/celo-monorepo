@@ -2,8 +2,8 @@ import { stripMetadata } from '@celo/protocol/lib/bytecode'
 import {
   Change,
   ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
-  MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
-  MethodReturnChange, MethodVisibilityChange, NewContractChange
+  MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
+  MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
 import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
@@ -132,12 +132,6 @@ function checkMethodCompatibility(contract: string, m1: Method, m2: Method): AST
   // Visibility changes
   if (m1.visibility !== m2.visibility) {
     report.push(new MethodVisibilityChange(contract, signature, m1.visibility, m2.visibility))
-  }
-  // Parameters signature (types are already equal, but this will check for storage locations)
-  const par1 = parametersSignature(m1.parameters.parameters)
-  const par2 = parametersSignature(m2.parameters.parameters)
-  if (par1 !== par2) {
-    report.push(new MethodParametersChange(contract, signature, par1, par2))
   }
 
   // Return parameter changes

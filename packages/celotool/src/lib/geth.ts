@@ -1,8 +1,6 @@
 // tslint:disable:no-console
-// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
-import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { CeloTxReceipt, TransactionResult } from '@celo/connect'
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
@@ -14,7 +12,6 @@ import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
@@ -24,7 +21,7 @@ import {
   generateGenesis,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator,
+  Validator
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -189,7 +186,7 @@ export const checkGethStarted = (dataDir: string) => {
 }
 
 export const getWeb3AndTokensContracts = async () => {
-  const kit = newKit('http://localhost:8545')
+  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
   const [goldToken, stableToken] = await Promise.all([
     kit.contracts.getGoldToken(),
     kit.contracts.getStableToken(),
@@ -221,7 +218,7 @@ const validateGethRPC = async (
   from: string,
   handleError: HandleErrorCallback
 ) => {
-  const transaction = await kit.web3.eth.getTransaction(txHash)
+  const transaction = await kit.connection.getTransaction(txHash)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -498,7 +495,7 @@ export const simulateClient = async (
   index: number
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
-  const kit = newKit('http://localhost:8545')
+  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
   kit.defaultAccount = senderAddress
 
   const baseLogMessage: any = {
@@ -638,11 +635,11 @@ export const transferERC20Token = async (
   password: string,
   txParams: any = {},
   onTransactionHash?: (hash: string) => void,
-  onReceipt?: (receipt: TransactionReceipt) => void,
+  onReceipt?: (receipt: CeloTxReceipt) => void,
   onError?: (error: any) => void
 ) => {
   txParams.from = from
-  await unlockAccount(kit.web3, 0, password, from)
+  await unlockAccount(kit.connection.web3, 0, password, from)
 
   const convertedAmount = await convertToContractDecimals(amount, token)
 
@@ -772,7 +769,6 @@ export async function importPrivateKey(
   verbose: boolean
 ) {
   const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
-
   if (!instance.privateKey) {
     throw new Error('Unexpected empty private key')
   }

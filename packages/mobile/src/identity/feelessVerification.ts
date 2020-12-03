@@ -1,11 +1,12 @@
 import { Result } from '@celo/base/lib/result'
+import { CeloTxReceipt } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import {
   CheckSessionResp,
   GetDistributedBlindedPepperResp,
@@ -89,7 +90,6 @@ import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
@@ -313,7 +313,13 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       // Start listening for manual and/or auto message inputs
       receiveMessageTask = yield takeEvery(
         Actions.RECEIVE_ATTESTATION_MESSAGE,
-        attestationCodeReceiver(attestationsWrapper, phoneHash, unverifiedMtwAddress, issuers, true)
+        attestationCodeReceiver(
+          attestationsWrapper,
+          phoneHashDetails,
+          unverifiedMtwAddress,
+          attestations,
+          true
+        )
       )
 
       if (!withoutRevealing) {
@@ -364,9 +370,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             Actions.RECEIVE_ATTESTATION_MESSAGE,
             attestationCodeReceiver(
               attestationsWrapper,
-              phoneHash,
+              phoneHashDetails,
               unverifiedMtwAddress,
-              issuers,
+              attestations,
               true
             )
           )
@@ -961,7 +967,7 @@ export function* feelessRequestAttestations(
       `Approving ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    const approveTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+    const approveTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.approveAttestations],
       mtwAddress,
       numAttestationsRequestsNeeded
@@ -981,7 +987,7 @@ export function* feelessRequestAttestations(
       `Requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    const requestTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+    const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.requestAttestations],
       mtwAddress,
       phoneHash,
@@ -1014,7 +1020,7 @@ export function* feelessRequestAttestations(
     feeless: true,
   })
 
-  const selectIssuersTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+  const selectIssuersTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.selectIssuers],
     mtwAddress,
     phoneHash
@@ -1044,7 +1050,7 @@ function* submitCompleteTxAndRetryOnRevert(
   code: AttestationCode
 ) {
   const numOfRetries = 3
-  let completeTxResult: Result<TransactionReceipt, FetchError | TxError>
+  let completeTxResult: Result<CeloTxReceipt, FetchError | TxError>
   for (let i = 0; i < numOfRetries; i += 1) {
     completeTxResult = yield call(
       [komenciKit, komenciKit.completeAttestation],
@@ -1100,7 +1106,7 @@ export function* feelessCompleteAttestation(
   }
 
   yield put(feelessProcessingInputCode(true))
-  const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+  const completeTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
     submitCompleteTxAndRetryOnRevert,
     komenciKit,
     mtwAddress,

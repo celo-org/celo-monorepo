@@ -1,3 +1,4 @@
+import { CeloTxObject } from '@celo/connect'
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
 import { call, cancel, delay, fork, join, race, select, take } from 'redux-saga/effects'
@@ -16,7 +17,6 @@ import Logger from 'src/utils/Logger'
 import { assertNever } from 'src/utils/typescript'
 import { getGasPrice } from 'src/web3/gas'
 import { fornoSelector } from 'src/web3/selectors'
-import { TransactionObject } from 'web3-eth'
 
 const TAG = 'transactions/send'
 
@@ -102,7 +102,7 @@ const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
 // WARNING: this method doesn't have retry and timeout logic built in, turns out that's tricky
 // to get right with this promise set interface. Prefer sendTransaction below
 export function* sendTransactionPromises(
-  tx: TransactionObject<any>,
+  tx: CeloTxObject<any>,
   account: string,
   context: TransactionContext,
   preferredFeeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
@@ -165,7 +165,7 @@ export function* sendTransactionPromises(
 // Send a transaction and await for its confirmation
 // Use this method for sending transactions and awaiting them to be confirmed
 export function* sendTransaction(
-  tx: TransactionObject<any>,
+  tx: CeloTxObject<any>,
   account: string,
   context: TransactionContext,
   staticGas?: number,
