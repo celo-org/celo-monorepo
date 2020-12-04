@@ -22,6 +22,10 @@ const SIGNING_ALGORITHM_FOR: Record<SupportedCurve, SigningAlgorithm> = {
   SECP256K1: 'ECDSA256',
 }
 
+const isSupportedCurve = (curveName: string): curveName is SupportedCurve => {
+  return curveName in SUPPORTED_CURVES
+}
+
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
  */
@@ -80,6 +84,9 @@ export class AzureKeyVaultClient {
       throw new Error(`Unable to locate key: ${keyName}`)
     }
     const curve = await this.getKeyCurve(keyName)
+    if (!isSupportedCurve(curve)) {
+      throw new Error(`Key curve ${curve} is not supported, must be one of: ${SUPPORTED_CURVES}`)
+    }
     const signingAlgorithm = SIGNING_ALGORITHM_FOR[curve]
     const cryptographyClient = await this.getCryptographyClient(keyName)
     const signResult = await cryptographyClient.sign(
@@ -154,16 +161,13 @@ export class AzureKeyVaultClient {
     }
   }
 
-  private async getKeyCurve(keyName: string): Promise<SupportedCurve> {
+  private async getKeyCurve(keyName: string): Promise<string> {
     const key = await this.getKey(keyName)
-
-    if (key.key?.crv && key.key.crv in SUPPORTED_CURVES) {
-      return key.key.crv as SupportedCurve
-    } else {
-      throw new Error(
-        `Key has unexpected curve: ${key.key?.crv} supported curves are: ${SUPPORTED_CURVES}`
-      )
+    if (key.key?.crv === undefined) {
+      throw new Error(`Key or curve is undefined`)
     }
+
+    return key.key.crv
   }
 
   /**
