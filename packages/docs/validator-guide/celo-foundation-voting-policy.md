@@ -50,14 +50,25 @@ To support effective and responsible validators, the Foundation considers the fo
 
 * **Attestation Performance.** Attestation Performance (attestations fulfilled / requests served) over the past 30 days on Mainnet (or Baklava if not elected Mainnet)
 
-
 ### Additional Criteria
 
 In addition to meeting the standard criteria, outlined above, the Foundation anticipates prioritizing validator groups who are mission aligned and/or will provide greater network resilience. These criteria may include:
+
 * The geographical location of the validator group
+
 * Non-profit organizations
+
 * Organizations who commit to donating a percentage of rewards to non-profit organizations
+
 * The likelihood of the validator group having substantial network support from other voters
+
+#### Notes On Improving Your Standard Criteria
+
+* More points are given to those who have performed an external security audit on their infrastructure over those who have self-audited.
+
+* If you are NOT ELECTED on Mainnet, you must be validating on Baklava testnet for at least 30 days. If you are ELECTED you must run validators and attestation service for at least one month (30 days) on  Mainnet. If you are ELECTED on mainnet but for less than 30 days, you must be validating on Baklava for 30 days at least.
+
+* Mission statement and community contributions may make a big difference in whether your application is approved or not.
 
 ## Application
 

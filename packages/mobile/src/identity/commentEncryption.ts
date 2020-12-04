@@ -3,8 +3,8 @@
 // because these manage comment metadata
 
 import { Address } from '@celo/base'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
