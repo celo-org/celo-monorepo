@@ -26,7 +26,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { WEB_LINK } from 'src/brandingConfig'
 import { APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
-import { calculateFee } from 'src/fees/saga'
+import { FeeInfo, calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
@@ -96,10 +96,14 @@ export async function getInviteFee(
   currency: CURRENCY_ENUM,
   amount: string,
   comment: string
-) {
+): Promise<FeeInfo> {
   try {
     const gas = await getInviteTxGas(account, currency, amount, comment)
-    return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+    const feeInfo = await calculateFee(gas, currency)
+    return {
+      ...feeInfo,
+      fee: feeInfo.fee.plus(getInvitationVerificationFeeInWei()),
+    }
   } catch (error) {
     throw error
   }

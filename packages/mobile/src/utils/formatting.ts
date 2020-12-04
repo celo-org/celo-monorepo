@@ -1,6 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
-import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM, WEI_PER_TOKEN } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 
 // Returns a localized string that represents the number with the right decimal points.
@@ -67,12 +67,12 @@ export const getNetworkFeeDisplayValue = (
 }
 
 export const divideByWei = (value: BigNumber.Value, decimals?: number) => {
-  const bn = new BigNumber(value).div(WEI_PER_CELO)
+  const bn = new BigNumber(value).div(WEI_PER_TOKEN)
   return decimals ? bn.decimalPlaces(decimals) : bn
 }
 
 export const multiplyByWei = (value: BigNumber.Value, decimals?: number) => {
-  const bn = new BigNumber(value).times(WEI_PER_CELO)
+  const bn = new BigNumber(value).times(WEI_PER_TOKEN)
   return decimals ? bn.decimalPlaces(decimals) : bn
 }
 

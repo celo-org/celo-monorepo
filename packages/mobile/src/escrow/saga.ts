@@ -471,7 +471,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
 
 export async function getReclaimEscrowFee(account: string, paymentID: string) {
   const gas = await getReclaimEscrowGas(account, paymentID)
-  return calculateFee(gas)
+  return calculateFee(gas, CURRENCY_ENUM.DOLLAR)
 }
 
 function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {

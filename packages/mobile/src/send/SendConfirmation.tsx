@@ -28,7 +28,7 @@ import CalculateFee, {
   CalculateFeeChildren,
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
-import { getFeeDollars } from 'src/fees/selectors'
+import { getFeeInTokens } from 'src/fees/selectors'
 import { features } from 'src/flags'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
@@ -221,8 +221,9 @@ function SendConfirmation(props: Props) {
   }
 
   const renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const fee = getFeeDollars(asyncFee.result)
-    const amountWithFee = amount.plus(fee || 0)
+    const feeInfo = asyncFee.result
+    const fee = getFeeInTokens(feeInfo?.fee)
+    const amountWithFee = amount.plus(fee ?? 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
 
@@ -232,7 +233,7 @@ function SendConfirmation(props: Props) {
     const { displayName, e164PhoneNumber } = transactionData.recipient
 
     const subtotalAmount = {
-      value: amount || inviteFee,
+      value: amount.isGreaterThan(0) ? amount : inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 

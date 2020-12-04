@@ -42,7 +42,7 @@ export function convertLocalAmountToDollars(
 //   (arg="value", coderType="uint256", value="101677681748856126.08")`
 //   as `0.10167768174885612608` is converted to wei but still has a
 //   decimal part which is not accepted by the contract.
-// - That's why we limit the precision to 18 decimals (number of 0 in WEI_PER_CELO)
+// - That's why we limit the precision to 18 decimals (number of 0 in WEI_PER_TOKEN)
 //   and round up at this precision!
 // - This really only affects amounts entered in a local currency.
 //   If the user enters `2.99` cUSD, this function has no impact

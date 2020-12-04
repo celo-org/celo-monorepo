@@ -17,6 +17,13 @@ import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'fees/saga'
 
+export interface FeeInfo {
+  fee: BigNumber
+  gas: BigNumber
+  gasPrice: BigNumber
+  currency: CURRENCY_ENUM
+}
+
 // TODO(victor): Deprecate this caching mechanism once offline calculation is standard.
 // Cache of the gas estimates for common tx types
 // Prevents us from having to recreate txs and estimate their gas each time
@@ -104,15 +111,21 @@ function* getOrSetFee(feeType: FeeType, gasGetter: CallEffect) {
     const gas: BigNumber = yield gasGetter
     feeGasCache.set(feeType, gas)
   }
-  const feeInWei: BigNumber = yield call(calculateFee, feeGasCache.get(feeType)!)
+  // Note: This code path only supports cUSD fees. It is not the most widely used version of fee
+  // estimation, and should be refactored or removed.
+  const feeInWei: BigNumber = yield call(
+    calculateFee,
+    feeGasCache.get(feeType)!,
+    CURRENCY_ENUM.DOLLAR
+  )
   return feeInWei
 }
 
-export async function calculateFee(gas: BigNumber) {
-  const gasPrice = await getGasPrice()
+export async function calculateFee(gas: BigNumber, currency: CURRENCY_ENUM): Promise<FeeInfo> {
+  const gasPrice = await getGasPrice(currency)
   const feeInWei = gas.multipliedBy(gasPrice)
-  Logger.debug(`${TAG}/calculateFee`, `Calculated fee is: ${feeInWei.toString()}`)
-  return feeInWei
+  Logger.debug(`${TAG}/calculateFee`, `Calculated ${currency} fee is: ${feeInWei.toString()}`)
+  return { gas, currency, gasPrice, fee: feeInWei }
 }
 
 export function* feesSaga() {

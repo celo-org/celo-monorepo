@@ -15,7 +15,7 @@ const TAG = 'web3/utils'
 export const BLOCK_AGE_LIMIT = 60 // seconds
 
 // Estimate gas taking into account the configured inflation factor
-export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
+export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx): Promise<BigNumber> {
   const contractKit = await getContractKitAsync()
   const gasEstimator = (_tx: CeloTx) => txObj.estimateGas({ ..._tx })
   const getCallTx = (_tx: CeloTx) => {

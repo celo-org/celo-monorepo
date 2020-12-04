@@ -10,12 +10,12 @@ const getExchangeFeeEstimateInWei = (state: RootState) => state.fees.estimates.e
 const getReclaimEscrowFeeEstimateInWei = (state: RootState) =>
   state.fees.estimates.reclaimEscrow.feeInWei
 
-export function getFeeDollars(feeInWei: BigNumber.Value | null | undefined) {
+export function getFeeInTokens(feeInWei: BigNumber.Value | null | undefined) {
   return feeInWei ? divideByWei(feeInWei) : undefined
 }
 
 function feeEstimateDollarsSelectorFactory(feeSelector: (state: RootState) => string | null) {
-  return createSelector(feeSelector, (feeInWei) => getFeeDollars(feeInWei))
+  return createSelector(feeSelector, (feeInWei) => getFeeInTokens(feeInWei))
 }
 
 export const getInviteFeeEstimateDollars = feeEstimateDollarsSelectorFactory(

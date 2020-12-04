@@ -16,7 +16,7 @@ import { reclaimEscrowPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
-import { getFeeDollars } from 'src/fees/selectors'
+import { getFeeInTokens } from 'src/fees/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -111,9 +111,10 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const { t, isReclaiming, appConnected, dollarBalance } = this.props
     const payment = this.getReclaimPaymentInput()
-    const fee = getFeeDollars(asyncFee.result)
+    const feeInfo = asyncFee.result
+    const fee = getFeeInTokens(feeInfo?.fee)
     const convertedAmount = divideByWei(payment.amount.valueOf())
-    const userHasEnough = fee && fee.isLessThanOrEqualTo(dollarBalance)
+    const userHasEnough = fee?.isLessThanOrEqualTo(dollarBalance)
 
     return (
       <SafeAreaView style={styles.container}>

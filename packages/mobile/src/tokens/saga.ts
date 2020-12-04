@@ -9,7 +9,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { WALLET_BALANCE_UPPER_BOUND } from 'src/config'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM, WEI_PER_TOKEN } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { TransactionContext, TransactionStatus } from 'src/transactions/types'
@@ -22,8 +22,8 @@ const TAG = 'tokens/saga'
 
 // The number of wei that represent one unit in a contract
 const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
-  [CURRENCY_ENUM.GOLD]: null,
-  [CURRENCY_ENUM.DOLLAR]: null,
+  [CURRENCY_ENUM.GOLD]: WEI_PER_TOKEN,
+  [CURRENCY_ENUM.DOLLAR]: WEI_PER_TOKEN,
 }
 
 function* getWeiPerUnit(token: CURRENCY_ENUM) {

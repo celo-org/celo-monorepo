@@ -69,7 +69,7 @@ function WithdrawCeloScreen({ route }: Props) {
     amount: goldBalance || '0',
     includeDekFee: false,
   })
-  const feeEstimate = result && divideByWei(result)
+  const feeEstimate = result && divideByWei(result.fee)
 
   const onConfirm = async () => {
     if (isTransferLimitReached) {

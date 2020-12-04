@@ -71,7 +71,7 @@ export async function getSendFee(
       gas = gas.plus(dekGas)
     }
 
-    return calculateFee(gas)
+    return calculateFee(gas, currency)
   } catch (error) {
     throw error
   }

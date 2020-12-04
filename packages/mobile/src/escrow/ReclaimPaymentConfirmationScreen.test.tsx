@@ -4,7 +4,7 @@ import { render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
-import { SHORT_CURRENCIES, WEI_PER_CELO } from 'src/geth/consts'
+import { SHORT_CURRENCIES, WEI_PER_TOKEN } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number } from 'test/values'
@@ -23,7 +23,7 @@ const mockScreenProps = getMockStackScreenProps(Screens.ReclaimPaymentConfirmati
     recipientPhone: mockE164Number,
     paymentID: mockAccount,
     currency: SHORT_CURRENCIES.DOLLAR,
-    amount: new BigNumber(10 * WEI_PER_CELO),
+    amount: new BigNumber(10).times(WEI_PER_TOKEN),
     timestamp: new BigNumber(10000),
     expirySeconds: new BigNumber(50000),
   },

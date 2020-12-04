@@ -8,11 +8,12 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
+import { FeeInfo } from 'src/fees/saga'
 import { getInviteFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import Logger from 'src/utils/Logger'
 
-export type CalculateFeeChildren = (asyncResult: UseAsyncReturn<BigNumber, any>) => React.ReactNode
+export type CalculateFeeChildren = (asyncResult: UseAsyncReturn<FeeInfo, any>) => React.ReactNode
 
 interface CommonProps {
   children: CalculateFeeChildren
@@ -87,7 +88,7 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   return props.children(asyncResult) as React.ReactElement
 }
 
-export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<BigNumber> => {
+export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<FeeInfo> => {
   return useAsyncShowError(
     (
       account: string,
