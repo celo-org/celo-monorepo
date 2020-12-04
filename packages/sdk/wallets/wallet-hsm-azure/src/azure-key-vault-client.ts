@@ -13,12 +13,14 @@ import {
 } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
 
-export enum AzureKeyVaultSigningAlgorithm {
-  ECDSA256 = 'ECDSA256',
-  ES256K = 'ES256K',
-}
+type SupportedCurve = 'P-256K' | 'SECP256K1'
+type SigningAlgorithm = 'ECDSA256' | 'ES256K'
 
-const DEFAULT_SIGNING_ALGORITHM = AzureKeyVaultSigningAlgorithm.ECDSA256
+const SUPPORTED_CURVES: readonly SupportedCurve[] = ['P-256K', 'SECP256K1'] as const
+const SIGNING_ALGORITHM_FOR: Record<SupportedCurve, SigningAlgorithm> = {
+  'P-256K': 'ES256K',
+  SECP256K1: 'ECDSA256',
+}
 
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
@@ -29,14 +31,13 @@ export class AzureKeyVaultClient {
   private readonly vaultUri: string
   private readonly credential: TokenCredential
   private readonly keyClient: KeyClient
-  private readonly SIGNING_ALGORITHM: AzureKeyVaultSigningAlgorithm
   private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
     string,
     CryptographyClient
   >()
   private readonly secretClient: SecretClient
 
-  constructor(vaultName: string, credential?: TokenCredential, signingAlgorithm?: AzureKeyVaultSigningAlgorithm) {
+  constructor(vaultName: string, credential?: TokenCredential) {
     this.vaultName = vaultName
     this.vaultUri = `https://${this.vaultName}.vault.azure.net`
     // DefaultAzureCredential supports service principal or managed identity
@@ -44,7 +45,6 @@ export class AzureKeyVaultClient {
     this.credential = credential || new DefaultAzureCredential()
     this.keyClient = new KeyClient(this.vaultUri, this.credential)
     this.secretClient = new SecretClient(this.vaultUri, this.credential)
-    this.SIGNING_ALGORITHM = signingAlgorithm || DEFAULT_SIGNING_ALGORITHM
   }
 
   public async getKeys(): Promise<string[]> {
@@ -79,10 +79,12 @@ export class AzureKeyVaultClient {
     if (!(await this.hasKey(keyName))) {
       throw new Error(`Unable to locate key: ${keyName}`)
     }
+    const curve = await this.getKeyCurve(keyName)
+    const signingAlgorithm = SIGNING_ALGORITHM_FOR[curve]
     const cryptographyClient = await this.getCryptographyClient(keyName)
     const signResult = await cryptographyClient.sign(
       // @ts-ignore-next-line (ECDSA256 is not included in the client enum but is valid)
-      this.SIGNING_ALGORITHM,
+      signingAlgorithm,
       new Uint8Array(message)
     )
     // The output of this will be a 64 byte array.
@@ -149,6 +151,18 @@ export class AzureKeyVaultClient {
         throw new Error(`Key ${keyName} not found in KeyVault ${this.vaultName}`)
       }
       throw new Error(`Unexpected KeyVault error ${e.message}`)
+    }
+  }
+
+  private async getKeyCurve(keyName: string): Promise<SupportedCurve> {
+    const key = await this.getKey(keyName)
+
+    if (key.key && key.key.crv && key.key.crv in SUPPORTED_CURVES) {
+      return key.key.crv as SupportedCurve
+    } else {
+      throw new Error(
+        `Key has unexpected curve: ${key.key?.crv} supported curves are: ${SUPPORTED_CURVES}`
+      )
     }
   }
 
