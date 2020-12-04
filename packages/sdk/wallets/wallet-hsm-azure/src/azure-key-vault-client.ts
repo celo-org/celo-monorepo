@@ -157,7 +157,7 @@ export class AzureKeyVaultClient {
   private async getKeyCurve(keyName: string): Promise<SupportedCurve> {
     const key = await this.getKey(keyName)
 
-    if (key.key && key.key.crv && key.key.crv in SUPPORTED_CURVES) {
+    if (key.key?.crv && key.key.crv in SUPPORTED_CURVES) {
       return key.key.crv as SupportedCurve
     } else {
       throw new Error(
