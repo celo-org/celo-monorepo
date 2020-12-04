@@ -87,9 +87,9 @@ cLabs is running the coordinator server, which has a list of approved participan
 
 * After receiving confirmation from cLabs, download the `contribute` binary from [here]https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-rc.1).
 * Run it in the same directory as the `plumo.keys` file as follows:
-    * Windows users: `contribute-windows --coordinator-url https://plumo-phase1.azurefd.net`
-    * macOS users: `./contribute-macos --coordinator-url https://plumo-phase1.azurefd.net`
-    * Linux users: `./contribute-linux --coordinator-url https://plumo-phase1.azurefd.net`
+    * Windows users: `contribute-windows --coordinator-url https://plumo-setup-phase-1.azurefd.net`
+    * macOS users: `./contribute-macos --coordinator-url https://plumo-setup-phase-1.azurefd.net`
+    * Linux users: `./contribute-linux --coordinator-url https://plumo-setup-phase-1.azurefd.net`
 * You will be asked for your passphrase - enter the same one from earlier. 
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
