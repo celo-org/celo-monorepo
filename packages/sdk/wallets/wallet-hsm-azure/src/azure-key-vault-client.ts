@@ -163,7 +163,7 @@ export class AzureKeyVaultClient {
 
   private async getKeyCurve(keyName: string): Promise<string> {
     const key = await this.getKey(keyName)
-    if (key.key?.crv === undefined) {
+    if (key.key === undefined || key.key.crv === undefined) {
       throw new Error(`Key or curve is undefined`)
     }
 
