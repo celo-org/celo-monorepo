@@ -1,4 +1,6 @@
+import { eqAddress } from '@celo/base'
 import { CeloTransactionObject } from '@celo/connect'
+import { Address } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -278,6 +280,22 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
         contractKit.contracts.getAttestations,
       ])
 
+      // If attestation status has more than one completed attestation, then the account
+      // must be assoicated with identifier. Otherwise, it is likely an account that
+      // has been revoked and cannot currently be reverified
+      if (status.completed > 0) {
+        const associatedAccounts: Address[] = yield call(
+          [attestationsWrapper, attestationsWrapper.lookupAccountsForIdentifier],
+          phoneHash
+        )
+        const associated = associatedAccounts.some((acc) => eqAddress(acc, account))
+        if (!associated) {
+          yield put(showError(ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT, 10000))
+          yield put(setVerificationStatus(VerificationStatus.Failed))
+          return ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT
+        }
+      }
+
       if (!isBalanceSufficient) {
         yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
         // Return error message for logging purposes
@@ -508,8 +526,23 @@ export async function getAttestationsStatus(
     `${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
   )
 
-  if (attestationStatus.numAttestationsRemaining <= 0) {
-    Logger.debug(TAG + '@getAttestationsStatus', 'User is already verified')
+  // If the user has enough attestations completed to be considered verified but doesn't
+  // have an account associated with the identifer, set `isVerified` to false
+  if (attestationStatus.isVerified) {
+    Logger.debug(TAG + '@getAttestationsStatus', `Account ${account} is already verified`)
+
+    const attestedAccounts: Address[] = await attestationsWrapper.lookupAccountsForIdentifier(
+      phoneHash
+    )
+    const associated = attestedAccounts.some((acc) => eqAddress(acc, account))
+
+    if (!associated) {
+      Logger.debug(
+        TAG + '@getAttestationsStatus',
+        `Account has enough completed attestations but is not associated with the identifier. Likely a revoked account`
+      )
+      attestationStatus.isVerified = false
+    }
   }
 
   return attestationStatus
