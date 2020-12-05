@@ -5,6 +5,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
+import * as RNFS from 'react-native-fs'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { setName, setPicture } from 'src/account/actions'
@@ -17,29 +18,47 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import PictureInput from 'src/onboarding/registration/PictureInput'
+import { saveImageDataUrlToFile } from 'src/utils/image'
 
 type Props = StackScreenProps<StackParamList, Screens.Profile>
 
 function Profile({ navigation, route }: Props) {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [newName, setNewName] = useState(useSelector(nameSelector) ?? '')
-  const [newPicture, setNewPicture] = useState(useSelector(pictureSelector) ?? '')
+  const picturePath = useSelector(pictureSelector)
+  // We are using newPictureUri to show the image until the user presses the Save button, at which
+  // point we store the newPictureData on the file system and update the URI on the Redux store.
+  const [newPictureUri, setNewPictureUri] = useState(picturePath)
+  const [newPictureData, setNewPictureData] = useState('')
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     if (route.params?.save) {
       navigation.setParams({ save: false })
-      dispatch(setPicture(newPicture))
+      let newPicturePath = null
+      if (newPictureData) {
+        newPicturePath = saveImageDataUrlToFile(
+          newPictureData,
+          `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
+        )
+      }
       dispatch(setName(newName))
-      // TODO: Save these things on CIP8.
+      dispatch(setPicture(newPicturePath))
+      // TODO: Save newName and newPictureData on CIP-8.
       dispatch(showMessage(t('namePictureSaved')))
       navigation.goBack()
+
+      // Delete old proflie pictures if necessary.
+      if (picturePath && picturePath !== newPictureUri) {
+        RNFS.unlink(picturePath).catch()
+      }
     }
   }, [route.params?.save])
 
-  const onPictureChosen = (chosenPicture: string) => {
-    setNewPicture(chosenPicture)
+  const onPictureChosen = (uri: string, pictureDataUrl: string) => {
+    setNewPictureUri(uri)
+    setNewPictureData(pictureDataUrl)
   }
 
   const updateName = (updatedName: string) => {
@@ -51,7 +70,7 @@ function Profile({ navigation, route }: Props) {
       <SafeAreaView edges={['bottom']}>
         <View style={styles.accountProfile}>
           <PictureInput
-            picture={newPicture}
+            picture={newPictureUri}
             onPhotoChosen={onPictureChosen}
             backgroundColor={colors.gray3}
           />

@@ -11,7 +11,7 @@ import Logger from 'src/utils/Logger'
 
 interface Props {
   picture: string | null
-  onPhotoChosen: (photo: string) => void
+  onPhotoChosen: (uri: string, dataUrl: string) => void
   backgroundColor: string
 }
 
@@ -33,7 +33,7 @@ function PictureInput({ picture, onPhotoChosen, backgroundColor }: Props) {
         cropperCancelText: t('global:cancel'),
       })
       // @ts-ignore
-      onPhotoChosen(`data:${image.mime};base64,${image.data}`)
+      onPhotoChosen(image.sourceURL, `data:${image.mime};base64,${image.data}`)
     } catch (e) {
       Logger.error('Error while fetching image from picker', e)
     }

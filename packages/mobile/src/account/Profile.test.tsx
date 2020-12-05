@@ -36,7 +36,7 @@ describe('Profile', () => {
           <Profile {...getMockStackScreenProps(Screens.Profile, { save: true })} />
         </Provider>
       )
-      expect(store.getActions()).toEqual(expect.arrayContaining([setPicture(''), setName(name)]))
+      expect(store.getActions()).toEqual(expect.arrayContaining([setPicture(null), setName(name)]))
     })
   })
 })

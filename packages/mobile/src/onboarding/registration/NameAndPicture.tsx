@@ -6,6 +6,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
+import * as RNFS from 'react-native-fs'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { setName, setPicture, setPromptForno } from 'src/account/actions'
@@ -20,11 +21,13 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import PictureInput from 'src/onboarding/registration/PictureInput'
 import useTypedSelector from 'src/redux/useSelector'
+import { saveImageDataUrlToFile } from 'src/utils/image'
 
 type Props = StackScreenProps<StackParamList, Screens.NameAndPicture>
 
 function NameAndPicture({}: Props) {
   const [nameInput, setNameInput] = useState('')
+  const [, /* pictureDataUrl */ setPictureDataUrl] = useState('')
   const cachedName = useTypedSelector((state) => state.account.name)
   const picture = useTypedSelector((state) => state.account.picture)
   const dispatch = useDispatch()
@@ -55,11 +58,18 @@ function NameAndPicture({}: Props) {
       includesPhoto: false,
     })
     dispatch(setName(newName))
+
+    // TODO: Store newName and pictureDataUrl on CIP-8.
     goToNextScreen()
   }
 
-  const onPhotoChosen = (photoData: string) => {
-    dispatch(setPicture(photoData))
+  const onPhotoChosen = (pictureUri: string, dataUrl: string) => {
+    const fileName = saveImageDataUrlToFile(
+      dataUrl,
+      `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
+    )
+    setPictureDataUrl(dataUrl)
+    dispatch(setPicture(fileName))
   }
 
   return (

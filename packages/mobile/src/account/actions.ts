@@ -53,7 +53,7 @@ export interface SetPhoneNumberAction {
 
 export interface SetPictureAction {
   type: Actions.SET_PICTURE
-  picture: string
+  picture: string | null
 }
 
 export interface DevModeTriggerClickedAction {
@@ -210,7 +210,7 @@ export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): Se
   }
 }
 
-export function setPicture(picture: string): SetPictureAction {
+export function setPicture(picture: string | null): SetPictureAction {
   return {
     type: Actions.SET_PICTURE,
     picture,
