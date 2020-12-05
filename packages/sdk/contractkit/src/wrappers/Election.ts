@@ -386,10 +386,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param value The amount of gold to use to vote.
    */
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.connection.defaultAccount == null) {
-      throw new Error(`missing kit.defaultAccount`)
-    }
-
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
     return toTransactionObject(
