@@ -17,4 +17,4 @@ A more detailed flow of the phone number hash construction and the code input re
 
 ![](https://storage.googleapis.com/celo-website/Get%20Phone%20Number%20Hash%20Details%20Flow%20(1).jpg)
 
-![](https://storage.googleapis.com/celo-website/Wait%20SMS%20and%20Complete%20Attestation%20Flow.jpg)
+![](https://storage.googleapis.com/celo-website/Wait%20SMS%20and%20Complete%20Attestation%20Flow%20(1).jpg)
