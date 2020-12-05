@@ -106,8 +106,9 @@ export function* sendTransactionPromises(
   account: string,
   context: TransactionContext,
   preferredFeeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
-  nonce?: number,
-  staticGas?: number
+  gas?: number,
+  gasPrice?: BigNumber,
+  nonce?: number
 ) {
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
@@ -116,9 +117,7 @@ export function* sendTransactionPromises(
 
   const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
   const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
-
   const fornoMode: boolean = yield select(fornoSelector)
-  let gasPrice: BigNumber | undefined
 
   // If stableToken is prefered to pay fee, use it unless its balance is Zero,
   // in that case use CELO to pay fee.
@@ -155,7 +154,7 @@ export function* sendTransactionPromises(
     account,
     feeCurrencyAddress,
     getLogger(context, fornoMode),
-    staticGas,
+    gas,
     gasPrice?.toString(),
     nonce
   )
@@ -168,7 +167,8 @@ export function* sendTransaction(
   tx: CeloTxObject<any>,
   account: string,
   context: TransactionContext,
-  staticGas?: number,
+  gas?: number,
+  gasPrice?: BigNumber,
   cancelAction?: string,
   feeCurrency?: CURRENCY_ENUM
 ) {
@@ -179,8 +179,9 @@ export function* sendTransaction(
       account,
       context,
       feeCurrency,
-      nonce,
-      staticGas
+      gas,
+      gasPrice,
+      nonce
     )
     const result = yield confirmation
     return result

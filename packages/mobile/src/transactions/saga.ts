@@ -1,6 +1,7 @@
 import { CeloTransactionObject } from '@celo/connect'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
+import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -64,7 +65,9 @@ export function* sendAndMonitorTransaction<T>(
   account: string,
   context: TransactionContext,
   currency?: CURRENCY_ENUM,
-  feeCurrency?: CURRENCY_ENUM
+  feeCurrency?: CURRENCY_ENUM,
+  gas?: number,
+  gasPrice?: BigNumber
 ) {
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${context.id}`)
@@ -76,6 +79,8 @@ export function* sendAndMonitorTransaction<T>(
         account,
         context,
         feeCurrency,
+        gas,
+        gasPrice,
         nonce
       )
       const hash = yield transactionHash
@@ -86,13 +91,16 @@ export function* sendAndMonitorTransaction<T>(
     yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
     yield put(transactionConfirmed(context.id))
 
-    if (currency === CURRENCY_ENUM.GOLD) {
+    // Determine which balances may be affected by the transaction and fetch updated balances.
+    // DO NOT MERGE: Test that this works as intended.
+    const balancesAffected = new Set([
+      ...(currency ? [currency] : [CURRENCY_ENUM.DOLLAR, CURRENCY_ENUM.GOLD]),
+      feeCurrency ?? CURRENCY_ENUM.DOLLAR,
+    ])
+    if (balancesAffected.has(CURRENCY_ENUM.GOLD)) {
       yield put(fetchGoldBalance())
-    } else if (currency === CURRENCY_ENUM.DOLLAR) {
-      yield put(fetchDollarBalance())
-    } else {
-      // Fetch both balances for exchange
-      yield put(fetchGoldBalance())
+    }
+    if (balancesAffected.has(CURRENCY_ENUM.DOLLAR)) {
       yield put(fetchDollarBalance())
     }
   } catch (error) {

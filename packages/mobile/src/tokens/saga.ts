@@ -9,6 +9,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { WALLET_BALANCE_UPPER_BOUND } from 'src/config'
+import { FeeInfo } from 'src/fees/saga'
 import { CURRENCY_ENUM, WEI_PER_TOKEN } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
@@ -109,6 +110,7 @@ export interface TokenTransfer {
   recipientAddress: string
   amount: string
   comment: string
+  feeInfo?: FeeInfo
   context: TransactionContext
 }
 
@@ -165,7 +167,7 @@ export function tokenTransferFactory({
   return function*() {
     while (true) {
       const transferAction: TokenTransferAction = yield take(actionName)
-      const { recipientAddress, amount, comment, context } = transferAction
+      const { recipientAddress, amount, comment, feeInfo, context } = transferAction
 
       Logger.debug(
         tag,
@@ -201,7 +203,16 @@ export function tokenTransferFactory({
           }
         )
 
-        yield call(sendAndMonitorTransaction, tx, account, context, currency)
+        yield call(
+          sendAndMonitorTransaction,
+          tx,
+          account,
+          context,
+          currency,
+          feeInfo?.currency,
+          feeInfo?.gas?.toNumber(),
+          feeInfo?.gasPrice
+        )
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
         yield put(removeStandbyTransaction(context.id))

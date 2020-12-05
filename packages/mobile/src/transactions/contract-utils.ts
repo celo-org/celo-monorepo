@@ -131,7 +131,7 @@ export async function sendTransactionAsync<T>(
   account: string,
   feeCurrencyAddress: string | undefined,
   logger: TxLogger = emptyTxLogger,
-  estimatedGas?: number,
+  gas?: number,
   gasPrice?: string,
   nonce?: number
 ): Promise<TxPromises> {
@@ -205,12 +205,12 @@ export async function sendTransactionAsync<T>(
       nonce,
     }
 
-    if (estimatedGas === undefined) {
-      estimatedGas = (await estimateGas(tx, txParams)).toNumber()
-      logger(EstimatedGas(estimatedGas))
+    if (gas === undefined) {
+      gas = (await estimateGas(tx, txParams)).toNumber()
+      logger(EstimatedGas(gas))
     }
 
-    emitter = tx.send({ ...txParams, gas: estimatedGas })
+    emitter = tx.send({ ...txParams, gas: gas })
     emitter
       // @ts-ignore
       .once('receipt', (r: CeloTxReceipt) => {

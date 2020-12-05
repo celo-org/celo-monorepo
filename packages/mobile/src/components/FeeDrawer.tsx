@@ -16,7 +16,7 @@ import { CurrencyInfo } from 'src/send/SendConfirmation'
 
 interface Props {
   isEstimate?: boolean
-  currency: CURRENCY_ENUM
+  currency?: CURRENCY_ENUM
   inviteFee?: BigNumber
   isInvite?: boolean
   isExchange?: boolean
@@ -57,30 +57,35 @@ export default function FeeDrawer({
 
   const title = isEstimate ? t('feeEstimate') : t('feeActual')
 
-  const securityAmount = securityFee && {
-    value: securityFee,
-    currencyCode: CURRENCIES[currency].code,
-  }
+  const securityAmount = securityFee &&
+    currency && {
+      value: securityFee,
+      currencyCode: CURRENCIES[currency].code,
+    }
 
-  const exchangeAmount = exchangeFee && {
-    value: exchangeFee,
-    currencyCode: CURRENCIES[currency].code,
-  }
+  const exchangeAmount = exchangeFee &&
+    currency && {
+      value: exchangeFee,
+      currencyCode: CURRENCIES[currency].code,
+    }
 
-  const inviteFeeAmount = inviteFee && {
-    value: inviteFee,
-    currencyCode: CURRENCIES[currency].code,
-  }
+  const inviteFeeAmount = inviteFee &&
+    currency && {
+      value: inviteFee,
+      currencyCode: CURRENCIES[currency].code,
+    }
 
-  const dekFeeAmount = dekFee && {
-    value: dekFee,
-    currencyCode: CURRENCIES[currency].code,
-  }
+  const dekFeeAmount = dekFee &&
+    currency && {
+      value: dekFee,
+      currencyCode: CURRENCIES[currency].code,
+    }
 
-  const totalFeeAmount = totalFee && {
-    value: totalFee,
-    currencyCode: CURRENCIES[currency].code,
-  }
+  const totalFeeAmount = totalFee &&
+    currency && {
+      value: totalFee,
+      currencyCode: CURRENCIES[currency].code,
+    }
 
   return (
     // Uses View instead of Fragment to workaround a glitch with LayoutAnimation

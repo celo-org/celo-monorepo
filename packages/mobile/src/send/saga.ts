@@ -5,7 +5,7 @@ import { showError } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { calculateFee } from 'src/fees/saga'
+import { FeeInfo, calculateFee } from 'src/fees/saga'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentEncryption'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
@@ -127,7 +127,8 @@ function* sendPayment(
   recipientAddress: string,
   amount: BigNumber,
   comment: string,
-  currency: CURRENCY_ENUM
+  currency: CURRENCY_ENUM,
+  feeInfo?: FeeInfo
 ) {
   try {
     ValoraAnalytics.track(SendEvents.send_tx_start)
@@ -146,6 +147,7 @@ function* sendPayment(
             recipientAddress,
             amount: amount.toString(),
             comment: encryptedComment,
+            feeInfo,
             context,
           })
         )
@@ -157,6 +159,7 @@ function* sendPayment(
             recipientAddress,
             amount: amount.toString(),
             comment: encryptedComment,
+            feeInfo,
             context,
           })
         )
@@ -184,6 +187,7 @@ function* sendPaymentOrInviteSaga({
   comment,
   recipient,
   recipientAddress,
+  feeInfo,
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
@@ -195,7 +199,7 @@ function* sendPaymentOrInviteSaga({
     }
 
     if (recipientAddress) {
-      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
+      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR, feeInfo)
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,

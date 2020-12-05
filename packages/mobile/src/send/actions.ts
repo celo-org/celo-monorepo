@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { FeeInfo } from 'src/fees/saga'
 import { Svg } from 'svgs'
 
 export interface QrCode {
@@ -45,8 +46,9 @@ export interface SendPaymentOrInviteAction {
   comment: string
   recipient: Recipient
   recipientAddress?: string | null
+  feeInfo?: FeeInfo
   inviteMethod?: InviteBy
-  firebasePendingRequestUid: string | null | undefined
+  firebasePendingRequestUid?: string | null
 }
 
 export interface SendPaymentOrInviteSuccessAction {
@@ -96,6 +98,7 @@ export const sendPaymentOrInvite = (
   comment: string,
   recipient: Recipient,
   recipientAddress: string | null | undefined,
+  feeInfo: FeeInfo | undefined,
   inviteMethod: InviteBy | undefined,
   firebasePendingRequestUid: string | null | undefined
 ): SendPaymentOrInviteAction => ({
@@ -104,6 +107,7 @@ export const sendPaymentOrInvite = (
   comment,
   recipient,
   recipientAddress,
+  feeInfo,
   inviteMethod,
   firebasePendingRequestUid,
 })

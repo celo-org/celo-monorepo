@@ -482,6 +482,7 @@ export function* moveAllFundsFromAccount(
     account,
     context,
     SEND_TOKEN_GAS_ESTIMATE,
+    undefined,
     AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
   )
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
