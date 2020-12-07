@@ -52,3 +52,13 @@ export async function linkSAForWorkloadIdentity(celoEnv: string) {
     )
   }
 }
+
+export async function delinkSAForWorkloadIdentituy(celoEnv: string) {
+    if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false") === "true") {
+    await execCmd(
+      `gcloud iam service-accounts remove-iam-policy-binding --project ${fetchEnv(envVar.TESTNET_PROJECT_NAME)} \
+        --role roles/iam.workloadIdentityUser \
+        --member "serviceAccount:celo-testnet.svc.id.goog[${celoEnv}/gcloud-storage-access]" chaindata-download@celo-testnet.iam.gserviceaccount.com`
+    )
+  }
+}
