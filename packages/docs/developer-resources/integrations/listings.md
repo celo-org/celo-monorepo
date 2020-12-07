@@ -22,7 +22,7 @@ For more specific use-cases for exchanges, please checkout the [Custody and Exch
 ## Important Information
 ### Celo Native Asset and Celo Dollar
 
-There are two important assets on the Celo network, the Celo native asset (CELO) and the Celo Dollar (cUSD). CELO was called Celo Gold (cGLD) when the contract was deployed, so you will often see references to Celo Gold in the codebase. To learn more about the two, please read [this](https://docs.celo.org/developer-guide/overview/celo-for-eth-devs#the-celo-native-asset-and-the-celo-dollar) section of the docs.
+There are two important assets on the Celo network, the Celo native asset (CELO) and the Celo Dollar (cUSD). CELO was called Celo Gold (cGLD) when the contract was deployed, so you will often see references to Celo Gold in the codebase. To learn more about the two, please read [this](https://docs.celo.org/developer-guide/celo-for-eth-devs#the-celo-native-asset-and-the-celo-dollar) section of the docs.
 
 You can also view the CGP proposal regarding the name change [here](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0003.md) and the forum post about the name change [here](https://forum.celo.org/t/proposal-to-rename-celo-gold-to-celo-native-asset/528).
 
