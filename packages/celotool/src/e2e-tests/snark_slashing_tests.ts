@@ -133,7 +133,6 @@ export interface Info {
 async function getSlashingInfo(web3: Web3, bn: number): Promise<Info> {
   const res = (await jsonRpc(web3, 'istanbul_getEpochValidatorSetData', [`0x${bn.toString(16)}`]))
     .result
-  console.info('json result', res)
   const info = {
     inner: '0x' + Buffer.from(res.bhhash, 'base64').toString('hex'),
     extra:
@@ -148,26 +147,18 @@ async function getSlashingInfo(web3: Web3, bn: number): Promise<Info> {
 
 async function makeHint(instance: SnarkEpochDataSlasher, { inner, extra }: Info) {
   const res = await instance.methods.testHashing(extra, inner).call()
-  // console.log("hash result", res)
   const arr = [...Buffer.from(res.substr(2), 'hex')]
-  // console.log(arr.slice(0, 48))
   const needed = arr.slice(0, 48).reverse()
-  // Parse to point
   needed[0] = needed[0] & 0x01
   const x = BigInt('0x' + Buffer.from(needed).toString('hex'))
   const [y1, y2] = findY(x)
-  // console.log("x y1 y2", x.toString(16), y1.toString(16), y2.toString(16))
   const hints = `0x${y1.toString(16).padStart(128, '0')}${y2.toString(16).padStart(128, '0')}`
-  // console.log('hint', hints)
-  // let point = await instance.testParseToG1Scaled(extra_data, inner_hash, hints)
-  // console.log('point', point)
   return hints
 }
 
 async function infoToData(instance: SnarkEpochDataSlasher, info: Info) {
   const hint = await makeHint(instance, info)
   const sig = uncompressSig(info.sig)
-  // console.log(sig, info.sig)
   const header = `0x${info.extra.substr(2)}${info.inner.substr(2)}${info.bitmap
     .toString(16)
     .padStart(64, '0')}${sig.substr(2)}${hint.substr(2)}`
@@ -244,14 +235,6 @@ describe('snark slashing tests', function(this: any) {
     this.timeout(0)
     await hooks.after()
   })
-  /*
-  const restart = async () => {
-    await hooks.restart()
-    web3 = new Web3('http://localhost:8545')
-    kit = newKitFromWeb3(web3)
-    await sleep(1)
-  }
-*/
   const restart1 = async () => {
     await hooks1.restart()
     web3 = new Web3('http://localhost:8545')
@@ -286,16 +269,6 @@ describe('snark slashing tests', function(this: any) {
       const uncompressed = Buffer.from(
         [...Buffer.from(compressed.substr(2, 94), 'hex')].reverse()
       ).toString('hex')
-      console.info(
-        'addr',
-        addr,
-        'bls',
-        blsPublicKey.substr(36, 94),
-        'compressed',
-        compressed,
-        'uncompressed',
-        uncompressed
-      )
       assert.equal(blsPublicKey.substr(36, 94), uncompressed)
     })
   })
@@ -321,26 +294,18 @@ describe('snark slashing tests', function(this: any) {
       const lockedGold = await kit.contracts.getLockedGold()
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
-      const balance0 = await lockedGold.getAccountTotalLockedGold(signer)
-      console.info('start balance', balance0.toString(10))
 
       const header = await infoToData(slasher0, info1)
       const other = await infoToData(slasher0, info2)
-      //"0x0100000080000044e6bd0a7d65bad7c6ed60883f2de140e9984ba6ba28019cc6667e5250c43800e4eabef9b0c7977a52d07976b806375400000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000007e146df7b894929b62ca9908687e4b7bcce6c0ceeedae9abc468948096b3b0600fdc4a957ca21d812ffa28578ce3ec0000000000000000000000000000000001696c3444d2e07abf9250bc3f8a39c3a35ee5f7e94597dfef7e60d99c8d6f8cdd1067c107df67a7266e7db390cd264900000000000000000000000000000000018be6d09213b7227c2686995e1a349d24de01f6602662c22a68dca69ba8e1f938fb20b333d6c0b9e5f381dbf148fc84000000000000000000000000000000000022537585b159c84a147f270e87149df544d7fca0ceb0ccf48a85891e606606de103c90fc293f469f153e240eb7037d"
-      console.info('header1', header)
-      // console.info("header2", await infoToData(slasher0, info2))
-      console.info('header2', other)
 
       const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
-      console.info(txRcpt, txResult)
       assert.equal(txRcpt.status, true)
 
       // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
+      // Gets also two rewards, so the eventual balance is 3000 cGLD
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      console.info('end balance', balance.toString(10))
-      // Gets also two rewards
       assert.equal(balance.toString(10), '3000000000000000000000')
     })
   })

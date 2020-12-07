@@ -93,11 +93,9 @@ export class SnarkEpochDataSlasherWrapper extends BaseWrapper<SnarkEpochDataSlas
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
     const blockNumber = await this.getBlockNumberFromData(headerA)
-    console.info('block number', blockNumber)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const signer = await election.validatorSignerAddressFromSet(signerIndex, blockNumber)
-    console.info('got signer', signer)
     const validator = await validators.getValidatorFromSigner(signer)
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, blockNumber)
     const lockedGold = await this.kit.contracts.getLockedGold()
