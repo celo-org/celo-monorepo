@@ -9,9 +9,10 @@ library CIP20Lib {
   uint8 private constant SHA3_512_SELECTOR = 0x01;
   uint8 private constant KECCAK_512_SELECTOR = 0x02;
   uint8 private constant BLAKE2S_SELECTOR = 0x10;
-  uint8 private constant BLAKE2XS_SELECTOR = 0x11;
 
-  bytes32 private constant BLAKE2S_DEFAULT_CONFIG = 0x2000010100000000000000000000000000000000000000000000000000000000;
+  bytes32 private constant BLAKE2S_DEFAULT_CONFIG = bytes32(
+    uint256((0x20 << (31 * 8)) | (0x01 << (29 * 8)) | (0x01 << (28 * 8)))
+  );
 
   // Accepts a fully formed input blob. This should include any config
   // options and the preimage, but not the selector.
@@ -75,41 +76,9 @@ library CIP20Lib {
     return executeCip20(configuredInput, BLAKE2S_SELECTOR, uint256(uint8(config[0])));
   }
 
-  function blake2XsWithConfig(
-    bytes32 config,
-    bytes memory key,
-    bytes memory preimage,
-    uint16 outputBytes
-  ) internal view returns (bytes memory) {
-    require(
-      key.length == uint256(config >> (8 * 30)) & 0xff,
-      "CIP20Lib/blake2XsWithConfig - Provided key length does not match key length in config"
-    );
-    require(
-      uint256(config >> (8 * 31)) == 0x20,
-      "CIP20Lib/blake2XsWithConfig - Digest size must be set to 0x20 for blake2Xs"
-    );
-    // Add an extra byte on the front. We'll then write the desired output
-    // size to the first 2 bytes.
-    bytes memory configuredInput = abi.encodePacked(config, key, outputBytes, preimage);
-
-    return executeCip20(configuredInput, BLAKE2XS_SELECTOR, uint256(outputBytes));
-  }
-
   // default settings, no key
   function blake2s(bytes memory preimage) internal view returns (bytes memory) {
     return blake2sWithConfig(BLAKE2S_DEFAULT_CONFIG, hex"", preimage);
-  }
-
-  // default settings, no key, XOF digest
-  function blake2Xs(bytes memory preimage, uint16 xofDigestLength)
-    internal
-    view
-    returns (bytes memory)
-  {
-    bytes32 config = BLAKE2S_DEFAULT_CONFIG;
-    config = writeLEU16(config, 12, xofDigestLength);
-    return blake2XsWithConfig(BLAKE2S_DEFAULT_CONFIG, hex"", preimage, xofDigestLength);
   }
 
   function createConfig(
