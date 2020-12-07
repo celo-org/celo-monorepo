@@ -11,7 +11,11 @@ library CIP20Lib {
   uint8 private constant BLAKE2S_SELECTOR = 0x10;
 
   bytes32 private constant BLAKE2S_DEFAULT_CONFIG = bytes32(
-    uint256((0x20 << (31 * 8)) | (0x01 << (29 * 8)) | (0x01 << (28 * 8)))
+    uint256(
+      (0x20 << (31 * 8)) | /* digest size */
+        (0x01 << (29 * 8)) | /* fan out */
+        (0x01 << (28 * 8))
+    ) /* depth */
   );
 
   // Accepts a fully formed input blob. This should include any config
