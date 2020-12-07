@@ -340,8 +340,8 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     for (uint256 i = 0; i < 150; i++) {
       if (bitmap & 1 == 1) {
         num++;
-        // public_key = getBLSPublicKeyInplace(blockNumber, i, public_key, buffer);
-        public_key = getBLSPublicKey(blockNumber, i);
+        getBLSPublicKeyInplace(blockNumber, i, public_key, buffer);
+        // public_key = getBLSPublicKey(blockNumber, i);
         if (!prev) {
           agg.X.a.a = public_key.X.a.a;
           agg.X.b.a = public_key.X.b.a;

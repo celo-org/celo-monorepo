@@ -130,7 +130,7 @@ const DefaultConstitution = {
     addSpender: 0.9,
     removeSpender: 0.8,
   },
-  SnarkEpochDataSigningSlasher: {
+  SnarkEpochDataSlasher: {
     default: 0.7,
     setSlashingIncentives: 0.7,
   },
