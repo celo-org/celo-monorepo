@@ -3,20 +3,6 @@ import { SnarkEpochDataSlasher } from '../generated/SnarkEpochDataSlasher'
 import { BaseSlasher } from './BaseSlasher'
 import { valueToInt } from './BaseWrapper'
 
-/*
-import { findAddressIndex } from '@celo/base/lib/address'
-import BigNumber from 'bignumber.js'
-import { Address } from '../base'
-import {
-  BaseWrapper,
-  CeloTransactionObject,
-  proxyCall,
-  toTransactionObject,
-  valueToBigNumber,
-  valueToInt,
-} from './BaseWrapper'
-*/ BigInt
-
 /**
  * Contract handling slashing for Validator double-signing
  */
