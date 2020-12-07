@@ -12,7 +12,13 @@ describe(getCountryFeaturesSelector, () => {
 
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
+        "FIAT_SPEND_ENABLED": false,
+        "KOTANI_SUPPORTED": false,
+        "MOONPAY_DISABLED": true,
+        "PONTO_SUPPORTED": false,
         "RESTRICTED_CP_DOTO": false,
+        "SANCTIONED_COUNTRY": false,
+        "SIMPLEX_DISABLED": false,
       }
     `)
   })
@@ -26,7 +32,53 @@ describe(getCountryFeaturesSelector, () => {
 
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
+        "FIAT_SPEND_ENABLED": true,
+        "KOTANI_SUPPORTED": false,
+        "MOONPAY_DISABLED": false,
+        "PONTO_SUPPORTED": true,
         "RESTRICTED_CP_DOTO": true,
+        "SANCTIONED_COUNTRY": false,
+        "SIMPLEX_DISABLED": true,
+      }
+    `)
+  })
+
+  it('returns the appropriate features for JP accounts', () => {
+    const state = getMockStoreData({
+      account: {
+        defaultCountryCode: '+81',
+      },
+    })
+
+    expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
+      Object {
+        "FIAT_SPEND_ENABLED": false,
+        "KOTANI_SUPPORTED": false,
+        "MOONPAY_DISABLED": false,
+        "PONTO_SUPPORTED": false,
+        "RESTRICTED_CP_DOTO": true,
+        "SANCTIONED_COUNTRY": false,
+        "SIMPLEX_DISABLED": false,
+      }
+    `)
+  })
+
+  it('returns the appropriate features for CU accounts', () => {
+    const state = getMockStoreData({
+      account: {
+        defaultCountryCode: '+53',
+      },
+    })
+
+    expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
+      Object {
+        "FIAT_SPEND_ENABLED": false,
+        "KOTANI_SUPPORTED": false,
+        "MOONPAY_DISABLED": false,
+        "PONTO_SUPPORTED": false,
+        "RESTRICTED_CP_DOTO": false,
+        "SANCTIONED_COUNTRY": true,
+        "SIMPLEX_DISABLED": true,
       }
     `)
   })

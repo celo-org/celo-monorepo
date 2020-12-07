@@ -223,6 +223,39 @@ export function appVersionDeprecationChannel() {
   })
 }
 
+export function appRemoteFeatureFlagChannel() {
+  if (!FIREBASE_ENABLED) {
+    return null
+  }
+
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const flags = snapshot.val()
+      Logger.debug(`Updated feature flags: ${JSON.stringify(flags)}`)
+      emit({
+        kotaniEnabled: flags?.kotaniEnabled || false,
+        pontoEnabled: flags?.pontoEnabled || false,
+      })
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref('versions/flags')
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
+      .database()
+      .ref('versions/flags')
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+    return cancel
+  })
+}
+
 export async function setUserLanguage(address: string, language: string) {
   try {
     Logger.info(TAG, `Setting language selection for user ${address}`)

@@ -64,6 +64,7 @@ resource "google_compute_instance" "full_node" {
       max_peers : var.max_peers,
       name : each.key,
       network_id : var.network_id,
+      network_name : var.celo_env,
       gcmode: var.gcmode,
       node_name : "${var.celo_env}-${each.key}",
       proxy : var.proxy,

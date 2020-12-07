@@ -1,14 +1,14 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {
   FreezerContract,
   FreezerInstance,

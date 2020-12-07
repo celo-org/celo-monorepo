@@ -15,7 +15,7 @@ Celo Core Contract's Address Registry
 ### Methods
 
 * [addressFor](_address_registry_.addressregistry.md#addressfor)
-* [allAddresses](_address_registry_.addressregistry.md#alladdresses)
+* [addressMapping](_address_registry_.addressregistry.md#addressmapping)
 
 ## Constructors
 
@@ -53,12 +53,12 @@ Name | Type |
 
 ___
 
-###  allAddresses
+###  addressMapping
 
-▸ **allAddresses**(): *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address) | null››*
+▸ **addressMapping**(): *Promise‹Map‹[CeloContract](../enums/_base_.celocontract.md), string››*
 
-*Defined in [packages/contractkit/src/address-registry.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L48)*
+*Defined in [packages/contractkit/src/address-registry.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L46)*
 
-Get the address for all possible `CeloContract`
+Get the address mapping for known registered contracts
 
-**Returns:** *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address) | null››*
+**Returns:** *Promise‹Map‹[CeloContract](../enums/_base_.celocontract.md), string››*

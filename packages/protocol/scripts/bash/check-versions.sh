@@ -13,7 +13,7 @@ set -euo pipefail
 OLD_BRANCH=""
 NEW_BRANCH=""
 REPORT=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-check-versions.log"
 
 while getopts 'a:b:r:l:' flag; do
   case "${flag}" in
@@ -34,6 +34,7 @@ BUILD_DIR_1=$(echo build/$(echo $OLD_BRANCH | sed -e 's/\//_/g'))
 git fetch --all --tags >> $LOG_FILE
 git checkout $OLD_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
+yarn install
 
 echo " - Build contract artifacts ..."
 # TODO: Move to yarn build:sol after the next contract release.
@@ -45,6 +46,7 @@ echo " - Checkout source code of new branch at $NEW_BRANCH"
 BUILD_DIR_2=$(echo build/$(echo $NEW_BRANCH | sed -e 's/\//_/g'))
 git checkout $NEW_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
+yarn install
 echo " - Build contract artifacts ..."
 yarn build:sol > $LOG_FILE
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
@@ -60,5 +62,5 @@ git checkout $ORIGINAL_GIT_REF > $LOG_FILE
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|Signatures|Proposals|UsingPrecompiles"
+CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles"
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR_1/contracts --new_contracts $BUILD_DIR_2/contracts --exclude $CONTRACT_EXCLUSION_REGEX $REPORT_FLAG

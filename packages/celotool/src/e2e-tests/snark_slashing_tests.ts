@@ -1,6 +1,3 @@
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { SnarkEpochDataSlasher } from '@celo/contractkit/lib/generated/SnarkEpochDataSlasher'
 import { assert } from 'chai'
@@ -101,7 +98,7 @@ function uncompressSig(comp: Buffer) {
 async function jsonRpc(web3: Web3, method: string, params: string[]): Promise<any> {
   return new Promise((resolve, reject) => {
     if (typeof web3.currentProvider !== 'string') {
-      web3.currentProvider!.send(
+      web3.currentProvider!.send!(
         {
           jsonrpc: '2.0',
           method,

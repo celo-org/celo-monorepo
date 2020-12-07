@@ -2,7 +2,7 @@
 
 ## Index
 
-### External modules
+### Modules
 
 * ["address-registry"](modules/_address_registry_.md)
 * ["base"](modules/_base_.md)
@@ -73,6 +73,7 @@
 * ["web3-contract-cache"](modules/_web3_contract_cache_.md)
 * ["wrappers/Accounts"](modules/_wrappers_accounts_.md)
 * ["wrappers/Attestations"](modules/_wrappers_attestations_.md)
+* ["wrappers/BaseSlasher"](modules/_wrappers_baseslasher_.md)
 * ["wrappers/BaseWrapper"](modules/_wrappers_basewrapper_.md)
 * ["wrappers/BlockchainParameters"](modules/_wrappers_blockchainparameters_.md)
 * ["wrappers/DoubleSigningSlasher"](modules/_wrappers_doublesigningslasher_.md)
@@ -90,7 +91,6 @@
 * ["wrappers/MultiSig"](modules/_wrappers_multisig_.md)
 * ["wrappers/ReleaseGold"](modules/_wrappers_releasegold_.md)
 * ["wrappers/Reserve"](modules/_wrappers_reserve_.md)
-* ["wrappers/SnarkEpochDataSlasher"](modules/_wrappers_snarkepochdataslasher_.md)
 * ["wrappers/SortedOracles"](modules/_wrappers_sortedoracles_.md)
 * ["wrappers/StableTokenWrapper"](modules/_wrappers_stabletokenwrapper_.md)
 * ["wrappers/Validators"](modules/_wrappers_validators_.md)

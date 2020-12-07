@@ -30,7 +30,7 @@ OpenPGP supports a number of cryptographic algorithms including [RSA](https://en
 
 Here we recommend `secp256k1`, which is the algorithm underlying identity on the Celo blockchain, because it is fast, secure, and promotes interoperability within the Celo ecosystem. (e.g. Your OpenPGP key could be used to take actions on-chain, which is pretty neat.)
 
-> Note: When using a YubiKey with firmware version less than 5.2.3, `secp256k1` is not available. Instead, we recommend using `rsa2048`.
+> Note: When using a YubiKey with firmware version less than 5.2.3, `secp256k1` is not available. Instead, we recommend using `rsa2048`. Github does have limited support for [signing algorithms](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/adding-a-new-gpg-key-to-your-github-account#supported-gpg-key-algorithms).
 
 #### User Identifier
 In OpenPGP, each key is associated with a user identity, which is commonly an email address and your name (e.g. "Alice Turing <alice@example.com>"). A public key created by `gpg` will automatically include the username, in addition to the cryptographic public key information, so when someone downloads your public key, they will know it is intended for your email address.

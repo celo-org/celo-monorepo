@@ -12,7 +12,7 @@
 
 ### Properties
 
-* [rpcCaller](_utils_tx_params_normalizer_.txparamsnormalizer.md#rpccaller)
+* [rpcCaller](_utils_tx_params_normalizer_.txparamsnormalizer.md#readonly-rpccaller)
 
 ### Methods
 
@@ -36,7 +36,7 @@ Name | Type |
 
 ## Properties
 
-###  rpcCaller
+### `Readonly` rpcCaller
 
 • **rpcCaller**: *[RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md)*
 

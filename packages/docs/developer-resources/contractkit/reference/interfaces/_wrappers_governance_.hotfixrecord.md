@@ -18,7 +18,7 @@
 
 • **approved**: *boolean*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:119](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L119)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L121)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **executed**: *boolean*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L120)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L122)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **preparedEpoch**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L121)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L123)*

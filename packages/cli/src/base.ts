@@ -1,11 +1,8 @@
+import { ReadOnlyWallet } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
-import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
-import {
-  AddressValidation,
-  newLedgerWalletWithSetup,
-} from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { ReadOnlyWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
+import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
+import { LocalWallet } from '@celo/wallet-local'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -13,29 +10,6 @@ import net from 'net'
 import Web3 from 'web3'
 import { getGasCurrency, getNodeUrl } from './utils/config'
 import { requireNodeIsSynced } from './utils/helpers'
-
-// Base for commands that do not need web3.
-export abstract class LocalCommand extends Command {
-  static flags = {
-    logLevel: flags.string({ char: 'l', hidden: true }),
-    help: flags.help({ char: 'h', hidden: true }),
-    truncate: flags.boolean({
-      default: true,
-      hidden: true,
-      allowNo: true,
-      description: 'Truncate fields to fit line',
-    }),
-  }
-
-  // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
-  log(msg: string, logLevel: string = 'info') {
-    if (logLevel === 'info') {
-      console.debug(msg)
-    } else if (logLevel === 'error') {
-      console.error(msg)
-    }
-  }
-}
 
 export enum GasOptions {
   celo = 'celo',
@@ -47,15 +21,22 @@ export enum GasOptions {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-export abstract class BaseCommand extends LocalCommand {
+export abstract class BaseCommand extends Command {
   static flags = {
-    ...LocalCommand.flags,
-    privateKey: flags.string({ hidden: true }),
-    node: flags.string({ char: 'n', hidden: true }),
+    privateKey: flags.string({
+      char: 'k',
+      description: 'Use a private key to sign local transactions with',
+    }),
+    node: flags.string({
+      char: 'n',
+      description: "URL of the node to run commands against (defaults to 'http://localhost:8545')",
+      hidden: true,
+    }),
     gasCurrency: flags.enum({
       options: Object.keys(GasOptions),
       description:
         "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
+      hidden: true,
     }),
     useLedger: flags.boolean({
       default: false,
@@ -134,12 +115,13 @@ export abstract class BaseCommand extends LocalCommand {
 
   get kit() {
     if (!this._kit) {
-      this._kit = newKitFromWeb3(this.web3, this._wallet)
+      this._kit = newKitFromWeb3(this.web3)
+      this._kit.connection.wallet = this._wallet
     }
 
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
-      this._kit.addAccount(res.flags.privateKey)
+      this._kit.connection.addAccount(res.flags.privateKey)
     }
     return this._kit
   }
@@ -184,6 +166,8 @@ export abstract class BaseCommand extends LocalCommand {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
+    } else {
+      this._wallet = new LocalWallet()
     }
 
     if (res.flags.from) {
@@ -194,7 +178,10 @@ export abstract class BaseCommand extends LocalCommand {
       ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
       : getGasCurrency(this.config.configDir)
 
-    const setUsdGas = () => this.kit.setFeeCurrency(CeloContract.StableToken)
+    const setUsdGas = async () => {
+      await this.kit.setFeeCurrency(CeloContract.StableToken)
+      await this.kit.updateGasPriceInConnectionLayer(CeloContract.StableToken)
+    }
     if (gasCurrencyConfig === GasOptions.cUSD) {
       await setUsdGas()
     } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
@@ -207,7 +194,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      stopProvider(this.web3.currentProvider)
+      this.kit.connection.stop()
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

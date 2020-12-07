@@ -1,4 +1,4 @@
-# External module: "explorer/block-explorer"
+# Module: "explorer/block-explorer"
 
 ## Index
 

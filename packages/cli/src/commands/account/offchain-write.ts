@@ -1,4 +1,4 @@
-import { PublicNameAccessor } from '@celo/contractkit/lib/identity/offchain/accessors/name'
+import { PublicNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
 import { flags } from '@oclif/command'
 import { OffchainDataCommand } from '../../utils/off-chain-data'
 

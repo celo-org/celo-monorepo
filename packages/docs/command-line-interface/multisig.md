@@ -13,14 +13,9 @@ USAGE
   $ celocli multisig:show ADDRESS
 
 OPTIONS
-  --all                                          Show info about all transactions
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
-  --raw                                          Do not attempt to parse transactions
-
-  --tx=tx                                        Show info for a transaction
+  --all    Show info about all transactions
+  --raw    Do not attempt to parse transactions
+  --tx=tx  Show info for a transaction
 
 EXAMPLES
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631

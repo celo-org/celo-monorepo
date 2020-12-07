@@ -11,6 +11,7 @@ import { createMockStore, getMockStackScreenProps } from 'test/utils'
 const mockScreenProps = getMockStackScreenProps(Screens.PincodeEnter, {
   withVerification: true,
   onSuccess: jest.fn(),
+  onCancel: jest.fn(),
 })
 const store = createMockStore()
 

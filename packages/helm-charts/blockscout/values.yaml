@@ -1,8 +1,25 @@
 imagePullPolicy: IfNotPresent
 blockscout:
+  indexer:
+    pool_size: 30
+  api:
+    autoscaling:
+        maxReplicas: 10
+        minReplicas: 2
+        target:
+          cpu: 70
+    pool_size: 40
+  web:
+    autoscaling:
+      maxReplicas: 5
+      minReplicas: 2
+      target:
+        cpu: 70
+    pool_size: 10
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
+  healthy_blocks_period: 60
   db:
     # ip: must be provided at runtime # IP address of the postgres DB
     # connection_name: must be provided at runtime # name of the cloud sql connection

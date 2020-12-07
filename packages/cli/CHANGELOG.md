@@ -7,7 +7,8 @@ This package will follow the release process outlined [here](https://docs.celo.o
 ## Development (not published yet)
 ### **[0.0.61--dev]**
 Features
-- [one-line summary] - ( [link PR] )
+- Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
+- Add downtime slashing commands - [#5632](https://github.com/celo-org/celo-monorepo/pull/5632)
 
 Bug Fixes
 - [one-line summary] - ( [link PR] )

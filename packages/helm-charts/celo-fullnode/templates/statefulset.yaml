@@ -4,7 +4,7 @@ metadata:
   name: {{ template "common.fullname" . }}
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
-  component: celo-fullnode
+    component: celo-fullnode
 spec:
 {{ if .Values.storage.enable }}
   volumeClaimTemplates:
@@ -78,6 +78,7 @@ spec:
 {{ include "celo-fullnode.health-checker-server" (dict "protocol_name" "http" "tcp_check_port" 8545 "server_port" 6000) | indent 6 }}
 {{ include "celo-fullnode.health-checker-server" (dict "protocol_name" "ws" "tcp_check_port" 8546 "server_port" 6001) | indent 6 }}
 {{ end }}
+      terminationGracePeriodSeconds: 120 # 2 mins
       volumes:
       - name: data
         emptyDir: {}

@@ -7,6 +7,7 @@ export default class List extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   static examples = ['list']
@@ -26,7 +27,7 @@ export default class List extends BaseCommand {
         capacity: { get: (g) => g.capacity.toFixed() },
         eligible: {},
       },
-      { 'no-truncate': !res.flags.truncate }
+      res.flags
     )
   }
 }

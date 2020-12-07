@@ -12,7 +12,7 @@
 
 ### Properties
 
-* [existingProvider](_providers_celo_provider_.celoprovider.md#existingprovider)
+* [existingProvider](_providers_celo_provider_.celoprovider.md#readonly-existingprovider)
 * [nonceLock](_providers_celo_provider_.celoprovider.md#noncelock)
 * [wallet](_providers_celo_provider_.celoprovider.md#wallet)
 
@@ -49,7 +49,7 @@ Name | Type | Default |
 
 ## Properties
 
-###  existingProvider
+### `Readonly` existingProvider
 
 • **existingProvider**: *provider*
 

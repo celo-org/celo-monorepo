@@ -1,6 +1,6 @@
 import { createNamespaceIfNotExists } from '../cluster'
 import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
-import { installAndEnableMetricsDeps, redeployTiller } from '../helm_deploy'
+import { installAndEnableMetricsDeps, installCertManagerAndNginx } from '../helm_deploy'
 
 export enum CloudProvider {
   AWS,
@@ -69,7 +69,7 @@ export abstract class BaseClusterManager {
 
     console.info('Performing any cluster setup that needs to be done...')
 
-    await redeployTiller()
+    await installCertManagerAndNginx()
     await installAndEnableMetricsDeps(true, this.clusterConfig)
   }
 
