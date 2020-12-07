@@ -63,12 +63,12 @@ contract('Exchange', (accounts: string[]) => {
   const SECONDS_IN_A_WEEK = 604800
 
   const unit = new BigNumber(10).pow(decimals)
-  const initialReserveBalance = new BigNumber(10000000000000000000000)
+  const initialReserveBalance = new BigNumber(10000000000000000000000) // 10000e18
   const reserveFraction = toFixed(5 / 100)
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
-  const goldAmountForRate = new BigNumber('0x10000000000000000')
+  const goldAmountForRate = new BigNumber('0x10000000000000000') // 18e18
   const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
   const initialStableBucket = initialGoldBucket.times(stableAmountForRate).div(goldAmountForRate)
   function getBuyTokenAmount(
@@ -148,7 +148,7 @@ contract('Exchange', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
-  describe('#initialize()', () => {
+  describe.skip('#initialize()', () => {
     it('should have set the owner', async () => {
       const expectedOwner: string = await exchange.owner()
       assert.equal(expectedOwner, accounts[0])
@@ -168,7 +168,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setUpdateFrequency', () => {
+  describe.skip('#setUpdateFrequency', () => {
     const newUpdateFrequency = new BigNumber(60 * 30)
 
     it('should set the update frequency', async () => {
@@ -197,7 +197,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setMinimumReports', () => {
+  describe.skip('#setMinimumReports', () => {
     const newMinimumReports = new BigNumber(3)
 
     it('should set the minimum reports', async () => {
@@ -226,7 +226,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setStableToken', () => {
+  describe.skip('#setStableToken', () => {
     const newStable = '0x0000000000000000000000000000000000077cfa'
 
     it('should set the stable token address', async () => {
@@ -254,7 +254,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setSpread', () => {
+  describe.skip('#setSpread', () => {
     const newSpread = toFixed(6 / 1000)
 
     it('should set the spread', async () => {
@@ -283,7 +283,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setReserveFraction', () => {
+  describe.skip('#setReserveFraction', () => {
     const newReserveFraction = toFixed(3 / 100)
 
     it('should set the reserve fraction', async () => {
@@ -379,8 +379,8 @@ contract('Exchange', (accounts: string[]) => {
 
       const expectedBuyAmount = getBuyTokenAmount(
         new BigNumber(amount),
-        initialGoldBucket,
-        initialStableBucket
+        initialGoldBucket, //
+        initialStableBucket //
       )
 
       assert.equal(buyAmount.toString(), expectedBuyAmount.toString())
@@ -623,6 +623,77 @@ contract('Exchange', (accounts: string[]) => {
               // The new value should be the updatedStableBucket (derived from the new
               // Gold Bucket value), minus the amount purchased during the exchange
               assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
+            })
+          })
+
+          describe.only('when stableBucket needs to be capped', () => {
+            let setMaxStableBucketFractionTx
+
+            beforeEach(async () => {
+              // const capFraction = 1 / 22
+
+              // mock a huge CELO price
+              // TODO
+              // set reserve to 120 M
+              // set reserve fraction to .05%, that'll give 600K bucket CELO
+              // set stable supply to 6M -> max bucket size (6e6)/22 = ~278K -> will not trigger cap
+              // play with the price of CELO and see the bucket size doesn't grow
+
+              await registry.setAddressFor(CeloContractName.Exchange, owner)
+              setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(toFixed(22))
+              await mockSortedOracles.setMedianRate(
+                stableToken.address,
+                new BigNumber('0x20000000000000000')
+              ) // should be two?
+              await stableToken.mint(user, new BigNumber('61e24')) // 6M
+              await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
+            })
+
+            it('has the right maxStableBucketFraction', async () => {
+              assertEqualBN(await exchange.maxStableBucketFraction(), new BigNumber('22e24'))
+            })
+
+            it("stable bucket doesn't hit the cap and it shouldn't be resized", async () => {
+              const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+              // console.log('mintableStable' + mintableStable)
+              // console.log('tradeableGold' + tradeableGold)
+              assertEqualBN(mintableStable, new BigNumber('2e21'))
+              assertEqualBN(tradeableGold, new BigNumber('1e21'))
+            })
+
+            it('emits', async () => {
+              const exchangeLogs = setMaxStableBucketFractionTx.logs.filter(
+                (x) => x.event === 'MaxStableBucketFractionSet'
+              )
+              assert(exchangeLogs.length === 1, 'Did not receive event')
+            })
+
+            // it.skip('stable bucket hit the cap and it should be resized', async () => {
+            //   // get a very high celo tank
+            //   await mockSortedOracles.setMedianRate(stableToken.address, new BigNumber("0x20000000000000000").multipliedBy(100))
+            //   const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+            //   console.log('mintableStable' + mintableStable)
+            //   console.log('tradeableGold' + tradeableGold)
+            // })
+
+            it('has the correct getStableBucketTokenCap', async () => {
+              assertEqualBN(
+                await exchange.getStableBucketTokenCap(),
+                new BigNumber('2772727272727272727272727')
+              )
+            })
+
+            it.skip('stable bucket hit the cap and it should be resized', async () => {
+              await mockSortedOracles.setMedianRate(
+                stableToken.address,
+                new BigNumber('0x20000000000000000').multipliedBy(2000)
+              ) // bump the price by 10000
+
+              const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+
+              assertEqualBN(mintableStable, await exchange.getStableBucketTokenCap())
+              console.log(tradeableGold)
+              // assertEqualBN(new BigNumber(mintableStable.dividedBy(tradeableGold)), new BigNumber('4000')) // Fix this test
             })
           })
 

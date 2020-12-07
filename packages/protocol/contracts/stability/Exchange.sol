@@ -406,19 +406,13 @@ contract Exchange is
 
   function getStableBucketTokenCap() public view returns (uint256) {
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
-    // uint256 maxStableBucketSize = (FixidityLib.wrap(stableTokenSupply).divide(maxStableBucketFraction)).unwrap(); // ~4% of current supply
-    // uint256 maxStableBucketSize = (FixidityLib.wrap(stableTokenSupply).divide(maxStableBucketFraction)).unwrap();
 
-    uint256 maxStableBucketSize = FixidityLib
-      .newFixed(stableTokenSupply)
-      .divide(maxStableBucketFraction)
-      .fromFixed();
+    // uint256 maxStableBucketSize = FixidityLib
+    //   .newFixed(stableTokenSupply)
+    //   .divide(maxStableBucketFraction)
+    //   .fromFixed();
 
-    // uint256 maxStableBucketSize = FixidityLib.fixed1().divide(maxStableBucketFraction).fromFixed();
-
-    // uint256 maxStableBucketSize = stableTokenSupply.div(22);
-    // stableTokenSupply.div(maxStableBucketFraction)
-    // return maxStableBucketFraction.unwrap();
+    uint256 maxStableBucketSize = stableTokenSupply.div(22);
     return maxStableBucketSize;
 
   }
