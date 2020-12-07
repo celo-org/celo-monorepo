@@ -406,7 +406,7 @@ contract Exchange is
 
   function getStableBucketTokenCap() public view returns (uint256) {
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
-    uint256 maxStableBucketSize = stableTokenSupply.divide(maxStableBucketFraction); // ~4% of current supply
+    uint256 maxStableBucketSize = stableTokenSupply.div(maxStableBucketFraction); // ~4% of current supply
     return maxStableBucketSize;
   }
 
