@@ -4925,6 +4925,36 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
+                  Community
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,1.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "paddingBottom": "10px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "10px",
+                      "textOverflow": "ellipsis",
+                      "textRendering": "geometricPrecision",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
                   Earn
                 </div>
                 <div
@@ -5075,7 +5105,67 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
+                  Pay
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,1.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "paddingBottom": "10px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "10px",
+                      "textOverflow": "ellipsis",
+                      "textRendering": "geometricPrecision",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
                   Preserve
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,1.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "paddingBottom": "10px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "10px",
+                      "textOverflow": "ellipsis",
+                      "textRendering": "geometricPrecision",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Regenerate
                 </div>
                 <div
                   className="css-text-901oao"
@@ -5385,6 +5475,79 @@ exports[`Alliance renders 1`] = `
             }
           >
             Deliver innovative solutions for your customers by building on the Celo platform
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxLines": "multiple",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "justify",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexWrap": "wrap",
+                "WebkitJustifyContent": "space-between",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-between",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "minHeight": "90px",
+                "msFlexDirection": "row",
+                "msFlexPack": "justify",
+                "msFlexWrap": "wrap",
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            onClick={[Function]}
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Community
+          </h4>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomWidth": "1px",
+                "marginBottom": "10px",
+                "marginTop": "2px",
+              }
+            }
+          />
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            onClick={[Function]}
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Strengthen communities by introducing local and community currencies
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5795,6 +5958,79 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
+            Pay
+          </h4>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomWidth": "1px",
+                "marginBottom": "10px",
+                "marginTop": "2px",
+              }
+            }
+          />
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            onClick={[Function]}
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Enable merchants to accept digital payments with lower fees by accepting cUSD.
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxLines": "multiple",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "justify",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexWrap": "wrap",
+                "WebkitJustifyContent": "space-between",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-between",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "minHeight": "90px",
+                "msFlexDirection": "row",
+                "msFlexPack": "justify",
+                "msFlexWrap": "wrap",
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            onClick={[Function]}
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
             Preserve
           </h4>
           <div
@@ -5868,7 +6104,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            Send
+            Regenerate
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5895,7 +6131,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            Send remittances almost anywhere, instantly for as little as $.01
+            Enable a regenerative, ecological economy by creating natural-capital backed assets and putting them into circulation.
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5969,6 +6205,79 @@ exports[`Alliance renders 1`] = `
             }
           >
             Help your communities overcome inflation and build for their future by saving in cUSD
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxLines": "multiple",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "justify",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexWrap": "wrap",
+                "WebkitJustifyContent": "space-between",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-between",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "minHeight": "90px",
+                "msFlexDirection": "row",
+                "msFlexPack": "justify",
+                "msFlexWrap": "wrap",
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            onClick={[Function]}
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Send
+          </h4>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomWidth": "1px",
+                "marginBottom": "10px",
+                "marginTop": "2px",
+              }
+            }
+          />
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            onClick={[Function]}
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Send remittances almost anywhere, instantly for as little as $.01
           </div>
           <div
             className="css-view-1dbjc4n"
