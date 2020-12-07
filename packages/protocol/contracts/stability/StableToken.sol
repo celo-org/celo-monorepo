@@ -216,7 +216,7 @@ contract StableToken is
    */
   function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
     require(
-      msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
+      msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) || // TODO this should be split into multiple CP-DOTO
         msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID),
       "Only the Exchange and Validators contracts are authorized to mint"
     );

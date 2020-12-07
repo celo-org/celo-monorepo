@@ -1,6 +1,7 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
@@ -34,8 +35,10 @@ contract Exchange is
   event MinimumReportsSet(uint256 minimumReports);
   event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
+  event MaxStableBucketFractionSet(uint256 maxStableBucketFraction);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
+  event StableBucketCapped();
 
   FixidityLib.Fraction public spread;
 
@@ -53,6 +56,8 @@ contract Exchange is
   uint256 public lastBucketUpdate = 0;
   uint256 public updateFrequency;
   uint256 public minimumReports;
+
+  FixidityLib.Fraction public maxStableBucketFraction;
 
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
@@ -283,6 +288,16 @@ contract Exchange is
     emit SpreadSet(newSpread);
   }
 
+  // TODO add docs
+  function setMaxStableBucketFraction(uint256 newMaxStableBucketFraction) public onlyOwner {
+    maxStableBucketFraction = FixidityLib.wrap(newMaxStableBucketFraction);
+    require(
+      maxStableBucketFraction.gt(FixidityLib.fixed1()),
+      "reserve fraction must be greater than 1"
+    );
+    emit MaxStableBucketFractionSet(newMaxStableBucketFraction);
+  }
+
   /**
     * @notice Allows owner to set the Reserve Fraction
     * @param newReserveFraction The new value for the reserve fraction
@@ -368,7 +383,31 @@ contract Exchange is
     uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
       exchangeRateDenominator
     );
+
+    // uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
+    // uint256 maxStableBUcketSize = stableTokenSupply.div(22); // ~4% of current supply
+    uint256 maxStableBUcketSize = getStableBucketTokenCap();
+
+    uint256 cappedUpdatedStableBucket = Math.min(maxStableBUcketSize, updatedStableBucket);
+
+    // rate = 2
+    // cUSD bucket 10000 (max 5000 -> gold 25000)
+
+    if (cappedUpdatedStableBucket < updatedStableBucket) {
+      // resize gold bucket
+      uint256 cappedUpdatedGoldBucket = exchangeRateDenominator.mul((maxStableBUcketSize)).div(
+        exchangeRateNumerator
+      );
+      return (cappedUpdatedGoldBucket, cappedUpdatedStableBucket);
+    }
+
     return (updatedGoldBucket, updatedStableBucket);
+  }
+
+  function getStableBucketTokenCap() public view returns (uint256) {
+    uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
+    uint256 maxStableBucketSize = stableTokenSupply.divide(maxStableBucketFraction); // ~4% of current supply
+    return maxStableBucketSize;
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
