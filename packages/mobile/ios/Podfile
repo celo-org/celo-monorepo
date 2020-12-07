@@ -14,12 +14,12 @@ platform :ios, '12.4'
 target "celo" do
   use_frameworks!
 
-
+  
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
   pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
-  
+
   pod 'Segment-Firebase', '~> 2.7.0'
-  
+
   # RNPermissions
   permissions_path = '../../../node_modules/react-native-permissions/ios'
   pod 'Permission-Camera', :path => "#{permissions_path}/Camera.podspec"
@@ -31,7 +31,7 @@ target "celo" do
   end
 
   config = use_native_modules!
-  use_react_native!(:path => config["../../../node_modules/react-native"])
+  use_react_native!(:path => config[:reactNativePath])
 
   # Enables Flipper.
   #
