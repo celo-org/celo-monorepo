@@ -14,8 +14,8 @@ library CIP20Lib {
     uint256(
       (0x20 << (31 * 8)) | /* digest size */
         (0x01 << (29 * 8)) | /* fan out */
-        (0x01 << (28 * 8))
-    ) /* depth */
+        (0x01 << (28 * 8)) /* depth */
+    )
   );
 
   // Accepts a fully formed input blob. This should include any config
