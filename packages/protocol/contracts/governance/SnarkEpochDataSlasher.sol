@@ -3,9 +3,9 @@ pragma solidity >=0.5.8;
 
 import { TypedMemView } from "@summa-tx/memview.sol/contracts/TypedMemView.sol";
 
-import { CIP20Lib } from "@celo/bls-sol/contracts/CIP20Lib.sol";
-import { CeloB12_377Lib } from "@celo/bls-sol/contracts/B12.sol";
-import { B12 } from "@celo/bls-sol/contracts/B12.sol";
+import { CIP20Lib } from "../common/libraries/CIP20Lib.sol";
+import { CeloB12_377Lib } from "../common/libraries/B12.sol";
+import { B12 } from "../common/libraries/B12.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";

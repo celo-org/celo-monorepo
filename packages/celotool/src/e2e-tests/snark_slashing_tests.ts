@@ -225,7 +225,6 @@ describe('snark slashing tests', function(this: any) {
   let info2: any
 
   before(async function(this: any) {
-    console.info('here')
     this.timeout(0)
     // Comment out the following line after a test run for a quick rerun.
     await hooks.before()
