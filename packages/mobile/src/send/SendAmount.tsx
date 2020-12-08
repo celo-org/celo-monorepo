@@ -55,7 +55,6 @@ import { getFeeType, useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
-import Logger from 'src/utils/Logger'
 
 const MAX_ESCROW_VALUE = new BigNumber(20)
 
