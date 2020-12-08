@@ -1,8 +1,9 @@
+import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import Animated from 'react-native-reanimated'
+import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
 
 interface Props {
@@ -14,22 +15,21 @@ interface Props {
 
 function DrawerTopBar({ middleElement, rightElement, scrollPosition, testID }: Props) {
   const navigation = useNavigation()
-  // TODO(erdal): fixme
-  // const viewStyle = React.useMemo(
-  //   () => ({
-  //     ...styles.container,
-  //     borderBottomWidth: 1,
-  //     borderBottomColor: cond(
-  //       greaterThan(scrollPosition ?? new Animated.Value(0), 0),
-  //       processColor(colors.gray2),
-  //       processColor('transparent')
-  //     ),
-  //   }),
-  //   [scrollPosition]
-  // )
+  const viewStyle = React.useMemo(
+    () => ({
+      ...styles.container,
+      borderBottomWidth: 1,
+      borderBottomColor: cond(
+        greaterThan(scrollPosition ?? new Animated.Value(0), 0),
+        colors.gray2,
+        'transparent'
+      ),
+    }),
+    [scrollPosition]
+  )
 
   return (
-    <Animated.View testID={testID}>
+    <Animated.View testID={testID} style={viewStyle}>
       <TouchableOpacity
         style={styles.hamburger}
         // @ts-ignore Only used in a drawer

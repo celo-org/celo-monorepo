@@ -33,11 +33,10 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
     outputRange: [1, 0],
   })
 
-  // TODO(erdal): fixme
-  // const color = interpolateColors(position, {
-  //   inputRange: [0.9, 1],
-  //   outputColorRange: [colors.dark, colors.light],
-  // })
+  const color = Animated.interpolateColors(position, {
+    inputRange: [0.9, 1],
+    outputColorRange: [colors.dark, colors.light],
+  })
 
   const onPressClose = () => {
     navigation.dangerouslyGetParent()?.goBack()
@@ -65,7 +64,7 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.leftContainer}>
-        <TopBarIconButton icon={<Times color={colors.dark} />} onPress={onPressClose} />
+        <TopBarIconButton icon={<Times color={color} />} onPress={onPressClose} />
       </View>
       <SegmentedControl
         values={values}

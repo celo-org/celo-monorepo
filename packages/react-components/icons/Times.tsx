@@ -7,7 +7,7 @@ const AnimatedPath = Animated.createAnimatedComponent(Path)
 
 export interface Props {
   height?: number
-  color?: string | Animated.Adaptable<number>
+  color?: string | Animated.Node<number | string>
   strokeWidth?: number
 }
 
