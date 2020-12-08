@@ -14,6 +14,7 @@ import {
 } from './events'
 import { EscrowContractCall } from './events/EscrowContractCall'
 import { ExchangeContractCall } from './events/ExchangeContractCall'
+import { RegisterAccountDekContractCall } from './events/RegisterAccountDekContractCall'
 import { Input } from './helpers/Input'
 import { InputDecoder } from './helpers/InputDecoder'
 import { TokenTransactionArgs } from './schema'
@@ -149,6 +150,7 @@ export class BlockscoutAPI extends RESTDataSource {
     const transactionClassifier = new TransactionClassifier([
       new ExchangeContractCall(context),
       new EscrowContractCall(context),
+      new RegisterAccountDekContractCall(context),
       new ContractCall(context),
       new Verification(context),
       new EscrowSent(context),

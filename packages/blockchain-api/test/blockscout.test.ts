@@ -249,6 +249,37 @@ describe('Blockscout', () => {
           "timestamp": 1566484000000,
           "type": "VERIFICATION_FEE",
         },
+        Object {
+          "address": "0x0000000000000000000000000000000000007E57",
+          "amount": Object {
+            "currencyCode": "cUSD",
+            "timestamp": 1602667173000,
+            "value": "-1",
+          },
+          "block": "1487877",
+          "comment": "",
+          "fees": Array [
+            Object {
+              "amount": Object {
+                "currencyCode": "cUSD",
+                "timestamp": 1602667173000,
+                "value": "0.000051519",
+              },
+              "type": "SECURITY_FEE",
+            },
+            Object {
+              "amount": Object {
+                "currencyCode": "cUSD",
+                "timestamp": 1602667173000,
+                "value": "0.000094212",
+              },
+              "type": "ONE_TIME_ENCRYPTION_FEE",
+            },
+          ],
+          "hash": "0x34e6e74bc01c7112817e669a8057ae7f4c1ed49d8de824bea8ecbdb945b41345",
+          "timestamp": 1602667173000,
+          "type": "SENT",
+        },
       ]
     `)
   })

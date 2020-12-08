@@ -29,4 +29,18 @@ export class InputDecoder {
 
     return decodedInput[0].toLowerCase() === this.contractAddresses[contract]
   }
+
+  registersAccountDek(account: string): boolean {
+    if (!this.input.isAccountDekRegistration()) {
+      return false
+    }
+
+    const decodedInput = this.input.decode(['uint256', 'uint256', 'address'])
+
+    if (!decodedInput) {
+      return false
+    }
+
+    return decodedInput[2].toLowerCase() === account
+  }
 }

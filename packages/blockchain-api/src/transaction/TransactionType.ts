@@ -1,4 +1,4 @@
-import { Transaction } from './Transaction'
+import { Fee, Transaction } from './Transaction'
 
 export interface Context {
   userAddress: string
@@ -10,6 +10,10 @@ export abstract class TransactionType {
 
   constructor(context: Context) {
     this.context = context
+  }
+
+  getFees(transaction: Transaction): Fee[] {
+    return transaction.fees
   }
 
   abstract matches(transaction: Transaction): boolean

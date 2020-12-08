@@ -446,6 +446,7 @@ const mockTokenTxs = {
             transactionHash: '0xf0592e026656f84cc17672fb08f5723deb8426787c2865aa763e859d10e85234',
           },
         },
+        // Escrow sent (TX 2)
         {
           node: {
             blockNumber: 117451,
@@ -480,7 +481,7 @@ const mockTokenTxs = {
             transactionHash: '0xfe39014b70746259a1dc4cc99c67acbb986d68f32cdb42e68a2678082a1695dc',
           },
         },
-        // Verification fee sent (no gateway fee recipient) (TX3)
+        // Verification fee sent (no gateway fee recipient)
         {
           node: {
             blockNumber: 117451,
@@ -562,6 +563,84 @@ const mockTokenTxs = {
             gatewayFeeRecipient: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
             timestamp: '2020-04-21T09:29:44.000000Z',
             transactionHash: '0xfa658a2be84e9ef0ead58ea2d8e2d3c9160bf0769451b5dc971c2d82c9c33c42',
+          },
+        },
+        // Dollars sent with one-time encryption fee (TX 1)
+        {
+          node: {
+            blockNumber: 1487877,
+            celoTransfer: {
+              edges: [
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x0000000000000000000000000000000000007E57',
+                    token: 'cUSD',
+                    value: '1000000000000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0xa12a699c641cc875a7ca57495861c79c33d293b4',
+                    token: 'cUSD',
+                    value: '10303800000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x456f41406b32c45d59e539e4bba3d7898c3584da',
+                    token: 'cUSD',
+                    value: '41215200000000',
+                  },
+                },
+              ],
+            },
+            feeToken: 'cUSD',
+            gasPrice: '500000000',
+            gasUsed: '103038',
+            gatewayFee: '0',
+            gatewayFeeRecipient: null,
+            input:
+              '0xe1d6aceb0000000000000000000000003a42be9c0ce3a98f5b3b0a3f2b9e392126c988fb0000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000',
+            timestamp: '2020-10-14T09:19:33.000000Z',
+            transactionHash: '0x34e6e74bc01c7112817e669a8057ae7f4c1ed49d8de824bea8ecbdb945b41345',
+          },
+        },
+        // Dollars sent with one-time encryption fee (TX 2)
+        {
+          node: {
+            blockNumber: 1487875,
+            celoTransfer: {
+              edges: [
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0xa12a699c641cc875a7ca57495861c79c33d293b4',
+                    token: 'cUSD',
+                    value: '18842400000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x3a42be9c0ce3a98f5b3b0a3f2b9e392126c988fb',
+                    toAddressHash: '0xb4e92c94a2712e98c020a81868264bde52c188cb',
+                    token: 'cUSD',
+                    value: '75369600000000',
+                  },
+                },
+              ],
+            },
+            feeToken: 'cUSD',
+            gasPrice: '500000000',
+            gasUsed: '188424',
+            gatewayFee: '0',
+            gatewayFeeRecipient: null,
+            input:
+              '0x90b12b4700000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000007E57000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000210362915ae5207a3cc69bc98fe02579203702f53641ab91f60aa8756f494326a56000000000000000000000000000000000000000000000000000000000000000',
+            timestamp: '2020-10-14T09:19:23.000000Z',
+            transactionHash: '0x1a8c50902bd67443f9fcc1842d20dca5d1b9e6dd4a2f83bd214c8d33cb83f253',
           },
         },
       ],

@@ -23,9 +23,9 @@ export class TransactionAggregator {
     array: ClassifiedTransaction[]
   ): ClassifiedTransaction[] {
     if (currentTransaction.type.isAggregatable()) {
-      currentTransaction.transaction.fees.forEach((fee) =>
-        accumulator[accumulator.length - 1].transaction.addFee(fee)
-      )
+      const transactionFees = currentTransaction.type.getFees(currentTransaction.transaction)
+
+      transactionFees.forEach((fee) => accumulator[accumulator.length - 1].transaction.addFee(fee))
     } else {
       accumulator.push(currentTransaction)
     }
