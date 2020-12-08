@@ -310,6 +310,10 @@ contract Exchange is
     emit ReserveFractionSet(newReserveFraction);
   }
 
+  /**
+    * @notice Allows owner to set the minSupplyForStableBucketCap, the minimal stableToken supply considered for the stableToken cap
+    * @param newMinSupplyForStableBucketCap The new value for the minSupplyForStableBucketCap
+    */
   function setMinSupplyForStableBucketCap(uint256 newMinSupplyForStableBucketCap) public onlyOwner {
     minSupplyForStableBucketCap = newMinSupplyForStableBucketCap;
     emit minSupplyForStableBucketCapSet(newMinSupplyForStableBucketCap);
@@ -407,6 +411,10 @@ contract Exchange is
     return (updatedGoldBucket, updatedStableBucket);
   }
 
+  /**
+   * @notice returns the max size the stableToken can be set durin a bucket update. if the supply of stableToken
+   * is smaller than minSupplyForStableBucketCap, the cap is calculated based on minSupplyForStableBucketCap.
+   */
   function getStableBucketTokenCap() public view returns (uint256) {
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap); // assume a miminum of 1M stable tokens supply to start the cap
 
