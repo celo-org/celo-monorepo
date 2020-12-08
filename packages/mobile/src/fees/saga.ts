@@ -113,12 +113,12 @@ function* getOrSetFee(feeType: FeeType, gasGetter: CallEffect) {
   }
   // Note: This code path only supports cUSD fees. It is not the most widely used version of fee
   // estimation, and should be refactored or removed.
-  const feeInWei: BigNumber = yield call(
+  const feeInfo: BigNumber = yield call(
     calculateFee,
     feeGasCache.get(feeType)!,
     CURRENCY_ENUM.DOLLAR
   )
-  return feeInWei
+  return feeInfo.fee
 }
 
 export async function calculateFee(gas: BigNumber, currency: CURRENCY_ENUM): Promise<FeeInfo> {

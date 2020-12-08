@@ -44,12 +44,14 @@ export const transferGoldToken = ({
   recipientAddress,
   amount,
   comment,
+  feeInfo,
   context,
 }: TokenTransfer): TransferAction => ({
   type: Actions.TRANSFER,
   recipientAddress,
   amount,
   comment,
+  feeInfo,
   context,
 })
 

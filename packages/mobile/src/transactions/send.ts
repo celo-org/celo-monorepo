@@ -119,6 +119,13 @@ export function* sendTransactionPromises(
   const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
   const fornoMode: boolean = yield select(fornoSelector)
 
+  //if (gas || gasPrice) {
+  Logger.debug(
+    `${TAG}@sendTransactionPromises`,
+    `Using provided gas parameters: ${gas} gas @ ${gasPrice} ${preferredFeeCurrency}`
+  )
+  //}
+
   // If stableToken is prefered to pay fee, use it unless its balance is Zero,
   // in that case use CELO to pay fee.
   // TODO: Make it transparent for the user.
@@ -127,6 +134,22 @@ export function* sendTransactionPromises(
     preferredFeeCurrency === CURRENCY_ENUM.DOLLAR && stableTokenBalance.isGreaterThan(0)
       ? CURRENCY_ENUM.DOLLAR
       : CURRENCY_ENUM.GOLD
+  if (preferredFeeCurrency && feeCurrency !== preferredFeeCurrency) {
+    Logger.warn(
+      `${TAG}@sendTransactionPromises`,
+      `Using fallback fee currency ${feeCurrency} instead of preferred ${preferredFeeCurrency}.`
+    )
+    // If the currency is changed, the gas value and price are invalidated.
+    // TODO: Move the fallback currency logic up the stackso this will never happen.
+    if (gas || gasPrice) {
+      Logger.warn(
+        `${TAG}@sendTransactionPromises`,
+        `Resetting gas parameters because fee currency was changed.`
+      )
+      gas = undefined
+      gasPrice = undefined
+    }
+  }
 
   const feeCurrencyAddress =
     feeCurrency === CURRENCY_ENUM.DOLLAR
@@ -145,7 +168,9 @@ export function* sendTransactionPromises(
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
 
-    gasPrice = yield getGasPrice(feeCurrency)
+    if (!gasPrice) {
+      gasPrice = yield getGasPrice(feeCurrency)
+    }
   }
 
   const transactionPromises = yield call(

@@ -172,9 +172,11 @@ export function tokenTransferFactory({
       Logger.debug(
         tag,
         'Transferring token',
-        amount,
+        context.description ?? 'No description',
         context.id,
-        context.description ?? 'No description'
+        currency,
+        amount,
+        feeInfo ? JSON.stringify(feeInfo) : 'undefined'
       )
 
       yield put(
