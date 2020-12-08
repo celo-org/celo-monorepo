@@ -627,14 +627,10 @@ contract('Exchange', (accounts: string[]) => {
           })
 
           describe.only('when stableBucket needs to be capped', () => {
+            // TODO remove only and move tests as needed
             let setMaxStableBucketFractionTx, minSupplyForStableBucketCapTx
 
             beforeEach(async () => {
-              // set reserve to 120 M
-              // set reserve fraction to .05%, that'll give 600K bucket CELO
-              // set stable supply to 6M -> max bucket size (6e6)/22 = ~278K -> will not trigger cap
-              // play with the price of CELO and see the bucket size doesn't grow
-
               await registry.setAddressFor(CeloContractName.Exchange, owner)
               setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
                 toFixed(1 / 22)
