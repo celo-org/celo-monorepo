@@ -50,10 +50,16 @@ const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
         })
         break
       case SendTransactionLogEventType.EstimatedGas:
-        Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
+        Logger.debug(
+          tag,
+          `Transaction with id ${txId} ${
+            event.prefilled ? 'using provided estimate' : 'estimated'
+          } gas: ${event.gas}`
+        )
         ValoraAnalytics.track(TransactionEvents.transaction_gas_estimated, {
           txId,
           estimatedGas: event.gas,
+          prefilled: event.prefilled,
         })
         break
       case SendTransactionLogEventType.TransactionHashReceived:

@@ -595,6 +595,7 @@ interface TransactionEventsProperties {
   [TransactionEvents.transaction_gas_estimated]: {
     txId: string
     estimatedGas: number
+    prefilled: boolean
   }
   [TransactionEvents.transaction_hash_received]: {
     txId: string

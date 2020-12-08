@@ -72,10 +72,11 @@ function Confirmed(n: number): Confirmed {
 interface EstimatedGas {
   type: SendTransactionLogEventType.EstimatedGas
   gas: number
+  prefilled: boolean
 }
 
-function EstimatedGas(gas: number): EstimatedGas {
-  return { type: SendTransactionLogEventType.EstimatedGas, gas }
+function EstimatedGas(gas: number, prefilled: boolean): EstimatedGas {
+  return { type: SendTransactionLogEventType.EstimatedGas, gas, prefilled }
 }
 
 interface ReceiptReceived {
@@ -207,7 +208,9 @@ export async function sendTransactionAsync<T>(
 
     if (gas === undefined) {
       gas = (await estimateGas(tx, txParams)).toNumber()
-      logger(EstimatedGas(gas))
+      logger(EstimatedGas(gas, false))
+    } else {
+      logger(EstimatedGas(gas, true))
     }
 
     emitter = tx.send({ ...txParams, gas: gas })
