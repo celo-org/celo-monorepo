@@ -39,6 +39,7 @@ contract Exchange is
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
   event StableBucketCapped();
+  event myTestEvent();
 
   FixidityLib.Fraction public spread;
 
@@ -69,7 +70,7 @@ contract Exchange is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -292,8 +293,8 @@ contract Exchange is
   function setMaxStableBucketFraction(uint256 newMaxStableBucketFraction) public onlyOwner {
     maxStableBucketFraction = FixidityLib.wrap(newMaxStableBucketFraction);
     require(
-      maxStableBucketFraction.gt(FixidityLib.fixed1()),
-      "reserve fraction must be greater than 1"
+      maxStableBucketFraction.lt(FixidityLib.fixed1()),
+      "bucket fraction must be smaller than 1"
     );
     emit MaxStableBucketFractionSet(newMaxStableBucketFraction);
   }
@@ -407,13 +408,18 @@ contract Exchange is
   function getStableBucketTokenCap() public view returns (uint256) {
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
 
-    // uint256 maxStableBucketSize = FixidityLib
-    //   .newFixed(stableTokenSupply)
-    //   .divide(maxStableBucketFraction)
-    //   .fromFixed();
+    uint256 maxStableBucketSize = FixidityLib
+      .newFixed(stableTokenSupply)
+    // .divide(reserveFraction)
+      .multiply(maxStableBucketFraction)
+      .fromFixed();
 
-    uint256 maxStableBucketSize = stableTokenSupply.div(22);
+    // return FixidityLib.fixed1().divide(FixidityLib.wrap(stableTokenSupply.mul(maxStableBucketFraction.fromFixed()))); // should no
+
+    // uint256 maxStableBucketSize = stableTokenSupply.div(22);
     return maxStableBucketSize;
+
+    // return maxStableBucketFraction.fromFixed();
 
   }
 

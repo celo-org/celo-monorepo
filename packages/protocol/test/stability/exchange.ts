@@ -640,7 +640,9 @@ contract('Exchange', (accounts: string[]) => {
               // play with the price of CELO and see the bucket size doesn't grow
 
               await registry.setAddressFor(CeloContractName.Exchange, owner)
-              setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(toFixed(22))
+              setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
+                toFixed(1 / 22)
+              )
               await mockSortedOracles.setMedianRate(
                 stableToken.address,
                 new BigNumber('0x20000000000000000')
@@ -650,7 +652,7 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it('has the right maxStableBucketFraction', async () => {
-              assertEqualBN(await exchange.maxStableBucketFraction(), new BigNumber('22e24'))
+              assertEqualBN(await exchange.maxStableBucketFraction(), toFixed(1 / 22))
             })
 
             it("stable bucket doesn't hit the cap and it shouldn't be resized", async () => {
@@ -677,13 +679,21 @@ contract('Exchange', (accounts: string[]) => {
             // })
 
             it('has the correct getStableBucketTokenCap', async () => {
+              console.log(
+                'right before maxStableBucketFraction ' + (await exchange.maxStableBucketFraction())
+              )
+              console.log(
+                'right before getStableBucketTokenCap ' + (await exchange.getStableBucketTokenCap())
+              )
+              console.log('right before reserveFraction ' + (await exchange.reserveFraction()))
+
               assertEqualBN(
                 await exchange.getStableBucketTokenCap(),
-                new BigNumber('2772727272727272727272727')
+                new BigNumber('2772727272727272816000000')
               )
             })
 
-            it.skip('stable bucket hit the cap and it should be resized', async () => {
+            it('stable bucket hit the cap and it should be resized', async () => {
               await mockSortedOracles.setMedianRate(
                 stableToken.address,
                 new BigNumber('0x20000000000000000').multipliedBy(2000)
