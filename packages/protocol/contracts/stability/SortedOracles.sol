@@ -82,7 +82,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @param _token The address of the token to set
    * @param _reportExpirySeconds The number of seconds before a report is considered expired.
    */
-  function setTokenReportExpiry(address _token, uint256 _reportExpirySeconds) public onlyOwner {
+  function setTokenReportExpiry(address _token, uint256 _reportExpirySeconds) external onlyOwner {
     require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
     require(
       _reportExpirySeconds != tokenReportExpirySeconds[_token],
@@ -295,7 +295,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @param token The address of the token
    * @return The report expiry in seconds
    */
-  function getTokenReportExpirySeconds(address token) internal view returns (uint256) {
+  function getTokenReportExpirySeconds(address token) public view returns (uint256) {
     if (tokenReportExpirySeconds[token] == 0) {
       return reportExpirySeconds;
     }

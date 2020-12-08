@@ -106,6 +106,19 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   )
 
   /**
+   * Returns the token report expiry parameter
+   * and default to the contract-wide value if no
+   * per-token is set
+   * @param token to query for
+   * @returns Current report expiry.
+   */
+  async getTokenReportExpirySeconds(token: CeloToken): Promise<BigNumber> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.getTokenReportExpirySeconds(tokenAddress).call()
+    return valueToBigNumber(response)
+  }
+
+  /**
    * Checks if the oldest report for a given token is expired
    * @param token The token for which to check reports
    */
