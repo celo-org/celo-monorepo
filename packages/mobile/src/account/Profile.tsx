@@ -26,26 +26,16 @@ function Profile({ navigation, route }: Props) {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [newName, setNewName] = useState(useSelector(nameSelector) ?? '')
   const picturePath = useSelector(pictureSelector)
-  // We are using newPictureUri to show the image until the user presses the Save button, at which
-  // point we store the newPictureData on the file system and update the URI on the Redux store.
   const [newPictureUri, setNewPictureUri] = useState(picturePath)
-  const [newPictureData, setNewPictureData] = useState('')
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     if (route.params?.save) {
       navigation.setParams({ save: false })
-      let newPicturePath = null
-      if (newPictureData) {
-        newPicturePath = saveImageDataUrlToFile(
-          newPictureData,
-          `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
-        )
-      }
       dispatch(setName(newName))
-      dispatch(setPicture(newPicturePath))
-      // TODO: Save newName and newPictureData on CIP-8.
+      dispatch(setPicture(newPictureUri))
+      // TODO: Save name and picture on CIP-8.
       dispatch(showMessage(t('namePictureSaved')))
       navigation.goBack()
 
@@ -56,9 +46,16 @@ function Profile({ navigation, route }: Props) {
     }
   }, [route.params?.save])
 
-  const onPictureChosen = (uri: string, pictureDataUrl: string) => {
-    setNewPictureUri(uri)
-    setNewPictureData(pictureDataUrl)
+  const onPictureChosen = (pictureDataUrl: string | null) => {
+    if (!pictureDataUrl) {
+      setNewPictureUri(null)
+    } else {
+      const newPicturePath = saveImageDataUrlToFile(
+        pictureDataUrl,
+        `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
+      )
+      setNewPictureUri(newPicturePath)
+    }
   }
 
   const updateName = (updatedName: string) => {

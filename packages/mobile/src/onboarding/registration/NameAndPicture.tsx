@@ -27,7 +27,6 @@ type Props = StackScreenProps<StackParamList, Screens.NameAndPicture>
 
 function NameAndPicture({}: Props) {
   const [nameInput, setNameInput] = useState('')
-  const [, /* pictureDataUrl */ setPictureDataUrl] = useState('')
   const cachedName = useTypedSelector((state) => state.account.name)
   const picture = useTypedSelector((state) => state.account.picture)
   const dispatch = useDispatch()
@@ -59,17 +58,20 @@ function NameAndPicture({}: Props) {
     })
     dispatch(setName(newName))
 
-    // TODO: Store newName and pictureDataUrl on CIP-8.
+    // TODO: Store name and picture on CIP-8.
     goToNextScreen()
   }
 
-  const onPhotoChosen = (pictureUri: string, dataUrl: string) => {
-    const fileName = saveImageDataUrlToFile(
-      dataUrl,
-      `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
-    )
-    setPictureDataUrl(dataUrl)
-    dispatch(setPicture(fileName))
+  const onPhotoChosen = (dataUrl: string | null) => {
+    if (!dataUrl) {
+      dispatch(setPicture(null))
+    } else {
+      const fileName = saveImageDataUrlToFile(
+        dataUrl,
+        `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
+      )
+      dispatch(setPicture(fileName))
+    }
   }
 
   return (
