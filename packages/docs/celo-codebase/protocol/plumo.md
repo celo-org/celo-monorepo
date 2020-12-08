@@ -86,7 +86,7 @@ Next you'll download the `contribute` binary and begin contributing to the Plumo
 
 cLabs is running the coordinator server, which has a list of approved participant addresses. Additionally, cLabs is running a few verifiers that verify contributions on-demand, allowing the setup to make progress.
 
-* After receiving confirmation from cLabs, download the `contribute` binary from [here]https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
+* After receiving confirmation from cLabs, download the `contribute` binary from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
 * Run it as follows, assuming your keys reside in KEYS_PATH:
     * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
     * macOS users: `./contribute-macos --keys-path KEYS_PATH`
