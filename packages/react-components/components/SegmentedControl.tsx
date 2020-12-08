@@ -30,15 +30,19 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
 
   // TODO: color should be dependant on the style for the value
   // here it's assuming value at index 0 is green and index 1 (or above) is white
-  // const color = Animated.interpolateColors(position, {
-  //   inputRange: [0.5, 1],
-  //   outputColorRange: [colors.greenUI, colors.light],
-  // })
+  // TODO: remove 'as any' when this is released:
+  // https://github.com/software-mansion/react-native-reanimated/issues/1354
+  const color = Animated.interpolateColors(position, {
+    inputRange: [0.5, 1],
+    outputColorRange: [colors.greenUI, colors.light],
+  }) as any
 
-  // const colorInverted = interpolateColors(position, {
-  //   inputRange: [0.5, 1],
-  //   outputColorRange: [colors.light, colors.dark],
-  // })
+  // TODO: remove 'as any' when this is released:
+  // https://github.com/software-mansion/react-native-reanimated/issues/1354
+  const colorInverted = Animated.interpolateColors(position, {
+    inputRange: [0.5, 1],
+    outputColorRange: [colors.light, colors.dark],
+  }) as any
 
   const onLayout = ({
     nativeEvent: {
@@ -52,7 +56,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
   }
 
   return (
-    <Animated.View style={[styles.container, { borderColor: colors.greenUI }]} onLayout={onLayout}>
+    <Animated.View style={[styles.container, { borderColor: color }]} onLayout={onLayout}>
       {selectedIndex != null && !!segmentWidth && (
         <Animated.View
           style={[
@@ -60,7 +64,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
             {
               transform: [{ translateX }],
               width: segmentWidth,
-              backgroundColor: colors.greenUI,
+              backgroundColor: color,
             },
           ]}
         />
@@ -81,9 +85,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
         }
       >
         {/* Shows behind the mask, i.e. inside the text */}
-        <Animated.View
-          style={{ ...StyleSheet.absoluteFillObject, backgroundColor: colors.greenUI }}
-        />
+        <Animated.View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: color }} />
         {selectedIndex != null && !!segmentWidth && (
           <Animated.View
             style={[
@@ -91,7 +93,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
               {
                 transform: [{ translateX }],
                 width: segmentWidth,
-                backgroundColor: colors.light,
+                backgroundColor: colorInverted,
               },
             ]}
           />
