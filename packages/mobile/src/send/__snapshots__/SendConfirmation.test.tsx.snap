@@ -26,12 +26,39 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
     }
   >
     <RCTScrollView
+      automaticallyAdjustContentInsets={false}
       contentContainerStyle={
         Object {
           "paddingVertical": 10,
         }
       }
+      contentInset={
+        Object {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableOnAndroid={false}
+      enableResetScrollToCoords={true}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
       keyboardShouldPersistTaps="handled"
+      keyboardSpace={0}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={true}
+      update={[Function]}
+      viewIsInsideTabBar={false}
     >
       <View>
         <View
@@ -332,6 +359,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -393,6 +421,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -440,6 +469,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -635,6 +665,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -687,6 +718,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -1020,6 +1052,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -1107,12 +1140,39 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     }
   >
     <RCTScrollView
+      automaticallyAdjustContentInsets={false}
       contentContainerStyle={
         Object {
           "paddingVertical": 10,
         }
       }
+      contentInset={
+        Object {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableOnAndroid={false}
+      enableResetScrollToCoords={true}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
       keyboardShouldPersistTaps="handled"
+      keyboardSpace={0}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={true}
+      update={[Function]}
+      viewIsInsideTabBar={false}
     >
       <View>
         <View
@@ -1413,6 +1473,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -1474,6 +1535,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -1521,6 +1583,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -1716,6 +1779,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -1768,6 +1832,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -2101,6 +2166,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2188,12 +2254,39 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     }
   >
     <RCTScrollView
+      automaticallyAdjustContentInsets={false}
       contentContainerStyle={
         Object {
           "paddingVertical": 10,
         }
       }
+      contentInset={
+        Object {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableOnAndroid={false}
+      enableResetScrollToCoords={true}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
       keyboardShouldPersistTaps="handled"
+      keyboardSpace={0}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={true}
+      update={[Function]}
+      viewIsInsideTabBar={false}
     >
       <View>
         <View
@@ -2494,6 +2587,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -2555,6 +2649,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -2602,6 +2697,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -2797,6 +2893,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -2849,6 +2946,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -3179,6 +3277,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3266,12 +3365,39 @@ exports[`SendConfirmation renders correctly when there are multiple user address
     }
   >
     <RCTScrollView
+      automaticallyAdjustContentInsets={false}
       contentContainerStyle={
         Object {
           "paddingVertical": 10,
         }
       }
+      contentInset={
+        Object {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableOnAndroid={false}
+      enableResetScrollToCoords={true}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
       keyboardShouldPersistTaps="handled"
+      keyboardSpace={0}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={true}
+      update={[Function]}
+      viewIsInsideTabBar={false}
     >
       <View>
         <View
@@ -3401,6 +3527,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
+                        "rippleRadius": undefined,
                         "type": "ThemeAttrAndroid",
                       }
                     }
@@ -3633,6 +3760,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -3694,6 +3822,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -3741,6 +3870,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -3936,6 +4066,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -3988,6 +4119,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -4321,6 +4453,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -4408,12 +4541,39 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
     }
   >
     <RCTScrollView
+      automaticallyAdjustContentInsets={false}
       contentContainerStyle={
         Object {
           "paddingVertical": 10,
         }
       }
+      contentInset={
+        Object {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableOnAndroid={false}
+      enableResetScrollToCoords={true}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
       keyboardShouldPersistTaps="handled"
+      keyboardSpace={0}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={true}
+      update={[Function]}
+      viewIsInsideTabBar={false}
     >
       <View>
         <View
@@ -4764,6 +4924,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -4801,6 +4962,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -5002,6 +5164,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackgroundBorderless",
+                          "rippleRadius": undefined,
                           "type": "ThemeAttrAndroid",
                         }
                       }
@@ -5054,6 +5217,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -5387,6 +5551,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

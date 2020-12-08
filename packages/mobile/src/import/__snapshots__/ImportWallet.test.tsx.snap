@@ -10,6 +10,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
   }
 >
   <RCTScrollView
+    automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Array [
         Object {
@@ -18,7 +19,33 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
         null,
       ]
     }
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableOnAndroid={false}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
     keyboardShouldPersistTaps="always"
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    update={[Function]}
+    viewIsInsideTabBar={false}
   >
     <View>
       <View
@@ -178,6 +205,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -431,6 +459,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -467,6 +496,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
