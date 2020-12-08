@@ -1,8 +1,8 @@
-import { Address } from '@celo/base'
+import { Address, isNullAddress } from '@celo/base'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationStat, AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
-import { isValidAddress, normalizeAddress, normalizeAddressWith0x } from '@celo/utils/src/address'
+import { isValidAddress, normalizeAddressWith0x } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
@@ -244,9 +244,7 @@ function* fetchWalletAddresses(e164Number: string) {
     const accountAddress = normalizeAddressWith0x(accountAddresses[i])
     const walletAddress = normalizeAddressWith0x(address)
     // `getWalletAddress` returns a null address when there isn't a wallet registered
-    // TODO: Use the helper function `isNullAddress` I made in base/src/address
-    // once I've built from the monorepo
-    if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
+    if (!isNullAddress(walletAddress)) {
       walletToAccountAddress[walletAddress] = accountAddress
       possibleUserAddresses.add(walletAddress)
     } else {

@@ -6,6 +6,7 @@
   "repeatVerificationCode": "Repeated Verification Code",
   "revealAttestationFailure": "Error requesting SMS message",
   "verificationFailure": "Verification Failed",
+  "cantVerifyRevokedAccount": "This account has been previously revoked. Please create a new account and try again.",
   "verificationTimeout": "Verification Timed Out",
   "errorRequestCode": "Failed to request codes.",
   "errorRedeemingCode": "Failed to redeem code.",
