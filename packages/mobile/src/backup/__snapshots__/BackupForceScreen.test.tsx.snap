@@ -9,6 +9,32 @@ exports[`BackupForceScreen renders correctly 1`] = `
     }
   }
 >
+  <RNCSafeAreaView
+    style={
+      Object {
+        "height": 35,
+        "position": "absolute",
+        "right": 10,
+        "top": 10,
+        "width": 60,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
