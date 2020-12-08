@@ -627,13 +627,9 @@ contract('Exchange', (accounts: string[]) => {
           })
 
           describe.only('when stableBucket needs to be capped', () => {
-            let setMaxStableBucketFractionTx
+            let setMaxStableBucketFractionTx, minSupplyForStableBucketCapTx
 
             beforeEach(async () => {
-              // const capFraction = 1 / 22
-
-              // mock a huge CELO price
-              // TODO
               // set reserve to 120 M
               // set reserve fraction to .05%, that'll give 600K bucket CELO
               // set stable supply to 6M -> max bucket size (6e6)/22 = ~278K -> will not trigger cap
@@ -643,10 +639,17 @@ contract('Exchange', (accounts: string[]) => {
               setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
                 toFixed(1 / 22)
               )
+
+              // Make the capp trigger only after 1 millon coins
+              minSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
+                new BigNumber('1e24')
+              ) // Todo test playing with this variable
+
               await mockSortedOracles.setMedianRate(
                 stableToken.address,
                 new BigNumber('0x20000000000000000')
-              ) // should be two?
+              ) // 1 CELO = 2 USD
+
               await stableToken.mint(user, new BigNumber('61e24')) // 6M
               await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
             })
@@ -657,36 +660,25 @@ contract('Exchange', (accounts: string[]) => {
 
             it("stable bucket doesn't hit the cap and it shouldn't be resized", async () => {
               const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
-              // console.log('mintableStable' + mintableStable)
-              // console.log('tradeableGold' + tradeableGold)
               assertEqualBN(mintableStable, new BigNumber('2e21'))
               assertEqualBN(tradeableGold, new BigNumber('1e21'))
             })
 
-            it('emits', async () => {
+            it('emits MaxStableBucketFractionSet', async () => {
               const exchangeLogs = setMaxStableBucketFractionTx.logs.filter(
                 (x) => x.event === 'MaxStableBucketFractionSet'
               )
               assert(exchangeLogs.length === 1, 'Did not receive event')
             })
 
-            // it.skip('stable bucket hit the cap and it should be resized', async () => {
-            //   // get a very high celo tank
-            //   await mockSortedOracles.setMedianRate(stableToken.address, new BigNumber("0x20000000000000000").multipliedBy(100))
-            //   const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
-            //   console.log('mintableStable' + mintableStable)
-            //   console.log('tradeableGold' + tradeableGold)
-            // })
+            it('emits minSupplyForStableBucketCapSet', async () => {
+              const exchangeLogs = minSupplyForStableBucketCapTx.logs.filter(
+                (x) => x.event === 'minSupplyForStableBucketCapSet'
+              )
+              assert(exchangeLogs.length === 1, 'Did not receive event')
+            })
 
             it('has the correct getStableBucketTokenCap', async () => {
-              console.log(
-                'right before maxStableBucketFraction ' + (await exchange.maxStableBucketFraction())
-              )
-              console.log(
-                'right before getStableBucketTokenCap ' + (await exchange.getStableBucketTokenCap())
-              )
-              console.log('right before reserveFraction ' + (await exchange.reserveFraction()))
-
               assertEqualBN(
                 await exchange.getStableBucketTokenCap(),
                 new BigNumber('2772727272727272816000000')
@@ -701,9 +693,15 @@ contract('Exchange', (accounts: string[]) => {
 
               const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
 
-              assertEqualBN(mintableStable, await exchange.getStableBucketTokenCap())
-              console.log(tradeableGold)
-              // assertEqualBN(new BigNumber(mintableStable.dividedBy(tradeableGold)), new BigNumber('4000')) // Fix this test
+              console.log(
+                'minteable token ' + new BigNumber(mintableStable.dividedBy(tradeableGold))
+              )
+
+              // ratio between the bucket's shouldn't change
+              assertEqualBN(
+                new BigNumber(mintableStable.dividedBy(tradeableGold)),
+                new BigNumber('4000')
+              )
             })
           })
 

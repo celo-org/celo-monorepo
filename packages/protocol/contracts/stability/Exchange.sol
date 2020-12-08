@@ -39,7 +39,7 @@ contract Exchange is
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
   event StableBucketCapped();
-  event myTestEvent();
+  event minSupplyForStableBucketCapSet(uint256 minSupplyForStableBucketCap);
 
   FixidityLib.Fraction public spread;
 
@@ -58,6 +58,7 @@ contract Exchange is
   uint256 public updateFrequency;
   uint256 public minimumReports;
 
+  uint256 public minSupplyForStableBucketCap;
   FixidityLib.Fraction public maxStableBucketFraction;
 
   modifier updateBucketsIfNecessary() {
@@ -309,6 +310,11 @@ contract Exchange is
     emit ReserveFractionSet(newReserveFraction);
   }
 
+  function setMinSupplyForStableBucketCap(uint256 newMinSupplyForStableBucketCap) public onlyOwner {
+    minSupplyForStableBucketCap = newMinSupplyForStableBucketCap;
+    emit minSupplyForStableBucketCapSet(newMinSupplyForStableBucketCap);
+  }
+
   /**
    * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
@@ -385,14 +391,10 @@ contract Exchange is
       exchangeRateDenominator
     );
 
-    // uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
-    // uint256 maxStableBUcketSize = stableTokenSupply.div(22); // ~4% of current supply
     uint256 maxStableBUcketSize = getStableBucketTokenCap();
 
+    // check if the token is bigger than the cap
     uint256 cappedUpdatedStableBucket = Math.min(maxStableBUcketSize, updatedStableBucket);
-
-    // rate = 2
-    // cUSD bucket 10000 (max 5000 -> gold 25000)
 
     if (cappedUpdatedStableBucket < updatedStableBucket) {
       // resize gold bucket
@@ -406,21 +408,14 @@ contract Exchange is
   }
 
   function getStableBucketTokenCap() public view returns (uint256) {
-    uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), 1e24); // assume a miminum of 1M stable tokens supply to start the cap
+    uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap); // assume a miminum of 1M stable tokens supply to start the cap
 
     uint256 maxStableBucketSize = FixidityLib
       .newFixed(stableTokenSupply)
-    // .divide(reserveFraction)
       .multiply(maxStableBucketFraction)
       .fromFixed();
 
-    // return FixidityLib.fixed1().divide(FixidityLib.wrap(stableTokenSupply.mul(maxStableBucketFraction.fromFixed()))); // should no
-
-    // uint256 maxStableBucketSize = stableTokenSupply.div(22);
     return maxStableBucketSize;
-
-    // return maxStableBucketFraction.fromFixed();
-
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
