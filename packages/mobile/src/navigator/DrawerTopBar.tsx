@@ -29,6 +29,7 @@ function DrawerTopBar({ middleElement, rightElement, scrollPosition, testID }: P
   )
 
   return (
+    // @ts-ignore no idea why this complains
     <Animated.View testID={testID} style={viewStyle}>
       <TouchableOpacity
         style={styles.hamburger}
