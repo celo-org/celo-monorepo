@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { processColor, StyleSheet, TouchableOpacity, View } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
 
@@ -21,8 +21,8 @@ function DrawerTopBar({ middleElement, rightElement, scrollPosition, testID }: P
       borderBottomWidth: 1,
       borderBottomColor: cond(
         greaterThan(scrollPosition ?? new Animated.Value(0), 0),
-        colors.gray2,
-        'transparent'
+        processColor(colors.gray2) as number,
+        processColor('transparent') as number
       ),
     }),
     [scrollPosition]
