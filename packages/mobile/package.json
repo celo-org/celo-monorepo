@@ -67,7 +67,7 @@
     "@sentry/react-native": "^1.7.1",
     "@ungap/url-search-params": "^0.1.2",
     "Base64": "^1.0.1",
-    "apollo-boost": "^0.4.7",
+    "apollo-boost": "^0.4.9",
     "apollo-cache-persist": "^0.1.1",
     "bignumber.js": "^9.0.0",
     "bn.js": "4.11.8",
