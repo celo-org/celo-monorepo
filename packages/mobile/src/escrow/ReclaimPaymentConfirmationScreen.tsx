@@ -35,6 +35,7 @@ interface StateProps {
   e164PhoneNumber: string | null
   account: string | null
   dollarBalance: string
+  celoBalance: string
   appConnected: boolean
 }
 
@@ -54,6 +55,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
     dollarBalance: state.stableToken.balance || '0',
+    celoBalance: state.goldToken.balance || '0',
     appConnected: isAppConnected(state),
   }
 }
@@ -109,12 +111,17 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, isReclaiming, appConnected, dollarBalance } = this.props
+    const { t, isReclaiming, appConnected, dollarBalance, celoBalance } = this.props
     const payment = this.getReclaimPaymentInput()
-    const feeInfo = asyncFee.result
-    const fee = getFeeInTokens(feeInfo?.fee)
+    const fee = getFeeInTokens(asyncFee.result?.fee)
+    // TODO: Although this is configured to display fees in CELO, the currency and fee is not yet
+    // plumbed through the rest of the system to ensure it actually pays for the fees in CELO if
+    // selected.
+    const feeCurrency = getFeeInTokens(asyncFee.result?.currency)
     const convertedAmount = divideByWei(payment.amount.valueOf())
-    const userHasEnough = fee?.isLessThanOrEqualTo(dollarBalance)
+    const userHasEnough = fee?.isLessThanOrEqualTo(
+      feeCurrency === CURRENCY_ENUM.DOLLAR ? dollarBalance : celoBalance
+    )
 
     return (
       <SafeAreaView style={styles.container}>
@@ -141,7 +148,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
             }
             amount={convertedAmount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
-            fee={fee}
+            feeInfo={asyncFee.result}
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
           />
