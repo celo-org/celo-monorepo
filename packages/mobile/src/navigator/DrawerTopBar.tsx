@@ -21,15 +21,15 @@ function DrawerTopBar({ middleElement, rightElement, scrollPosition, testID }: P
       borderBottomWidth: 1,
       borderBottomColor: cond(
         greaterThan(scrollPosition ?? new Animated.Value(0), 0),
-        processColor(colors.gray2) as number,
-        processColor('transparent') as number
+        // TODO: fix type
+        processColor(colors.gray2) as any,
+        processColor('transparent') as any
       ),
     }),
     [scrollPosition]
   )
 
   return (
-    // @ts-ignore no idea why this complains
     <Animated.View testID={testID} style={viewStyle}>
       <TouchableOpacity
         style={styles.hamburger}

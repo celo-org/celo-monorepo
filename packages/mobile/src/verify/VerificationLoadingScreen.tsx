@@ -208,7 +208,6 @@ export default function VerificationLoadingScreen({ route }: Props) {
         <CancelButton onCancel={onCancel} />
       </SafeAreaView>
       <Animated.ScrollView
-        // @ts-ignore This works fine ;)
         ref={scrollViewRef}
         onScroll={onScroll}
         scrollEventThrottle={16}
