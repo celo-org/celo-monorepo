@@ -94,3 +94,32 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/identity/test-attestation-service.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/test-attestation-service.ts)_
+
+### Withdraw-attestation-rewards
+
+Withdraw accumulated attestation rewards for a given currency
+
+```
+USAGE
+  $ celocli identity:withdraw-attestation-rewards
+
+OPTIONS
+  -k, --privateKey=privateKey                                Use a private key to sign local transactions with
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          (required) Address to withdraw to
+
+  --ledgerAddresses=ledgerAddresses                          [default: 1] If --useLedger is set, this will get the first
+                                                             N addresses for local signing
+
+  --ledgerConfirmAddress                                     Set it to ask confirmation for the address of the
+                                                             transaction from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses              [default: [0]] If --useLedger is set, this will get the
+                                                             array of index addresses for local signing. Example
+                                                             --ledgerCustomAddresses "[4,99]"
+
+  --tokenAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address of the token that will be withdrawn
+
+  --useLedger                                                Set it to use a ledger wallet
+```
+
+_See code: [packages/cli/src/commands/identity/withdraw-attestation-rewards.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/withdraw-attestation-rewards.ts)_
