@@ -1,11 +1,12 @@
 import { Result } from '@celo/base/lib/result'
-import { CeloTxReceipt } from '@celo/connect'
+import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import {
   CheckSessionResp,
@@ -356,6 +357,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             attestations,
             attestations.length + attestationsToRequest,
             true,
+            contractKit,
             komenciKit
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
@@ -931,6 +933,7 @@ export function* feelessRequiredAttestationsCompleted() {
 }
 
 export function* feelessRequestAttestations(
+  contractKit: ContractKit,
   komenciKit: KomenciKit,
   attestationsWrapper: AttestationsWrapper,
   numAttestationsRequestsNeeded: number,
@@ -964,39 +967,41 @@ export function* feelessRequestAttestations(
   } else {
     Logger.debug(
       `${TAG}@feelessRequestAttestations`,
-      `Approving ${numAttestationsRequestsNeeded} new attestations`
+      `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    const approveTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
-      [komenciKit, komenciKit.approveAttestations],
-      mtwAddress,
+    const mtwWrapper: MetaTransactionWalletWrapper = yield call(
+      [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
+      mtwAddress
+    )
+
+    const approveTx: CeloTransactionObject<boolean> = yield call(
+      [attestationsWrapper, attestationsWrapper.approveAttestationFee],
       numAttestationsRequestsNeeded
     )
 
-    if (!approveTxResult.ok) {
+    const requestTx: CeloTransactionObject<void> = yield call(
+      [attestationsWrapper, attestationsWrapper.request],
+      phoneHash,
+      numAttestationsRequestsNeeded
+    )
+
+    const approveAndRequestTx = mtwWrapper.executeTransactions([approveTx.txo, requestTx.txo])
+
+    const approveAndRequestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+      [komenciKit, komenciKit.submitMetaTransaction],
+      mtwAddress,
+      approveAndRequestTx
+    )
+
+    if (!approveAndRequestTxResult.ok) {
       Logger.debug(TAG, '@feelessRequestAttestations', 'Failed approve tx')
-      throw approveTxResult.error
+      throw approveAndRequestTxResult.error
     }
 
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
       feeless: true,
     })
-
-    Logger.debug(
-      `${TAG}@feelessRequestAttestations`,
-      `Requesting ${numAttestationsRequestsNeeded} new attestations`
-    )
-
-    const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
-      [komenciKit, komenciKit.requestAttestations],
-      mtwAddress,
-      phoneHash,
-      numAttestationsRequestsNeeded
-    )
-    if (!requestTxResult.ok) {
-      Logger.debug(TAG, '@feelessRequestAttestations', 'Failed request tx')
-      throw requestTxResult.error
-    }
 
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent, {
       feeless: true,

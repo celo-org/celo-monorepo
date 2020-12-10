@@ -246,6 +246,14 @@ export const reducer = (
         isFetchingAddresses: false,
       }
     }
+    case Actions.CANCEL_VERIFICATION:
+      return {
+        ...state,
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          isActive: false,
+        },
+      }
     case Actions.RESET_VERIFICATION:
       return {
         ...state,
@@ -309,7 +317,7 @@ export const reducer = (
         feelessVerificationStatus: action.status,
         feelessVerificationState: {
           ...state.feelessVerificationState,
-          isActive: action.status > 0 && action.status !== VerificationStatus.Done,
+          isActive: action.status !== VerificationStatus.Done,
           isLoading: action.status === VerificationStatus.GettingStatus,
         },
       }
