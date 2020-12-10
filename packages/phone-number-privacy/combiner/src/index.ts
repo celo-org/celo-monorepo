@@ -19,16 +19,16 @@ async function meterResponse(
   }
   const logger: Logger = loggerMiddleware(req, res)
   logger.fields.endpoint = endpoint
-  logger.debug({ req: req.body }, 'Request received')
+  logger.info({ req: req.body }, 'Request received')
   if (!req.body.sessionID) {
-    logger.warn({ req: req.body }, 'Request does not have sessionID')
+    logger.info({ req: req.body }, 'Request does not have sessionID')
   }
   const startMark = `Begin ${handler.name}`
   const endMark = `End ${handler.name}`
   const entryName = `${handler.name} latency`
 
   const obs = new PerformanceObserver((list, observer) => {
-    logger.info({ latency: list.getEntries()[0].duration })
+    logger.info({ latency: list.getEntries().pop()!.duration }, 'e2e response latency measured')
     performance.clearMarks()
     observer.disconnect()
   })
@@ -40,8 +40,7 @@ async function meterResponse(
       logger.info({ res }, 'Response sent')
     })
     .catch((err) => {
-      logger.error(ErrorMessage.UNKNOWN_ERROR)
-      logger.error({ err })
+      logger.error({ err }, ErrorMessage.UNKNOWN_ERROR)
     })
     .finally(() => {
       performance.mark(endMark)

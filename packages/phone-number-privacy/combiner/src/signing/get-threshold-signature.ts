@@ -84,7 +84,7 @@ async function requestSignatures(request: Request, response: Response) {
 
     const obs = new PerformanceObserver((list, observer) => {
       logger.info(
-        { latency: list.getEntries()[0].duration, signer: service },
+        { latency: list.getEntries().pop()!.duration, signer: service },
         'Signer response latency measured'
       )
       performance.clearMarks()
@@ -100,7 +100,7 @@ async function requestSignatures(request: Request, response: Response) {
       .then(async (res: FetchResponse) => {
         const data = await res.text()
         logger.info(
-          { signer: service, res: data },
+          { signer: service, res: data, status: res.status },
           'received requestSignature response from signer'
         )
         if (res.ok) {
@@ -115,17 +115,14 @@ async function requestSignatures(request: Request, response: Response) {
             request.body.blindedQueryPhoneNumber
           )
         } else {
-          logger.info({ status: res.status }, 'signer response not ok')
           errorCodes.set(res.status, (errorCodes.get(res.status) || 0) + 1)
         }
       })
       .catch((err) => {
         if (err.name === 'AbortError') {
-          logger.error(ErrorMessage.TIMEOUT_FROM_SIGNER)
-          logger.error({ err, signer: service })
+          logger.error({ err, signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
         } else {
-          logger.error(ErrorMessage.ERROR_REQUESTING_SIGNATURE)
-          logger.error({ err, signer: service })
+          logger.error({ err, signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
         }
       })
       .finally(() => {
@@ -158,11 +155,13 @@ async function handleSuccessResponse(
   const signResponse = (await res.json()) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
-    logger.info('Signer responded with error')
-    logger.error({
-      err: signResponse.error,
-      signer: serviceUrl,
-    })
+    logger.error(
+      {
+        err: signResponse.error,
+        signer: serviceUrl,
+      },
+      'Signer responded with error'
+    )
   }
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)

@@ -1,7 +1,7 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { getDatabase } from '../database'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
+import { NumberPair, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
 function numberPairs() {
   return getDatabase()<NumberPair>(NUMBER_PAIRS_TABLE)
@@ -25,8 +25,7 @@ export async function getNumberPairContacts(
       .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
       .filter((number) => contactPhonesSet.has(number))
   } catch (err) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error({ err })
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
     return []
   }
 }
@@ -49,8 +48,7 @@ export async function setNumberPairContacts(
   } catch (err) {
     // ignore duplicate insertion error (23505)
     if (err.code !== '23505') {
-      logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
-      logger.error({ err })
+      logger.error({ err }, ErrorMessage.DATABASE_INSERT_FAILURE)
     }
   }
 }

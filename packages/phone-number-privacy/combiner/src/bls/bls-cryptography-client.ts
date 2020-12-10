@@ -31,8 +31,7 @@ export class BLSCryptographyClient {
       )
       this.verifiedSignatures.push(sigBuffer)
     } catch (err) {
-      logger.error(ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
-      logger.error({ err, url: serviceResponse.url })
+      logger.error({ err, url: serviceResponse.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
     }
   }
 
