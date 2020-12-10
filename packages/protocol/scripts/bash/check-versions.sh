@@ -59,7 +59,6 @@ fi
 
 echo " - Return to original git ref"
 git checkout $ORIGINAL_GIT_REF > $LOG_FILE
-yarn build:ts
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
