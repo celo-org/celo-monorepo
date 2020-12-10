@@ -8,7 +8,11 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Address to withdraw to' }),
+    from: Flags.address({
+      required: true,
+      description:
+        'Address to withdraw from. Can be the attestation signer address or the underlying account address',
+    }),
     tokenAddress: Flags.address({
       required: true,
       description: 'The address of the token that will be withdrawn',
@@ -22,9 +26,13 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
       this.kit.contracts.getAttestations(),
     ])
 
-    const attestationSigner = await accounts.getAttestationSigner(res.flags.from)
+    let address = res.flags.from
+    if (await accounts.isAccount(address)) {
+      address = await accounts.getAttestationSigner(res.flags.from)
+    }
+
     const pendingWithdrawals = await attestations.getPendingWithdrawals(
-      attestationSigner,
+      address,
       res.flags.tokenAddress
     )
     if (!pendingWithdrawals.gt(0)) {
