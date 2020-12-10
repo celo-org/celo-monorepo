@@ -18,7 +18,7 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import PictureInput from 'src/onboarding/registration/PictureInput'
-import { saveImageDataUrlToFile } from 'src/utils/image'
+import { saveProfilePicture } from 'src/utils/image'
 
 type Props = StackScreenProps<StackParamList, Screens.Profile>
 
@@ -50,10 +50,7 @@ function Profile({ navigation, route }: Props) {
     if (!pictureDataUrl) {
       setNewPictureUri(null)
     } else {
-      const newPicturePath = saveImageDataUrlToFile(
-        pictureDataUrl,
-        `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
-      )
+      const newPicturePath = saveProfilePicture(pictureDataUrl)
       setNewPictureUri(newPicturePath)
     }
   }

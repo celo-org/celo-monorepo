@@ -29,3 +29,10 @@ export const saveImageDataUrlToFile = (
     .catch((e) => Logger.error('Error saving image', e))
   return fileName
 }
+
+export const saveProfilePicture = (dataUrl: string): string => {
+  return saveImageDataUrlToFile(
+    dataUrl,
+    `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`
+  )
+}
