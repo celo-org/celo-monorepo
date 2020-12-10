@@ -1,10 +1,9 @@
+import { quote } from '../utils'
+
 export default HandleDeepLinkSend = () => {
-  // on ios the command line uses double quotes around the string
-  // while on android it does not
-  const PAY_URL =
-    device.getPlatform() === 'ios'
-      ? 'celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229&displayName=Crypto4BlackLives&e164PhoneNumber=%2B14046251530'
-      : '"celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229&displayName=Crypto4BlackLives&e164PhoneNumber=%2B14046251530"'
+  const PAY_URL = quote(
+    'celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229&displayName=Crypto4BlackLives&e164PhoneNumber=%2B14046251530'
+  )
 
   it('Launch app cold with url', async () => {
     await device.terminateApp()
