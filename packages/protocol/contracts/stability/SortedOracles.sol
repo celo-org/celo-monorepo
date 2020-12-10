@@ -31,7 +31,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   // `reportExpirySeconds is the fallback value used to determine reporting
   // frequency. Initially it was the _only_ value but we later introduced
   // the per token mapping in `tokenReportExpirySeconds`. If a token
-  // doesn't have a value in the mapping (i.e. it's 0), it uses the fallback.
+  // doesn't have a value in the mapping (i.e. it's 0), the fallback is used.
   // See: #getTokenReportExpirySeconds
   uint256 public reportExpirySeconds;
   mapping(address => uint256) public tokenReportExpirySeconds;
