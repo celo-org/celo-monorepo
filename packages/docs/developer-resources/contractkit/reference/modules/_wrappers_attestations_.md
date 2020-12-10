@@ -33,22 +33,22 @@
 
 ###  IdentifierLookupResult
 
-Ƭ **IdentifierLookupResult**: *Record‹string, Record‹[Address](_base_.md#address), [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
+Ƭ **IdentifierLookupResult**: *Record‹string, Record‹Address, [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L78)*
+*Defined in [wrappers/Attestations.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L78)*
 
 ## Functions
 
 ###  getSecurityCodePrefix
 
-▸ **getSecurityCodePrefix**(`issuerAddress`: [Address](_base_.md#address)): *string*
+▸ **getSecurityCodePrefix**(`issuerAddress`: Address): *string*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L28)*
+*Defined in [wrappers/Attestations.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L28)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`issuerAddress` | [Address](_base_.md#address) |
+`issuerAddress` | Address |
 
 **Returns:** *string*
