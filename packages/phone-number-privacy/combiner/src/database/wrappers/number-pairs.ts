@@ -1,7 +1,7 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { getDatabase } from '../database'
-import { NumberPair, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
+import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
 
 function numberPairs() {
   return getDatabase()<NumberPair>(NUMBER_PAIRS_TABLE)
