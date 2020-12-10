@@ -20,7 +20,7 @@
 
 Ƭ **CFType**: *typeof ContractFactories*
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L61)*
+*Defined in [web3-contract-cache.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L61)*
 
 ## Object literals
 
@@ -28,154 +28,154 @@
 
 ### ▪ **ContractFactories**: *object*
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L33)*
+*Defined in [web3-contract-cache.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L33)*
 
 ###  [CeloContract.Accounts]
 
-• **[CeloContract.Accounts]**: *newAccounts* = newAccounts
+• **[CeloContract.Accounts]**: *any* = newAccounts
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L34)*
+*Defined in [web3-contract-cache.ts:34](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L34)*
 
 ###  [CeloContract.Attestations]
 
-• **[CeloContract.Attestations]**: *newAttestations* = newAttestations
+• **[CeloContract.Attestations]**: *any* = newAttestations
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L35)*
+*Defined in [web3-contract-cache.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L35)*
 
 ###  [CeloContract.BlockchainParameters]
 
-• **[CeloContract.BlockchainParameters]**: *newBlockchainParameters* = newBlockchainParameters
+• **[CeloContract.BlockchainParameters]**: *any* = newBlockchainParameters
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L36)*
+*Defined in [web3-contract-cache.ts:36](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L36)*
 
 ###  [CeloContract.DoubleSigningSlasher]
 
-• **[CeloContract.DoubleSigningSlasher]**: *newDoubleSigningSlasher* = newDoubleSigningSlasher
+• **[CeloContract.DoubleSigningSlasher]**: *any* = newDoubleSigningSlasher
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L37)*
+*Defined in [web3-contract-cache.ts:37](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L37)*
 
 ###  [CeloContract.DowntimeSlasher]
 
-• **[CeloContract.DowntimeSlasher]**: *newDowntimeSlasher* = newDowntimeSlasher
+• **[CeloContract.DowntimeSlasher]**: *any* = newDowntimeSlasher
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L38)*
+*Defined in [web3-contract-cache.ts:38](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L38)*
 
 ###  [CeloContract.Election]
 
-• **[CeloContract.Election]**: *newElection* = newElection
+• **[CeloContract.Election]**: *any* = newElection
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L39)*
+*Defined in [web3-contract-cache.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L39)*
 
 ###  [CeloContract.EpochRewards]
 
-• **[CeloContract.EpochRewards]**: *newEpochRewards* = newEpochRewards
+• **[CeloContract.EpochRewards]**: *any* = newEpochRewards
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L40)*
+*Defined in [web3-contract-cache.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L40)*
 
 ###  [CeloContract.Escrow]
 
-• **[CeloContract.Escrow]**: *newEscrow* = newEscrow
+• **[CeloContract.Escrow]**: *any* = newEscrow
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L41)*
+*Defined in [web3-contract-cache.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L41)*
 
 ###  [CeloContract.Exchange]
 
-• **[CeloContract.Exchange]**: *newExchange* = newExchange
+• **[CeloContract.Exchange]**: *any* = newExchange
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L42)*
+*Defined in [web3-contract-cache.ts:42](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L42)*
 
 ###  [CeloContract.FeeCurrencyWhitelist]
 
-• **[CeloContract.FeeCurrencyWhitelist]**: *newFeeCurrencyWhitelist* = newFeeCurrencyWhitelist
+• **[CeloContract.FeeCurrencyWhitelist]**: *any* = newFeeCurrencyWhitelist
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L43)*
+*Defined in [web3-contract-cache.ts:43](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L43)*
 
 ###  [CeloContract.Freezer]
 
-• **[CeloContract.Freezer]**: *newFreezer* = newFreezer
+• **[CeloContract.Freezer]**: *any* = newFreezer
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L44)*
+*Defined in [web3-contract-cache.ts:44](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L44)*
 
 ###  [CeloContract.GasPriceMinimum]
 
-• **[CeloContract.GasPriceMinimum]**: *newGasPriceMinimum* = newGasPriceMinimum
+• **[CeloContract.GasPriceMinimum]**: *any* = newGasPriceMinimum
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L45)*
+*Defined in [web3-contract-cache.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L45)*
 
 ###  [CeloContract.GoldToken]
 
-• **[CeloContract.GoldToken]**: *newGoldToken* = newGoldToken
+• **[CeloContract.GoldToken]**: *any* = newGoldToken
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L46)*
+*Defined in [web3-contract-cache.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L46)*
 
 ###  [CeloContract.Governance]
 
-• **[CeloContract.Governance]**: *newGovernance* = newGovernance
+• **[CeloContract.Governance]**: *any* = newGovernance
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L47)*
+*Defined in [web3-contract-cache.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L47)*
 
 ###  [CeloContract.LockedGold]
 
-• **[CeloContract.LockedGold]**: *newLockedGold* = newLockedGold
+• **[CeloContract.LockedGold]**: *any* = newLockedGold
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L48)*
+*Defined in [web3-contract-cache.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L48)*
 
 ###  [CeloContract.MetaTransactionWalletDeployer]
 
-• **[CeloContract.MetaTransactionWalletDeployer]**: *newMetaTransactionWalletDeployer* = newMetaTransactionWalletDeployer
+• **[CeloContract.MetaTransactionWalletDeployer]**: *any* = newMetaTransactionWalletDeployer
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L50)*
+*Defined in [web3-contract-cache.ts:50](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L50)*
 
 ###  [CeloContract.MetaTransactionWallet]
 
-• **[CeloContract.MetaTransactionWallet]**: *newMetaTransactionWallet* = newMetaTransactionWallet
+• **[CeloContract.MetaTransactionWallet]**: *any* = newMetaTransactionWallet
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L49)*
+*Defined in [web3-contract-cache.ts:49](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L49)*
 
 ###  [CeloContract.MultiSig]
 
-• **[CeloContract.MultiSig]**: *newMultiSig* = newMultiSig
+• **[CeloContract.MultiSig]**: *any* = newMultiSig
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L51)*
+*Defined in [web3-contract-cache.ts:51](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L51)*
 
 ###  [CeloContract.Random]
 
-• **[CeloContract.Random]**: *newRandom* = newRandom
+• **[CeloContract.Random]**: *any* = newRandom
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L52)*
+*Defined in [web3-contract-cache.ts:52](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L52)*
 
 ###  [CeloContract.Registry]
 
-• **[CeloContract.Registry]**: *newRegistry* = newRegistry
+• **[CeloContract.Registry]**: *any* = newRegistry
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L53)*
+*Defined in [web3-contract-cache.ts:53](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L53)*
 
 ###  [CeloContract.Reserve]
 
-• **[CeloContract.Reserve]**: *newReserve* = newReserve
+• **[CeloContract.Reserve]**: *any* = newReserve
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L54)*
+*Defined in [web3-contract-cache.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L54)*
 
 ###  [CeloContract.SortedOracles]
 
-• **[CeloContract.SortedOracles]**: *newSortedOracles* = newSortedOracles
+• **[CeloContract.SortedOracles]**: *any* = newSortedOracles
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L55)*
+*Defined in [web3-contract-cache.ts:55](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L55)*
 
 ###  [CeloContract.StableToken]
 
-• **[CeloContract.StableToken]**: *newStableToken* = newStableToken
+• **[CeloContract.StableToken]**: *any* = newStableToken
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L56)*
+*Defined in [web3-contract-cache.ts:56](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L56)*
 
 ###  [CeloContract.TransferWhitelist]
 
-• **[CeloContract.TransferWhitelist]**: *newTransferWhitelist* = newTransferWhitelist
+• **[CeloContract.TransferWhitelist]**: *any* = newTransferWhitelist
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L57)*
+*Defined in [web3-contract-cache.ts:57](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L57)*
 
 ###  [CeloContract.Validators]
 
-• **[CeloContract.Validators]**: *newValidators* = newValidators
+• **[CeloContract.Validators]**: *any* = newValidators
 
-*Defined in [packages/contractkit/src/web3-contract-cache.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L58)*
+*Defined in [web3-contract-cache.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L58)*
