@@ -221,7 +221,7 @@ async function nginxHelmParameters(valueFilePath: string, celoEnv: string, clust
   "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
   "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
   let loadBalancerIP = ''
-  if (clusterConfig?.cloudProvider == CloudProvider.GCP) {
+  if (clusterConfig?.cloudProvider === CloudProvider.GCP) {
     loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv)
   }
 
