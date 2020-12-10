@@ -105,7 +105,9 @@ USAGE
 
 OPTIONS
   -k, --privateKey=privateKey                                Use a private key to sign local transactions with
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          (required) Address to withdraw to
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          (required) Address to withdraw from. Can be the attestation
+                                                             signer address or the underlying account address
 
   --ledgerAddresses=ledgerAddresses                          [default: 1] If --useLedger is set, this will get the first
                                                              N addresses for local signing
