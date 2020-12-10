@@ -426,7 +426,7 @@ export class KomenciKit {
     let receipt: CeloTxReceipt | null = null
     let waited = 0
     while (receipt == null && waited < this.options.txRetryTimeoutMs) {
-      receipt = await this.contractKit.connection.getTransactionReceipt(txHash)
+      receipt = await this.contractKit.web3.eth.getTransactionReceipt(txHash)
       if (receipt == null) {
         await sleep(this.options.txPollingIntervalMs)
         waited += this.options.txPollingIntervalMs
@@ -498,7 +498,7 @@ export class KomenciKit {
 
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 
-    const events = await deployer.getPastEvents(deployer.events.WalletDeployed, {
+    const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
       fromBlock: receipt.blockNumber,
       toBlock: receipt.blockNumber,
     })
@@ -508,7 +508,7 @@ export class KomenciKit {
     )
 
     if (deployWalletLog === undefined) {
-      return Err(new TxEventNotFound(txHash, deployer.events.WalletDeployed))
+      return Err(new TxEventNotFound(txHash, deployer.eventTypes.WalletDeployed))
     }
 
     return Ok(deployWalletLog.returnValues.wallet)
