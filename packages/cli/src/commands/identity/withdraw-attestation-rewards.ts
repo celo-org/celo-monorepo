@@ -17,10 +17,14 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
 
   async run() {
     const res = this.parse(AttestationRewardsWithdraw)
-    const attestations = await this.kit.contracts.getAttestations()
+    const [accounts, attestations] = await Promise.all([
+      this.kit.contracts.getAccounts(),
+      this.kit.contracts.getAttestations(),
+    ])
 
+    const attestationSigner = await accounts.getAttestationSigner(res.flags.from)
     const pendingWithdrawals = await attestations.getPendingWithdrawals(
-      res.flags.from,
+      attestationSigner,
       res.flags.tokenAddress
     )
     if (!pendingWithdrawals.gt(0)) {
