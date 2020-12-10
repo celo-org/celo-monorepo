@@ -134,6 +134,28 @@ contract('SortedOracles', (accounts: string[]) => {
     })
   })
 
+  describe('#getTokenReportExpirySeconds', () => {
+    describe('when no token level expiry is set', () => {
+      it('returns the contract level one', async () => {
+        assert.isTrue((await sortedOracles.getTokenReportExpirySeconds(aToken)).eq(aReportExpiry))
+      })
+    })
+
+    describe('when a token level expiry is set', () => {
+      const anotherReportExpirt = 2 * aReportExpiry
+
+      beforeEach(async () => {
+        await sortedOracles.setTokenReportExpiry(aToken, anotherReportExpirt)
+      })
+
+      it('returns the contract level one', async () => {
+        assert.isTrue(
+          (await sortedOracles.getTokenReportExpirySeconds(aToken)).eq(anotherReportExpirt)
+        )
+      })
+    })
+  })
+
   describe('#removeExpiredReports', () => {
     beforeEach(async () => {
       await sortedOracles.addOracle(aToken, anOracle)
@@ -220,28 +242,69 @@ contract('SortedOracles', (accounts: string[]) => {
         })
       })
 
-      describe('when a per token expiry is set, which is grater than the default', () => {
+      describe('when a per token expiry is set, which is greater than the default', () => {
+        const tokenReportExpiry = 2 * aReportExpiry
+
         beforeEach(async () => {
-          await sortedOracles.setTokenReportExpiry(aToken, 2 * aReportExpiry)
+          await sortedOracles.setTokenReportExpiry(aToken, tokenReportExpiry)
         })
 
-        describe('and the default has passed', () => {
-          it('should return false', async () => {
-            await timeTravel(aReportExpiry, web3)
+        describe('and no time has passed', () => {
+          it('it should not be expired', async () => {
             const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
             assert.isFalse(isReportExpired[0])
           })
         })
 
-        it('should return true if the report is expired', async () => {
-          await timeTravel(2 * aReportExpiry, web3)
-          const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
-          assert.isTrue(isReportExpired[0])
+        describe('and the default expiry time has passed', () => {
+          beforeEach(() => timeTravel(aReportExpiry, web3))
+
+          it('should return false', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isFalse(isReportExpired[0])
+          })
         })
 
-        it('should return false if the report is not expired', async () => {
-          const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
-          assert.isFalse(isReportExpired[0])
+        describe('and the token expiry time has passed', () => {
+          beforeEach(() => timeTravel(tokenReportExpiry, web3))
+
+          it('should return true if the report is expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isTrue(isReportExpired[0])
+          })
+        })
+      })
+
+      describe('when a per token expiry is set, which is lower than the default', () => {
+        const tokenReportExpiry = aReportExpiry / 2
+
+        beforeEach(async () => {
+          await sortedOracles.setTokenReportExpiry(aToken, tokenReportExpiry)
+        })
+
+        describe('and no time has passed', () => {
+          it('it should not be expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isFalse(isReportExpired[0])
+          })
+        })
+
+        describe('and the default expiry time has passed', () => {
+          beforeEach(() => timeTravel(aReportExpiry, web3))
+
+          it('should return true', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isTrue(isReportExpired[0])
+          })
+        })
+
+        describe('and the token expiry time has passed', () => {
+          beforeEach(() => timeTravel(tokenReportExpiry, web3))
+
+          it('should return true if the report is expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isTrue(isReportExpired[0])
+          })
         })
       })
     })
