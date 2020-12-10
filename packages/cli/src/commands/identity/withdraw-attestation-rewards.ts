@@ -11,7 +11,7 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
     from: Flags.address({ required: true, description: 'Address to withdraw to' }),
     tokenAddress: Flags.address({
       required: true,
-      description: "Your validator's signer or account address",
+      description: 'The address of the token that will be withdrawn',
     }),
   }
 
@@ -20,7 +20,6 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
     const attestations = await this.kit.contracts.getAttestations()
     cli.action.start('Withdrawing rewards')
     await displaySendTx('withdraw', attestations.withdraw(res.flags.tokenAddress))
-
     cli.action.stop()
   }
 }
