@@ -167,7 +167,7 @@
     "@types/graphql": "^14.0.7",
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/lodash": "^4.14.136",
-    "@types/react": "^17.0.0",
+    "@types/react": "^16.9.34",
     "@types/react-native": "^0.63.37",
     "@types/react-native-fs": "^2.13.0",
     "@types/react-native-keep-awake": "^2.0.1",
