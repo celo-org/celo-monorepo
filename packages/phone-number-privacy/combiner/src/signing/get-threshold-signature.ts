@@ -62,7 +62,7 @@ export async function handleGetBlindedMessageSig(
     logger.debug('Requesting signatures')
     await requestSignatures(request, response)
   } catch (err) {
-    logger.error({ err })
+    logger.error({ error: err })
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }
@@ -84,7 +84,7 @@ async function requestSignatures(request: Request, response: Response) {
 
     const obs = new PerformanceObserver((list, observer) => {
       logger.info(
-        { latency: list.getEntries().pop()!.duration, signer: service },
+        { latency: list.getEntries().pop()!.duration, signer: service, list },
         'Signer response latency measured'
       )
       performance.clearMarks()
@@ -120,9 +120,9 @@ async function requestSignatures(request: Request, response: Response) {
       })
       .catch((err) => {
         if (err.name === 'AbortError') {
-          logger.error({ err, signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+          logger.error({ error: err, signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
         } else {
-          logger.error({ err, signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
+          logger.error({ error: err, signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
         }
       })
       .finally(() => {
@@ -157,7 +157,7 @@ async function handleSuccessResponse(
     // Continue on failure as long as signature is present to unblock user
     logger.error(
       {
-        err: signResponse.error,
+        error: signResponse.error,
         signer: serviceUrl,
       },
       'Signer responded with error'

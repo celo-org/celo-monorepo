@@ -64,7 +64,7 @@ export async function handleGetContactMatches(
     await setDidMatchmaking(account, logger)
     response.json({ success: true, matchedContacts, version: VERSION })
   } catch (err) {
-    logger.error({ err }, 'Failed to getContactMatches')
+    logger.error({ error: err }, 'Failed to getContactMatches')
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }

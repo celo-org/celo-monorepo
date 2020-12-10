@@ -28,7 +28,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error({ error: err }, ErrorMessage.DATABASE_GET_FAILURE)
     return false
   }
 }
@@ -49,7 +49,7 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
       return insertRecord(newAccount)
     }
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     return null
   }
 }
