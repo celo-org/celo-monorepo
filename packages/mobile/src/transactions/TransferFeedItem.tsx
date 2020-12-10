@@ -94,7 +94,7 @@ export function TransferFeedItem(props: Props) {
     timestamp,
     invitees
   )
-  const picture = addressToDisplayName[address]?.picture ?? null
+  const imageUrl = addressToDisplayName[address]?.imageUrl ?? null
 
   return (
     <TransactionFeedItem
@@ -103,7 +103,7 @@ export function TransferFeedItem(props: Props) {
       title={title}
       info={info}
       icon={
-        <TransferFeedIcon type={type} recipient={recipient} address={address} picture={picture} />
+        <TransferFeedIcon type={type} recipient={recipient} address={address} imageUrl={imageUrl} />
       }
       timestamp={timestamp}
       status={status}

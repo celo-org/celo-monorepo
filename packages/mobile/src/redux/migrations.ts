@@ -98,7 +98,7 @@ export const migrations = {
       (newMapping: AddressToDisplayNameType, address: string) => {
         newMapping[address] = {
           name: state.identity.addressToDisplayName[address],
-          picture: null,
+          imageUrl: null,
         }
         return newMapping
       },

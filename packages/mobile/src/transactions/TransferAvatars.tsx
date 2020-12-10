@@ -17,7 +17,7 @@ interface Props {
 
 export default function TransferAvatars({ type, address, recipient }: Props) {
   const addressToDisplayName = useSelector(addressToDisplayNameSelector)
-  const userPicture = addressToDisplayName[address || '']?.picture
+  const userPicture = addressToDisplayName[address || '']?.imageUrl
 
   const userAvatar = (
     <ContactCircle

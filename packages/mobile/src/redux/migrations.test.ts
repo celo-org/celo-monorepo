@@ -118,6 +118,6 @@ describe('Redux persist migrations', () => {
     const migratedSchema = migrations[7](v6Stub)
     expect(Object.keys(migratedSchema.identity.addressToDisplayName).length).toEqual(1)
     expect(migratedSchema.identity.addressToDisplayName[mockAddress].name).toEqual(mockName)
-    expect(migratedSchema.identity.addressToDisplayName[mockAddress].picture).toBeNull()
+    expect(migratedSchema.identity.addressToDisplayName[mockAddress].imageUrl).toBeNull()
   })
 })

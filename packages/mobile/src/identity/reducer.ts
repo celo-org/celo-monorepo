@@ -48,7 +48,7 @@ export interface AddressToDataEncryptionKeyType {
 
 export interface AddressInfoToDisplay {
   name: string
-  picture: string | null
+  imageUrl: string | null
 }
 
 export interface AddressToDisplayNameType {
@@ -402,7 +402,7 @@ export const reducer = (
         knownAddresses: {
           [action.recipient.address]: {
             name: action.recipient.displayName,
-            picture: null,
+            imageUrl: null,
           },
         },
       }
