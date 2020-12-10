@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import RadioIcon from 'src/icons/RadioIcon'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN } from 'src/shared/Button.3'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -42,7 +42,7 @@ export function SectionHeader({ section }) {
   const title = section.title
   return (
     <View style={[standardStyles.blockMarginTopMobile, standardStyles.elementalMarginBottom]}>
-      <Fade bottom={true} distance="20px">
+      <Fade distance="20px">
         <Text style={fonts.h4}>{title}</Text>
         <View style={styles.line} />
       </Fade>
@@ -57,7 +57,7 @@ interface NotFoundProps {
 }
 export function NoneFound({ onPress, actionText, longText }: NotFoundProps) {
   return (
-    <Fade bottom={true} distance="20px">
+    <Fade distance="20px">
       <View style={[standardStyles.centered, styles.noJobs]}>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom, textStyles.center]}>
           {longText}

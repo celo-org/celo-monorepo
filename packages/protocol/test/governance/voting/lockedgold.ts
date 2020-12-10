@@ -1,10 +1,10 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -179,6 +179,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when the account does not exist', async () => {
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await assertRevert(lockedGold.lock({ value, from: accounts[1] }))
     })
   })

@@ -1,4 +1,4 @@
-# External module: "wallets/signers/rpc-signer"
+# Module: "wallets/signers/rpc-signer"
 
 ## Index
 

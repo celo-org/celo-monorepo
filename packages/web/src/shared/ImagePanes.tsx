@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import { fonts, textStyles } from 'src/styles'
 
 interface Pane {

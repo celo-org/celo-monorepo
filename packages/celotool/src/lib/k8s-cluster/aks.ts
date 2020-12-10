@@ -2,13 +2,14 @@ import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
-export interface AKSClusterConfig extends BaseClusterConfig {
+export interface AksClusterConfig extends BaseClusterConfig {
   tenantId: string
   resourceGroup: string
   subscriptionId: string
+  regionName: string
 }
 
-export class AKSClusterManager extends BaseClusterManager {
+export class AksClusterManager extends BaseClusterManager {
   async switchToSubscription() {
     let currentTenantId = null
     try {
@@ -38,20 +39,20 @@ export class AKSClusterManager extends BaseClusterManager {
     // Until we upgrade to helm v3, we rely on our own helm chart adapted from:
     // https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment-rbac.yaml
     const aadPodIdentityExists = await outputIncludes(
-      `helm list`,
+      `helm list -A`,
       `aad-pod-identity`,
       `aad-pod-identity exists, skipping install`
     )
     if (!aadPodIdentityExists) {
       console.info('Installing aad-pod-identity')
       await execCmdWithExitOnFailure(
-        `helm install --name aad-pod-identity ../helm-charts/aad-pod-identity`
+        `helm install aad-pod-identity aad-pod-identity/aad-pod-identity`
       )
     }
   }
 
-  get clusterConfig(): AKSClusterConfig {
-    return this._clusterConfig as AKSClusterConfig
+  get clusterConfig(): AksClusterConfig {
+    return this._clusterConfig as AksClusterConfig
   }
 
   get kubernetesContextName(): string {

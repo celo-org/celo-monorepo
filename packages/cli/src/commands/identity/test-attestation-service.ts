@@ -71,7 +71,7 @@ export default class TestAttestationService extends BaseCommand {
       return
     }
 
-    const signature = await this.kit.web3.eth.sign(phoneNumber + message, address)
+    const signature = await this.kit.connection.sign(phoneNumber + message, address)
 
     try {
       const testUrl = appendPath(attestationServiceUrlClaim.url, 'test_attestations')
@@ -94,7 +94,7 @@ export default class TestAttestationService extends BaseCommand {
       cli.action.stop()
 
       const testRes = JSON.parse(await response.text())
-      if (testRes.success !== 'true') {
+      if (!testRes.success) {
         console.error('Request was not successful')
         cli.styledJSON(testRes)
         return

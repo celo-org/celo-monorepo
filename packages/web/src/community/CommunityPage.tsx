@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import ArticleData from 'src/community/connect/ArticleData'
 import CodeOfConduct from 'src/community/connect/CodeOfConduct'
 import Contribute from 'src/community/connect/Contribute'
@@ -14,6 +13,7 @@ import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import { hashNav } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
 
@@ -53,7 +53,7 @@ export class CommunityPage extends React.Component<Props> {
             mobileStyle={standardStyles.sectionMarginTopMobile}
           >
             <Cell span={Spans.full} style={standardStyles.centered}>
-              <Fade bottom={true} distance={'20px'}>
+              <Fade distance={'20px'}>
                 <H2>{t('events.title')}</H2>
               </Fade>
             </Cell>

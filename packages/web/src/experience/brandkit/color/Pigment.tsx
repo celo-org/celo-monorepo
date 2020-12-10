@@ -6,7 +6,7 @@ import { brandStyles } from 'src/experience/common/constants'
 import CopyIcon from 'src/icons/CopyIcon'
 import Hoverable from 'src/shared/Hoverable'
 import { colors, fonts, standardStyles } from 'src/styles'
-import yiq from 'yiq'
+import { yiq } from 'yiq'
 
 function hexToHumanRGB(hex: string) {
   return hexRgba(hex, 1)
@@ -15,7 +15,7 @@ function hexToHumanRGB(hex: string) {
 }
 
 function getContrastingColor(hex: string) {
-  return yiq(hex, { white: colors.white, black: colors.dark })
+  return yiq(hex, { colors: { light: colors.white, dark: colors.dark } })
 }
 
 async function onCopy(text: string) {

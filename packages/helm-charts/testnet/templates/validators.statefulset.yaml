@@ -160,7 +160,7 @@ spec:
           ACCOUNT_ADDRESS=$(cat /root/.celo/address)
           RID=$(cat /root/.celo/replica_id)
 
-          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
@@ -180,6 +180,13 @@ spec:
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
+
+          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
+            BOOTNODE_FLAG="--${network_name}"
+          else
+            BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
+          fi
+
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
           {{- end }}
@@ -187,7 +194,8 @@ spec:
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
           exec geth \
-            --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
+            $BOOTNODE_FLAG \
+            --datadir /root/.celo \
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
@@ -259,6 +267,7 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      terminationGracePeriodSeconds: 120 # 2 mins
       volumes:
       - name: data
         emptyDir: {}

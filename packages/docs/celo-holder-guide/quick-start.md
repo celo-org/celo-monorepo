@@ -247,9 +247,14 @@ celocli lockedgold:show $CELO_RG_ADDRESS
 
 ## Vote for a Validator Group
 
-CELO holders can vote for Validator Groups and not Validators directly. This is similar to delegating on other cryptographic networks. CELO holders who vote for an elected Validator Group may earn [epoch rewards](https://docs.celo.org/getting-started/glossary#epoch-rewards).
+Similar to staking or delegating in other Proof of Stake cryptocurrency protocols, CELO holders can lock CELO and vote for Validator Groups on the Celo network. By doing this, not only do you contribute to the health and security of the network, but you can also earn [epoch rewards](../GLOSSARY.md#epoch-rewards).
 
-The [Voting on Validators](voting-validators.md) has useful background and guidance on how to select a Validator Group to vote for. Community Validator explorers include the [cLabs Validator explorer](https://celo.org/validators/explore) and [Bi23 Labs' `thecelo` dashboard](https://thecelo.com).
+For more details, check out the [Voting for Validators page](voting-validators.md), which contains useful background on how voting Validator Elections work, as well as more guidance on how to select a Validator Group to vote for. For now, all you need to know is that:
+
+- in Celo, CELO holders vote for Validator Groups, not Validators directly
+- you only earn epoch rewards if the Validator Group you voted gets at least 1 Validator elected
+
+Keeping this in mind, you will need to find a Validator Group to vote for, and copy its address. You can find this information on community validator explorers such as the [cLabs Validator explorer](https://celo.org/validators/explore) and [Bi23 Labs' `thecelo` dashboard](https://thecelo.com).
 
 You can also see registered Validator Groups through the Celo CLI. This will display a list of Validator Groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect Validators:
 

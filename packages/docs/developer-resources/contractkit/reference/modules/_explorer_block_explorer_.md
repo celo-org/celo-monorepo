@@ -1,4 +1,4 @@
-# External module: "explorer/block-explorer"
+# Module: "explorer/block-explorer"
 
 ## Index
 
@@ -22,7 +22,7 @@
 
 ▸ **newBlockExplorer**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹[BlockExplorer](../classes/_explorer_block_explorer_.blockexplorer.md)‹››*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L31)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L42)*
 
 **Parameters:**
 

@@ -1,12 +1,12 @@
+import { logger } from '@celo/phone-number-privacy-common'
 import knex from 'knex'
 import Knex from 'knex/types'
-import logger from '../common/logger'
 import config, { DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
-  logger.info('Initializing database connection')
+  logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl } = config.db
 
   let dbConfig: any
@@ -53,28 +53,16 @@ export async function initDatabase(doTestQuery = true) {
     debug: DEV_MODE,
   })
 
-  if (doTestQuery) {
-    await executeTestQuery(db)
-  }
-
   logger.info('Running Migrations')
-
-  // This deletes the old migrations from before we used the .js extension.
-  // Without this step, knex thinks the migrations folder is corrupt.
-  // This really only needs to be run once per signer so it can be removed
-  // in future realeases.
-  await db
-    .table('knex_migrations')
-    .delete()
-    .whereIn('name', [
-      '20200330212224_create-accounts-table.ts',
-      '20200811163913_create_requests_table.ts',
-    ])
 
   await db.migrate.latest({
     directory: './dist/migrations',
     loadExtensions: ['.js'],
   })
+
+  if (doTestQuery) {
+    await executeTestQuery(db)
+  }
 
   logger.info('Database initialized successfully')
   return db

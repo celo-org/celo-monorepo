@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import * as React from 'react'
 import Events from 'src/community/connect/Events'
 

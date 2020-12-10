@@ -30,7 +30,10 @@ data:
       evaluation_interval: 5s
 
     scrape_configs:
-
+      - job_name: 'prometheus'
+        scrape_interval: 20s
+        static_configs:
+          - targets: ['localhost:9090']
       - job_name: 'kubernetes-apiservers'
 
         kubernetes_sd_configs:

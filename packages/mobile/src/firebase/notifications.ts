@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
+import { openUrl } from 'src/app/actions'
 import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import {
@@ -84,12 +85,31 @@ export function* handleNotification(
   message: FirebaseMessagingTypes.RemoteMessage,
   notificationState: NotificationReceiveState
 ) {
+  // See if this is a notification with an open url action (`ou` prop in the data)
+  const urlToOpen = message.data?.ou
+
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    const title = message.notification?.title
+    const { title, body } = message.notification ?? {}
     if (title) {
-      yield put(showMessage(title))
+      yield put(
+        showMessage(
+          body || title,
+          undefined,
+          null,
+          urlToOpen ? openUrl(urlToOpen) : null,
+          body ? title : null
+        )
+      )
+    }
+  } else {
+    // Notification was received while app wasn't already open (i.e. tapped to act on it)
+    // So directly handle the action if any
+    if (urlToOpen) {
+      yield put(openUrl(urlToOpen))
+      return
     }
   }
+
   switch (message.data?.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
       yield call(

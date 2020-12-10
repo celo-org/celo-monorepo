@@ -7,12 +7,12 @@ import {
   Text,
   View,
 } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H3, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
@@ -42,7 +42,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
       {props.h3Text && <H3 style={standardStyles.elementalMarginBottom}>{props.h3Text}</H3>}
       {props.h4Text && <H4 style={standardStyles.elementalMarginBottom}>{props.h4Text}</H4>}
       <Text style={fonts.h6}>{props.network}</Text>
-      <Fade fraction={0.5} bottom={true} distance={'10px'}>
+      <Fade fraction={0.5} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
           <Image style={styles.graphic} source={props.image} resizeMode="contain" />
         </AspectRatio>
@@ -89,7 +89,7 @@ const Aside = React.memo(function _Aside({
       ]}
     >
       <View style={styles.asideFrame}>
-        <Fade fraction={0.5} bottom={true} distance={'10px'}>
+        <Fade fraction={0.5} distance={'10px'}>
           <AspectRatio style={styles.asideGraphic} ratio={1}>
             <Image source={image} style={styles.graphic} />
           </AspectRatio>

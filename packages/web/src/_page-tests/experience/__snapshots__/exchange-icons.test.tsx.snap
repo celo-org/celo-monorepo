@@ -477,6 +477,83 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
+                    href="/experience/grants"
+                    onClick={[Function]}
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(129,134,139,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    GrantKit
+                  </a>
+                </div>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
                     href="/experience/merchant"
                     onClick={[Function]}
                     role="link"
@@ -1476,7 +1553,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   }
                 >
-                  logo.overviewBtn
+                  Download Logo Package
                 </a>
               </div>
             </div>
@@ -1498,7 +1575,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              licenseTitle
+              Usage & License Note
             </div>
             <div
               className="css-text-901oao"
@@ -1518,6 +1595,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
+              These assets may only be used to represent Celo assets on exchanges. The use of the Celo Exchange Icons requires following the Celo Community Code of Conduct as provided 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1548,9 +1626,10 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   }
                 >
-                  Code of Conduct
+                  here
                 </a>
               </div>
+               and 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1581,7 +1660,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   }
                 >
-                  Brand Policy
+                  Brand Policy.
                 </a>
               </div>
             </div>
@@ -1624,12 +1703,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -1826,7 +1900,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -1884,12 +1958,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2086,7 +2155,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2153,12 +2222,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2356,7 +2420,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2414,12 +2478,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2617,7 +2676,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2675,12 +2734,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2878,7 +2932,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2936,12 +2990,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -3139,7 +3188,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -3299,7 +3348,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -3318,6 +3367,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -3827,7 +3877,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4075,7 +4125,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4488,6 +4538,61 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
+                  href="/experience/grants"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  GrantKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
                   href="/community#fund"
                   onClick={[Function]}
                   rel=" noopener noreferrer"
@@ -4543,7 +4648,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -5191,7 +5296,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

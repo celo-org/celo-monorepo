@@ -11,20 +11,12 @@ pragma solidity ^0.5.13;
  * in the internal representation of a fraction.
  * When using this library be sure to use maxNewFixed() as the upper limit for
  * creation of fixed point numbers.
- * @dev All contained functions are pure and thus marked internal to be inlined 
- * on consuming contracts at compile time for gas efficiency. 
+ * @dev All contained functions are pure and thus marked internal to be inlined
+ * on consuming contracts at compile time for gas efficiency.
  */
 library FixidityLib {
   struct Fraction {
     uint256 value;
-  }
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
   }
 
   /**

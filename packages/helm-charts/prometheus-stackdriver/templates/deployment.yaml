@@ -57,7 +57,7 @@ spec:
 {{ if .Values.includeFilter }}
 {{ indent 12 (printf "- --include=%s" .Values.includeFilter) }}
 {{ end }}
-{{ /* This used to be enabled, but now is not. Enable this for oracle clusters only. */ }}
+{{/* This used to be enabled, but now is not. Enable this for oracle clusters only. */}}
 {{ if (and false .Values.stackdriver_metrics_prefix) }}
             - --stackdriver.metrics-prefix={{ .Values.stackdriver_metrics_prefix }}
 {{ end }}

@@ -1,4 +1,4 @@
-# External module: "network-utils/genesis-block-utils"
+# Module: "network-utils/genesis-block-utils"
 
 ## Index
 

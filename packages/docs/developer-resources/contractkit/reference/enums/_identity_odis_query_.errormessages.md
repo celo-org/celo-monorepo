@@ -15,7 +15,7 @@
 
 • **ODIS_AUTH_ERROR**: = "odisAuthError"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L64)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L70)*
 
 ___
 
@@ -23,7 +23,7 @@ ___
 
 • **ODIS_CLIENT_ERROR**: = "Unknown Client Error"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L65)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L71)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **ODIS_INPUT_ERROR**: = "odisBadInputError"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L63)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L69)*
 
 ___
 
@@ -39,4 +39,4 @@ ___
 
 • **ODIS_QUOTA_ERROR**: = "odisQuotaError"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L62)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L68)*

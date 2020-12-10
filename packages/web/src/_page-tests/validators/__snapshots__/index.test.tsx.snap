@@ -420,14 +420,68 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-vsf5x1"
           >
-            Operate Celo
+            <span
+              className="css-q7lffx"
+            >
+              O
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              C
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              l
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
           </div>
         </h2>
         <h4
@@ -450,14 +504,333 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-vsf5x1"
           >
-            Participate in Celo's proof-of-stake consensus and produce blocks
+            <span
+              className="css-q7lffx"
+            >
+              P
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              i
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              i
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              i
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              C
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              l
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              '
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              f
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              -
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              f
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              -
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              k
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              u
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              d
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              d
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              u
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              b
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              l
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              k
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
           </div>
         </h4>
       </div>
@@ -1805,12 +2178,7 @@ exports[`BuildPage renders 1`] = `
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -3120,12 +3488,7 @@ exports[`BuildPage renders 1`] = `
           
         </div>
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -3357,12 +3720,7 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -3613,12 +3971,7 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"

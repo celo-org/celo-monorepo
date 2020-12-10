@@ -30,7 +30,7 @@ const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(clusterConfig?: BaseClusterConfig) {
   const prometheusExists = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     releaseName,
     `prometheus-stackdriver exists, skipping install`
   )
@@ -51,7 +51,7 @@ async function installPrometheus(clusterConfig?: BaseClusterConfig) {
 }
 
 export async function removeHelmRelease() {
-  await removeGenericHelmChart(releaseName)
+  await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
 export async function upgradePrometheus() {
@@ -163,7 +163,7 @@ function getServiceAccountName(clusterConfig: BaseClusterConfig) {
 
 export async function installGrafanaIfNotExists() {
   const grafanaExists = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     grafanaReleaseName,
     `grafana exists, skipping install`
   )
@@ -197,11 +197,11 @@ export async function upgradeGrafana() {
 
 export async function removeGrafanaHelmRelease() {
   const grafanaExists = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     grafanaReleaseName,
   )
   if (grafanaExists) {
     console.info('Removing grafana')
-    await removeGenericHelmChart(releaseName)
+    await removeGenericHelmChart(releaseName, kubeNamespace)
   }
 }

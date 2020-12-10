@@ -1,5 +1,3 @@
-import fetch from 'cross-fetch'
-
 export default async function abortableFetch(url: string, options = {}) {
   return Promise.race([fetch(url, { ...options }), abort(url)])
 }

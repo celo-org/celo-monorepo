@@ -1,6 +1,5 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
-import logger from '../common/logger'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 
@@ -22,8 +21,9 @@ export class GoogleKeyProvider extends KeyProviderBase {
       }
 
       this.setPrivateKey(privateKey)
-    } catch (error) {
-      logger.error('Error retrieving key', error)
+    } catch (err) {
+      logger.info('Error retrieving key')
+      logger.error({ err })
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }

@@ -1,4 +1,4 @@
-import logger from './common/logger'
+import { logger } from '@celo/phone-number-privacy-common'
 import config, { DEV_MODE } from './config'
 import { initDatabase } from './database/database'
 import { initKeyProvider } from './key-management/key-provider'
@@ -17,7 +17,8 @@ async function start() {
   })
 }
 
-start().catch((e) => {
-  logger.error('Fatal error occured. Exiting', e)
+start().catch((err) => {
+  logger.info('Fatal error occured. Exiting')
+  logger.error({ err })
   process.exit(1)
 })

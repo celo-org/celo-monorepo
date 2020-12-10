@@ -112,9 +112,10 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/papers/whitepaper/chinese', (_, res) => {
     res.redirect('/papers/celo-wp-simplified-chinese.pdf')
   })
-
-  server.get('/brand', (_, res) => {
-    res.redirect('/experience/brand')
+  ;['/brand', '/grants'].forEach((slug) => {
+    server.get(slug, (_, res) => {
+      res.redirect(`/experience${slug}`)
+    })
   })
 
   server.get('/connect', (_, res) => {

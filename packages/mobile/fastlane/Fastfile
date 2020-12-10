@@ -2,13 +2,6 @@ fastlane_version '2.94.0'
 
 default_platform(:android)
 
-$mapping_path = 'android/app/build/outputs/mapping/'
-$mapping_file = '/mapping.txt'
-
-def get_mapping_path(env)
-  return $mapping_path + env + $mapping_file
-end
-
 def get_app_bundle_id(env)
   Dotenv.parse("../.env.#{env}")['APP_BUNDLE_ID']
 end
@@ -19,7 +12,7 @@ def fastlane_supply(env, track)
     track: track,
     track_promote_to: track,
     package_name: get_app_bundle_id(env),
-    mapping: get_mapping_path(env),
+    mapping: lane_context[SharedValues::GRADLE_MAPPING_TXT_OUTPUT_PATH],
     skip_upload_apk: true,
     skip_upload_metadata: true,
     skip_upload_changelogs: true,

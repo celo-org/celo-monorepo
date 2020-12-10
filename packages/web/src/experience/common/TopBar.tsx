@@ -14,7 +14,7 @@ interface Props {
   kitName?: string
 }
 
-const KITS = [links.BRAND, links.EVENTS_KIT, links.MERCHANTS]
+const KITS = [links.BRAND, links.EVENTS_KIT, links.GRANT_KIT, links.MERCHANTS]
 
 export default function TopBar({ current, kitName }: Props) {
   const { isMobile } = useScreenSize()
@@ -64,10 +64,12 @@ export default function TopBar({ current, kitName }: Props) {
   )
 }
 
-function Kits({ current }) {
+const Kits = React.memo(({ current }: { current: string }) => {
+  const { isTablet } = useScreenSize()
+  const displayedKits = isTablet ? KITS.filter((kit) => kit.link !== current) : KITS
   return (
     <>
-      {KITS.map((kit) => {
+      {displayedKits.map((kit) => {
         return (
           <Navigation
             key={kit.link}
@@ -81,7 +83,7 @@ function Kits({ current }) {
       })}
     </>
   )
-}
+})
 
 const styles = StyleSheet.create({
   title: {

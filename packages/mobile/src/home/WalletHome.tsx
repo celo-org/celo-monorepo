@@ -17,7 +17,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
@@ -50,7 +49,6 @@ interface StateProps {
 interface DispatchProps {
   refreshAllBalances: typeof refreshAllBalances
   initializeSentryUserContext: typeof initializeSentryUserContext
-  exitBackupFlow: typeof exitBackupFlow
   setLoading: typeof setLoading
   showMessage: typeof showMessage
   importContacts: typeof importContacts
@@ -61,7 +59,6 @@ type Props = StateProps & DispatchProps & WithTranslation
 const mapDispatchToProps = {
   refreshAllBalances,
   initializeSentryUserContext,
-  exitBackupFlow,
   setLoading,
   showMessage,
   importContacts,
@@ -144,6 +141,7 @@ export class WalletHome extends React.Component<Props, State> {
     this.props.showMessage(
       t('testnetAlert.1', { testnet: _.startCase(DEFAULT_TESTNET) }),
       ALERT_BANNER_DURATION,
+      null,
       null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )

@@ -20,7 +20,7 @@
 
 • **lastBucketUpdate**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L21)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L23)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **minimumReports**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L20)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L22)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **reserveFraction**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L18)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L20)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **spread**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L17)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L19)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **updateFrequency**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L19)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L21)*

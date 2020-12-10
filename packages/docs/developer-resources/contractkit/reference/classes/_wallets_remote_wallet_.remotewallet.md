@@ -29,16 +29,39 @@ Abstract class representing a remote wallet that requires async initialization
 
 ### Methods
 
+* [computeSharedSecret](_wallets_remote_wallet_.remotewallet.md#computesharedsecret)
 * [decrypt](_wallets_remote_wallet_.remotewallet.md#decrypt)
 * [getAccounts](_wallets_remote_wallet_.remotewallet.md#getaccounts)
 * [hasAccount](_wallets_remote_wallet_.remotewallet.md#hasaccount)
 * [init](_wallets_remote_wallet_.remotewallet.md#init)
 * [isSetupFinished](_wallets_remote_wallet_.remotewallet.md#issetupfinished)
+* [removeAccount](_wallets_remote_wallet_.remotewallet.md#removeaccount)
 * [signPersonalMessage](_wallets_remote_wallet_.remotewallet.md#signpersonalmessage)
 * [signTransaction](_wallets_remote_wallet_.remotewallet.md#signtransaction)
 * [signTypedData](_wallets_remote_wallet_.remotewallet.md#signtypeddata)
 
 ## Methods
+
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`address`: [Address](../modules/_base_.md#address), `publicKey`: string): *Promise‹Buffer›*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[computeSharedSecret](_wallets_wallet_.walletbase.md#computesharedsecret)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L157)*
+
+Computes the shared secret (an ECDH key exchange object) between two accounts
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+`publicKey` | string |
+
+**Returns:** *Promise‹Buffer›*
+
+___
 
 ###  decrypt
 
@@ -46,7 +69,7 @@ Abstract class representing a remote wallet that requires async initialization
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L130)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L149)*
 
 **Parameters:**
 
@@ -113,6 +136,26 @@ ___
 *Defined in [packages/contractkit/src/wallets/remote-wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L111)*
 
 **Returns:** *boolean*
+
+___
+
+###  removeAccount
+
+▸ **removeAccount**(`_address`: string): *void*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[removeAccount](_wallets_wallet_.walletbase.md#removeaccount)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L52)*
+
+Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_address` | string |
+
+**Returns:** *void*
 
 ___
 

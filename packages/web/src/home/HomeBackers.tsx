@@ -9,12 +9,12 @@ import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
 
 const homeBackers = [
-  { image: ah, height: 36 },
-  { image: polychain, height: 26 },
-  { image: gc, height: 33 },
-  { image: coinbase, height: 37 },
-  { image: lakestar, height: 47 },
-  { image: svAngel, height: 55 },
+  { image: ah, height: 36, id: 'ah' },
+  { image: polychain, height: 26, id: 'pc' },
+  { image: gc, height: 33, id: 'gc' },
+  { image: coinbase, height: 37, id: 'cb' },
+  { image: lakestar, height: 47, id: 'ls' },
+  { image: svAngel, height: 55, id: 'sv' },
 ]
 
 const HomeBackers = ({ t }: I18nProps) => {
@@ -31,7 +31,7 @@ const HomeBackers = ({ t }: I18nProps) => {
               <Image
                 resizeMode={'contain'}
                 style={[styles.backerLogo, { height: backer.height }]}
-                key={backer.image}
+                key={backer.id}
                 source={{ uri: backer.image }}
               />
             ))}

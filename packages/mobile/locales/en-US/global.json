@@ -44,6 +44,7 @@
   "invalidPhone": "Invalid phone number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
   "needMoreFundsToSend": "Need more funds to send payment",
+  "maxEscrowTransferExceeded": "The maximum amount to transfer to unverified users is {{symbol}}{{maxAmount}}",
   "invalidAmount": "Invalid amount",
   "invalidCode": "Invalid Verification Code",
   "confirm": "Confirm",
@@ -179,9 +180,10 @@
   "review": "Review",
   "insufficientBalance": "Your balance is too low to make this transaction",
   "amount": "Amount",
-  "currentBalance": "Current Balance",
+  "currentBalance": "Current Balance (cUSD)",
   "restore": "Restore",
   "commentUnavailable": "Comment Unavailable",
   "accountClearFailed": "There was an error while removing your Account Key. You might have to reinstall the app to restore all functionality.",
-  "withdraw": "Withdraw"
+  "withdraw": "Withdraw",
+  "countryNotAvailable": "{{appName}} is not available in your country"
 }

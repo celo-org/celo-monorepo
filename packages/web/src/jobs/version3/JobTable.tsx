@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { SectionList, StyleSheet } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { groupByTeam, LeverJob, sortJobs } from 'src/jobs/lever'
 import { JobRow, MobileJobRow } from 'src/jobs/version3/JobRows'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import { NoneFound, SectionHeader } from 'src/table/table'
 
 interface OwnProps {
@@ -27,13 +27,13 @@ class JobsTable extends React.Component<OwnProps & ScreenProps> {
   renderItem = ({ item }: { item: LeverJob }) => {
     if (this.props.screen === ScreenSizes.MOBILE) {
       return (
-        <Fade bottom={true} distance="20px">
+        <Fade distance="20px">
           <MobileJobRow {...item} key={item.id} />
         </Fade>
       )
     }
     return (
-      <Fade bottom={true} distance="20px">
+      <Fade distance="20px">
         <JobRow {...item} key={item.id} screen={this.props.screen} />
       </Fade>
     )

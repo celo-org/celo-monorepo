@@ -7,7 +7,7 @@ export async function installHelmChart(celoEnv: string) {
   console.info(`Installing helm release ${celoEnv}-transaction-metrics-exporter-${suffix}`)
   const params = await helmParameters(celoEnv)
   await execCmdWithExitOnFailure(
-    `helm install ../helm-charts/transaction-metrics-exporter/ --name ${celoEnv}-transaction-metrics-exporter-${suffix} ${params.join(
+    `helm install ${celoEnv}-transaction-metrics-exporter-${suffix} ../helm-charts/transaction-metrics-exporter/ ${params.join(
       ' '
     )}
   `
@@ -29,7 +29,7 @@ export async function removeHelmRelease(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
   console.info(`Deleting helm chart ${celoEnv}-transaction-metrics-exporter-${suffix}`)
   await execCmdWithExitOnFailure(
-    `helm del --purge ${celoEnv}-transaction-metrics-exporter-${suffix}`
+    `helm uninstall --namespace ${celoEnv} ${celoEnv}-transaction-metrics-exporter-${suffix}`
   )
 }
 

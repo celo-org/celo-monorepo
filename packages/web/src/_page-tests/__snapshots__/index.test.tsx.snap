@@ -557,12 +557,7 @@ exports[`HomePage renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -659,12 +654,7 @@ exports[`HomePage renders 1`] = `
         </div>
       </div>
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -781,12 +771,7 @@ exports[`HomePage renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -1549,12 +1534,7 @@ exports[`HomePage renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"

@@ -1,12 +1,12 @@
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Title from 'src/dev/Title'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
@@ -29,17 +29,16 @@ export default withNamespaces(NameSpaces.download)(
           allStyle={standardStyles.centered}
         >
           <Cell span={Spans.half}>
-            <Fade distance={'20px'} bottom={true}>
-              <View style={standardStyles.centered}>
+            <Fade distance={'20px'}>
+              <View style={styles.account}>
                 <H1 style={[textStyles.center, standardStyles.elementalMargin]} ariaLevel={'2'}>
                   {t('haveAccount')}
                 </H1>
-                <H4 style={[textStyles.center, standardStyles.elementalMargin, styles.seedPhrase]}>
-                  {t('useSeed')}
-                </H4>
+                <H4 style={[textStyles.center, standardStyles.elementalMargin]}>{t('useSeed')}</H4>
                 <Button
                   size={SIZE.normal}
                   kind={BTN.NAKED}
+                  align={'center'}
                   text={t('learnMore')}
                   href={CeloLinks.gettingStarted}
                 />
@@ -67,13 +66,13 @@ const Logos = withScreenSize(({ screen }: ScreenProps) => {
   return (
     <Cell span={Spans.full} style={[!isMobile && standardStyles.row, styles.stores]}>
       <TouchableOpacity>
-        <a href={CeloLinks.playStoreWallet}>
+        <a href={CeloLinks.playStoreDevWallet}>
           <FadingImage source={playLogo} />
         </a>
       </TouchableOpacity>
       {isMobile || <View style={[standardStyles.verticalLine, styles.verticalLine]} />}
       <TouchableOpacity>
-        <a href={CeloLinks.appStoreWallet}>
+        <a href={CeloLinks.appStoreDevWallet}>
           <FadingImage source={appStoreLogo} />
         </a>
       </TouchableOpacity>
@@ -82,6 +81,11 @@ const Logos = withScreenSize(({ screen }: ScreenProps) => {
 })
 
 const styles = StyleSheet.create({
+  account: {
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+  },
   stores: {
     justifyContent: 'space-evenly',
     alignItems: 'center',
@@ -94,5 +98,4 @@ const styles = StyleSheet.create({
     width: 212,
     height: 103,
   },
-  seedPhrase: { maxWidth: 450 },
 })

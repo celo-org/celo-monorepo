@@ -1,7 +1,6 @@
 import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import analytics from 'src/analytics/analytics'
 import { H2 } from 'src/fonts/Fonts'
 import Cyclone from 'src/home/Cyclone'
@@ -9,6 +8,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
@@ -42,7 +42,7 @@ class HomeSystems extends React.PureComponent<Props> {
           mobileStyle={standardStyles.sectionMarginTopMobile}
         >
           <Cell span={Spans.three4th} tabletSpan={Spans.three4th}>
-            <Fade bottom={true} distance="20px">
+            <Fade distance="20px">
               <View>
                 <H2
                   accessibilityRole={'heading'}
@@ -67,7 +67,7 @@ class HomeSystems extends React.PureComponent<Props> {
             <Cyclone />
           </Cell>
         </GridRow>
-        <Fade bottom={true} distance="20px">
+        <Fade distance="20px">
           <View style={standardStyles.centered}>
             <GridRow
               desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
@@ -97,7 +97,7 @@ class HomeSystems extends React.PureComponent<Props> {
             </GridRow>
           </View>
         </Fade>
-        <Fade bottom={true} distance="20px" delay={300}>
+        <Fade distance="20px" delay={300}>
           <View style={standardStyles.centered}>
             <GridRow
               desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
@@ -119,7 +119,7 @@ class HomeSystems extends React.PureComponent<Props> {
             </GridRow>
           </View>
         </Fade>
-        <Fade bottom={true} distance="20px" delay={150}>
+        <Fade distance="20px" delay={150}>
           <View style={standardStyles.centered}>
             <GridRow
               desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
@@ -149,7 +149,7 @@ class HomeSystems extends React.PureComponent<Props> {
           allStyle={styles.fitContent}
         >
           <Cell span={Spans.half} style={styles.whitePaperCell}>
-            <Fade bottom={true} distance="20px">
+            <Fade distance="20px">
               <Responsive medium={[styles.technicalPaper]}>
                 <View style={styles.technicalPaperMobile}>
                   <Responsive medium={[fonts.h3, textStyles.heading, styles.foreground]}>
@@ -179,7 +179,7 @@ class HomeSystems extends React.PureComponent<Props> {
             </Fade>
           </Cell>
           <Cell span={Spans.half} style={styles.whitePaperCell}>
-            <Fade bottom={true} distance="20px">
+            <Fade distance="20px">
               <Responsive medium={[styles.technicalPaper, styles.technicalPaperEnd]}>
                 <View style={styles.technicalPaperMobile}>
                   <View>

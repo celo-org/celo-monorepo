@@ -36,8 +36,7 @@ const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
-// Gas limit is doubled for initial contract deployment.
-const gasLimit = argv.reset ? 20000000 : 12500000
+const gasLimit = 13000000
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -56,7 +55,8 @@ let coverageProvider = null
 const fornoUrls = {
   alfajores: 'https://alfajores-forno.celo-testnet.org',
   baklava: 'https://baklava-forno.celo-testnet.org',
-  rc1: 'https://rc1-forno.celo-testnet.org',
+  rc1: 'https://forno.celo.org',
+  mainnet: 'https://forno.celo.org',
 }
 
 const networks = {
@@ -178,6 +178,9 @@ const networks = {
     network_id: BAKLAVASTAGING_NETWORKID,
   },
 }
+// Equivalent
+networks.mainnet = networks.rc1
+
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.
 if (argv.truffle_override || !(argv.network in networks)) {

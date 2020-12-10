@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/connect'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
@@ -63,7 +63,8 @@ export function* sendAndMonitorTransaction<T>(
   tx: CeloTransactionObject<T>,
   account: string,
   context: TransactionContext,
-  currency?: CURRENCY_ENUM
+  currency?: CURRENCY_ENUM,
+  feeCurrency?: CURRENCY_ENUM
 ) {
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${context.id}`)
@@ -74,6 +75,7 @@ export function* sendAndMonitorTransaction<T>(
         tx.txo,
         account,
         context,
+        feeCurrency,
         nonce
       )
       const hash = yield transactionHash

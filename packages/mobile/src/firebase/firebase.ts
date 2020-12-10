@@ -1,11 +1,10 @@
 import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
 import '@react-native-firebase/auth'
-import '@react-native-firebase/database'
+import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 // We can't combine the 2 imports otherwise it only imports the type and fails at runtime
 // tslint:disable-next-line: no-duplicate-imports
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
-import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, select, spawn, take } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -138,14 +137,13 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   })
   yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
-  const initialNotification = yield call([app.messaging(), 'getInitialNotification'])
+  // Manual type checking because yield calls can't infer return type yet :'(
+  const initialNotification: Awaited<ReturnType<
+    FirebaseMessagingTypes.Module['getInitialNotification']
+  >> = yield call([app.messaging(), 'getInitialNotification'])
   if (initialNotification) {
-    Logger.info(TAG, 'App opened fresh via a notification')
-    yield call(
-      handleNotification,
-      initialNotification.notification,
-      NotificationReceiveState.APP_OPENED_FRESH
-    )
+    Logger.info(TAG, 'App opened fresh via a notification', JSON.stringify(initialNotification))
+    yield call(handleNotification, initialNotification, NotificationReceiveState.APP_OPENED_FRESH)
   }
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
@@ -189,30 +187,73 @@ export function isVersionBelowMinimum(version: string, minVersion: string): bool
   return false
 }
 
+const VALUE_CHANGE_HOOK = 'value'
+
 /*
 Get the Version deprecation information.
 Firebase DB Format:
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
-export async function isAppVersionDeprecated() {
+export function appVersionDeprecationChannel() {
   if (!FIREBASE_ENABLED) {
-    return false
+    return null
   }
 
-  Logger.info(TAG, 'Checking version info')
-  const version = DeviceInfo.getVersion()
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
 
-  const versionsInfo = (
-    await firebase
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const minVersion = snapshot.val().minVersion
+      emit(minVersion)
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref('versions')
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
       .database()
       .ref('versions')
-      .once('value')
-  ).val()
-  if (!versionsInfo || !versionsInfo.minVersion) {
-    return false
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+    return cancel
+  })
+}
+
+export function appRemoteFeatureFlagChannel() {
+  if (!FIREBASE_ENABLED) {
+    return null
   }
-  const minVersion: string = versionsInfo.minVersion
-  return isVersionBelowMinimum(version, minVersion)
+
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const flags = snapshot.val()
+      Logger.debug(`Updated feature flags: ${JSON.stringify(flags)}`)
+      emit({
+        kotaniEnabled: flags?.kotaniEnabled || false,
+        pontoEnabled: flags?.pontoEnabled || false,
+      })
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref('versions/flags')
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
+      .database()
+      .ref('versions/flags')
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+    return cancel
+  })
 }
 
 export async function setUserLanguage(address: string, language: string) {

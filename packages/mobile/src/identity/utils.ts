@@ -10,3 +10,13 @@ export function isUserBalanceSufficient(
 
   return true
 }
+
+export const removeKeyFromMapping = (mapping: { [key: string]: string }, keyToRemove: string) => {
+  const newMapping: { [key: string]: string } = {}
+  for (const [key, value] of Object.entries(mapping)) {
+    if (key !== keyToRemove) {
+      newMapping[key] = value
+    }
+  }
+  return newMapping
+}

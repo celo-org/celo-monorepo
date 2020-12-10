@@ -22,6 +22,7 @@ resource "google_compute_backend_service" "backend_service" {
   name = "${var.celo_env}-forno-backend-service-${var.type}"
 
   health_checks = [google_compute_health_check.http_health_check.self_link]
+  timeout_sec = var.timeout_sec
 
   dynamic "backend" {
     for_each = var.context_info

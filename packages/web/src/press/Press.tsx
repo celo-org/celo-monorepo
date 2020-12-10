@@ -25,8 +25,8 @@ class Press extends React.PureComponent<I18nProps> {
           <Cell span={Spans.full} style={standardStyles.centered}>
             <View style={styles.logoContainer}>
               {logos.map((logo) => (
-                <a key={logo.source} href={logo.url} target={'_blank'} rel="noopener">
-                  <Responsive key={logo.source} medium={[styles.logo, styles.largeLogo, logo.size]}>
+                <a key={logo.url} href={logo.url} target={'_blank'} rel="noopener">
+                  <Responsive medium={[styles.logo, styles.largeLogo, logo.size]}>
                     <Image
                       resizeMode={'contain'}
                       source={logo.source}
