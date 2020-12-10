@@ -426,7 +426,7 @@ export class KomenciKit {
     let receipt: CeloTxReceipt | null = null
     let waited = 0
     while (receipt == null && waited < this.options.txRetryTimeoutMs) {
-      receipt = await this.contractKit.web3.eth.getTransactionReceipt(txHash)
+      receipt = await this.contractKit.connection.getTransactionReceipt(txHash)
       if (receipt == null) {
         await sleep(this.options.txPollingIntervalMs)
         waited += this.options.txPollingIntervalMs
