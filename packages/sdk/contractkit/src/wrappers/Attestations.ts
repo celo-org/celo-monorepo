@@ -372,6 +372,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
+   * Allows issuers to withdraw accumulated attestation rewards
+   * @param address The address of the token that will be withdrawn
+   */
+  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
+
+  /**
    * Given a list of issuers, finds the matching issuer for a given code
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
