@@ -6,7 +6,7 @@ import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { BaseClusterConfig } from './k8s-cluster/base'
+import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
 import {
@@ -180,7 +180,7 @@ export async function installGCPSSDStorageClass() {
   }
 }
 
-export async function installCertManagerAndNginx(celoEnv: string) {
+export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?: BaseClusterConfig) {
   const nginxChartVersion = '3.9.0'
   const nginxChartNamespace = 'default'
 
@@ -200,7 +200,7 @@ export async function installCertManagerAndNginx(celoEnv: string) {
   )
   if (!nginxIngressReleaseExists) {
     const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
-    await nginxHelmParameters(valueFilePath, celoEnv)
+    await nginxHelmParameters(valueFilePath, celoEnv, clusterConfig)
 
     await helmUpdateNginxRepo()
     await execCmdWithExitOnFailure(`helm install \
@@ -212,7 +212,7 @@ export async function installCertManagerAndNginx(celoEnv: string) {
   }
 }
 
-async function nginxHelmParameters(valueFilePath: string, celoEnv: string) {
+async function nginxHelmParameters(valueFilePath: string, celoEnv: string, clusterConfig?: BaseClusterConfig) {
   const logFormat = `{"timestamp": "$time_iso8601", "requestID": "$req_id", "proxyUpstreamName":
   "$proxy_upstream_name", "proxyAlternativeUpstreamName": "$proxy_alternative_upstream_name","upstreamStatus":
   "$upstream_status", "upstreamAddr": "$upstream_addr","httpRequest":{"requestMethod":
@@ -220,7 +220,10 @@ async function nginxHelmParameters(valueFilePath: string, celoEnv: string) {
   "$request_length", "responseSize": "$upstream_response_length", "userAgent":
   "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
   "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
-  const loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv)
+  let loadBalancerIP = ''
+  if (clusterConfig?.cloudProvider == CloudProvider.GCP) {
+    loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv)
+  }
 
   const valueFileContent = `
 controller:

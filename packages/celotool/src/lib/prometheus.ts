@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
@@ -100,7 +100,6 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
     `--set cluster=${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`,
     `--set gcloud.region=${fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)}`,
-    `--set gcloud.gceScrapeZones={${fetchEnv(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS)}}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set stackdriver_metrics_prefix=${prometheusImageTag}`,
@@ -122,6 +121,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
       )}`
     )
   } else {
+    // GCP
     const clusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
     const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     const cloudProvider = 'gcp'
@@ -131,9 +131,13 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     params.push(
       `--set cluster=${clusterName}`,
+      `--set storageClassName=ssd`,
       `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
       `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
     )
+    if (fetchEnvOrFallback(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS, '')) {
+      params.push(`--set gcloud.gceScrapeZones={${fetchEnv(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS)}}`)
+    }
   }
   return params
 }
