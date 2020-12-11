@@ -60,7 +60,10 @@ contract('Exchange', (accounts: string[]) => {
 
   const updateFrequency = 60 * 60
   const minimumReports = 2
-  const SECONDS_IN_A_WEEK = 604800
+  const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7 // 604800
+
+  const minSupplyForStableBucketCap = new BigNumber('1e24')
+  const maxStableBucketFraction = toFixed(1 / 22)
 
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000) // 10000e18
@@ -143,7 +146,9 @@ contract('Exchange', (accounts: string[]) => {
       spread,
       reserveFraction,
       updateFrequency,
-      minimumReports
+      minimumReports,
+      minSupplyForStableBucketCap,
+      maxStableBucketFraction
     )
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
@@ -162,7 +167,9 @@ contract('Exchange', (accounts: string[]) => {
           spread,
           reserveFraction,
           updateFrequency,
-          minimumReports
+          minimumReports,
+          minSupplyForStableBucketCap,
+          maxStableBucketFraction
         )
       )
     })
@@ -632,14 +639,6 @@ contract('Exchange', (accounts: string[]) => {
 
             beforeEach(async () => {
               await registry.setAddressFor(CeloContractName.Exchange, owner)
-              setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
-                toFixed(1 / 22)
-              )
-
-              // Make the capp trigger only after 1 millon coins
-              minSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
-                new BigNumber('1e24')
-              ) // Todo test playing with this variable
 
               await mockSortedOracles.setMedianRate(
                 stableToken.address,
@@ -661,6 +660,9 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it('emits MaxStableBucketFractionSet', async () => {
+              setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
+                toFixed(1 / 22)
+              )
               const exchangeLogs = setMaxStableBucketFractionTx.logs.filter(
                 (x) => x.event === 'MaxStableBucketFractionSet'
               )
@@ -668,15 +670,19 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it('emits minSupplyForStableBucketCapSet', async () => {
+              // Make the capp trigger only after 1 millon coins
+              minSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
+                new BigNumber('1e24')
+              ) // Todo test playing with this variable
               const exchangeLogs = minSupplyForStableBucketCapTx.logs.filter(
-                (x) => x.event === 'minSupplyForStableBucketCapSet'
+                (x) => x.event === 'MinSupplyForStableBucketCapSet'
               )
               assert(exchangeLogs.length === 1, 'Did not receive event')
             })
 
-            it('has the correct getStableBucketTokenCap', async () => {
+            it('has the correct getStableBucketCap', async () => {
               assertEqualBN(
-                await exchange.getStableBucketTokenCap(),
+                await exchange.getStableBucketCap(),
                 new BigNumber('2772727272727272816000000')
               )
             })
