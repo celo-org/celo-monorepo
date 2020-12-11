@@ -73,7 +73,7 @@ The instructions below are for the first phase of the Plumo setup, Powers of Tau
 
 The first step to participating is generating your Celo address in a secure location.
 
-* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-benchmarking.4).
+* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
     * Make sure to save your passphrase - you will need it later.
