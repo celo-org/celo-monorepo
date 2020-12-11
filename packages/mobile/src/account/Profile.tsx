@@ -28,7 +28,7 @@ function Profile({ navigation, route }: Props) {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [newName, setNewName] = useState(useSelector(nameSelector) ?? '')
   const picturePath = useSelector(pictureSelector)
-  const [newPictureUri, setNewPictureUri] = useState(picturePath)
+  const [newPictureUri, setNewPictureUri] = useState(picturePath || null)
 
   const dispatch = useDispatch()
 

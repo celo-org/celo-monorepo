@@ -7,13 +7,14 @@ import Profile from 'src/account/Profile'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { mockNavigation } from 'test/values'
 
 describe('Profile', () => {
   const store = createMockStore({})
   it('renders correctly', () => {
     const { toJSON } = render(
       <Provider store={store}>
-        <Profile {...getMockStackScreenProps(Screens.Profile, { save: false })} />
+        <Profile {...getMockStackScreenProps(Screens.Profile)} />
       </Provider>
     )
     expect(toJSON()).toMatchSnapshot()
@@ -22,20 +23,24 @@ describe('Profile', () => {
   describe('when updating name', () => {
     const name = 'New Name'
     it('edits name', () => {
-      const { getByDisplayValue, update } = render(
+      let headerSaveButton: React.ReactNode
+      ;(mockNavigation.setOptions as jest.Mock).mockImplementation((options) => {
+        headerSaveButton = options.headerRight()
+      })
+
+      const { getByDisplayValue } = render(
         <Provider store={store}>
-          <Profile {...getMockStackScreenProps(Screens.Profile, { save: false })} />
+          <Profile {...getMockStackScreenProps(Screens.Profile)} />
         </Provider>
       )
+
       const input = getByDisplayValue((store.getState() as RootState).account.name!)
       fireEvent.changeText(input, name)
       expect(store.getActions().length).toEqual(0)
 
-      update(
-        <Provider store={store}>
-          <Profile {...getMockStackScreenProps(Screens.Profile, { save: true })} />
-        </Provider>
-      )
+      const { getByTestId } = render(<Provider store={store}>{headerSaveButton}</Provider>)
+
+      fireEvent.press(getByTestId('SaveButton'))
       expect(store.getActions()).toEqual(expect.arrayContaining([saveNameAndPicture(name, null)]))
     })
   })
