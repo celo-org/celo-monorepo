@@ -837,6 +837,12 @@
 
   - [Wallet-Remote](developer-resources/wallet-remote/reference/SUMMARY.md)
     <!-- wallet-remote-reference-start -->
+    - [Globals](../../developer-resources/wallet-remote/reference/globals.md)
+    - [Modules]()
+      - [remote-wallet](../../developer-resources/wallet-remote/reference/modules/_remote_wallet_.md)
+      - [RemoteWallet](../../developer-resources/wallet-remote/reference/classes/_remote_wallet_.remotewallet.md)
+    - [Classes]()
+      - [RemoteWallet](../../developer-resources/wallet-remote/reference/classes/_remote_wallet_.remotewallet.md)
     <!-- wallet-remote-reference-end -->
 
   - [Wallet-Rpc](developer-resources/wallet-rpc/reference/SUMMARY.md)
