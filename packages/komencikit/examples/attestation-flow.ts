@@ -3,10 +3,10 @@ import {
   printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
 } from '@celo/celotool/lib/lib/attestation'
-import { ContractKit } from '@celo/contractkit'
-import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
-import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
+import { newKitFromWeb3 } from '@celo/contractkit'
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import { compressedPubKey } from '@celo/utils/src/dataEncryptionKey'
+import { LocalWallet } from '@celo/wallet-local'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
@@ -85,7 +85,7 @@ const fornoURL: Record<Network, string> = {
 
 const provider = new Web3.providers.HttpProvider(fornoURL[network])
 const web3 = new Web3(provider)
-const contractKit = new ContractKit(web3, wallet)
+const contractKit = newKitFromWeb3(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
 
