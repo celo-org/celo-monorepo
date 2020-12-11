@@ -784,6 +784,18 @@
 
   - [Wallet-Hsm-Azure](developer-resources/wallet-hsm-azure/reference/SUMMARY.md)
     <!-- wallet-hsm-azure-reference-start -->
+    - [Globals](../../developer-resources/wallet-hsm-azure/reference/globals.md)
+    - [Modules]()
+      - [azure-hsm-signer](../../developer-resources/wallet-hsm-azure/reference/modules/_azure_hsm_signer_.md)
+      - [AzureHSMSigner](../../developer-resources/wallet-hsm-azure/reference/classes/_azure_hsm_signer_.azurehsmsigner.md)
+      - [azure-hsm-wallet](../../developer-resources/wallet-hsm-azure/reference/modules/_azure_hsm_wallet_.md)
+      - [AzureHSMWallet](../../developer-resources/wallet-hsm-azure/reference/classes/_azure_hsm_wallet_.azurehsmwallet.md)
+      - [azure-key-vault-client](../../developer-resources/wallet-hsm-azure/reference/modules/_azure_key_vault_client_.md)
+      - [AzureKeyVaultClient](../../developer-resources/wallet-hsm-azure/reference/classes/_azure_key_vault_client_.azurekeyvaultclient.md)
+    - [Classes]()
+      - [AzureHSMSigner](../../developer-resources/wallet-hsm-azure/reference/classes/_azure_hsm_signer_.azurehsmsigner.md)
+      - [AzureHSMWallet](../../developer-resources/wallet-hsm-azure/reference/classes/_azure_hsm_wallet_.azurehsmwallet.md)
+      - [AzureKeyVaultClient](../../developer-resources/wallet-hsm-azure/reference/classes/_azure_key_vault_client_.azurekeyvaultclient.md)
     <!-- wallet-hsm-azure-reference-end -->
 
   - [Wallet-Ledger](developer-resources/wallet-ledger/reference/SUMMARY.md)
