@@ -6,7 +6,6 @@ if (!pkgName) {
   console.error('No package name given.')
   process.exit(1)
 }
-console.log('pkgName: ', pkgName)
 const indent = '    '
 
 const config: Partial<TypeDocOptionMap> = JSON.parse(readFileSync('./typedoc.json').toString())
@@ -19,7 +18,8 @@ const modifiedLocalSummary = localSummary
   .replace(pathRegex, (match) => `(${localPathPrefix}/${match.slice(1, -1)})`)
   .replace(/\*/g, indent + '-')
 
-const globalSummaryPath = '../../docs/SUMMARY.md'
+const globalSummaryPath =
+  pkgName.indexOf('wallet') >= 0 ? '../../../docs/SUMMARY.md' : '../../docs/SUMMARY.md'
 const globalSummary = readFileSync(globalSummaryPath).toString()
 
 // Adding the indent to the tag, otherwise the markdows has poor preview
