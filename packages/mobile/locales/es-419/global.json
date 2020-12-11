@@ -186,5 +186,6 @@
   "commentUnavailable": "Comentario no disponible",
   "accountClearFailed": "Hubo un error al borrar tu Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",
   "withdraw": "Retirar",
-  "countryNotAvailable": "{{appName}} no está disponible en tu país"
+  "countryNotAvailable": "{{appName}} no está disponible en tu país",
+  "pictureLoadFailed": "Hubo un error al cargar la imagen"
 }

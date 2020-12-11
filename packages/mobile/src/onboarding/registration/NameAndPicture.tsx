@@ -27,7 +27,7 @@ type Props = StackScreenProps<StackParamList, Screens.NameAndPicture>
 function NameAndPicture({}: Props) {
   const [nameInput, setNameInput] = useState('')
   const cachedName = useTypedSelector((state) => state.account.name)
-  const picture = useTypedSelector((state) => state.account.picture)
+  const picture = useTypedSelector((state) => state.account.pictureUri)
   const dispatch = useDispatch()
 
   const { t } = useTranslation(Namespaces.nuxNamePin1)
@@ -61,12 +61,16 @@ function NameAndPicture({}: Props) {
     goToNextScreen()
   }
 
-  const onPhotoChosen = (dataUrl: string | null) => {
+  const onPhotoChosen = async (dataUrl: string | null) => {
     if (!dataUrl) {
       dispatch(setPicture(null))
     } else {
-      const fileName = saveProfilePicture(dataUrl)
-      dispatch(setPicture(fileName))
+      try {
+        const fileName = await saveProfilePicture(dataUrl)
+        dispatch(setPicture(fileName))
+      } catch (error) {
+        dispatch(showError(ErrorMessages.PICTURE_LOAD_FAILED))
+      }
     }
   }
 

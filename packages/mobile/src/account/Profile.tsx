@@ -2,15 +2,16 @@ import { SettingsItemInput } from '@celo/react-components/components/SettingsIte
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import * as RNFS from 'react-native-fs'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { setName, setPicture } from 'src/account/actions'
+import { saveNameAndPicture } from 'src/account/actions'
 import { nameSelector, pictureSelector } from 'src/account/selectors'
-import { showMessage } from 'src/alert/actions'
+import { showError, showMessage } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import i18n, { Namespaces } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -19,6 +20,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import PictureInput from 'src/onboarding/registration/PictureInput'
 import { saveProfilePicture } from 'src/utils/image'
+import Logger from 'src/utils/Logger'
 
 type Props = StackScreenProps<StackParamList, Screens.Profile>
 
@@ -30,28 +32,38 @@ function Profile({ navigation, route }: Props) {
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    if (route.params?.save) {
-      navigation.setParams({ save: false })
-      dispatch(setName(newName))
-      dispatch(setPicture(newPictureUri))
+  useLayoutEffect(() => {
+    const onSave = () => {
+      dispatch(saveNameAndPicture(newName, newPictureUri))
       // TODO: Save name and picture on CIP-8.
       dispatch(showMessage(t('namePictureSaved')))
       navigation.goBack()
 
-      // Delete old proflie pictures if necessary.
+      // Delete old profile pictures if necessary.
       if (picturePath && picturePath !== newPictureUri) {
-        RNFS.unlink(picturePath).catch()
+        RNFS.unlink(picturePath).catch((e) => {
+          Logger.error('Error deleting old profile picture:', e)
+        })
       }
     }
-  }, [route.params?.save])
 
-  const onPictureChosen = (pictureDataUrl: string | null) => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TopBarTextButton title={i18n.t('global:save')} testID="SaveButton" onPress={onSave} />
+      ),
+    })
+  }, [navigation, newName, newPictureUri])
+
+  const onPictureChosen = async (pictureDataUrl: string | null) => {
     if (!pictureDataUrl) {
       setNewPictureUri(null)
     } else {
-      const newPicturePath = saveProfilePicture(pictureDataUrl)
-      setNewPictureUri(newPicturePath)
+      try {
+        const newPicturePath = await saveProfilePicture(pictureDataUrl)
+        setNewPictureUri(newPicturePath)
+      } catch (error) {
+        dispatch(showError(ErrorMessages.PICTURE_LOAD_FAILED))
+      }
     }
   }
 
@@ -85,16 +97,10 @@ Profile.navigationOptions = ({ navigation, route }: Props) => {
   const onCancel = () => {
     navigation.goBack()
   }
-  const onSave = () => {
-    navigation.setParams({ save: true })
-  }
   return {
     ...emptyHeader,
     headerTitle: i18n.t('accountScreen10:editProfile'),
     headerLeft: () => <CancelButton onCancel={onCancel} />,
-    headerRight: () => (
-      <TopBarTextButton title={i18n.t('global:save')} testID="SaveButton" onPress={onSave} />
-    ),
   }
 }
 

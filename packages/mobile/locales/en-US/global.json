@@ -186,5 +186,6 @@
   "commentUnavailable": "Comment Unavailable",
   "accountClearFailed": "There was an error while removing your Account Key. You might have to reinstall the app to restore all functionality.",
   "withdraw": "Withdraw",
-  "countryNotAvailable": "{{appName}} is not available in your country"
+  "countryNotAvailable": "{{appName}} is not available in your country",
+  "pictureLoadFailed": "There was an error while loading your picture"
 }

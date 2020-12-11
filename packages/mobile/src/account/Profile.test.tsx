@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import { setName, setPicture } from 'src/account/actions'
+import { saveNameAndPicture } from 'src/account/actions'
 import Profile from 'src/account/Profile'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -36,7 +36,7 @@ describe('Profile', () => {
           <Profile {...getMockStackScreenProps(Screens.Profile, { save: true })} />
         </Provider>
       )
-      expect(store.getActions()).toEqual(expect.arrayContaining([setPicture(null), setName(name)]))
+      expect(store.getActions()).toEqual(expect.arrayContaining([saveNameAndPicture(name, null)]))
     })
   })
 })

@@ -1,7 +1,7 @@
 import * as RNFS from 'react-native-fs'
 import Logger from 'src/utils/Logger'
 
-const mimeTypeToExtension: { [key: string]: string } = {
+const mimeTypeToExtension: { [key: string]: string | undefined } = {
   'image/png': 'png',
   'image/x-png': 'png',
   'image/jpeg': 'jpeg',
@@ -10,27 +10,23 @@ const mimeTypeToExtension: { [key: string]: string } = {
 }
 
 // Data URL format: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
-export const saveImageDataUrlToFile = (
+export const saveImageDataUrlToFile = async (
   dataUrl: string,
   fileNameWithoutExtension: string
-): string => {
+): Promise<string> => {
   const mimeType = dataUrl
     .split(':')[1]
     .split(',')[0]
     .split(';')[0]
   const extension = mimeTypeToExtension[mimeType] || '.jpg'
   const fileName = `${fileNameWithoutExtension}.${extension}`
-  const data = dataUrl
-    .split(',')
-    .slice(1) // Not sure if there could be more commas in the data, but if there are just join them again.
-    .join(',')
-  RNFS.writeFile(fileName, data, 'base64')
-    .then(() => Logger.info('Image saved successfully'))
-    .catch((e) => Logger.error('Error saving image', e))
+  const data = dataUrl.substr(dataUrl.indexOf(',') + 1)
+  await RNFS.writeFile(fileName, data, 'base64')
+  Logger.info('Image saved successfully')
   return fileName
 }
 
-export const saveProfilePicture = (dataUrl: string): string => {
+export const saveProfilePicture = async (dataUrl: string): Promise<string> => {
   return saveImageDataUrlToFile(
     dataUrl,
     `file://${RNFS.DocumentDirectoryPath}/profile-${Date.now()}`

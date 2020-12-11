@@ -7,6 +7,7 @@ export enum Actions {
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
   SET_PICTURE = 'ACCOUNT/SET_PICTURE',
+  SAVE_NAME_AND_PICTURE = 'ACCOUNT/SAVE_NAME_AND_PICTURE',
   DEV_MODE_TRIGGER_CLICKED = 'ACCOUNT/NAME_CLICKED',
   PHOTOSNUX_CLICKED = 'ACCOUNT/PHOTOSNUX_CLICKED',
   SET_PINCODE = 'ACCOUNT/SET_PINCODE',
@@ -53,7 +54,13 @@ export interface SetPhoneNumberAction {
 
 export interface SetPictureAction {
   type: Actions.SET_PICTURE
-  picture: string | null
+  pictureUri: string | null
+}
+
+export interface SaveNameAndPictureAction {
+  type: Actions.SAVE_NAME_AND_PICTURE
+  name: string
+  pictureUri: string | null
 }
 
 export interface DevModeTriggerClickedAction {
@@ -150,6 +157,7 @@ export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
   | SetPictureAction
+  | SaveNameAndPictureAction
   | DevModeTriggerClickedAction
   | PhotosNUXClickedAction
   | SetPincodeAction
@@ -210,10 +218,21 @@ export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): Se
   }
 }
 
-export function setPicture(picture: string | null): SetPictureAction {
+export function saveNameAndPicture(
+  name: string,
+  pictureUri: string | null
+): SaveNameAndPictureAction {
+  return {
+    type: Actions.SAVE_NAME_AND_PICTURE,
+    name,
+    pictureUri,
+  }
+}
+
+export function setPicture(pictureUri: string | null): SetPictureAction {
   return {
     type: Actions.SET_PICTURE,
-    picture,
+    pictureUri,
   }
 }
 

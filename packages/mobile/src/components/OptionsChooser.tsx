@@ -3,6 +3,7 @@
 
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import React, { useEffect } from 'react'
 import { ActionSheetIOS, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'src/components/Modal'
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   option: {
-    marginVertical: 16,
+    marginVertical: Spacing.Regular16,
   },
   separator: {
     width: '100%',
