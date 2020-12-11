@@ -106,6 +106,17 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   )
 
   /**
+   * Returns the expiry for the token if exists, if not the default.
+   * @param token The address of the token.
+   * @return The report expiry in seconds.
+   */
+  async getTokenReportExpirySeconds(token: CeloToken): Promise<BigNumber> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.getTokenReportExpirySeconds(tokenAddress).call()
+    return valueToBigNumber(response)
+  }
+
+  /**
    * Checks if the oldest report for a given token is expired
    * @param token The token for which to check reports
    */

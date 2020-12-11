@@ -46,8 +46,13 @@ export interface AddressToDataEncryptionKeyType {
   [address: string]: string | null // null means no DEK registered
 }
 
+export interface AddressInfoToDisplay {
+  name: string
+  imageUrl: string | null
+}
+
 export interface AddressToDisplayNameType {
-  [address: string]: string | undefined
+  [address: string]: AddressInfoToDisplay | undefined
 }
 
 export interface WalletToAccountAddressType {
@@ -392,11 +397,21 @@ export const reducer = (
       if (!action.recipient.address) {
         return state
       }
+      action = {
+        type: Actions.UPDATE_KNOWN_ADDRESSES,
+        knownAddresses: {
+          [action.recipient.address]: {
+            name: action.recipient.displayName,
+            imageUrl: null,
+          },
+        },
+      }
+    case Actions.UPDATE_KNOWN_ADDRESSES:
       return {
         ...state,
         addressToDisplayName: {
           ...state.addressToDisplayName,
-          [action.recipient.address]: action.recipient.displayName,
+          ...action.knownAddresses,
         },
       }
     case Actions.IMPORT_CONTACTS:
