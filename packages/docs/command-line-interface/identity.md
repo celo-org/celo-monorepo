@@ -119,7 +119,8 @@ OPTIONS
                                                              array of index addresses for local signing. Example
                                                              --ledgerCustomAddresses "[4,99]"
 
-  --tokenAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address of the token that will be withdrawn
+  --tokenAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  The address of the token that will be withdrawn. Defaults
+                                                             to cUSD
 
   --useLedger                                                Set it to use a ledger wallet
 ```
