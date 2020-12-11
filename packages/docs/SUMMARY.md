@@ -800,6 +800,26 @@
 
   - [Wallet-Ledger](developer-resources/wallet-ledger/reference/SUMMARY.md)
     <!-- wallet-ledger-reference-start -->
+    - [Globals](../../developer-resources/wallet-ledger/reference/globals.md)
+    - [Modules]()
+      - [data](../../developer-resources/wallet-ledger/reference/modules/_data_.md)
+      - [ledger-signer](../../developer-resources/wallet-ledger/reference/modules/_ledger_signer_.md)
+      - [LedgerSigner](../../developer-resources/wallet-ledger/reference/classes/_ledger_signer_.ledgersigner.md)
+      - [ledger-utils](../../developer-resources/wallet-ledger/reference/modules/_ledger_utils_.md)
+      - [ledger-wallet](../../developer-resources/wallet-ledger/reference/modules/_ledger_wallet_.md)
+      - [AddressValidation](../../developer-resources/wallet-ledger/reference/enums/_ledger_wallet_.addressvalidation.md)
+      - [LedgerWallet](../../developer-resources/wallet-ledger/reference/classes/_ledger_wallet_.ledgerwallet.md)
+      - [tokens](../../developer-resources/wallet-ledger/reference/modules/_tokens_.md)
+      - [API](../../developer-resources/wallet-ledger/reference/interfaces/_tokens_.api.md)
+      - [TokenInfo](../../developer-resources/wallet-ledger/reference/interfaces/_tokens_.tokeninfo.md)
+    - [Classes]()
+      - [LedgerSigner](../../developer-resources/wallet-ledger/reference/classes/_ledger_signer_.ledgersigner.md)
+      - [LedgerWallet](../../developer-resources/wallet-ledger/reference/classes/_ledger_wallet_.ledgerwallet.md)
+    - [Enums]()
+      - [AddressValidation](../../developer-resources/wallet-ledger/reference/enums/_ledger_wallet_.addressvalidation.md)
+    - [Interfaces]()
+      - [API](../../developer-resources/wallet-ledger/reference/interfaces/_tokens_.api.md)
+      - [TokenInfo](../../developer-resources/wallet-ledger/reference/interfaces/_tokens_.tokeninfo.md)
     <!-- wallet-ledger-reference-end -->
 
   - [Wallet-Local](developer-resources/wallet-local/reference/SUMMARY.md)
