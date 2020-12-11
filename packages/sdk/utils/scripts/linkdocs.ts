@@ -1,9 +1,13 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { TypeDocOptionMap } from 'typedoc'
 
-// TODO(yorke): make function package agnostic and move to `packages/utils`
-const pkgName = 'contractkit'
-const indent = '  '
+const pkgName = process.argv.slice(2)[0]
+if (!pkgName) {
+  console.error('No package name given.')
+  process.exit(1)
+}
+console.log('pkgName: ', pkgName)
+const indent = '    '
 
 const config: Partial<TypeDocOptionMap> = JSON.parse(readFileSync('./typedoc.json').toString())
 const localSummaryPath = `${config.out!}/SUMMARY.md`
