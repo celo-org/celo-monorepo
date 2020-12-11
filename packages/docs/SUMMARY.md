@@ -754,7 +754,7 @@
       - [Wallet](../../developer-resources/wallet-base/reference/interfaces/_wallet_base_.wallet.md)
     <!-- wallet-base-reference-end -->
 
-  - [Wallet-Hsm ](developer-resources/wallet-hsm/reference/SUMMARY.md)
+  - [Wallet-Hsm](developer-resources/wallet-hsm/reference/SUMMARY.md)
     <!-- wallet-hsm-reference-start -->
     - [Globals](../../developer-resources/wallet-hsm/reference/globals.md)
     - [Modules]()
