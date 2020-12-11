@@ -590,21 +590,29 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param serviceURL: validator's attestation service URL
    * @param body
    */
-  getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
+  async getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
     const urlParams = new URLSearchParams({
       phoneNumber: requestBody.phoneNumber,
       account: requestBody.account,
       issuer: requestBody.issuer,
     })
+
+    let additionalHeaders = {}
     if (requestBody.salt) {
       urlParams.set('salt', requestBody.salt)
     }
     if (requestBody.securityCode) {
       urlParams.set('securityCode', requestBody.securityCode)
+      additionalHeaders = {
+        Authentication: await this.kit.signTypedData(
+          requestBody.account,
+          buildSecurityCodeTypedData(requestBody.securityCode)
+        ),
+      }
     }
     return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...additionalHeaders },
     })
   }
 

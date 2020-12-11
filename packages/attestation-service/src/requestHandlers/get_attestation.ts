@@ -1,5 +1,7 @@
 import { PhoneNumberUtils } from '@celo/utils'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
+import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import Logger from 'bunyan'
 import express from 'express'
 import { Transaction } from 'sequelize'
@@ -87,10 +89,24 @@ class GetAttestationRequestHandler {
 }
 
 export async function handleGetAttestationRequest(
-  _req: express.Request,
+  req: express.Request,
   res: express.Response,
   getRequest: GetAttestationRequest
 ) {
+  const {
+    headers: { authentication },
+  } = req
+  if (!authentication) {
+    respondWithError(res, 401, 'Missing authentication')
+    return
+  }
+
+  const typedData = buildSecurityCodeTypedData(getRequest.account)
+  if (!verifyEIP712TypedDataSigner(typedData, authentication as string, getRequest.account)) {
+    respondWithError(res, 401, 'Invalid signature')
+    return
+  }
+
   try {
     const handler = new GetAttestationRequestHandler(getRequest, res.locals.logger)
 

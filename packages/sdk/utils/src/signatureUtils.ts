@@ -145,6 +145,15 @@ export function recoverEIP712TypedDataSigner(
   return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
 }
 
+export function verifyEIP712TypedDataSigner(
+  typedData: EIP712TypedData,
+  signature: string,
+  signer: string
+) {
+  const recoveredSigner = recoverEIP712TypedDataSigner(typedData, signature)
+  return eqAddress(signer, recoveredSigner)
+}
+
 export function guessSigner(message: string, signature: string): string {
   const messageHash = hashMessageWithPrefix(message)
   const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
@@ -200,4 +209,6 @@ export const SignatureUtils = {
   parseSignature,
   parseSignatureWithoutPrefix,
   serializeSignature,
+  recoverEIP712TypedDataSigner,
+  verifyEIP712TypedDataSigner,
 }
