@@ -372,6 +372,24 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
+   * Returns the attestation signer for the specified account.
+   * @param account The address of token rewards are accumulated in.
+   * @param account The address of the account.
+   * @return The reward amount.
+   */
+  getPendingWithdrawals: (token: string, account: string) => Promise<BigNumber> = proxyCall(
+    this.contract.methods.pendingWithdrawals,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
+   * Allows issuers to withdraw accumulated attestation rewards
+   * @param address The address of the token that will be withdrawn
+   */
+  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
+
+  /**
    * Given a list of issuers, finds the matching issuer for a given code
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
