@@ -20,7 +20,7 @@ import { deleteChainData, isProviderConnectionError } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { CANCELED_PIN_INPUT, getPasswordSaga } from 'src/pincode/authentication'
+import { CANCELLED_PIN_INPUT, getPasswordSaga } from 'src/pincode/authentication'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 import {
@@ -282,7 +282,7 @@ export function* unlockAccount(account: string, force: boolean = false) {
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return UnlockResult.SUCCESS
   } catch (error) {
-    if (error === CANCELED_PIN_INPUT) {
+    if (error === CANCELLED_PIN_INPUT) {
       return UnlockResult.CANCELED
     }
     Logger.error(TAG + '@unlockAccount', 'Account unlock failed, clearing password caches', error)

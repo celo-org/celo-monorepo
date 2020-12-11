@@ -46,7 +46,7 @@ export const PIN_LENGTH = 6
 // Pepper and pin not currently generalized to be per account
 // Using this value in the caches
 export const DEFAULT_CACHE_ACCOUNT = 'default'
-export const CANCELED_PIN_INPUT = 'CANCELED_PIN_INPUT'
+export const CANCELLED_PIN_INPUT = 'CANCELLED_PIN_INPUT'
 
 const PIN_BLACKLIST = [
   '000000',
@@ -210,7 +210,7 @@ export async function requestPincodeInput(withVerification = true, shouldNavigat
   const pin = await new Promise((resolve: PinCallback, reject: (error: string) => void) => {
     navigate(Screens.PincodeEnter, {
       onSuccess: resolve,
-      onCancel: () => reject(CANCELED_PIN_INPUT),
+      onCancel: () => reject(CANCELLED_PIN_INPUT),
       withVerification,
     })
   })
