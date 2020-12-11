@@ -4,7 +4,7 @@ Contract for handling reserve for stable currencies
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Escrow](../enums/_base_.celocontract.md#escrow)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Escrow›
 
   ↳ **EscrowWrapper**
 
@@ -40,18 +40,18 @@ Contract for handling reserve for stable currencies
 
 ###  constructor
 
-\+ **new EscrowWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Escrow](../enums/_base_.celocontract.md#escrow)): *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
+\+ **new EscrowWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Escrow): *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [Escrow](../enums/_base_.celocontract.md#escrow) |
+`contract` | Escrow |
 
 **Returns:** *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
 
@@ -61,7 +61,7 @@ Name | Type |
 
 • **escrowedPayments**: *function* = proxyCall(this.contract.methods.escrowedPayments)
 
-*Defined in [wrappers/Escrow.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L8)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L8)*
 
 #### Type declaration:
 
@@ -84,7 +84,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 • **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.getReceivedPaymentIds)
 
-*Defined in [wrappers/Escrow.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L14)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L14)*
 
 #### Type declaration:
 
@@ -120,7 +120,7 @@ ___
 
 • **getSentPaymentIds**: *function* = proxyCall(this.contract.methods.getSentPaymentIds)
 
-*Defined in [wrappers/Escrow.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L16)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L16)*
 
 #### Type declaration:
 
@@ -152,7 +152,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
 
 ___
 
@@ -160,7 +160,7 @@ ___
 
 • **receivedPaymentIds**: *function* = proxyCall(this.contract.methods.receivedPaymentIds)
 
-*Defined in [wrappers/Escrow.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L10)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L10)*
 
 #### Type declaration:
 
@@ -178,7 +178,7 @@ ___
 
 • **revoke**: *function* = proxySend(this.kit, this.contract.methods.revoke)
 
-*Defined in [wrappers/Escrow.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L22)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L22)*
 
 #### Type declaration:
 
@@ -196,7 +196,7 @@ ___
 
 • **sentPaymentIds**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
 
-*Defined in [wrappers/Escrow.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L12)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L12)*
 
 #### Type declaration:
 
@@ -214,7 +214,7 @@ ___
 
 • **transfer**: *function* = proxySend(this.kit, this.contract.methods.transfer)
 
-*Defined in [wrappers/Escrow.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L18)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L18)*
 
 #### Type declaration:
 
@@ -232,7 +232,7 @@ ___
 
 • **withdraw**: *function* = proxySend(this.kit, this.contract.methods.withdraw)
 
-*Defined in [wrappers/Escrow.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L20)*
+*Defined in [contractkit/src/wrappers/Escrow.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Escrow.ts#L20)*
 
 #### Type declaration:
 
@@ -252,7 +252,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
 
 Contract address
 
@@ -262,11 +262,11 @@ Contract address
 
 ###  getPastEvents
 
-▸ **getPastEvents**(`event`: Events‹[Escrow](../enums/_base_.celocontract.md#escrow)›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+▸ **getPastEvents**(`event`: Events‹Escrow›, `options`: PastEventOptions): *Promise‹EventLog[]›*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
@@ -274,7 +274,7 @@ Contract getPastEvents
 
 Name | Type |
 ------ | ------ |
-`event` | Events‹[Escrow](../enums/_base_.celocontract.md#escrow)› |
+`event` | Events‹Escrow› |
 `options` | PastEventOptions |
 
 **Returns:** *Promise‹EventLog[]›*

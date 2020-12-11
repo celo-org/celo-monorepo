@@ -20,7 +20,7 @@
 
 • **confirmations**: *string[]*
 
-*Defined in [wrappers/MultiSig.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L20)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L20)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **data**: *string*
 
-*Defined in [wrappers/MultiSig.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L18)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L18)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **destination**: *string*
 
-*Defined in [wrappers/MultiSig.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L16)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L16)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **executed**: *boolean*
 
-*Defined in [wrappers/MultiSig.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L19)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L19)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **value**: *BigNumber*
 
-*Defined in [wrappers/MultiSig.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L17)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MultiSig.ts#L17)*

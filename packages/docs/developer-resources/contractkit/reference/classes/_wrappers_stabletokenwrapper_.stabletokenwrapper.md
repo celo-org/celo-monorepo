@@ -4,7 +4,7 @@ Stable token with variable supply (cUSD)
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[StableToken](../enums/_base_.celocontract.md#stabletoken)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹StableToken›
 
   ↳ **StableTokenWrapper**
 
@@ -53,18 +53,18 @@ Stable token with variable supply (cUSD)
 
 ###  constructor
 
-\+ **new StableTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [StableToken](../enums/_base_.celocontract.md#stabletoken)): *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
+\+ **new StableTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: StableToken): *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [StableToken](../enums/_base_.celocontract.md#stabletoken) |
+`contract` | StableToken |
 
 **Returns:** *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
 
@@ -74,7 +74,7 @@ Name | Type |
 
 • **allowance**: *function* = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
 
-*Defined in [wrappers/StableTokenWrapper.ts:42](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L42)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:42](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L42)*
 
 Gets the amount of owner's StableToken allowed to be spent by spender.
 
@@ -103,7 +103,7 @@ ___
     this.contract.methods.approve
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:181](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L181)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:181](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L181)*
 
 Approve a user to transfer StableToken on behalf of another user.
 
@@ -134,7 +134,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L70)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L70)*
 
 Gets the balance of the specified address using the presently stored inflation factor.
 
@@ -158,7 +158,7 @@ ___
 
 • **burn**: *function* = proxySend(this.kit, this.contract.methods.burn)
 
-*Defined in [wrappers/StableTokenWrapper.ts:121](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L121)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:121](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L121)*
 
 #### Type declaration:
 
@@ -176,7 +176,7 @@ ___
 
 • **decimals**: *function* = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
 
-*Defined in [wrappers/StableTokenWrapper.ts:57](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L57)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:57](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L57)*
 
 **`returns`** The number of decimal places to which StableToken is divisible.
 
@@ -196,7 +196,7 @@ ___
 
 • **decreaseAllowance**: *function* = proxySend(this.kit, this.contract.methods.decreaseAllowance)
 
-*Defined in [wrappers/StableTokenWrapper.ts:119](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L119)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:119](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L119)*
 
 Decreases the allowance of another user.
 
@@ -227,7 +227,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 ___
 
@@ -237,7 +237,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -249,7 +249,7 @@ ___
     tupleParser(stringIdentity, valueToString)
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:108](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L108)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:108](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L108)*
 
 Increases the allowance of another user.
 
@@ -289,7 +289,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
 
 ___
 
@@ -297,7 +297,7 @@ ___
 
 • **mint**: *function* = proxySend(this.kit, this.contract.methods.mint)
 
-*Defined in [wrappers/StableTokenWrapper.ts:120](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L120)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:120](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L120)*
 
 #### Type declaration:
 
@@ -315,7 +315,7 @@ ___
 
 • **name**: *function* = proxyCall(this.contract.methods.name)
 
-*Defined in [wrappers/StableTokenWrapper.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L47)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L47)*
 
 **`returns`** The name of the stable token.
 
@@ -329,7 +329,7 @@ ___
 
 • **owner**: *function* = proxyCall(this.contract.methods.owner)
 
-*Defined in [wrappers/StableTokenWrapper.ts:76](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L76)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:76](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L76)*
 
 #### Type declaration:
 
@@ -347,7 +347,7 @@ ___
 
 • **setInflationParameters**: *function* = proxySend(this.kit, this.contract.methods.setInflationParameters)
 
-*Defined in [wrappers/StableTokenWrapper.ts:123](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L123)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:123](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L123)*
 
 #### Type declaration:
 
@@ -365,7 +365,7 @@ ___
 
 • **symbol**: *function* = proxyCall(this.contract.methods.symbol)
 
-*Defined in [wrappers/StableTokenWrapper.ts:52](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L52)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:52](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L52)*
 
 **`returns`** The symbol of the stable token.
 
@@ -379,7 +379,7 @@ ___
 
 • **totalSupply**: *function* = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
-*Defined in [wrappers/StableTokenWrapper.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L63)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L63)*
 
 Returns the total supply of the token, that is, the amount of tokens currently minted.
 
@@ -404,7 +404,7 @@ ___
     this.contract.methods.transfer
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:208](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L208)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:208](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L208)*
 
 Transfers `value` from `msg.sender` to `to`
 
@@ -429,7 +429,7 @@ ___
 
 • **transferFrom**: *function* = proxySend(this.kit, this.contract.methods.transferFrom)
 
-*Defined in [wrappers/StableTokenWrapper.ts:220](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L220)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:220](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L220)*
 
 Transfers StableToken from one address to another on behalf of a user.
 
@@ -462,7 +462,7 @@ ___
     this.contract.methods.transferWithComment
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:193](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L193)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:193](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L193)*
 
 Transfer token for a specified address
 
@@ -496,7 +496,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:96](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L96)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:96](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L96)*
 
 Returns the value of a given number of units given the current inflation factor.
 
@@ -524,7 +524,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [wrappers/StableTokenWrapper.ts:85](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L85)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:85](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L85)*
 
 Returns the units for a given value given the current inflation factor.
 
@@ -553,7 +553,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
 
 Contract address
 
@@ -565,7 +565,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[StableTokenConfig](../interfaces/_wrappers_stabletokenwrapper_.stabletokenconfig.md)›*
 
-*Defined in [wrappers/StableTokenWrapper.ts:142](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L142)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:142](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L142)*
 
 Returns current configuration parameters.
 
@@ -577,7 +577,7 @@ ___
 
 ▸ **getHumanReadableConfig**(): *Promise‹object›*
 
-*Defined in [wrappers/StableTokenWrapper.ts:161](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L161)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:161](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L161)*
 
 **`dev`** Returns human readable configuration of the stabletoken contract
 
@@ -591,7 +591,7 @@ ___
 
 ▸ **getInflationParameters**(): *Promise‹[InflationParameters](../interfaces/_wrappers_stabletokenwrapper_.inflationparameters.md)›*
 
-*Defined in [wrappers/StableTokenWrapper.ts:129](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L129)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:129](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L129)*
 
 Querying the inflation parameters.
 
@@ -603,11 +603,11 @@ ___
 
 ###  getPastEvents
 
-▸ **getPastEvents**(`event`: Events‹[StableToken](../enums/_base_.celocontract.md#stabletoken)›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+▸ **getPastEvents**(`event`: Events‹StableToken›, `options`: PastEventOptions): *Promise‹EventLog[]›*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
@@ -615,7 +615,7 @@ Contract getPastEvents
 
 Name | Type |
 ------ | ------ |
-`event` | Events‹[StableToken](../enums/_base_.celocontract.md#stabletoken)› |
+`event` | Events‹StableToken› |
 `options` | PastEventOptions |
 
 **Returns:** *Promise‹EventLog[]›*

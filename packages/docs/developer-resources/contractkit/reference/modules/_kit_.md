@@ -21,7 +21,7 @@
 
 ▸ **newKit**(`url`: string, `wallet?`: ReadOnlyWallet): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [kit.ts:37](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L37)*
+*Defined in [contractkit/src/kit.ts:37](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L37)*
 
 Creates a new instance of `ContractKit` give a nodeUrl
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **newKitFromWeb3**(`web3`: Web3, `wallet`: ReadOnlyWallet): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [kit.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L48)*
+*Defined in [contractkit/src/kit.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L48)*
 
 Creates a new instance of the `ContractKit` with a web3 instance
 

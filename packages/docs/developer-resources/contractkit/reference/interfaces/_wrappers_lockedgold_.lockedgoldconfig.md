@@ -17,7 +17,7 @@
 
 • **totalLockedGold**: *BigNumber*
 
-*Defined in [wrappers/LockedGold.ts:60](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L60)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:60](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L60)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **unlockingPeriod**: *BigNumber*
 
-*Defined in [wrappers/LockedGold.ts:59](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L59)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:59](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L59)*

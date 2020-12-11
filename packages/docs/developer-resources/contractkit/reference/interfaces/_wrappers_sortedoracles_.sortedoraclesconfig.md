@@ -16,4 +16,4 @@
 
 • **reportExpirySeconds**: *BigNumber*
 
-*Defined in [wrappers/SortedOracles.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L24)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L24)*

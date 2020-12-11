@@ -21,7 +21,7 @@
 
 • **commissionUpdateDelay**: *BigNumber*
 
-*Defined in [wrappers/Validators.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L63)*
+*Defined in [contractkit/src/wrappers/Validators.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L63)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **groupLockedGoldRequirements**: *[LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)*
 
-*Defined in [wrappers/Validators.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L58)*
+*Defined in [contractkit/src/wrappers/Validators.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L58)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **maxGroupSize**: *BigNumber*
 
-*Defined in [wrappers/Validators.ts:60](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L60)*
+*Defined in [contractkit/src/wrappers/Validators.ts:60](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L60)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **membershipHistoryLength**: *BigNumber*
 
-*Defined in [wrappers/Validators.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L61)*
+*Defined in [contractkit/src/wrappers/Validators.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L61)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **slashingMultiplierResetPeriod**: *BigNumber*
 
-*Defined in [wrappers/Validators.ts:62](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L62)*
+*Defined in [contractkit/src/wrappers/Validators.ts:62](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L62)*
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 • **validatorLockedGoldRequirements**: *[LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)*
 
-*Defined in [wrappers/Validators.ts:59](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L59)*
+*Defined in [contractkit/src/wrappers/Validators.ts:59](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L59)*

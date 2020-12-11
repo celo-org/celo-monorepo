@@ -4,7 +4,7 @@ Contract handling slashing for Validator double-signing
 
 ## Hierarchy
 
-  ↳ [BaseSlasher](_wrappers_baseslasher_.baseslasher.md)‹[DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher)›
+  ↳ [BaseSlasher](_wrappers_baseslasher_.baseslasher.md)‹DoubleSigningSlasher›
 
   ↳ **DoubleSigningSlasherWrapper**
 
@@ -36,18 +36,18 @@ Contract handling slashing for Validator double-signing
 
 ###  constructor
 
-\+ **new DoubleSigningSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher)): *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
+\+ **new DoubleSigningSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: DoubleSigningSlasher): *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher) |
+`contract` | DoubleSigningSlasher |
 
 **Returns:** *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
 
@@ -62,7 +62,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
 
 ___
 
@@ -111,7 +111,7 @@ ___
 
 *Inherited from [BaseSlasher](_wrappers_baseslasher_.baseslasher.md).[slashingIncentives](_wrappers_baseslasher_.baseslasher.md#slashingincentives)*
 
-*Defined in [wrappers/BaseSlasher.ts:69](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseSlasher.ts#L69)*
+*Defined in [contractkit/src/wrappers/BaseSlasher.ts:69](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseSlasher.ts#L69)*
 
 Returns slashing incentives.
 
@@ -135,7 +135,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
 
 Contract address
 
@@ -147,7 +147,7 @@ Contract address
 
 ▸ **getBlockNumberFromHeader**(`header`: string): *Promise‹number›*
 
-*Defined in [wrappers/DoubleSigningSlasher.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DoubleSigningSlasher.ts#L15)*
+*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DoubleSigningSlasher.ts#L15)*
 
 Parses block number out of header.
 
@@ -165,11 +165,11 @@ ___
 
 ###  getPastEvents
 
-▸ **getPastEvents**(`event`: Events‹[DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher)›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+▸ **getPastEvents**(`event`: Events‹DoubleSigningSlasher›, `options`: PastEventOptions): *Promise‹EventLog[]›*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
@@ -177,7 +177,7 @@ Contract getPastEvents
 
 Name | Type |
 ------ | ------ |
-`event` | Events‹[DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher)› |
+`event` | Events‹DoubleSigningSlasher› |
 `options` | PastEventOptions |
 
 **Returns:** *Promise‹EventLog[]›*
@@ -186,9 +186,9 @@ ___
 
 ###  slashSigner
 
-▸ **slashSigner**(`signerAddress`: Address, `headerA`: string, `headerB`: string): *Promise‹any›*
+▸ **slashSigner**(`signerAddress`: Address, `headerA`: string, `headerB`: string): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [wrappers/DoubleSigningSlasher.ts:38](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DoubleSigningSlasher.ts#L38)*
+*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:38](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DoubleSigningSlasher.ts#L38)*
 
 Slash a Validator signer for double-signing.
 
@@ -200,15 +200,15 @@ Name | Type | Description |
 `headerA` | string | First double signed block header. |
 `headerB` | string | Second double signed block header.  |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹CeloTransactionObject‹void››*
 
 ___
 
 ###  slashValidator
 
-▸ **slashValidator**(`validatorAddress`: Address, `headerA`: string, `headerB`: string): *Promise‹any›*
+▸ **slashValidator**(`validatorAddress`: Address, `headerA`: string, `headerB`: string): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [wrappers/DoubleSigningSlasher.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DoubleSigningSlasher.ts#L26)*
+*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/DoubleSigningSlasher.ts#L26)*
 
 Slash a Validator for double-signing.
 
@@ -220,4 +220,4 @@ Name | Type | Description |
 `headerA` | string | First double signed block header. |
 `headerB` | string | Second double signed block header.  |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹CeloTransactionObject‹void››*
