@@ -760,6 +760,13 @@
 
   - [Wallet-Hsm](developer-resources/wallet-hsm/reference/SUMMARY.md)
     <!-- wallet-hsm-reference-start -->
+    - [Globals](../../developer-resources/wallet-hsm/reference/globals.md)
+    - [Modules]()
+      - [ber-utils](../../developer-resources/wallet-hsm/reference/modules/_ber_utils_.md)
+      - [signature-utils](../../developer-resources/wallet-hsm/reference/modules/_signature_utils_.md)
+      - [Signature](../../developer-resources/wallet-hsm/reference/classes/_signature_utils_.signature.md)
+    - [Classes]()
+      - [Signature](../../developer-resources/wallet-hsm/reference/classes/_signature_utils_.signature.md)
     <!-- wallet-hsm-reference-end -->
 
   - [Wallet-Hsm-Aws](developer-resources/wallet-hsm-aws/reference/SUMMARY.md)
