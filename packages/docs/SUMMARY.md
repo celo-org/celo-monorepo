@@ -95,7 +95,7 @@
   - [Custody](developer-resources/integrations/custody.md)
   - [Listings](developer-resources/integrations/listings.md)
   - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
-- [SDK Reference]
+- SDK Code Reference
   - [ContractKit Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](../developer-resources/contractkit/reference/globals.md)
@@ -385,6 +385,9 @@
       - [ReadOnlyWallet](../developer-resources/connect/reference/interfaces/_wallet_.readonlywallet.md)
       - [Signer](../developer-resources/connect/reference/interfaces/_wallet_.signer.md)
     <!-- connect-reference-end -->
+
+
+
 
 ## Celo Codebase
 
