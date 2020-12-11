@@ -256,6 +256,37 @@ export function appRemoteFeatureFlagChannel() {
   })
 }
 
+export async function knownAddressesChannel() {
+  if (!FIREBASE_ENABLED) {
+    return null
+  }
+
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const addresses = snapshot.val()
+      Logger.debug(`Got known addresses: ${JSON.stringify(addresses)}`)
+      emit(addresses)
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref('addressesExtraInfo')
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
+      .database()
+      .ref('addressesExtraInfo')
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+
+    return cancel
+  })
+}
+
 export async function setUserLanguage(address: string, language: string) {
   try {
     Logger.info(TAG, `Setting language selection for user ${address}`)

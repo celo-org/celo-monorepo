@@ -1,6 +1,7 @@
 import { normalizeAddressWith0x } from '@celo/base'
 import { E164Number } from '@celo/utils/src/io'
 import {
+  AddressToDisplayNameType,
   AddressToE164NumberType,
   AddressValidationType,
   E164NumberToAddressType,
@@ -37,6 +38,7 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   UPDATE_WALLET_TO_ACCOUNT_ADDRESS = 'UPDATE_WALLET_TO_ACCOUNT_ADDRESS',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
+  UPDATE_KNOWN_ADDRESSES = 'IDENTITY/UPDATE_KNOWN_ADDRESSES',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
   END_FETCHING_ADDRESSES = 'IDENTITY/END_FETCHING_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
@@ -172,6 +174,11 @@ export interface UpdateWalletToAccountAddressAction {
 export interface UpdateE164PhoneNumberSaltAction {
   type: Actions.UPDATE_E164_PHONE_NUMBER_SALT
   e164NumberToSalt: E164NumberToSaltType
+}
+
+export interface UpdateKnownAddressesAction {
+  type: Actions.UPDATE_KNOWN_ADDRESSES
+  knownAddresses: AddressToDisplayNameType
 }
 
 export interface FetchAddressesAndValidateAction {
@@ -318,6 +325,7 @@ export type ActionTypes =
   | UpdateE164PhoneNumberAddressesAction
   | UpdateWalletToAccountAddressAction
   | UpdateE164PhoneNumberSaltAction
+  | UpdateKnownAddressesAction
   | ImportContactsAction
   | UpdateImportContactProgress
   | EndImportContactsAction
@@ -500,6 +508,13 @@ export const updateE164PhoneNumberSalts = (
 ): UpdateE164PhoneNumberSaltAction => ({
   type: Actions.UPDATE_E164_PHONE_NUMBER_SALT,
   e164NumberToSalt,
+})
+
+export const updateKnownAddresses = (
+  addresses: AddressToDisplayNameType
+): UpdateKnownAddressesAction => ({
+  type: Actions.UPDATE_KNOWN_ADDRESSES,
+  knownAddresses: addresses,
 })
 
 export const importContacts = (doMatchmaking: boolean = false): ImportContactsAction => ({
