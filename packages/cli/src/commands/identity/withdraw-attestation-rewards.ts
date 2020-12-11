@@ -14,13 +14,12 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
         'Address to withdraw from. Can be the attestation signer address or the underlying account address',
     }),
     tokenAddress: Flags.address({
-      required: true,
-      description: 'The address of the token that will be withdrawn',
+      description: 'The address of the token that will be withdrawn. Defaults to cUSD',
     }),
   }
 
   async run() {
-    const {
+    let {
       flags: { from, tokenAddress },
     } = this.parse(AttestationRewardsWithdraw)
     const [accounts, attestations] = await Promise.all([
@@ -28,15 +27,19 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
       this.kit.contracts.getAttestations(),
     ])
 
-    const address = await accounts.signerToAccount(from)
-    const pendingWithdrawals = await attestations.getPendingWithdrawals(tokenAddress, address)
+    if (!tokenAddress) {
+      tokenAddress = (await this.kit.contracts.getStableToken()).address
+    }
+
+    from = await accounts.signerToAccount(from)
+    const pendingWithdrawals = await attestations.getPendingWithdrawals(tokenAddress, from)
     if (!pendingWithdrawals.gt(0)) {
       console.info('No pending rewards for this token address')
       return
     }
 
-    cli.action.start(`Withdrawing ${pendingWithdrawals.toString()} rewards to ${address}`)
-    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from: address })
+    cli.action.start(`Withdrawing ${pendingWithdrawals.toString()} rewards to ${from}`)
+    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from })
     cli.action.stop()
   }
 }
