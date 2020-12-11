@@ -847,6 +847,20 @@
 
   - [Wallet-Rpc](developer-resources/wallet-rpc/reference/SUMMARY.md)
     <!-- wallet-rpc-reference-start -->
+    - [Globals](../../developer-resources/wallet-rpc/reference/globals.md)
+    - [Modules]()
+      - [rpc-signer](../../developer-resources/wallet-rpc/reference/modules/_rpc_signer_.md)
+      - [RpcSigner](../../developer-resources/wallet-rpc/reference/classes/_rpc_signer_.rpcsigner.md)
+      - [rpc-wallet](../../developer-resources/wallet-rpc/reference/modules/_rpc_wallet_.md)
+      - [RpcWalletErrors](../../developer-resources/wallet-rpc/reference/enums/_rpc_wallet_.rpcwalleterrors.md)
+      - [RpcWallet](../../developer-resources/wallet-rpc/reference/classes/_rpc_wallet_.rpcwallet.md)
+      - [test-utils/ganache.setup](../../developer-resources/wallet-rpc/reference/modules/_test_utils_ganache_setup_.md)
+      - [test-utils/ganache.teardown](../../developer-resources/wallet-rpc/reference/modules/_test_utils_ganache_teardown_.md)
+    - [Classes]()
+      - [RpcSigner](../../developer-resources/wallet-rpc/reference/classes/_rpc_signer_.rpcsigner.md)
+      - [RpcWallet](../../developer-resources/wallet-rpc/reference/classes/_rpc_wallet_.rpcwallet.md)
+    - [Enums]()
+      - [RpcWalletErrors](../../developer-resources/wallet-rpc/reference/enums/_rpc_wallet_.rpcwalleterrors.md)
     <!-- wallet-rpc-reference-end -->
 
 
