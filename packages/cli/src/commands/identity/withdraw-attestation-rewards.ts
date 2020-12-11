@@ -28,21 +28,15 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
       this.kit.contracts.getAttestations(),
     ])
 
-    let accountAddress = from
-    if (!(await accounts.isAccount(from))) {
-      accountAddress = await accounts.signerToAccount(from)
-    }
-    const pendingWithdrawals = await attestations.getPendingWithdrawals(
-      tokenAddress,
-      accountAddress
-    )
+    const address = await accounts.signerToAccount(from)
+    const pendingWithdrawals = await attestations.getPendingWithdrawals(tokenAddress, address)
     if (!pendingWithdrawals.gt(0)) {
       console.info('No pending rewards for this token address')
       return
     }
 
-    cli.action.start(`Withdrawing ${pendingWithdrawals.toString()} rewards to ${accountAddress}`)
-    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from: accountAddress })
+    cli.action.start(`Withdrawing ${pendingWithdrawals.toString()} rewards to ${address}`)
+    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from: address })
     cli.action.stop()
   }
 }
