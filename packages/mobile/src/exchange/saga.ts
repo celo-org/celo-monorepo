@@ -376,7 +376,7 @@ function* celoToDollarAmount(amount: BigNumber) {
   return goldToDollarAmount(amount, exchangeRate) || new BigNumber(0)
 }
 
-function* withdrawCelo(action: WithdrawCeloAction) {
+export function* withdrawCelo(action: WithdrawCeloAction) {
   let context: TransactionContext | null = null
   try {
     const { recipientAddress, amount, isCashOut } = action

@@ -179,7 +179,7 @@ function* sendPayment(
   }
 }
 
-function* sendPaymentOrInviteSaga({
+export function* sendPaymentOrInviteSaga({
   amount,
   comment,
   recipient,

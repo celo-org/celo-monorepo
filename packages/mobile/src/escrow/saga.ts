@@ -67,7 +67,7 @@ import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
 
-function* transferToEscrow(action: EscrowTransferPaymentAction) {
+export function* transferToEscrow(action: EscrowTransferPaymentAction) {
   features.ESCROW_WITHOUT_CODE
     ? yield call(transferStableTokenToEscrowWithoutCode, action)
     : yield call(transferStableTokenToEscrow, action)
@@ -383,7 +383,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
   }
 }
 
-function* withdrawFromEscrow() {
+export function* withdrawFromEscrow() {
   try {
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
@@ -466,7 +466,7 @@ export async function getReclaimEscrowFee(account: string, paymentID: string) {
   return calculateFee(gas)
 }
 
-function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
+export function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   Logger.debug(TAG + '@reclaimFromEscrow', 'Reclaiming escrowed payment')
 
   try {

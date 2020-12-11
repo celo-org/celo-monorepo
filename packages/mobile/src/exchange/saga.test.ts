@@ -5,9 +5,15 @@ import { call, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { Actions, ExchangeTokensAction, setTobinTax } from 'src/exchange/actions'
+import {
+  Actions,
+  ExchangeTokensAction,
+  setTobinTax,
+  WithdrawCeloAction,
+  withdrawCeloCanceled,
+} from 'src/exchange/actions'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
-import { doFetchTobinTax, exchangeGoldAndStableTokens } from 'src/exchange/saga'
+import { doFetchTobinTax, exchangeGoldAndStableTokens, withdrawCelo } from 'src/exchange/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
@@ -106,6 +112,25 @@ describe(exchangeGoldAndStableTokens, () => {
         [matchers.call.fn(unlockAccount), UnlockResult.CANCELED],
       ])
       .put(showError(ErrorMessages.PIN_INPUT_CANCELED))
+      .run()
+  })
+})
+
+describe(withdrawCelo, () => {
+  it('fails if user cancels PIN input', async () => {
+    const mockAddress = '0x1234'
+    const withdrawCeloAction: WithdrawCeloAction = {
+      type: Actions.WITHDRAW_CELO,
+      amount: new BigNumber(10),
+      recipientAddress: mockAddress,
+      isCashOut: false,
+    }
+    await expectSaga(withdrawCelo, withdrawCeloAction)
+      .provide([
+        [call(getConnectedAccount), account],
+        [matchers.call.fn(unlockAccount), UnlockResult.CANCELED],
+      ])
+      .put(withdrawCeloCanceled())
       .run()
   })
 })
