@@ -7,7 +7,7 @@ if (!pkgName) {
   process.exit(1)
 }
 console.log('pkgName: ', pkgName)
-const indent = '  '
+const indent = '    '
 
 const config: Partial<TypeDocOptionMap> = JSON.parse(readFileSync('./typedoc.json').toString())
 const localSummaryPath = `${config.out!}/SUMMARY.md`
