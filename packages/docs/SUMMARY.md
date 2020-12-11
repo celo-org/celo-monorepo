@@ -771,6 +771,15 @@
 
   - [Wallet-Hsm-Aws](developer-resources/wallet-hsm-aws/reference/SUMMARY.md)
     <!-- wallet-hsm-aws-reference-start -->
+    - [Globals](../../developer-resources/wallet-hsm-aws/reference/globals.md)
+    - [Modules]()
+      - [aws-hsm-signer](../../developer-resources/wallet-hsm-aws/reference/modules/_aws_hsm_signer_.md)
+      - [AwsHsmSigner](../../developer-resources/wallet-hsm-aws/reference/classes/_aws_hsm_signer_.awshsmsigner.md)
+      - [aws-hsm-wallet](../../developer-resources/wallet-hsm-aws/reference/modules/_aws_hsm_wallet_.md)
+      - [AwsHsmWallet](../../developer-resources/wallet-hsm-aws/reference/classes/_aws_hsm_wallet_.awshsmwallet.md)
+    - [Classes]()
+      - [AwsHsmSigner](../../developer-resources/wallet-hsm-aws/reference/classes/_aws_hsm_signer_.awshsmsigner.md)
+      - [AwsHsmWallet](../../developer-resources/wallet-hsm-aws/reference/classes/_aws_hsm_wallet_.awshsmwallet.md)
     <!-- wallet-hsm-aws-reference-end -->
 
   - [Wallet-Hsm-Azure](developer-resources/wallet-hsm-azure/reference/SUMMARY.md)
