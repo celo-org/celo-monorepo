@@ -2,6 +2,7 @@ import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@cel
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
+import { ContractEventLog } from '@celo/contractkit/lib/generated/types'
 import {
   MetaTransactionWalletWrapper,
   toRawTransaction,
@@ -498,17 +499,26 @@ export class KomenciKit {
 
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 
-    const events = await deployer.getPastEvents(deployer.events.WalletDeployed, {
+    const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
       fromBlock: receipt.blockNumber,
       toBlock: receipt.blockNumber,
     })
 
     const deployWalletLog = events.find(
-      (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
+      (
+        event: ContractEventLog<{
+          owner: string
+          wallet: string
+          implementation: string
+          0: string
+          1: string
+          2: string
+        }>
+      ) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
     )
 
     if (deployWalletLog === undefined) {
-      return Err(new TxEventNotFound(txHash, deployer.events.WalletDeployed))
+      return Err(new TxEventNotFound(txHash, deployer.eventTypes.WalletDeployed))
     }
 
     return Ok(deployWalletLog.returnValues.wallet)
