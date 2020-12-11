@@ -2282,10 +2282,10 @@
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
 
-"@celo/typechain-target-web3-v1-celo@0.1.0-beta2":
-  version "0.1.0-beta2"
-  resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.1.0-beta2.tgz#08673e58dee4816828c4c04956f1ae7979ae0fc7"
-  integrity sha512-tJqO1hqOJ17JBE5ZsbsaQw4dE7bYsH97Ko6SOCOmvZBtwwSG1ubEOqBzwN260UG3lMKlSMpA+w7N2dhLKvJJTQ==
+"@celo/typechain-target-web3-v1-celo@0.1.0-beta3":
+  version "0.1.0-beta3"
+  resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.1.0-beta3.tgz#3c55113f6dd41b03270be3ababd8b73deb081cf0"
+  integrity sha512-9eIKc7D+wMS3hmocTWk6RZsy7rH69XmI7T8zp2K9F8fRHF1eVyQp9t1+nOcFX6ZClbe1zFaHHZ//0AiB8UcHLw==
   dependencies:
     elliptic "~6.5.3"
     lodash "~4.17.19"
