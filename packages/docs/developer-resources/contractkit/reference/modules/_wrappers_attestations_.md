@@ -35,7 +35,7 @@
 
 Ƭ **IdentifierLookupResult**: *Record‹string, Record‹Address, [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [wrappers/Attestations.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L78)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L78)*
 
 ## Functions
 
@@ -43,7 +43,7 @@
 
 ▸ **getSecurityCodePrefix**(`issuerAddress`: Address): *string*
 
-*Defined in [wrappers/Attestations.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L28)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L28)*
 
 **Parameters:**
 

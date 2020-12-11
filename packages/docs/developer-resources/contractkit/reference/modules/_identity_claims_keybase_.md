@@ -19,7 +19,7 @@
 
 • **keybaseFilePathToProof**: *".well-known/celo/"* = `.well-known/celo/`
 
-*Defined in [identity/claims/keybase.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L9)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L9)*
 
 ## Functions
 
@@ -27,7 +27,7 @@
 
 ▸ **createKeybaseClaim**(`username`: string): *[KeybaseClaim](_identity_claims_claim_.md#keybaseclaim)*
 
-*Defined in [identity/claims/keybase.ts:62](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L62)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:62](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L62)*
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ ___
 
 ▸ **proofFileName**(`address`: Address): *string*
 
-*Defined in [identity/claims/keybase.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L10)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L10)*
 
 **Parameters:**
 
@@ -59,7 +59,7 @@ ___
 
 ▸ **targetURL**(`username`: string, `address`: Address): *string*
 
-*Defined in [identity/claims/keybase.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L11)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L11)*
 
 **Parameters:**
 
@@ -76,7 +76,7 @@ ___
 
 ▸ **verifyKeybaseClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [KeybaseClaim](_identity_claims_claim_.md#keybaseclaim), `signer`: Address): *Promise‹string | undefined›*
 
-*Defined in [identity/claims/keybase.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L16)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L16)*
 
 **Parameters:**
 

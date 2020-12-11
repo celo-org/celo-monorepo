@@ -2,7 +2,7 @@
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Freezer](../enums/_base_.celocontract.md#freezer)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Freezer›
 
   ↳ **FreezerWrapper**
 
@@ -33,18 +33,18 @@
 
 ###  constructor
 
-\+ **new FreezerWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Freezer](../enums/_base_.celocontract.md#freezer)): *[FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)*
+\+ **new FreezerWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Freezer): *[FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [Freezer](../enums/_base_.celocontract.md#freezer) |
+`contract` | Freezer |
 
 **Returns:** *[FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)*
 
@@ -59,7 +59,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 • **freeze**: *function* = proxySend(this.kit, this.contract.methods.freeze)
 
-*Defined in [wrappers/Freezer.ts:5](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Freezer.ts#L5)*
+*Defined in [contractkit/src/wrappers/Freezer.ts:5](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Freezer.ts#L5)*
 
 #### Type declaration:
 
@@ -95,7 +95,7 @@ ___
 
 • **isFrozen**: *function* = proxyCall(this.contract.methods.isFrozen)
 
-*Defined in [wrappers/Freezer.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Freezer.ts#L7)*
+*Defined in [contractkit/src/wrappers/Freezer.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Freezer.ts#L7)*
 
 #### Type declaration:
 
@@ -127,7 +127,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 • **unfreeze**: *function* = proxySend(this.kit, this.contract.methods.unfreeze)
 
-*Defined in [wrappers/Freezer.ts:6](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Freezer.ts#L6)*
+*Defined in [contractkit/src/wrappers/Freezer.ts:6](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Freezer.ts#L6)*
 
 #### Type declaration:
 
@@ -155,7 +155,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
 
 Contract address
 
@@ -165,11 +165,11 @@ Contract address
 
 ###  getPastEvents
 
-▸ **getPastEvents**(`event`: Events‹[Freezer](../enums/_base_.celocontract.md#freezer)›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+▸ **getPastEvents**(`event`: Events‹Freezer›, `options`: PastEventOptions): *Promise‹EventLog[]›*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
@@ -177,7 +177,7 @@ Contract getPastEvents
 
 Name | Type |
 ------ | ------ |
-`event` | Events‹[Freezer](../enums/_base_.celocontract.md#freezer)› |
+`event` | Events‹Freezer› |
 `options` | PastEventOptions |
 
 **Returns:** *Promise‹EventLog[]›*

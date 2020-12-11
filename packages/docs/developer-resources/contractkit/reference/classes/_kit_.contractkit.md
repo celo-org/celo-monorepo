@@ -53,7 +53,7 @@
 
 \+ **new ContractKit**(`connection`: Connection): *[ContractKit](_kit_.contractkit.md)*
 
-*Defined in [kit.ts:86](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L86)*
+*Defined in [contractkit/src/kit.ts:86](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L86)*
 
 **Parameters:**
 
@@ -69,7 +69,7 @@ Name | Type |
 
 • **_web3Contracts**: *[Web3ContractCache](_web3_contract_cache_.web3contractcache.md)*
 
-*Defined in [kit.ts:81](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L81)*
+*Defined in [contractkit/src/kit.ts:81](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L81)*
 
 factory for core contract's native web3 wrappers
 
@@ -79,7 +79,7 @@ ___
 
 • **connection**: *Connection*
 
-*Defined in [kit.ts:88](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L88)*
+*Defined in [contractkit/src/kit.ts:88](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L88)*
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • **contracts**: *[WrapperCache](_contract_cache_.wrappercache.md)*
 
-*Defined in [kit.ts:83](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L83)*
+*Defined in [contractkit/src/kit.ts:83](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L83)*
 
 factory for core contract's kit wrappers
 
@@ -97,7 +97,7 @@ ___
 
 • **gasPriceSuggestionMultiplier**: *number* = 5
 
-*Defined in [kit.ts:86](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L86)*
+*Defined in [contractkit/src/kit.ts:86](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L86)*
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 • **registry**: *[AddressRegistry](_address_registry_.addressregistry.md)*
 
-*Defined in [kit.ts:79](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L79)*
+*Defined in [contractkit/src/kit.ts:79](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L79)*
 
 core contract's address registry
 
@@ -115,13 +115,13 @@ core contract's address registry
 
 • **get defaultAccount**(): *Address | undefined*
 
-*Defined in [kit.ts:290](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L290)*
+*Defined in [contractkit/src/kit.ts:290](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L290)*
 
 **Returns:** *Address | undefined*
 
 • **set defaultAccount**(`address`: Address | undefined): *void*
 
-*Defined in [kit.ts:286](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L286)*
+*Defined in [contractkit/src/kit.ts:286](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L286)*
 
 **Parameters:**
 
@@ -135,15 +135,15 @@ ___
 
 ###  defaultFeeCurrency
 
-• **get defaultFeeCurrency**(): *any*
+• **get defaultFeeCurrency**(): *undefined | string*
 
-*Defined in [kit.ts:314](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L314)*
+*Defined in [contractkit/src/kit.ts:314](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L314)*
 
-**Returns:** *any*
+**Returns:** *undefined | string*
 
 • **set defaultFeeCurrency**(`address`: Address | undefined): *void*
 
-*Defined in [kit.ts:310](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L310)*
+*Defined in [contractkit/src/kit.ts:310](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L310)*
 
 **Parameters:**
 
@@ -159,13 +159,13 @@ ___
 
 • **get gasInflationFactor**(): *number*
 
-*Defined in [kit.ts:298](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L298)*
+*Defined in [contractkit/src/kit.ts:298](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L298)*
 
 **Returns:** *number*
 
 • **set gasInflationFactor**(`factor`: number): *void*
 
-*Defined in [kit.ts:294](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L294)*
+*Defined in [contractkit/src/kit.ts:294](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L294)*
 
 **Parameters:**
 
@@ -181,13 +181,13 @@ ___
 
 • **get gasPrice**(): *number*
 
-*Defined in [kit.ts:306](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L306)*
+*Defined in [contractkit/src/kit.ts:306](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L306)*
 
 **Returns:** *number*
 
 • **set gasPrice**(`price`: number): *void*
 
-*Defined in [kit.ts:302](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L302)*
+*Defined in [contractkit/src/kit.ts:302](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L302)*
 
 **Parameters:**
 
@@ -201,11 +201,11 @@ ___
 
 ###  web3
 
-• **get web3**(): *any*
+• **get web3**(): *Web3‹›*
 
-*Defined in [kit.ts:352](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L352)*
+*Defined in [contractkit/src/kit.ts:352](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L352)*
 
-**Returns:** *any*
+**Returns:** *Web3‹›*
 
 ## Methods
 
@@ -213,7 +213,7 @@ ___
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [kit.ts:282](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L282)*
+*Defined in [contractkit/src/kit.ts:282](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L282)*
 
 **Parameters:**
 
@@ -229,7 +229,7 @@ ___
 
 ▸ **fillGasPrice**(`tx`: CeloTx): *Promise‹CeloTx›*
 
-*Defined in [kit.ts:326](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L326)*
+*Defined in [contractkit/src/kit.ts:326](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L326)*
 
 **Parameters:**
 
@@ -245,7 +245,7 @@ ___
 
 ▸ **getEpochNumberOfBlock**(`blockNumber`: number): *Promise‹number›*
 
-*Defined in [kit.ts:267](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L267)*
+*Defined in [contractkit/src/kit.ts:267](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L267)*
 
 **Parameters:**
 
@@ -261,7 +261,7 @@ ___
 
 ▸ **getEpochSize**(): *Promise‹number›*
 
-*Defined in [kit.ts:240](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L240)*
+*Defined in [contractkit/src/kit.ts:240](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L240)*
 
 **Returns:** *Promise‹number›*
 
@@ -271,7 +271,7 @@ ___
 
 ▸ **getFirstBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [kit.ts:247](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L247)*
+*Defined in [contractkit/src/kit.ts:247](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L247)*
 
 **Parameters:**
 
@@ -287,7 +287,7 @@ ___
 
 ▸ **getHumanReadableNetworkConfig**(): *Promise‹object›*
 
-*Defined in [kit.ts:171](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L171)*
+*Defined in [contractkit/src/kit.ts:171](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L171)*
 
 **Returns:** *Promise‹object›*
 
@@ -297,7 +297,7 @@ ___
 
 ▸ **getLastBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [kit.ts:257](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L257)*
+*Defined in [contractkit/src/kit.ts:257](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L257)*
 
 **Parameters:**
 
@@ -313,7 +313,7 @@ ___
 
 ▸ **getNetworkConfig**(): *Promise‹[NetworkConfig](../interfaces/_kit_.networkconfig.md)›*
 
-*Defined in [kit.ts:120](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L120)*
+*Defined in [contractkit/src/kit.ts:120](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L120)*
 
 **Returns:** *Promise‹[NetworkConfig](../interfaces/_kit_.networkconfig.md)›*
 
@@ -323,7 +323,7 @@ ___
 
 ▸ **getTotalBalance**(`address`: string): *Promise‹AccountBalance›*
 
-*Defined in [kit.ts:98](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L98)*
+*Defined in [contractkit/src/kit.ts:98](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L98)*
 
 **Parameters:**
 
@@ -337,11 +337,11 @@ ___
 
 ###  getWallet
 
-▸ **getWallet**(): *any*
+▸ **getWallet**(): *undefined | ReadOnlyWallet*
 
-*Defined in [kit.ts:94](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L94)*
+*Defined in [contractkit/src/kit.ts:94](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L94)*
 
-**Returns:** *any*
+**Returns:** *undefined | ReadOnlyWallet*
 
 ___
 
@@ -349,7 +349,7 @@ ___
 
 ▸ **isListening**(): *Promise‹boolean›*
 
-*Defined in [kit.ts:318](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L318)*
+*Defined in [contractkit/src/kit.ts:318](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L318)*
 
 **Returns:** *Promise‹boolean›*
 
@@ -359,7 +359,7 @@ ___
 
 ▸ **isSyncing**(): *Promise‹boolean›*
 
-*Defined in [kit.ts:322](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L322)*
+*Defined in [contractkit/src/kit.ts:322](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L322)*
 
 **Returns:** *Promise‹boolean›*
 
@@ -369,7 +369,7 @@ ___
 
 ▸ **sendTransaction**(`tx`: CeloTx): *Promise‹TransactionResult›*
 
-*Defined in [kit.ts:333](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L333)*
+*Defined in [contractkit/src/kit.ts:333](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L333)*
 
 **Parameters:**
 
@@ -385,7 +385,7 @@ ___
 
 ▸ **sendTransactionObject**(`txObj`: CeloTxObject‹any›, `tx?`: Omit‹CeloTx, "data"›): *Promise‹TransactionResult›*
 
-*Defined in [kit.ts:337](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L337)*
+*Defined in [contractkit/src/kit.ts:337](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L337)*
 
 **Parameters:**
 
@@ -402,7 +402,7 @@ ___
 
 ▸ **setFeeCurrency**(`token`: [CeloToken](../modules/_base_.md#celotoken)): *Promise‹void›*
 
-*Defined in [kit.ts:223](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L223)*
+*Defined in [contractkit/src/kit.ts:223](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L223)*
 
 Set CeloToken to use to pay for gas fees
 
@@ -420,7 +420,7 @@ ___
 
 ▸ **signTypedData**(`signer`: string, `typedData`: EIP712TypedData): *Promise‹Signature›*
 
-*Defined in [kit.ts:344](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L344)*
+*Defined in [contractkit/src/kit.ts:344](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L344)*
 
 **Parameters:**
 
@@ -437,7 +437,7 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [kit.ts:348](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L348)*
+*Defined in [contractkit/src/kit.ts:348](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L348)*
 
 **Returns:** *void*
 
@@ -447,7 +447,7 @@ ___
 
 ▸ **updateGasPriceInConnectionLayer**(`currency`: Address): *Promise‹void›*
 
-*Defined in [kit.ts:233](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L233)*
+*Defined in [contractkit/src/kit.ts:233](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L233)*
 
 **Parameters:**
 

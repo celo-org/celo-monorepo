@@ -18,7 +18,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [wrappers/Election.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L48)*
+*Defined in [contractkit/src/wrappers/Election.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L48)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **group**: *[ValidatorGroup](_wrappers_validators_.validatorgroup.md)*
 
-*Defined in [wrappers/Election.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L46)*
+*Defined in [contractkit/src/wrappers/Election.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L46)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **groupVoterPayment**: *BigNumber*
 
-*Defined in [wrappers/Election.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L47)*
+*Defined in [contractkit/src/wrappers/Election.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L47)*

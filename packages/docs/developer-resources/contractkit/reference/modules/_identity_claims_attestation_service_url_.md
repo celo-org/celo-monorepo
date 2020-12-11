@@ -21,7 +21,7 @@
 
 Ƭ **AttestationServiceURLClaim**: *t.TypeOf‹typeof AttestationServiceURLClaimType›*
 
-*Defined in [identity/claims/attestation-service-url.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L20)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L20)*
 
 ## Variables
 
@@ -33,7 +33,7 @@
   url: UrlType,
 })
 
-*Defined in [identity/claims/attestation-service-url.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L14)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L14)*
 
 ## Functions
 
@@ -41,7 +41,7 @@
 
 ▸ **createAttestationServiceURLClaim**(`url`: string): *[AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim)*
 
-*Defined in [identity/claims/attestation-service-url.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L22)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L22)*
 
 **Parameters:**
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **validateAttestationServiceUrl**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim), `address`: Address): *Promise‹string | undefined›*
 
-*Defined in [identity/claims/attestation-service-url.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L28)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L28)*
 
 **Parameters:**
 

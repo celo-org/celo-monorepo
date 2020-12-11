@@ -22,7 +22,7 @@
 
 Ƭ **CeloToken**: *[GoldToken](../enums/_base_.celocontract.md#goldtoken) | [StableToken](../enums/_base_.celocontract.md#stabletoken)*
 
-*Defined in [base.ts:31](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L31)*
+*Defined in [contractkit/src/base.ts:31](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L31)*
 
 ## Variables
 
@@ -30,7 +30,7 @@
 
 • **AllContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = Object.keys(CeloContract) as CeloContract[]
 
-*Defined in [base.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L33)*
+*Defined in [contractkit/src/base.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L33)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **ProxyContracts**: *string[]* = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
-*Defined in [base.ts:29](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L29)*
+*Defined in [contractkit/src/base.ts:29](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L29)*
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 • **RegisteredContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
-*Defined in [base.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L39)*
+*Defined in [contractkit/src/base.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L39)*

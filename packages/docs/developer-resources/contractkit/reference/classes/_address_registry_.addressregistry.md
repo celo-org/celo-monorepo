@@ -23,7 +23,7 @@ Celo Core Contract's Address Registry
 
 \+ **new AddressRegistry**(`kit`: [ContractKit](_kit_.contractkit.md)): *[AddressRegistry](_address_registry_.addressregistry.md)*
 
-*Defined in [address-registry.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L18)*
+*Defined in [contractkit/src/address-registry.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L18)*
 
 **Parameters:**
 
@@ -39,7 +39,7 @@ Name | Type |
 
 ▸ **addressFor**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *Promise‹Address›*
 
-*Defined in [address-registry.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L28)*
+*Defined in [contractkit/src/address-registry.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L28)*
 
 Get the address for a `CeloContract`
 
@@ -55,10 +55,10 @@ ___
 
 ###  addressMapping
 
-▸ **addressMapping**(): *Promise‹Map‹unknown, unknown››*
+▸ **addressMapping**(): *Promise‹Map‹[CeloContract](../enums/_base_.celocontract.md), string››*
 
-*Defined in [address-registry.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L47)*
+*Defined in [contractkit/src/address-registry.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L47)*
 
 Get the address mapping for known registered contracts
 
-**Returns:** *Promise‹Map‹unknown, unknown››*
+**Returns:** *Promise‹Map‹[CeloContract](../enums/_base_.celocontract.md), string››*

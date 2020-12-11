@@ -18,7 +18,7 @@
 
 • **proposalID**: *BigNumber*
 
-*Defined in [wrappers/Governance.ts:124](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L124)*
+*Defined in [contractkit/src/wrappers/Governance.ts:124](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L124)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **value**: *[VoteValue](../enums/_wrappers_governance_.votevalue.md)*
 
-*Defined in [wrappers/Governance.ts:126](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L126)*
+*Defined in [contractkit/src/wrappers/Governance.ts:126](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L126)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **votes**: *BigNumber*
 
-*Defined in [wrappers/Governance.ts:125](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L125)*
+*Defined in [contractkit/src/wrappers/Governance.ts:125](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L125)*

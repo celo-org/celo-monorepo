@@ -20,7 +20,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [wrappers/Validators.ts:49](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L49)*
+*Defined in [contractkit/src/wrappers/Validators.ts:49](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L49)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **group**: *[ValidatorGroup](_wrappers_validators_.validatorgroup.md)*
 
-*Defined in [wrappers/Validators.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L47)*
+*Defined in [contractkit/src/wrappers/Validators.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L47)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **groupPayment**: *BigNumber*
 
-*Defined in [wrappers/Validators.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L48)*
+*Defined in [contractkit/src/wrappers/Validators.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L48)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **validator**: *[Validator](_wrappers_validators_.validator.md)*
 
-*Defined in [wrappers/Validators.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L45)*
+*Defined in [contractkit/src/wrappers/Validators.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L45)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **validatorPayment**: *BigNumber*
 
-*Defined in [wrappers/Validators.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L46)*
+*Defined in [contractkit/src/wrappers/Validators.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L46)*
