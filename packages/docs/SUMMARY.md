@@ -635,6 +635,11 @@
 
   - [Transactions-Uri](developer-resources/transactions-uri/reference/SUMMARY.md)
     <!-- transactions-uri-reference-start -->
+    - [Globals](../developer-resources/transactions-uri/reference/globals.md)
+    - [Modules]()
+      - [test-utils/setup.global](../developer-resources/transactions-uri/reference/modules/_test_utils_setup_global_.md)
+      - [test-utils/teardown.global](../developer-resources/transactions-uri/reference/modules/_test_utils_teardown_global_.md)
+      - [tx-uri](../developer-resources/transactions-uri/reference/modules/_tx_uri_.md)
     <!-- transactions-uri-reference-end -->
 
 
