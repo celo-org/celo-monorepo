@@ -40,10 +40,12 @@ describe(getPasswordSaga, () => {
 })
 
 describe(getPincode, () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
   const mockedNavigate = navigate as jest.Mock
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedNavigate.mockReset()
+  })
 
   it('returns PIN from cache', async () => {
     setCachedPin(DEFAULT_CACHE_ACCOUNT, mockPin)
@@ -67,9 +69,9 @@ describe(getPincode, () => {
     mockedNavigate.mockImplementationOnce((_, params) => {
       params.onCancel()
     })
+    expect.assertions(4)
     try {
       await getPincode()
-      fail('getPincode should hace thrown an error.')
     } catch (error) {
       expect(error).toEqual(CANCELLED_PIN_INPUT)
     }
