@@ -642,7 +642,6 @@
       - [tx-uri](../developer-resources/transactions-uri/reference/modules/_tx_uri_.md)
     <!-- transactions-uri-reference-end -->
 
-
   - [Utils](developer-resources/utils/reference/SUMMARY.md)
     <!-- utils-reference-start -->
     - [Globals](../developer-resources/utils/reference/globals.md)
@@ -745,6 +744,18 @@
 
   - [Wallet-Base](developer-resources/wallet-base/reference/SUMMARY.md)
     <!-- wallet-base-reference-start -->
+    - [Globals](../../developer-resources/wallet-base/reference/globals.md)
+    - [Modules]()
+      - [signing-utils](../../developer-resources/wallet-base/reference/modules/_signing_utils_.md)
+      - [wallet-base](../../developer-resources/wallet-base/reference/modules/_wallet_base_.md)
+      - [WalletBase](../../developer-resources/wallet-base/reference/classes/_wallet_base_.walletbase.md)
+      - [UnlockableWallet](../../developer-resources/wallet-base/reference/interfaces/_wallet_base_.unlockablewallet.md)
+      - [Wallet](../../developer-resources/wallet-base/reference/interfaces/_wallet_base_.wallet.md)
+    - [Classes]()
+      - [WalletBase](../../developer-resources/wallet-base/reference/classes/_wallet_base_.walletbase.md)
+    - [Interfaces]()
+      - [UnlockableWallet](../../developer-resources/wallet-base/reference/interfaces/_wallet_base_.unlockablewallet.md)
+      - [Wallet](../../developer-resources/wallet-base/reference/interfaces/_wallet_base_.wallet.md)
     <!-- wallet-base-reference-end -->
 
   - [Wallet-Hsm](developer-resources/wallet-hsm/reference/SUMMARY.md)
