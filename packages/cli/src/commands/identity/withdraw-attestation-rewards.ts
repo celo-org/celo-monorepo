@@ -20,30 +20,29 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
   }
 
   async run() {
-    const res = this.parse(AttestationRewardsWithdraw)
+    const {
+      flags: { from, tokenAddress },
+    } = this.parse(AttestationRewardsWithdraw)
     const [accounts, attestations] = await Promise.all([
       this.kit.contracts.getAccounts(),
       this.kit.contracts.getAttestations(),
     ])
 
-    let address = res.flags.from
-    if (await accounts.isAccount(address)) {
-      address = await accounts.getAttestationSigner(res.flags.from)
+    let accountAddress = from
+    if (!(await accounts.isAccount(from))) {
+      accountAddress = await accounts.signerToAccount(from)
     }
-
     const pendingWithdrawals = await attestations.getPendingWithdrawals(
-      address,
-      res.flags.tokenAddress
+      tokenAddress,
+      accountAddress
     )
     if (!pendingWithdrawals.gt(0)) {
       console.info('No pending rewards for this token address')
       return
     }
 
-    cli.action.start(
-      `Withdrawing ${pendingWithdrawals.toString()} rewards for ${res.flags.tokenAddress}`
-    )
-    await displaySendTx('withdraw', attestations.withdraw(res.flags.tokenAddress))
+    cli.action.start(`Withdrawing ${pendingWithdrawals.toString()} rewards to ${accountAddress}`)
+    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from: accountAddress })
     cli.action.stop()
   }
 }
