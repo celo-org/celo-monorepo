@@ -25,7 +25,8 @@ export async function getNumberPairContacts(
       .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
       .filter((number) => contactPhonesSet.has(number))
   } catch (err) {
-    logger.error({ error: err }, ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
     return []
   }
 }
@@ -48,7 +49,8 @@ export async function setNumberPairContacts(
   } catch (err) {
     // ignore duplicate insertion error (23505)
     if (err.code !== '23505') {
-      logger.error({ error: err }, ErrorMessage.DATABASE_INSERT_FAILURE)
+      logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
+      logger.error(err)
     }
   }
 }

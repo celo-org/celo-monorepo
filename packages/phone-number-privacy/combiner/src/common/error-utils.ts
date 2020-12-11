@@ -8,13 +8,13 @@ export type ErrorType = ErrorMessage | WarningMessage
 export function respondWithError(
   res: Response,
   statusCode: number,
-  err: ErrorType,
+  error: ErrorType,
   logger: Logger
 ) {
-  if (err in WarningMessage) {
-    logger.warn({ error: err, statusCode }, 'Responding with warning')
+  if (error in WarningMessage) {
+    logger.warn({ error, statusCode }, 'Responding with warning')
   } else {
-    logger.error({ error: err, statusCode }, 'Responding with error')
+    logger.error({ error, statusCode }, 'Responding with error')
   }
-  res.status(statusCode).json({ success: false, err, version: VERSION })
+  res.status(statusCode).json({ success: false, error, version: VERSION })
 }

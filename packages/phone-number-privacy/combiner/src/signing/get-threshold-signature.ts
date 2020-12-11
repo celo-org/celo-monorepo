@@ -62,7 +62,8 @@ export async function handleGetBlindedMessageSig(
     logger.debug('Requesting signatures')
     await requestSignatures(request, response)
   } catch (err) {
-    logger.error({ error: err })
+    logger.error('Unknown error in handleGetBlindedMessageSig')
+    logger.error(err)
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }
@@ -83,6 +84,7 @@ async function requestSignatures(request: Request, response: Response) {
     }, config.odisServices.timeoutMilliSeconds)
 
     const obs = new PerformanceObserver((list, observer) => {
+      logger.info({ list: list.getEntries() }, ' test ')
       logger.info(
         { latency: list.getEntries().pop()!.duration, signer: service, list },
         'Signer response latency measured'
@@ -120,10 +122,11 @@ async function requestSignatures(request: Request, response: Response) {
       })
       .catch((err) => {
         if (err.name === 'AbortError') {
-          logger.error({ error: err, signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+          logger.error({ signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
         } else {
-          logger.error({ error: err, signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
+          logger.error({ signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
         }
+        logger.error(err)
       })
       .finally(() => {
         performance.mark(endMark)

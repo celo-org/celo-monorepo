@@ -40,7 +40,8 @@ async function meterResponse(
       logger.info({ res }, 'Response sent')
     })
     .catch((err) => {
-      logger.error({ error: err }, ErrorMessage.UNKNOWN_ERROR)
+      logger.error(ErrorMessage.UNKNOWN_ERROR)
+      logger.error(err)
     })
     .finally(() => {
       performance.mark(endMark)
