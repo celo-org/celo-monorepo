@@ -95,7 +95,8 @@
   - [Custody](developer-resources/integrations/custody.md)
   - [Listings](developer-resources/integrations/listings.md)
   - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
-- [Reference](developer-resources/contractkit/reference/SUMMARY.md)
+- [ContractKit Reference](developer-resources/contractkit/reference/SUMMARY.md)
+- [Connect Reference](developer-resources/connect/reference/SUMMARY.md)
   <!-- contractkit-reference-start -->
   - [Globals](../developer-resources/contractkit/reference/globals.md)
   - [Modules]()
