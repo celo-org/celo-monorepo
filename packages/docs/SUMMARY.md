@@ -468,10 +468,6 @@
       - [ValidatorsConfig](../developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorsconfig.md)
     <!-- contractkit-reference-end -->
 
-  - [DappKit](developer-resources/dappkit/reference/SUMMARY.md)
-    <!-- dappkit-reference-start -->
-    <!-- dappkit-reference-end -->
-
   - [Explorer](developer-resources/explorer/reference/SUMMARY.md)
     <!-- explorer-reference-start -->
     - [Globals](../developer-resources/explorer/reference/globals.md)
