@@ -613,6 +613,24 @@
 
   - [Network-Utils](developer-resources/network-utils/reference/SUMMARY.md)
     <!-- network-utils-reference-start -->
+    - [Globals](../developer-resources/network-utils/reference/globals.md)
+    - [Modules]()
+      - [genesis-block-utils](../developer-resources/network-utils/reference/modules/_genesis_block_utils_.md)
+      - [GenesisBlockUtils](../developer-resources/network-utils/reference/classes/_genesis_block_utils_.genesisblockutils.md)
+      - [google-storage-utils](../developer-resources/network-utils/reference/modules/_google_storage_utils_.md)
+      - [GoogleStorageUtils](../developer-resources/network-utils/reference/classes/_google_storage_utils_.googlestorageutils.md)
+      - [static-node-utils](../developer-resources/network-utils/reference/modules/_static_node_utils_.md)
+      - [StaticNodeUtils](../developer-resources/network-utils/reference/classes/_static_node_utils_.staticnodeutils.md)
+      - [utils/timezone](../developer-resources/network-utils/reference/modules/_utils_timezone_.md)
+      - [Coordinates](../developer-resources/network-utils/reference/interfaces/_utils_timezone_.coordinates.md)
+      - [Timezone](../developer-resources/network-utils/reference/interfaces/_utils_timezone_.timezone.md)
+    - [Classes]()
+      - [GenesisBlockUtils](../developer-resources/network-utils/reference/classes/_genesis_block_utils_.genesisblockutils.md)
+      - [GoogleStorageUtils](../developer-resources/network-utils/reference/classes/_google_storage_utils_.googlestorageutils.md)
+      - [StaticNodeUtils](../developer-resources/network-utils/reference/classes/_static_node_utils_.staticnodeutils.md)
+    - [Interfaces]()
+      - [Coordinates](../developer-resources/network-utils/reference/interfaces/_utils_timezone_.coordinates.md)
+      - [Timezone](../developer-resources/network-utils/reference/interfaces/_utils_timezone_.timezone.md)
     <!-- network-utils-reference-end -->
 
   - [Transactions-Uri](developer-resources/transactions-uri/reference/SUMMARY.md)
