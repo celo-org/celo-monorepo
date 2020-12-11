@@ -386,7 +386,7 @@
       - [Signer](../developer-resources/connect/reference/interfaces/_wallet_.signer.md)
     <!-- connect-reference-end -->
 
-  - [Utils](developer-resources/connect/reference/SUMMARY.md)
+  - [Utils](developer-resources/utils/reference/SUMMARY.md)
     <!-- utils-reference-start -->
     - [Globals](../developer-resources/utils/reference/globals.md)
     - [Modules]()
