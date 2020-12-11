@@ -96,7 +96,7 @@
   - [Listings](developer-resources/integrations/listings.md)
   - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
 - SDK Code Reference
-  - [Base Reference](developer-resources/base/reference/SUMMARY.md)
+  - [Base](developer-resources/base/reference/SUMMARY.md)
     <!-- base-reference-start -->
     - [Globals](../developer-resources/base/reference/globals.md)
     - [Modules]()
@@ -177,6 +177,68 @@
       - [RunningTaskWithValue](../developer-resources/base/reference/interfaces/_task_.runningtaskwithvalue.md)
       - [TaskOptions](../developer-resources/base/reference/interfaces/_task_.taskoptions.md)
     <!-- base-reference-end -->
+
+  - [Connect](developer-resources/connect/reference/SUMMARY.md)
+    <!-- connect-reference-start -->
+    - [Globals](../developer-resources/connect/reference/globals.md)
+    - [Modules]()
+      - [abi-types](../developer-resources/connect/reference/modules/_abi_types_.md)
+      - [ABIDefinition](../developer-resources/connect/reference/interfaces/_abi_types_.abidefinition.md)
+      - [AbiCoder](../developer-resources/connect/reference/interfaces/_abi_types_.abicoder.md)
+      - [DecodedParamsArray](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsarray.md)
+      - [DecodedParamsObject](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsobject.md)
+      - [celo-provider](../developer-resources/connect/reference/modules/_celo_provider_.md)
+      - [CeloProvider](../developer-resources/connect/reference/classes/_celo_provider_.celoprovider.md)
+      - [connection](../developer-resources/connect/reference/modules/_connection_.md)
+      - [Connection](../developer-resources/connect/reference/classes/_connection_.connection.md)
+      - [ConnectionOptions](../developer-resources/connect/reference/interfaces/_connection_.connectionoptions.md)
+      - [types](../developer-resources/connect/reference/modules/_types_.md)
+      - [CeloParams](../developer-resources/connect/reference/interfaces/_types_.celoparams.md)
+      - [CeloTxObject](../developer-resources/connect/reference/interfaces/_types_.celotxobject.md)
+      - [EncodedTransaction](../developer-resources/connect/reference/interfaces/_types_.encodedtransaction.md)
+      - [JsonRpcPayload](../developer-resources/connect/reference/interfaces/_types_.jsonrpcpayload.md)
+      - [JsonRpcResponse](../developer-resources/connect/reference/interfaces/_types_.jsonrpcresponse.md)
+      - [Provider](../developer-resources/connect/reference/interfaces/_types_.provider.md)
+      - [RLPEncodedTx](../developer-resources/connect/reference/interfaces/_types_.rlpencodedtx.md)
+      - [utils/abi-utils](../developer-resources/connect/reference/modules/_utils_abi_utils_.md)
+      - [utils/celo-transaction-object](../developer-resources/connect/reference/modules/_utils_celo_transaction_object_.md)
+      - [CeloTransactionObject](../developer-resources/connect/reference/classes/_utils_celo_transaction_object_.celotransactionobject.md)
+      - [utils/formatter](../developer-resources/connect/reference/modules/_utils_formatter_.md)
+      - [utils/provider-utils](../developer-resources/connect/reference/modules/_utils_provider_utils_.md)
+      - [utils/rpc-caller](../developer-resources/connect/reference/modules/_utils_rpc_caller_.md)
+      - [DefaultRpcCaller](../developer-resources/connect/reference/classes/_utils_rpc_caller_.defaultrpccaller.md)
+      - [RpcCaller](../developer-resources/connect/reference/interfaces/_utils_rpc_caller_.rpccaller.md)
+      - [utils/tx-params-normalizer](../developer-resources/connect/reference/modules/_utils_tx_params_normalizer_.md)
+      - [TxParamsNormalizer](../developer-resources/connect/reference/classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
+      - [utils/tx-result](../developer-resources/connect/reference/modules/_utils_tx_result_.md)
+      - [TransactionResult](../developer-resources/connect/reference/classes/_utils_tx_result_.transactionresult.md)
+      - [wallet](../developer-resources/connect/reference/modules/_wallet_.md)
+      - [ReadOnlyWallet](../developer-resources/connect/reference/interfaces/_wallet_.readonlywallet.md)
+      - [Signer](../developer-resources/connect/reference/interfaces/_wallet_.signer.md)
+    - [Classes]()
+      - [CeloProvider](../developer-resources/connect/reference/classes/_celo_provider_.celoprovider.md)
+      - [Connection](../developer-resources/connect/reference/classes/_connection_.connection.md)
+      - [CeloTransactionObject](../developer-resources/connect/reference/classes/_utils_celo_transaction_object_.celotransactionobject.md)
+      - [DefaultRpcCaller](../developer-resources/connect/reference/classes/_utils_rpc_caller_.defaultrpccaller.md)
+      - [TxParamsNormalizer](../developer-resources/connect/reference/classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
+      - [TransactionResult](../developer-resources/connect/reference/classes/_utils_tx_result_.transactionresult.md)
+    - [Interfaces]()
+      - [ABIDefinition](../developer-resources/connect/reference/interfaces/_abi_types_.abidefinition.md)
+      - [AbiCoder](../developer-resources/connect/reference/interfaces/_abi_types_.abicoder.md)
+      - [DecodedParamsArray](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsarray.md)
+      - [DecodedParamsObject](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsobject.md)
+      - [ConnectionOptions](../developer-resources/connect/reference/interfaces/_connection_.connectionoptions.md)
+      - [CeloParams](../developer-resources/connect/reference/interfaces/_types_.celoparams.md)
+      - [CeloTxObject](../developer-resources/connect/reference/interfaces/_types_.celotxobject.md)
+      - [EncodedTransaction](../developer-resources/connect/reference/interfaces/_types_.encodedtransaction.md)
+      - [JsonRpcPayload](../developer-resources/connect/reference/interfaces/_types_.jsonrpcpayload.md)
+      - [JsonRpcResponse](../developer-resources/connect/reference/interfaces/_types_.jsonrpcresponse.md)
+      - [Provider](../developer-resources/connect/reference/interfaces/_types_.provider.md)
+      - [RLPEncodedTx](../developer-resources/connect/reference/interfaces/_types_.rlpencodedtx.md)
+      - [RpcCaller](../developer-resources/connect/reference/interfaces/_utils_rpc_caller_.rpccaller.md)
+      - [ReadOnlyWallet](../developer-resources/connect/reference/interfaces/_wallet_.readonlywallet.md)
+      - [Signer](../developer-resources/connect/reference/interfaces/_wallet_.signer.md)
+    <!-- connect-reference-end -->
 
   - [ContractKit](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
@@ -406,67 +468,49 @@
       - [ValidatorsConfig](../developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorsconfig.md)
     <!-- contractkit-reference-end -->
 
-  - [Connect](developer-resources/connect/reference/SUMMARY.md)
-    <!-- connect-reference-start -->
-    - [Globals](../developer-resources/connect/reference/globals.md)
+  - [DappKit](developer-resources/dappkit/reference/SUMMARY.md)
+    <!-- dappkit-reference-start -->
+    <!-- dappkit-reference-end -->
+
+  - [Explorer](developer-resources/explorer/reference/SUMMARY.md)
+    <!-- explorer-reference-start -->
+    - [Globals](../developer-resources/explorer/reference/globals.md)
     - [Modules]()
-      - [abi-types](../developer-resources/connect/reference/modules/_abi_types_.md)
-      - [ABIDefinition](../developer-resources/connect/reference/interfaces/_abi_types_.abidefinition.md)
-      - [AbiCoder](../developer-resources/connect/reference/interfaces/_abi_types_.abicoder.md)
-      - [DecodedParamsArray](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsarray.md)
-      - [DecodedParamsObject](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsobject.md)
-      - [celo-provider](../developer-resources/connect/reference/modules/_celo_provider_.md)
-      - [CeloProvider](../developer-resources/connect/reference/classes/_celo_provider_.celoprovider.md)
-      - [connection](../developer-resources/connect/reference/modules/_connection_.md)
-      - [Connection](../developer-resources/connect/reference/classes/_connection_.connection.md)
-      - [ConnectionOptions](../developer-resources/connect/reference/interfaces/_connection_.connectionoptions.md)
-      - [types](../developer-resources/connect/reference/modules/_types_.md)
-      - [CeloParams](../developer-resources/connect/reference/interfaces/_types_.celoparams.md)
-      - [CeloTxObject](../developer-resources/connect/reference/interfaces/_types_.celotxobject.md)
-      - [EncodedTransaction](../developer-resources/connect/reference/interfaces/_types_.encodedtransaction.md)
-      - [JsonRpcPayload](../developer-resources/connect/reference/interfaces/_types_.jsonrpcpayload.md)
-      - [JsonRpcResponse](../developer-resources/connect/reference/interfaces/_types_.jsonrpcresponse.md)
-      - [Provider](../developer-resources/connect/reference/interfaces/_types_.provider.md)
-      - [RLPEncodedTx](../developer-resources/connect/reference/interfaces/_types_.rlpencodedtx.md)
-      - [utils/abi-utils](../developer-resources/connect/reference/modules/_utils_abi_utils_.md)
-      - [utils/celo-transaction-object](../developer-resources/connect/reference/modules/_utils_celo_transaction_object_.md)
-      - [CeloTransactionObject](../developer-resources/connect/reference/classes/_utils_celo_transaction_object_.celotransactionobject.md)
-      - [utils/formatter](../developer-resources/connect/reference/modules/_utils_formatter_.md)
-      - [utils/provider-utils](../developer-resources/connect/reference/modules/_utils_provider_utils_.md)
-      - [utils/rpc-caller](../developer-resources/connect/reference/modules/_utils_rpc_caller_.md)
-      - [DefaultRpcCaller](../developer-resources/connect/reference/classes/_utils_rpc_caller_.defaultrpccaller.md)
-      - [RpcCaller](../developer-resources/connect/reference/interfaces/_utils_rpc_caller_.rpccaller.md)
-      - [utils/tx-params-normalizer](../developer-resources/connect/reference/modules/_utils_tx_params_normalizer_.md)
-      - [TxParamsNormalizer](../developer-resources/connect/reference/classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
-      - [utils/tx-result](../developer-resources/connect/reference/modules/_utils_tx_result_.md)
-      - [TransactionResult](../developer-resources/connect/reference/classes/_utils_tx_result_.transactionresult.md)
-      - [wallet](../developer-resources/connect/reference/modules/_wallet_.md)
-      - [ReadOnlyWallet](../developer-resources/connect/reference/interfaces/_wallet_.readonlywallet.md)
-      - [Signer](../developer-resources/connect/reference/interfaces/_wallet_.signer.md)
+      - [base](../developer-resources/explorer/reference/modules/_base_.md)
+      - [ContractDetails](../developer-resources/explorer/reference/interfaces/_base_.contractdetails.md)
+      - [block-explorer](../developer-resources/explorer/reference/modules/_block_explorer_.md)
+      - [BlockExplorer](../developer-resources/explorer/reference/classes/_block_explorer_.blockexplorer.md)
+      - [CallDetails](../developer-resources/explorer/reference/interfaces/_block_explorer_.calldetails.md)
+      - [ParsedBlock](../developer-resources/explorer/reference/interfaces/_block_explorer_.parsedblock.md)
+      - [ParsedTx](../developer-resources/explorer/reference/interfaces/_block_explorer_.parsedtx.md)
+      - [log-explorer](../developer-resources/explorer/reference/modules/_log_explorer_.md)
+      - [LogExplorer](../developer-resources/explorer/reference/classes/_log_explorer_.logexplorer.md)
     - [Classes]()
-      - [CeloProvider](../developer-resources/connect/reference/classes/_celo_provider_.celoprovider.md)
-      - [Connection](../developer-resources/connect/reference/classes/_connection_.connection.md)
-      - [CeloTransactionObject](../developer-resources/connect/reference/classes/_utils_celo_transaction_object_.celotransactionobject.md)
-      - [DefaultRpcCaller](../developer-resources/connect/reference/classes/_utils_rpc_caller_.defaultrpccaller.md)
-      - [TxParamsNormalizer](../developer-resources/connect/reference/classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
-      - [TransactionResult](../developer-resources/connect/reference/classes/_utils_tx_result_.transactionresult.md)
+      - [BlockExplorer](../developer-resources/explorer/reference/classes/_block_explorer_.blockexplorer.md)
+      - [LogExplorer](../developer-resources/explorer/reference/classes/_log_explorer_.logexplorer.md)
     - [Interfaces]()
-      - [ABIDefinition](../developer-resources/connect/reference/interfaces/_abi_types_.abidefinition.md)
-      - [AbiCoder](../developer-resources/connect/reference/interfaces/_abi_types_.abicoder.md)
-      - [DecodedParamsArray](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsarray.md)
-      - [DecodedParamsObject](../developer-resources/connect/reference/interfaces/_abi_types_.decodedparamsobject.md)
-      - [ConnectionOptions](../developer-resources/connect/reference/interfaces/_connection_.connectionoptions.md)
-      - [CeloParams](../developer-resources/connect/reference/interfaces/_types_.celoparams.md)
-      - [CeloTxObject](../developer-resources/connect/reference/interfaces/_types_.celotxobject.md)
-      - [EncodedTransaction](../developer-resources/connect/reference/interfaces/_types_.encodedtransaction.md)
-      - [JsonRpcPayload](../developer-resources/connect/reference/interfaces/_types_.jsonrpcpayload.md)
-      - [JsonRpcResponse](../developer-resources/connect/reference/interfaces/_types_.jsonrpcresponse.md)
-      - [Provider](../developer-resources/connect/reference/interfaces/_types_.provider.md)
-      - [RLPEncodedTx](../developer-resources/connect/reference/interfaces/_types_.rlpencodedtx.md)
-      - [RpcCaller](../developer-resources/connect/reference/interfaces/_utils_rpc_caller_.rpccaller.md)
-      - [ReadOnlyWallet](../developer-resources/connect/reference/interfaces/_wallet_.readonlywallet.md)
-      - [Signer](../developer-resources/connect/reference/interfaces/_wallet_.signer.md)
-    <!-- connect-reference-end -->
+      - [ContractDetails](../developer-resources/explorer/reference/interfaces/_base_.contractdetails.md)
+      - [CallDetails](../developer-resources/explorer/reference/interfaces/_block_explorer_.calldetails.md)
+      - [ParsedBlock](../developer-resources/explorer/reference/interfaces/_block_explorer_.parsedblock.md)
+      - [ParsedTx](../developer-resources/explorer/reference/interfaces/_block_explorer_.parsedtx.md)
+    <!-- explorer-reference-end -->
+  
+  - [Governance](developer-resources/governance/reference/SUMMARY.md)
+    <!-- governance-reference-start -->
+    <!-- governance-reference-end -->
+
+  - [Identity](developer-resources/identity/reference/SUMMARY.md)
+    <!-- identity-reference-start -->
+    <!-- identity-reference-end -->
+
+  - [Network-Utils](developer-resources/network-utils/reference/SUMMARY.md)
+    <!-- network-utils-reference-start -->
+    <!-- network-utils-reference-end -->
+
+  - [Transactions-Uri](developer-resources/transactions-uri/reference/SUMMARY.md)
+    <!-- transactions-uri-reference-start -->
+    <!-- transactions-uri-reference-end -->
+
 
   - [Utils](developer-resources/utils/reference/SUMMARY.md)
     <!-- utils-reference-start -->
@@ -568,6 +612,37 @@
       - [EIP712Types](../developer-resources/utils/reference/interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712types.md)
     <!-- utils-reference-end -->
 
+  - [Wallet-Base](developer-resources/wallet-base/reference/SUMMARY.md)
+    <!-- wallet-base-reference-start -->
+    <!-- wallet-base-reference-end -->
+
+  - [Wallet-Hsm](developer-resources/wallet-hsm/reference/SUMMARY.md)
+    <!-- wallet-hsm-reference-start -->
+    <!-- wallet-hsm-reference-end -->
+
+  - [Wallet-Hsm-Aws](developer-resources/wallet-hsm-aws/reference/SUMMARY.md)
+    <!-- wallet-hsm-aws-reference-start -->
+    <!-- wallet-hsm-aws-reference-end -->
+
+  - [Wallet-Hsm-Azure](developer-resources/wallet-hsm-azure/reference/SUMMARY.md)
+    <!-- wallet-hsm-azure-reference-start -->
+    <!-- wallet-hsm-azure-reference-end -->
+
+  - [Wallet-Ledger](developer-resources/wallet-ledger/reference/SUMMARY.md)
+    <!-- wallet-ledger-reference-start -->
+    <!-- wallet-ledger-reference-end -->
+
+  - [Wallet-Local](developer-resources/wallet-local/reference/SUMMARY.md)
+    <!-- wallet-local-reference-start -->
+    <!-- wallet-local-reference-end -->
+
+  - [Wallet-Remote](developer-resources/wallet-remote/reference/SUMMARY.md)
+    <!-- wallet-remote-reference-start -->
+    <!-- wallet-remote-reference-end -->
+
+  - [Wallet-Rpc](developer-resources/wallet-rpc/reference/SUMMARY.md)
+    <!-- wallet-rpc-reference-start -->
+    <!-- wallet-rpc-reference-end -->
 
 
 ## Celo Codebase
