@@ -1,4 +1,4 @@
-import { quote } from '../utils'
+import { quote } from '../utils/utils'
 
 export default HandleDeepLinkDappkit = () => {
   const DAPPKIT_URL = quote(
