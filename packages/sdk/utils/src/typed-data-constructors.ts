@@ -1,4 +1,4 @@
-import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712TypedData } from './sign-typed-data-utils'
 
 export function attestationSecurityCode(code: string): EIP712TypedData {
   return {
