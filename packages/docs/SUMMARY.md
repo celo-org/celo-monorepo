@@ -824,6 +824,15 @@
 
   - [Wallet-Local](developer-resources/wallet-local/reference/SUMMARY.md)
     <!-- wallet-local-reference-start -->
+    - [Globals](../../developer-resources/wallet-local/reference/globals.md)
+    - [Modules]()
+      - [local-signer](../../developer-resources/wallet-local/reference/modules/_local_signer_.md)
+      - [LocalSigner](../../developer-resources/wallet-local/reference/classes/_local_signer_.localsigner.md)
+      - [local-wallet](../../developer-resources/wallet-local/reference/modules/_local_wallet_.md)
+      - [LocalWallet](../../developer-resources/wallet-local/reference/classes/_local_wallet_.localwallet.md)
+    - [Classes]()
+      - [LocalSigner](../../developer-resources/wallet-local/reference/classes/_local_signer_.localsigner.md)
+      - [LocalWallet](../../developer-resources/wallet-local/reference/classes/_local_wallet_.localwallet.md)
     <!-- wallet-local-reference-end -->
 
   - [Wallet-Remote](developer-resources/wallet-remote/reference/SUMMARY.md)
