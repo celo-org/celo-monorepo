@@ -10,7 +10,7 @@ description: >-
 
 ### **Prerequisites**
 
-* **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/mainnet/running-a-full-node-in-mainnet.md) instructions for more details on running a full node.
+- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/mainnet/running-a-full-node-in-mainnet.md) instructions for more details on running a full node.
 
 ### NPM Package
 
@@ -59,4 +59,3 @@ celocli autocomplete
 ```
 
 The update warning plugin notifies the user if they are using an oudated version of the CLI. This plugin is enabled by default.
-
