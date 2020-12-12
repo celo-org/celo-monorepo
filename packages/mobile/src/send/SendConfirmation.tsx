@@ -111,9 +111,8 @@ function SendConfirmation(props: Props) {
   )
   const account = useSelector(currentAccountSelector)
   const isSending = useSelector(isSendingSelector)
-  // tslint:disable-next-line: react-hooks-nesting
-  const dollarBalance = useSelector(stableTokenBalanceSelector) || '0'
-  const celoBalance = useSelector(celoTokenBalanceSelector) || '0'
+  const dollarBalance = useSelector(stableTokenBalanceSelector) ?? '0'
+  const celoBalance = useSelector(celoTokenBalanceSelector) ?? '0'
   const appConnected = useSelector(isAppConnected)
   const isDekRegistered = useSelector(isDekRegisteredSelector) ?? false
   const addressToDataEncryptionKey = useSelector(addressToDataEncryptionKeySelector)

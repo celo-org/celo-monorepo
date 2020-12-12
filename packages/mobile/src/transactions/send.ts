@@ -125,12 +125,12 @@ export function* sendTransactionPromises(
   const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
   const fornoMode: boolean = yield select(fornoSelector)
 
-  //if (gas || gasPrice) {
-  Logger.debug(
-    `${TAG}@sendTransactionPromises`,
-    `Using provided gas parameters: ${gas} gas @ ${gasPrice} ${preferredFeeCurrency}`
-  )
-  //}
+  if (gas || gasPrice) {
+    Logger.debug(
+      `${TAG}@sendTransactionPromises`,
+      `Using provided gas parameters: ${gas} gas @ ${gasPrice} ${preferredFeeCurrency}`
+    )
+  }
 
   // If stableToken is prefered to pay fee, use it unless its balance is Zero,
   // in that case use CELO to pay fee.
@@ -213,11 +213,9 @@ export function* sendTransaction(
       gasPrice,
       nonce
     )
-    const result = yield receipt
-    return result
+    return yield receipt
   }
-  const receipt = yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
-  return receipt
+  return yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
 }
 
 // SendTransactionMethod is a redux saga generator that takes a nonce and returns a receipt.

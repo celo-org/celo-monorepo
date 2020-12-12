@@ -213,7 +213,7 @@ export async function sendTransactionAsync<T>(
       logger(EstimatedGas(gas, true))
     }
 
-    emitter = tx.send({ ...txParams, gas: gas })
+    emitter = tx.send({ ...txParams, gas })
     emitter
       // @ts-ignore
       .once('receipt', (r: CeloTxReceipt) => {

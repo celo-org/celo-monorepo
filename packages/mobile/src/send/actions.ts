@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js'
+import { FeeInfo } from 'src/fees/saga'
 import { InviteBy } from 'src/invite/actions'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { FeeInfo } from 'src/fees/saga'
 import { Svg } from 'svgs'
 
 export interface QrCode {

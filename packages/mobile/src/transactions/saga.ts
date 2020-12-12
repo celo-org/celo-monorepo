@@ -18,8 +18,8 @@ import {
   NewTransactionsInFeedAction,
   removeStandbyTransaction,
   transactionConfirmed,
-  transactionFailed,
   TransactionConfirmedAction,
+  transactionFailed,
   TransactionFailedAction,
   updateRecentTxRecipientsCache,
 } from 'src/transactions/actions'
@@ -90,11 +90,10 @@ export function* sendAndMonitorTransaction<T>(
       )
       const hash = yield transactionHash
       yield put(addHashToStandbyTransaction(context.id, hash))
-      const result = yield receipt
-      return result
+      return yield receipt
     }
-    const receipt = yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
-    yield put(transactionConfirmed(context.id, receipt))
+    const txReceipt = yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
+    yield put(transactionConfirmed(context.id, txReceipt))
 
     // Determine which balances may be affected by the transaction and fetch updated balances.
     // DO NOT MERGE: Test that this works as intended.
@@ -108,7 +107,7 @@ export function* sendAndMonitorTransaction<T>(
     if (balancesAffected.has(CURRENCY_ENUM.DOLLAR)) {
       yield put(fetchDollarBalance())
     }
-    return receipt
+    return txReceipt
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${context.id}`, error)
     yield put(removeStandbyTransaction(context.id))

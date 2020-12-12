@@ -9,10 +9,10 @@ import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { FeeInfo } from 'src/fees/saga'
+import { getFeeInTokens } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { RecipientWithContact } from 'src/recipients/recipient'
-import { getFeeInTokens } from 'src/fees/selectors'
 
 interface Props {
   recipientPhone: string
