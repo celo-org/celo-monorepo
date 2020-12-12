@@ -19,6 +19,8 @@ import {
   removeStandbyTransaction,
   transactionConfirmed,
   transactionFailed,
+  TransactionConfirmedAction,
+  TransactionFailedAction,
   updateRecentTxRecipientsCache,
 } from 'src/transactions/actions'
 import { TxPromises } from 'src/transactions/contract-utils'
@@ -52,10 +54,13 @@ function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedActi
 
 export function* waitForTransactionWithId(txId: string) {
   while (true) {
-    const action = yield take([Actions.TRANSACTION_CONFIRMED, Actions.TRANSACTION_FAILED])
+    const action: TransactionConfirmedAction | TransactionFailedAction = yield take([
+      Actions.TRANSACTION_CONFIRMED,
+      Actions.TRANSACTION_FAILED,
+    ])
     if (action.txId === txId) {
-      // Return true for success, false otherwise
-      return action.type === Actions.TRANSACTION_CONFIRMED
+      // Return the receipt on success and undefined otherwise.
+      return action.type === Actions.TRANSACTION_CONFIRMED ? action.receipt : undefined
     }
   }
 }
@@ -73,7 +78,7 @@ export function* sendAndMonitorTransaction<T>(
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${context.id}`)
 
     const sendTxMethod = function*(nonce?: number) {
-      const { transactionHash, confirmation }: TxPromises = yield call(
+      const { transactionHash, receipt }: TxPromises = yield call(
         sendTransactionPromises,
         tx.txo,
         account,
@@ -85,11 +90,11 @@ export function* sendAndMonitorTransaction<T>(
       )
       const hash = yield transactionHash
       yield put(addHashToStandbyTransaction(context.id, hash))
-      const result = yield confirmation
+      const result = yield receipt
       return result
     }
-    yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
-    yield put(transactionConfirmed(context.id))
+    const receipt = yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
+    yield put(transactionConfirmed(context.id, receipt))
 
     // Determine which balances may be affected by the transaction and fetch updated balances.
     // DO NOT MERGE: Test that this works as intended.
@@ -103,6 +108,7 @@ export function* sendAndMonitorTransaction<T>(
     if (balancesAffected.has(CURRENCY_ENUM.DOLLAR)) {
       yield put(fetchDollarBalance())
     }
+    return receipt
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${context.id}`, error)
     yield put(removeStandbyTransaction(context.id))

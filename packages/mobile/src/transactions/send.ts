@@ -1,7 +1,7 @@
-import { CeloTxObject } from '@celo/connect'
+import { CeloTxObject, CeloTxReceipt } from '@celo/connect'
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
-import { call, cancel, delay, fork, join, race, select, take } from 'redux-saga/effects'
+import { call, cancel, cancelled, delay, fork, join, race, select } from 'redux-saga/effects'
 import { TransactionEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -200,11 +200,10 @@ export function* sendTransaction(
   context: TransactionContext,
   gas?: number,
   gasPrice?: BigNumber,
-  cancelAction?: string,
   feeCurrency?: CURRENCY_ENUM
 ) {
   const sendTxMethod = function*(nonce?: number) {
-    const { confirmation } = yield call(
+    const { receipt } = yield call(
       sendTransactionPromises,
       tx,
       account,
@@ -214,27 +213,27 @@ export function* sendTransaction(
       gasPrice,
       nonce
     )
-    const result = yield confirmation
+    const result = yield receipt
     return result
   }
-  yield call(wrapSendTransactionWithRetry, sendTxMethod, context, cancelAction)
+  const receipt = yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
+  return receipt
 }
 
+// SendTransactionMethod is a redux saga generator that takes a nonce and returns a receipt.
+type SendTransactionMethod = (nonce?: number) => Generator<any, CeloTxReceipt, any>
+
 export function* wrapSendTransactionWithRetry(
-  sendTxMethod: (nonce?: number) => Generator<any, any, any>,
-  context: TransactionContext,
-  cancelAction?: string
+  sendTxMethod: SendTransactionMethod,
+  context: TransactionContext
 ) {
   for (let i = 1; i <= TX_NUM_TRIES; i++) {
     try {
       // Spin tx send into a Task so that it does not get cancelled automatically on timeout.
       const task = yield fork(sendTxMethod)
-      let { result, timeout, cancelled } = yield race({
-        result: join(task),
+      let { receipt, timeout } = yield race({
+        receipt: join(task),
         timeout: delay(TX_TIMEOUT * i - TX_TIMEOUT_GRACE_PERIOD),
-        ...(cancelAction && {
-          cancelled: take(cancelAction),
-        }),
       })
 
       // In some conditions (e.g. app backgrounding) the app may become suspended, preventing the
@@ -247,12 +246,9 @@ export function* wrapSendTransactionWithRetry(
           `${TAG}@wrapSendTransactionWithRetry`,
           `tx ${context.id} entering timeout grace period for attempt ${i}`
         )
-        ;({ result, timeout, cancelled } = yield race({
-          result: join(task),
+        ;({ receipt, timeout } = yield race({
+          receipt: join(task),
           timeout: delay(TX_TIMEOUT_GRACE_PERIOD),
-          ...(cancelAction && {
-            cancelled: take(cancelAction),
-          }),
         }))
       }
 
@@ -265,24 +261,18 @@ export function* wrapSendTransactionWithRetry(
           `tx ${context.id} timeout for attempt ${i}`
         )
         throw new Error(ErrorMessages.TRANSACTION_TIMEOUT)
-      } else if (cancelled) {
-        Logger.warn(
-          `${TAG}@wrapSendTransactionWithRetry`,
-          `tx ${context.id} cancelled for attempt ${i}`
-        )
-        return
       }
 
       Logger.debug(
         `${TAG}@wrapSendTransactionWithRetry`,
-        `tx ${context.id} successful for attempt ${i} with result ${result}`
+        `tx ${context.id} successful for attempt ${i}`
       )
-      return
+      return receipt
     } catch (err) {
       Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${context.id} failed`, err)
 
       if (!shouldTxFailureRetry(err)) {
-        return
+        throw err
       }
 
       if (i + 1 <= TX_NUM_TRIES) {
@@ -293,6 +283,13 @@ export function* wrapSendTransactionWithRetry(
         )
       } else {
         throw err
+      }
+    } finally {
+      if (yield cancelled()) {
+        Logger.warn(
+          `${TAG}@wrapSendTransactionWithRetry`,
+          `tx ${context.id} cancelled on attempt ${i}`
+        )
       }
     }
   }
@@ -306,7 +303,7 @@ function shouldTxFailureRetry(err: any) {
 
   // Web3 doesn't like the tx, it's invalid (e.g. fails a require), or funds insufficient
   if (message.includes(OUT_OF_GAS_ERROR)) {
-    Logger.debug(
+    Logger.error(
       `${TAG}@shouldTxFailureRetry`,
       'Out of gas or invalid tx error. Will not reattempt.'
     )
@@ -315,19 +312,19 @@ function shouldTxFailureRetry(err: any) {
 
   // Similar to case above
   if (message.includes(ALWAYS_FAILING_ERROR)) {
-    Logger.debug(`${TAG}@shouldTxFailureRetry`, 'Transaction always failing. Will not reattempt')
+    Logger.error(`${TAG}@shouldTxFailureRetry`, 'Transaction always failing. Will not reattempt')
     return false
   }
 
   // Geth already knows about the tx of this nonce, no point in resending it
   if (message.includes(KNOWN_TX_ERROR)) {
-    Logger.debug(`${TAG}@shouldTxFailureRetry`, 'Known transaction error. Will not reattempt.')
+    Logger.error(`${TAG}@shouldTxFailureRetry`, 'Known transaction error. Will not reattempt.')
     return false
   }
 
   // Nonce too low, probably because the tx already went through
   if (message.includes(NONCE_TOO_LOW_ERROR)) {
-    Logger.debug(
+    Logger.error(
       `${TAG}@shouldTxFailureRetry`,
       'Nonce too low, possible from retrying. Will not reattempt.'
     )

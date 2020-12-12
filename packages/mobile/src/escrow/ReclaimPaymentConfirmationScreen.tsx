@@ -117,7 +117,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     // TODO: Although this is configured to display fees in CELO, the currency and fee is not yet
     // plumbed through the rest of the system to ensure it actually pays for the fees in CELO if
     // selected.
-    const feeCurrency = getFeeInTokens(asyncFee.result?.currency)
+    const feeCurrency = asyncFee.result?.currency
     const convertedAmount = divideByWei(payment.amount.valueOf())
     const userHasEnough = fee?.isLessThanOrEqualTo(
       feeCurrency === CURRENCY_ENUM.DOLLAR ? dollarBalance : celoBalance

@@ -19,7 +19,12 @@ describe('ReclaimPaymentConfirmationCard', () => {
           recipientContact={mockRecipient}
           amount={new BigNumber(10)}
           currency={CURRENCY_ENUM.DOLLAR}
-          fee={new BigNumber(0.01)}
+          feeInfo={{
+            fee: new BigNumber(10).pow(16),
+            gas: new BigNumber(200000),
+            gasPrice: new BigNumber(10).pow(9).times(5),
+            currency: CURRENCY_ENUM.DOLLAR,
+          }}
         />
       </Provider>
     )

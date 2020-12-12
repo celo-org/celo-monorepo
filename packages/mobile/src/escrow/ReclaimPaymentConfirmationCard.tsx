@@ -8,10 +8,11 @@ import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/Currenc
 import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
-import { FeeInfo } from 'src/fees/saga.ts'
+import { FeeInfo } from 'src/fees/saga'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { RecipientWithContact } from 'src/recipients/recipient'
+import { getFeeInTokens } from 'src/fees/selectors'
 
 interface Props {
   recipientPhone: string
@@ -33,13 +34,18 @@ export default function ReclaimPaymentConfirmationCard({
   currency,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const amount = { value: amountProp, currencyCode: CURRENCIES[currency].code }
-  const securityFeeAmount = feeInfo && {
-    value: feeInfo.fee.negated(),
-    currencyCode: CURRENCIES[feeInfo.currency].code,
+  const amount = {
+    value: amountProp,
+    currencyCode: CURRENCIES[currency].code,
   }
+  const fee = getFeeInTokens(feeInfo?.fee)
+  const securityFeeAmount = fee &&
+    feeInfo && {
+      value: fee.negated(),
+      currencyCode: CURRENCIES[feeInfo.currency].code,
+    }
   const totalAmount = {
-    value: amountProp.minus(feeInfo?.fee ?? 0),
+    value: amountProp.minus(fee ?? 0),
     currencyCode: amount.currencyCode,
   }
 

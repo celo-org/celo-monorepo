@@ -1,6 +1,7 @@
 export const SENTINEL_INVITE_COMMENT = '__CELO_INVITE_TX__'
 import BigNumber from 'bignumber.js'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { FeeInfo } from 'src/fees/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 
 export enum Actions {
@@ -44,19 +45,22 @@ export interface SendInviteAction {
   inviteMode: InviteBy
   amount?: BigNumber
   currency?: CURRENCY_ENUM
+  feeInfo?: FeeInfo
 }
 
 export const sendInvite = (
   e164Number: string,
   inviteMode: InviteBy,
   amount?: BigNumber,
-  currency?: CURRENCY_ENUM
+  currency?: CURRENCY_ENUM,
+  feeInfo?: FeeInfo
 ): SendInviteAction => ({
   type: Actions.SEND_INVITE,
   e164Number,
   inviteMode,
   amount,
   currency,
+  feeInfo,
 })
 
 export interface SendInviteSuccessAction {

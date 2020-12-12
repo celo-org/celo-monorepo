@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/connect'
+import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { UnlockableWallet } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
@@ -26,6 +26,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { WEB_LINK } from 'src/brandingConfig'
 import { APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
+import { getEscrowTxGas } from 'src/escrow/saga'
 import { FeeInfo, calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { features } from 'src/flags'
@@ -51,7 +52,7 @@ import { createInviteCode } from 'src/invite/utils'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getPasswordSaga } from 'src/pincode/authentication'
-import { getSendTxGas } from 'src/send/saga'
+import { getSendTxGas, getSendFee } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { waitForTransactionWithId } from 'src/transactions/saga'
@@ -66,11 +67,6 @@ import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 1.5 * 60 * 1000 // 1.5 minutes
 export const INVITE_FEE = '0.30'
-// TODO: Extract offline gas estimation into an independent library.
-// Hardcoding estimate at 1/2 cent. Fees are currently an order of magnitude smaller ($0.0003)
-const SEND_TOKEN_FEE_ESTIMATE = new BigNumber(0.005)
-// Transfer for invite flow consistently takes 191775 gas. 200k is rounded up from there.
-const SEND_TOKEN_GAS_ESTIMATE = 200000
 
 export async function getInviteTxGas(
   account: string,
@@ -79,13 +75,19 @@ export async function getInviteTxGas(
   comment: string
 ) {
   try {
+    const escrowGas = await getEscrowTxGas()
+    if (features.ESCROW_WITHOUT_CODE) {
+      return escrowGas
+    }
+
     const contractKit = await getContractKitAsync()
     const escrowContract = await contractKit.contracts.getEscrow()
-    return getSendTxGas(account, currency, {
+    const sendGas = await getSendTxGas(account, currency, {
       amount,
       comment,
       recipientAddress: escrowContract.address,
     })
+    return escrowGas.plus(sendGas)
   } catch (error) {
     throw error
   }
@@ -167,7 +169,8 @@ export function* sendInvite(
   e164Number: string,
   inviteMode: InviteBy,
   amount?: BigNumber,
-  currency?: CURRENCY_ENUM
+  currency?: CURRENCY_ENUM,
+  feeInfo?: FeeInfo
 ) {
   const escrowIncluded = !!amount
 
@@ -176,6 +179,7 @@ export function* sendInvite(
       features.KOMENCI ? InviteEvents.invite_start : InviteEvents.invite_tx_start,
       { escrowIncluded, amount: amount?.toString() }
     )
+
     const web3 = yield call(getWeb3)
     const randomness: Uint8Array = yield call(generateSecureRandom, 64)
     const temporaryWalletAccount = web3.eth.accounts.create(
@@ -198,7 +202,7 @@ export function* sendInvite(
 
     if (features.ESCROW_WITHOUT_CODE) {
       if (amount) {
-        yield call(initiateEscrowTransfer, e164Number, amount)
+        yield call(initiateEscrowTransfer, e164Number, amount, undefined, feeInfo)
       }
       yield call(Share.share, { message })
       return
@@ -217,6 +221,7 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
+    let transferReceipt: CeloTxReceipt | undefined
     if (!features.KOMENCI) {
       const context = newTransactionContext(TAG, 'Transfer to invite address')
       yield put(
@@ -225,16 +230,26 @@ export function* sendInvite(
           amount: INVITE_FEE,
           comment: SENTINEL_INVITE_COMMENT,
           context,
+          feeInfo,
         })
       )
-      yield call(waitForTransactionWithId, context.id)
+      transferReceipt = yield call(waitForTransactionWithId, context.id)
+      if (!transferReceipt) {
+        throw new Error('Transfer to invite address failed')
+      }
       ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
       Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
     }
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      yield call(initiateEscrowTransfer, e164Number, amount, temporaryAddress)
+      yield call(
+        initiateEscrowTransfer,
+        e164Number,
+        amount,
+        temporaryAddress,
+        feeInfo && { ...feeInfo, gas: feeInfo.gas.minus(transferReceipt?.gasUsed ?? 0) }
+      )
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
@@ -263,12 +278,13 @@ export function* sendInvite(
 export function* initiateEscrowTransfer(
   e164Number: string,
   amount: BigNumber,
-  temporaryAddress?: string
+  temporaryAddress?: string,
+  feeInfo?: FeeInfo
 ) {
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    yield put(transferEscrowedPayment(phoneHashDetails, amount, context, temporaryAddress))
+    yield put(transferEscrowedPayment(phoneHashDetails, amount, context, temporaryAddress, feeInfo))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {
@@ -310,10 +326,10 @@ export function* initiateEscrowTransfer(
 // }
 
 function* sendInviteSaga(action: SendInviteAction) {
-  const { e164Number, inviteMode, amount, currency } = action
+  const { e164Number, inviteMode, amount, currency, feeInfo } = action
 
   try {
-    yield call(sendInvite, e164Number, inviteMode, amount, currency)
+    yield call(sendInvite, e164Number, inviteMode, amount, currency, feeInfo)
     yield put(showMessage(i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number))
     navigateHome()
     yield put(sendInviteSuccess())
@@ -448,21 +464,17 @@ export function* moveAllFundsFromAccount(
   )
   const tempAccountBalance = divideByWei(accountBalanceWei)
 
-  // Temporarily hardcoding fee estimate to save time on gas estimation
-  const sendTokenFee = SEND_TOKEN_FEE_ESTIMATE
-  // const sendTokenFeeInWei: BigNumber = yield call(getSendFee, account, currency, {
-  //   recipientAddress: toAccount,
-  //   amount: tempAccountBalance,
-  //   comment,
-  // })
-  // // Inflate fee by 10% to harden against minor gas changes
-  // const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
+  const sendTokenFee: FeeInfo = yield call(getSendFee, account, currency, {
+    recipientAddress: toAccount,
+    amount: tempAccountBalance,
+    comment,
+  })
 
-  if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
+  if (sendTokenFee.fee.isGreaterThanOrEqualTo(tempAccountBalance)) {
     throw new Error('Fee is too large for amount in temp wallet')
   }
 
-  const netSendAmount = tempAccountBalance.minus(sendTokenFee)
+  const netSendAmount = tempAccountBalance.minus(sendTokenFee.fee)
   Logger.debug(
     TAG + '@moveAllFundsFromAccount',
     `Withdrawing net amount of ${netSendAmount.toString()}`
@@ -474,17 +486,22 @@ export function* moveAllFundsFromAccount(
     comment,
   })
 
-  const context = newTransactionContext(TAG, 'Transfer from temp wallet')
   // Temporarily hardcoding gas estimate to save time on estimation
-  yield call(
-    sendTransaction,
-    tx.txo,
-    account,
-    context,
-    SEND_TOKEN_GAS_ESTIMATE,
-    undefined,
-    AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
-  )
+  const { cancel } = yield race({
+    success: call(
+      sendTransaction,
+      tx.txo,
+      account,
+      newTransactionContext(TAG, 'Transfer from temp wallet'),
+      sendTokenFee.gas.toNumber(),
+      sendTokenFee.gasPrice,
+      sendTokenFee.currency
+    ),
+    cancel: take(AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT),
+  })
+  if (cancel) {
+    Logger.warn(TAG + '@moveAllFundsFromAccount', 'Withdrawal cancelled')
+  }
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 

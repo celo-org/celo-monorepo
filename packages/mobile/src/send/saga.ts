@@ -39,7 +39,7 @@ import { estimateGas } from 'src/web3/utils'
 const TAG = 'send/saga'
 
 // All observed cUSD and CELO transfers take less than 200000 gas.
-const STATIC_SEND_GAS = 200000
+const STATIC_SEND_TOKEN_GAS_ESTIMATE = 200000
 
 export async function getSendTxGas(
   account: string,
@@ -48,8 +48,8 @@ export async function getSendTxGas(
   useStatic: boolean = true
 ) {
   if (useStatic) {
-    Logger.debug(`${TAG}/getSendTxGas`, `Using static gas of ${STATIC_SEND_GAS}`)
-    return new BigNumber(STATIC_SEND_GAS)
+    Logger.debug(`${TAG}/getSendTxGas`, `Using static gas of ${STATIC_SEND_TOKEN_GAS_ESTIMATE}`)
+    return new BigNumber(STATIC_SEND_TOKEN_GAS_ESTIMATE)
   }
 
   try {
@@ -210,13 +210,13 @@ function* sendPaymentOrInviteSaga({
     if (recipientAddress) {
       yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR, feeInfo)
     } else if (recipient.e164PhoneNumber) {
-      // TODO: Use feeInfo to eliminate the gas estimation here in the invite flow.
       yield call(
         sendInvite,
         recipient.e164PhoneNumber,
         inviteMethod || InviteBy.SMS,
         amount,
-        CURRENCY_ENUM.DOLLAR
+        CURRENCY_ENUM.DOLLAR,
+        feeInfo
       )
     }
 

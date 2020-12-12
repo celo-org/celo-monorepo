@@ -24,7 +24,9 @@ export interface FeeInfo {
   currency: CURRENCY_ENUM
 }
 
-// TODO(victor): Deprecate this caching mechanism once offline calculation is standard.
+// TODO(victor): This fee caching mechansim is only being used by the balance check on the send
+// amount entry screen. In an effort to standardize and improve fee estimation, we should either
+// update and use this mechanism everywhere or remove it in favor of another solution.
 // Cache of the gas estimates for common tx types
 // Prevents us from having to recreate txs and estimate their gas each time
 const feeGasCache = new Map<FeeType, BigNumber>()
