@@ -189,7 +189,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       throw new Error('Invalid exchange rate')
     }
 
-    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate, account)
+    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate)
 
     const contractKit = yield call(getContractKit)
 
@@ -346,8 +346,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 function* createStandbyTx(
   makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber,
-  exchangeRate: BigNumber,
-  account: string
+  exchangeRate: BigNumber
 ) {
   const takerAmount = getTakerAmount(makerAmount, exchangeRate)
   const context = newTransactionContext(TAG, `Exchange ${makerToken}`)
