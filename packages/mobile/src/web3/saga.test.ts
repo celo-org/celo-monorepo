@@ -3,7 +3,7 @@ import { call, delay, select } from 'redux-saga/effects'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
-import { getWeb3Async } from 'src/web3/contracts'
+import { getContractKitAsync, getWeb3Async } from 'src/web3/contracts'
 import {
   checkWeb3SyncProgress,
   getOrCreateAccount,
@@ -89,7 +89,8 @@ describe(checkWeb3SyncProgress, () => {
       })
       .mockReturnValueOnce(false)
 
-    web3.eth.getBlock
+    const contractkit = await getContractKitAsync()
+    contractkit.connection.getBlock
       // @ts-ignore
       .mockReturnValueOnce({
         number: 100,
