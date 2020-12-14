@@ -11,7 +11,9 @@ const indent = '    '
 const config: Partial<TypeDocOptionMap> = JSON.parse(readFileSync('./typedoc.json').toString())
 const localSummaryPath = `${config.out!}/SUMMARY.md`
 const localSummary = readFileSync(localSummaryPath).toString()
-const localPathPrefix = config.out!.replace('../docs/', '')
+
+const replace = pkgName.indexOf('wallet') >= 0 ? '../../../docs/' : '../../docs/'
+const localPathPrefix = config.out!.replace(replace, '')
 
 const pathRegex = /\(.*.md\)/g
 const modifiedLocalSummary = localSummary
