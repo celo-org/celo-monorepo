@@ -76,6 +76,12 @@ async function requestSignatures(request: Request, response: Response) {
 
   const logger: Logger = response.locals.logger
 
+  const obs = new PerformanceObserver((list) => {
+    const entry = list.getEntries()[0]
+    logger.info({ latency: entry, signer: entry!.name }, 'Signer response latency measured')
+  })
+  obs.observe({ entryTypes: ['measure'], buffered: true })
+
   const signers = JSON.parse(config.odisServices.signers) as SignerService[]
   const signerReqs = signers.map((service) => {
     const controller = new AbortController()
@@ -83,19 +89,9 @@ async function requestSignatures(request: Request, response: Response) {
       controller.abort()
     }, config.odisServices.timeoutMilliSeconds)
 
-    const obs = new PerformanceObserver((list, observer) => {
-      logger.info({ list: list.getEntries() }, ' test ')
-      logger.info(
-        { latency: list.getEntries().pop()!.duration, signer: service, list },
-        'Signer response latency measured'
-      )
-      performance.clearMarks()
-      observer.disconnect()
-    })
-    obs.observe({ entryTypes: ['measure'], buffered: true })
     const startMark = `Begin requestSignature ${service.url}`
     const endMark = `End requestSignature ${service.url}`
-    const entryName = `requestSignature latency ${service.url}`
+    const entryName = service.url
     performance.mark(startMark)
 
     return requestSignature(service, request, controller, logger)
@@ -136,6 +132,9 @@ async function requestSignatures(request: Request, response: Response) {
   })
 
   await Promise.all(signerReqs)
+
+  performance.clearMarks()
+  obs.disconnect()
 
   logResponseDiscrepancies(responses, logger)
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
@@ -259,7 +258,10 @@ function requestSignature(
 
 function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   if (errorCodes.size > 1) {
-    logger.error({ errorCodes }, ErrorMessage.INCONSISTENT_SIGNER_RESPONSES)
+    logger.error(
+      { errorCodes: JSON.stringify([...errorCodes]) },
+      ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
+    )
   }
 
   let maxErrorCode = -1

@@ -27,10 +27,9 @@ async function meterResponse(
   const endMark = `End ${handler.name}`
   const entryName = `${handler.name} latency`
 
-  const obs = new PerformanceObserver((list, observer) => {
-    logger.info({ latency: list.getEntries().pop()!.duration }, 'e2e response latency measured')
-    performance.clearMarks()
-    observer.disconnect()
+  const obs = new PerformanceObserver((list) => {
+    const entry = list.getEntriesByName(entryName)[0]
+    logger.info({ latency: entry }, 'e2e response latency measured')
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
@@ -43,10 +42,10 @@ async function meterResponse(
       logger.error(ErrorMessage.UNKNOWN_ERROR)
       logger.error(err)
     })
-    .finally(() => {
-      performance.mark(endMark)
-      performance.measure(entryName, startMark, endMark)
-    })
+  performance.mark(endMark)
+  performance.measure(entryName, startMark, endMark)
+  performance.clearMarks()
+  obs.disconnect()
 }
 
 // DEPRECATED, TODO: Remove once clients are all on contract kit version 4.11
