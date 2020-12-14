@@ -1,11 +1,18 @@
 import { PhoneNumberUtils } from '@celo/utils'
+import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import Logger from 'bunyan'
 import express from 'express'
 import { Transaction } from 'sequelize'
-import { findAttestationByKey, makeSequelizeLogger, sequelize, SequelizeLogger } from '../db'
+import {
+  findAttestationByKey,
+  makeSequelizeLogger,
+  sequelize,
+  SequelizeLogger,
+  useKit,
+} from '../db'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
@@ -102,7 +109,16 @@ export async function handleGetAttestationRequest(
   }
 
   const typedData = buildSecurityCodeTypedData(getRequest.account)
-  if (!verifyEIP712TypedDataSigner(typedData, authentication as string, getRequest.account)) {
+  const accounts = await useKit((kit) => kit.contracts.getAccounts())
+  const [walletAddress, dek] = await Promise.all([
+    accounts.getWalletAddress(getRequest.account),
+    accounts.getDataEncryptionKey(getRequest.account),
+  ])
+  if (
+    !verifyEIP712TypedDataSigner(typedData, authentication as string, getRequest.account) &&
+    !verifyEIP712TypedDataSigner(typedData, authentication as string, walletAddress) &&
+    !verifyEIP712TypedDataSigner(typedData, authentication as string, publicKeyToAddress(dek))
+  ) {
     respondWithError(res, 401, 'Invalid signature')
     return
   }
