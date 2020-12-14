@@ -586,7 +586,7 @@ contract Validators is
   /**
    * @notice Updates a validator's BLS key.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 48 bytes.
+   *   proof of possession. 96 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 48 bytes.
    * @return True upon success.

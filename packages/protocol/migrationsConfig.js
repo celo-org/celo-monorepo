@@ -147,6 +147,10 @@ const DefaultConfig = {
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
   },
+  snarkEpochDataSlasher: {
+    reward: '1000000000000000000000', // 1000 cGLD
+    penalty: '9000000000000000000000', // 9000 cGLD
+  },
   stableToken: {
     decimals: 18,
     goldPrice: 1,
@@ -220,6 +224,39 @@ const NetworkConfigs = {
     },
   },
   testing: {
+    downtimeSlasher: {
+      slashableDowntime: 6,
+    },
+    election: {
+      minElectableValidators: '1',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+        max: 0.0005,
+        adjustmentFactor: 0.1,
+      },
+    },
+    exchange: {
+      frozen: false,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    governance: {
+      skipSetConstitution: true,
+      skipTransferOwnership: true,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000, // CELO
+    },
+  },
+  local: {
     downtimeSlasher: {
       slashableDowntime: 6,
     },

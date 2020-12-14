@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ensureLeading0x } from '@celo/utils/lib/address'
@@ -180,6 +179,16 @@ describe('slashing tests', function(this: any) {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restartWithDowntime()
+    })
+
+    it('should get correct validator address using the precompile', async () => {
+      const contract = await kit._web3Contracts.getElection()
+      const validators = await kit._web3Contracts.getValidators()
+      const addr = await contract.methods.validatorSignerAddressFromSet(0, 10).call()
+      const blsPublicKey = await contract.methods.validatorBLSPublicKeyFromSet(0, 10).call()
+      const blsKey = await validators.methods.getValidatorBlsPublicKeyFromSigner(addr).call()
+      // console.info('addr', addr, 'bls', blsPublicKey, 'compressed', blsKey)
+      assert.equal(blsPublicKey.substr(0, 2 + 96 * 2 - 1), blsKey.substr(0, 2 + 96 * 2 - 1))
     })
 
     it('should parse blockNumber from test header', async () => {

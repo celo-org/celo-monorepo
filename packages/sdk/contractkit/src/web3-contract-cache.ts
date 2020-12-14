@@ -22,6 +22,7 @@ import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
+import { newSnarkEpochDataSlasher } from './generated/SnarkEpochDataSlasher'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
@@ -52,6 +53,7 @@ export const ContractFactories = {
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
+  [CeloContract.SnarkEpochDataSlasher]: newSnarkEpochDataSlasher,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
@@ -135,6 +137,9 @@ export class Web3ContractCache {
   }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
+  }
+  getSnarkEpochDataSlasher() {
+    return this.getContract(CeloContract.SnarkEpochDataSlasher)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)

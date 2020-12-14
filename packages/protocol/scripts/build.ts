@@ -30,6 +30,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
+  'SnarkEpochDataSlasherProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
 ]
@@ -58,6 +59,7 @@ export const CoreContracts = [
   'LockedGold',
   'Validators',
   'ReleaseGold',
+  'SnarkEpochDataSlasher',
 
   // identity
   'Attestations',

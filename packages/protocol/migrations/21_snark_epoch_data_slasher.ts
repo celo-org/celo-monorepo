@@ -4,29 +4,29 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { DoubleSigningSlasherInstance, LockedGoldInstance } from 'types'
+import { LockedGoldInstance, SnarkEpochDataSlasherInstance } from 'types'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    config.doubleSigningSlasher.penalty,
-    config.doubleSigningSlasher.reward,
+    config.snarkEpochDataSlasher.penalty,
+    config.snarkEpochDataSlasher.reward,
   ]
 }
 
-module.exports = deploymentForCoreContract<DoubleSigningSlasherInstance>(
+module.exports = deploymentForCoreContract<SnarkEpochDataSlasherInstance>(
   web3,
   artifacts,
-  CeloContractName.DoubleSigningSlasher,
+  CeloContractName.SnarkEpochDataSlasher,
   initializeArgs,
   async () => {
-    console.info('Adding DoubleSigningSlasher contract as slasher.')
+    console.info('Adding SnarkEpochDataSlasher contract as slasher.')
     const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
       'LockedGold',
       artifacts
     )
     try {
-      await lockedGold.addSlasher(CeloContractName.DoubleSigningSlasher)
+      await lockedGold.addSlasher(CeloContractName.SnarkEpochDataSlasher)
     } catch (err) {
       console.info('hmm', err)
     }

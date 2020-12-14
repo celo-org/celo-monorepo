@@ -6,6 +6,7 @@ contract MockUsingPrecompiles {
   mapping(bytes32 => bytes32) verifiedSealBitmap;
   mapping(uint256 => bytes32) parentSealBitmap;
   mapping(bytes32 => address) epochSigner;
+  mapping(bytes32 => bytes) epochBLS;
 
   uint256 numValidators;
 
@@ -42,6 +43,14 @@ contract MockUsingPrecompiles {
     returns (address)
   {
     return epochSigner[keccak256(abi.encodePacked(calcEpoch(blockNumber), index))];
+  }
+
+  function validatorBLSPublicKeyFromSet(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (bytes memory)
+  {
+    return epochBLS[keccak256(abi.encodePacked(calcEpoch(blockNumber), index))];
   }
 
   function setEpochSigner(uint256 epoch, uint256 index, address signer) public {

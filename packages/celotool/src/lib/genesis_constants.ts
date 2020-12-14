@@ -19,6 +19,8 @@ export const TEMPLATE = {
     constantinopleBlock: 0,
     petersburgBlock: 0,
     istanbulBlock: 0,
+    churritoBlock: 0,
+    donutBlock: 0,
   },
   nonce: '0x0',
   timestamp: '0x5b843511',

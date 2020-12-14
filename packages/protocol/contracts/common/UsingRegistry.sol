@@ -45,6 +45,9 @@ contract UsingRegistry is Ownable {
   bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
+  bytes32 constant SNARK_EPOCH_DATA_SLASHER_REGISTRY_ID = keccak256(
+    abi.encodePacked("SnarkEpochDataSlasher")
+  );
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));

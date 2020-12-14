@@ -18,6 +18,7 @@ import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
 import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
+import { SnarkEpochDataSlasherWrapper } from './wrappers/SnarkEpochDataSlasher'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
@@ -44,6 +45,7 @@ const WrapperFactories = {
   [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
   [CeloContract.MultiSig]: MultiSigWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
+  [CeloContract.SnarkEpochDataSlasher]: SnarkEpochDataSlasherWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
@@ -74,6 +76,7 @@ interface WrapperCacheMap {
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
   [CeloContract.Reserve]?: ReserveWrapper
+  [CeloContract.SnarkEpochDataSlasher]?: SnarkEpochDataSlasherWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
@@ -149,6 +152,9 @@ export class WrapperCache {
   // }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
+  }
+  getSnarkEpochDataSlasher() {
+    return this.getContract(CeloContract.SnarkEpochDataSlasher)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)

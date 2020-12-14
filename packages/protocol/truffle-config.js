@@ -145,6 +145,11 @@ const networks = {
     ...defaultConfig,
     from: INTEGRATION_TESTING_FROM,
   },
+  local: {
+    ...defaultConfig,
+    network_id: 1337,
+    from: INTEGRATION_TESTING_FROM,
+  },
   argentinastaging: freeGasConfig,
   argentinaproduction: freeGasConfig,
 

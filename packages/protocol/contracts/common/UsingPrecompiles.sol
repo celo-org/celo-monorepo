@@ -16,6 +16,7 @@ contract UsingPrecompiles {
   address constant HASH_HEADER = address(0xff - 9);
   address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
+  address constant VALIDATOR_BLS = address(0xff - 20);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -78,6 +79,15 @@ contract UsingPrecompiles {
     return getEpochNumberOfBlock(block.number);
   }
 
+  function getEpochLastBlock(uint256 epoch) public view returns (uint256) {
+    if (epoch == 0) {
+      return 0;
+    }
+    uint256 size = getEpochSize();
+    uint256 firstBlock = ((epoch - 1) * size) + 1;
+    return firstBlock + (size - 1);
+  }
+
   /**
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.
@@ -127,6 +137,25 @@ contract UsingPrecompiles {
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
     require(success, "error calling validatorSignerAddressFromSet precompile");
     return address(getUint256FromBytes(out, 0));
+  }
+
+  /**
+   * @notice Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
+  function validatorBLSPublicKeyFromSet(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (bytes memory)
+  {
+    bytes memory out;
+    bool success;
+    (success, out) = VALIDATOR_BLS.staticcall(abi.encodePacked(index, blockNumber));
+    require(success, "error calling validatorBLSPublicKeyFromSet precompile");
+    require(out.length == 256, "bad BLS public key length");
+    return out;
   }
 
   /**
