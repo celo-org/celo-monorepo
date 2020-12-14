@@ -12,16 +12,15 @@ const config: Partial<TypeDocOptionMap> = JSON.parse(readFileSync('./typedoc.jso
 const localSummaryPath = `${config.out!}/SUMMARY.md`
 const localSummary = readFileSync(localSummaryPath).toString()
 
-const replace = pkgName.indexOf('wallet') >= 0 ? '../../../docs/' : '../../docs/'
-const localPathPrefix = config.out!.replace(replace, '')
+const filePathPrefix = pkgName.indexOf('wallet') >= 0 ? '../../../docs/' : '../../docs/'
+const localPathPrefix = config.out!.replace(filePathPrefix, '')
 
 const pathRegex = /\(.*.md\)/g
 const modifiedLocalSummary = localSummary
   .replace(pathRegex, (match) => `(${localPathPrefix}/${match.slice(1, -1)})`)
   .replace(/\*/g, indent + '-')
 
-const globalSummaryPath =
-  pkgName.indexOf('wallet') >= 0 ? '../../../docs/SUMMARY.md' : '../../docs/SUMMARY.md'
+const globalSummaryPath = filePathPrefix + 'SUMMARY.md'
 const globalSummary = readFileSync(globalSummaryPath).toString()
 
 // Adding the indent to the tag, otherwise the markdows has poor preview
