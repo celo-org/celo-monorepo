@@ -18,8 +18,8 @@ Payment requests occur off chain - using a service \(firebase in the open source
 
 For non-essential functionality that is not detrimental to interoperability, a private firebase service. Notifications in the Celo Wallet are one example of this. Users receive push notifications in the following circumstances:
 
-- Receiving a payment request
-- Payment of an outstanding payment request
+* Receiving a payment request
+* Payment of an outstanding payment request
 
 {% hint style="info" %}
 In order for notifications to work in a fork of the Celo Wallet, creation of another firebase service for the forked wallet is necessary.
@@ -30,3 +30,4 @@ In order for notifications to work in a fork of the Celo Wallet, creation of ano
 The Mobile Exchange experience implements the uniswap-style exchange detailed in [Stability Mechanism Documentation](../../protocol/stability/doto.md). For this reason, rates provided are an overestimate of the current rate and subject to change \(such changes are presented to the user if they result in a less favorable rate\)
 
 \_\_
+

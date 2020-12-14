@@ -6,14 +6,13 @@ Plumo is a zk-SNARK based system that allows mobile and resource constrained nod
 
 Celo is a mobile-first blockchain platform with a mission to enable the conditions for prosperity across the world. This means that may of Celo and the Valora wallet's first users will be in emerging markets. In these countries, while mobile phone penetration has significantly increased, data plans and device hardware still lags. This means that for average users, data is a scarce commodity and devices are underpowered in compute relative to the latest and greatest iPhone or Android devices.
 
-If these users are to trustlessly sync and interact with a blockchain network, they'll need to run a [light client](https://www.parity.io/what-is-a-light-client/) on devices. However, traditional light clients in proof of work (PoW) blockchains need to download every block header, which grows linearly with new blocks. Over time, this becomes untenable, and even light clients [take minutes to sync](https://ethereum.stackexchange.com/questions/82568/whats-the-status-of-ethereum-light-client).
+If these users are to trustlessly sync and interact with a blockchain network, they'll need to run a [light client](https://www.parity.io/what-is-a-light-client/) on devices. However, traditional light clients in proof of work \(PoW\) blockchains need to download every block header, which grows linearly with new blocks. Over time, this becomes untenable, and even light clients [take minutes to sync](https://ethereum.stackexchange.com/questions/82568/whats-the-status-of-ethereum-light-client).
 
 ### Proof of Stake Light Clients
 
-Celo uses a proof of stake (PoS) consensus sytem, enabling it to offer a better light client sync experience, right off the bat: 
+Celo uses a proof of stake \(PoS\) consensus sytem, enabling it to offer a better light client sync experience, right off the bat:
 
-1. First, Celo light clients only need to download epoch block headers, which contain information about the current validator set. [The validator set](./consensus/validator-set-differences.md) in Celo changes once every epoch, roughly about once per day. This means instead of downloading a block header for every block on the Celo network, they can just download one a day.
-
+1. First, Celo light clients only need to download epoch block headers, which contain information about the current validator set. [The validator set](consensus/validator-set-differences.md) in Celo changes once every epoch, roughly about once per day. This means instead of downloading a block header for every block on the Celo network, they can just download one a day.
 2. Second, Celo uses BLS signatures to aggregate validator signatures. Similar to Tendermint consensus, Celo's IBFT consensus mechanism requires a quorum of 2/3 or more validators to sign each block to commit it to the blockchain. Instead of having each of these signatures be separately stored on-chain, Celo uses BLS signatures which can combine them into one signature per block.
 
 These two innovations reduce the time and data required to sync significantly, but over time, sync time continues to increase. One option is to [checkpoint](https://decentralizedthoughts.github.io/2019-09-13-dont-trust-checkpoint/) the chain ever so frequently so that clients do not need to sync from the genesis block. This certainly alleviates the challenge, but checkpointing requires getting consensus and agreement from the community, which can take time. What if there were a way to "checkpoint" cryptographically?
@@ -28,9 +27,9 @@ Using Plumo, light clients can drastically reduce the amount of data and time re
 
 ## Plumo MPC Setup
 
-In order to generate the prover and verifier keys for the Plumo SNARK circuit, it is necessary to run a multi-party computation (MPC). 
+In order to generate the prover and verifier keys for the Plumo SNARK circuit, it is necessary to run a multi-party computation \(MPC\).
 
-An MPC is a cryptographic mechanism for different parties to jointly perform a computation. SNARK circuits require a “trusted setup” where a shared secret is used to generate public parameters that can be used to prove and verify SNARKs. If one person ran this setup, then they could potentially prove incorrect things by exploiting a backdoor in the circuit. However, with an MPC, this setup process is split amongst tens or hundreds of contributors, and if even one of the participants is honest (keeps their inputs private), then the system will be secure.
+An MPC is a cryptographic mechanism for different parties to jointly perform a computation. SNARK circuits require a “trusted setup” where a shared secret is used to generate public parameters that can be used to prove and verify SNARKs. If one person ran this setup, then they could potentially prove incorrect things by exploiting a backdoor in the circuit. However, with an MPC, this setup process is split amongst tens or hundreds of contributors, and if even one of the participants is honest \(keeps their inputs private\), then the system will be secure.
 
 In the case of the Plumo Ceremony, this collective computation will be a series of joint actions done by a group of participants from within the Celo community and beyond.
 
@@ -39,9 +38,9 @@ In the case of the Plumo Ceremony, this collective computation will be a series 
 The Plumo MPC setup is broken up into two phases:
 
 * Phase 1 - Powers of Tau
-  - The output of this phase can be used for either Groth16 circuits up to the size of the phase, or universal proving systems such as PLONK and Marlin.
+  * The output of this phase can be used for either Groth16 circuits up to the size of the phase, or universal proving systems such as PLONK and Marlin.
 * Phase 2 - Plumo circuit
-  - In this phase, the participants contribute to the Plumo circuit keys, which would be used by provers to create proofs and verifiers to verify them.
+  * In this phase, the participants contribute to the Plumo circuit keys, which would be used by provers to create proofs and verifiers to verify them.
 
 Phase 1 will take place starting early December 2020, and continue until January 2021. It will consist of multiple rounds of 6–10 contributors each running the Plumo setup for approximately 36 hours. While much of the activity is passive and involves simply running the computation continuously, contributors should not expect to use their machines for other intensive activies through the duration of the setup.
 
@@ -55,13 +54,13 @@ You can run the contributor software locally or on cloud VMs, but desktop machin
 
 #### Machine requirements:
 
-- CPU model newer than 2016
-- Minimum processor requirements:
-    - 2.6GHz, 6 cores, 12 threads, OR
-    - 2.3GHz, 8 cores, 16 threads, OR
-    - 3.6GHz, 4 cores, 4 threads
-- Operating system: Linux, macOS, Windows
-- Recommended internet connection speed: 10Mbit upload
+* CPU model newer than 2016
+* Minimum processor requirements:
+  * 2.6GHz, 6 cores, 12 threads, OR
+  * 2.3GHz, 8 cores, 16 threads, OR
+  * 3.6GHz, 4 cores, 4 threads
+* Operating system: Linux, macOS, Windows
+* Recommended internet connection speed: 10Mbit upload
 
 With these kind of machines, participiation in the setup should take around 30 hours, potentially a bit more or much less, depending on your specific hardware and internet connection.
 
@@ -73,28 +72,30 @@ The instructions below are for the first phase of the Plumo setup, Powers of Tau
 
 The first step to participating is generating your Celo address in a secure location.
 
-* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-benchmarking.4).
+* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
-    * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
-    * Make sure to save your passphrase - you will need it later.
+  * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
+  * Make sure to save your passphrase - you will need it later.
 * Send the address generated to plumo@celo.org.
 * Keep the resulting `plumo.keys` file. Ideally, it will be stored in a location that's easy to destroy afterwards, such as a USB thumbdrive.
 
 ### Run the Contributor software
 
-Next you'll download the `contribute` binary and begin contributing to the Plumo setup. 
+Next you'll download the `contribute` binary and begin contributing to the Plumo setup.
 
 cLabs is running the coordinator server, which has a list of approved participant addresses. Additionally, cLabs is running a few verifiers that verify contributions on-demand, allowing the setup to make progress.
 
 * After receiving confirmation from cLabs, download the `contribute` binary from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
-* Run it as follows, assuming your keys reside in KEYS_PATH:
-    * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
-    * macOS users: `./contribute-macos --keys-path KEYS_PATH`
-    * Linux users: `./contribute-linux --keys-path KEYS_PATH`
-  
+* Run it as follows, assuming your keys reside in KEYS\_PATH:
+
+  * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
+  * macOS users: `./contribute-macos --keys-path KEYS_PATH`
+  * Linux users: `./contribute-linux --keys-path KEYS_PATH`
+
   For example, assuming you're using Linux and your keys reside in `/mnt/plumo/plumo.keys`, you'd run: `./contribute-linux --keys-path /mnt/plumo/plumo.keys`.
+
 * You will be asked for your passphrase - enter the same one from earlier. 
-    * Follow the same process from earlier when prompted for additional entropy.
+  * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
 
 Once this is running, you can leave the machine running -- no direct action is needed. This will run for about ~36 hours, after which the software will terminate running and you will have finished contributing to the Plumo setup!
@@ -104,25 +105,30 @@ Once this is running, you can leave the machine running -- no direct action is n
 This section contains some common issues contributors may run into while running the setup software.
 
 **Permissions:**
-- You may need to change the permissions on both the `generate` and `contribute` files to be able to run them. For example, on macOS, you can run `chmod u+x generate-macos contribute-macos`.
-- On Windows, you might be presented with a warning that this program is from an unsigned developer. Click "run anyway" to continue.
-- On macOS, you might be shown a "permission denied" error. This is because it's a downloaded file and is by default in quarantine. You can remove it from quarantine by running `xattr -d com.apple.quarantine contribute-macos`. See here for more details: https://superuser.com/questions/526920/how-to-remove-quarantine-from-file-permissions-in-os-x. 
+
+* You may need to change the permissions on both the `generate` and `contribute` files to be able to run them. For example, on macOS, you can run `chmod u+x generate-macos contribute-macos`.
+* On Windows, you might be presented with a warning that this program is from an unsigned developer. Click "run anyway" to continue.
+* On macOS, you might be shown a "permission denied" error. This is because it's a downloaded file and is by default in quarantine. You can remove it from quarantine by running `xattr -d com.apple.quarantine contribute-macos`. See here for more details: [https://superuser.com/questions/526920/how-to-remove-quarantine-from-file-permissions-in-os-x](https://superuser.com/questions/526920/how-to-remove-quarantine-from-file-permissions-in-os-x). 
 
 **Hardware:**
-- Disable sleep - if your machine is automatically set to sleep or turn hard disks off, it's best to switch these options off.
-- Battery - it's best to connect the machine to an outlet, as the setup is computationally intensive and would drain a battery fast.
+
+* Disable sleep - if your machine is automatically set to sleep or turn hard disks off, it's best to switch these options off.
+* Battery - it's best to connect the machine to an outlet, as the setup is computationally intensive and would drain a battery fast.
 
 If either of these happen, don't worry - stop and restart the contribution program and re-enter the passphrase to continue.
 
 **Network:**
-- If you have issues uploading your contributions, it could be that you have some other processes that are consuming your bandwidth. Make sure to quit any processes such as:
-    - A Nest or home camera uploading feeds
-    - Torrenting / seeding any files
-    - Backup services
+
+* If you have issues uploading your contributions, it could be that you have some other processes that are consuming your bandwidth. Make sure to quit any processes such as:
+  * A Nest or home camera uploading feeds
+  * Torrenting / seeding any files
+  * Backup services
 
 ## Additional Resources
-- [Plumo Paper](https://docs.zkproof.org/pages/standards/accepted-workshop3/proposal-plumo_celolightclient.pdf)
-- [Plumo Celo Improvement Proposal](https://github.com/celo-org/celo-proposals/pull/41)
-- [Zero Knowledge Summit Presentation on Plumo](https://www.youtube.com/watch?v=2e0XpWgFKLg)
-- [Transcript of Plumo presentation at Stanford Blockchain Conference](https://diyhpl.us/wiki/transcripts/stanford-blockchain-conference/2020/celo-ultralight-client/)
-- [Zero Knowledge Summit Presentation on the Plumo setup system, Espero](https://www.youtube.com/watch?v=LKbDNc-LrA4)
+
+* [Plumo Paper](https://docs.zkproof.org/pages/standards/accepted-workshop3/proposal-plumo_celolightclient.pdf)
+* [Plumo Celo Improvement Proposal](https://github.com/celo-org/celo-proposals/pull/41)
+* [Zero Knowledge Summit Presentation on Plumo](https://www.youtube.com/watch?v=2e0XpWgFKLg)
+* [Transcript of Plumo presentation at Stanford Blockchain Conference](https://diyhpl.us/wiki/transcripts/stanford-blockchain-conference/2020/celo-ultralight-client/)
+* [Zero Knowledge Summit Presentation on the Plumo setup system, Espero](https://www.youtube.com/watch?v=LKbDNc-LrA4)
+
