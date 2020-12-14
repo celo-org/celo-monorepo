@@ -22,7 +22,7 @@ export async function getPerformedQueryCount(account: string, logger: Logger): P
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return 0
   }
 }
@@ -53,7 +53,7 @@ export async function incrementQueryCount(account: string, logger: Logger) {
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return null
   }
 }
@@ -74,7 +74,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return false
   }
 }
@@ -97,7 +97,7 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return null
   }
 }

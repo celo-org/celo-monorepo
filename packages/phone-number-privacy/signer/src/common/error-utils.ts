@@ -14,7 +14,7 @@ export function respondWithError(
   endpoint: string,
   res: Response,
   statusCode: number,
-  err: ErrorType,
+  error: ErrorType,
   performedQueryCount: number = -1,
   totalQuota: number = -1,
   blockNumber: number = -1,
@@ -23,7 +23,7 @@ export function respondWithError(
   const response: SignMessageResponseFailure = {
     success: false,
     version: getVersion(),
-    error: err,
+    error,
     performedQueryCount,
     totalQuota,
     blockNumber,
@@ -32,10 +32,10 @@ export function respondWithError(
 
   const logger: Logger = res.locals.logger
 
-  if (err in WarningMessage) {
-    logger.warn({ err, statusCode, response }, 'Responding with warning')
+  if (error in WarningMessage) {
+    logger.warn({ error, statusCode, response }, 'Responding with warning')
   } else {
-    logger.error({ err, statusCode, response }, 'Responding with error')
+    logger.error({ error, statusCode, response }, 'Responding with error')
   }
 
   Counters.responses.labels(endpoint, statusCode.toString()).inc()

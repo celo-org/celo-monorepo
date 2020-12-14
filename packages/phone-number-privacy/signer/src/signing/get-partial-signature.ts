@@ -177,7 +177,7 @@ export async function handleGetBlindedMessagePartialSig(
     response.json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
-    logger.error({ err })
+    logger.error(err)
     respondWithError(
       Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
       response,

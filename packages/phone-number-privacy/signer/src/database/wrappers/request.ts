@@ -30,7 +30,7 @@ export async function getRequestExists(
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return false
   }
 }
@@ -49,7 +49,7 @@ export async function storeRequest(request: GetBlindedMessagePartialSigRequest, 
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return null
   }
 }

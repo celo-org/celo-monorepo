@@ -73,7 +73,8 @@ export async function handleGetQuota(
     logger.info({ response: queryQuotaResponse }, 'Query quota retrieval success')
     response.status(200).json(queryQuotaResponse)
   } catch (err) {
-    logger.error({ err }, 'Failed to get user quota')
+    logger.error('Failed to get user quota')
+    logger.error(err)
     respondWithError(Endpoints.GET_QUOTA, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
@@ -243,7 +244,10 @@ export async function getDollarBalance(logger: Logger, ...addresses: string[]): 
         )
       )
   ).then((values) => {
-    logger.trace({ addresses, balances: values }, 'Fetched cusd balances for addresses')
+    logger.trace(
+      { addresses, balances: values.map((bn) => bn.toString()) },
+      'Fetched cusd balances for addresses'
+    )
     return values.reduce((a, b) => a.plus(b))
   })
 }
@@ -261,7 +265,10 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
         )
       )
   ).then((values) => {
-    logger.trace({ addresses, balances: values }, 'Fetched celo balances for addresses')
+    logger.trace(
+      { addresses, balances: values.map((bn) => bn.toString()) },
+      'Fetched celo balances for addresses'
+    )
     return values.reduce((a, b) => a.plus(b))
   })
 }
@@ -276,7 +283,7 @@ export async function getWalletAddress(logger: Logger, account: string): Promise
     )
   } catch (err) {
     logger.error({ account }, 'failed to get wallet address for account')
-    logger.error({ err })
+    logger.error(err)
     return NULL_ADDRESS
   }
 }

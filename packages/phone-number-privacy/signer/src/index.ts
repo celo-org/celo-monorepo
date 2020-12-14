@@ -19,6 +19,6 @@ async function start() {
 
 start().catch((err) => {
   logger.info('Fatal error occured. Exiting')
-  logger.error({ err })
+  logger.error(err)
   process.exit(1)
 })
