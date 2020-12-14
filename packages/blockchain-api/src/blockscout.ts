@@ -21,8 +21,8 @@ import { TokenTransactionArgs } from './schema'
 import { Transaction } from './transaction/Transaction'
 import { TransactionAggregator } from './transaction/TransactionAggregator'
 import { TransactionClassifier } from './transaction/TransactionClassifier'
-import { TransactionNavigator } from './transaction/TransactionNavigator'
 import { TransferCollection } from './transaction/TransferCollection'
+import { TransfersNavigator } from './transaction/TransfersNavigator'
 import { ContractAddresses, getContractAddresses } from './utils'
 
 export interface BlockscoutTransferTx {
@@ -98,7 +98,7 @@ export class BlockscoutAPI extends RESTDataSource {
       const celoTransfers = node.celoTransfer.edges.map((edge: any) => edge.node)
 
       const transferCollection = new TransferCollection(celoTransfers)
-      const transactionNavigator = new TransactionNavigator(
+      const transfersNavigator = new TransfersNavigator(
         contractAddresses,
         FAUCET_ADDRESS,
         transferCollection
@@ -108,7 +108,7 @@ export class BlockscoutAPI extends RESTDataSource {
         Input.fromString(partialTransferTx.input)
       )
 
-      return new Transaction(partialTransferTx, transactionNavigator, inputDecoder)
+      return new Transaction(partialTransferTx, transfersNavigator, inputDecoder)
     })
 
     return transactions

@@ -22,12 +22,23 @@ export class TransferCollection {
   }
 
   popWhich(predicate: TransferFilter): BlockscoutCeloTransfer | undefined {
-    const index = this.transfers.findIndex(predicate)
+    const index = this.findLastIndex(this.transfers, predicate)
     return index > -1 ? this.transfers.splice(index, 1)[0] : undefined
   }
 
   get(predicate: TransferFilter): BlockscoutCeloTransfer | undefined {
     const index = this.transfers.findIndex(predicate)
     return index > -1 ? this.transfers[index] : undefined
+  }
+
+  findLastIndex<T>(array: T[], predicate: (value: T, index: number, obj: T[]) => boolean): number {
+    let l = array.length
+
+    while (l--) {
+      if (predicate(array[l], l, array)) {
+        return l
+      }
+    }
+    return -1
   }
 }

@@ -39,12 +39,12 @@ describe('Blockchain API Utils', () => {
       const decoded = decoder.getTransactionComment()
       expect(decoded).toEqual(comment)
     })
-    xit('should return empty on too short input', () => {
+    it('should return empty on too short input', () => {
       const decoder = new InputDecoder(contractAddresses, Input.fromString('0x10'))
       const decoded = decoder.getTransactionComment()
       expect(decoded).toEqual('')
     })
-    xit('should return empty on invalid function selector', () => {
+    it('should return empty on invalid function selector', () => {
       const decoder = new InputDecoder(
         contractAddresses,
         Input.fromString(

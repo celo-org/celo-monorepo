@@ -249,6 +249,106 @@ const mockTokenTxs = {
             transactionHash: '0x21dd2c18ae6c80d61ffbddaa073f7cde7bbfe9436fdf5059b506f1686326a2fb',
           },
         },
+        // Dollars sent to the governance contract (edge case)
+        {
+          node: {
+            blockNumber: 90791,
+            celoTransfer: {
+              edges: [
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0xa12a699c641cc875a7ca57495861c79c33d293b4',
+                    token: 'cUSD',
+                    value: '150000000000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0xa12a699c641cc875a7ca57495861c79c33d293b4',
+                    token: 'cUSD',
+                    value: '1131780000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x050f34537f5b2a00b9b9c752cb8500a3fce3da7d',
+                    token: 'cUSD',
+                    value: '4527120000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
+                    token: 'cUSD',
+                    value: '10000000000000000',
+                  },
+                },
+              ],
+            },
+            feeCurrency: '0xa561131a1c8ac25925fb848bca45a74af61e5a38',
+            feeToken: 'cUSD',
+            gasPrice: '50000000000',
+            gasUsed: '113178',
+            gatewayFee: '10000000000000000',
+            gatewayFeeRecipient: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
+            timestamp: '2019-08-21T00:11:16.000000Z',
+            transactionHash: '0x21dd2c18ae6c80d61ffbddaa073f7cde7bbfe9436fdf5059b506f1686326a2ff',
+          },
+        },
+        // Dollars sent to the gateway fee recipient (edge case)
+        {
+          node: {
+            blockNumber: 90792,
+            celoTransfer: {
+              edges: [
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
+                    token: 'cUSD',
+                    value: '150000000000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0xa12a699c641cc875a7ca57495861c79c33d293b4',
+                    token: 'cUSD',
+                    value: '1131780000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x050f34537f5b2a00b9b9c752cb8500a3fce3da7d',
+                    token: 'cUSD',
+                    value: '4527120000000000',
+                  },
+                },
+                {
+                  node: {
+                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
+                    toAddressHash: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
+                    token: 'cUSD',
+                    value: '10000000000000000',
+                  },
+                },
+              ],
+            },
+            feeCurrency: '0xa561131a1c8ac25925fb848bca45a74af61e5a38',
+            feeToken: 'cUSD',
+            gasPrice: '50000000000',
+            gasUsed: '113178',
+            gatewayFee: '10000000000000000',
+            gatewayFeeRecipient: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
+            timestamp: '2019-08-21T00:11:16.000000Z',
+            transactionHash: '0x21dd2c18ae6c80d61ffbddaa073f7cde7bbfe9436fdf5059b506f1686326afff',
+          },
+        },
         // Dollars received
         {
           node: {
@@ -316,7 +416,7 @@ const mockTokenTxs = {
               ],
             },
             feeCurrency: null,
-            feeToken: 'cGLD',
+            feeToken: '', // empty feeToken should be treated as cGLD
             gasPrice: '5000000000',
             gasUsed: '47426',
             gatewayFee: '0',
@@ -342,7 +442,7 @@ const mockTokenTxs = {
               ],
             },
             feeCurrency: null,
-            feeToken: 'cGLD',
+            feeToken: null, // empty feeToken should be treated as cGLD
             gasPrice: '5000000000',
             gasUsed: '47426',
             gatewayFee: '10000000000',

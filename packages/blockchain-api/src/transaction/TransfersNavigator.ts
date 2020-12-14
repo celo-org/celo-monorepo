@@ -4,7 +4,7 @@ import { TransferCollection } from './TransferCollection'
 
 const MINTED_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export class TransactionNavigator {
+export class TransfersNavigator {
   private contractAddresses: ContractAddresses
   private faucetAddress: string
   private transferCollection: TransferCollection

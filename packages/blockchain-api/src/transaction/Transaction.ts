@@ -4,7 +4,7 @@ import { CGLD } from '../currencyConversion/consts'
 import { InputDecoder } from '../helpers/InputDecoder'
 import { FeeType } from '../schema'
 import { Contracts } from '../utils'
-import { TransactionNavigator } from './TransactionNavigator'
+import { TransfersNavigator } from './TransfersNavigator'
 
 export interface Fee {
   type: FeeType
@@ -29,8 +29,8 @@ export class Transaction {
     return this.input.getTransactionComment()
   }
 
-  get transfers(): TransactionNavigator {
-    return this.transactionNavigator
+  get transfers(): TransfersNavigator {
+    return this.transfersNavigator
   }
 
   get fees(): Fee[] {
@@ -42,17 +42,17 @@ export class Transaction {
   }
 
   private blockscoutTx: BlockscoutTransferTx
-  private transactionNavigator: TransactionNavigator
+  private transfersNavigator: TransfersNavigator
   private transactionFees: Fee[] = []
   private inputDecoder: InputDecoder
 
   constructor(
     blockscoutTx: BlockscoutTransferTx,
-    transactionNavigator: TransactionNavigator,
+    transfersNavigator: TransfersNavigator,
     inputDecoder: InputDecoder
   ) {
     this.blockscoutTx = blockscoutTx
-    this.transactionNavigator = transactionNavigator
+    this.transfersNavigator = transfersNavigator
     this.inputDecoder = inputDecoder
 
     this.extractFees()
@@ -71,7 +71,7 @@ export class Transaction {
   }
 
   isCeloTransaction(): boolean {
-    return this.blockscoutTx.feeToken !== undefined && this.blockscoutTx.feeToken === CGLD
+    return !this.blockscoutTx.feeToken || this.blockscoutTx.feeToken === CGLD
   }
 
   private hasGatewayRecipient(): boolean {
@@ -111,28 +111,35 @@ export class Transaction {
   }
 
   private calculateSecurityFee(): void {
+    // Non-native transactions have additional transfers to a validator
+    // and the Governance smart contract on the list of transfers
+    // but their sum also equals to gasPrice * gasUsed
     if (!this.isCeloTransaction()) {
       // transfer to validator should be the last one
-      this.transactionNavigator.popLastTransfer()
-      this.transactionNavigator.popTransferTo(Contracts.Governance)
+      this.transfersNavigator.popLastTransfer()
+      this.transfersNavigator.popTransferTo(Contracts.Governance)
     }
 
     this.transactionFees.push({
       type: FeeType.SECURITY_FEE,
       value: new BigNumber(this.blockscoutTx.gasPrice).multipliedBy(this.blockscoutTx.gasUsed),
-      currencyCode: this.blockscoutTx.feeToken,
+      currencyCode: this.isCeloTransaction() ? CGLD : this.blockscoutTx.feeToken,
     })
   }
 
   private calculateGatewayFee(): void {
+    // Non-native transactions have an additional transfer to the
+    // gateway fee recipient on the list of transfers
+    // but it's value is also recorded in gatewayFee
     if (!this.isCeloTransaction()) {
-      this.transactionNavigator.popTransferTo(this.blockscoutTx.gatewayFeeRecipient)
+      // it's the last transfer on the list
+      this.transfersNavigator.popTransferTo(this.blockscoutTx.gatewayFeeRecipient)
     }
 
     this.transactionFees.push({
       type: FeeType.GATEWAY_FEE,
       value: new BigNumber(this.blockscoutTx.gatewayFee),
-      currencyCode: this.blockscoutTx.feeToken,
+      currencyCode: this.isCeloTransaction() ? CGLD : this.blockscoutTx.feeToken,
     })
   }
 }
