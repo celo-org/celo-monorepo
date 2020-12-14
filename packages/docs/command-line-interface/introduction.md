@@ -10,7 +10,7 @@ description: >-
 
 ### **Prerequisites**
 
-- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/mainnet/running-a-full-node-in-mainnet.md) instructions for more details on running a full node.
+- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node-in-mainnet.md) instructions for more details on running a full node.
 
 ### NPM Package
 
@@ -36,7 +36,7 @@ The tool is broken down into modules and commands with the following pattern:
 celocli <module>:<command> <...args> <...flags?>
 ```
 
-The `celocli` tool assumes that users are running a node which they have access to signing transactions on. See documentation on the [config](commands/config.md) module for information about how set which node commands are sent to.
+The `celocli` tool assumes that users are running a node which they have access to signing transactions on. See documentation on the [config](config.md) module for information about how set which node commands are sent to.
 
 {% hint style="info" %}
 **All balances of CELO or Celo Dollars are expressed in units of 10-18**
@@ -46,7 +46,7 @@ The `celocli` tool assumes that users are running a node which they have access 
 
 ### Using a Ledger Wallet
 
-The Celo CLI supports using a [Ledger hardware wallet](../celo-owner-guide/ledger.md) to sign transactions.
+The Celo CLI supports using a [Ledger hardware wallet](../celo-holder-guide/ledger.md) to sign transactions.
 
 ### Plugins
 
