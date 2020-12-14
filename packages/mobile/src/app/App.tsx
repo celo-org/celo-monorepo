@@ -37,6 +37,7 @@ YellowBox.ignoreWarnings(ignoreWarnings)
 const { decimalSeparator, groupingSeparator } = getNumberFormatSettings()
 
 BigNumber.config({
+  EXPONENTIAL_AT: 1e9, // toString almost never return exponential notation
   FORMAT: {
     decimalSeparator,
     groupSeparator: groupingSeparator,
