@@ -6,6 +6,7 @@ import { appendPath } from '@celo/base/lib/string'
 import { Address, toTransactionObject } from '@celo/connect'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { AttestationRequest, GetAttestationRequest } from '@celo/utils/lib/io'
+import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { CeloContract } from '../base'
@@ -604,9 +605,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     if (requestBody.securityCode) {
       urlParams.set('securityCode', requestBody.securityCode)
       additionalHeaders = {
-        Authentication: await this.kit.signTypedData(
-          requestBody.account,
-          buildSecurityCodeTypedData(requestBody.securityCode)
+        Authentication: SignatureUtils.serializeSignature(
+          await this.kit.signTypedData(
+            requestBody.account,
+            buildSecurityCodeTypedData(requestBody.securityCode)
+          )
         ),
       }
     }

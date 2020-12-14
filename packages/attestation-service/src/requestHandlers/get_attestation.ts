@@ -108,19 +108,21 @@ export async function handleGetAttestationRequest(
     return
   }
 
-  const typedData = buildSecurityCodeTypedData(getRequest.account)
-  const accounts = await useKit((kit) => kit.contracts.getAccounts())
-  const [walletAddress, dek] = await Promise.all([
-    accounts.getWalletAddress(getRequest.account),
-    accounts.getDataEncryptionKey(getRequest.account),
-  ])
-  if (
-    !verifyEIP712TypedDataSigner(typedData, authentication as string, getRequest.account) &&
-    !verifyEIP712TypedDataSigner(typedData, authentication as string, walletAddress) &&
-    !verifyEIP712TypedDataSigner(typedData, authentication as string, publicKeyToAddress(dek))
-  ) {
-    respondWithError(res, 401, 'Invalid signature')
-    return
+  if (getRequest.securityCode) {
+    const typedData = buildSecurityCodeTypedData(getRequest.securityCode)
+    const accounts = await useKit((kit) => kit.contracts.getAccounts())
+    const [walletAddress, dekAddress] = await Promise.all([
+      accounts.getWalletAddress(getRequest.account),
+      accounts.getDataEncryptionKey(getRequest.account).then((x) => x && publicKeyToAddress(x)),
+    ])
+
+    const validSignature = [getRequest.account, walletAddress, dekAddress]
+      .filter(Boolean)
+      .find((address) => verifyEIP712TypedDataSigner(typedData, authentication as string, address))
+    if (!validSignature) {
+      respondWithError(res, 401, 'Invalid signature')
+      return
+    }
   }
 
   try {
