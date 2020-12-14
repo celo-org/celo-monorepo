@@ -7,10 +7,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-web-ingress
   labels:
-    app: blockscout
-    chart: blockscout
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-web-ingress
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"

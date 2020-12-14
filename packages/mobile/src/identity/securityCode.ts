@@ -3,7 +3,7 @@ import {
   AttestationsWrapper,
   getSecurityCodePrefix,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { PhoneNumberHashDetails } from '@celo/contractkit/src/identity/odis/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'src/utils/Logger'
 

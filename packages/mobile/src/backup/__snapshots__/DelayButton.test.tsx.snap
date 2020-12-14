@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DelayButton renders button with text when backup too late and not delayed 1`] = `
+exports[`DelayButton renders button with text when backup not completed and not delayed yet 1`] = `
 <View
   accessible={true}
   focusable={true}
@@ -28,23 +28,16 @@ exports[`DelayButton renders button with text when backup too late and not delay
 >
   <Text
     style={
-      Array [
-        Object {
-          "color": "#1AB775",
-          "fontFamily": "Inter-Regular",
-          "fontSize": 16,
-          "lineHeight": 22,
-          "paddingHorizontal": 24,
-        },
-        Object {
-          "color": "#9CA4A9",
-        },
-      ]
+      Object {
+        "color": "#1AB775",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 16,
+        "lineHeight": 22,
+        "paddingHorizontal": 24,
+      }
     }
   >
     delayBackup
   </Text>
 </View>
 `;
-
-exports[`DelayButton renders empty when backup too late and delayed 1`] = `<View />`;
