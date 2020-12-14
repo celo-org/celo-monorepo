@@ -29,7 +29,9 @@ async function meterResponse(
 
   const obs = new PerformanceObserver((list) => {
     const entry = list.getEntriesByName(entryName)[0]
-    logger.info({ latency: entry }, 'e2e response latency measured')
+    if (entry) {
+      logger.info({ latency: entry }, 'e2e response latency measured')
+    }
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
