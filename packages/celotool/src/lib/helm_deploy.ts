@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
@@ -5,7 +6,7 @@ import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { BaseClusterConfig } from './k8s-cluster/base'
+import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
 import {
@@ -179,7 +180,10 @@ export async function installGCPSSDStorageClass() {
   }
 }
 
-export async function installCertManagerAndNginx() {
+export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?: BaseClusterConfig) {
+  const nginxChartVersion = '3.9.0'
+  const nginxChartNamespace = 'default'
+
   // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
     `helm list -A`,
@@ -195,8 +199,74 @@ export async function installCertManagerAndNginx() {
     `nginx-ingress-release exists, skipping install`
   )
   if (!nginxIngressReleaseExists) {
-    await execCmdWithExitOnFailure(`helm install nginx-ingress-release stable/nginx-ingress`)
+    const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
+    await nginxHelmParameters(valueFilePath, celoEnv, clusterConfig)
+
+    await helmUpdateNginxRepo()
+    await execCmdWithExitOnFailure(`helm install \
+      -n ${nginxChartNamespace} \
+      --version ${nginxChartVersion} \
+      nginx-ingress-release ingress-nginx/ingress-nginx \
+      -f ${valueFilePath}
+    `)
   }
+}
+
+async function nginxHelmParameters(valueFilePath: string, celoEnv: string, clusterConfig?: BaseClusterConfig) {
+  const logFormat = `{"timestamp": "$time_iso8601", "requestID": "$req_id", "proxyUpstreamName":
+  "$proxy_upstream_name", "proxyAlternativeUpstreamName": "$proxy_alternative_upstream_name","upstreamStatus":
+  "$upstream_status", "upstreamAddr": "$upstream_addr","httpRequest":{"requestMethod":
+  "$request_method", "requestUrl": "$host$request_uri", "status": $status,"requestSize":
+  "$request_length", "responseSize": "$upstream_response_length", "userAgent":
+  "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
+  "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
+  let loadBalancerIP = ''
+  if (clusterConfig?.cloudProvider === CloudProvider.GCP) {
+    loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv)
+  }
+
+  const valueFileContent = `
+controller:
+  autoscaling:
+    enabled: "true"
+    targetMemoryUtilizationPercentage: 85
+  config:
+    log-format-escape-json: "true"
+    log-format-upstream: '${logFormat}'
+  metrics:
+    enabled: "true"
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+  service:
+    loadBalancerIP: ${loadBalancerIP}
+  resources:
+    requests:
+      cpu: 200m
+      memory: 400Mi
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
+}
+
+async function getOrCreateNginxStaticIp(celoEnv: string) {
+  const staticIpName = `${celoEnv}-nginx`
+  await registerIPAddress(staticIpName)
+  const staticIpAddress = await retrieveIPAddress(staticIpName)
+  console.info(staticIpAddress)
+  return staticIpAddress
+}
+
+export async function helmUpdateNginxRepo() {
+  await execCmdWithExitOnFailure(
+    `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
+  )
+  await execCmdWithExitOnFailure(
+    `helm repo add stable https://charts.helm.sh/stable`
+  )
+  await execCmdWithExitOnFailure(
+    `helm repo update`
+  )
 }
 
 export async function installCertManager() {

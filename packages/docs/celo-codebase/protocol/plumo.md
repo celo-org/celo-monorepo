@@ -71,13 +71,14 @@ The instructions below are for the first phase of the Plumo setup, Powers of Tau
 
 ### Generate your address
 
-The first step to participating is generating your Celo address.
+The first step to participating is generating your Celo address in a secure location.
 
-* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-benchmarking.4).
+* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
     * Make sure to save your passphrase - you will need it later.
-* Send the address generated to kobi@clabs.co. Keep the resulting `plumo.keys` file.
+* Send the address generated to plumo@celo.org.
+* Keep the resulting `plumo.keys` file. Ideally, it will be stored in a location that's easy to destroy afterwards, such as a USB thumbdrive.
 
 ### Run the Contributor software
 
@@ -85,11 +86,13 @@ Next you'll download the `contribute` binary and begin contributing to the Plumo
 
 cLabs is running the coordinator server, which has a list of approved participant addresses. Additionally, cLabs is running a few verifiers that verify contributions on-demand, allowing the setup to make progress.
 
-* After receiving confirmation from cLabs, download the `contribute` binary from [here]https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-rc.1).
-* Run it in the same directory as the `plumo.keys` file as follows:
-    * Windows users: `contribute-windows --coordinator-url https://plumo-setup-phase-1.azurefd.net`
-    * macOS users: `./contribute-macos --coordinator-url https://plumo-setup-phase-1.azurefd.net`
-    * Linux users: `./contribute-linux --coordinator-url https://plumo-setup-phase-1.azurefd.net`
+* After receiving confirmation from cLabs, download the `contribute` binary from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
+* Run it as follows, assuming your keys reside in KEYS_PATH:
+    * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
+    * macOS users: `./contribute-macos --keys-path KEYS_PATH`
+    * Linux users: `./contribute-linux --keys-path KEYS_PATH`
+  
+  For example, assuming you're using Linux and your keys reside in `/mnt/plumo/plumo.keys`, you'd run: `./contribute-linux --keys-path /mnt/plumo/plumo.keys`.
 * You will be asked for your passphrase - enter the same one from earlier. 
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
@@ -122,3 +125,4 @@ If either of these happen, don't worry - stop and restart the contribution progr
 - [Plumo Celo Improvement Proposal](https://github.com/celo-org/celo-proposals/pull/41)
 - [Zero Knowledge Summit Presentation on Plumo](https://www.youtube.com/watch?v=2e0XpWgFKLg)
 - [Transcript of Plumo presentation at Stanford Blockchain Conference](https://diyhpl.us/wiki/transcripts/stanford-blockchain-conference/2020/celo-ultralight-client/)
+- [Zero Knowledge Summit Presentation on the Plumo setup system, Espero](https://www.youtube.com/watch?v=LKbDNc-LrA4)
