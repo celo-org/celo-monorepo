@@ -17,4 +17,3 @@ A number of substantial changes have been made in service of Celo's product goal
 {% page-ref page="identity/" %}
 
 {% page-ref page="plumo.md" %}
-
