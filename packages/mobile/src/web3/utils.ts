@@ -4,7 +4,7 @@ import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import { ChainHead } from 'src/geth/actions'
 import Logger from 'src/utils/Logger'
-import { getContractKitAsync, getWeb3, getWeb3Async } from 'src/web3/contracts'
+import { getContractKitAsync, getWeb3 } from 'src/web3/contracts'
 
 const TAG = 'web3/utils'
 
@@ -34,21 +34,21 @@ export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
 // Fetches the transaction receipt for a given hash, returning null if the transaction has not been mined.
 export async function getTransactionReceipt(txHash: string): Promise<CeloTxReceipt | null> {
   Logger.debug(TAG, `Getting transaction receipt for ${txHash}`)
-  const web3 = await getWeb3Async(false)
-  return web3.eth.getTransactionReceipt(txHash)
+  const contractkit = await getContractKitAsync()
+  return contractkit.connection.getTransactionReceipt(txHash)
 }
 
 // Note: This returns Promise<Block>
 export async function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
-  const web3 = await getWeb3Async(false)
-  return web3.eth.getBlock('latest')
+  const contractkit = await getContractKitAsync()
+  return contractkit.connection.getBlock('latest')
 }
 
 export async function getLatestBlockNumber() {
   Logger.debug(TAG, 'Getting latest block number')
-  const web3 = await getWeb3Async(false)
-  return web3.eth.getBlockNumber()
+  const contractkit = await getContractKitAsync()
+  return contractkit.connection.getBlockNumber()
 }
 
 // Returns true if the block was produced within the block age limit.
