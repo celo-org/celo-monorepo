@@ -276,7 +276,7 @@ export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 
 ### Deploy a Validator Machine
 
-The Validator machine is node that actually assembles and signs blocks to particpate in consesnsus. We will set it up in this section.
+The Validator machine is node that actually assembles and signs blocks to particpate in consensus. We will set it up in this section.
 
 To operate as a validator, you'll need to generate a validator signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
 
