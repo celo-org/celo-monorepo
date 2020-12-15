@@ -67,7 +67,7 @@ export async function getSendFee(
   dollarBalance: string
 ) {
   try {
-    if (new BigNumber(params.amount) > new BigNumber(dollarBalance)) {
+    if (new BigNumber(params.amount).isGreaterThan(new BigNumber(dollarBalance))) {
       throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
 

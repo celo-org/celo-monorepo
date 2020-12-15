@@ -99,7 +99,7 @@ export async function getInviteFee(
   comment: string
 ) {
   try {
-    if (dollarBalance && new BigNumber(amount) > new BigNumber(dollarBalance)) {
+    if (new BigNumber(amount).isGreaterThan(new BigNumber(dollarBalance))) {
       throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
     const gas = await getInviteTxGas(account, currency, amount, comment)

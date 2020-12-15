@@ -187,10 +187,6 @@ export function* handleSendPaymentData(
   }
   yield put(storeLatestInRecents(recipient))
 
-  if (!data.amount) {
-    data.amount = '1'
-  }
-
   if (data.amount) {
     if (data.token === 'CELO') {
       navigate(Screens.WithdrawCeloReviewScreen, {
