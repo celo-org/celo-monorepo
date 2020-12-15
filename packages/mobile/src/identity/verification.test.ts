@@ -43,7 +43,12 @@ import {
 import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import {
+  getConnectedAccount,
+  getConnectedUnlockedAccount,
+  unlockAccount,
+  UnlockResult,
+} from 'src/web3/saga'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
 import {
@@ -60,10 +65,13 @@ const MockedAnalytics = ValoraAnalytics as any
 
 jest.mock('src/web3/saga', () => ({
   ...jest.requireActual('src/web3/saga'),
-  unlockAccount: jest.fn(async () => true),
+  unlockAccount: jest.fn(),
 }))
 
-const { unlockAccount } = require('src/web3/saga')
+const mockUnlockAccount = unlockAccount as jest.MockedFunction<typeof unlockAccount>
+mockUnlockAccount.mockImplementation(function*() {
+  return UnlockResult.SUCCESS
+})
 
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),
@@ -300,6 +308,10 @@ const mockVerificationStateInsufficientBalance: VerificationState = {
   isBalanceSufficient: false,
 }
 
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
 describe(startVerification, () => {
   beforeEach(() => {
     MockedAnalytics.track.mockReset()
@@ -365,8 +377,6 @@ describe(startVerification, () => {
 describe(fetchVerificationState, () => {
   it('fetches unverified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -406,13 +416,12 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches partly verified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -452,13 +461,12 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches verified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -498,13 +506,12 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches verified but sets `isVerified` to false if the account has been revoked', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -547,13 +554,12 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches with forcing unlock account', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState, true)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -593,7 +599,8 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, true)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, true)
   })
 
   it('catches insufficient balance for sig retrieval', async () => {
