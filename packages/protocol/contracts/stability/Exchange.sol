@@ -293,7 +293,10 @@ contract Exchange is
     emit SpreadSet(newSpread);
   }
 
-  // TODO add docs
+  /**
+    * @notice Allows owner to set the Stable Bucket Fraction
+    * @param newMaxStableBucketFraction The new value for the Stable Bucket Fraction
+    */
   function setMaxStableBucketFraction(uint256 newMaxStableBucketFraction) public onlyOwner {
     maxStableBucketFraction = FixidityLib.wrap(newMaxStableBucketFraction);
     require(
@@ -395,25 +398,28 @@ contract Exchange is
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
-    uint256 updatedGoldBucket = getUpdatedGoldBucket();
+    uint256 updatedGoldBucket = getUpdatedGoldBucket(); // 1e+21
     uint256 exchangeRateNumerator;
     uint256 exchangeRateDenominator;
     (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate();
     uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
-      exchangeRateDenominator
+      exchangeRateDenominator // 5e20
     );
 
-    uint256 maxStableBucketSize = getStableBucketCap();
+    uint256 maxStableBucketSize = getStableBucketCap(); // 4.5e22
 
     // check if the bucket is bigger than the cap
-    uint256 cappedUpdatedStableBucket = Math.min(maxStableBucketSize, updatedStableBucket);
+    //                                       min(4.5e22, 5e20) -> 5e20
+    uint256 cappedUpdatedStableBucket = Math.min(maxStableBucketSize, updatedStableBucket); // with this, right is zero
 
+    // 5e20     <                               5e20
     if (cappedUpdatedStableBucket < updatedStableBucket) {
       // resize gold bucket
       uint256 cappedUpdatedGoldBucket = exchangeRateDenominator.mul((maxStableBucketSize)).div(
         exchangeRateNumerator
       );
       return (cappedUpdatedGoldBucket, cappedUpdatedStableBucket);
+
     }
 
     return (updatedGoldBucket, updatedStableBucket);
@@ -424,14 +430,13 @@ contract Exchange is
    * is smaller than minSupplyForStableBucketCap, the cap is calculated based on minSupplyForStableBucketCap.
    */
   function getStableBucketCap() public view returns (uint256) {
+    require(minSupplyForStableBucketCap > 0, "minSupplyForStableBucketCap not initialized");
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap); // assume a miminum of 1M stable tokens supply to start the cap
 
-    uint256 maxStableBucketSize = FixidityLib
-      .newFixed(stableTokenSupply)
-      .multiply(maxStableBucketFraction)
-      .fromFixed();
+    return FixidityLib.newFixed(stableTokenSupply).multiply(maxStableBucketFraction).fromFixed();
 
-    return maxStableBucketSize;
+    // return maxStableBucketSize;
+
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {

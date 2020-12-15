@@ -153,7 +153,7 @@ contract('Exchange', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
-  describe.skip('#initialize()', () => {
+  describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const expectedOwner: string = await exchange.owner()
       assert.equal(expectedOwner, accounts[0])
@@ -175,7 +175,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setUpdateFrequency', () => {
+  describe('#setUpdateFrequency', () => {
     const newUpdateFrequency = new BigNumber(60 * 30)
 
     it('should set the update frequency', async () => {
@@ -204,7 +204,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setMinimumReports', () => {
+  describe('#setMinimumReports', () => {
     const newMinimumReports = new BigNumber(3)
 
     it('should set the minimum reports', async () => {
@@ -233,7 +233,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setStableToken', () => {
+  describe('#setStableToken', () => {
     const newStable = '0x0000000000000000000000000000000000077cfa'
 
     it('should set the stable token address', async () => {
@@ -261,7 +261,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setSpread', () => {
+  describe('#setSpread', () => {
     const newSpread = toFixed(6 / 1000)
 
     it('should set the spread', async () => {
@@ -290,7 +290,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setReserveFraction', () => {
+  describe('#setReserveFraction', () => {
     const newReserveFraction = toFixed(3 / 100)
 
     it('should set the reserve fraction', async () => {
@@ -323,11 +323,62 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
+  describe('#setMaxStableBucketFraction', () => {
+    const newMaxStableBucketFraction = toFixed(1 / 22)
+
+    // it('should set the maxStableBucketFractionTx', async () => {
+    // })
+
+    it('emits MaxStableBucketFractionSet', async () => {
+      const setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
+        newMaxStableBucketFraction
+      )
+      const exchangeLogs = setMaxStableBucketFractionTx.logs.filter(
+        (x) => x.event === 'MaxStableBucketFractionSet'
+      )
+      assert(exchangeLogs.length === 1, 'Did not receive event')
+    })
+
+    it('should not allow to set the maxStableBucketFraction to zero', async () => {
+      await assertRevert(exchange.setMaxStableBucketFraction(toFixed(0)))
+    })
+
+    it('should not allow to set the maxStableBucketFraction greater than 1', async () => {
+      await assertRevert(exchange.setMaxStableBucketFraction(toFixed(1)))
+      await assertRevert(exchange.setMaxStableBucketFraction(toFixed(2)))
+    })
+
+    it('should not allow a non-owner not set the maxStableBucketFraction', async () => {
+      await assertRevert(
+        exchange.setMaxStableBucketFraction(newMaxStableBucketFraction, { from: accounts[1] })
+      )
+    })
+  })
+
   describe('#getBuyAndSellBuckets', () => {
-    it('should return the correct amount of buy and sell token', async () => {
+    it.only('should return the correct amount of buy and sell token', async () => {
+      // console.log('stableTokenSupple: ', (await stableToken.totalSupply()).toString())
+
+      console.log('stableTokenSupple: ', (await stableToken.totalSupply()).toString())
+      console.log(
+        'minSupplyForStableBucketCap: ',
+        (await exchange.minSupplyForStableBucketCap()).toString()
+      )
+      console.log(
+        'maxStableBucketFraction: ',
+        (await exchange.maxStableBucketFraction()).toString()
+      )
+      console.log('getStableBucketCap: ', (await exchange.getStableBucketCap()).toString())
+
+      // stable, gold
       const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
+      console.log('sellBucketSize (left): ', sellBucketSize.toString())
+      console.log('buyBucketSize (right): ', buyBucketSize.toString())
+
       assertEqualBN(sellBucketSize, initialGoldBucket)
+      console.log('test')
       assertEqualBN(buyBucketSize, initialStableBucket)
+      console.log('make it one')
     })
 
     describe(`after the Reserve's balance changes`, () => {
@@ -633,9 +684,8 @@ contract('Exchange', (accounts: string[]) => {
             })
           })
 
-          describe.only('when stableBucket needs to be capped', () => {
+          describe('when stableBucket needs to be capped', () => {
             // TODO remove only and move tests as needed
-            let setMaxStableBucketFractionTx, minSupplyForStableBucketCapTx
 
             beforeEach(async () => {
               await registry.setAddressFor(CeloContractName.Exchange, owner)
@@ -657,21 +707,17 @@ contract('Exchange', (accounts: string[]) => {
               const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
               assertEqualBN(mintableStable, new BigNumber('2e21'))
               assertEqualBN(tradeableGold, new BigNumber('1e21'))
-            })
 
-            it('emits MaxStableBucketFractionSet', async () => {
-              setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
-                toFixed(1 / 22)
+              // the buckets hold the price
+              assertEqualBN(
+                new BigNumber(mintableStable.dividedBy(tradeableGold)),
+                new BigNumber('2')
               )
-              const exchangeLogs = setMaxStableBucketFractionTx.logs.filter(
-                (x) => x.event === 'MaxStableBucketFractionSet'
-              )
-              assert(exchangeLogs.length === 1, 'Did not receive event')
             })
 
             it('emits minSupplyForStableBucketCapSet', async () => {
               // Make the capp trigger only after 1 millon coins
-              minSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
+              const minSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
                 new BigNumber('1e24')
               ) // Todo test playing with this variable
               const exchangeLogs = minSupplyForStableBucketCapTx.logs.filter(
@@ -695,11 +741,6 @@ contract('Exchange', (accounts: string[]) => {
 
               const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
 
-              console.log(
-                'minteable token ' + new BigNumber(mintableStable.dividedBy(tradeableGold))
-              )
-
-              // ratio between the bucket's shouldn't change
               assertEqualBN(
                 new BigNumber(mintableStable.dividedBy(tradeableGold)),
                 new BigNumber('4000')
