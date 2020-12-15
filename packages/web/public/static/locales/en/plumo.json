@@ -13,7 +13,7 @@
   "figureSubheading3": "A multi-party computation for cutting-edge cryptography",
   "mainHeader": "The Plumo Ceremony",
   "mainBody1": "The SNARK to be secured by the Plumo Ceremony is one of the most complex yet powerful SNARKs to ever be secured. The outcome can be used not only by cLabs & the Plumo construction, but also by any project that uses the BW6 curve with the Groth16 proving system or any other based on polynomial commitments. By participating in this Ceremony, participants can be part of something that is a public good, and will hopefully be used to power many more systems to come.",
-  "mainBody2": "For the Plumo Ceremony, we’re excited to award the following prizes:",
+  "mainBody2": "For the Plumo Ceremony, we’re excited to award the following prizes (terms and conditions apply):",
   "prizes": [
     {
       "title": "Fastest Contribution (Desktop)",
