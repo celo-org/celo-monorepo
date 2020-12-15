@@ -24,6 +24,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
+import { getCountryFeatures } from 'src/utils/countryFeatures'
 
 interface StateProps {
   cachedName: string | null
@@ -164,6 +165,12 @@ export class NameAndNumber extends React.Component<Props, State> {
         obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
       })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
+      return
+    }
+
+    const { SANCTIONED_COUNTRY } = getCountryFeatures(countryCodeAlpha2)
+    if (SANCTIONED_COUNTRY) {
+      this.props.showError(ErrorMessages.COUNTRY_NOT_AVAILABLE)
       return
     }
 

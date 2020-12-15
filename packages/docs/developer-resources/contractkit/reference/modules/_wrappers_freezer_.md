@@ -1,4 +1,4 @@
-# External module: "wrappers/Freezer"
+# Module: "wrappers/Freezer"
 
 ## Index
 

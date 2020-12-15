@@ -1,4 +1,3 @@
-import { TFunction } from 'next-i18next'
 import * as React from 'react'
 import LazyFade from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
@@ -13,16 +12,6 @@ import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
 import Outbound, { externalizeURL } from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-
-function buildDropDownProps(t: TFunction, currentFilter: string): ListItem[] {
-  return Object.keys(CategoryEnum).map((key) => {
-    return {
-      id: key,
-      selected: key === currentFilter,
-      label: t(`members.categoryTitle.${key.toLocaleLowerCase()}`),
-    }
-  })
-}
 
 function initialState() {
   return Object.keys(CategoryEnum).map((key: CategoryEnum) => {
@@ -64,6 +53,16 @@ export default function Members() {
     [alliesByCategory, selectedFilter]
   )
 
+  function buildDropDownProps(currentFilter: string): ListItem[] {
+    return alliesByCategory.map(({ name }) => {
+      return {
+        id: name,
+        selected: name === currentFilter,
+        label: t(`members.categoryTitle.${name.toLocaleLowerCase()}`),
+      }
+    })
+  }
+
   return (
     <View nativeID={'members'}>
       <GridRow
@@ -93,8 +92,9 @@ export default function Members() {
               data={[
                 {
                   name: t(`members.categoryTitle.all`),
-                  list: React.useMemo(() => buildDropDownProps(t, selectedFilter), [
+                  list: React.useMemo(() => buildDropDownProps(selectedFilter), [
                     t,
+                    alliesByCategory,
                     selectedFilter,
                   ]),
                   onSelect: setFilter,

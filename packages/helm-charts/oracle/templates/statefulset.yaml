@@ -37,8 +37,9 @@ spec:
 {{ include "metric-annotations" . | indent 8 }}
 {{ end }}
     spec:
+{{ if .Values.kube.serviceAccountSecretNames }}
       initContainers:
-      - name: set-label
+      - name: set-metadata
         image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
         command:
         - /bin/bash
@@ -47,14 +48,23 @@ spec:
         - |
           RID=${POD_NAME##*-}
           TOKEN_ENV_VAR_NAME="TOKEN_$RID"
+          {{ if (eq .Values.kube.cloudProvider "azure") }}
+          # Azure
+          CMD="label pod $POD_NAME aadpodidbinding=$POD_NAME-identity-binding"
+          {{ else }}
+          # AWS
+          ROLE_ARNS={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.aws.roleArn }},{{- end }}
+          ROLE_ARN=`echo -n $ROLE_ARNS | cut -d ',' -f $((RID + 1))`
+          CMD="annotate pod $POD_NAME iam.amazonaws.com/role=$ROLE_ARN"
+          {{ end }}
+
           kubectl \
           --namespace "$POD_NAMESPACE" \
           --server="https://kubernetes.default.svc" \
           --token="${!TOKEN_ENV_VAR_NAME}" \
           --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
-          label pod "$POD_NAME" \
-          --overwrite \
-          "aadpodidbinding=$POD_NAME-identity-binding"
+          --overwrite=true \
+          $CMD
         env:
         - name: POD_NAMESPACE
           valueFrom:
@@ -71,6 +81,7 @@ spec:
               key: token
               name: {{ $e }}
         {{ end }}
+{{ end }}
       containers:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -136,6 +147,7 @@ spec:
 {{ include "common.env-var" (dict "name" "TARGET_MAX_HEARTBEAT_PERIOD_MS" "dict" .Values.oracle.reporter.blockBased "value_name" "targetMaxHeartbeatPeriodMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "TOKEN" "dict" .Values.oracle "value_name" "token" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "UNUSED_ORACLE_ADDRESSES" "dict" .Values.oracle "value_name" "unusedOracleAddresses") | indent 8 }}
+{{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.oracle "value_name" "walletType") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WS_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "ws") | indent 8 }}
         readinessProbe:
           exec:

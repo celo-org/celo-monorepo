@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.1.1",
+  "version": "1.1.3",
   "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -12,17 +12,19 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
+    "test:e2e": "jest --runInBand test/end-to-end",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "bls:keygen": "ts-node scripts/create-bls-keys.ts",
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.12",
-    "@celo/phone-number-privacy-common": "1.0.7",
-    "@celo/utils": "0.1.18",
+    "@celo/contractkit": "1.0.0-beta3",
+    "@celo/phone-number-privacy-common": "1.0.15-beta2",
+    "@celo/utils": "1.0.0-beta3",
+    "@celo/wallet-hsm-azure": "1.0.0-beta3",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/elliptic": "^6.4.12",
-    "aws-sdk": "^2.696.0",
+    "aws-sdk": "^2.705.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "dotenv": "^8.2.0",
     "elliptic": "6.5.3",
@@ -31,7 +33,8 @@
     "morgan": "^1.10.0",
     "mssql": "^6.2.0",
     "mysql2": "^2.1.0",
-    "pg": "^8.2.1"
+    "pg": "^8.2.1",
+    "web3": "1.3.0"
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",

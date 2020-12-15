@@ -2,7 +2,15 @@ import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Image,
+  ImageSourcePropType,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import Modal from 'src/components/Modal'
 
 interface Props {
@@ -15,6 +23,7 @@ interface Props {
   secondaryActionDisabled?: boolean
   secondaryActionPress?: () => void
   isVisible: boolean
+  showLoading?: boolean
   testID?: string
 }
 
@@ -26,6 +35,7 @@ export default function Dialog({
   secondaryActionText,
   secondaryActionDisabled,
   secondaryActionPress,
+  showLoading = false,
   image,
   isVisible,
   testID,
@@ -48,13 +58,17 @@ export default function Dialog({
             {secondaryActionText}
           </TextButton>
         )}
-        <TextButton
-          style={styles.primary}
-          onPress={actionPress}
-          testID={testID && `${testID}/PrimaryAction`}
-        >
-          {actionText}
-        </TextButton>
+        {showLoading ? (
+          <ActivityIndicator style={styles.primary} size="small" color={colors.greenUI} />
+        ) : (
+          <TextButton
+            style={styles.primary}
+            onPress={actionPress}
+            testID={testID && `${testID}/PrimaryAction`}
+          >
+            {actionText}
+          </TextButton>
+        )}
       </View>
     </Modal>
   )

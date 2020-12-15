@@ -1,6 +1,5 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
-import logger from '../common/logger'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 
@@ -38,8 +37,9 @@ export class AWSKeyProvider extends KeyProviderBase {
         throw new Error('Secret is empty or undefined')
       }
       this.setPrivateKey(privateKey)
-    } catch (error) {
-      logger.error('Error retrieving key', error)
+    } catch (err) {
+      logger.info('Error retrieving key')
+      logger.error({ err })
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }

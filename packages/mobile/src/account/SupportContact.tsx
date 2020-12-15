@@ -27,11 +27,11 @@ interface Email {
   recipients: [string]
   body: string
   isHTML: boolean
-  attachment?: {
+  attachments?: Array<{
     path: string
     type: string
     name: string
-  }
+  }>
 }
 
 async function sendEmailWithNonNativeApp(
@@ -93,11 +93,13 @@ function SupportContact() {
     if (attachLogs) {
       combinedLogsPath = await Logger.createCombinedLogs()
       if (combinedLogsPath) {
-        email.attachment = {
-          path: combinedLogsPath, // The absolute path of the file from which to read data.
-          type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-          name: '', // Optional: Custom filename for attachment
-        }
+        email.attachments = [
+          {
+            path: combinedLogsPath, // The absolute path of the file from which to read data.
+            type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+            name: '', // Optional: Custom filename for attachment
+          },
+        ]
         email.body += (email.body ? '<br/><br/>' : '') + '<b>Support logs are attached...</b>'
       }
     }

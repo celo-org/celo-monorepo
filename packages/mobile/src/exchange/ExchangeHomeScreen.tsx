@@ -21,6 +21,7 @@ import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { useExchangeRate } from 'src/exchange/hooks'
 import { exchangeHistorySelector } from 'src/exchange/reducer'
+import RestrictedCeloExchange from 'src/exchange/RestrictedCeloExchange'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
@@ -34,6 +35,7 @@ import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import TransactionsList from 'src/transactions/TransactionsList'
+import { useCountryFeatures } from 'src/utils/countryFeatures'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
@@ -55,7 +57,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
 
   function goToWithdrawCelo() {
     ValoraAnalytics.track(CeloExchangeEvents.celo_home_withdraw)
-    navigation.navigate(Screens.WithdrawCeloScreen)
+    navigation.navigate(Screens.WithdrawCeloScreen, { isCashOut: false })
   }
 
   const scrollPosition = useRef(new Animated.Value(0)).current
@@ -85,6 +87,8 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }, [])
 
   const { t } = useTranslation(Namespaces.exchangeFlow9)
+
+  const { RESTRICTED_CP_DOTO } = useCountryFeatures()
 
   // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
   const localCurrencyCode = null
@@ -167,16 +171,22 @@ function ExchangeHomeScreen({ navigation }: Props) {
           </View>
 
           <CeloGoldHistoryChart />
-          <CeloExchangeButtons navigation={navigation} />
+          {RESTRICTED_CP_DOTO ? (
+            <RestrictedCeloExchange onPressWithdraw={goToWithdrawCelo} />
+          ) : (
+            <CeloExchangeButtons navigation={navigation} />
+          )}
           <ItemSeparator />
           <CeloGoldOverview testID="ExchangeAccountOverview" />
           <ItemSeparator />
-          <SettingsItemTextValue
-            title={t('withdrawCelo')}
-            onPress={goToWithdrawCelo}
-            testID={'WithdrawCELO'}
-            showChevron={true}
-          />
+          {!RESTRICTED_CP_DOTO && (
+            <SettingsItemTextValue
+              title={t('withdrawCelo')}
+              onPress={goToWithdrawCelo}
+              testID={'WithdrawCELO'}
+              showChevron={true}
+            />
+          )}
           <SectionHead text={t('global:activity')} />
           <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </SafeAreaView>

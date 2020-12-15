@@ -19,23 +19,19 @@ interface Props extends ViewProps {
   HeaderComponent?: React.ComponentType<any>
   FooterComponent?: React.FunctionComponent
   LabelAboveKeyboard?: React.FunctionComponent
-  shouldReset?: boolean
   isSending?: boolean
 }
 
 interface State {
-  confirmed: boolean
   keyboardVisible: boolean
 }
 
 class ReviewFrame extends React.PureComponent<Props, State> {
   state: State = {
-    confirmed: false,
     keyboardVisible: false,
   }
 
   onConfirm = () => {
-    this.setState({ confirmed: true })
     if (this.props.confirmButton) {
       this.props.confirmButton.action()
     }
@@ -43,12 +39,6 @@ class ReviewFrame extends React.PureComponent<Props, State> {
 
   onToggleKeyboard = (visible: boolean) => {
     this.setState({ keyboardVisible: visible })
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.shouldReset === false && this.props.shouldReset === true) {
-      this.setState({ confirmed: false })
-    }
   }
 
   renderButtons = () => {
@@ -66,7 +56,7 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               type={BtnTypes.PRIMARY}
               size={BtnSizes.FULL}
               style={styles.confirmButton}
-              disabled={confirmButton.disabled || this.state.confirmed}
+              disabled={confirmButton.disabled}
               testID="ConfirmButton"
             />
           )}

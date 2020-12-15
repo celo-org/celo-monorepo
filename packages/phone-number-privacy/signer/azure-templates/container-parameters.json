@@ -64,6 +64,14 @@
                 {
                     "name": "KEYSTORE_AZURE_SECRET_NAME",
                     "value": "TODO"
+                },
+                {
+                  "name": "LOG_LEVEL",
+                  "value": "trace"
+                },
+                {
+                  "name": "LOG_FORMAT",
+                  "value": "stackdriver"
                 }
             ]
         },
@@ -90,6 +98,9 @@
         },
         "logAnalyticsWorkspaceKey": {
             "value": "TODO"
-        }
+        },
+        "userAssignedIdentity": {
+          "value": "TODO"
+      }
     }
 }

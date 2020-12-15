@@ -13,10 +13,8 @@ USAGE
   $ celocli election:activate
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -48,12 +46,17 @@ USAGE
   $ celocli election:current
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
-  --valset                                       Show currently used signers from valset (by default the authorized
-                                                 validator signers are shown). Useful for checking if keys have been
-                                                 rotated.
+  --valset                Show currently used signers from valset (by default the authorized validator signers are
+                          shown). Useful for checking if keys have been rotated.
 ```
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
@@ -67,8 +70,14 @@ USAGE
   $ celocli election:list
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLE
   list
@@ -85,11 +94,9 @@ USAGE
   $ celocli election:revoke
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -121,8 +128,14 @@ USAGE
   $ celocli election:run
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 ```
 
 _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
@@ -139,12 +152,8 @@ ARGUMENTS
   ADDRESS  Voter or Validator Groups's address
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
-  --group                                        Show information about a group running in Validator elections
-
-  --voter                                        Show information about an account voting in Validator elections
+  --group  Show information about a group running in Validator elections
+  --voter  Show information about an account voting in Validator elections
 
 EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter
@@ -162,11 +171,9 @@ USAGE
   $ celocli election:vote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing

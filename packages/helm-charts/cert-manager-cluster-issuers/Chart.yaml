@@ -5,3 +5,7 @@ keywords:
 - "let's encrypt"
 - cert-manager
 appVersion: v1.7.3
+dependencies:
+  - name: cert-manager
+    version: v0.11.0
+    repository: https://charts.jetstack.io

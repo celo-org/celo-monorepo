@@ -1,13 +1,13 @@
-import { AKSClusterConfig, AKSClusterManager } from './aks'
-import { AWSClusterConfig, AWSClusterManager } from './aws'
+import { AksClusterConfig, AksClusterManager } from './aks'
+import { AwsClusterConfig, AwsClusterManager } from './aws'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 import { GCPClusterConfig, GCPClusterManager } from './gcp'
 
 const clusterManagerByCloudProvider: {
   [key in CloudProvider]: (clusterConfig: BaseClusterConfig, celoEnv: string) => BaseClusterManager
 } = {
-  [CloudProvider.AWS]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AWSClusterManager(clusterConfig as AWSClusterConfig, celoEnv),
-  [CloudProvider.AZURE]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AKSClusterManager(clusterConfig as AKSClusterConfig, celoEnv),
+  [CloudProvider.AWS]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AwsClusterManager(clusterConfig as AwsClusterConfig, celoEnv),
+  [CloudProvider.AZURE]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AksClusterManager(clusterConfig as AksClusterConfig, celoEnv),
   [CloudProvider.GCP]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new GCPClusterManager(clusterConfig as GCPClusterConfig, celoEnv),
 }
 

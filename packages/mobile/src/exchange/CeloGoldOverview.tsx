@@ -6,6 +6,7 @@ import React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
 import useSelector from 'src/redux/useSelector'
@@ -18,7 +19,7 @@ type Props = WithTranslation & OwnProps
 
 export function CeloGoldOverview({ t, testID }: Props) {
   useBalanceAutoRefresh()
-  const goldBalance = useSelector((state) => state.goldToken.balance)
+  const goldBalance = useSelector(celoTokenBalanceSelector)
 
   const goldBalanceAmount = goldBalance
     ? { value: goldBalance, currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code }
