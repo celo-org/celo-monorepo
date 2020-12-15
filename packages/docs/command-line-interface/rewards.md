@@ -13,18 +13,19 @@ USAGE
   $ celocli rewards:show
 
 OPTIONS
+  -x, --extended                                          show extra columns
+  --columns=columns                                       only show provided columns (comma-separated)
+  --csv                                                   output is csv format [alias: --output=csv]
   --epochs=epochs                                         [default: 1] Show results for the last N epochs
   --estimate                                              Estimate voter rewards from current votes
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
-                                                          'auto' which uses whatever feeCurrency is available)
-
+  --filter=filter                                         filter property by partial string matching, ex: name=foo
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
-
+  --no-header                                             hide table header from output
+  --no-truncate                                           do not truncate output to fit screen
+  --output=csv|json|yaml                                  output in a more machine friendly format
   --slashing                                              Show rewards for slashing
-
+  --sort=sort                                             property to sort by (prepend '-' for descending)
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Validator to show rewards for
-
   --voter=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Voter to show rewards for
 
 EXAMPLE

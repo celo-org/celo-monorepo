@@ -14,7 +14,7 @@ set -euo pipefail
 BRANCH=""
 NETWORK=""
 FORNO=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-verify-deployed.log"
 
 while getopts 'b:n:rfl:' flag; do
   case "${flag}" in
@@ -31,7 +31,7 @@ done
 
 echo "- Checkout source code at $BRANCH"
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags >> $LOG_FILE
+git fetch --all --tags 2>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts
@@ -44,7 +44,7 @@ echo "- Return to original git commit"
 git checkout - >> $LOG_FILE
 
 echo "- Build verification script"
-yarn build >> $LOG_FILE
+yarn build:ts >> $LOG_FILE
 
 echo "- Run verification script"
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $FORNO

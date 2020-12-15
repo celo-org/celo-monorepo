@@ -13,4 +13,7 @@ maintainers:
   email: contact@celo.org
 icon: https://avatars1.githubusercontent.com/u/37552875?s=200&v=4
 appVersion: v1.0.0
-
+dependencies:
+- name: common
+  version: 0.1.0
+  repository: file://../common

@@ -18,6 +18,9 @@ export default SecureSend = () => {
     await inputNumberKeypad(AMOUNT_TO_SEND)
     await element(by.id('Review')).tap()
 
+    // hack: we shouldn't need this but the test fails without
+    await sleep(3000)
+
     // Use the last digits of the account to confirm the sender.
     await element(by.id('confirmAccountButton')).tap()
     for (let index = 0; index < 4; index++) {

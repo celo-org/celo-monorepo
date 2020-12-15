@@ -9,6 +9,9 @@ export interface AttestationModel extends Model {
   countryCode: string
   phoneNumber: E164Number
   message: string
+  securityCode: string | null
+  securityCodeAttempt: number
+  attestationCode: string | null
   ongoingDeliveryId: string | null
   providers: string
   attempt: number
@@ -51,6 +54,9 @@ export default (sequelize: Sequelize) => {
     countryCode: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
     message: DataTypes.STRING,
+    securityCode: DataTypes.STRING,
+    securityCodeAttempt: DataTypes.INTEGER,
+    attestationCode: DataTypes.STRING,
     ongoingDeliveryId: DataTypes.STRING,
     providers: DataTypes.STRING,
     attempt: DataTypes.INTEGER,

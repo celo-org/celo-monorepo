@@ -28,11 +28,11 @@ type Props = ScreenProps
 
 function ImportContactsScreen({ route, navigation }: Props) {
   const [isFindMeSwitchChecked, setFindMeSwitch] = useState(true)
+  const [isFinishUnderway, setFinishUnderway] = useState(false)
   const { t } = useTranslation(Namespaces.onboarding)
   const importContactsProgress = useSelector(importContactsProgressSelector)
   const importStatus = importContactsProgress.status
   const totalContacts = importContactsProgress.total
-  const prevImportContactProgressRef = React.useRef(importContactsProgress)
   const matchedContacts = useSelector(matchedContactsSelector)
   const matchedContactsCount = Object.keys(matchedContacts).length
   const dispatch = useDispatch()
@@ -82,6 +82,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
 
   const onFinish = () => {
     navigate(Screens.OnboardingSuccessScreen)
+    setFinishUnderway(false)
   }
 
   const onPressConnect = async () => {
@@ -107,15 +108,8 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }, [])
 
   React.useEffect(() => {
-    navigation.setParams({ importStatus })
-    const prevImportContactProgress = prevImportContactProgressRef.current
-    const prevImportStatus = prevImportContactProgress.status
-    prevImportContactProgressRef.current = importContactsProgress
-
-    if (
-      prevImportStatus !== ImportContactsStatus.Done &&
-      importStatus === ImportContactsStatus.Done
-    ) {
+    if (importStatus === ImportContactsStatus.Done && !isFinishUnderway) {
+      setFinishUnderway(true)
       const onFinishTimeout = setTimeout(onFinish, 1500)
       return () => {
         clearTimeout(onFinishTimeout)
@@ -157,7 +151,6 @@ function ImportContactsScreen({ route, navigation }: Props) {
 
 ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
   const onPressSkip = route.params?.onPressSkip ? route.params.onPressSkip : () => null
-  const importDone = route.params?.importStatus === ImportContactsStatus.Done
   return {
     ...nuxNavigationOptionsNoBackButton,
     headerTitle: () => (
@@ -166,15 +159,13 @@ ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
         subTitle={i18n.t('onboarding:step', { step: '5' })}
       />
     ),
-    headerRight: !importDone
-      ? () => (
-          <TopBarTextButtonOnboarding
-            title={i18n.t('global:skip')}
-            testID="ImportContactsSkip"
-            onPress={onPressSkip}
-          />
-        )
-      : () => null,
+    headerRight: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:skip')}
+        testID="ImportContactsSkip"
+        onPress={onPressSkip}
+      />
+    ),
   }
 }
 

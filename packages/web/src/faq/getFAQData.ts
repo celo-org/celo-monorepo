@@ -1,14 +1,10 @@
 import { GetServerSideProps } from 'next'
-import getConfig from 'next/config'
 import { Props } from 'src/faq/FAQ'
 import { getFAQ } from 'src/utils/contentful'
-const { publicRuntimeConfig } = getConfig()
-
-const preview = publicRuntimeConfig.ENV === 'development'
 
 const getServerSideProps: GetServerSideProps<Props> = async function getServerSideProp({ query }) {
   const locale = query.locale || 'en-US'
-  const faqs = await getFAQ({ preview, locale })
+  const faqs = await getFAQ({ locale })
   return {
     props: {
       title: faqs.fields.title,

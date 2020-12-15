@@ -1,4 +1,4 @@
-import { Address } from '@celo/contractkit'
+import { Address } from '@celo/connect'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
@@ -58,6 +58,7 @@ export default class ValidatorStatus extends BaseCommand {
         'what block to end at when looking at signer activity. defaults to the latest block',
       default: -1,
     }),
+    ...(cli.table.flags() as object),
   }
 
   static examples = [
@@ -121,7 +122,7 @@ export default class ValidatorStatus extends BaseCommand {
     )
     cli.action.stop()
 
-    cli.table(validatorStatuses, statusTable, { 'no-truncate': !res.flags.truncate })
+    cli.table(validatorStatuses, statusTable, res.flags)
   }
 
   private async getSignatureCounts(

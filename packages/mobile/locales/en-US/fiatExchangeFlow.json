@@ -1,18 +1,46 @@
 {
   "addFunds": "Add Funds",
+  "addFundsSubtitle": "Purchase cUSD or CELO",
   "exchanges": "Exchanges",
   "buySellOnExchanges": "Buy/Sell on Exchanges",
   "cashOut": "Cash Out",
+  "cashOutSubtitle": "Exchange cUSD or CELO for another currency",
   "cashOutComingSoon": "Cash Out (Coming Soon)",
+  "spend": "Spend",
+  "spendSubtitle": "Use your balance with supporting merchants",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Amount (CELO)",
+  "onlyCeloDollars": "cUSD only",
+  "onlyCelo": "CELO only",
+  "celoDollar": "Celo Dollar",
+  "celoDollars": "Celo Dollars",
+  "tapToCopyCeloDollarsAddress": "Tap to copy your {{appName}} CUSD address",
   "disclaimerCeloDollars": "Celo dollar values are estimates.",
   "dollarsNotYetEnabledNote": "Celo Dollars are not yet available on any providers. To get Celo Dollars, purchase CELO and exchange it for Celo Dollars in the CELO tab.",
-  "pleaseSelectProvider": "Please select a provider below. These links connect to a third party service.",
+  "selectDigitalCurrency": "Select a digital currency",
+  "selectPaymentMethod": "Pay with:",
+  "payWithFiat": "Debit card or bank account",
+  "payWithExchange": "Cryptocurrency exchange",
+  "selectCashOutMethod": "Receive funds in:",
+  "receiveOnAddress": "cUSD/CELO address",
+  "receiveWithPonto": "GCash (with Ponto)",
+  "receiveWithKotani": "M-PESA (with Kotani Pay)",
+  "fundingEducationDialog": {
+    "title": "Funding {{appName}}",
+    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a stable digital currency tracking the US Dollar.\n\nTo fund your {{appName}} wallet, purchase cUSD from one of the 3rd party providers available in your location. For more information please visit <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
+  "cashOutEducationDialog": {
+    "title": "Withdraw from {{appName}}",
+    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a stable digital currency tracking the US Dollar.\n\nTo withdraw your {{appName}} balance, sell cUSD with one of the 3rd party providers available in your location. For more information please visit <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
   "explanationModal": {
     "title": "About Providers",
     "body": "Providers allow you to add funds to or cash out from your account. They determine their own rates and restrictions depending on location, amount, and other factors. Please visit the provider website for specific help. Visit the FAQ to learn more."
   },
   "otherFundingOptions": "For more ways to add and withdraw funds, visit <0>How to fund your account</0>",
-  "youCanTransfer": "You can transfer CELO and Celo Dollars to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy."
+  "youCanTransfer": "You can transfer {{currency}} to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy.",
+  "useBalanceWithMerchants": "Use your balance with supporting merchants",
+  "findMerchants": "Find local merchants near you"
 }

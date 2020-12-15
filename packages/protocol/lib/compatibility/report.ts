@@ -1,19 +1,18 @@
 // tslint:disable: max-classes-per-file
-import {
-  ASTCodeCompatibilityReport,
-  Change
-} from '@celo/protocol/lib/compatibility/ast-code'
+import { ASTCodeCompatibilityReport, } from '@celo/protocol/lib/compatibility/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
+import { Change } from '@celo/protocol/lib/compatibility/change'
 import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
-
 /**
  * Value object holding all uncategorized storage and code reports.
  */
 export class ASTReports {
   constructor(
     public readonly code: ASTCodeCompatibilityReport,
-    public readonly storage: ASTStorageCompatibilityReport[]) {}
+    public readonly storage: ASTStorageCompatibilityReport[],
+    public readonly libraryLinking: Change[]
+  ) {}
 
   /**
    * @return a new {@link ASTReports} with the same storage and code
@@ -29,7 +28,10 @@ export class ASTReports {
     }
     const codeReport = new ASTCodeCompatibilityReport(this.code.getChanges().filter(r => included(r.getContract())))
     const storageReports = this.storage.filter(r => included(r.contract))
-    return new ASTReports(codeReport, storageReports)
+
+    const libraryLinkingReport = this.libraryLinking.filter(change => included(change.getContract()))
+
+    return new ASTReports(codeReport, storageReports, libraryLinkingReport)
   }
 }
 
@@ -67,7 +69,7 @@ export class CategorizedChanges {
     reports: ASTReports,
     categorizer: Categorizer): CategorizedChanges {
     const storage = reports.storage.filter(r => !r.compatible)
-    const c = categorize(reports.code.getChanges(), categorizer)
+    const c = categorize(reports.code.getChanges().concat(reports.libraryLinking), categorizer)
     const major = c[ChangeType.Major]
     const minor = c[ChangeType.Minor]
     const patch = c[ChangeType.Patch]

@@ -1,6 +1,5 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import logger from '../common/logger'
 import config from '../config'
 
 export interface ServicePartialSignature {
@@ -28,12 +27,9 @@ export class BLSCryptographyClient {
         sigBuffer
       )
       this.verifiedSignatures.push(sigBuffer)
-    } catch (e) {
-      logger.error(
-        `${ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR} 
-        Failed to verify signature for ${serviceResponse.url}`,
-        e
-      )
+    } catch (err) {
+      logger.error(ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+      logger.error({ err, url: serviceResponse.url })
     }
   }
 
@@ -51,12 +47,11 @@ export class BLSCryptographyClient {
   public async combinePartialBlindedSignatures(): Promise<string> {
     const threshold = config.thresholdSignature.threshold
     if (!this.hasSufficientVerifiedSignatures()) {
-      logger.error(
+      const err = new Error(
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.verifiedSignatures.length}/${threshold}`
       )
-      throw new Error(
-        `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.verifiedSignatures.length}/${threshold}`
-      )
+      logger.error({ err })
+      throw err
     }
     const result = threshold_bls.combine(threshold, flattenSigsArray(this.verifiedSignatures))
     return Buffer.from(result).toString('base64')

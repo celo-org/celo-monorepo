@@ -41,6 +41,4 @@ export const BLOCKSCOUT_API = (process.env.BLOCKSCOUT_API as string).toLowerCase
 export const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID
 export const FIREBASE_DB = `https://${FIREBASE_PROJECT_ID}.firebaseio.com`
 export const FAUCET_ADDRESS = (process.env.FAUCET_ADDRESS as string).toLowerCase()
-export const VERIFICATION_REWARDS_ADDRESS = (process.env
-  .VERIFICATION_REWARDS_ADDRESS as string).toLowerCase()
 export const WEB3_PROVIDER_URL = process.env.WEB3_PROVIDER_URL

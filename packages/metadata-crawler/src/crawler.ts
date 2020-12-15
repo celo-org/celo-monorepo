@@ -1,4 +1,5 @@
-import { Address, newKit } from '@celo/contractkit'
+import { Address } from '@celo/connect'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import {
   verifyAccountClaim,
@@ -14,6 +15,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
 import fetch from 'cross-fetch'
 import { Client } from 'pg'
+import Web3 from 'web3'
 import { dataLogger, logger, operationalLogger } from './logger'
 
 const CONCURRENCY = 10
@@ -33,7 +35,7 @@ const client = new Client({
   database: PGDATABASE,
 })
 
-const kit = newKit(PROVIDER_URL)
+const kit = newKitFromWeb3(new Web3(PROVIDER_URL))
 
 const discordWebhook = process.env['DISCORD_WEBHOOK_URL']
 const clusterName = process.env['CLUSTER_NAME']
@@ -251,7 +253,7 @@ async function processAttestationServices() {
   const attestationsWrapper = await kit.contracts.getAttestations()
   const validators = await validatorsWrapper.getRegisteredValidators()
 
-  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.web3.eth.getBlockNumber())
+  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.connection.getBlockNumber())
   const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
   const electedValidatorsSet: Set<Address> = new Set()
   electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))

@@ -78,6 +78,7 @@ resource "google_compute_instance" "validator" {
       max_light_peers : 20,
       max_peers : 125,
       network_id : var.network_id,
+      network_name : var.celo_env,
       proxied : count.index < length(var.proxies_per_validator),
       # proxied : var.proxies_per_validator[count.index] > 0 ? true : false,
       rid : count.index,

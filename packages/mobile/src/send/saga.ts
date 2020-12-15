@@ -1,7 +1,7 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -32,6 +32,7 @@ import {
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -178,7 +179,7 @@ function* sendPayment(
   }
 }
 
-function* sendPaymentOrInviteSaga({
+export function* sendPaymentOrInviteSaga({
   amount,
   comment,
   recipient,
@@ -187,6 +188,8 @@ function* sendPaymentOrInviteSaga({
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
   try {
+    yield call(getConnectedUnlockedAccount)
+
     if (!recipient?.e164PhoneNumber && !recipient?.address) {
       throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }
@@ -210,7 +213,7 @@ function* sendPaymentOrInviteSaga({
     navigateHome()
     yield put(sendPaymentOrInviteSuccess(amount))
   } catch (e) {
-    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
+    yield put(showErrorOrFallback(e, ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }
 }

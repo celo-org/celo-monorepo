@@ -1,4 +1,4 @@
-import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
+import { proposalToJSON } from '@celo/governance'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
@@ -97,7 +97,7 @@ export default class Show extends BaseCommand {
         },
         isApproved: await governance.isApproved(id),
         isProposalPassing: await governance.isProposalPassing(id),
-        secondsUntilStages: await governance.timeUntilStages(id),
+        timeUntilStages: await governance.humanReadableTimeUntilStages(id),
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer

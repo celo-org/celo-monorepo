@@ -12,7 +12,7 @@ export enum Actions {
   HIDE = 'ALERT/HIDE',
 }
 
-enum AlertTypes {
+export enum AlertTypes {
   MESSAGE = 'message',
   ERROR = 'error',
 }
@@ -22,7 +22,7 @@ enum AlertTypes {
 // As we don't yet have a type encompassing all redux actions
 type AlertAction = OpenUrlAction
 
-interface ShowAlertAction {
+export interface ShowAlertAction {
   type: Actions.SHOW
   alertType: AlertTypes
   displayMethod: ErrorDisplayType

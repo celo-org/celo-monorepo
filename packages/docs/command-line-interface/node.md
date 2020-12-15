@@ -13,8 +13,7 @@ USAGE
   $ celocli node:accounts
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
@@ -39,10 +38,7 @@ USAGE
   $ celocli node:synced
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
-  --verbose                                      output the full status if syncing
+  --verbose  output the full status if syncing
 ```
 
 _See code: [packages/cli/src/commands/node/synced.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/synced.ts)_
