@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import React, { FunctionComponent, useEffect } from 'react'
 import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { useDispatch } from 'react-redux'
-import { showError } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
@@ -68,10 +68,7 @@ function useAsyncShowError<R, Args extends any[]>(
     // Generic error banner
     if (asyncResult.error) {
       Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-      const errMsg = asyncResult.error.message?.includes('insufficientBalance')
-        ? ErrorMessages.INSUFFICIENT_BALANCE
-        : ErrorMessages.CALCULATE_FEE_FAILED
-      dispatch(showError(errMsg))
+      dispatch(showErrorOrFallback(asyncResult.error.message, ErrorMessages.CALCULATE_FEE_FAILED))
     }
   }, [asyncResult.error])
 

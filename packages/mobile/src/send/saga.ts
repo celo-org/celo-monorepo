@@ -54,7 +54,7 @@ export async function getSendTxGas(
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
   } catch (error) {
-    throw Error(ErrorMessages.CALCULATE_FEE_FAILED)
+    throw error
   }
 }
 
