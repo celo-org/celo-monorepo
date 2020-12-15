@@ -439,11 +439,16 @@ export class Connection {
     return outputCeloTxFormatter(response.result)
   }
 
-  getTransactionReceipt = async (txhash: string): Promise<CeloTxReceipt> => {
+  getTransactionReceipt = async (txhash: string): Promise<CeloTxReceipt | null> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getTransactionReceipt
     const response = await this.rpcCaller.call('eth_getTransactionReceipt', [
       ensureLeading0x(txhash),
     ])
+
+    if (response.result === null) {
+      return null
+    }
+
     return outputCeloTxReceiptFormatter(response.result)
   }
 

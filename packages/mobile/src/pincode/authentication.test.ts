@@ -3,8 +3,14 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import { navigate } from 'src/navigator/NavigationService'
-import { getPasswordSaga, getPincode } from 'src/pincode/authentication'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import {
+  CANCELLED_PIN_INPUT,
+  DEFAULT_CACHE_ACCOUNT,
+  getPasswordSaga,
+  getPincode,
+} from 'src/pincode/authentication'
+import { clearPasswordCaches, getCachedPin, setCachedPin } from 'src/pincode/PasswordCache'
 import { mockAccount } from 'test/values'
 
 const mockPepper = { password: '0000000000000000000000000000000000000000000000000000000000000001' }
@@ -34,53 +40,43 @@ describe(getPasswordSaga, () => {
 })
 
 describe(getPincode, () => {
-  // it('returns PIN from phone keystore', async () => {
-  //   // // const mockStore = store as jest.Mock
-  //   // mockStore.mockImplementation(() => {})
-  //   const pin = await getPincode()
-  //   expect(pin).toBe(mockPin)
-  // })
-  // it('returns custom PIN', async () => {
-  //   await expectSaga(getPincode)
-  //     .provide([[select(pincodeTypeSelector), PincodeType.CustomPin]])
-  //     .returns(mockPin)
-  //     .run()
-  // })
-  // it('returns custom PIN without cache', async () => {
-  //   mockedGetCachedPincode.mockReturnValueOnce(null)
-  //   mockedNavigate.mockImplementationOnce((_, params) => {
-  //     expect(params.withVerification).toBe(true)
-  //     params.onSuccess(mockPin)
-  //   })
-  //   await expectSaga(getPincode)
-  //     .provide([[select(pincodeTypeSelector), PincodeType.CustomPin]])
-  //     .returns(mockPin)
-  //     .run()
-  //   expect(navigate).toHaveBeenCalled()
-  //   expect(navigateBack).toHaveBeenCalled()
-  //   expect(setCachedPincode).toHaveBeenCalledWith(mockPin)
-  // })
-  // it('returns custom PIN without cache and verification', async () => {
-  //   mockedGetCachedPincode.mockReturnValueOnce(null)
-  //   mockedNavigate.mockImplementationOnce((_, params) => {
-  //     expect(params.withVerification).toBe(false)
-  //     params.onSuccess(mockPin)
-  //   })
-  //   await expectSaga(getPincode, false)
-  //     .provide([[select(pincodeTypeSelector), PincodeType.CustomPin]])
-  //     .returns(mockPin)
-  //     .run()
-  //   expect(navigate).toHaveBeenCalled()
-  //   expect(navigateBack).toHaveBeenCalled()
-  //   expect(setCachedPincode).toHaveBeenCalledWith(mockPin)
-  // })
-  // it('throws error for unset pin', async () => {
-  //   try {
-  //     await expectSaga(getPincode)
-  //       .provide([[select(pincodeTypeSelector), PincodeType.Unset]])
-  //       .run()
-  //   } catch (error) {
-  //     expect(error.message).toBe('Pin has never been set')
-  //   }
-  // })
+  const mockedNavigate = navigate as jest.Mock
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedNavigate.mockReset()
+  })
+
+  it('returns PIN from cache', async () => {
+    setCachedPin(DEFAULT_CACHE_ACCOUNT, mockPin)
+    const pin = await getPincode()
+    expect(pin).toBe(mockPin)
+  })
+  it('returns pin and stores it in cache', async () => {
+    clearPasswordCaches()
+    mockedNavigate.mockImplementationOnce((_, params) => {
+      expect(params.withVerification).toBe(true)
+      params.onSuccess(mockPin)
+    })
+    const pin = await getPincode()
+    expect(pin).toEqual(mockPin)
+    expect(navigate).toHaveBeenCalled()
+    expect(navigateBack).toHaveBeenCalled()
+    expect(getCachedPin(DEFAULT_CACHE_ACCOUNT)).toEqual(pin)
+  })
+  it('throws an error if user cancels the Pin input', async () => {
+    clearPasswordCaches()
+    mockedNavigate.mockImplementationOnce((_, params) => {
+      params.onCancel()
+    })
+    expect.assertions(4)
+    try {
+      await getPincode()
+    } catch (error) {
+      expect(error).toEqual(CANCELLED_PIN_INPUT)
+    }
+    expect(navigate).toHaveBeenCalled()
+    expect(navigateBack).not.toHaveBeenCalled()
+    expect(getCachedPin(DEFAULT_CACHE_ACCOUNT)).toBeNull()
+  })
 })
