@@ -96,7 +96,6 @@ export function* sendAndMonitorTransaction<T>(
     yield put(transactionConfirmed(context.id, txReceipt))
 
     // Determine which balances may be affected by the transaction and fetch updated balances.
-    // DO NOT MERGE: Test that this works as intended.
     const balancesAffected = new Set([
       ...(currency ? [currency] : [CURRENCY_ENUM.DOLLAR, CURRENCY_ENUM.GOLD]),
       feeCurrency ?? CURRENCY_ENUM.DOLLAR,

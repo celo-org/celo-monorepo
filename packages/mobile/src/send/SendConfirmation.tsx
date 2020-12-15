@@ -285,8 +285,6 @@ function SendConfirmation(props: Props) {
         dekFee = fee.dividedBy(2)
       }
 
-      // DO NOT MERGE: This will emit every time the page renders this compoenent. Almost certainly
-      // not intended. I will fix this before merging this PR.
       ValoraAnalytics.track(FeeEvents.fee_rendered, {
         feeType: 'Security',
         fee: securityFee?.toString(),
