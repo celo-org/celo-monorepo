@@ -15,6 +15,7 @@ function Times({ color, height, strokeWidth }: Props) {
   return (
     <Svg xmlns="http://www.w3.org/2000/svg" height={height} width={height} viewBox="0 0 16 16">
       <AnimatedPath
+        // @ts-ignore
         d="M13.9999 2.00146L1.99994 14.0015"
         stroke={color}
         strokeWidth={strokeWidth}
@@ -22,6 +23,7 @@ function Times({ color, height, strokeWidth }: Props) {
         strokeLinejoin="round"
       />
       <AnimatedPath
+        // @ts-ignore
         d="M1.99994 2.00146L13.9999 14.0015"
         stroke={color}
         strokeWidth={strokeWidth}
