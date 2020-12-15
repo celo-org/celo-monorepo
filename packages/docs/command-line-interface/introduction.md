@@ -25,7 +25,7 @@ We are currently deploying the CLI with only Node v10.x LTS support. If you are 
 {% endhint %}
 
 {% hint style="info" %}
-If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
+If you have trouble installing globally \(i.e. with the `-g` flag\), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
 {% endhint %}
 
 ### Overview
@@ -36,14 +36,13 @@ The tool is broken down into modules and commands with the following pattern:
 celocli <module>:<command> <...args> <...flags?>
 ```
 
-The `celocli` tool assumes that users are running a node which they have access to signing transactions on.
-See documentation on the [config](./config.md) module for information about how set which node commands are sent to.
+The `celocli` tool assumes that users are running a node which they have access to signing transactions on. See documentation on the [config](config.md) module for information about how set which node commands are sent to.
 
 {% hint style="info" %}
-**All balances of CELO or Celo Dollars are expressed in units of 10<sup>-18</sup>**
+**All balances of CELO or Celo Dollars are expressed in units of 10-18**
 {% endhint %}
 
-{% embed url="https://www.npmjs.com/package/@celo/celocli" %}
+{% embed url="https://www.npmjs.com/package/@celo/celocli" caption="" %}
 
 ### Using a Ledger Wallet
 

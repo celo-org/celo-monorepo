@@ -11,6 +11,7 @@ import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
+import Web3 from 'web3'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 
@@ -69,6 +70,33 @@ contract('SortedOracles', (accounts: string[]) => {
     })
   })
 
+  describe('#setTokenReportExpiry', () => {
+    const newReportExpiry = aReportExpiry + 1
+    const token = Web3.utils.toChecksumAddress(Web3.utils.randomHex(20))
+
+    it('should update reportExpiry', async () => {
+      await sortedOracles.setTokenReportExpiry(token, newReportExpiry)
+      assertEqualBN(await sortedOracles.tokenReportExpirySeconds(token), newReportExpiry)
+    })
+
+    it('should emit the TokenReportExpirySet event', async () => {
+      const resp = await sortedOracles.setTokenReportExpiry(token, newReportExpiry)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'TokenReportExpirySet',
+        args: {
+          token,
+          reportExpiry: new BigNumber(newReportExpiry),
+        },
+      })
+    })
+
+    it('should revert when called by a non-owner', async () => {
+      await assertRevert(sortedOracles.setReportExpiry(newReportExpiry, { from: accounts[1] }))
+    })
+  })
+
   describe('#addOracle', () => {
     it('should add an Oracle', async () => {
       await sortedOracles.addOracle(aToken, anOracle)
@@ -103,6 +131,28 @@ contract('SortedOracles', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(sortedOracles.addOracle(aToken, anOracle, { from: accounts[1] }))
+    })
+  })
+
+  describe('#getTokenReportExpirySeconds', () => {
+    describe('when no token level expiry is set', () => {
+      it('returns the contract level one', async () => {
+        assert.isTrue((await sortedOracles.getTokenReportExpirySeconds(aToken)).eq(aReportExpiry))
+      })
+    })
+
+    describe('when a token level expiry is set', () => {
+      const anotherReportExpirt = 2 * aReportExpiry
+
+      beforeEach(async () => {
+        await sortedOracles.setTokenReportExpiry(aToken, anotherReportExpirt)
+      })
+
+      it('returns the contract level one', async () => {
+        assert.isTrue(
+          (await sortedOracles.getTokenReportExpirySeconds(aToken)).eq(anotherReportExpirt)
+        )
+      })
     })
   })
 
@@ -179,15 +229,83 @@ contract('SortedOracles', (accounts: string[]) => {
         })
       })
 
-      it('should return true if report is expired', async () => {
-        await timeTravel(aReportExpiry, web3)
-        const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
-        assert.isTrue(isReportExpired[0])
+      describe('using the default expiry', () => {
+        it('should return true if report is expired', async () => {
+          await timeTravel(aReportExpiry, web3)
+          const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+          assert.isTrue(isReportExpired[0])
+        })
+
+        it('should return false if report is not expired', async () => {
+          const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+          assert.isFalse(isReportExpired[0])
+        })
       })
 
-      it('should return false if report is not expired', async () => {
-        const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
-        assert.isFalse(isReportExpired[0])
+      describe('when a per token expiry is set, which is greater than the default', () => {
+        const tokenReportExpiry = 2 * aReportExpiry
+
+        beforeEach(async () => {
+          await sortedOracles.setTokenReportExpiry(aToken, tokenReportExpiry)
+        })
+
+        describe('and no time has passed', () => {
+          it('it should not be expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isFalse(isReportExpired[0])
+          })
+        })
+
+        describe('and the default expiry time has passed', () => {
+          beforeEach(() => timeTravel(aReportExpiry, web3))
+
+          it('should return false', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isFalse(isReportExpired[0])
+          })
+        })
+
+        describe('and the token expiry time has passed', () => {
+          beforeEach(() => timeTravel(tokenReportExpiry, web3))
+
+          it('should return true if the report is expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isTrue(isReportExpired[0])
+          })
+        })
+      })
+
+      describe('when a per token expiry is set, which is lower than the default', () => {
+        const tokenReportExpiry = aReportExpiry / 2
+
+        beforeEach(async () => {
+          await sortedOracles.setTokenReportExpiry(aToken, tokenReportExpiry)
+        })
+
+        describe('and no time has passed', () => {
+          it('it should not be expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isFalse(isReportExpired[0])
+          })
+        })
+
+        describe('and the default expiry time has passed', () => {
+          beforeEach(() => timeTravel(aReportExpiry, web3))
+
+          it('should return true', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isTrue(isReportExpired[0])
+          })
+        })
+
+        describe('and the token expiry time has passed', () => {
+          beforeEach(() => timeTravel(tokenReportExpiry, web3))
+
+          it('should return true if the report is expired', async () => {
+            const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+            assert.isTrue(isReportExpired[0])
+          })
+        })
       })
     })
   })

@@ -76,7 +76,7 @@ import {
 } from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import { waitFor } from 'src/redux/sagas-helpers'
@@ -86,7 +86,12 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
+import {
+  getConnectedAccount,
+  getConnectedUnlockedAccount,
+  unlockAccount,
+  UnlockResult,
+} from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -125,7 +130,13 @@ export function* fetchVerificationState(forceUnlockAccount?: boolean) {
       // we want to reset password before force unlock account
       clearPasswordCaches()
     }
-    yield call(unlockAccount, account, !!forceUnlockAccount)
+    const result: UnlockResult = yield call(unlockAccount, account, !!forceUnlockAccount)
+    if (result !== UnlockResult.SUCCESS) {
+      // This navigateBack has no effect if part of onboarding and returns to home or
+      // settings page if the user pressed on the back button when prompted for the PIN.
+      navigateBack()
+      return
+    }
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
