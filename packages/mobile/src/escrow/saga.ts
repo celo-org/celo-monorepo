@@ -342,16 +342,19 @@ function* withdrawFromEscrowWithoutCode(komenciActive: boolean = false) {
             url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
             token: feelessVerificationState.komenci.sessionToken,
           })
-          // TODO: When Komenci supports batched subsidized transactions, batch these two txs
-          // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
-          // there will be a service in place to transfer funds from MTW to EOA for users
+
+          const signedWithdrawAndTransferTx: CeloTransactionObject<string> = yield call(
+            [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
+            withdrawAndTransferTx.txo
+          )
+
           const withdrawAndTransferTxResult: Result<
             CeloTxReceipt,
             FetchError | TxError
           > = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
-            withdrawAndTransferTx
+            signedWithdrawAndTransferTx
           )
 
           if (!withdrawAndTransferTxResult.ok) {

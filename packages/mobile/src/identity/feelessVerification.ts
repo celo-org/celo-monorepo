@@ -988,10 +988,15 @@ export function* feelessRequestAttestations(
 
     const approveAndRequestTx = mtwWrapper.executeTransactions([approveTx.txo, requestTx.txo])
 
+    const signedApproveAndRequestTx: CeloTransactionObject<string> = yield call(
+      [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
+      approveAndRequestTx.txo
+    )
+
     const approveAndRequestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.submitMetaTransaction],
       mtwAddress,
-      approveAndRequestTx
+      signedApproveAndRequestTx
     )
 
     if (!approveAndRequestTxResult.ok) {
