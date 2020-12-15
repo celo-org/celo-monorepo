@@ -53,7 +53,7 @@ export async function linkSAForWorkloadIdentity(celoEnv: string) {
   }
 }
 
-export async function delinkSAForWorkloadIdentituy(celoEnv: string) {
+export async function delinkSAForWorkloadIdentity(celoEnv: string) {
     if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false").toLowerCase() === "true") {
     await execCmd(
       `gcloud iam service-accounts remove-iam-policy-binding --project ${fetchEnv(envVar.TESTNET_PROJECT_NAME)} \
