@@ -4,7 +4,7 @@ import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import { ChainHead } from 'src/geth/actions'
 import Logger from 'src/utils/Logger'
-import { getContractKitAsync, getWeb3 } from 'src/web3/contracts'
+import { getContractKitAsync, getWeb3, getWeb3Async } from 'src/web3/contracts'
 
 const TAG = 'web3/utils'
 
@@ -41,14 +41,14 @@ export async function getTransactionReceipt(txHash: string): Promise<CeloTxRecei
 // Note: This returns Promise<Block>
 export async function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
-  const contractkit = await getContractKitAsync()
-  return contractkit.connection.getBlock('latest')
+  const web3 = await getWeb3Async(false)
+  return web3.eth.getBlock('latest')
 }
 
 export async function getLatestBlockNumber() {
   Logger.debug(TAG, 'Getting latest block number')
-  const contractkit = await getContractKitAsync()
-  return contractkit.connection.getBlockNumber()
+  const web3 = await getWeb3Async(false)
+  return web3.eth.getBlockNumber()
 }
 
 // Returns true if the block was produced within the block age limit.
