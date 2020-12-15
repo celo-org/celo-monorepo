@@ -29266,10 +29266,9 @@ react-native-randombytes@^3.5.1, react-native-randombytes@^3.6.0:
     buffer "^4.9.1"
     sjcl "^1.0.3"
 
-react-native-reanimated@^2.0.0-rc.0:
+"react-native-reanimated@https://github.com/software-mansion/react-native-reanimated#8638cdbd55f3250bc6d25588e27bb0f2ee44b603":
   version "2.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-2.0.0-rc.0.tgz#7a1b0bfd48e3de9dfa985a524463b6a216531358"
-  integrity sha512-v+SMpeSxQ8kO116B5q3/D6VlFSot4eIRASw0nxxU+6zh9wb4W8shMyQi7/ag/gt246FvjBZOPwxsBS2iTcw8Zg==
+  resolved "https://github.com/software-mansion/react-native-reanimated#8638cdbd55f3250bc6d25588e27bb0f2ee44b603"
   dependencies:
     "@babel/plugin-transform-object-assign" "^7.10.4"
     fbjs "^3.0.0"

@@ -118,7 +118,7 @@
     "react-native-progress": "^4.1.2",
     "react-native-qrcode-svg": "^6.0.6",
     "react-native-randombytes": "^3.6.0",
-    "react-native-reanimated": "^2.0.0-rc.0",
+    "react-native-reanimated": "https://github.com/software-mansion/react-native-reanimated#8638cdbd55f3250bc6d25588e27bb0f2ee44b603",
     "react-native-restart-android": "^0.0.7",
     "react-native-safe-area-context": "^3.0.6",
     "react-native-screens": "^2.7.0",
