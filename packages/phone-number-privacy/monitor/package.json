@@ -23,7 +23,7 @@
     "@celo/contractkit": "1.0.0-beta3",
     "@celo/identity": "1.0.0-beta3",
     "@celo/wallet-local": "1.0.0-beta3",
-    "@celo/phone-number-privacy-common": "1.0.15-beta2",
+    "@celo/phone-number-privacy-common": "1.0.23",
     "@celo/utils": "1.0.0-beta3",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",
