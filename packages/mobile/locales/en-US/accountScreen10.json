@@ -36,6 +36,11 @@
     "body": "You will no longer be able to access your funds or your Account Key from this device. There's no way to recover your Account Key if you haven't written it down.",
     "resetNow": "Reset Now"
   },
+  "promptConfirmRevokeModal": {
+    "header": "Are you sure you want to revoke your Valora account?",
+    "body": "Once revoked, this account will not be able reverify. Only revoke if you are sure you will never need this account again.",
+    "revoke": "Revoke"
+  },
   "testFaqLink": "{{appName}} FAQ",
   "termsOfServiceLink": "Terms of Service",
   "editProfile": "Edit Profile",

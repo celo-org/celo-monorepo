@@ -1,8 +1,7 @@
 import { Address, normalizeAddress } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
-import { GET_IMPLEMENTATION_ABI } from '@celo/contractkit/lib/governance/proxy'
-import { soliditySha3 } from 'web3-utils'
+import { GET_IMPLEMENTATION_ABI } from '@celo/contractkit/lib/proxy'
 import {
   InvalidBytecode,
   InvalidImplementation,
@@ -26,22 +25,18 @@ export const verifyWallet = async (
   allowedImplementations: Address[],
   expectedSigner: Address
 ): Promise<Result<true, WalletValidationError>> => {
-  const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
+  const code = await contractKit.connection.web3.eth.getCode(metaTxWalletAddress)
 
-  if (soliditySha3(stripBzz(code)) !== PROXY_BYTECODE_SHA3) {
+  if (contractKit.connection.web3.utils.soliditySha3(stripBzz(code)) !== PROXY_BYTECODE_SHA3) {
     return Err(new InvalidBytecode(metaTxWalletAddress))
   }
 
-  const actualImplementationRaw = await contractKit.web3.eth.call({
+  const actualImplementationRaw = await contractKit.connection.web3.eth.call({
     to: metaTxWalletAddress,
     data: GET_IMPLEMENTATION_ABI.signature,
   })
   const actualImplementation = normalizeAddress(
-    // XXX: This is a typing issue in web3js :(
-    (contractKit.web3.eth.abi.decodeParameter(
-      'address',
-      actualImplementationRaw
-    ) as unknown) as string
+    contractKit.connection.getAbiCoder().decodeParameter('address', actualImplementationRaw)
   )
   const normalizedAllowedImplementations = allowedImplementations.map(normalizeAddress)
 

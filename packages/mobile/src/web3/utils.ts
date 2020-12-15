@@ -1,12 +1,10 @@
-import { estimateGas as ckEstimateGas } from '@celo/contractkit/lib/utils/web3-utils'
+import { BlockHeader, CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import { ChainHead } from 'src/geth/actions'
 import Logger from 'src/utils/Logger'
-import { getWeb3, getWeb3Async } from 'src/web3/contracts'
-import { Tx } from 'web3-core'
-import { BlockHeader, TransactionObject, TransactionReceipt } from 'web3-eth'
+import { getContractKitAsync, getWeb3, getWeb3Async } from 'src/web3/contracts'
 
 const TAG = 'web3/utils'
 
@@ -17,22 +15,24 @@ const TAG = 'web3/utils'
 export const BLOCK_AGE_LIMIT = 60 // seconds
 
 // Estimate gas taking into account the configured inflation factor
-export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
-  const web3 = await getWeb3Async()
-  const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
-  const getCallTx = (_tx: Tx) => {
+export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
+  const contractKit = await getContractKitAsync()
+  const gasEstimator = (_tx: CeloTx) => txObj.estimateGas({ ..._tx })
+  const getCallTx = (_tx: CeloTx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
     return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
   }
-  const caller = (_tx: Tx) => web3.eth.call(getCallTx(_tx))
-  const gas = new BigNumber(await ckEstimateGas(txParams, gasEstimator, caller))
-    .times(GAS_INFLATION_FACTOR)
-    .integerValue()
+  const caller = (_tx: CeloTx) => contractKit.connection.web3.eth.call(getCallTx(_tx))
+
+  contractKit.connection.defaultGasInflationFactor = GAS_INFLATION_FACTOR
+  const gas = new BigNumber(
+    await contractKit.connection.estimateGasWithInflationFactor(txParams, gasEstimator, caller)
+  )
   return gas
 }
 
 // Fetches the transaction receipt for a given hash, returning null if the transaction has not been mined.
-export async function getTransactionReceipt(txHash: string): Promise<TransactionReceipt | null> {
+export async function getTransactionReceipt(txHash: string): Promise<CeloTxReceipt | null> {
   Logger.debug(TAG, `Getting transaction receipt for ${txHash}`)
   const web3 = await getWeb3Async(false)
   return web3.eth.getTransactionReceipt(txHash)

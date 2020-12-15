@@ -13,7 +13,7 @@
   },
   "affirmations": {
     "smallTitle": "Take action to solve real-world problems",
-    "title":"What the Alliance stands for",
+    "title": "What the Alliance stands for",
     "laboratoriaBelief": "We believe we have a lot to learn from <0>one another.</0>",
     "laboratoriaCopy": "Hosting a design-a-thon with young female coding students in Mexico exploring ideas for blockchain technology.",
     "wfpBelief": "We believe in designing <0>with communities</0>, not for them.",
@@ -39,10 +39,16 @@
       "grow": "Grow",
       "secure": "Secure",
       "build": "Build",
-      "preserve": "Preserve"
+      "preserve": "Preserve",
+      "regenerate": "Regenerate",
+      "pay": "Pay",
+      "community": "Community"
     },
     "categoryText": {
       "preserve": "Preserve natural resources by supporting projects through Celo rewards",
+      "regenerate": "Enable a regenerative, ecological economy by creating natural-capital backed assets and putting them into circulation.",
+      "pay": "Enable merchants to accept digital payments with lower fees by accepting cUSD.",
+      "community": "Strengthen communities by introducing local and community currencies",
       "accept": "Enable your communities to easily pay for mobile top ups, utilities, and shopping online with cUSD",
       "acquire": "Make it easy to acquire cUSD in digital wallets",
       "send": "Send remittances almost anywhere, instantly for as little as $.01",

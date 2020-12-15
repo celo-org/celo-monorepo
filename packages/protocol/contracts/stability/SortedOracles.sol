@@ -28,7 +28,13 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   mapping(address => mapping(address => bool)) public isOracle;
   mapping(address => address[]) public oracles;
 
+  // `reportExpirySeconds` is the fallback value used to determine reporting
+  // frequency. Initially it was the _only_ value but we later introduced
+  // the per token mapping in `tokenReportExpirySeconds`. If a token
+  // doesn't have a value in the mapping (i.e. it's 0), the fallback is used.
+  // See: #getTokenReportExpirySeconds
   uint256 public reportExpirySeconds;
+  mapping(address => uint256) public tokenReportExpirySeconds;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -41,6 +47,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event OracleReportRemoved(address indexed token, address indexed oracle);
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
+  event TokenReportExpirySet(address token, uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -52,7 +59,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -73,6 +80,21 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
     reportExpirySeconds = _reportExpirySeconds;
     emit ReportExpirySet(_reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the report expiry parameter for a token.
+   * @param _token The address of the token to set expiry for.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
+   */
+  function setTokenReportExpiry(address _token, uint256 _reportExpirySeconds) external onlyOwner {
+    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
+    require(
+      _reportExpirySeconds != tokenReportExpirySeconds[_token],
+      "token reportExpirySeconds hasn't changed"
+    );
+    tokenReportExpirySeconds[_token] = _reportExpirySeconds;
+    emit TokenReportExpirySet(_token, _reportExpirySeconds);
   }
 
   /**
@@ -143,7 +165,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
-    if (now.sub(timestamp) >= reportExpirySeconds) {
+    if (now.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
       return (true, oldest);
     }
     return (false, oldest);
@@ -271,6 +293,19 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    */
   function getOracles(address token) external view returns (address[] memory) {
     return oracles[token];
+  }
+
+  /**
+   * @notice Returns the expiry for the token if exists, if not the default.
+   * @param token The address of the token.
+   * @return The report expiry in seconds.
+   */
+  function getTokenReportExpirySeconds(address token) public view returns (uint256) {
+    if (tokenReportExpirySeconds[token] == 0) {
+      return reportExpirySeconds;
+    }
+
+    return tokenReportExpirySeconds[token];
   }
 
   /**
