@@ -26,6 +26,7 @@ Currently hosted core developer keys include:
 * victor@clabs.co
 * mariano@clabs.co
 * joshua@clabs.co
+* or@clabs.co
 
 ## Documentation
 
