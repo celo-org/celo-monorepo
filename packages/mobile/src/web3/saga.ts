@@ -219,7 +219,10 @@ export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: strin
     try {
       yield call([wallet, wallet.addAccount], privateKey, password)
     } catch (e) {
-      if (e === RpcWalletErrors.AccountAlreadyExists) {
+      if (
+        e === RpcWalletErrors.AccountAlreadyExists ||
+        e === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS
+      ) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
       } else {
         Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
