@@ -154,13 +154,6 @@
     "location": "packages/typescript",
     "dependencies": []
   },
-  "@celo/web": {
-    "location": "packages/web",
-    "dependencies": [
-      "@celo/flake-tracker",
-      "@celo/utils"
-    ]
-  },
   "@celo/phone-number-privacy-combiner": {
     "location": "packages/phone-number-privacy/combiner",
     "dependencies": [
