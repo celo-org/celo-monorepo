@@ -1,3 +1,4 @@
+import { BlockHeader } from '@celo/connect'
 import { sleep } from '@celo/utils/src/async'
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
@@ -33,8 +34,8 @@ import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { BLOCK_AGE_LIMIT, blockIsFresh } from 'src/web3/utils'
-import { BlockHeader } from 'web3-eth'
+// tslint:disable-next-line: ordered-imports
+import { blockIsFresh, BLOCK_AGE_LIMIT } from 'src/web3/utils'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 

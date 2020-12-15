@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertAlmostEqualBN,
@@ -5,7 +6,6 @@ import {
   assertEqualBN,
   assertRevert,
   mineBlocks,
-  NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import { normalizeAddressWith0x } from '@celo/utils/lib/address'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'

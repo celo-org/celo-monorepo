@@ -13,10 +13,10 @@ export function runExchangeTest(context: EnvTestContext) {
 
     test('exchange cUSD for CELO', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.Exchange)
-      context.kit.addAccount(from.privateKey)
+      context.kit.connection.addAccount(from.privateKey)
       context.kit.defaultAccount = from.address
       const stableToken = await context.kit.contracts.getStableToken()
-      context.kit.defaultFeeCurrency = stableToken.address
+      context.kit.connection.defaultFeeCurrency = stableToken.address
       const goldToken = await context.kit.contracts.getGoldToken()
       const exchange = await context.kit.contracts.getExchange()
 

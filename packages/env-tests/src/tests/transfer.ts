@@ -12,10 +12,10 @@ export function runTransfercUSDTest(context: EnvTestContext) {
     test('transfer cUSD', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
       const to = await getKey(context.mnemonic, TestAccounts.TransferTo)
-      context.kit.addAccount(from.privateKey)
-      context.kit.addAccount(to.privateKey)
+      context.kit.connection.addAccount(from.privateKey)
+      context.kit.connection.addAccount(to.privateKey)
       const stableToken = await context.kit.contracts.getStableToken()
-      context.kit.defaultFeeCurrency = stableToken.address
+      context.kit.connection.defaultFeeCurrency = stableToken.address
 
       const toBalanceBefore = await stableToken.balanceOf(to.address)
       logger.debug(

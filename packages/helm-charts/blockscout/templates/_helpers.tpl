@@ -9,6 +9,13 @@ heritage: {{ .Release.Service }}
 {{- end -}}
 
 {{- /*
+Defines common annotations across all blockscout components.
+*/ -}}
+{{- define "celo.blockscout.annotations" -}}
+kubernetes.io/change-cause: Deployed {{ .Values.blockscout.image.tag }} by {{ .Values.blockscout.deployment.account }}
+{{- end -}}
+
+{{- /*
 Defines the CloudSQL proxy container that terminates
 after termination of the main container.
 Should be included as the last container as it contains
