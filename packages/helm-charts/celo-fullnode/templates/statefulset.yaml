@@ -54,7 +54,8 @@ spec:
             weight: 100
       initContainers:
 {{- if .Values.geth.use_gstorage_data | default false }}
-{{ include "common.gsutil-sync-data-init-container" . | indent 6}}
+{{ include "common.gsutil-sync-data-init-container" . | indent 6 }}
+{{ include "common.setup-bootnodes" . | indent 6 }}
 {{ else }}
 {{ include "common.init-genesis-container" .  | indent 6 }}
 {{ end }}

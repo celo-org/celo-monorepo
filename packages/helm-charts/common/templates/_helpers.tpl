@@ -65,6 +65,22 @@ release: {{ .Release.Name }}
   {{ end -}}
 {{- end -}}
 
+{{- define "common.setup-bootnodes" -}}
+- name: download-bootnodes
+  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+  imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
+  command:
+  - /bin/sh
+  - -c
+  args:
+  - |
+      mkdir -p /var/geth /root/celo
+      wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}
+
 {{- define "common.import-geth-account-container" -}}
 - name: import-geth-account
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -441,15 +457,6 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - -c
   args:
   - |
-     # Start with setting up the genesis as this replaces the init genesis step.
-     # The bootnode step is important for nodes being setup for the first time.
-     mkdir -p /var/geth /root/celo
-     if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
-       cp -L /var/geth/genesis.json /root/.celo/
-     else
-       wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
-       wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
-     fi
      # If older than upload period, remove the chain data dir.
      if [ -d /root/.celo/celo/chaindata ]; then
        mtime=$(stat --format "%Y" /root/.celo/celo/chaindata)
