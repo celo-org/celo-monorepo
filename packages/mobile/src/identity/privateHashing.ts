@@ -25,7 +25,7 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
-import { getAccount, getAccountAddress, unlockAccount } from 'src/web3/saga'
+import { getAccount, getAccountAddress, unlockAccount, UnlockResult } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privateHashing'
@@ -104,8 +104,8 @@ function* getPhoneHashPrivate(e164Number: string, selfPhoneHash?: string) {
 
   // Unlock the account if the authentication is signed by the wallet
   if (authSigner.authenticationMethod === OdisUtils.Query.AuthenticationMethod.WALLET_KEY) {
-    const success: boolean = yield call(unlockAccount, walletAddress)
-    if (!success) {
+    const result: UnlockResult = yield call(unlockAccount, walletAddress)
+    if (result !== UnlockResult.SUCCESS) {
       throw new Error(ErrorMessages.INCORRECT_PIN)
     }
   }

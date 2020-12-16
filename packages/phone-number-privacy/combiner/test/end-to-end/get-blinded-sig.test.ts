@@ -1,9 +1,9 @@
-import { OdisUtils } from '@celo/contractkit'
+import { OdisUtils } from '@celo/identity/lib/odis'
 import {
   AuthenticationMethod,
   ErrorMessages,
   SignMessageRequest,
-} from '@celo/contractkit/lib/identity/odis/query'
+} from '@celo/identity/lib/odis/query'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
 import {
@@ -21,7 +21,7 @@ require('dotenv').config()
 
 export const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
-jest.setTimeout(15000)
+jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
   describe('Returns status ODIS_INPUT_ERROR', () => {

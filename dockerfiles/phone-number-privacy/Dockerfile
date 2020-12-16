@@ -7,7 +7,7 @@ COPY packages/phone-number-privacy/signer signer
 WORKDIR /celo-phone-number-privacy/signer
 COPY yarn.lock ./
 
-RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
+RUN yarn install --network-timeout 100000 && yarn cache clean
 
 ENV NODE_ENV production
 

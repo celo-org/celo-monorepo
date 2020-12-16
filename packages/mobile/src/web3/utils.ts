@@ -34,8 +34,8 @@ export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
 // Fetches the transaction receipt for a given hash, returning null if the transaction has not been mined.
 export async function getTransactionReceipt(txHash: string): Promise<CeloTxReceipt | null> {
   Logger.debug(TAG, `Getting transaction receipt for ${txHash}`)
-  const web3 = await getWeb3Async(false)
-  return web3.eth.getTransactionReceipt(txHash)
+  const contractkit = await getContractKitAsync()
+  return contractkit.connection.getTransactionReceipt(txHash)
 }
 
 // Note: This returns Promise<Block>
