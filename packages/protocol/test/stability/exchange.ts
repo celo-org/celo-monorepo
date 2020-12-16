@@ -324,16 +324,20 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setStableBucketFractionCap', () => {
-    const newStableBucketFractionCap = toFixed(1 / 22)
+  describe.only('#setStableBucketFractionCap', () => {
+    const newStableBucketFractionCap = toFixed(2 / 22)
 
-    // it('should set the stableBucketFractionCapTx', async () => {
-    // })
+    it('should set the stableBucketFractionCap', async () => {
+      await exchange.setStableBucketFractionCap(newStableBucketFractionCap)
 
-    it('emits StableBucketFractionCapSet', async () => {
+      assertEqualBN(await exchange.stableBucketFractionCap(), newStableBucketFractionCap)
+    })
+
+    it.only('emits StableBucketFractionCapSet', async () => {
       const setStableBucketFractionCapTx = await exchange.setStableBucketFractionCap(
         newStableBucketFractionCap
       )
+
       const exchangeLogs = setStableBucketFractionCapTx.logs.filter(
         (x) => x.event === 'StableBucketFractionCapSet'
       )
