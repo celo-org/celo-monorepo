@@ -69,6 +69,7 @@ export async function kubectlAnnotateKSA(celoEnv: string) {
       `kubectl annotate serviceaccount \
         --namespace ${celoEnv} \
         gcloud-storage-access \
+        --overwrite \
         iam.gke.io/gcp-service-account=chaindata-download@${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.iam.gserviceaccount.com`
     )
   }

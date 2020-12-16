@@ -448,8 +448,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
        diff=$(($day - $mtime))
        # If mtime is older than 1 day old, pull the chaindata rather than using the current PVC.
        if [ "$diff" -gt 86400 ]; then
+         echo Chaindata is more than one day out of date. Wiping to use saved chaindata.
          rm -rf /root/.celo/celo/chaindata
        else
+         echo Chaindata is less than one day out of date. Using existing chaindata.
          exit 0
        fi
      fi
