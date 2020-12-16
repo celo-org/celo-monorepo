@@ -1,7 +1,7 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { installFullNodeChart } from 'src/lib/fullnodes'
-import { linkSAForWorkloadIdentity, kubectlAnnotateKSA } from 'src/lib/gcloud_utils'
+import { kubectlAnnotateKSA, linkSAForWorkloadIdentity } from 'src/lib/gcloud_utils'
 import yargs from 'yargs'
 
 export const command = 'fullnodes'
