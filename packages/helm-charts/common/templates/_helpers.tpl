@@ -55,7 +55,12 @@ release: {{ .Release.Name }}
         wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
         wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
       fi
-      geth init /root/.celo/genesis.json
+      # There are issues with running geth init over existing chaindata around the use of forks.
+      # The case that this could cause problems is when a network is set up with Base64 genesis files & chaindata
+      # as that could interfere with accessing bootnodes for newly created nodes.
+      if [ "{{ .Values.geth.use_gstorage_data | default false }}" == "false" ]; then
+        geth init /root/.celo/genesis.json
+      fi
   volumeMounts:
   - name: data
     mountPath: /root/.celo
@@ -63,22 +68,6 @@ release: {{ .Release.Name }}
   - name: config
     mountPath: /var/geth
   {{ end -}}
-{{- end -}}
-
-{{- define "common.setup-bootnodes" -}}
-- name: download-bootnodes
-  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-  imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
-  command:
-  - /bin/sh
-  - -c
-  args:
-  - |
-      mkdir -p /var/geth /root/celo
-      wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
-  volumeMounts:
-  - name: data
-    mountPath: /root/.celo
 {{- end -}}
 
 {{- define "common.import-geth-account-container" -}}
