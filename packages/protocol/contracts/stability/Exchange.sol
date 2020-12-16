@@ -295,8 +295,8 @@ contract Exchange is
   }
 
   /**
-    * @notice Allows owner to set the Stable Bucket Fraction
-    * @param newStableBucketFractionCap The new value for the Stable Bucket Fraction
+    * @notice Allows owner to set the Stable Bucket Fraction Cap
+    * @param newStableBucketFractionCap The new value for the Stable Bucket Fraction CAP
     */
   function setStableBucketFractionCap(uint256 newStableBucketFractionCap) public onlyOwner {
     stableBucketFractionCap = FixidityLib.wrap(newStableBucketFractionCap);
