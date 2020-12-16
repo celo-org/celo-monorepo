@@ -68,10 +68,10 @@ export const ATTESTATION_REVEAL_TIMEOUT_SECONDS = 60 // 1 minute
 // higher than this is incorrect (currently set to 10M)
 export const WALLET_BALANCE_UPPER_BOUND = new BigNumber('1e10')
 
-// TODO: remove special case for mainnet
-export const DEFAULT_FORNO_URL = `https://${
-  DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET
-}-forno.celo-testnet.org`
+export const DEFAULT_FORNO_URL =
+  DEFAULT_TESTNET === 'mainnet'
+    ? 'https://forno.celo.org/'
+    : 'https://alfajores-forno.celo-testnet.org/'
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
