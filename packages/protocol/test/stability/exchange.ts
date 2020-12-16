@@ -150,6 +150,7 @@ contract('Exchange', (accounts: string[]) => {
       minSupplyForStableBucketCap,
       maxStableBucketFraction
     )
+    // expect not to be reverted
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
@@ -356,29 +357,12 @@ contract('Exchange', (accounts: string[]) => {
   })
 
   describe('#getBuyAndSellBuckets', () => {
-    it.only('should return the correct amount of buy and sell token', async () => {
-      // console.log('stableTokenSupple: ', (await stableToken.totalSupply()).toString())
-
-      console.log('stableTokenSupple: ', (await stableToken.totalSupply()).toString())
-      console.log(
-        'minSupplyForStableBucketCap: ',
-        (await exchange.minSupplyForStableBucketCap()).toString()
-      )
-      console.log(
-        'maxStableBucketFraction: ',
-        (await exchange.maxStableBucketFraction()).toString()
-      )
-      console.log('getStableBucketCap: ', (await exchange.getStableBucketCap()).toString())
-
+    it('should return the correct amount of buy and sell token', async () => {
       // stable, gold
       const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
-      console.log('sellBucketSize (left): ', sellBucketSize.toString())
-      console.log('buyBucketSize (right): ', buyBucketSize.toString())
 
       assertEqualBN(sellBucketSize, initialGoldBucket)
-      console.log('test')
       assertEqualBN(buyBucketSize, initialStableBucket)
-      console.log('make it one')
     })
 
     describe(`after the Reserve's balance changes`, () => {
