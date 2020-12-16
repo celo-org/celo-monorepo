@@ -100,15 +100,15 @@ export async function handleGetAttestationRequest(
   res: express.Response,
   getRequest: GetAttestationRequest
 ) {
-  const {
-    headers: { authentication },
-  } = req
-  if (!authentication) {
-    respondWithError(res, 401, 'Missing authentication')
-    return
-  }
-
   if (getRequest.securityCode) {
+    const {
+      headers: { authentication },
+    } = req
+    if (!authentication) {
+      respondWithError(res, 401, 'Missing authentication')
+      return
+    }
+
     const typedData = buildSecurityCodeTypedData(getRequest.securityCode)
     const accounts = await useKit((kit) => kit.contracts.getAccounts())
     const [walletAddress, dekAddress] = await Promise.all([
