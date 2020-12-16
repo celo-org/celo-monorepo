@@ -169,7 +169,7 @@ export function runAttestationTest(
         phoneNumber.phoneNumber,
         attestationAccountAddress,
         pepper,
-        false
+        true
       )
 
       await reportErrors(possibleErrors, logger)
