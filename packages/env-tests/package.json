@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "@celo/contractkit": "1.0.0-dev",
+    "@celo/celotool": "1.0.0",
     "@celo/utils": "1.0.0-dev",
     "@celo/base": "1.0.0-dev",
     "@celo/connect": "1.0.0-dev",

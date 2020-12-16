@@ -1,29 +1,22 @@
-import { Address, CeloTransactionParams } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import {
-  ActionableAttestation,
-  AttestationsWrapper,
-} from '@celo/contractkit/lib/wrappers/Attestations'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { notEmpty } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Logger, { createLogger, stdSerializers } from 'bunyan'
 import { createStream } from 'bunyan-gke-stackdriver'
 import { Level } from 'bunyan-gke-stackdriver/dist/types'
-import moment from 'moment'
 import sleep from 'sleep-promise'
 import {
-  fetchLatestMessagesFromToday,
-  findValidCode,
   getIdentifierAndPepper,
   getPhoneNumber,
+  pollForMessagesAndCompleteAttestations,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
 } from 'src/lib/attestation'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, generatePrivateKey } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
-import twilio, { Twilio } from 'twilio'
+import twilio from 'twilio'
 import Web3 from 'web3'
 import { Argv } from 'yargs'
 import { BotsArgv } from '../bots'
@@ -93,182 +86,138 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     serializers: stdSerializers,
     streams: [createStream(Level.INFO)],
   })
-  try {
-    const kit = newKitFromWeb3(new Web3(argv.celoProvider))
-    const mnemonic = fetchEnv(envVar.MNEMONIC)
-    // This really should be the ATTESTATION_BOT key, but somehow we can't get it to have cUSD
-    const clientKey = ensure0x(
-      generatePrivateKey(mnemonic, AccountType.ATTESTATION_BOT, argv.index)
-    )
-    const clientAddress = privateKeyToAddress(clientKey)
-    logger = logger.child({ address: clientAddress })
-    kit.connection.addAccount(clientKey)
 
-    const twilioClient = twilio(
-      fetchEnv(envVar.TWILIO_ACCOUNT_SID),
-      fetchEnv(envVar.TWILIO_ACCOUNT_AUTH_TOKEN)
-    )
+  for (const useSecurityCode of [true, false]) {
+    try {
+      const kit = newKitFromWeb3(new Web3(argv.celoProvider))
+      const mnemonic = fetchEnv(envVar.MNEMONIC)
+      // This really should be the ATTESTATION_BOT key, but somehow we can't get it to have cUSD
+      const clientKey = ensure0x(
+        generatePrivateKey(mnemonic, AccountType.ATTESTATION_BOT, argv.index)
+      )
+      const clientAddress = privateKeyToAddress(clientKey)
+      logger = logger.child({ address: clientAddress })
+      kit.connection.addAccount(clientKey)
 
-    const attestations = await kit.contracts.getAttestations()
-    const stableToken = await kit.contracts.getStableToken()
-    const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
-
-    const waitTime = Math.random() * argv.initialWaitSeconds
-    await sleep(waitTime * 1000)
-    logger.info({ waitTime, initialWaitSeconds: argv.initialWaitSeconds }, 'Initial Wait')
-
-    const phoneNumber = await getPhoneNumber(
-      attestations,
-      twilioClient,
-      argv.attestationMax,
-      argv.salt
-    )
-    const { identifier, pepper } = await getIdentifierAndPepper(
-      kit,
-      argv.context,
-      clientAddress,
-      phoneNumber,
-      argv.salt
-    )
-    logger.info({ identifier }, 'Using identifier')
-
-    const nonCompliantIssuersAlreadyLogged: string[] = []
-
-    logger = logger.child({ phoneNumber })
-    logger.info('Initialized phone number')
-
-    let stat = await attestations.getAttestationStat(identifier, clientAddress)
-
-    while (stat.total < argv.attestationMax) {
-      logger.info({ ...stat }, 'Start Attestation')
-
-      const gasPrice = new BigNumber(
-        await gasPriceMinimum.getGasPriceMinimum(stableToken.address)
-      ).times(5)
-      const txParams = {
-        from: clientAddress,
-        feeCurrency: stableToken.address,
-        gasPrice: gasPrice.toString(),
-      }
-
-      logger.info('Request Attestation')
-      await requestMoreAttestations(attestations, identifier, 1, clientAddress, txParams)
-
-      const attestationsToComplete = await attestations.getActionableAttestations(
-        identifier,
-        clientAddress
+      const twilioClient = twilio(
+        fetchEnv(envVar.TWILIO_ACCOUNT_SID),
+        fetchEnv(envVar.TWILIO_ACCOUNT_AUTH_TOKEN)
       )
 
-      const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
-        identifier,
-        clientAddress
-      )
-      nonCompliantIssuers
-        .filter((_) => !nonCompliantIssuersAlreadyLogged.includes(_))
-        .forEach((issuer) => {
-          logger.info({ issuer }, 'Did not run the attestation service')
-          nonCompliantIssuersAlreadyLogged.push(issuer)
-        })
+      const attestations = await kit.contracts.getAttestations()
+      const stableToken = await kit.contracts.getStableToken()
+      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
 
-      logger.info({ attestationsToComplete }, 'Reveal to issuers')
+      const waitTime = Math.random() * argv.initialWaitSeconds
+      await sleep(waitTime * 1000)
+      logger.info({ waitTime, initialWaitSeconds: argv.initialWaitSeconds }, 'Initial Wait')
 
-      const possibleErrors = await requestAttestationsFromIssuers(
-        attestationsToComplete,
-        attestations,
-        phoneNumber,
-        clientAddress,
-        pepper
-      )
-
-      logger.info(
-        { possibleErrors: possibleErrors.filter((_) => _ && _.known).length },
-        'Reveal errors'
-      )
-
-      possibleErrors.filter(notEmpty).forEach((error) => {
-        if (error.known) {
-          logger.info({ ...error }, 'Error while requesting from attestation service')
-        } else {
-          logger.info({ ...error }, 'Unknown error while revealing to issuer')
-        }
-      })
-
-      await pollForMessagesAndCompleteAttestations(
+      const phoneNumber = await getPhoneNumber(
         attestations,
         twilioClient,
-        phoneNumber,
-        identifier,
+        argv.attestationMax,
+        argv.salt
+      )
+      const { identifier, pepper } = await getIdentifierAndPepper(
+        kit,
+        argv.context,
         clientAddress,
-        attestationsToComplete,
-        txParams,
-        logger,
-        argv.timeToPollForTextMessages
+        phoneNumber,
+        argv.salt
       )
+      logger.info({ identifier }, 'Using identifier')
 
-      const sleepTime = Math.random() * argv.inBetweenWaitSeconds
-      logger.info(
-        { waitTime: sleepTime, inBetweenWaitSeconds: argv.inBetweenWaitSeconds },
-        `InBetween Wait`
-      )
+      const nonCompliantIssuersAlreadyLogged: string[] = []
 
-      await sleep(sleepTime * 1000)
-      stat = await attestations.getAttestationStat(identifier, clientAddress)
+      logger = logger.child({ phoneNumber })
+      logger.info('Initialized phone number')
+
+      let stat = await attestations.getAttestationStat(identifier, clientAddress)
+
+      while (stat.total < argv.attestationMax) {
+        logger.info({ ...stat }, 'Start Attestation')
+
+        const gasPrice = new BigNumber(
+          await gasPriceMinimum.getGasPriceMinimum(stableToken.address)
+        ).times(5)
+        const txParams = {
+          from: clientAddress,
+          feeCurrency: stableToken.address,
+          gasPrice: gasPrice.toString(),
+        }
+
+        logger.info('Request Attestation')
+        await requestMoreAttestations(attestations, identifier, 1, clientAddress, txParams)
+
+        const attestationsToComplete = await attestations.getActionableAttestations(
+          identifier,
+          clientAddress
+        )
+
+        const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
+          identifier,
+          clientAddress
+        )
+        nonCompliantIssuers
+          .filter((_) => !nonCompliantIssuersAlreadyLogged.includes(_))
+          .forEach((issuer) => {
+            logger.info({ issuer }, 'Did not run the attestation service')
+            nonCompliantIssuersAlreadyLogged.push(issuer)
+          })
+
+        logger.info({ attestationsToComplete }, 'Reveal to issuers')
+
+        const possibleErrors = await requestAttestationsFromIssuers(
+          attestationsToComplete,
+          attestations,
+          phoneNumber,
+          clientAddress,
+          pepper,
+          useSecurityCode
+        )
+
+        logger.info(
+          { possibleErrors: possibleErrors.filter((_) => _ && _.known).length },
+          'Reveal errors'
+        )
+
+        possibleErrors.filter(notEmpty).forEach((error) => {
+          if (error.known) {
+            logger.info({ ...error }, 'Error while requesting from attestation service')
+          } else {
+            logger.info({ ...error }, 'Unknown error while revealing to issuer')
+          }
+        })
+
+        await pollForMessagesAndCompleteAttestations(
+          attestations,
+          // @ts-ignore
+          twilioClient,
+          phoneNumber,
+          identifier,
+          pepper,
+          clientAddress,
+          attestationsToComplete,
+          txParams,
+          logger,
+          argv.timeToPollForTextMessages
+        )
+
+        const sleepTime = Math.random() * argv.inBetweenWaitSeconds
+        logger.info(
+          { waitTime: sleepTime, inBetweenWaitSeconds: argv.inBetweenWaitSeconds },
+          `InBetween Wait`
+        )
+
+        await sleep(sleepTime * 1000)
+        stat = await attestations.getAttestationStat(identifier, clientAddress)
+      }
+
+      logger.info({ ...stat }, 'Completed attestations for phone number')
+      process.exit(0)
+    } catch (error) {
+      logger.error({ err: error })
+      process.exit(1)
     }
-
-    logger.info({ ...stat }, 'Completed attestations for phone number')
-    process.exit(0)
-  } catch (error) {
-    logger.error({ err: error })
-    process.exit(1)
-  }
-}
-
-const POLLING_WAIT = 300
-
-async function pollForMessagesAndCompleteAttestations(
-  attestations: AttestationsWrapper,
-  client: Twilio,
-  phoneNumber: string,
-  identifier: string,
-  account: Address,
-  attestationsToComplete: ActionableAttestation[],
-  txParams: CeloTransactionParams = {},
-  logger: Logger,
-  timeToPollForTextMessages: number
-) {
-  const startDate = moment()
-  logger.info({ pollingWait: POLLING_WAIT }, 'Poll for the attestation code')
-  while (
-    moment.duration(moment().diff(startDate)).asMinutes() < timeToPollForTextMessages &&
-    attestationsToComplete.length > 0
-  ) {
-    const messages = await fetchLatestMessagesFromToday(client, phoneNumber, 100)
-
-    const res = await findValidCode(
-      attestations,
-      messages.map((_) => _.body),
-      identifier,
-      attestationsToComplete,
-      account
-    )
-
-    if (!res) {
-      process.stdout.write('.')
-      await sleep(POLLING_WAIT)
-      continue
-    }
-    console.info('')
-
-    logger.info(
-      { waitingTime: moment.duration(moment().diff(startDate)).asSeconds() },
-      'Received valid code'
-    )
-
-    const completeTx = await attestations.complete(identifier, account, res.issuer, res.code)
-
-    await completeTx.sendAndWaitForReceipt(txParams)
-
-    logger.info({ issuer: res.issuer }, 'Completed attestation')
-    attestationsToComplete = await attestations.getActionableAttestations(identifier, account)
   }
 }
