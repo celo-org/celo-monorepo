@@ -17,6 +17,7 @@ import {
   CommonActions,
   DrawerActions,
   DrawerNavigationState,
+  ParamListBase,
   useLinkBuilder,
 } from '@react-navigation/native'
 import { TransitionPresets } from '@react-navigation/stack'
@@ -71,7 +72,7 @@ const TAG = 'NavigationService'
 const Drawer = createDrawerNavigator()
 
 type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerStyle' | 'style'> & {
-  state: DrawerNavigationState
+  state: DrawerNavigationState<ParamListBase>
   navigation: DrawerNavigationHelpers
   descriptors: DrawerDescriptorMap
   protectedRoutes: string[]
@@ -110,7 +111,11 @@ function CustomDrawerItemList({
       if (protectedRoutes.includes(route.name) && activeRouteName !== route.name) {
         // Route should be protected by PIN code
         ensurePincode()
-          .then(navigateToItem)
+          .then((pinIsCorrect) => {
+            if (pinIsCorrect) {
+              navigateToItem()
+            }
+          })
           .catch((error) => {
             Logger.error(`${TAG}@onPress`, 'PIN ensure error', error)
           })

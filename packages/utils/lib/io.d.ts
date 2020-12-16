@@ -1,0 +1,65 @@
+import * as t from 'io-ts';
+export { isValidUrl, URL_REGEX } from '@celo/base/lib/io';
+export declare const UrlType: t.Type<string, string, unknown>;
+export declare const JSONStringType: t.Type<string, string, unknown>;
+export declare const E164PhoneNumberType: t.Type<string, string, unknown>;
+export declare const AddressType: t.Type<string, string, unknown>;
+export declare const PublicKeyType: t.Type<string, string, unknown>;
+export declare const SignatureType: t.StringC;
+export declare const SaltType: t.StringC;
+export declare const AttestationServiceStatusResponseType: t.TypeC<{
+    status: t.LiteralC<"ok">;
+    smsProviders: t.ArrayC<t.StringC>;
+    blacklistedRegionCodes: t.UnionC<[t.ArrayC<t.StringC>, t.UndefinedC]>;
+    accountAddress: t.Type<string, string, unknown>;
+    signature: t.UnionC<[t.StringC, t.UndefinedC]>;
+    version: t.StringC;
+    latestBlock: t.NumberC;
+    ageOfLatestBlock: t.NumberC;
+    isNodeSyncing: t.BooleanC;
+    appSignature: t.StringC;
+}>;
+export declare const AttestationServiceTestRequestType: t.TypeC<{
+    phoneNumber: t.Type<string, string, unknown>;
+    message: t.StringC;
+    signature: t.StringC;
+    provider: t.UnionC<[t.StringC, t.UndefinedC]>;
+}>;
+export declare type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>;
+export declare type Signature = t.TypeOf<typeof SignatureType>;
+export declare type Address = t.TypeOf<typeof AddressType>;
+export declare type E164Number = t.TypeOf<typeof E164PhoneNumberType>;
+export declare const AttestationRequestType: t.TypeC<{
+    phoneNumber: t.Type<string, string, unknown>;
+    account: t.Type<string, string, unknown>;
+    issuer: t.Type<string, string, unknown>;
+    salt: t.UnionC<[t.UndefinedC, t.StringC]>;
+    smsRetrieverAppSig: t.UnionC<[t.UndefinedC, t.StringC]>;
+    securityCodePrefix: t.UnionC<[t.UndefinedC, t.StringC]>;
+    language: t.UnionC<[t.UndefinedC, t.StringC]>;
+}>;
+export declare type AttestationRequest = t.TypeOf<typeof AttestationRequestType>;
+export declare const GetAttestationRequestType: t.TypeC<{
+    phoneNumber: t.Type<string, string, unknown>;
+    account: t.Type<string, string, unknown>;
+    issuer: t.Type<string, string, unknown>;
+    salt: t.UnionC<[t.UndefinedC, t.StringC]>;
+    securityCode: t.UnionC<[t.UndefinedC, t.StringC]>;
+}>;
+export declare type GetAttestationRequest = t.TypeOf<typeof GetAttestationRequestType>;
+export declare const AttestationResponseType: t.TypeC<{
+    success: t.BooleanC;
+    error: t.UnionC<[t.UndefinedC, t.StringC]>;
+    errors: t.UnionC<[t.UndefinedC, t.StringC]>;
+    provider: t.UnionC<[t.UndefinedC, t.StringC]>;
+    identifier: t.UnionC<[t.UndefinedC, t.StringC]>;
+    account: t.UnionC<[t.UndefinedC, t.Type<string, string, unknown>]>;
+    issuer: t.UnionC<[t.UndefinedC, t.Type<string, string, unknown>]>;
+    status: t.UnionC<[t.UndefinedC, t.StringC]>;
+    attempt: t.UnionC<[t.UndefinedC, t.NumberC]>;
+    countryCode: t.UnionC<[t.UndefinedC, t.StringC]>;
+    duration: t.UnionC<[t.UndefinedC, t.NumberC]>;
+    salt: t.UnionC<[t.UndefinedC, t.StringC]>;
+    attestationCode: t.UnionC<[t.UndefinedC, t.StringC]>;
+}>;
+export declare type AttestationResponse = t.TypeOf<typeof AttestationResponseType>;

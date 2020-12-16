@@ -7,10 +7,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-api-ingress
   labels:
-    app: blockscout
-    chart: blockscout
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-api-ingress
   annotations:
     kubernetes.io/tls-acme: "true"

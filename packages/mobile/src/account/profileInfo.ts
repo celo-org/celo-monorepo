@@ -1,21 +1,16 @@
-import { eqAddress, Err, Ok, Result } from '@celo/base'
+import { ensureLeading0x, eqAddress, Err, normalizeAddressWith0x, Ok, Result } from '@celo/base'
 import { Address, ContractKit } from '@celo/contractkit'
 import {
   FetchError,
   InvalidSignature,
   OffchainDataWrapper,
   OffchainErrors,
-} from '@celo/contractkit/src/identity/offchain-data-wrapper'
-import { PrivateNameAccessor } from '@celo/contractkit/src/identity/offchain/accessors/name'
-import { buildEIP712TypedData, resolvePath } from '@celo/contractkit/src/identity/offchain/utils'
-import { UnlockableWallet } from '@celo/contractkit/src/wallets/wallet'
-import {
-  ensureLeading0x,
-  normalizeAddressWith0x,
-  privateKeyToAddress,
-  toChecksumAddress,
-} from '@celo/utils/src/address'
-import { recoverEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
+} from '@celo/identity/lib/offchain-data-wrapper'
+import { PrivateNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
+import { buildEIP712TypedData, resolvePath } from '@celo/identity/lib/offchain/utils'
+import { privateKeyToAddress, toChecksumAddress } from '@celo/utils/lib/address'
+import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import { UnlockableWallet } from '@celo/wallet-base'
 import { SignedPostPolicyV4Output } from '@google-cloud/storage'
 // Use targetted import otherwise the RN FormData gets used which doesn't support Buffer related functionality
 import FormData from 'form-data/lib/form_data'

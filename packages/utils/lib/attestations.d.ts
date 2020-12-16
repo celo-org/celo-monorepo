@@ -1,0 +1,20 @@
+import { base64ToHex, extractAttestationCodeFromMessage, getIdentifierPrefix, IdentifierType, isAccountConsideredVerified, messageContainsAttestationCode, sanitizeMessageBase64 } from '@celo/base/lib/attestations';
+import { Signature } from './signatureUtils';
+export { AttestationsStatus, base64ToHex, extractAttestationCodeFromMessage, getIdentifierPrefix, IdentifierType, isAccountConsideredVerified, messageContainsAttestationCode, sanitizeMessageBase64, } from '@celo/base/lib/attestations';
+export declare function hashIdentifier(identifier: string, type: IdentifierType, salt?: string): string;
+export declare function getAttestationMessageToSignFromIdentifier(identifier: string, account: string): string;
+export declare function getAttestationMessageToSignFromPhoneNumber(phoneNumber: string, account: string, phoneSalt?: string): string;
+export declare function attestToIdentifier(identifier: string, account: string, privateKey: string): Signature;
+export declare const AttestationUtils: {
+    IdentifierType: typeof IdentifierType;
+    getIdentifierPrefix: typeof getIdentifierPrefix;
+    hashIdentifier: typeof hashIdentifier;
+    getAttestationMessageToSignFromIdentifier: typeof getAttestationMessageToSignFromIdentifier;
+    getAttestationMessageToSignFromPhoneNumber: typeof getAttestationMessageToSignFromPhoneNumber;
+    base64ToHex: typeof base64ToHex;
+    attestToIdentifier: typeof attestToIdentifier;
+    sanitizeMessageBase64: typeof sanitizeMessageBase64;
+    messageContainsAttestationCode: typeof messageContainsAttestationCode;
+    extractAttestationCodeFromMessage: typeof extractAttestationCodeFromMessage;
+    isAccountConsideredVerified: typeof isAccountConsideredVerified;
+};

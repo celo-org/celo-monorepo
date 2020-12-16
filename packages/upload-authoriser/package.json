@@ -1,0 +1,25 @@
+{
+  "name": "@celo/upload-authoriser",
+  "version": "1.0.0",
+  "description": "Basic attestation proxy for revealing",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "functions-framework --target=authorize --signature-type=http --source=./dist",
+    "deploy": "gcloud functions deploy valora-upload-authorizer --entry-point authorize --runtime nodejs10 --trigger-http --allow-unauthenticated",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project ."
+  },
+  "dependencies": {
+    "@celo/utils": "0.1.22",
+    "ethereumjs-util": "^6.2.0",
+    "node-fetch": "^2.6.0",
+    "@google-cloud/functions-framework": "^1.7.1",
+    "@google-cloud/storage": "^5"
+  },
+  "engines": {
+    "node": "10"
+  }
+}

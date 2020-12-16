@@ -1,10 +1,5 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
-import {
-  addContextMiddleware,
-  ContextArgv,
-  serviceName,
-  switchToContextCluster,
-} from 'src/lib/context-utils'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { upgradeKomenciChart } from 'src/lib/komenci'
 import yargs from 'yargs'
 
@@ -26,6 +21,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context, serviceName.Komenci)
+  await switchToContextCluster(argv.celoEnv, argv.context)
   await upgradeKomenciChart(argv.celoEnv, argv.context, argv.useForno)
 }

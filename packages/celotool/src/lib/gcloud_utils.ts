@@ -1,11 +1,12 @@
 import { execCmd } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 
-async function getCurrentGcloudAccount() {
+export async function getCurrentGcloudAccount() {
   const [output] = await execCmd('gcloud config get-value account')
   if (output.trim() === '') {
     throw new Error('No Gcloud account set')
   }
+  return output.trim()
 }
 
 async function ensureGcloudInstalled() {

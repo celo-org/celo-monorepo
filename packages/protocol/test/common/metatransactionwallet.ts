@@ -2,12 +2,7 @@ import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/l
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import {
-  MetaTransactionWalletContract,
-  MetaTransactionWalletInstance,
-  MockStableTokenContract,
-  MockStableTokenInstance,
-} from 'types'
+import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
@@ -134,7 +129,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should emit the SignerSet event', () => {
-      assertLogMatches2(initializeRes.logs[1], {
+      assertLogMatches2(initializeRes.logs[0], {
         event: 'SignerSet',
         args: {
           signer,
@@ -143,7 +138,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should emit the EIP712DomainSeparatorSet event', () => {
-      assertLogMatches2(initializeRes.logs[2], {
+      assertLogMatches2(initializeRes.logs[1], {
         event: 'EIP712DomainSeparatorSet',
         args: {
           eip712DomainSeparator: getDomainDigest(wallet.address),
@@ -152,7 +147,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should emit the OwnershipTransferred event', () => {
-      assertLogMatches2(initializeRes.logs[3], {
+      assertLogMatches2(initializeRes.logs[2], {
         event: 'OwnershipTransferred',
         args: {
           previousOwner: accounts[0],
@@ -594,24 +589,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
         })
       })
-    })
-  })
-
-  describe('#transferERC20ToSigner', () => {
-    const value = 100
-    let mockStableToken: MockStableTokenInstance
-    beforeEach(async () => {
-      const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-      mockStableToken = await MockStableToken.new()
-      await mockStableToken.mint(wallet.address, value)
-      assertEqualBN(await mockStableToken.balanceOf(wallet.address), value)
-      assertEqualBN(await mockStableToken.balanceOf(signer), 0)
-    })
-
-    it('transfers all cUSD to the signer', async () => {
-      await wallet.transferERC20ToSigner(mockStableToken.address)
-      assertEqualBN(await mockStableToken.balanceOf(wallet.address), 0)
-      assertEqualBN(await mockStableToken.balanceOf(signer), value)
     })
   })
 })

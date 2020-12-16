@@ -1,10 +1,5 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
-import {
-  addContextMiddleware,
-  ContextArgv,
-  serviceName,
-  switchToContextCluster,
-} from 'src/lib/context-utils'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { getOracleDeployerForContext } from 'src/lib/oracle'
 import yargs from 'yargs'
 
@@ -26,11 +21,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
-  const clusterManager = await switchToContextCluster(
-    argv.celoEnv,
-    argv.context,
-    serviceName.Oracle
-  )
+  const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
   const deployer = getOracleDeployerForContext(
     argv.celoEnv,
     argv.context,

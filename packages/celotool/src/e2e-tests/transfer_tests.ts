@@ -1,14 +1,11 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-
-import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
-import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { CeloTxPending, CeloTxReceipt, TransactionResult } from '@celo/connect'
+import { CeloContract, CeloToken, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { eqAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-core'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils'
@@ -24,12 +21,12 @@ class InflationManager {
   private readonly minUpdateDelay = 10
 
   constructor(readonly validatorUri: string, readonly validatorAddress: string) {
-    this.kit = newKit(validatorUri)
-    this.kit.defaultAccount = validatorAddress
+    this.kit = newKitFromWeb3(new Web3(validatorUri))
+    this.kit.connection.defaultAccount = validatorAddress
   }
 
   now = async (): Promise<number> => {
-    return Number((await this.kit.web3.eth.getBlock('pending')).timestamp)
+    return Number((await this.kit.connection.getBlock('pending')).timestamp)
   }
 
   getNextUpdateRate = async (): Promise<number> => {
@@ -64,20 +61,20 @@ class InflationManager {
   setInflationParameters = async (rate: BigNumber, updatePeriod: number) => {
     const stableToken = await this.kit.contracts.getStableToken()
     await stableToken
-      .setInflationParameters(toFixed(rate).toFixed(), updatePeriod)
+      .setInflationParameters(toFixed(rate).toFixed(), updatePeriod.toFixed())
       .sendAndWaitForReceipt({ from: this.validatorAddress })
   }
 }
 
 const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const tokenAddress = await kit.registry.addressFor(token)
   const freezer = await kit.contracts.getFreezer()
   await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const tokenAddress = await kit.registry.addressFor(token)
   const freezer = await kit.contracts.getFreezer()
   await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
@@ -88,7 +85,7 @@ const whitelistAddress = async (
   validatorAddress: string,
   address: string
 ) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
 }
@@ -98,7 +95,7 @@ const setAddressWhitelist = async (
   validatorAddress: string,
   whitelist: string[]
 ) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods
     .setDirectlyWhitelistedAddresses(whitelist)
@@ -106,7 +103,7 @@ const setAddressWhitelist = async (
 }
 
 const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const parameters = await kit.contracts.getBlockchainParameters()
   await parameters
     .setIntrinsicGasForAlternativeFeeCurrency(gasCost.toString())
@@ -254,12 +251,12 @@ describe('Transfer tests', function(this: any) {
     await hooks.restart()
 
     kit = newKitFromWeb3(new Web3('http://localhost:8545'))
-    kit.gasInflationFactor = 1
+    kit.connection.defaultGasInflationFactor = 1
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     await initAndSyncGethWithRetry(
       gethConfig,
@@ -314,16 +311,16 @@ describe('Transfer tests', function(this: any) {
     )
 
     // Reset contracts to send RPCs through transferring node.
-    kit.web3.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
+    kit.connection.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
 
     // Give the node time to sync the latest block.
     const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
-    while ((await kit.web3.eth.getBlock('latest')).number < upstream.number) {
+    while ((await kit.connection.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
 
     // Unlock Node account
-    await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    await kit.connection.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
   const transferCeloGold = async (
@@ -338,7 +335,7 @@ describe('Transfer tests', function(this: any) {
       gatewayFee?: string
     } = {}
   ) => {
-    const res = await kit.sendTransaction({
+    const res = await kit.connection.sendTransaction({
       from: fromAddress,
       to: toAddress,
       value: amount.toString(),
@@ -402,7 +399,7 @@ describe('Transfer tests', function(this: any) {
     return '0x' + hex.substr(26)
   }
 
-  function parseEvents(receipt: TransactionReceipt | undefined) {
+  function parseEvents(receipt: CeloTxReceipt | undefined) {
     if (!receipt) {
       return []
     }
@@ -429,7 +426,7 @@ describe('Transfer tests', function(this: any) {
     assert.isAbove(parseInt(minGasPrice, 10), 0)
 
     let ok = false
-    let receipt: TransactionReceipt | undefined
+    let receipt: CeloTxReceipt | undefined
     try {
       receipt = await txResult.waitReceipt()
       ok = true
@@ -447,7 +444,7 @@ describe('Transfer tests', function(this: any) {
     const gasVal = receipt ? receipt.gasUsed : expectedGasUsed
     assert.isAbove(gasVal, 0)
     const txHash = await txResult.getHash()
-    const tx = await kit.web3.eth.getTransaction(txHash)
+    const tx: CeloTxPending = await kit.connection.getTransaction(txHash)
     assert.isAbove(parseInt(tx.gasPrice, 10), 0)
     const txFee = new BigNumber(gasVal).times(tx.gasPrice)
     const txFeeBase = new BigNumber(gasVal).times(minGasPrice)
@@ -675,10 +672,7 @@ describe('Transfer tests', function(this: any) {
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
                             } catch (error) {
-                              assert.include(
-                                error.toString(),
-                                `Returned error: no suitable peers available`
-                              )
+                              assert.include(error.toString(), `Error: no suitable peers available`)
                             }
                           })
                         } else {
@@ -726,7 +720,7 @@ describe('Transfer tests', function(this: any) {
                     await res.getHash()
                     assert.fail('no error was thrown')
                   } catch (error) {
-                    assert.include(error.toString(), 'Returned error: intrinsic gas too low')
+                    assert.include(error.toString(), 'Error: intrinsic gas too low')
                   }
                 })
               })
@@ -795,7 +789,7 @@ describe('Transfer tests', function(this: any) {
                 testTxPoolFiltering({
                   gas: intrinsicGas - 1,
                   feeToken: CeloContract.StableToken,
-                  expectedError: 'Returned error: intrinsic gas too low',
+                  expectedError: 'Error: intrinsic gas too low',
                 })
               })
             })
@@ -933,7 +927,7 @@ describe('Transfer tests', function(this: any) {
             testTxPoolFiltering({
               gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
               feeToken: CeloContract.StableToken,
-              expectedError: 'Returned error: transfers are currently frozen',
+              expectedError: 'Error: transfers are currently frozen',
             })
           })
           describe('when receiver is whitelisted', () => {
@@ -966,7 +960,7 @@ describe('Transfer tests', function(this: any) {
               testTxPoolFiltering({
                 gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 feeToken: CeloContract.GoldToken,
-                expectedError: 'Returned error: transfers are currently frozen',
+                expectedError: 'Error: transfers are currently frozen',
               })
             })
           })

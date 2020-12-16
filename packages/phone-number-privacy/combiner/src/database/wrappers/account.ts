@@ -1,4 +1,5 @@
-import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -16,7 +17,7 @@ async function getAccountExists(account: string): Promise<boolean> {
 /*
  * Returns whether account has already performed matchmaking
  */
-export async function getDidMatchmaking(account: string): Promise<boolean> {
+export async function getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
   try {
     const didMatchmaking = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -28,7 +29,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return false
   }
 }
@@ -36,7 +37,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
 /*
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
-export async function setDidMatchmaking(account: string) {
+export async function setDidMatchmaking(account: string, logger: Logger) {
   logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
@@ -50,7 +51,7 @@ export async function setDidMatchmaking(account: string) {
     }
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return null
   }
 }
