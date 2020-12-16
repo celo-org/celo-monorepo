@@ -18,6 +18,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
   Actions,
+  Actions as EscrowActions,
   EscrowedPayment,
   EscrowReclaimPaymentAction,
   EscrowTransferPaymentAction,
@@ -484,7 +485,9 @@ export function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
       sendTransaction,
       reclaimTx,
       account,
-      newTransactionContext(TAG, 'Reclaim escrowed funds')
+      newTransactionContext(TAG, 'Reclaim escrowed funds'),
+      undefined,
+      EscrowActions.RECLAIM_PAYMENT_CANCEL
     )
 
     yield put(fetchDollarBalance())
