@@ -188,7 +188,7 @@ jobs:
           name: set ANDROID_SDK_ROOT and ANDROID_NDK
           command: |
             echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
-            echo 'export ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/22.0.7026061'  >> $BASH_ENV
+            echo 'export ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/21.0.6113669'  >> $BASH_ENV
 
       - restore_cache:
           key: android=tools-v2-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
