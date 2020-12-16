@@ -68,12 +68,6 @@ class AttestationRequestHandler {
   async findOrValidateRequest(): Promise<AttestationModel | null> {
     const { account, issuer } = this.attestationRequest
 
-    this.logger.error({
-      req: this.attestationRequest,
-      me: getAccountAddress(),
-      eq: getAccountAddress() === issuer,
-      eqAddress: eqAddress(getAccountAddress(), issuer),
-    })
     const address = getAccountAddress()
     if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
