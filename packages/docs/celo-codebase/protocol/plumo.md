@@ -99,6 +99,10 @@ cLabs is running the coordinator server, which has a list of approved participan
 
 Once this is running, you can leave the machine running -- no direct action is needed. This will run for about ~36 hours, after which the software will terminate running and you will have finished contributing to the Plumo setup!
 
+### Publish your attestation
+
+The `contribute` binary produces a `plumo.attestation` file that contains a signature with your address. After your participation finishes (and not before!), please post it (here)[https://github.com/celo-org/plumo-ceremony-attestations] by creating a new issue! If you don't have access to the `plumo.attestation` anymore, that's still OK, you can fill in the other details in the issue.
+
 ### Troubleshooting
 
 This section contains some common issues contributors may run into while running the setup software.
