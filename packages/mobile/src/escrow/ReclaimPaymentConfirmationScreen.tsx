@@ -97,7 +97,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   }
 
   onCancel = () => {
-    this.props.reclaimEscrowPaymentCancel
+    this.props.reclaimEscrowPaymentCancel()
     ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
     navigateBack()
   }
