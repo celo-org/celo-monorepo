@@ -6,6 +6,7 @@ import {
 } from '@celo/contractkit/lib/utils/signing-utils'
 import { Signer } from '@celo/contractkit/lib/wallets/signers/signer'
 import { ensureLeading0x } from '@celo/utils/lib/address'
+import { ensureUncompressed } from '@celo/utils/lib/ecdh'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { normalizeAddressWith0x } from '@celo/utils/src/address'
 import * as ethUtil from 'ethereumjs-util'
@@ -109,12 +110,20 @@ export class GethNativeBridgeSigner implements Signer {
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 
-  decrypt(_ciphertext: Buffer) {
-    return Promise.reject(new Error('Decryption operation is not supported on this signer'))
+  decrypt(ciphertext: Buffer): Promise<Buffer> {
+    const ciphertextBase64 = ciphertext.toString('base64')
+    return this.geth.decrypt(this.account, ciphertextBase64).then((textBase64) => {
+      return Buffer.from(textBase64, 'base64')
+    })
   }
 
-  computeSharedSecret(_publicKey: string): Promise<Buffer> {
-    return Promise.reject(new Error('computeSharedSecret is not supported on this signer'))
+  computeSharedSecret(publicKey: string): Promise<Buffer> {
+    const uncompressedPublicKey = ensureUncompressed(publicKey)
+    return this.geth
+      .computeSharedSecret(this.account, this.hexToBase64(uncompressedPublicKey))
+      .then((secretBase64) => {
+        return Buffer.from(secretBase64, 'base64')
+      })
   }
 
   hexToBase64(hex: string) {

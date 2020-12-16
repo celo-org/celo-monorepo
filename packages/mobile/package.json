@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "0.0.319",
+    "@celo/client": "0.0.322",
     "@celo/contractkit": "0.4.19-dev",
     "@celo/komencikit": "0.0.1-dev",
     "@celo/react-components": "1.0.0",
@@ -107,7 +107,7 @@
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.6.1",
-    "react-native-geth": "https://github.com/celo-org/react-native-geth#5864c09",
+    "react-native-geth": "https://github.com/celo-org/react-native-geth#83a45675",
     "react-native-google-safetynet": "https://github.com/celo-org/react-native-google-safetynet#8a0355f",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",

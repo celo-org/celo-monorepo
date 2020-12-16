@@ -13,7 +13,7 @@ import { ContractKit, newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
-import OffchainDataWrapper, { OffchainErrorTypes } from './offchain-data-wrapper'
+import { BasicDataWrapper, OffchainDataWrapper, OffchainErrorTypes } from './offchain-data-wrapper'
 import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
 import { SchemaErrorTypes } from './offchain/accessors/errors'
 import { PrivateNameAccessor, PublicNameAccessor } from './offchain/accessors/name'
@@ -83,7 +83,7 @@ testWithGanache('Offchain Data', (web3) => {
 
     kit.addAccount(privateKey)
 
-    const wrapper = new OffchainDataWrapper(address, kit)
+    const wrapper = new BasicDataWrapper(address, kit)
     wrapper.storageWriter = new MockStorageWriter(localStorageRoot, storageRoot, fetchMock)
 
     return { wrapper, privateKey, publicKey, address, storageRoot, localStorageRoot, kit }
@@ -148,7 +148,7 @@ testWithGanache('Offchain Data', (web3) => {
       404
     )
 
-    const wrapper = new OffchainDataWrapper(signer.address, kit)
+    const wrapper = new BasicDataWrapper(signer.address, kit)
     wrapper.storageWriter = new MockStorageWriter(
       writer.localStorageRoot,
       writer.storageRoot,

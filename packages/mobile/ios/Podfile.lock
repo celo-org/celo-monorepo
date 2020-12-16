@@ -1,7 +1,7 @@
 PODS:
   - Analytics (4.1.1)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.319)
+  - CeloBlockchain (0.0.322)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
@@ -760,7 +760,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Analytics: 952eac761f84ba0a508a4cf691598654073f9e3d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: 2b3bc8846dff06152d3fcc59c14c43c9740c0a72
+  CeloBlockchain: ae0f8ee0423bee329b6180ac3beb552f32ce7295
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e

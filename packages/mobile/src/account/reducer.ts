@@ -28,6 +28,7 @@ export interface State {
   acceptedTerms: boolean
   hasMigratedToNewBip39: boolean
   choseToRestoreAccount: boolean | undefined
+  profileUploaded: boolean
 }
 
 export enum PincodeType {
@@ -64,6 +65,7 @@ export const initialState = {
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
   hasMigratedToNewBip39: false,
   choseToRestoreAccount: false,
+  profileUploaded: false,
 }
 
 export const reducer = (
@@ -205,6 +207,12 @@ export const reducer = (
       return {
         ...state,
         hasMigratedToNewBip39: true,
+      }
+    }
+    case Actions.PROFILE_UPLOADED: {
+      return {
+        ...state,
+        profileUploaded: true,
       }
     }
     default:

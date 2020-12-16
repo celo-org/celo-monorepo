@@ -26,6 +26,7 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   CLEAR_STORED_ACCOUNT = 'ACCOUNT/CLEAR_STORED_ACCOUNT',
+  PROFILE_UPLOADED = 'ACCOUNT/PROFILE_UPLOADED',
 }
 
 export interface ChooseCreateAccountAction {
@@ -137,6 +138,10 @@ export interface ClearStoredAccountAction {
   account: string
 }
 
+export interface ProfileUploadedAction {
+  type: Actions.PROFILE_UPLOADED
+}
+
 export type ActionTypes =
   | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
@@ -163,6 +168,7 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | ClearStoredAccountAction
+  | ProfileUploadedAction
 
 export function chooseCreateAccount(): ChooseCreateAccountAction {
   return {
@@ -288,4 +294,8 @@ export const setUserContactDetails = (
 export const clearStoredAccount = (account: string): ClearStoredAccountAction => ({
   type: Actions.CLEAR_STORED_ACCOUNT,
   account,
+})
+
+export const profileUploaded = (): ProfileUploadedAction => ({
+  type: Actions.PROFILE_UPLOADED,
 })
