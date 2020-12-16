@@ -404,16 +404,14 @@ contract Exchange is
     uint256 exchangeRateDenominator;
     (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate();
     uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
-      exchangeRateDenominator // 5e20
+      exchangeRateDenominator
     );
 
-    uint256 maxStableBucketSize = getStableBucketCap(); // 4.5e22
+    uint256 maxStableBucketSize = getStableBucketCap();
 
-    // check if the bucket is bigger than the cap
-    //                                       min(4.5e22, 5e20) -> 5e20
-    uint256 cappedUpdatedStableBucket = Math.min(maxStableBucketSize, updatedStableBucket); // with this, right is zero
+    // check if the bucket is bigger
+    uint256 cappedUpdatedStableBucket = Math.min(maxStableBucketSize, updatedStableBucket);
 
-    // 5e20     <                               5e20
     if (cappedUpdatedStableBucket < updatedStableBucket) {
       // resize gold bucket
       uint256 cappedUpdatedGoldBucket = exchangeRateDenominator.mul((maxStableBucketSize)).div(
