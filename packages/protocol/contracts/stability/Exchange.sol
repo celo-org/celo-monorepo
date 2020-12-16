@@ -399,7 +399,7 @@ contract Exchange is
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
-    uint256 updatedGoldBucket = getUpdatedGoldBucket(); // 1e+21
+    uint256 updatedGoldBucket = getUpdatedGoldBucket();
     uint256 exchangeRateNumerator;
     uint256 exchangeRateDenominator;
     (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate();

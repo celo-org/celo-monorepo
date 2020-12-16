@@ -324,7 +324,7 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe.only('#setStableBucketFractionCap', () => {
+  describe('#setStableBucketFractionCap', () => {
     const newStableBucketFractionCap = toFixed(2 / 22)
 
     it('should set the stableBucketFractionCap', async () => {
@@ -333,7 +333,7 @@ contract('Exchange', (accounts: string[]) => {
       assertEqualBN(await exchange.stableBucketFractionCap(), newStableBucketFractionCap)
     })
 
-    it.only('emits StableBucketFractionCapSet', async () => {
+    it('emits StableBucketFractionCapSet', async () => {
       const setStableBucketFractionCapTx = await exchange.setStableBucketFractionCap(
         newStableBucketFractionCap
       )
@@ -344,18 +344,51 @@ contract('Exchange', (accounts: string[]) => {
       assert(exchangeLogs.length === 1, 'Did not receive event')
     })
 
-    it('should not allow to set the stableBucketFractionCap to zero', async () => {
-      await assertRevert(exchange.setStableBucketFractionCap(toFixed(0)))
-    })
-
     it('should not allow to set the stableBucketFractionCap greater than 1', async () => {
       await assertRevert(exchange.setStableBucketFractionCap(toFixed(1)))
       await assertRevert(exchange.setStableBucketFractionCap(toFixed(2)))
     })
 
+    it('should not allow to set the stableBucketFractionCap to zero', async () => {
+      await assertRevert(exchange.setStableBucketFractionCap(toFixed(0)))
+    })
+
     it('should not allow a non-owner not set the stableBucketFractionCap', async () => {
       await assertRevert(
         exchange.setStableBucketFractionCap(newStableBucketFractionCap, { from: accounts[1] })
+      )
+    })
+  })
+
+  describe('#setMinSupplyForStableBucketCap', () => {
+    const newMinSupplyForStableBucketCap = new BigNumber('2e24')
+
+    it('should set the minSupplyForStableBucketCap', async () => {
+      await exchange.setMinSupplyForStableBucketCap(newMinSupplyForStableBucketCap)
+
+      assertEqualBN(await exchange.minSupplyForStableBucketCap(), newMinSupplyForStableBucketCap)
+    })
+
+    it('emits MinSupplyForStableBucketCapSet', async () => {
+      const setMinSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
+        newMinSupplyForStableBucketCap
+      )
+
+      const exchangeLogs = setMinSupplyForStableBucketCapTx.logs.filter(
+        (x) => x.event === 'MinSupplyForStableBucketCapSet'
+      )
+      assert(exchangeLogs.length === 1, 'Did not receive event')
+    })
+
+    it('should not allow to set the minSupplyForStableBucketCap to zero', async () => {
+      await assertRevert(exchange.setMinSupplyForStableBucketCap(toFixed(0)))
+    })
+
+    it('should not allow a non-owner not set the minSupplyForStableBucketCap', async () => {
+      await assertRevert(
+        exchange.setMinSupplyForStableBucketCap(newMinSupplyForStableBucketCap, {
+          from: accounts[1],
+        })
       )
     })
   })
@@ -425,8 +458,8 @@ contract('Exchange', (accounts: string[]) => {
 
       const expectedBuyAmount = getBuyTokenAmount(
         new BigNumber(amount),
-        initialGoldBucket, //
-        initialStableBucket //
+        initialGoldBucket,
+        initialStableBucket
       )
 
       assert.equal(buyAmount.toString(), expectedBuyAmount.toString())
@@ -673,8 +706,6 @@ contract('Exchange', (accounts: string[]) => {
           })
 
           describe('when stableBucket needs to be capped', () => {
-            // TODO remove only and move tests as needed
-
             beforeEach(async () => {
               await registry.setAddressFor(CeloContractName.Exchange, owner)
 
@@ -691,7 +722,7 @@ contract('Exchange', (accounts: string[]) => {
               assertEqualBN(await exchange.stableBucketFractionCap(), toFixed(1 / 22))
             })
 
-            it("stable bucket doesn't hit the cap and it shouldn't be resized", async () => {
+            it("doesn't hit the cap and it shouldn't be resized", async () => {
               const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
               assertEqualBN(mintableStable, new BigNumber('2e21'))
               assertEqualBN(tradeableGold, new BigNumber('1e21'))
@@ -703,17 +734,6 @@ contract('Exchange', (accounts: string[]) => {
               )
             })
 
-            it('emits minSupplyForStableBucketCapSet', async () => {
-              // Make the capp trigger only after 1 millon coins
-              const minSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
-                new BigNumber('1e24')
-              ) // Todo test playing with this variable
-              const exchangeLogs = minSupplyForStableBucketCapTx.logs.filter(
-                (x) => x.event === 'MinSupplyForStableBucketCapSet'
-              )
-              assert(exchangeLogs.length === 1, 'Did not receive event')
-            })
-
             it('has the correct getStableBucketCap', async () => {
               assertEqualBN(
                 await exchange.getStableBucketCap(),
@@ -721,11 +741,11 @@ contract('Exchange', (accounts: string[]) => {
               )
             })
 
-            it('stable bucket hit the cap and it should be resized', async () => {
+            it('has the right price after the cap', async () => {
               await mockSortedOracles.setMedianRate(
                 stableToken.address,
                 new BigNumber('0x20000000000000000').multipliedBy(2000)
-              ) // bump the price by 10000
+              ) // bump the price by 2000, leaving with 4K CELO per dollar
 
               const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
 
