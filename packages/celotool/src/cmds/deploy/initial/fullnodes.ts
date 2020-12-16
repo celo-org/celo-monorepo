@@ -1,7 +1,7 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { installFullNodeChart } from 'src/lib/fullnodes'
-import { linkSAForWorkloadIdentity } from 'src/lib/gcloud_utils'
+import { linkSAForWorkloadIdentity, kubectlAnnotateKSA } from 'src/lib/gcloud_utils'
 import yargs from 'yargs'
 
 export const command = 'fullnodes'
@@ -33,5 +33,6 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: FullNodeInitialArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
   await linkSAForWorkloadIdentity(argv.celoEnv)
+  await kubectlAnnotateKSA(argv.celoEnv)
   await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
 }

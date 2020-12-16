@@ -1,7 +1,7 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { upgradeFullNodeChart } from 'src/lib/fullnodes'
-import { linkSAForWorkloadIdentity } from 'src/lib/gcloud_utils'
+import { linkSAForWorkloadIdentity, kubectlAnnotateKSA } from 'src/lib/gcloud_utils'
 import yargs from 'yargs'
 
 export const command = 'fullnodes'
@@ -39,6 +39,7 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: FullNodeUpgradeArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
   await linkSAForWorkloadIdentity(argv.celoEnv)
+  await kubectlAnnotateKSA(argv.celoEnv)
   await upgradeFullNodeChart(
     argv.celoEnv,
     argv.context,
