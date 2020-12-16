@@ -4,7 +4,10 @@ import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { Spacing } from '@celo/react-components/styles/styles'
-import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import {
+  extractAttestationCodeFromMessage,
+  extractSecurityCodeWithPrefix,
+} from '@celo/utils/src/attestations'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import dotProp from 'dot-prop-immutable'
 import * as React from 'react'
@@ -26,7 +29,6 @@ import {
   receiveAttestationMessage,
   resendAttestations,
 } from 'src/identity/actions'
-import { extractSecurityCodeWithPrefix } from 'src/identity/securityCode'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,

@@ -74,18 +74,10 @@ async function requestValidator(
       securityCode,
     }
 
-    const response = await attestationsWrapper.getAttestationForSecurityCode(
+    return attestationsWrapper.getAttestationForSecurityCode(
       attestation.attestationServiceURL,
       requestBody
     )
-    const { ok, status } = response
-    if (ok) {
-      const body = await response.json()
-      if (body.attestationCode) {
-        return body.attestationCode
-      }
-    }
-    throw new Error(`Error getting security code for ${issuer}. Status code: ${status}`)
   } catch (error) {
     Logger.error(
       TAG + '@getAttestationCodeFromSecurityCode',
