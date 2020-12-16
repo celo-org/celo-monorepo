@@ -39,7 +39,6 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: FullNodeUpgradeArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
   await linkSAForWorkloadIdentity(argv.celoEnv)
-  await kubectlAnnotateKSA(argv.celoEnv)
   await upgradeFullNodeChart(
     argv.celoEnv,
     argv.context,
@@ -47,4 +46,5 @@ export const handler = async (argv: FullNodeUpgradeArgv) => {
     argv.staticNodes,
     argv.createNEG
   )
+  await kubectlAnnotateKSA(argv.celoEnv)
 }
