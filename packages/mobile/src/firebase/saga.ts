@@ -68,7 +68,7 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
-function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
+function celoGoldExchangeRateHistoryChannel(lastTimeUpdated: number) {
   const errorCallback = (error: Error) => {
     Logger.warn(TAG, error.toString())
   }
@@ -86,9 +86,7 @@ function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
     }
 
     // timestamp + 1 is used because .startAt is inclusive
-    const startAt = latestExchangeRate
-      ? latestExchangeRate.timestamp + 1
-      : now - MAX_HISTORY_RETENTION
+    const startAt = lastTimeUpdated + 1 || now - MAX_HISTORY_RETENTION
 
     const cancel = () => {
       firebase
@@ -113,7 +111,7 @@ export function* subscribeToCeloGoldExchangeRateHistory() {
   yield call(waitForFirebaseAuth)
   const history = yield select(exchangeHistorySelector)
   const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
-  const chan = yield call(celoGoldExchangeRateHistoryChannel, latestExchangeRate)
+  const chan = yield call(celoGoldExchangeRateHistoryChannel, history.lastTimeUpdated)
   try {
     while (true) {
       const exchangeRates = yield take(chan)
