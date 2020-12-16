@@ -34,7 +34,7 @@ interface SendProps extends CommonProps {
   comment?: string
   includeDekFee: boolean
   currency?: CURRENCY_ENUM
-  dollarBalance: string
+  dollarBalance?: string
 }
 
 interface ExchangeProps extends CommonProps {
@@ -91,7 +91,7 @@ export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<B
       account: string,
       recipientAddress: string,
       amount: string,
-      dollarBalance: string,
+      dollarBalance?: string,
       comment: string = MAX_PLACEHOLDER_COMMENT,
       includeDekFee: boolean = false,
       currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR

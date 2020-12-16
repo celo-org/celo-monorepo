@@ -64,10 +64,10 @@ export async function getSendFee(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer,
   includeDekFee: boolean = false,
-  dollarBalance: string
+  dollarBalance?: string
 ) {
   try {
-    if (new BigNumber(params.amount).isGreaterThan(new BigNumber(dollarBalance))) {
+    if (dollarBalance && new BigNumber(params.amount).isGreaterThan(new BigNumber(dollarBalance))) {
       throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
 
