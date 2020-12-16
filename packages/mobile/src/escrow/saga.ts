@@ -488,16 +488,16 @@ export function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     )
 
     yield put(fetchDollarBalance())
-    yield put(fetchSentEscrowPayments())
+    yield put(reclaimEscrowPaymentSuccess())
 
     yield call(navigateHome)
-    yield put(reclaimEscrowPaymentSuccess())
     ValoraAnalytics.track(EscrowEvents.escrow_reclaim_complete)
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     ValoraAnalytics.track(EscrowEvents.escrow_reclaim_error, { error: e.message })
     yield put(showErrorOrFallback(e, ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
-    yield put(reclaimEscrowPaymentFailure(e))
+    yield put(reclaimEscrowPaymentFailure())
+  } finally {
     yield put(fetchSentEscrowPayments())
   }
 }
