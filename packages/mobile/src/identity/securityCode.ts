@@ -9,14 +9,6 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/securityCode'
 
-export function extractSecurityCodeWithPrefix(message: string) {
-  const matches = message.match('\\s(\\d{8})\\s')
-  if (matches && matches.length === 2) {
-    return matches[1]
-  }
-  return null
-}
-
 // We look for the case, where all the promises fail or the first one to succeed.
 // Promise.all looks for all the values or the first error, so we can switch roles
 // for reject and resolve to achieve what we need

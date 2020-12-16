@@ -591,7 +591,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param serviceURL: validator's attestation service URL
    * @param body
    */
-  async getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
+  async getAttestationForSecurityCode(
+    serviceURL: string,
+    requestBody: GetAttestationRequest
+  ): Promise<string> {
     const urlParams = new URLSearchParams({
       phoneNumber: requestBody.phoneNumber,
       account: requestBody.account,
@@ -613,10 +616,22 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         ),
       }
     }
-    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+
+    const response = await fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', ...additionalHeaders },
     })
+
+    const { ok, status } = response
+    if (ok) {
+      const body = await response.json()
+      if (body.attestationCode) {
+        return body.attestationCode
+      }
+    }
+    throw new Error(
+      `Error getting security code for ${requestBody.issuer}. ${status}: ${await response.text()}`
+    )
   }
 
   /**

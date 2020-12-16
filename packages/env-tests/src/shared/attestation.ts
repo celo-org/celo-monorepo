@@ -4,6 +4,7 @@ import { ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
+  getSecurityCodePrefix,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { OdisUtils } from '@celo/identity'
 import { AuthSigner } from '@celo/identity/lib/odis/query'
@@ -84,7 +85,8 @@ export async function requestAttestationsFromIssuers(
   attestations: AttestationsWrapper,
   phoneNumber: string,
   account: string,
-  pepper: string
+  pepper: string,
+  securityCode?: boolean
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
@@ -94,7 +96,7 @@ export async function requestAttestationsFromIssuers(
         issuer: attestation.issuer,
         salt: pepper,
         smsRetrieverAppSig: undefined,
-        securityCodePrefix: undefined,
+        securityCodePrefix: securityCode ? getSecurityCodePrefix(attestation.issuer) : undefined,
         language: undefined,
       }
 
@@ -140,20 +142,57 @@ async function findValidCode(
   attestations: AttestationsWrapper,
   messages: string[],
   identifier: string,
+  pepper: string,
+  phoneNumber: string,
   attestationsToComplete: ActionableAttestation[],
   account: string
 ) {
   for (const message of messages) {
     try {
-      const code = AttestationUtils.extractAttestationCodeFromMessage(message)
-      if (!code) {
+      let attestationCode: string | null
+
+      const securityCode = AttestationUtils.extractSecurityCodeWithPrefix(message)
+      if (securityCode) {
+        // optimisation code implemented to reduce possibility
+        // of hitting wrong service
+        const possibleIssuers = attestationsToComplete.filter(
+          (a) => getSecurityCodePrefix(a.issuer) === securityCode[0]
+        )
+
+        const attestationCodeDeepLink = (
+          await Promise.all(
+            possibleIssuers.map((a) =>
+              attestations
+                .getAttestationForSecurityCode(a.attestationServiceURL, {
+                  account,
+                  issuer: a.issuer,
+                  phoneNumber,
+                  salt: pepper,
+                  securityCode: securityCode.slice(1),
+                })
+                // hit the wrong service
+                .catch((_) => null)
+            )
+          )
+        ).find(Boolean)
+        if (!attestationCodeDeepLink) {
+          continue
+        }
+        attestationCode = AttestationUtils.extractAttestationCodeFromMessage(
+          attestationCodeDeepLink
+        )
+      } else {
+        attestationCode = AttestationUtils.extractAttestationCodeFromMessage(message)
+      }
+
+      if (!attestationCode) {
         continue
       }
 
       const issuer = await attestations.findMatchingIssuer(
         identifier,
         account,
-        code,
+        attestationCode,
         attestationsToComplete.map((_) => _.issuer)
       )
 
@@ -161,13 +200,17 @@ async function findValidCode(
         continue
       }
 
-      const isValid = await attestations.validateAttestationCode(identifier, account, issuer, code)
-
+      const isValid = await attestations.validateAttestationCode(
+        identifier,
+        account,
+        issuer,
+        attestationCode
+      )
       if (!isValid) {
         continue
       }
 
-      return { code, issuer }
+      return { code: attestationCode, issuer }
     } catch {
       continue
     }
@@ -224,6 +267,7 @@ export async function pollForMessagesAndCompleteAttestations(
   client: Twilio,
   phoneNumber: string,
   identifier: string,
+  pepper: string,
   account: Address,
   attestationsToComplete: ActionableAttestation[],
   txParams: CeloTransactionParams = {},
@@ -237,11 +281,12 @@ export async function pollForMessagesAndCompleteAttestations(
     attestationsToComplete.length > 0
   ) {
     const messages = await fetchLatestMessagesFromToday(client, phoneNumber, 100)
-
     const res = await findValidCode(
       attestations,
       messages.map((_) => _.body),
       identifier,
+      pepper,
+      phoneNumber,
       attestationsToComplete,
       account
     )
