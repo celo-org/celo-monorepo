@@ -413,7 +413,7 @@ contract Exchange is
     uint256 cappedUpdatedStableBucket = Math.min(maxStableBucketSize, updatedStableBucket);
 
     if (cappedUpdatedStableBucket < updatedStableBucket) {
-      // resize gold bucket
+      // resize Celo bucket
       uint256 cappedUpdatedGoldBucket = exchangeRateDenominator.mul((maxStableBucketSize)).div(
         exchangeRateNumerator
       );
