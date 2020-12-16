@@ -87,7 +87,7 @@ const DefaultConfig = {
     minimumReports: 1,
     frozen: false,
     minSupplyForStableBucketCap: '1000000000000000000000000', // 1e24 = 1M
-    maxStableBucketFraction: 1 / 22,
+    stableBucketFractionCap: 1 / 22,
   },
   gasPriceMinimum: {
     minimumFloor: 100000000,

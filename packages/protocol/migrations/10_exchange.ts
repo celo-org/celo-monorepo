@@ -22,7 +22,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.exchange.updateFrequency,
     config.exchange.minimumReports,
     config.exchange.minSupplyForStableBucketCap,
-    toFixed(config.exchange.maxStableBucketFraction).toString(),
+    toFixed(config.exchange.stableBucketFractionCap).toString(),
   ]
 }
 

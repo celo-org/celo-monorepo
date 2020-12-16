@@ -63,7 +63,7 @@ contract('Exchange', (accounts: string[]) => {
   const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7 // 604800
 
   const minSupplyForStableBucketCap = new BigNumber('1e24')
-  const maxStableBucketFraction = toFixed(1 / 22)
+  const stableBucketFractionCap = toFixed(1 / 22)
 
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000) // 10000e18
@@ -148,7 +148,7 @@ contract('Exchange', (accounts: string[]) => {
       updateFrequency,
       minimumReports,
       minSupplyForStableBucketCap,
-      maxStableBucketFraction
+      stableBucketFractionCap
     )
     // expect not to be reverted
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
@@ -170,7 +170,7 @@ contract('Exchange', (accounts: string[]) => {
           updateFrequency,
           minimumReports,
           minSupplyForStableBucketCap,
-          maxStableBucketFraction
+          stableBucketFractionCap
         )
       )
     })
@@ -324,34 +324,34 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#setMaxStableBucketFraction', () => {
-    const newMaxStableBucketFraction = toFixed(1 / 22)
+  describe('#setStableBucketFractionCap', () => {
+    const newStableBucketFractionCap = toFixed(1 / 22)
 
-    // it('should set the maxStableBucketFractionTx', async () => {
+    // it('should set the stableBucketFractionCapTx', async () => {
     // })
 
-    it('emits MaxStableBucketFractionSet', async () => {
-      const setMaxStableBucketFractionTx = await exchange.setMaxStableBucketFraction(
-        newMaxStableBucketFraction
+    it('emits StableBucketFractionCapSet', async () => {
+      const setStableBucketFractionCapTx = await exchange.setStableBucketFractionCap(
+        newStableBucketFractionCap
       )
-      const exchangeLogs = setMaxStableBucketFractionTx.logs.filter(
-        (x) => x.event === 'MaxStableBucketFractionSet'
+      const exchangeLogs = setStableBucketFractionCapTx.logs.filter(
+        (x) => x.event === 'StableBucketFractionCapSet'
       )
       assert(exchangeLogs.length === 1, 'Did not receive event')
     })
 
-    it('should not allow to set the maxStableBucketFraction to zero', async () => {
-      await assertRevert(exchange.setMaxStableBucketFraction(toFixed(0)))
+    it('should not allow to set the stableBucketFractionCap to zero', async () => {
+      await assertRevert(exchange.setStableBucketFractionCap(toFixed(0)))
     })
 
-    it('should not allow to set the maxStableBucketFraction greater than 1', async () => {
-      await assertRevert(exchange.setMaxStableBucketFraction(toFixed(1)))
-      await assertRevert(exchange.setMaxStableBucketFraction(toFixed(2)))
+    it('should not allow to set the stableBucketFractionCap greater than 1', async () => {
+      await assertRevert(exchange.setStableBucketFractionCap(toFixed(1)))
+      await assertRevert(exchange.setStableBucketFractionCap(toFixed(2)))
     })
 
-    it('should not allow a non-owner not set the maxStableBucketFraction', async () => {
+    it('should not allow a non-owner not set the stableBucketFractionCap', async () => {
       await assertRevert(
-        exchange.setMaxStableBucketFraction(newMaxStableBucketFraction, { from: accounts[1] })
+        exchange.setStableBucketFractionCap(newStableBucketFractionCap, { from: accounts[1] })
       )
     })
   })
@@ -683,8 +683,8 @@ contract('Exchange', (accounts: string[]) => {
               await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
             })
 
-            it('has the right maxStableBucketFraction', async () => {
-              assertEqualBN(await exchange.maxStableBucketFraction(), toFixed(1 / 22))
+            it('has the right stableBucketFractionCap', async () => {
+              assertEqualBN(await exchange.stableBucketFractionCap(), toFixed(1 / 22))
             })
 
             it("stable bucket doesn't hit the cap and it shouldn't be resized", async () => {

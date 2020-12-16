@@ -35,7 +35,7 @@ contract Exchange is
   event MinimumReportsSet(uint256 minimumReports);
   event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
-  event MaxStableBucketFractionSet(uint256 maxStableBucketFraction);
+  event StableBucketFractionCapSet(uint256 stableBucketFractionCap);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
   event MinSupplyForStableBucketCapSet(uint256 minSupplyForStableBucketCap);
@@ -58,7 +58,7 @@ contract Exchange is
   uint256 public minimumReports;
 
   uint256 public minSupplyForStableBucketCap;
-  FixidityLib.Fraction public maxStableBucketFraction;
+  FixidityLib.Fraction public stableBucketFractionCap;
 
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
@@ -93,7 +93,7 @@ contract Exchange is
     uint256 _updateFrequency,
     uint256 _minimumReports,
     uint256 _minSupplyForStableBucketCap,
-    uint256 _maxStableBucketFraction
+    uint256 _stableBucketFractionCap
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -103,7 +103,7 @@ contract Exchange is
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
     setMinSupplyForStableBucketCap(_minSupplyForStableBucketCap);
-    setMaxStableBucketFraction(_maxStableBucketFraction);
+    setStableBucketFractionCap(_stableBucketFractionCap);
 
     _updateBucketsIfNecessary();
   }
@@ -296,16 +296,16 @@ contract Exchange is
 
   /**
     * @notice Allows owner to set the Stable Bucket Fraction
-    * @param newMaxStableBucketFraction The new value for the Stable Bucket Fraction
+    * @param newStableBucketFractionCap The new value for the Stable Bucket Fraction
     */
-  function setMaxStableBucketFraction(uint256 newMaxStableBucketFraction) public onlyOwner {
-    maxStableBucketFraction = FixidityLib.wrap(newMaxStableBucketFraction);
+  function setStableBucketFractionCap(uint256 newStableBucketFractionCap) public onlyOwner {
+    stableBucketFractionCap = FixidityLib.wrap(newStableBucketFractionCap);
     require(
-      maxStableBucketFraction.lt(FixidityLib.fixed1()),
+      stableBucketFractionCap.lt(FixidityLib.fixed1()),
       "bucket fraction must be smaller than 1"
     );
-    require(newMaxStableBucketFraction > 0, "bucket fraction must be greather than 0");
-    emit MaxStableBucketFractionSet(newMaxStableBucketFraction);
+    require(newStableBucketFractionCap > 0, "bucket fraction must be greather than 0");
+    emit StableBucketFractionCapSet(newStableBucketFractionCap);
   }
 
   /**
@@ -427,17 +427,12 @@ contract Exchange is
   }
 
   /**
-   * @notice returns the max size the stableToken can be set durin a bucket update. if the supply of stableToken
+   * @notice returns the max size the stableToken can be set during a bucket update. if the supply of stableToken
    * is smaller than minSupplyForStableBucketCap, the cap is calculated based on minSupplyForStableBucketCap.
    */
   function getStableBucketCap() public view returns (uint256) {
-    require(minSupplyForStableBucketCap > 0, "minSupplyForStableBucketCap not initialized");
-    uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap); // assume a miminum of 1M stable tokens supply to start the cap
-
-    return FixidityLib.newFixed(stableTokenSupply).multiply(maxStableBucketFraction).fromFixed();
-
-    // return maxStableBucketSize;
-
+    uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap);
+    return FixidityLib.newFixed(stableTokenSupply).multiply(stableBucketFractionCap).fromFixed();
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
