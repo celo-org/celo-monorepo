@@ -1,4 +1,6 @@
+import { eqAddress } from '@celo/base'
 import { CeloTransactionObject } from '@celo/connect'
+import { Address } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -74,7 +76,7 @@ import {
 } from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import { waitFor } from 'src/redux/sagas-helpers'
@@ -84,7 +86,12 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
+import {
+  getConnectedAccount,
+  getConnectedUnlockedAccount,
+  unlockAccount,
+  UnlockResult,
+} from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -123,7 +130,13 @@ export function* fetchVerificationState(forceUnlockAccount?: boolean) {
       // we want to reset password before force unlock account
       clearPasswordCaches()
     }
-    yield call(unlockAccount, account, !!forceUnlockAccount)
+    const result: UnlockResult = yield call(unlockAccount, account, !!forceUnlockAccount)
+    if (result !== UnlockResult.SUCCESS) {
+      // This navigateBack has no effect if part of onboarding and returns to home or
+      // settings page if the user pressed on the back button when prompted for the PIN.
+      navigateBack()
+      return
+    }
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -277,6 +290,22 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
         contractKit.contracts,
         contractKit.contracts.getAttestations,
       ])
+
+      // If attestation status has more than one completed attestation, then the account
+      // must be assoicated with identifier. Otherwise, it is likely an account that
+      // has been revoked and cannot currently be reverified
+      if (status.completed > 0) {
+        const associatedAccounts: Address[] = yield call(
+          [attestationsWrapper, attestationsWrapper.lookupAccountsForIdentifier],
+          phoneHash
+        )
+        const associated = associatedAccounts.some((acc) => eqAddress(acc, account))
+        if (!associated) {
+          yield put(showError(ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT, 10000))
+          yield put(setVerificationStatus(VerificationStatus.Failed))
+          return ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT
+        }
+      }
 
       if (!isBalanceSufficient) {
         yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
@@ -508,8 +537,23 @@ export async function getAttestationsStatus(
     `${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
   )
 
-  if (attestationStatus.numAttestationsRemaining <= 0) {
-    Logger.debug(TAG + '@getAttestationsStatus', 'User is already verified')
+  // If the user has enough attestations completed to be considered verified but doesn't
+  // have an account associated with the identifer, set `isVerified` to false
+  if (attestationStatus.isVerified) {
+    Logger.debug(TAG + '@getAttestationsStatus', `Account ${account} is already verified`)
+
+    const attestedAccounts: Address[] = await attestationsWrapper.lookupAccountsForIdentifier(
+      phoneHash
+    )
+    const associated = attestedAccounts.some((acc) => eqAddress(acc, account))
+
+    if (!associated) {
+      Logger.debug(
+        TAG + '@getAttestationsStatus',
+        `Account has enough completed attestations but is not associated with the identifier. Likely a revoked account`
+      )
+      attestationStatus.isVerified = false
+    }
   }
 
   return attestationStatus

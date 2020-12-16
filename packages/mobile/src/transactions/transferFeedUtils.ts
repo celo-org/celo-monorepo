@@ -90,7 +90,8 @@ export function getTransferFeedParams(
     timestamp,
     invitees
   )
-  const nameOrNumber = recipient?.displayName || addressToDisplayName[address] || e164PhoneNumber
+  const nameOrNumber =
+    recipient?.displayName || addressToDisplayName[address]?.name || e164PhoneNumber
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info

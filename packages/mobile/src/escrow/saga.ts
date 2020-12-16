@@ -10,7 +10,7 @@ import { FetchError, TxError } from '@celo/komencikit/src/errors'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError, showErrorOrFallback } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { EscrowEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -67,7 +67,7 @@ import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
 
-function* transferToEscrow(action: EscrowTransferPaymentAction) {
+export function* transferToEscrow(action: EscrowTransferPaymentAction) {
   features.ESCROW_WITHOUT_CODE
     ? yield call(transferStableTokenToEscrowWithoutCode, action)
     : yield call(transferStableTokenToEscrow, action)
@@ -242,19 +242,8 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
   return { withdrawTx, transferTx }
 }
 
-function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
+function* withdrawFromEscrowWithoutCode(komenciActive: boolean = false) {
   try {
-    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
-    Logger.debug(TAG + '@withdrawFromEscrowUsingPepper', 'Withdrawing escrowed payment')
-    const phoneHashDetails: PhoneNumberHashDetails | undefined = yield call(
-      getUserSelfPhoneHashDetails
-    )
-
-    if (!phoneHashDetails) {
-      throw Error('Couldnt find own phone hash or pepper. Should never happen.')
-    }
-
-    const { phoneHash, pepper } = phoneHashDetails
     const [contractKit, walletAddress, mtwAddress, feelessVerificationState]: [
       ContractKit,
       string,
@@ -266,6 +255,23 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       select(mtwAddressSelector),
       select(feelessVerificationStateSelector),
     ])
+
+    if (!mtwAddress) {
+      yield call(withdrawFromEscrow)
+      return
+    }
+
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
+    Logger.debug(TAG + '@withdrawFromEscrowWithoutCode', 'Withdrawing escrowed payment')
+    const phoneHashDetails: PhoneNumberHashDetails | undefined = yield call(
+      getUserSelfPhoneHashDetails
+    )
+
+    if (!phoneHashDetails) {
+      throw Error("Couldn't find own phone hash or pepper. Should never happen.")
+    }
+
+    const { phoneHash, pepper } = phoneHashDetails
 
     const [stableTokenWrapper, escrowWrapper, mtwWrapper]: [
       StableTokenWrapper,
@@ -283,7 +289,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
     )
 
     if (escrowPaymentIds.length === 0) {
-      Logger.debug(TAG + '@withdrawFromEscrow', 'No pending payments in escrow')
+      Logger.debug(TAG + '@withdrawFromEscrowWithoutCode', 'No pending payments in escrow')
       ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
       return
     }
@@ -305,7 +311,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       const receivedPayment = yield call(getEscrowedPayment, escrowWrapper, paymentId)
       const value = new BigNumber(receivedPayment[3])
       if (!value.isGreaterThan(0)) {
-        Logger.warn(TAG + '@withdrawFromEscrowUsingPepper', 'Escrow payment is empty, skipping.')
+        Logger.warn(TAG + '@withdrawFromEscrowWithoutCode', 'Escrow payment is empty, skipping.')
         continue
       }
 
@@ -362,7 +368,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       } catch (error) {
         withdrawTxSuccess.push(false)
         Logger.error(
-          TAG + '@withdrawFromEscrowViaKomenci',
+          TAG + '@withdrawFromEscrowWithoutCode',
           'Unable to withdraw from escrow. Error: ',
           error
         )
@@ -377,17 +383,13 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
   } catch (e) {
-    Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
+    Logger.error(TAG + '@withdrawFromEscrowWithoutCode', 'Error withdrawing payment from escrow', e)
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_error, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
   }
 }
 
-function* withdrawFromEscrow() {
+export function* withdrawFromEscrow() {
   try {
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
@@ -442,11 +444,7 @@ function* withdrawFromEscrow() {
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_error, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
   }
 }
 
@@ -474,7 +472,7 @@ export async function getReclaimEscrowFee(account: string, paymentID: string) {
   return calculateFee(gas)
 }
 
-function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
+export function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   Logger.debug(TAG + '@reclaimFromEscrow', 'Reclaiming escrowed payment')
 
   try {
@@ -498,11 +496,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     ValoraAnalytics.track(EscrowEvents.escrow_reclaim_error, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
     yield put(reclaimEscrowPaymentFailure(e))
     yield put(fetchSentEscrowPayments())
   }
@@ -604,13 +598,13 @@ export function* watchVerificationEnd() {
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
       if (features.ESCROW_WITHOUT_CODE) {
-        yield call(withdrawFromEscrowUsingPepper, false)
+        yield call(withdrawFromEscrowWithoutCode, false)
       } else {
         yield call(withdrawFromEscrow)
       }
     } else if (feelessUpdate?.status === VerificationStatus.Done) {
       yield waitForNextBlock()
-      yield call(withdrawFromEscrowUsingPepper, true)
+      yield call(withdrawFromEscrowWithoutCode, true)
     }
   }
 }
