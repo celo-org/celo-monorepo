@@ -284,7 +284,6 @@ export class Connection {
           jsonrpc: '2.0',
           method: 'eth_sign',
           params: [inputAddressFormatter(address.toString()), inputSignFormatter(dataToSign)],
-          id: 1,
         },
         (error, resp) => {
           if (error) {
