@@ -1,6 +1,6 @@
-import { CeloTransactionObject } from '@celo/contractkit'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { CeloTransactionObject } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { UnlockableWallet } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
 import { Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
