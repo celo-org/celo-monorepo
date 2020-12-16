@@ -1,4 +1,4 @@
-import { isVerified } from '@celo/phone-number-privacy-common'
+import { isVerified, rootLogger } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import {
   ContractRetrieval,
@@ -12,6 +12,9 @@ import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit } from '../../src/web3/contracts'
+import allSettled from 'promise.allsettled'
+
+allSettled.shim()
 
 jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock
@@ -38,7 +41,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(2)))
     mockIsVerified.mockReturnValue(true)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 2,
       totalQuota: 52,
     })
@@ -56,7 +59,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
       totalQuota: 2,
     })
@@ -74,7 +77,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(10)))
     mockIsVerified.mockReturnValue(true)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 10,
       totalQuota: 432,
     })
@@ -92,7 +95,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 0,
       totalQuota: 402,
     })
@@ -110,7 +113,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 0,
       totalQuota: 0,
     })
@@ -128,7 +131,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
       totalQuota: 2,
     })
@@ -146,7 +149,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
       totalQuota: 2,
     })
@@ -163,7 +166,7 @@ describe(getRemainingQueryCount, () => {
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, undefined)).toEqual({
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, undefined)).toEqual({
       performedQueryCount: 0,
       totalQuota: 2,
     })
