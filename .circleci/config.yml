@@ -183,11 +183,9 @@ jobs:
       - run: cd ~/app/
 
       - run:
-          name: set ANDROID_SDK_ROOT
+          name: set ANDROID_SDK_ROOT and ANDROID_NDK
           command: |
             echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
-          name: set ANDROID_NDK
-          command: |
             echo 'export ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/22.0.7026061'  >> $BASH_ENV
 
       - restore_cache:
