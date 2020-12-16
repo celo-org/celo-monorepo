@@ -40,7 +40,8 @@ export async function getPhoneNumberIdentifier(
   context: ServiceContext,
   selfPhoneHash?: string,
   clientVersion?: string,
-  blsBlindingClient?: BlsBlindingClient
+  blsBlindingClient?: BlsBlindingClient,
+  sessionID?: string
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
@@ -61,7 +62,8 @@ export async function getPhoneNumberIdentifier(
     context,
     base64BlindedMessage,
     selfPhoneHash,
-    clientVersion
+    clientVersion,
+    sessionID
   )
 
   return getPhoneNumberIdentifierFromSignature(e164Number, base64BlindSig, blsBlindingClient)
@@ -91,7 +93,8 @@ export async function getBlindedPhoneNumberSignature(
   context: ServiceContext,
   base64BlindedMessage: string,
   selfPhoneHash?: string,
-  clientVersion?: string
+  clientVersion?: string,
+  sessionID?: string
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
@@ -100,6 +103,10 @@ export async function getBlindedPhoneNumberSignature(
     hashedPhoneNumber: selfPhoneHash,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
+  }
+
+  if (sessionID) {
+    body.sessionID = sessionID
   }
 
   const response = await queryOdis<SignMessageResponse>(

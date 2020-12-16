@@ -3,7 +3,7 @@ import { CeloContract } from '@celo/contractkit'
 import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -205,11 +205,7 @@ export function tokenTransferFactory({
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
         yield put(removeStandbyTransaction(context.id))
-        if (error.message === ErrorMessages.INCORRECT_PIN) {
-          yield put(showError(ErrorMessages.INCORRECT_PIN))
-        } else {
-          yield put(showError(ErrorMessages.TRANSACTION_FAILED))
-        }
+        yield put(showErrorOrFallback(error, ErrorMessages.TRANSACTION_FAILED))
       }
     }
   }
