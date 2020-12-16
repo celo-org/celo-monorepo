@@ -1,8 +1,7 @@
 // The purpose of the Voting bot in a testnet is to add incentives for good
 // behavior by validators. This introduces some non-validator stakers into the
 // network that will judge the validator groups, and vote accordingly.
-import { ContractKit, newKit } from '@celo/contractkit'
-import { Address } from '@celo/contractkit/lib/base'
+import { Address, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import {
   ensureLeading0x,
   eqAddress,
@@ -15,6 +14,7 @@ import BigNumber from 'bignumber.js'
 import { groupBy, mapValues } from 'lodash'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
+import Web3 from 'web3'
 import { Argv } from 'yargs'
 
 export const command = 'auto-vote'
@@ -52,7 +52,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
 
     const excludedGroups: string[] = argv.excludedGroups || []
 
-    const kit = newKit(argv.celoProvider)
+    const kit = newKitFromWeb3(new Web3(argv.celoProvider))
     const election = await kit.contracts.getElection()
 
     const wakeProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY))
@@ -82,8 +82,8 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     for (const key of botKeysVotingThisRound) {
       const botAccount = ensureLeading0x(privateKeyToAddress(key))
 
-      kit.addAccount(key)
-      kit.defaultAccount = botAccount
+      kit.connection.addAccount(key)
+      kit.connection.defaultAccount = botAccount
 
       console.info(`Voting as: ${botAccount}.`)
       try {
@@ -284,7 +284,7 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
   const election = await kit.contracts.getElection()
 
   await concurrentMap(10, botKeys, async (key) => {
-    kit.addAccount(key)
+    kit.connection.addAccount(key)
     const account = ensureLeading0x(privateKeyToAddress(key))
     if (!(await election.hasActivatablePendingVotes(account))) {
       try {

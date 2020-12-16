@@ -1,4 +1,5 @@
-import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { eqAddress } from '@celo/utils/src/address'
@@ -40,7 +41,7 @@ export function* revokeVerificationSaga() {
     const accountAddress: string = yield call(getAccountAddress)
     Logger.debug(
       TAG + '@revokeVerification',
-      `Checking for attestaions on ${mtwAddress ? 'MTW' : 'EOA'} account address ${accountAddress}`
+      `Checking for attestations on ${mtwAddress ? 'MTW' : 'EOA'} account address ${accountAddress}`
     )
 
     const contractKit: ContractKit = yield call(getContractKit)

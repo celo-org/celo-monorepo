@@ -1,6 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { BlockExplorer, newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
-import { LogExplorer, newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
+import { BlockExplorer, newBlockExplorer } from '@celo/explorer/lib/block-explorer'
+import { LogExplorer, newLogExplorer } from '@celo/explorer/lib/log-explorer'
 import fetch from 'node-fetch'
 import { CONTRACTS_TO_COPY, copyContractArtifacts, downloadArtifacts } from 'src/lib/artifacts'
 import { getWeb3Client } from 'src/lib/blockchain'
@@ -63,7 +63,7 @@ async function fetchTx(
   const transaction = await web3.eth.getTransaction(blockscoutTx.hash)
   const receipt = await web3.eth.getTransactionReceipt(blockscoutTx.hash)
 
-  const parsedTransaction = blockExplorer.tryParseTx(transaction)
+  const parsedTransaction = await blockExplorer.tryParseTx(transaction)
 
   if (parsedTransaction === null) {
     console.info(`Unparsable Transaction: ${transaction.hash}`)
