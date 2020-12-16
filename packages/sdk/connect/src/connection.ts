@@ -255,7 +255,7 @@ export class Connection {
           id: getRandomId(),
           jsonrpc: '2.0',
           method: 'eth_signTypedData',
-          params: [signer, typedData],
+          params: [inputAddressFormatter(signer), typedData],
         },
         (error, resp) => {
           if (error) {
