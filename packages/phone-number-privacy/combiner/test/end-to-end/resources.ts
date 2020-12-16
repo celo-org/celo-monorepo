@@ -4,7 +4,7 @@ import {
   EncryptionKeySigner,
   ServiceContext,
   WalletKeySigner,
-} from '@celo/contractkit/lib/identity/odis/query'
+} from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
