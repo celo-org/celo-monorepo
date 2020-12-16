@@ -103,8 +103,8 @@ contract Exchange is
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
     _updateBucketsIfNecessary();
-    setMinSupplyForStableBucketCap(_minSupplyForStableBucketCap);
-    setMaxStableBucketFraction(_maxStableBucketFraction);
+    // setMinSupplyForStableBucketCap(_minSupplyForStableBucketCap);
+    // setMaxStableBucketFraction(_maxStableBucketFraction);
   }
 
   /**
@@ -299,11 +299,11 @@ contract Exchange is
     */
   function setMaxStableBucketFraction(uint256 newMaxStableBucketFraction) public onlyOwner {
     maxStableBucketFraction = FixidityLib.wrap(newMaxStableBucketFraction);
-    require(
-      maxStableBucketFraction.lt(FixidityLib.fixed1()),
-      "bucket fraction must be smaller than 1"
-    );
-    require(newMaxStableBucketFraction > 0, "bucket fraction must be greather than 0");
+    // require(
+    //   maxStableBucketFraction.lt(FixidityLib.fixed1()),
+    //   "bucket fraction must be smaller than 1"
+    // );
+    // require(newMaxStableBucketFraction > 0, "bucket fraction must be greather than 0");
     emit MaxStableBucketFractionSet(newMaxStableBucketFraction);
   }
 
@@ -323,10 +323,10 @@ contract Exchange is
     */
   function setMinSupplyForStableBucketCap(uint256 newMinSupplyForStableBucketCap) public onlyOwner {
     minSupplyForStableBucketCap = newMinSupplyForStableBucketCap;
-    require(
-      newMinSupplyForStableBucketCap > 0,
-      "min supply for stable bucket cap must be greather than 0"
-    );
+    // require(
+    //   newMinSupplyForStableBucketCap > 0,
+    //   "min supply for stable bucket cap must be greather than 0"
+    // );
     emit MinSupplyForStableBucketCapSet(newMinSupplyForStableBucketCap);
   }
 
