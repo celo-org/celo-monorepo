@@ -56,7 +56,7 @@ interface AppEventsProperties {
     dollarBalance?: string
     goldBalance?: string
   }
-  [AppEvents.redux_keychain_missmatch]: {
+  [AppEvents.redux_keychain_mismatch]: {
     account: string
   }
 }

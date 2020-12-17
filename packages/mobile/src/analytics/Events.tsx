@@ -9,7 +9,7 @@ export enum AppEvents {
   user_restart = 'user_restart',
   fetch_balance = 'fetch_balance',
   fetch_balance_error = 'fetch_balance_error',
-  redux_keychain_missmatch = 'redux_keychain_missmatch',
+  redux_keychain_mismatch = 'redux_keychain_mismatch',
 }
 
 export enum HomeEvents {

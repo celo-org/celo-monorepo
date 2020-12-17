@@ -43,7 +43,7 @@ const fetchAsyncStorageState = (config: any) =>
 
 persistConfig.getStoredState = (config: any) =>
   getStoredState(config)
-    .then((state) => (state ? state : fetchAsyncStorageState(config)))
+    .then((state) => state ?? fetchAsyncStorageState(config))
     .catch(() => fetchAsyncStorageState(config))
 
 if (__DEV__) {

@@ -14,7 +14,7 @@ export function* checkAccountExistenceSaga() {
   const reduxAddress: string = yield select(currentAccountSelector)
   if (!reduxAddress && gethAccounts.length > 0) {
     // TODO: Try to recover access to the account.
-    ValoraAnalytics.track(AppEvents.redux_keychain_missmatch, {
+    ValoraAnalytics.track(AppEvents.redux_keychain_mismatch, {
       account: gethAccounts[0],
     })
   }
