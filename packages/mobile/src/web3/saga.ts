@@ -2,6 +2,7 @@ import { BlockHeader } from '@celo/connect'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { UnlockableWallet } from '@celo/wallet-base'
+import { RpcWalletErrors } from '@celo/wallet-rpc/src/rpc-wallet'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -218,7 +219,10 @@ export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: strin
     try {
       yield call([wallet, wallet.addAccount], privateKey, password)
     } catch (e) {
-      if (e.message === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS) {
+      if (
+        e.message === RpcWalletErrors.AccountAlreadyExists ||
+        e.message === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS
+      ) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
       } else {
         Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
