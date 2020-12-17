@@ -66,9 +66,11 @@ type Props = DispatchProps & StateProps & WithTranslation & ScreenProps
 
 class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   componentDidMount() {
-    this.props.navigation.addListener('beforeRemove', (e) => {
-      this.props.reclaimEscrowPaymentCancel()
-      ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
+    this.props.navigation.addListener('beforeRemove', () => {
+      if (this.props.isReclaiming) {
+        this.props.reclaimEscrowPaymentCancel()
+        ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
+      }
     })
   }
 
