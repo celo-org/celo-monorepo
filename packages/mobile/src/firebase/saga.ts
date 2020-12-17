@@ -110,7 +110,6 @@ function celoGoldExchangeRateHistoryChannel(lastTimeUpdated: number) {
 export function* subscribeToCeloGoldExchangeRateHistory() {
   yield call(waitForFirebaseAuth)
   const history = yield select(exchangeHistorySelector)
-  const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
   const chan = yield call(celoGoldExchangeRateHistoryChannel, history.lastTimeUpdated)
   try {
     while (true) {

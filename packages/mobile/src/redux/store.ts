@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-community/async-storage'
-import fs from 'react-native-fs'
 import { applyMiddleware, compose, createStore } from 'redux'
 import { createMigrate, getStoredState, persistReducer, persistStore } from 'redux-persist'
 import FSStorage from 'redux-persist-fs-storage'
@@ -13,19 +12,19 @@ import rootReducer from 'src/redux/reducers'
 import { rootSaga } from 'src/redux/sagas'
 import { ONE_DAY_IN_MILLIS } from 'src/utils/time'
 
-const storageFolder = 'reduxPersist'
 const timeBetweenStoreSizeEvents = ONE_DAY_IN_MILLIS
 let lastEventTime = Date.now()
 
 const persistConfig: any = {
   key: 'root',
   version: 7, // default is -1, increment as we make migrations
-  keyPrefix: `${APP_NAME}-`, // the redux-persist default is `persist:` which doesn't work with some file systems
-  storage: FSStorage(fs.DocumentDirectoryPath, storageFolder),
+  keyPrefix: `${APP_NAME}-`, // the redux-persist default is `persist:` which doesn't work with some file systems.
+  storage: FSStorage(),
   blacklist: ['home', 'geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
   stateReconciler: autoMergeLevel2,
   migrate: createMigrate(migrations, { debug: true }),
   serialize: (data: any) => {
+    // We're using this to send the size of the store to analytics while using the default implementation of JSON.stringify.
     const stringifiedData = JSON.stringify(data)
     // if data._persist or any other key is present the whole state is present (the content of the keys are
     // sometimes serialized independently).
