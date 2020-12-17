@@ -11,6 +11,7 @@ import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'sr
 import { Actions, firebaseAuthorized } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
+import { getRemoteTime } from 'src/utils/time'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -114,7 +115,7 @@ export function* subscribeToCeloGoldExchangeRateHistory() {
   try {
     while (true) {
       const exchangeRates = yield take(chan)
-      const now = Date.now()
+      const now = getRemoteTime()
       yield put(updateCeloGoldExchangeRateHistory(exchangeRates, now))
     }
   } catch (error) {
