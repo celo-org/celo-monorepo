@@ -187,6 +187,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for CP-DOTO restricted
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -295,6 +296,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for CP-DOTO restricted
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -645,6 +647,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for non CP-DOTO restri
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -762,6 +765,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for non CP-DOTO restri
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackground",
+                    "rippleRadius": undefined,
                     "type": "ThemeAttrAndroid",
                   }
                 }
@@ -832,6 +836,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for non CP-DOTO restri
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackground",
+                    "rippleRadius": undefined,
                     "type": "ThemeAttrAndroid",
                   }
                 }
@@ -981,6 +986,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for non CP-DOTO restri
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

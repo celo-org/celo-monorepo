@@ -95,7 +95,7 @@ runTest() {
     "${FILE_TO_RUN}" \
     --artifacts-location e2e/artifacts \
     --take-screenshots=all \
-    --record-logs=failing \
+    --record-logs=all \
     --detectOpenHandles \
     --loglevel verbose \
     "${extra_param}" 

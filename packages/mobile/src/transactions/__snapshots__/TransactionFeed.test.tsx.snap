@@ -137,6 +137,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
