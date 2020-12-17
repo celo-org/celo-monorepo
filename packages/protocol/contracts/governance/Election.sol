@@ -144,7 +144,7 @@ contract Election is
    * @param registryAddress The address of the registry core smart contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
    * @param _maxNumGroupsVotedFor The maximum number of groups that an account can vote for at once.
-   * @param _electabilityThresholdFraction The minimum ratio of votes a group needs before its members can
+   * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
    *   be elected.
    * @dev Should be called only once.
    */
@@ -153,13 +153,13 @@ contract Election is
     uint256 minElectableValidators,
     uint256 maxElectableValidators,
     uint256 _maxNumGroupsVotedFor,
-    uint256 _electabilityThresholdFraction
+    uint256 _electabilityThreshold
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setElectableValidators(minElectableValidators, maxElectableValidators);
     setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
-    setElectabilityThreshold(_electabilityThresholdFraction);
+    setElectabilityThreshold(_electabilityThreshold);
   }
 
   /**
