@@ -1,7 +1,7 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
 
 import { NavigationActions, StackActions } from '@react-navigation/compat'
-import { NavigationContainerRef } from '@react-navigation/native'
+import { CommonActions, NavigationContainerRef } from '@react-navigation/native'
 import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
@@ -85,6 +85,28 @@ export function navigate<RouteName extends keyof StackParamList>(
     })
     .catch((reason) => {
       Logger.error(`${TAG}@navigate`, `Navigation failure: ${reason}`)
+    })
+}
+
+export function navigateClearingStack<RouteName extends keyof StackParamList>(
+  ...args: undefined extends StackParamList[RouteName]
+    ? [RouteName] | [RouteName, StackParamList[RouteName]]
+    : [RouteName, StackParamList[RouteName]]
+) {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@navigateClearingStack`, `Dispatch ${routeName}`)
+
+      navigationRef.current?.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: routeName, params }],
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@navigateClearingStack`, `Navigation failure: ${reason}`)
     })
 }
 
