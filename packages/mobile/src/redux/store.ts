@@ -37,6 +37,7 @@ const persistConfig: any = {
     }
     return stringifiedData
   },
+  timeout: 0,
 }
 
 // We used to use AsyncStorage to save the state, but moved to file system storage because of problems with Android
