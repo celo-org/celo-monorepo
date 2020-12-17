@@ -12,7 +12,7 @@ import { showError } from 'src/alert/actions'
 import { EscrowEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { reclaimEscrowPayment } from 'src/escrow/actions'
+import { reclaimEscrowPayment, reclaimEscrowPaymentCancel } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
@@ -40,11 +40,15 @@ interface StateProps {
 
 interface DispatchProps {
   reclaimPayment: typeof reclaimEscrowPayment
+  reclaimEscrowPaymentCancel: typeof reclaimEscrowPaymentCancel
   showError: typeof showError
 }
 
+type ScreenProps = StackScreenProps<StackParamList, Screens.ReclaimPaymentConfirmationScreen>
+
 const mapDispatchToProps = {
   reclaimPayment: reclaimEscrowPayment,
+  reclaimEscrowPaymentCancel,
   showError,
 }
 
@@ -58,13 +62,17 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-type Props = DispatchProps &
-  StateProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.ReclaimPaymentConfirmationScreen>
+type Props = DispatchProps & StateProps & WithTranslation & ScreenProps
 
 class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  componentDidMount() {
+    this.props.navigation.addListener('beforeRemove', () => {
+      if (this.props.isReclaiming) {
+        this.props.reclaimEscrowPaymentCancel()
+        ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
+      }
+    })
+  }
 
   getReclaimPaymentInput() {
     const reclaimPaymentInput = this.props.route.params.reclaimPaymentInput
@@ -91,8 +99,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     }
   }
 
-  onPressCancel = () => {
-    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
+  onCancel = () => {
     navigateBack()
   }
 
@@ -131,7 +138,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
               asyncFee.loading ||
               !!asyncFee.error,
           }}
-          modifyButton={{ action: this.onPressCancel, text: t('cancel'), disabled: isReclaiming }}
+          modifyButton={{ action: this.onCancel, text: t('cancel'), disabled: isReclaiming }}
         >
           <ReclaimPaymentConfirmationCard
             recipientPhone={payment.recipientPhone}
