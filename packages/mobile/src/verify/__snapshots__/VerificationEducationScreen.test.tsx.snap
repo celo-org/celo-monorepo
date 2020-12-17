@@ -759,6 +759,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -1781,6 +1782,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -2803,6 +2805,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -3825,6 +3828,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",

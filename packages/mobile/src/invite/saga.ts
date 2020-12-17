@@ -95,9 +95,13 @@ export async function getInviteFee(
   account: string,
   currency: CURRENCY_ENUM,
   amount: string,
+  dollarBalance: string,
   comment: string
 ) {
   try {
+    if (new BigNumber(amount).isGreaterThan(new BigNumber(dollarBalance))) {
+      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
     const gas = await getInviteTxGas(account, currency, amount, comment)
     return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
   } catch (error) {
