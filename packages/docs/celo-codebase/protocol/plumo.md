@@ -77,6 +77,7 @@ The first step to participating is generating your Celo address in a secure loca
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
     * Make sure to save your passphrase - you will need it later.
+    * If you are using a USB thumbdrive, you can use the flag `--keys-path KEYS_PATH`, passing in the respective path to save the key on the drive itself.
 * Send the address generated to plumo@celo.org.
 * Keep the resulting `plumo.keys` file. Ideally, it will be stored in a location that's easy to destroy afterwards, such as a USB thumbdrive.
 
@@ -99,9 +100,13 @@ cLabs is running the coordinator server, which has a list of approved participan
 
 Once this is running, you can leave the machine running -- no direct action is needed. This will run for about ~36 hours, after which the software will terminate running and you will have finished contributing to the Plumo setup!
 
+### Publish your attestation
+
+The `contribute` binary produces a `plumo.attestation` file that contains a signature with your address. After your participation finishes (and not before!), please post it (here)[https://github.com/celo-org/plumo-ceremony-attestations] by creating a new issue! If you don't have access to the `plumo.attestation` anymore, that's still OK, you can fill in the other details in the issue.
+
 ### Troubleshooting
 
-This section contains some common issues contributors may run into while running the setup software.
+This section contains some common issues contributors may run into while running the setup software. If you have any questions, please reach out on the #plumo channel in the [Celo Discord server](https://discord.gg/6yWMkgM). It is recommended that you have another device to be able to reach out in case of persistent issues.
 
 **Permissions:**
 - You may need to change the permissions on both the `generate` and `contribute` files to be able to run them. For example, on macOS, you can run `chmod u+x generate-macos contribute-macos`.
@@ -111,6 +116,7 @@ This section contains some common issues contributors may run into while running
 **Hardware:**
 - Disable sleep - if your machine is automatically set to sleep or turn hard disks off, it's best to switch these options off.
 - Battery - it's best to connect the machine to an outlet, as the setup is computationally intensive and would drain a battery fast.
+- Frozen machine - if your computer freezes, don't worry -- the Plumo setup software is using all the threads on the CPU, and it should resolve itself.
 
 If either of these happen, don't worry - stop and restart the contribution program and re-enter the passphrase to continue.
 
