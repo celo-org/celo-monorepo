@@ -37,7 +37,7 @@ const persistConfig: any = {
     }
     return stringifiedData
   },
-  timeout: 0,
+  timeout: null,
 }
 
 // We used to use AsyncStorage to save the state, but moved to file system storage because of problems with Android
@@ -53,10 +53,6 @@ persistConfig.getStoredState = (config: any) =>
       Sentry.captureException(error)
       Logger.error('redux/store', 'Failed to retrieve redux state.', error)
     })
-
-if (__DEV__) {
-  persistConfig.timeout = 10000
-}
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
