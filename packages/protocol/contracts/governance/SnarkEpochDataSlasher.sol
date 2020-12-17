@@ -222,10 +222,11 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return q;
   }
 
-  function validatorBLSPublicKeyFromSet(uint256 index, uint256 blockNumber, bytes memory buffer)
-    public
-    view
-  {
+  function validatorBLSPublicKeyFromSetInPlace(
+    uint256 index,
+    uint256 blockNumber,
+    bytes memory buffer
+  ) public view {
     bool success;
     assembly {
       mstore(add(0x20, buffer), index)
@@ -248,7 +249,7 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     B12.G2Point memory p,
     bytes memory buffer
   ) internal view {
-    validatorBLSPublicKeyFromSet(i, blockNumber, buffer);
+    validatorBLSPublicKeyFromSetInPlace(i, blockNumber, buffer);
     B12.readG2(buffer, 0, p);
   }
 
@@ -365,14 +366,6 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     args[0] = B12.PairingArg(sig_point, negativeP2());
     args[1] = B12.PairingArg(p, agg);
     return CeloB12_377Lib.pairing(args);
-  }
-
-  function testHashing(bytes memory extra, bytes memory message)
-    public
-    view
-    returns (bytes memory)
-  {
-    return doHash(abi.encodePacked(extra, message));
   }
 
 }

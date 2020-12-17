@@ -42,7 +42,7 @@
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",
-    "@celo/protocol": "1.0.0",
+    "@celo/protocol": "1.0.0-dev",
     "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",
     "jest": "^25.2.4",

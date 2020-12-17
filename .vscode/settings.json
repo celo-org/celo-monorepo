@@ -44,5 +44,5 @@
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "tslint.jsEnable": true,
-  "solidity.compileUsingRemoteVersion": "v0.5.17+commit.d19bba13"
+  "solidity.compileUsingRemoteVersion": "v0.5.13+commit.5b0b510c"
 }

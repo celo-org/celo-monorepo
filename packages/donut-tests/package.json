@@ -1,0 +1,29 @@
+{
+  "name": "@celo/donut-tests",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "5:compile": "npx buidler compile --config buidler.config.5.js",
+    "6:compile": "npx buidler compile --config buidler.config.6.js",
+    "compile": "npm run 5:compile && npm run 6:compile",
+    "5:test": "npx buidler test --config buidler.config.5.js",
+    "6:test": "npx buidler test --config buidler.config.6.js",
+    "test": "npm run 5:test && npm run 6:test"
+  },
+  "author": "James Prestwich",
+  "license": "MIT OR Apache-2.0",
+  "dependencies": {
+    "@celo/protocol": "1.0.0-dev",
+    "openzeppelin-solidity": "^2.5.0",
+    "@summa-tx/memview.sol": "^1.1.0"
+  },
+  "devDependencies": {
+    "@nomiclabs/buidler": "^1.4.7",
+    "@nomiclabs/buidler-ethers": "^2.0.0",
+    "@nomiclabs/buidler-waffle": "^2.1.0",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^3.1.1",
+    "ethers": "^5.0.14"
+  }
+}
