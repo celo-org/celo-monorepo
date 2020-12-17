@@ -1,14 +1,14 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ActivityIndicator } from 'react-native'
-import { render, waitForElement } from 'react-native-testing-library'
+import { flushMicrotasksQueue, render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import { getReclaimEscrowFee, reclaimFromEscrow } from 'src/escrow/saga'
 import { SHORT_CURRENCIES, WEI_PER_CELO } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockStackScreenProps, sleep } from 'test/utils'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number } from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
@@ -111,7 +111,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
       </Provider>
     )
 
-    await sleep(500)
+    await flushMicrotasksQueue()
 
     expect(tree.queryByType(ActivityIndicator)).toBeFalsy()
   })

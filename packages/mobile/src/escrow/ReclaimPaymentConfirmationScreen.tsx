@@ -12,14 +12,12 @@ import { showError } from 'src/alert/actions'
 import { EscrowEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton'
 import { reclaimEscrowPayment, reclaimEscrowPaymentCancel } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { emptyHeader } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -68,7 +66,10 @@ type Props = DispatchProps & StateProps & WithTranslation & ScreenProps
 
 class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   componentDidMount() {
-    this.props.navigation.setParams({ onCancel: this.onCancel })
+    this.props.navigation.addListener('beforeRemove', (e) => {
+      this.props.reclaimEscrowPaymentCancel()
+      ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
+    })
   }
 
   getReclaimPaymentInput() {
@@ -97,8 +98,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   }
 
   onCancel = () => {
-    this.props.reclaimEscrowPaymentCancel()
-    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
     navigateBack()
   }
 
@@ -174,14 +173,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
         {(asyncFee) => this.renderWithAsyncFee(asyncFee)}
       </CalculateFee>
     )
-  }
-}
-
-export function reclaimPaymentConfirmationScreenNavigationOptions({ route }: ScreenProps) {
-  const onCancel = route.params?.onCancel ? route.params.onCancel : () => null
-  return {
-    ...emptyHeader,
-    headerLeft: () => <BackButton onPress={onCancel} />,
   }
 }
 

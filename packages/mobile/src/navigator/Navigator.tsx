@@ -26,9 +26,7 @@ import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
-import ReclaimPaymentConfirmationScreen, {
-  reclaimPaymentConfirmationScreenNavigationOptions,
-} from 'src/escrow/ReclaimPaymentConfirmationScreen'
+import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
@@ -291,7 +289,7 @@ const sendScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ReclaimPaymentConfirmationScreen}
       component={ReclaimPaymentConfirmationScreen}
-      options={reclaimPaymentConfirmationScreenNavigationOptions}
+      options={headerWithBackButton}
     />
   </>
 )
