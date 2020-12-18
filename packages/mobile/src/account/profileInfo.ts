@@ -47,18 +47,8 @@ async function makeCall(data: any, signature: string): Promise<SignedPostPolicyV
 // Workaround fetch response.arrayBuffer() not working in RN environment
 // See https://github.com/facebook/react-native/blob/f96478778cc00da8c11da17f9591dbdf928e7437/Libraries/Blob/FileReader.js#L85
 async function responseBuffer(response: Response) {
-  let blob: Blob | undefined
-  try {
-    blob = await response.blob()
-    return blobToBuffer(blob)
-  } catch (error) {
-    throw error
-  } finally {
-    // close() does exist in RN and needs to be invoked
-    // See https://github.com/facebook/react-native/blob/b26a9549ce2dffd1d0073ae13502830459051c27/Libraries/Blob/Blob.js#L123
-    // @ts-ignore
-    blob?.close()
-  }
+  const blob = await response.blob()
+  return blobToBuffer(blob)
 }
 
 // Hacky way to get Buffer from Blob
