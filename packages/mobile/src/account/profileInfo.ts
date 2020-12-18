@@ -24,8 +24,8 @@ import { currentAccountSelector, dataEncryptionKeySelector } from 'src/web3/sele
 
 const TAG = 'account/profileInfo'
 
-const authorizerUrl = 'https://us-central1-celo-testnet.cloudfunctions.net/valora-upload-authorizer'
-const valoraMetadataUrl = 'https://storage.googleapis.com/celo-test-alexh-bucket'
+const authorizerUrl = 'https://kel03d4ef0.execute-api.eu-west-1.amazonaws.com/dev/authorize'
+const valoraMetadataUrl = 'https://stokado-storage-dev.s3-eu-west-1.amazonaws.com'
 
 async function makeCall(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
   const response = await fetch(authorizerUrl, {
@@ -250,7 +250,7 @@ export function* uploadSymmetricKeys(recipientAddresses: string[]) {
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
   const nameAccessor = new PrivateNameAccessor(offchainWrapper)
 
-  const writeError = yield call([nameAccessor, 'writeKeys'], { name }, recipientAddresses)
+  const writeError = yield call([nameAccessor, 'writeKeys'], recipientAddresses)
   Logger.info(TAG + '@uploadSymmetricKeys', 'uploaded symmetric keys for ' + recipientAddresses)
 
   if (writeError) {

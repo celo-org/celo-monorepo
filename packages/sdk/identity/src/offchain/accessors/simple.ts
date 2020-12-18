@@ -86,11 +86,7 @@ export class PrivateSimpleAccessor<DataType> implements PrivateAccessor<DataType
     return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
   }
 
-  writeKeys(data: DataType, toAddresses: Address[], symmetricKey?: Buffer) {
-    if (!this.type.is(data)) {
-      return Promise.resolve(new InvalidDataError())
-    }
-
+  writeKeys(toAddresses: Address[], symmetricKey?: Buffer) {
     return writeSymmetricKeys(this.wrapper, this.dataPath, toAddresses, symmetricKey)
   }
 
