@@ -16,7 +16,7 @@ export async function installSentry() {
   Sentry.init({
     dsn: SENTRY_URL,
     environment: DeviceInfo.getBundleId(),
-    enableAutoSessionTracking: false,
+    enableAutoSessionTracking: true,
   })
   Logger.info(TAG, 'installSentry', 'Sentry installation complete')
 }
