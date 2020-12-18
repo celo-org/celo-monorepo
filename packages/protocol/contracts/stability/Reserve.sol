@@ -298,7 +298,7 @@ contract Reserve is
    */
   function addSpender(address spender) external onlyOwner {
     isSpender[spender] = true;
-    emit SpenderAdded(spender); // TODO this is not teste
+    emit SpenderAdded(spender);
   }
 
   /**
@@ -307,7 +307,7 @@ contract Reserve is
    */
   function removeSpender(address spender) external onlyOwner {
     isSpender[spender] = false;
-    emit SpenderRemoved(spender); // TODO this is not teste
+    emit SpenderRemoved(spender);
   }
 
   function addExchangeSpender(address spender) external onlyOwner {
