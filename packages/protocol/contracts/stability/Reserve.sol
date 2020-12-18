@@ -55,6 +55,8 @@ contract Reserve is
   uint256 public frozenReserveGoldStartDay;
   uint256 public frozenReserveGoldDays;
 
+  mapping(address => bool) public isExchangeSpender;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
@@ -67,6 +69,8 @@ contract Reserve is
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
   event TobinTaxSet(uint256 value);
   event TobinTaxReserveRatioSet(uint256 value);
+  event ExchangeSpenderAdded(address indexed exchangeSpender);
+  event ExchangeSpenderRemoved(address indexed exchangeSpender);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -78,7 +82,7 @@ contract Reserve is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -294,7 +298,7 @@ contract Reserve is
    */
   function addSpender(address spender) external onlyOwner {
     isSpender[spender] = true;
-    emit SpenderAdded(spender);
+    emit SpenderAdded(spender); // TODO this is not teste
   }
 
   /**
@@ -303,7 +307,17 @@ contract Reserve is
    */
   function removeSpender(address spender) external onlyOwner {
     isSpender[spender] = false;
-    emit SpenderRemoved(spender);
+    emit SpenderRemoved(spender); // TODO this is not teste
+  }
+
+  function addExchangeSpender(address spender) external onlyOwner {
+    isExchangeSpender[spender] = true;
+    emit ExchangeSpenderAdded(spender);
+  }
+
+  function removeExchangeSpender(address spender) external onlyOwner {
+    isExchangeSpender[spender] = false;
+    emit ExchangeSpenderRemoved(spender);
   }
 
   /**
@@ -347,9 +361,12 @@ contract Reserve is
    */
   function transferExchangeGold(address payable to, uint256 value)
     external
-    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
-    returns (bool)
+    returns (
+      // onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+      bool
+    )
   {
+    require(isExchangeSpender[msg.sender], "can't send to a non-exchange");
     return _transferGold(to, value);
   }
 

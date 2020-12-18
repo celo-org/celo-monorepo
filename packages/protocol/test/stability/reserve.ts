@@ -7,13 +7,13 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import BN = require('bn.js')
 import {
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
@@ -48,6 +48,7 @@ contract('Reserve', (accounts: string[]) => {
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
+    // await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
     await reserve.initialize(
       registry.address,
       aTobinTaxStalenessThreshold,
@@ -283,6 +284,42 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
+  describe('addExchangeSpender & removeExchangeSpender', () => {
+    it('emits on add', async () => {
+      const addExchangeSpenderTx = await reserve.addExchangeSpender(exchangeAddress)
+
+      const addExchangeSpenderTxLogs = addExchangeSpenderTx.logs.filter(
+        (x) => x.event === 'ExchangeSpenderAdded'
+      )
+      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+
+    it('emits on remove', async () => {
+      const addExchangeSpenderTx = await reserve.removeExchangeSpender(exchangeAddress)
+
+      const addExchangeSpenderTxLogs = addExchangeSpenderTx.logs.filter(
+        (x) => x.event === 'ExchangeSpenderRemoved'
+      )
+      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+  })
+
+  describe('addSpender & removeSpender', () => {
+    it('emits on add', async () => {
+      const addSpenderTx = await reserve.addSpender(spender)
+
+      const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderAdded')
+      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+
+    it('emits on remove', async () => {
+      const addSpenderTx = await reserve.removeSpender(spender)
+
+      const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderRemoved')
+      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+  })
+
   describe('#transferExchangeGold()', () => {
     const aValue = 10000
     let otherReserveAddress: string = ''
@@ -291,6 +328,7 @@ contract('Reserve', (accounts: string[]) => {
       await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
       await reserve.addSpender(spender)
       await reserve.addOtherReserveAddress(otherReserveAddress)
+      await reserve.addExchangeSpender(exchangeAddress)
     })
 
     it('should allow a exchange to call transferExchangeGold', async () => {
@@ -302,6 +340,11 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it('should not allow other addresses to call transferExchangeGold', async () => {
+      await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
+    })
+
+    it('should not allow removed removed exchange spender addresses to call transferExchangeGold', async () => {
+      await reserve.removeExchangeSpender(exchangeAddress)
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
     })
 
