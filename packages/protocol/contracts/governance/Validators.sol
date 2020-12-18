@@ -403,7 +403,6 @@ contract Validators is
     uint256 numerator;
     uint256 denominator;
     uptime = uptime + 6250000000000000000000 > FixidityLib.fixed1().unwrap() ? FixidityLib.fixed1().unwrap() : uptime + 6250000000000000000000;
-    uint256 updated = uptime + grace_period.unwrap();
     (numerator, denominator) = fractionMulExp(
       FixidityLib.fixed1().unwrap(),
       FixidityLib.fixed1().unwrap(),
