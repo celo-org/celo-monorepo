@@ -1,4 +1,4 @@
-import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, rootLogger as logger } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
@@ -39,7 +39,7 @@ export class AWSKeyProvider extends KeyProviderBase {
       this.setPrivateKey(privateKey)
     } catch (err) {
       logger.info('Error retrieving key')
-      logger.error({ err })
+      logger.error(err)
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }

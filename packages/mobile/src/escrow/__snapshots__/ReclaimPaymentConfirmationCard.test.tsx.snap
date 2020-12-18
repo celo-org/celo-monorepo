@@ -333,6 +333,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -541,6 +542,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }

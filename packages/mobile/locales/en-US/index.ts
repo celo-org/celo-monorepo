@@ -8,7 +8,6 @@ import global from '@celo/mobile/locales/en-US/global.json'
 import goldEducation from '@celo/mobile/locales/en-US/goldEducation.json'
 import inviteFlow11 from '@celo/mobile/locales/en-US/inviteFlow11.json'
 import nuxNamePin1 from '@celo/mobile/locales/en-US/nuxNamePin1.json'
-import nuxRestoreWallet3 from '@celo/mobile/locales/en-US/nuxRestoreWallet3.json'
 import nuxVerification2 from '@celo/mobile/locales/en-US/nuxVerification2.json'
 import onboarding from '@celo/mobile/locales/en-US/onboarding.json'
 import paymentRequestFlow from '@celo/mobile/locales/en-US/paymentRequestFlow.json'
@@ -24,7 +23,6 @@ export default {
   inviteFlow11,
   goldEducation,
   nuxNamePin1,
-  nuxRestoreWallet3,
   nuxVerification2,
   paymentRequestFlow,
   receiveFlow8,

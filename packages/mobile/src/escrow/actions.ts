@@ -1,6 +1,5 @@
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import BigNumber from 'bignumber.js'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FeeInfo } from 'src/fees/saga'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { TransactionContext } from 'src/transactions/types'
@@ -24,6 +23,7 @@ export enum Actions {
   RESEND_PAYMENT = 'ESCROW/RESEND_PAYMENT',
   RECLAIM_PAYMENT_SUCCESS = 'ESCROW/RECLAIM_PAYMENT_SUCCESS',
   RECLAIM_PAYMENT_FAILURE = 'ESCROW/RECLAIM_PAYMENT_FAILURE',
+  RECLAIM_PAYMENT_CANCEL = 'RECLAIM_PAYMENT_CANCEL',
 }
 
 export interface EscrowTransferPaymentAction {
@@ -59,7 +59,10 @@ export interface EscrowReclaimPaymentSuccessAction {
 
 export interface EscrowReclaimFailureAction {
   type: Actions.RECLAIM_PAYMENT_FAILURE
-  error: ErrorMessages
+}
+
+export interface EscrowReclaimCancelAction {
+  type: Actions.RECLAIM_PAYMENT_CANCEL
 }
 
 export type ActionTypes =
@@ -70,6 +73,7 @@ export type ActionTypes =
   | EscrowResendPaymentAction
   | EscrowReclaimPaymentSuccessAction
   | EscrowReclaimFailureAction
+  | EscrowReclaimCancelAction
 
 export const transferEscrowedPayment = (
   phoneHashDetails: PhoneNumberHashDetails,
@@ -111,7 +115,10 @@ export const reclaimEscrowPaymentSuccess = (): EscrowReclaimPaymentSuccessAction
   type: Actions.RECLAIM_PAYMENT_SUCCESS,
 })
 
-export const reclaimEscrowPaymentFailure = (error: ErrorMessages): EscrowReclaimFailureAction => ({
+export const reclaimEscrowPaymentFailure = (): EscrowReclaimFailureAction => ({
   type: Actions.RECLAIM_PAYMENT_FAILURE,
-  error,
+})
+
+export const reclaimEscrowPaymentCancel = (): EscrowReclaimCancelAction => ({
+  type: Actions.RECLAIM_PAYMENT_CANCEL,
 })
