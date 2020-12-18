@@ -170,6 +170,7 @@ exports[`renders correctly with giant numbers 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -664,6 +665,7 @@ exports[`renders correctly with no exchange rate 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

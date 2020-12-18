@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { render, waitForElement } from 'react-native-testing-library'
+import { ActivityIndicator } from 'react-native'
+import { flushMicrotasksQueue, render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
-import { getReclaimEscrowFee } from 'src/escrow/saga'
+import { getReclaimEscrowFee, reclaimFromEscrow } from 'src/escrow/saga'
 import { SHORT_CURRENCIES, WEI_PER_CELO } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
@@ -14,6 +16,7 @@ const TEST_FEE = new BigNumber(10000000000000000)
 jest.mock('src/escrow/saga')
 
 const mockedGetReclaimEscrowFee = getReclaimEscrowFee as jest.Mock
+const mockedReclaimPayment = reclaimFromEscrow as jest.Mock
 
 const store = createMockStore()
 
@@ -82,5 +85,34 @@ describe('ReclaimPaymentConfirmationScreen', () => {
 
     expect(queryAllByText('10.00')).toHaveLength(1)
     expect(toJSON()).toMatchSnapshot()
+  })
+
+  it('shows the activity indicator when a reclaim is in progress', async () => {
+    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
+
+    const tree = render(
+      <Provider store={store}>
+        <ReclaimPaymentConfirmationScreen {...mockScreenProps} />
+      </Provider>
+    )
+
+    expect(tree.queryByType(ActivityIndicator)).toBeTruthy()
+  })
+
+  it('clears the activity indicator when a reclaim fails', async () => {
+    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
+    mockedReclaimPayment.mockImplementation(async () => {
+      throw Error(ErrorMessages.TRANSACTION_FAILED)
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <ReclaimPaymentConfirmationScreen {...mockScreenProps} />
+      </Provider>
+    )
+
+    await flushMicrotasksQueue()
+
+    expect(tree.queryByType(ActivityIndicator)).toBeFalsy()
   })
 })

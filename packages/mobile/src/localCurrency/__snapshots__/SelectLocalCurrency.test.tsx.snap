@@ -89,6 +89,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -160,6 +161,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -231,6 +233,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -302,6 +305,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -383,6 +387,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -454,6 +459,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -525,6 +531,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -596,6 +603,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -667,6 +675,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -738,6 +747,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

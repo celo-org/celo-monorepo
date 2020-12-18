@@ -158,6 +158,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -364,6 +365,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

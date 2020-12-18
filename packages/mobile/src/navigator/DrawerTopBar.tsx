@@ -21,8 +21,9 @@ function DrawerTopBar({ middleElement, rightElement, scrollPosition, testID }: P
       borderBottomWidth: 1,
       borderBottomColor: cond(
         greaterThan(scrollPosition ?? new Animated.Value(0), 0),
-        processColor(colors.gray2),
-        processColor('transparent')
+        // TODO: fix type
+        processColor(colors.gray2) as any,
+        processColor('transparent') as any
       ),
     }),
     [scrollPosition]

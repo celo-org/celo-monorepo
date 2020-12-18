@@ -29,7 +29,7 @@ import {
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
-import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'
+import { DefaultRpcCaller, getRandomId, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
@@ -252,9 +252,10 @@ export class Connection {
     const signature = await new Promise<string>((resolve, reject) => {
       ;(this.web3.currentProvider as Provider).send(
         {
+          id: getRandomId(),
           jsonrpc: '2.0',
           method: 'eth_signTypedData',
-          params: [signer, typedData],
+          params: [inputAddressFormatter(signer), typedData],
         },
         (error, resp) => {
           if (error) {
@@ -279,6 +280,7 @@ export class Connection {
     const signature = await new Promise<string>((resolve, reject) => {
       ;(this.web3.currentProvider as Provider).send(
         {
+          id: getRandomId(),
           jsonrpc: '2.0',
           method: 'eth_sign',
           params: [inputAddressFormatter(address.toString()), inputSignFormatter(dataToSign)],

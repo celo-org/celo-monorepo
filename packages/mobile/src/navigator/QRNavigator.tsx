@@ -63,19 +63,19 @@ function AnimatedScannerScene({ route, position, ...props }: AnimatedScannerScen
   )
 
   const animatedStyle = useMemo(() => {
-    const opacity = Animated.interpolate(position, {
+    const opacity = Animated.interpolateNode(position, {
       inputRange: [0, 1],
       outputRange: [0, 1],
       extrapolate: Animated.Extrapolate.CLAMP,
     })
 
-    const translateX = Animated.interpolate(position, {
+    const translateX = Animated.interpolateNode(position, {
       inputRange: [0, 1],
       outputRange: [-width, 0],
       extrapolate: Animated.Extrapolate.CLAMP,
     })
 
-    const scale = Animated.interpolate(position, {
+    const scale = Animated.interpolateNode(position, {
       inputRange: [0, 1],
       outputRange: [0.7, 1],
       extrapolate: Animated.Extrapolate.CLAMP,
