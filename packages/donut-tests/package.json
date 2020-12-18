@@ -6,7 +6,7 @@
   "scripts": {
     "5:compile": "npx buidler compile --config buidler.config.5.js",
     "6:compile": "npx buidler compile --config buidler.config.6.js",
-    "compile": "npm run 5:compile && npm run 6:compile",
+    "build": "npm run 5:compile",
     "5:test": "npx buidler test --config buidler.config.5.js",
     "6:test": "npx buidler test --config buidler.config.6.js",
     "test": "npm run 5:test && npm run 6:test"
