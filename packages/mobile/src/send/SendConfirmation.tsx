@@ -285,6 +285,7 @@ function SendConfirmation(props: Props) {
         dekFee = fee.dividedBy(2)
       }
 
+      // DO NOT MERGE: Reduce the noisiness of this call to only emit if the fee has changed.
       ValoraAnalytics.track(FeeEvents.fee_rendered, {
         feeType: 'Security',
         fee: securityFee?.toString(),

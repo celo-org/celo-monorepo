@@ -9,7 +9,19 @@ import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number } from 'test/values'
 
-const TEST_FEE = new BigNumber(10000000000000000)
+const TEST_FEE_INFO_CUSD = {
+  fee: new BigNumber(10).pow(16),
+  gas: new BigNumber(200000),
+  gasPrice: new BigNumber(10).pow(9).times(5),
+  currency: CURRENCY_ENUM.DOLLAR,
+}
+
+const TEST_FEE_INFO_CELO = {
+  fee: new BigNumber(10).pow(16),
+  gas: new BigNumber(200000),
+  gasPrice: new BigNumber(10).pow(9).times(5),
+  currency: CURRENCY_ENUM.GOLD,
+}
 
 jest.mock('src/escrow/saga')
 
@@ -38,8 +50,30 @@ describe('ReclaimPaymentConfirmationScreen', () => {
     mockedGetReclaimEscrowFee.mockClear()
   })
 
-  it('renders correctly', async () => {
-    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
+  it('renders correctly in Celo dollars', async () => {
+    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE_INFO_CUSD)
+
+    const { queryByText, queryAllByText, toJSON } = render(
+      <Provider store={store}>
+        <ReclaimPaymentConfirmationScreen {...mockScreenProps} />
+      </Provider>
+    )
+
+    // Initial render
+    expect(toJSON()).toMatchSnapshot()
+    expect(queryAllByText('securityFee')).toHaveLength(2)
+    expect(queryByText('$0.001')).toBeNull()
+
+    // Wait for fee to be calculated and displayed
+    // TODO fix and re-enable, seeing the same issue as in TransferReviewCard
+    // await waitForElement(() => getByText('$0.001'))
+
+    // expect(queryByText('$9.99')).not.toBeNull()
+    // expect(toJSON()).toMatchSnapshot()
+  })
+
+  it('renders correctly in CELO', async () => {
+    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE_INFO_CELO)
 
     const { queryByText, queryAllByText, toJSON } = render(
       <Provider store={store}>
