@@ -115,7 +115,7 @@ jobs:
   install_dependencies:
     <<: *defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
+    resource_class: large
     steps:
       - restore_cache:
           keys:
@@ -151,8 +151,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            # Limit concurrency to avoid ENOMEM in CI :(
-            yarn build --concurrency 2 --ignore docs
+            yarn build --ignore docs
 
       - run:
           name: Check licenses
