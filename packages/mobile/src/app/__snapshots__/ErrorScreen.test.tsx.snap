@@ -103,6 +103,7 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -249,6 +250,7 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }

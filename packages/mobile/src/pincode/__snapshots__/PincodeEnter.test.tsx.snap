@@ -244,6 +244,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -280,6 +281,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -316,6 +318,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -363,6 +366,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -399,6 +403,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -435,6 +440,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -482,6 +488,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -518,6 +525,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -554,6 +562,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -616,6 +625,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -652,6 +662,7 @@ exports[`PincodeEnter renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

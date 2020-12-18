@@ -134,6 +134,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -212,6 +213,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -290,6 +292,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -395,6 +398,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -780,6 +784,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -858,6 +863,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -970,6 +976,7 @@ exports[`Account renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -1211,6 +1218,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1247,6 +1255,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1447,6 +1456,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1483,6 +1493,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1687,6 +1698,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1724,6 +1736,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1925,6 +1938,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1962,6 +1976,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -2163,6 +2178,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -2200,6 +2216,7 @@ exports[`Account renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -2374,6 +2391,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2452,6 +2470,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2530,6 +2549,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2635,6 +2655,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3020,6 +3041,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3098,6 +3120,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3210,6 +3233,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3715,6 +3739,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -3751,6 +3776,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -3951,6 +3977,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -3987,6 +4014,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4191,6 +4219,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4228,6 +4257,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4429,6 +4459,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4466,6 +4497,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4667,6 +4699,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4704,6 +4737,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -4878,6 +4912,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -4956,6 +4991,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -5034,6 +5070,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -5139,6 +5176,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -5524,6 +5562,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -5602,6 +5641,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -5714,6 +5754,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -5955,6 +5996,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -5991,6 +6033,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6191,6 +6234,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6227,6 +6271,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6431,6 +6476,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6468,6 +6514,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6669,6 +6716,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6706,6 +6754,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6907,6 +6956,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -6944,6 +6994,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
