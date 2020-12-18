@@ -100,7 +100,7 @@ describe('SnarkEpochDataSlasher', function() {
   })
 
   it('getting BLS public key', async () => {
-    let res = await instance.validatorBLSPublicKeyFromSet(0, 123)
+    let res = await instance.validatorBLSPublicKeyFromSet(0, 1)
     assert(
       res ==
         '0x0000000000000000000000000000000000b776302a4f1511de7b3d3f77a608c494480df288a80fa2365abe8d98bfd31349c5ddcda11f8d068b8713c97ff6a34f0000000000000000000000000000000000ff9afc060bdbad7a5d3fbef42ce043a7caec1c5759e9d3eff2d895cd5320ac7979ac8655dbf4835e0e5ad22fa445d3000000000000000000000000000000000011437e87ba00d150098f1c22cc7987b9376e6e0fe4b87190b24c2d970bd7c999c7217ef096e110d80979b2e89aca8800000000000000000000000000000000009cc04c559d4f8286a6ac425b4dd7793a28bd2a09d2787cccece08041db5e9387589225435475915a027c35bbea5724'
@@ -519,7 +519,7 @@ describe('SnarkEpochDataSlasher', function() {
   it('test slashing', async () => {
     for (const info of cases) {
       const header = await infoToData(instance, info)
-      assert(await instance.testSlash(header))
+      assert(await instance.testSlashFakeEpoch(header))
     }
   })
 

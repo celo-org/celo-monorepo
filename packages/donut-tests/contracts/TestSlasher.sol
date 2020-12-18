@@ -117,7 +117,7 @@ contract TestSlasher is SnarkEpochDataSlasher {
     returns (bool)
   {
     B12.G1Point memory p = parseToG1Scaled(doHash(abi.encodePacked(extra, message)), hints);
-    B12.G2Point memory public_key = getBLSPublicKey(100, 0);
+    B12.G2Point memory public_key = getBLSPublicKey(1, 0);
     B12.G1Point memory sig_point = B12.parseG1(sig, 0);
     B12.PairingArg[] memory args = new B12.PairingArg[](2);
     args[0] = B12.PairingArg(sig_point, negativeP2());
@@ -132,6 +132,13 @@ contract TestSlasher is SnarkEpochDataSlasher {
   {
     DataArg memory arg = decodeDataArg(data);
     return (arg.extra, arg.bhhash, arg.bitmap, arg.sig, arg.hint);
+  }
+
+  function testSlashFakeEpoch(bytes memory arg_data) public view returns (bool) {
+    DataArg memory arg = decodeDataArg(arg_data);
+    bytes memory data = abi.encodePacked(arg.extra, arg.bhhash);
+    uint16 epoch = epochFromExtraData(arg.extra);
+    return isValid(1, data, arg.bitmap, arg.sig, arg.hint);
   }
 
   function testSlash(bytes memory arg_data) public view returns (bool) {
