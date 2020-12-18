@@ -54,6 +54,7 @@ spec:
             weight: 100
       initContainers:
 {{- if .Values.geth.use_gstorage_data | default false }}
+{{ include "common.remove-old-chaindata" . | indent 6 }}
 {{ include "common.gsutil-sync-data-init-container" . | indent 6 }}
 {{ end }}
 {{ include "common.init-genesis-container" .  | indent 6 }}
