@@ -444,16 +444,19 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   args:
   - "-c"
   - |
-    lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
-    day=$(date +%s)
-    diff=$(($day - $lastBlockTimestamp))
-    # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
-    if [ "$diff" -gt 86400 ]; then
-      echo Chaindata is more than one day out of date. Wiping existing chaindata.
-      rm -rf /root/.celo/celo/chaindata
-    else
-      echo Chaindata is less than one day out of date. Using existing chaindata.
+    if [ -d /root/.celo/celo/chaindata ]; then
+      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      day=$(date +%s)
+      diff=$(($day - $lastBlockTimestamp))
+      # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
+      if [ "$diff" -gt 86400 ]; then
+        echo Chaindata is more than one day out of date. Wiping existing chaindata.
+        rm -rf /root/.celo/celo/chaindata
+      else
+        echo Chaindata is less than one day out of date. Using existing chaindata.
+      fi
     fi
+    echo No chaindata at all.
   volumeMounts:
   - name: data
     mountPath: /root/.celo
