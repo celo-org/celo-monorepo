@@ -48,7 +48,7 @@ export const Counters = {
     help: 'Counter for the number of requests in which the account is verified',
   }),
   requestsWithUnverifiedAccountWithMinBalance: new Counter({
-    name: 'requests_with_verified_account_with_min_balance',
+    name: 'requests_with_unverified_account_with_min_balance',
     help:
       'Counter for the number of requests in which the account is not verified but meets min balance',
   }),

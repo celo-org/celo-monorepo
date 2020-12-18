@@ -223,6 +223,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -263,6 +264,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -478,6 +480,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -518,6 +521,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -733,6 +737,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -773,6 +778,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }

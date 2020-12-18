@@ -221,6 +221,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -296,6 +297,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -341,6 +343,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -623,6 +626,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -698,6 +702,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -743,6 +748,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -1025,6 +1031,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -1100,6 +1107,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -1145,6 +1153,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }

@@ -159,6 +159,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -340,6 +341,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -559,6 +561,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -740,6 +743,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

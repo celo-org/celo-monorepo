@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 // Note: we're NOT using Animated from 'react-native-reanimated'
 // because it currently has a glitch on Android and is 1 frame behind
 // when swiping quickly
-import { Animated, StyleSheet, View } from 'react-native'
+import { Animated, ScrollView, StyleSheet, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import KeepAwake from 'react-native-keep-awake'
 import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -109,7 +109,10 @@ export default function VerificationLoadingScreen({ route }: Props) {
   }
 
   const onPressLearnMore = () => {
-    scrollViewRef.current?.getNode().scrollToEnd({ animated: true })
+    const scrollView = scrollViewRef.current
+    if (scrollView) {
+      scrollView.scrollToEnd({ animated: true })
+    }
   }
 
   const items: CarouselItem[] = [
@@ -132,7 +135,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
   ]
 
   const [contentHeight, setContentHeight] = useState(0)
-  const scrollViewRef = useRef<typeof Animated.ScrollView>(null)
+  const scrollViewRef = useRef<ScrollView>(null)
   const { height: viewportHeight } = useSafeAreaFrame()
   const safeAreaInsets = useSafeAreaInsets()
 
@@ -205,7 +208,6 @@ export default function VerificationLoadingScreen({ route }: Props) {
         <CancelButton onCancel={onCancel} />
       </SafeAreaView>
       <Animated.ScrollView
-        // @ts-ignore This works fine ;)
         ref={scrollViewRef}
         onScroll={onScroll}
         scrollEventThrottle={16}

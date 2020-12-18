@@ -15,6 +15,7 @@ exports[`DelayButton renders button with text when backup not completed and not 
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackgroundBorderless",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
