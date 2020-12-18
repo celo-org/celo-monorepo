@@ -80,5 +80,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
     >(CeloContractName.ReserveSpenderMultiSig, artifacts)
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
+
+    // await reserve.addExchangeSpender(exchange?)
   }
 )
