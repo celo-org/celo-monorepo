@@ -151,7 +151,8 @@ jobs:
       - run:
           name: Build packages
           command: |
-            yarn build --ignore docs
+            # Limit concurrency to avoid ENOMEM in CI :(
+            yarn build --concurrency 2 --ignore docs
 
       - run:
           name: Check licenses
