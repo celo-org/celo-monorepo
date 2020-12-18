@@ -61,6 +61,12 @@
     "location": "packages/docs",
     "dependencies": []
   },
+  "@celo/donut-tests": {
+    "location": "packages/donut-tests",
+    "dependencies": [
+      "@celo/protocol"
+    ]
+  },
   "@celo/env-tests": {
     "location": "packages/env-tests",
     "dependencies": [
