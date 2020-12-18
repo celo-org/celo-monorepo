@@ -33,7 +33,6 @@
   "edit": "Editar",
   "paste": "Pegar",
   "receivedPayment": "Pago recibido",
-  "readOnlyState": "Modo de solo lectura: crea la clave de cuenta para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",
   "manageCeloDollars": "Administrar {{CeloDollars}}",
   "sendCeloDollars": "Enviar {{CeloDollars}}",
