@@ -29,46 +29,28 @@ exports[`renders correctly with backup completed 1`] = `
             }
           }
         >
-          <View
+          <Text
             style={
               Object {
-                "flexDirection": "column",
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Jost-Medium",
-                  "fontSize": 22,
-                  "lineHeight": 28,
-                  "marginBottom": 16,
-                }
-              }
-            >
-              writeDownKey
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 16,
-                }
-              }
-            >
-              yourAccountKey
-            </Text>
-          </View>
+            yourAccountKey
+          </Text>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
               "backgroundColor": "#F1F0EB",
+              "borderColor": "#2E3338",
               "borderRadius": 4,
+              "borderWidth": 1,
               "justifyContent": "center",
               "marginTop": 8,
               "padding": 16,
@@ -123,46 +105,28 @@ exports[`renders correctly with backup not completed 1`] = `
             }
           }
         >
-          <View
+          <Text
             style={
               Object {
-                "flexDirection": "column",
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Jost-Medium",
-                  "fontSize": 22,
-                  "lineHeight": 28,
-                  "marginBottom": 16,
-                }
-              }
-            >
-              writeDownKey
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 16,
-                }
-              }
-            >
-              yourAccountKey
-            </Text>
-          </View>
+            yourAccountKey
+          </Text>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
               "backgroundColor": "#F1F0EB",
+              "borderColor": "#2E3338",
               "borderRadius": 4,
+              "borderWidth": 1,
               "justifyContent": "center",
               "marginTop": 8,
               "padding": 16,
@@ -322,46 +286,28 @@ exports[`still renders when mnemonic doesnt show up 1`] = `
             }
           }
         >
-          <View
+          <Text
             style={
               Object {
-                "flexDirection": "column",
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Jost-Medium",
-                  "fontSize": 22,
-                  "lineHeight": 28,
-                  "marginBottom": 16,
-                }
-              }
-            >
-              writeDownKey
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 16,
-                }
-              }
-            >
-              yourAccountKey
-            </Text>
-          </View>
+            yourAccountKey
+          </Text>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
               "backgroundColor": "#F1F0EB",
+              "borderColor": "#2E3338",
               "borderRadius": 4,
+              "borderWidth": 1,
               "justifyContent": "center",
               "marginTop": 8,
               "padding": 16,
