@@ -9,6 +9,19 @@ In this documentation you’ll find information on:
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
+## Quick Reference
+
+- CELO Owners
+  - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
+- Validator & Node Operators
+  - Check out the [Validator overview page](validator-guide/overview.md).
+  - Consider running a node on the [Baklava testnet](getting-started/baklava-testnet.md) before getting started on Mainnet.
+  - Learn more about running nodes on [Mainnet](getting-started/mainnet.md).
+- Developers
+  - Start at the [developer tools page](developer-resources/overview.md) for help building a DApp or service on the Celo network.
+- Integration Guide
+  - [This section](developer-resources/integrations/integrations.md) includes guides on common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
+
 ### About Celo
 
 Celo’s purpose is to empower anyone with a smartphone anywhere in the world to have access to financial services, send money to phone numbers, and pay merchants.

@@ -1,13 +1,15 @@
 import { normalizeAddressWith0x } from '@celo/base'
 import { Err, Ok } from '@celo/base/lib/result'
+import { Connection } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
-import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import Web3 from 'web3'
 import { ActionTypes } from './actions'
 import { AuthenticationFailed, KomenciErrorTypes, ServiceUnavailable, Unauthorised } from './errors'
 import { KomenciKit, KomenciOptionsInput } from './kit'
 
 jest.mock('@celo/contractkit')
+jest.mock('@celo/connect')
 jest.mock('./verifyWallet', () => ({
   verifyWallet: () => Promise.resolve(Ok(true)),
 }))
@@ -20,10 +22,12 @@ const ODIS_PUB_KEY =
   '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
+// @ts-ignore mocked by jest
+contractKit.connection = new Connection()
 // @ts-ignore
-contractKit.web3 = { eth: { sign: jest.fn() } }
+contractKit.connection.web3 = { eth: { sign: jest.fn() } }
 
-jest.mock('@celo/contractkit/lib/identity/odis/bls-blinding-client', () => {
+jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
   class WasmBlsBlindingClient {
     blindMessage = (m: string) => m
@@ -58,13 +62,15 @@ describe('KomenciKit', () => {
       // @ts-ignore
       expect(kit.options).toMatchObject(defaults)
       // @ts-ignore
-      expect(kit.client.url).toEqual(defaults.url)
+      expect(kit.client.callbackUrl).toEqual(defaults.url)
     })
   })
 
   describe('startSession', () => {
     beforeEach(() => {
-      jest.spyOn(contractKit, 'signTypedData').mockResolvedValue({ v: 0, r: '0x0', s: '0x0' })
+      contractKit.connection.signTypedData = jest
+        .fn()
+        .mockResolvedValue({ v: 0, r: '0x0', s: '0x0' })
     })
 
     it('constructs the payload and calls exec', async () => {
@@ -119,11 +125,17 @@ describe('KomenciKit', () => {
     describe('when the request succeeds', () => {
       it('records the token and returns Ok', async () => {
         const kit = kitWithOptions()
-        jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Ok({ token: 'komenci-token' }))
+        jest
+          .spyOn((kit as any).client, 'exec')
+          .mockResolvedValue(Ok({ token: 'komenci-token', callbackUrl: 'https://updatedCallback' }))
         const setTokenSpy = jest.spyOn((kit as any).client, 'setToken')
+        const setCallbackUrlSpy = jest.spyOn((kit as any).client, 'setCallbackUrl')
 
-        await expect(kit.startSession('captcha-token')).resolves.toEqual(Ok('komenci-token'))
+        await expect(kit.startSession('captcha-token')).resolves.toEqual(
+          Ok({ token: 'komenci-token', callbackUrl: 'https://updatedCallback' })
+        )
         expect(setTokenSpy).toHaveBeenCalledWith('komenci-token')
+        expect(setCallbackUrlSpy).toHaveBeenCalledWith('https://updatedCallback')
       })
     })
   })

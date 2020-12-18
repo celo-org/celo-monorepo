@@ -17,5 +17,16 @@
   "inviteFriendsToCelo": "Invitar amigos a {{appName}}",
   "inviteAnyone": "Envía fácilmente a tus amigos agregando tus contactos",
   "inviteReceived": "Invitación recibida",
-  "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)"
+  "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)",
+  "inviteDialog": {
+    "title": "Invita a un amigo",
+    "body": "Conecta y comparte valor con tus amigos y familia en {{appName}}.",
+    "button": "Invitar"
+  },
+  "sendAndInvite": "Envía e invita",
+  "inviteAndSendDialog": {
+    "title": "Invita y envía",
+    "body": "Tu pago estará esperando hasta que {{name}} verifique su número de teléfono. ¡Envíale una invitación para que se registre en {{appName}} y reciba tu pago!",
+    "button": "Invitar"
+  }
 }

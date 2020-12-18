@@ -76,15 +76,15 @@ Or use the `WasmBlsBlindingClient` if your runtime environment supports Web Asse
 const blsBlindingClient = new WasmBlsBlindingClient(odisPubKey)
 ```
 
-Now you're ready to get the phone number identifier. `OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier` [documentation can be found here](./reference/modules/_identity_odis_phone_number_identifier_.md#getphonenumberidentifier).
+Now you're ready to get the phone number identifier. `OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier` [documentation can be found here](../identity/reference/modules/_odis_phone_number_identifier_.md#getphonenumberidentifier).
 
-The response will be [an object](./reference/interfaces/_identity_odis_phone_number_identifier_.phonenumberhashdetails.md) with the original phone number, the on-chain identifier (phoneHash), and the phone number's pepper.
+The response will be [an object](../identity/reference/interfaces/_odis_phone_number_identifier_.phonenumberhashdetails.md) with the original phone number, the on-chain identifier (phoneHash), and the phone number's pepper.
 
 You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/identity/privateHashing.ts).
 
 ## Matchmaking
 
-Instead of querying for all the user's contact's peppers and consuming the user's quota, it's recommended to only query the pepper before it's actually used (ex. just before sending funds). However, sometimes it's helpful to let your users know that they have contacts already using the Celo network. To do this, you can make use of the matchmaking interface. Given two phone numbers, it will let you know whether the other party has also registered on the Celo network with this identifier. `OdisUtils.Matchmaking.getContactMatches` [documentation can be found here](./reference/modules/_identity_odis_matchmaking_.md#getcontactmatches).
+Instead of querying for all the user's contact's peppers and consuming the user's quota, it's recommended to only query the pepper before it's actually used (ex. just before sending funds). However, sometimes it's helpful to let your users know that they have contacts already using the Celo network. To do this, you can make use of the matchmaking interface. Given two phone numbers, it will let you know whether the other party has also registered on the Celo network with this identifier. `OdisUtils.Matchmaking.getContactMatches` [documentation can be found here](reference/modules/_identity_claims_account_.md).
 
 The response will be a subset of the input `e164NumberContacts` that are matched by the matchmaking service.
 

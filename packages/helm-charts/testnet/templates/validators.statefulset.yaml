@@ -160,7 +160,7 @@ spec:
           ACCOUNT_ADDRESS=$(cat /root/.celo/address)
           RID=$(cat /root/.celo/replica_id)
 
-          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
@@ -267,6 +267,7 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      terminationGracePeriodSeconds: 120 # 2 mins
       volumes:
       - name: data
         emptyDir: {}

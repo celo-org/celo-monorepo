@@ -1,13 +1,15 @@
-import { LocalCommand } from '../../base'
+import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { readConfig } from '../../utils/config'
 
-export default class Get extends LocalCommand {
+export default class Get extends BaseCommand {
   static description = 'Output network node configuration'
 
   static flags = {
-    ...LocalCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
+
+  requireSynced = false
 
   async run() {
     printValueMap(readConfig(this.config.configDir))

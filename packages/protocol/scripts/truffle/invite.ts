@@ -6,7 +6,7 @@ import {
   sendEscrowedPayment,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
-import * as twilio from 'twilio'
+import twilio from 'twilio'
 import { AttestationsInstance, EscrowInstance, GoldTokenInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
 

@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import * as React from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { HomeEvents } from 'src/analytics/Events'
@@ -94,6 +94,7 @@ export function TransferFeedItem(props: Props) {
     timestamp,
     invitees
   )
+  const imageUrl = addressToDisplayName[address]?.imageUrl ?? null
 
   return (
     <TransactionFeedItem
@@ -101,7 +102,9 @@ export function TransferFeedItem(props: Props) {
       amount={amount}
       title={title}
       info={info}
-      icon={<TransferFeedIcon type={type} recipient={recipient} address={address} />}
+      icon={
+        <TransferFeedIcon type={type} recipient={recipient} address={address} imageUrl={imageUrl} />
+      }
       timestamp={timestamp}
       status={status}
       onPress={onPress}

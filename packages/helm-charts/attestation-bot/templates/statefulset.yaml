@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
     component: attestation-bot
 spec:
+  serviceName: attestation-bot
   podManagementPolicy: Parallel
   replicas: 1
   selector:
@@ -60,11 +61,6 @@ spec:
             secretKeyRef:
               name: {{ .Values.environment }}-attestation-bot-secrets
               key: twilioAuthToken
-        - name: TWILIO_ADDRESS_SID
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.environment }}-attestation-bot-secrets
-              key: twilioAddressSid
       volumes:
       - name: data
         emptyDir: {}

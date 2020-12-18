@@ -16,6 +16,7 @@ Contract for handling reserve for stable currencies
 
 ### Properties
 
+* [dailySpendingRatio](_wrappers_reserve_.reservewrapper.md#dailyspendingratio)
 * [eventTypes](_wrappers_reserve_.reservewrapper.md#eventtypes)
 * [events](_wrappers_reserve_.reservewrapper.md#events)
 * [frozenReserveGoldDays](_wrappers_reserve_.reservewrapper.md#frozenreservegolddays)
@@ -48,7 +49,7 @@ Contract for handling reserve for stable currencies
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L25)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L26)*
 
 **Parameters:**
 
@@ -61,18 +62,38 @@ Name | Type |
 
 ## Properties
 
+###  dailySpendingRatio
+
+• **dailySpendingRatio**: *function* = proxyCall(
+    this.contract.methods.getDailySpendingRatio,
+    undefined,
+    fixidityValueToBigNumber
+  )
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L33)*
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
 ###  eventTypes
 
-• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
+• **eventTypes**: *EventsEnum‹T›* = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L41)*
-
-#### Type declaration:
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 ___
 
@@ -82,7 +103,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -94,7 +115,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L41)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:51](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L51)*
 
 #### Type declaration:
 
@@ -116,7 +137,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L31)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L41)*
 
 #### Type declaration:
 
@@ -138,7 +159,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L36)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L46)*
 
 #### Type declaration:
 
@@ -156,11 +177,11 @@ ___
 
 • **getOrComputeTobinTax**: *function* = proxySend(this.kit, this.contract.methods.getOrComputeTobinTax)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L30)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L40)*
 
 #### Type declaration:
 
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
@@ -174,7 +195,7 @@ ___
 
 • **getOtherReserveAddresses**: *function* = proxyCall(this.contract.methods.getOtherReserveAddresses)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L51)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L61)*
 
 #### Type declaration:
 
@@ -196,7 +217,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L46)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:56](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L56)*
 
 #### Type declaration:
 
@@ -214,7 +235,7 @@ ___
 
 • **isOtherReserveAddress**: *function* = proxyCall(this.contract.methods.isOtherReserveAddress)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L66)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:76](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L76)*
 
 #### Type declaration:
 
@@ -232,7 +253,7 @@ ___
 
 • **isSpender**: *function* = proxyCall(this.contract.methods.isSpender)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L28)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:38](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L38)*
 
 #### Type declaration:
 
@@ -248,12 +269,14 @@ ___
 
 ###  methodIds
 
-• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+• **methodIds**: *Record‹keyof T["methods"], string›* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
     (acc, method: Methods<T>) => {
       const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
 
       acc[method] =
-        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+        methodABI === undefined
+          ? '0x'
+          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
 
       return acc
     },
@@ -262,9 +285,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L46)*
-
-#### Type declaration:
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L46)*
 
 ___
 
@@ -276,7 +297,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L23)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L28)*
 
 Query Tobin tax staleness threshold parameter.
 
@@ -298,11 +319,11 @@ ___
 
 • **transferGold**: *function* = proxySend(this.kit, this.contract.methods.transferGold)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L29)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L39)*
 
 #### Type declaration:
 
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
@@ -318,7 +339,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
 
 Contract address
 
@@ -330,7 +351,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L56)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:66](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L66)*
 
 Returns current configuration parameters.
 
@@ -344,7 +365,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
@@ -361,8 +382,8 @@ ___
 
 ###  getSpenders
 
-▸ **getSpenders**(): *Promise‹[Address](../modules/_base_.md#address)[]›*
+▸ **getSpenders**(): *Promise‹Address[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L68)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L78)*
 
-**Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
+**Returns:** *Promise‹Address[]›*

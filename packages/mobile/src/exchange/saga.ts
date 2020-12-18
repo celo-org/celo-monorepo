@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/connect'
 import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
@@ -6,7 +6,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { CELO_AMOUNT_FOR_ESTIMATE, DOLLAR_AMOUNT_FOR_ESTIMATE } from '@celo/utils/src/celoHistory'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showError, showErrorOrFallback } from 'src/alert/actions'
 import { CeloExchangeEvents, FeeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -19,6 +19,7 @@ import {
   setExchangeRate,
   setTobinTax,
   WithdrawCeloAction,
+  withdrawCeloCanceled,
   withdrawCeloFailed,
   withdrawCeloSuccess,
 } from 'src/exchange/actions'
@@ -167,9 +168,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of token ${makerToken}`)
   let context: TransactionContext | null = null
   try {
-    navigate(Screens.ExchangeHomeScreen) // Must navigate to final screen before getting unlocked account which prompts pin
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_start)
     const account: string = yield call(getConnectedUnlockedAccount)
+    navigate(Screens.ExchangeHomeScreen)
+
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
     if (!exchangeRate) {
@@ -187,7 +189,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       throw new Error('Invalid exchange rate')
     }
 
-    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate, account)
+    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate)
 
     const contractKit = yield call(getContractKit)
 
@@ -337,19 +339,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       yield put(removeStandbyTransaction(context.id))
     }
 
-    if (error.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.EXCHANGE_FAILED))
-    }
+    yield put(showErrorOrFallback(error, ErrorMessages.EXCHANGE_FAILED))
   }
 }
 
 function* createStandbyTx(
   makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber,
-  exchangeRate: BigNumber,
-  account: string
+  exchangeRate: BigNumber
 ) {
   const takerAmount = getTakerAmount(makerAmount, exchangeRate)
   const context = newTransactionContext(TAG, `Exchange ${makerToken}`)
@@ -378,13 +375,13 @@ function* celoToDollarAmount(amount: BigNumber) {
   return goldToDollarAmount(amount, exchangeRate) || new BigNumber(0)
 }
 
-function* withdrawCelo(action: WithdrawCeloAction) {
+export function* withdrawCelo(action: WithdrawCeloAction) {
   let context: TransactionContext | null = null
   try {
-    const { recipientAddress, amount } = action
+    const { recipientAddress, amount, isCashOut } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
-    navigate(Screens.ExchangeHomeScreen)
+    navigate(isCashOut ? Screens.WalletHome : Screens.ExchangeHomeScreen)
 
     context = newTransactionContext(TAG, 'Withdraw CELO')
     yield put(
@@ -429,6 +426,11 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     })
   } catch (error) {
     Logger.error(TAG, 'Error withdrawing CELO', error)
+
+    if (error.message === ErrorMessages.PIN_INPUT_CANCELED) {
+      yield put(withdrawCeloCanceled())
+      return
+    }
 
     const errorToShow =
       error.message === ErrorMessages.INCORRECT_PIN

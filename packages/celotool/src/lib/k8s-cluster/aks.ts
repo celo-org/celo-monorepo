@@ -2,13 +2,14 @@ import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
-export interface AKSClusterConfig extends BaseClusterConfig {
+export interface AksClusterConfig extends BaseClusterConfig {
   tenantId: string
   resourceGroup: string
   subscriptionId: string
+  regionName: string
 }
 
-export class AKSClusterManager extends BaseClusterManager {
+export class AksClusterManager extends BaseClusterManager {
   async switchToSubscription() {
     let currentTenantId = null
     try {
@@ -43,15 +44,19 @@ export class AKSClusterManager extends BaseClusterManager {
       `aad-pod-identity exists, skipping install`
     )
     if (!aadPodIdentityExists) {
+      console.info('Adding aad-pod-identity helm repository to local helm')
+      await execCmdWithExitOnFailure(
+        `helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts`
+      )
       console.info('Installing aad-pod-identity')
       await execCmdWithExitOnFailure(
-        `helm install aad-pod-identity ../helm-charts/aad-pod-identity`
+        `helm install aad-pod-identity aad-pod-identity/aad-pod-identity`
       )
     }
   }
 
-  get clusterConfig(): AKSClusterConfig {
-    return this._clusterConfig as AKSClusterConfig
+  get clusterConfig(): AksClusterConfig {
+    return this._clusterConfig as AksClusterConfig
   }
 
   get kubernetesContextName(): string {

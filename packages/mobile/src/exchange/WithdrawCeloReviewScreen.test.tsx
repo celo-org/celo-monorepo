@@ -15,6 +15,7 @@ const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloReviewScreen
   recipientAddress: SAMPLE_ADDRESS,
   amount: SAMPLE_AMOUNT,
   feeEstimate: new BigNumber(1),
+  isCashOut: false,
 })
 
 const store = createMockStore()
@@ -42,6 +43,7 @@ describe('WithdrawCeloReviewScreen', () => {
         type: Actions.WITHDRAW_CELO,
         amount: SAMPLE_AMOUNT,
         recipientAddress: SAMPLE_ADDRESS,
+        isCashOut: false,
       },
     ])
   })

@@ -114,6 +114,7 @@ export const reducer = (
           ...persisted.history,
         },
         exchangeRatePair: initialState.exchangeRatePair,
+        isLoading: false,
       }
     }
 
@@ -142,6 +143,7 @@ export const reducer = (
         ...state,
         isLoading: false,
       }
+    case Actions.WITHDRAW_CELO_CANCELED:
     case Actions.WITHDRAW_CELO_FAILED:
       return {
         ...state,

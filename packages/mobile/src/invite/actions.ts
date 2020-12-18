@@ -11,9 +11,6 @@ export enum Actions {
   REDEEM_INVITE = 'INVITE/REDEEM_INVITE',
   REDEEM_INVITE_SUCCESS = 'INVITE/REDEEM_INVITE_SUCCESS',
   REDEEM_INVITE_FAILURE = 'INVITE/REDEEM_INVITE_FAILURE',
-  SKIP_INVITE = 'INVITE/SKIP_INVITE',
-  SKIP_INVITE_SUCCESS = 'INVITE/SKIP_INVITE_SUCCESS',
-  SKIP_INVITE_FAILURE = 'INVITE/SKIP_INVITE_FAILURE',
 }
 
 export interface InviteDetails {
@@ -106,30 +103,6 @@ export const redeemInviteFailure = (): RedeemInviteFailureAction => ({
   type: Actions.REDEEM_INVITE_FAILURE,
 })
 
-export interface SkipInviteAction {
-  type: Actions.SKIP_INVITE
-}
-
-export const skipInvite = (): SkipInviteAction => ({
-  type: Actions.SKIP_INVITE,
-})
-
-export interface SkipInviteSuccessAction {
-  type: Actions.SKIP_INVITE_SUCCESS
-}
-
-export const skipInviteSuccess = (): SkipInviteSuccessAction => ({
-  type: Actions.SKIP_INVITE_SUCCESS,
-})
-
-export interface SkipInviteFailureAction {
-  type: Actions.SKIP_INVITE_FAILURE
-}
-
-export const skipInviteFailure = (): SkipInviteFailureAction => ({
-  type: Actions.SKIP_INVITE_FAILURE,
-})
-
 export type ActionTypes =
   | StoreInviteeDataAction
   | SendInviteAction
@@ -138,6 +111,3 @@ export type ActionTypes =
   | RedeemInviteFailureAction
   | SendInviteFailureAction
   | SendInviteSuccessAction
-  | SkipInviteAction
-  | SkipInviteSuccessAction
-  | SkipInviteFailureAction

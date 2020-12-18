@@ -7,6 +7,7 @@ export default class Reports extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   static args = [
@@ -33,7 +34,7 @@ export default class Reports extends BaseCommand {
         rate: { get: (r) => r.rate.toNumber() },
         timestamp: { get: (r) => r.timestamp.toNumber() },
       },
-      { 'no-truncate': !res.flags.truncate }
+      res.flags
     )
   }
 }

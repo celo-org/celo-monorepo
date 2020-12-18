@@ -5,7 +5,7 @@
     "step3": "Conveniente, confiable y seguro. Tu teléfono es tu billetera"
   },
   "welcome": {
-    "title": "Comparta dinero con aquellos que valora",
+    "title": "Comparte dinero con quienes valoras",
     "createAccount": "Crear una cuenta",
     "restoreAccount": "Tengo una cuenta"
   },
@@ -28,7 +28,7 @@
   "selectCountryCode": "Seleccionar código de país",
   "pincodeSet": {
     "create": "Crea un PIN",
-    "verify": "Ingrese el PIN nuevamente",
+    "verify": "Ingresa el PIN nuevamente",
     "pinsDontMatch": "Los PIN no coinciden",
     "invalidPin": "Por favor use un PIN más fuerte"
   },
@@ -44,7 +44,7 @@
   },
   "verificationEducation": {
     "title": "Número de Teléfono",
-    "header": "Conectá tu número de teléfono",
+    "header": "Conecta tu número de teléfono",
     "body": "Para asegurarnos de que tu número sea realmente tuyo, te enviaremos tres mensajes de texto que costarán alrededor de 0.05 cUSD cada uno.\n\nConfirmar tu número tomará unos tres minutos.",
     "feelessBody": "Confirmar tu número tomará unos tres minutos. Para confirmar tu número, recibirás tres mensajes.",
     "start": "Comenzar",
@@ -72,8 +72,8 @@
   },
   "verificationInput": {
     "title": "Confirmar",
-    "body": "We sent you three messages (SMS). Please copy and paste them below.",
-    "body_ios": "Te enviamos tres mensajes (SMS). Cópielos y péguelos a continuación.",
+    "body": "Te enviamos tres mensajes de texto (SMS). Por favor copia y pégualos abajo.",
+    "body_ios": "Te enviamos tres mensajes de texto (SMS). Por favor presiona el link en cada mensaje para completar los códigos a continuación o cópialos y pégalos manualmente.",
     "codeLabel1": "Primer código",
     "codeLabel2": "Segundo código",
     "codeLabel3": "Tercer código",
@@ -93,7 +93,7 @@
     "title": "Ayuda",
     "bodySection1": {
       "title": "¿Recibió los tres mensajes?",
-      "content": "Si tus mensajes contienen un enlace, simplemente toque los enlaces para confirmar.\n\nSi no hay enlaces, copia y pega los mensajes en los campos. Puedes pegar todo el mensaje."
+      "content": "Si tus mensajes contienen un enlace, simplemente toca los enlaces para confirmar.\n\nSi no hay enlaces, copia y pega los mensajes en los campos. Puedes pegar todo el mensaje."
     },
     "bodySection2": {
       "title": "¿Faltan algunos o todos los mensajes?",

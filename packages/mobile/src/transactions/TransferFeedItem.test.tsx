@@ -429,7 +429,9 @@ describe('transfer feed item renders correctly', () => {
         store={createMockStore({
           identity: {
             addressToDisplayName: {
-              [mockAccount]: contactName,
+              [mockAccount]: {
+                name: contactName,
+              },
             },
           },
         })}
@@ -447,7 +449,9 @@ describe('transfer feed item renders correctly', () => {
         store={createMockStore({
           identity: {
             addressToDisplayName: {
-              [mockAccount2]: contactName,
+              [mockAccount2]: {
+                name: contactName,
+              },
             },
           },
         })}

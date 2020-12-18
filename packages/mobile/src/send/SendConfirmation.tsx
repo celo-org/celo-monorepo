@@ -29,6 +29,7 @@ import CalculateFee, {
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
+import { features } from 'src/flags'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
 import { fetchDataEncryptionKey } from 'src/identity/actions'
@@ -39,6 +40,7 @@ import {
 } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
+import InviteAndSendModal from 'src/invite/InviteAndSendModal'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
@@ -190,6 +192,11 @@ function SendConfirmation(props: Props) {
     setModalVisible(false)
   }
 
+  const sendInvite = () => {
+    setModalVisible(false)
+    sendOrInvite()
+  }
+
   const sendWhatsApp = () => {
     setModalVisible(false)
     sendOrInvite(InviteBy.WhatsApp)
@@ -222,6 +229,8 @@ function SendConfirmation(props: Props) {
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
 
+    const { displayName, e164PhoneNumber } = transactionData.recipient
+
     const subtotalAmount = {
       value: amount || inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
@@ -237,7 +246,7 @@ function SendConfirmation(props: Props) {
     } else {
       primaryBtnInfo = {
         action: onSendClick,
-        text: t('global:send'),
+        text: isInvite ? t('inviteFlow11:sendAndInvite') : t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
     }
@@ -247,7 +256,7 @@ function SendConfirmation(props: Props) {
     const FeeContainer = () => {
       let securityFee
       let dekFee
-      if (isInvite && fee) {
+      if (isInvite && fee && !features.KOMENCI) {
         // 'fee' already contains the invitation fee for invites
         // so we adjust it here
         securityFee = fee.minus(inviteFee)
@@ -274,7 +283,7 @@ function SendConfirmation(props: Props) {
             isEstimate={true}
             currency={CURRENCY_ENUM.DOLLAR}
             inviteFee={inviteFee}
-            isInvite={isInvite}
+            isInvite={isInvite && !features.KOMENCI}
             securityFee={securityFee}
             showDekfee={!isDekRegistered}
             dekFee={dekFee}
@@ -359,12 +368,22 @@ function SendConfirmation(props: Props) {
               />
             )}
           </View>
-          <InviteOptionsModal
-            isVisible={modalVisible}
-            onWhatsApp={sendWhatsApp}
-            onSMS={sendSMS}
-            onCancel={cancelModal}
-          />
+          {features.KOMENCI ? (
+            <InviteAndSendModal
+              isVisible={modalVisible}
+              // TODO: we should refactor name display, this is fragile, we shouldn't compare against the english string. Here and in other places!
+              name={!displayName || displayName === 'Mobile #' ? e164PhoneNumber! : displayName}
+              onInvite={sendInvite}
+              onCancel={cancelModal}
+            />
+          ) : (
+            <InviteOptionsModal
+              isVisible={modalVisible}
+              onWhatsApp={sendWhatsApp}
+              onSMS={sendSMS}
+              onCancel={cancelModal}
+            />
+          )}
           {/** Encryption warning dialog */}
           <Dialog
             title={t('encryption.warningModalHeader')}

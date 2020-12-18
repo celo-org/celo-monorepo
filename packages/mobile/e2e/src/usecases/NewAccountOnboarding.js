@@ -28,8 +28,9 @@ export default NewAccountOnboarding = () => {
     await enterPinUi()
     await enterPinUi()
 
-    // Skip invite code.
-    await element(by.id('ButtonSkip')).tap()
+    // Skip Phone Number verification
+    await element(by.id('VerificationEducationSkipHeader')).tap()
+    await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
 
     // Arrived to Home screen
     await expect(element(by.id('SendOrRequestBar'))).toBeVisible()

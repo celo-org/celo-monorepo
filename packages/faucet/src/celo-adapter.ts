@@ -1,5 +1,6 @@
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import Web3 from 'web3'
 
 export class CeloAdapter {
   public readonly defaultAddress: string
@@ -8,16 +9,15 @@ export class CeloAdapter {
 
   constructor({ pk, nodeUrl }: { pk: string; nodeUrl: string }) {
     // To add more logging:
-    // Uncomment when in need for debug
-    // injectDebugProvider(this.kit.web3)
+    // Use the debug of the contractkit. Run it with DEBUG=* (or the options)
 
-    this.kit = newKit(nodeUrl)
+    this.kit = newKitFromWeb3(new Web3(nodeUrl))
     console.info(`New kit from url: ${nodeUrl}`)
     this.privateKey = ensureLeading0x(pk)
     this.defaultAddress = privateKeyToAddress(this.privateKey)
     console.info(`Using address ${this.defaultAddress} to send transactions`)
-    this.kit.addAccount(this.privateKey)
-    this.kit.defaultAccount = this.defaultAddress
+    this.kit.connection.addAccount(this.privateKey)
+    this.kit.connection.defaultAccount = this.defaultAddress
   }
 
   async transferGold(to: string, amount: string) {
@@ -62,6 +62,6 @@ export class CeloAdapter {
   }
 
   stop() {
-    this.kit.stop()
+    this.kit.connection.stop()
   }
 }

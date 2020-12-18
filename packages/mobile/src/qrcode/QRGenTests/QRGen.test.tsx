@@ -40,6 +40,7 @@ describe('QRCode', () => {
       currencyCode: 'PHP',
       amount: '500',
       comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
+      token: undefined,
     }
     renderer.create(
       <QRCode value={urlFromUriData(data)} onError={onErrorMock} svgRef={{ current: null }} />

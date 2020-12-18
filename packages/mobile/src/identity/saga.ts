@@ -1,8 +1,10 @@
 import {
+  call,
   cancelled,
   put,
   select,
   spawn,
+  take,
   takeEvery,
   takeLatest,
   takeLeading,
@@ -11,14 +13,25 @@ import { showErrorInline } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { knownAddressesChannel } from 'src/firebase/firebase'
 import {
   Actions,
+  FetchVerificationState,
+  updateKnownAddresses,
   ValidateRecipientAddressAction,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
-import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
+import {
+  feelessFetchVerificationState,
+  feelessStartVerification,
+} from 'src/identity/feelessVerification'
+import {
+  AddressToDisplayNameType,
+  AddressValidationType,
+  e164NumberToAddressSelector,
+} from 'src/identity/reducer'
 import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
 import {
@@ -92,9 +105,35 @@ export function* validateRecipientAddressSaga({
   }
 }
 
+function* handleFetchVerificationState(action: FetchVerificationState) {
+  const { forceUnlockAccount } = action
+  yield call(fetchVerificationState, forceUnlockAccount)
+}
+
+function* fetchKnownAddresses() {
+  const addressesChannel = yield call(knownAddressesChannel)
+  if (!addressesChannel) {
+    return
+  }
+  try {
+    while (true) {
+      const addresses: AddressToDisplayNameType = yield take(addressesChannel)
+      yield put(updateKnownAddresses(addresses))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@fetchKnownAddresses`, error)
+  } finally {
+    if (yield cancelled()) {
+      addressesChannel.close()
+    }
+  }
+}
+
 function* watchVerification() {
-  yield takeLatest(Actions.FETCH_VERIFICATION_STATE, fetchVerificationState)
+  yield takeLeading(Actions.FETCH_VERIFICATION_STATE, handleFetchVerificationState)
+  yield takeLatest(Actions.FEELESS_FETCH_VERIFICATION_STATE, feelessFetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
+  yield takeLatest(Actions.FEELESS_START_VERIFICATION, feelessStartVerification)
   yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
 
@@ -128,6 +167,7 @@ export function* identitySaga() {
     yield spawn(watchNewFeedTransactions)
     yield spawn(watchFetchDataEncryptionKey)
     yield spawn(watchReportRevealStatus)
+    yield spawn(fetchKnownAddresses)
   } catch (error) {
     Logger.error(TAG, 'Error initializing identity sagas', error)
   } finally {

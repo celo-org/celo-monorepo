@@ -16,7 +16,7 @@ export const retry = <TArgs extends any[], TError extends RootError<any>>(
 ) => {
   return (
     target: any,
-    _propertyKey: string,
+    propertyKey: string,
     descriptor: TypedPropertyDescriptor<Retryable<TArgs, any, TError>>
   ) => {
     const actual = descriptor.value
@@ -51,6 +51,23 @@ export const retry = <TArgs extends any[], TError extends RootError<any>>(
 
         tries += 1
       }
+    }
+
+    return {
+      configurable: true,
+      get(this: Retryable<TArgs, any, TError>) {
+        if (!descriptor.value) {
+          throw Error('@retry used on an method which is undefined')
+        }
+        // @ts-ignore
+        const value = descriptor.value.bind(this)
+        Object.defineProperty(this, propertyKey, {
+          value,
+          configurable: true,
+          writable: true,
+        })
+        return value
+      },
     }
   }
 }

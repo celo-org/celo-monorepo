@@ -6,9 +6,15 @@ const buildTestInstanceWithOptions = <TArgs extends any[], TResult, TError exten
   implementation: Retryable<TArgs, TResult, TError>
 ) => {
   class TestClass {
+    someAttribute = 'test'
+
+    impl = (...args: TArgs): Promise<Result<TResult, TError>> => {
+      return implementation(...args)
+    }
+
     @retry(options)
     async testMethod(...args: TArgs): Promise<Result<TResult, TError>> {
-      return implementation(...args)
+      return this.impl(...args)
     }
   }
 
@@ -41,6 +47,22 @@ const returnFromList = <TResult, TError extends RootError<any>>(
 }
 
 describe('retry Decorator', () => {
+  describe('when called using call', () => {
+    it('works', async () => {
+      const impl = alwaysReturn(Ok(true))
+
+      const instance = buildTestInstanceWithOptions(
+        {
+          tries: 4,
+        },
+        impl
+      )
+      const fn = instance.testMethod
+
+      await expect(fn.call(null)).resolves.toEqual(Ok(true))
+      expect(impl).toHaveBeenCalledTimes(1)
+    })
+  })
   describe('options:tries', () => {
     describe('when the function fails all the time', () => {
       it('retries a given number of times then returns the error', async () => {

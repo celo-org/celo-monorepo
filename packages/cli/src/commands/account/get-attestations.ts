@@ -11,7 +11,7 @@ export default class GetAttestations extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     phoneNumber: flags.string({
-      required: true,
+      required: false,
       description: 'Phone number to check attestations for',
     }),
     from: flags.string({
@@ -22,6 +22,10 @@ export default class GetAttestations extends BaseCommand {
       required: false,
       description: 'ODIS phone number pepper',
     }),
+    identifier: flags.string({
+      required: false,
+      description: 'On-chain identifier',
+    }),
     network: flags.string({
       required: false,
       description: 'The ODIS service to hit: mainnet, alfajores, alfajoresstaging',
@@ -31,34 +35,42 @@ export default class GetAttestations extends BaseCommand {
   static examples = [
     'get-attestations --phoneNumber +15555555555 --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95',
     'get-attestations --phoneNumber +15555555555 --pepper XgnKVpplZc0p1',
+    'get-attestations --identifier 0x4952c9db9c283a62721b13f56c4b5e84a438e2569af3de21cb3440efa8840872',
   ]
 
   async run() {
     const res = this.parse(GetAttestations)
     const phoneNumber = res.flags.phoneNumber
     const account = res.flags.from
+    let identifier = res.flags.identifier
     let pepper = res.flags.pepper
-    if (!account && !pepper) {
-      console.error('Must specify either --from or --pepper')
+    if (!account && !pepper && !identifier) {
+      console.error('Must specify either --from or --pepper or --identifier')
       return
     }
     const network = res.flags.network
 
     const web3 = new Web3()
-
-    // Get Phone number pepper
-    // Needs a balance to perform query
-    if (!pepper) {
-      pepper = await this.getPhoneNumberPepper(this.kit, phoneNumber, account!, network)
-      console.log('Pepper: ' + pepper)
-    }
-
     const attestations = await this.kit.contracts.getAttestations()
-    const identifier = web3.utils.soliditySha3({
-      type: 'string',
-      value: 'tel://' + phoneNumber + '__' + pepper,
-    })
-    console.log(await attestations.lookupIdentifiers([identifier]))
+
+    if (!identifier) {
+      if (!phoneNumber) {
+        console.error('Must specify phoneNumber if identifier not provided')
+      }
+      // Get Phone number pepper
+      // Needs a balance to perform query
+      if (!pepper) {
+        pepper = await this.getPhoneNumberPepper(this.kit, phoneNumber!, account!, network)
+        console.log('Pepper: ' + pepper)
+      }
+
+      const computedIdentifier = web3.utils.soliditySha3({
+        type: 'string',
+        value: 'tel://' + phoneNumber + '__' + pepper,
+      })
+      identifier = computedIdentifier!
+    }
+    console.log(await attestations.lookupAccountsForIdentifier(identifier))
   }
 
   async getPhoneNumberPepper(

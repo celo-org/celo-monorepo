@@ -1,7 +1,8 @@
-import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { BlockHeader } from '@celo/connect'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { UnlockableWallet } from '@celo/wallet-base'
+import { RpcWalletErrors } from '@celo/wallet-rpc/src/rpc-wallet'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -19,7 +20,7 @@ import { deleteChainData, isProviderConnectionError } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getPasswordSaga } from 'src/pincode/authentication'
+import { CANCELLED_PIN_INPUT, getPasswordSaga } from 'src/pincode/authentication'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 import {
@@ -34,9 +35,8 @@ import {
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector, fornoSelector, mtwAddressSelector } from 'src/web3/selectors'
 import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
-import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
@@ -219,7 +219,10 @@ export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: strin
     try {
       yield call([wallet, wallet.addAccount], privateKey, password)
     } catch (e) {
-      if (e === RpcWalletErrors.AccountAlreadyExists) {
+      if (
+        e === RpcWalletErrors.AccountAlreadyExists ||
+        e === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS
+      ) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
       } else {
         Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
@@ -257,26 +260,37 @@ export function* getAccount() {
   }
 }
 
-export function* unlockAccount(account: string) {
+export enum UnlockResult {
+  SUCCESS,
+  FAILURE,
+  CANCELED,
+}
+
+export function* unlockAccount(account: string, force: boolean = false) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
+
   const wallet: UnlockableWallet = yield call(getWallet)
-  if (wallet.isAccountUnlocked(account)) {
-    return true
+  if (!force && wallet.isAccountUnlocked(account)) {
+    return UnlockResult.SUCCESS
   }
 
   try {
     const password: string = yield call(getPasswordSaga, account)
+
     const result = yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
     if (!result) {
       throw new Error('Unlock account result false')
     }
 
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
-    return true
+    return UnlockResult.SUCCESS
   } catch (error) {
+    if (error === CANCELLED_PIN_INPUT) {
+      return UnlockResult.CANCELED
+    }
     Logger.error(TAG + '@unlockAccount', 'Account unlock failed, clearing password caches', error)
     clearPasswordCaches()
-    return false
+    return UnlockResult.FAILURE
   }
 }
 
@@ -290,12 +304,26 @@ export function* getConnectedAccount() {
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)
-  const success: boolean = yield call(unlockAccount, account)
-  if (success) {
+  const result: UnlockResult = yield call(unlockAccount, account)
+  if (result === UnlockResult.SUCCESS) {
     return account
   } else {
-    throw new Error(ErrorMessages.INCORRECT_PIN)
+    throw new Error(
+      result === UnlockResult.FAILURE
+        ? ErrorMessages.INCORRECT_PIN
+        : ErrorMessages.PIN_INPUT_CANCELED
+    )
   }
+}
+
+// This will return MTW if there is one and the EOA if
+// there isn't. Eventually need to change naming convention
+// used elsewhere that errouneously refers to the EOA
+// as `account`
+export function* getAccountAddress() {
+  const walletAddress: string = yield call(getAccount)
+  const mtwAddress: string | null = yield select(mtwAddressSelector)
+  return mtwAddress ?? walletAddress
 }
 
 export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {

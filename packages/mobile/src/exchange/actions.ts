@@ -14,6 +14,7 @@ export enum Actions {
   WITHDRAW_CELO = 'EXCHANGE/WITHDRAW_CELO',
   WITHDRAW_CELO_SUCCESS = 'EXCHANGE/WITHDRAW_CELO_SUCCESS',
   WITHDRAW_CELO_FAILED = 'EXCHANGE/WITHDRAW_CELO_FAILED',
+  WITHDRAW_CELO_CANCELED = 'EXCHANGE/WITHDRAW_CELO_CANCELED',
 }
 
 export interface FetchExchangeRateAction {
@@ -54,12 +55,17 @@ export interface WithdrawCeloAction {
   type: Actions.WITHDRAW_CELO
   amount: BigNumber
   recipientAddress: string
+  isCashOut: boolean
 }
 
 export interface WithdrawCeloFailureAction {
   type: Actions.WITHDRAW_CELO_FAILED
   idx: string | undefined
   error: ErrorMessages
+}
+
+export interface WithdrawCeloCanceledAction {
+  type: Actions.WITHDRAW_CELO_CANCELED
 }
 
 export interface WithdrawCeloSuccessAction {
@@ -109,10 +115,15 @@ export const exchangeTokens = (
   makerAmount,
 })
 
-export const withdrawCelo = (amount: BigNumber, recipientAddress: string): WithdrawCeloAction => ({
+export const withdrawCelo = (
+  amount: BigNumber,
+  recipientAddress: string,
+  isCashOut: boolean
+): WithdrawCeloAction => ({
   type: Actions.WITHDRAW_CELO,
   amount,
   recipientAddress,
+  isCashOut,
 })
 
 export const withdrawCeloFailed = (
@@ -122,6 +133,10 @@ export const withdrawCeloFailed = (
   type: Actions.WITHDRAW_CELO_FAILED,
   idx,
   error,
+})
+
+export const withdrawCeloCanceled = (): WithdrawCeloCanceledAction => ({
+  type: Actions.WITHDRAW_CELO_CANCELED,
 })
 
 export const withdrawCeloSuccess = (): WithdrawCeloSuccessAction => ({
@@ -135,4 +150,5 @@ export type ActionTypes =
   | UpdateCeloGoldExchangeRateHistory
   | WithdrawCeloAction
   | WithdrawCeloFailureAction
+  | WithdrawCeloCanceledAction
   | WithdrawCeloSuccessAction

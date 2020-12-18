@@ -47,9 +47,10 @@ rm -rf build/contracts
 yarn build
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
-
+cp migrationsConfig.js $BUILD_DIR/
 git checkout -
-yarn build
+cp $BUILD_DIR/migrationsConfig.js ./
+yarn build:ts
 
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \
@@ -58,3 +59,5 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --proposal $PROPOSAL \
   --truffle_override $TRUFFLE_OVERRIDE \
   --initialize_data $INITIALIZE_DATA $DRYRUN
+
+git checkout migrationsConfig.js

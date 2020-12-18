@@ -36,7 +36,15 @@ export function createMockContractKit(
     registry: {
       addressFor: async () => 1000,
     },
-    web3: mockWeb3 ? mockWeb3 : new Web3(),
+    connection: createMockConnection(mockWeb3),
+  }
+}
+
+export function createMockConnection(mockWeb3?: any) {
+  mockWeb3 = mockWeb3 ?? new Web3()
+  return {
+    web3: mockWeb3,
+    getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
   }
 }
 

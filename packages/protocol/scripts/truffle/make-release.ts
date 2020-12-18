@@ -1,6 +1,8 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
+import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
@@ -20,26 +22,6 @@ import { RegistryInstance } from 'types'
  *   --network alfajores --build_directory build/alfajores/ --report report.json \
  *   --initialize_data initialize_data.json --proposal proposal.json
  */
-
-class ContractDependencies {
-  dependencies: Map<string, string[]>
-  constructor(libraries: { [library: string]: string[] }) {
-    this.dependencies = new Map()
-    Object.keys(libraries).forEach((lib: string) => {
-      libraries[lib].forEach((contract: string) => {
-        if (this.dependencies.has(contract)) {
-          this.dependencies.get(contract).push(lib)
-        } else {
-          this.dependencies.set(contract, [lib])
-        }
-      })
-    })
-  }
-
-  public get = (contract: string): string[] => {
-    return this.dependencies.has(contract) ? this.dependencies.get(contract) : []
-  }
-}
 
 class ContractAddresses {
   static async create(contracts: string[], registry: RegistryInstance) {
@@ -71,6 +53,22 @@ class ContractAddresses {
 }
 
 const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
+
+const isProxiedContract = (contractName: string) => {
+  if (contractName.endsWith('Proxy')) {
+    return false
+  }
+
+  try {
+    artifacts.require(`${contractName}Proxy`)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+const isCoreContract = (contractName: string) =>
+  Object.keys(CeloContractName).includes(contractName)
 
 const deployImplementation = async (
   contractName: string,
@@ -132,7 +130,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const fullReport = readJsonSync(argv.report)
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
-    const dependencies = new ContractDependencies(linkedLibraries)
+    const dependencies = getCeloContractDependencies()
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
     )
@@ -210,7 +208,9 @@ module.exports = async (callback: (error?: any) => number) => {
       }
     }
     for (const contractName of contracts) {
-      await release(contractName)
+      if (isCoreContract(contractName) && isProxiedContract(contractName)) {
+        await release(contractName)
+      }
     }
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()

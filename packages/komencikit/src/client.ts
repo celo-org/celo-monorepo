@@ -1,7 +1,6 @@
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import 'cross-fetch/polyfill'
 import { isRight } from 'fp-ts/Either'
-
 import { Action } from './actions'
 import {
   FetchError,
@@ -21,16 +20,20 @@ const TAG = 'KomenciClient'
 
 export class KomenciClient {
   private token: string | undefined
-  private readonly url: string
+  private callbackUrl: string | undefined
 
-  constructor(url: string, token?: string) {
-    // Ensure trailing slash
-    this.url = url.replace(/\/$/, '') + '/'
+  constructor(callbackUrl: string, token?: string) {
+    this.setCallbackUrl(callbackUrl)
     this.token = token
   }
 
   setToken(token: string) {
     this.token = token
+  }
+
+  setCallbackUrl(callbackUrl: string) {
+    // Ensure trailing slash
+    this.callbackUrl = callbackUrl.replace(/\/$/, '') + '/'
   }
 
   @retry({
@@ -55,7 +58,7 @@ export class KomenciClient {
       }
 
       const body = action.payload !== null ? JSON.stringify(action.payload) : undefined
-      const resp = await fetch(this.url + action.path, {
+      const resp = await fetch(this.callbackUrl + action.path, {
         method: action.method,
         body,
         headers,
@@ -72,7 +75,7 @@ export class KomenciClient {
       } else if (resp.status === 401) {
         return Err(new Unauthorised())
       } else if (resp.status === 404) {
-        return Err(new NotFoundError(this.url + action.path))
+        return Err(new NotFoundError(this.callbackUrl + action.path))
       } else if (resp.status === 429) {
         return Err(new QuotaExceededError())
       } else if (resp.status === 400) {

@@ -1,6 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -14,6 +14,7 @@ import {
   requestMoreAttestations,
 } from 'src/lib/attestation'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import Web3 from 'web3'
 import yargs from 'yargs'
 
 export const command = 'verify'
@@ -25,8 +26,6 @@ interface VerifyArgv extends AccountArgv {
   salt: string
   context: string
 }
-
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const builder = (argv: yargs.Argv) => {
   return argv
@@ -65,8 +64,9 @@ export const handler = async (argv: VerifyArgv) => {
 }
 
 async function verifyCmd(argv: VerifyArgv) {
-  const kit = newKit('http://localhost:8545')
-  const account = (await kit.web3.eth.getAccounts())[0]
+  const web3: Web3 = new Web3('http://localhost:8545')
+  const kit: ContractKit = newKitFromWeb3(web3)
+  const account = (await kit.connection.getAccounts())[0]
   kit.defaultAccount = account
 
   const attestations = await kit.contracts.getAttestations()
