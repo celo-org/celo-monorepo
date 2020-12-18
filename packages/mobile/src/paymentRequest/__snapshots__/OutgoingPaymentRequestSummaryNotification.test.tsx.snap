@@ -178,6 +178,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -218,6 +219,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -436,6 +438,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -476,6 +479,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -620,6 +624,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for multipl
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
