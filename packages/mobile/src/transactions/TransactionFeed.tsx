@@ -88,8 +88,8 @@ function TransactionFeed({ kind, loading, error, data }: Props) {
   }, [kind, data])
 
   if (error) {
+    // Log an error, but continue to show any events we have cached.
     Logger.error(TAG, 'Failure while loading transaction feed', error)
-    return <NoActivity kind={kind} loading={loading} error={error} />
   }
 
   if (!data || data.length === 0) {

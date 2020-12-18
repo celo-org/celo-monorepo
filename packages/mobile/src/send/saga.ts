@@ -46,7 +46,7 @@ export async function getSendTxGas(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer,
   useStatic: boolean = true
-) {
+): Promise<BigNumber> {
   if (useStatic) {
     Logger.debug(`${TAG}/getSendTxGas`, `Using static gas of ${STATIC_SEND_TOKEN_GAS_ESTIMATE}`)
     return new BigNumber(STATIC_SEND_TOKEN_GAS_ESTIMATE)

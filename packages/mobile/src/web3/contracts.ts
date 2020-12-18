@@ -3,6 +3,7 @@
  * It now manages contractKit and wallet initialization.
  * Leaving the name for recognizability to current devs
  */
+import { Lock } from '@celo/base/lib/lock'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { sleep } from '@celo/utils/src/async'
 import { UnlockableWallet } from '@celo/wallet-base'
@@ -28,6 +29,8 @@ const WAIT_FOR_CONTRACT_KIT_RETRIES = 10
 
 let wallet: UnlockableWallet | undefined
 let contractKit: ContractKit | undefined
+
+const initContractKitLock = new Lock()
 
 async function initWallet() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
@@ -84,7 +87,6 @@ export function* initContractKit() {
       contractKit = newKitFromWeb3(web3, wallet)
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
       ValoraAnalytics.track(ContractKitEvents.init_contractkit_finish)
-      initContractKitLock = false
       return
     } catch (error) {
       if (isProviderConnectionError(error)) {
@@ -95,7 +97,6 @@ export function* initContractKit() {
           error
         )
         if (retries <= 0) {
-          initContractKitLock = false
           break
         }
 
@@ -103,7 +104,6 @@ export function* initContractKit() {
         yield delay(KIT_INIT_RETRY_DELAY)
       } else {
         Logger.error(`${TAG}@initContractKit`, 'Unexpected error initializing kit', error)
-        initContractKitLock = false
         break
       }
     }
@@ -118,8 +118,6 @@ export function destroyContractKit() {
   contractKit = undefined
   wallet = undefined
 }
-
-let initContractKitLock = false
 
 async function waitForContractKit(tries: number) {
   while (!contractKit) {
@@ -137,11 +135,14 @@ async function waitForContractKit(tries: number) {
 
 export function* getContractKit(waitForSync: boolean = true) {
   if (!contractKit) {
-    if (initContractKitLock) {
-      yield call(waitForContractKit, WAIT_FOR_CONTRACT_KIT_RETRIES)
-    } else {
-      initContractKitLock = true
+    yield initContractKitLock.acquire()
+    try {
+      if (contractKit) {
+        return contractKit
+      }
       yield call(initContractKit)
+    } finally {
+      initContractKitLock.release()
     }
   }
 
@@ -169,14 +170,16 @@ export async function getContractKitAsync(waitForSync: boolean = true): Promise<
 
 export function* getWallet() {
   if (!wallet) {
-    if (initContractKitLock) {
-      yield call(waitForContractKit, WAIT_FOR_CONTRACT_KIT_RETRIES)
-    } else {
-      initContractKitLock = true
+    yield initContractKitLock.acquire()
+    try {
+      if (wallet) {
+        return wallet
+      }
       yield call(initContractKit)
+    } finally {
+      initContractKitLock.release()
     }
   }
-
   return wallet
 }
 

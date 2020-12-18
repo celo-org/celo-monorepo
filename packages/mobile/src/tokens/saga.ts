@@ -121,6 +121,7 @@ interface TokenTransferFactory {
   tag: string
   currency: CURRENCY_ENUM
   fetchAction: () => any
+  staticGas?: number
 }
 
 // TODO(martinvol) this should go to the SDK
@@ -163,6 +164,7 @@ export function tokenTransferFactory({
   tag,
   currency,
   fetchAction,
+  staticGas,
 }: TokenTransferFactory) {
   return function*() {
     while (true) {
