@@ -101,6 +101,7 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
+      `--set geth.flags=${this.celoEnv === 'baklava' ? '--baklava' : ''}`,
       ...(await this.additionalHelmParameters()),
       (nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '')
     ]
