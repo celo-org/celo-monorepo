@@ -8,6 +8,7 @@ if [ "${1}" == "checkout" ]; then
     BRANCH_TO_TEST=${2:-"master"}
     echo "Checking out geth at branch ${BRANCH_TO_TEST}..."
     rm -rf /tmp/geth
+    git clone https://github.com/mrsmkl/celo-bls-go -b test /tmp/celo-bls-go
     git clone https://github.com/celo-org/celo-blockchain -b ${BRANCH_TO_TEST} /tmp/geth
     pushd /tmp/geth
     make
