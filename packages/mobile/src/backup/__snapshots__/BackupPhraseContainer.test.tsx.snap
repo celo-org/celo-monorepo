@@ -95,19 +95,39 @@ exports[` renders correctly for readonly backup phrase 1`] = `
       }
     }
   >
-    <Text
+    <View
       style={
         Object {
-          "color": "#2E3338",
-          "fontFamily": "Inter-Medium",
-          "fontSize": 16,
-          "lineHeight": 22,
-          "marginBottom": 8,
+          "flexDirection": "column",
         }
       }
     >
-      yourAccountKey
-    </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 16,
+          }
+        }
+      >
+        writeDownKey
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
+          }
+        }
+      >
+        yourAccountKey
+      </Text>
+    </View>
   </View>
   <View
     style={

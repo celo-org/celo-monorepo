@@ -112,6 +112,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
               "fontFamily": "Jost-Medium",
               "fontSize": 22,
               "lineHeight": 28,
+              "marginBottom": 8,
             }
           }
         >

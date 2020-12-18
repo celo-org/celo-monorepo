@@ -84,7 +84,7 @@ function AccountKeyPostSetup() {
   return (
     <ScrollView contentContainerStyle={styles.postSetupContentContainer}>
       <View style={styles.postSetupContainer}>
-        <Text style={fontStyles.h2}>{t('postSetupTitle')}</Text>
+        <Text style={styles.postSetupTitle}>{t('postSetupTitle')}</Text>
         <BackupPhraseContainer
           value={accountKey}
           mode={BackupPhraseContainerMode.READONLY}
@@ -121,6 +121,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Spacing.Thick24,
     paddingHorizontal: Spacing.Regular16,
+  },
+  postSetupTitle: {
+    ...fontStyles.h2,
+    marginBottom: Spacing.Smallest8,
   },
   h1: {
     ...fontStyles.h1,

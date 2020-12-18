@@ -72,16 +72,12 @@ export class BackupPhraseContainer extends React.Component<Props> {
     return (
       <View style={style}>
         <View style={styles.headerContainer}>
-          {type === BackupPhraseType.BACKUP_KEY &&
-            includeHeader !== false &&
-            (mode === BackupPhraseContainerMode.INPUT ? (
-              <View style={styles.writeDownKeyContainer}>
-                <Text style={styles.writeDownKey}>{t('writeDownKey')}</Text>
-                <Text style={fontStyles.label}>{t('yourAccountKey')}</Text>
-              </View>
-            ) : (
-              <Text style={styles.headerText}>{t('yourAccountKey')}</Text>
-            ))}
+          {type === BackupPhraseType.BACKUP_KEY && includeHeader !== false && (
+            <View style={styles.writeDownKeyContainer}>
+              <Text style={styles.writeDownKey}>{t('writeDownKey')}</Text>
+              <Text style={fontStyles.label}>{t('yourAccountKey')}</Text>
+            </View>
+          )}
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
               <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
