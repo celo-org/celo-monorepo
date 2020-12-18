@@ -52,18 +52,6 @@ contract TestSlasher is SnarkEpochDataSlasher {
     return (p.X.a, p.X.b, p.Y.a, p.Y.b);
   }
 
-  function testHashing(bytes memory extra, bytes memory message)
-    public
-    view
-    returns (uint16, bytes memory, bytes memory)
-  {
-    return (
-      epochFromExtraData(extra),
-      doHash(abi.encodePacked(extra, message)),
-      abi.encodePacked(extra, message)
-    );
-  }
-
   function testAggregation(bytes memory sig0, bytes memory sig1, bytes memory sig2)
     public
     view

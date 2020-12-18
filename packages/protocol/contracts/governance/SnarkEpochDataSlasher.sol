@@ -368,4 +368,16 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return CeloB12_377Lib.pairing(args);
   }
 
+  function testHashing(bytes memory extra, bytes memory message)
+    public
+    view
+    returns (uint16, bytes memory, bytes memory)
+  {
+    return (
+      epochFromExtraData(extra),
+      doHash(abi.encodePacked(extra, message)),
+      abi.encodePacked(extra, message)
+    );
+  }
+
 }
