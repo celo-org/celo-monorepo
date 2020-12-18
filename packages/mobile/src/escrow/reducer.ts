@@ -25,6 +25,15 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
         isReclaiming: true,
       }
     case Actions.RECLAIM_PAYMENT_FAILURE:
+      return {
+        ...state,
+        isReclaiming: false,
+      }
+    case Actions.RECLAIM_PAYMENT_CANCEL:
+      return {
+        ...state,
+        isReclaiming: false,
+      }
     case Actions.RECLAIM_PAYMENT_SUCCESS:
       return {
         ...state,

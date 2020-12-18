@@ -177,6 +177,7 @@ exports[`VerificationEducationScreen allows to skip if verification is loading 1
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -214,6 +215,7 @@ exports[`VerificationEducationScreen allows to skip if verification is loading 1
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -350,6 +352,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -510,6 +513,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -562,6 +566,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -688,6 +693,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -759,6 +765,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -986,6 +993,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1023,6 +1031,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1243,6 +1252,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1372,6 +1382,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -1532,6 +1543,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -1584,6 +1596,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -1710,6 +1723,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -1781,6 +1795,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -2008,6 +2023,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -2045,6 +2061,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -2265,6 +2282,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -2394,6 +2412,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2554,6 +2573,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2606,6 +2626,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -2732,6 +2753,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -2803,6 +2825,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -3030,6 +3053,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -3067,6 +3091,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -3287,6 +3312,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -3416,6 +3442,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3576,6 +3603,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -3628,6 +3656,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -3754,6 +3783,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -3825,6 +3855,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
           overScrollMode="always"
           saveFormDataDisabled={false}
           scalesPageToFit={true}
+          setSupportMultipleWindows={true}
           source={
             Object {
               "baseUrl": "https://celo.org/",
@@ -4052,6 +4083,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -4089,6 +4121,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -4309,6 +4342,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
