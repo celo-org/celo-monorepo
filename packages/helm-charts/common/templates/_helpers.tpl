@@ -455,8 +455,9 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
       else
         echo Chaindata is less than one day out of date. Using existing chaindata.
       fi
+    else
+      echo No chaindata at all.
     fi
-    echo No chaindata at all.
   volumeMounts:
   - name: data
     mountPath: /root/.celo
