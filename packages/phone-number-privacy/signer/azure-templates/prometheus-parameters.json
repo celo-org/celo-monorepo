@@ -121,7 +121,7 @@
             {
               "name": "prometheus-config-volume",
               "secret": {
-                "prometheus.yaml": "Z2xvYmFsOgogIHNjcmFwZV9pbnRlcnZhbDogNjBzCnNjcmFwZV9jb25maWdzOgogIC0gam9iX25hbWU6IHNjcmFwZS1vZGlzCiAgICBzY2hlbWU6IGh0dHBzCiAgICBtZXRyaWNzX3BhdGg6IC9tZXRyaWNzCiAgICBzdGF0aWNfY29uZmlnczoKICAgICAgLSB0YXJnZXRzOgogICAgICAgICAgLSAyMC4zNy4xMzMuMjEyOjQ0MwogICAgICAgICAgLSAyMC4zNy4xMzIuNzc6NDQzCiAgICAgICAgICAtIDUyLjE1NC4yMDUuMTk0OjQ0MwogICAgICAgIGxhYmVsczoKICAgICAgICAgIF9nZW5lcmljX2xvY2F0aW9uOiBjZW50cmFsdXMKICAgICAgICAgIF9nZW5lcmljX25hbWVzcGFjZTogb2Rpcy1zaWduZXIK"
+                "prometheus.yaml": "Z2xvYmFsOgogIHNjcmFwZV9pbnRlcnZhbDogNjBzCnNjcmFwZV9jb25maWdzOgogIC0gam9iX25hbWU6IHNjcmFwZS1vZGlzCiAgICBtZXRyaWNzX3BhdGg6IC9tZXRyaWNzCiAgICBzY2hlbWU6IGh0dHAKICAgIHN0YXRpY19jb25maWdzOgogICAgICAtIHRhcmdldHM6CiAgICAgICAgICAtIGNsYWJzLXN0YWdpbmctcGdwbnAxLXNpZ25lci5jZW50cmFsdXMuYXp1cmVjb250YWluZXIuaW86ODAKICAgICAgICAgIC0gY2xhYnMtc3RhZ2luZy1wZ3BucC1zaWduZXIuY2VudHJhbHVzLmF6dXJlY29udGFpbmVyLmlvOjgwCiAgICAgICAgICAtIGNsYWJzLXN0YWdpbmctcGdwbnAyLXNpZ25lci5jZW50cmFsdXMuYXp1cmVjb250YWluZXIuaW86ODAKICAgICAgICBsYWJlbHM6CiAgICAgICAgICBfZ2VuZXJpY19sb2NhdGlvbjogdXMtY2VudHJhbDEKICAgICAgICAgIF9nZW5lcmljX25hbWVzcGFjZTogb2Rpcy1zaWduZXIK"
               }
             }
           ]
