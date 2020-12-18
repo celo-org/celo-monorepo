@@ -88,11 +88,7 @@ export function navigate<RouteName extends keyof StackParamList>(
     })
 }
 
-export function navigateClearingStack<RouteName extends keyof StackParamList>(
-  ...args: undefined extends StackParamList[RouteName]
-    ? [RouteName] | [RouteName, StackParamList[RouteName]]
-    : [RouteName, StackParamList[RouteName]]
-) {
+export const navigateClearingStack: SafeNavigate = (...args) => {
   const [routeName, params] = args
   ensureNavigator()
     .then(() => {
