@@ -448,10 +448,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - |
      # If older than upload period, remove the chain data dir.
      if [ -d /root/.celo/celo/chaindata ]; then
-       mtime=$(stat --format "%Y" /root/.celo/celo/chaindata)
+       ctime=$(stat --format "%Z" /root/.celo/celo/chaindata)
        day=$(date +%s)
-       diff=$(($day - $mtime))
-       # If mtime is older than 1 day old, pull the chaindata rather than using the current PVC.
+       diff=$(($day - $ctime))
+       # If ctime is older than 1 day old, pull the chaindata rather than using the current PVC.
        if [ "$diff" -gt 86400 ]; then
          echo Chaindata is more than one day out of date. Wiping to use saved chaindata.
          rm -rf /root/.celo/celo/chaindata
