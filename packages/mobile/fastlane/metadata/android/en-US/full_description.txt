@@ -10,7 +10,7 @@ SAVE & SPEND STABLE VALUE
 Send, request, and save Celo Dollars, which are stable relative to US Dollars. Easily verify ownership of your phone number to get started. After that, sending or requesting payment from a friend is easy - all you need is their phone number and a small fee.
 
 SAFE & SECURE
-Securely send value to any mobile phone number or receive value at your phone number. To keep your value secure, protect your wallet with a Backup Key. This key protects your funds so that only you can access them -- don’t lose it!
+Securely send value to any mobile phone number or receive value at your phone number. To keep your value secure, protect your wallet with an Account Key. This key protects your funds so that only you can access them -- don’t lose it!
 
 EXCHANGE FOR CELO GOLD
 Exchange Celo Dollars for Celo Gold.
