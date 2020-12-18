@@ -3,7 +3,7 @@ import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Animated, FlexStyle, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export enum AlertTypes {
@@ -141,11 +141,10 @@ function SmartTopAlert(props: Props) {
     <View style={styles.overflowContainer} testID={testID}>
       <TouchableWithoutFeedback onPress={onPress} testID="SmartTopAlertTouchable">
         <Animated.View
-          // @ts-ignore
           ref={animatedRef}
           style={[
             styles.container,
-            buttonMessage && styles.containerWithButton,
+            (buttonMessage && styles.containerWithButton) as FlexStyle,
             isError && styles.containerError,
             {
               // TODO(jeanregisser): Handle case where SmartTopAlert are stacked and only the first one would need the inset

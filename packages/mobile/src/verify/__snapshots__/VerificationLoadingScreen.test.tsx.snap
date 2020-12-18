@@ -84,6 +84,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -239,14 +240,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
           onGestureHandlerStateChange={[Function]}
           onHandlerStateChange={[Function]}
           rippleColor={0}
-          style={
-            Array [
-              Object {
-                "overflow": "hidden",
-              },
-              undefined,
-            ]
-          }
         >
           <View
             accessible={true}
@@ -301,6 +294,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -818,6 +812,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -854,6 +849,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -975,6 +971,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -1130,14 +1127,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
           onGestureHandlerStateChange={[Function]}
           onHandlerStateChange={[Function]}
           rippleColor={0}
-          style={
-            Array [
-              Object {
-                "overflow": "hidden",
-              },
-              undefined,
-            ]
-          }
         >
           <View
             accessible={true}
@@ -1192,6 +1181,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1709,6 +1699,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1745,6 +1736,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

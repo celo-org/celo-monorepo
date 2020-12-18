@@ -407,9 +407,10 @@ function SendConfirmation(props: Props) {
         account,
         recipientAddress,
         amount: amount.valueOf(),
+        dollarBalance,
         includeDekFee: !isDekRegistered,
       }
-    : { feeType: FeeType.INVITE, account, amount }
+    : { feeType: FeeType.INVITE, account, amount, dollarBalance }
 
   return (
     // Note: intentionally passing a new child func here otherwise
