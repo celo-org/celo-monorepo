@@ -144,7 +144,7 @@ async function getSlashingInfo(web3: Web3, bn: number): Promise<Info> {
 
 async function makeHint(instance: SnarkEpochDataSlasher, { inner, extra }: Info) {
   const res = await instance.methods.testHashing(extra, inner).call()
-  const arr = [...Buffer.from(res.substr(2), 'hex')]
+  const arr = [...Buffer.from(res[1].substr(2), 'hex')]
   const needed = arr.slice(0, 48).reverse()
   needed[0] = needed[0] & 0x01
   const x = BigInt('0x' + Buffer.from(needed).toString('hex'))
