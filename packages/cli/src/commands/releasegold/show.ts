@@ -1,5 +1,5 @@
-import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { printValueMapRecursive } from '../../utils/cli'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class Show extends ReleaseGoldBaseCommand {
   static description = 'Show info on a ReleaseGold instance contract.'

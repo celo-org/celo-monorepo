@@ -35,7 +35,7 @@ export default class ValidatorStatus extends BaseCommand {
     'Shows the consensus status of a validator. This command will show whether a validator is currently elected, would be elected if an election were to be run right now, and the percentage of blocks signed and number of blocks successfully proposed within a given window.'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     validator: Flags.address({
       description: 'address of the validator to check if elected and validating',
       exclusive: ['all', 'signer'],
