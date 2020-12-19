@@ -7,7 +7,9 @@ export default HandleDeepLinkSend = () => {
 
   it('Launch app cold with url', async () => {
     await device.terminateApp()
+    await sleep(5000)
     await device.launchApp({ url: PAY_URL, newInstance: true })
+    await sleep(5000)
     // Arrived at SendAmount screen
     await expect(element(by.id('Review'))).toBeVisible()
   })

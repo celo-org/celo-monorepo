@@ -7,7 +7,12 @@ export default HandleDeepLinkDappkit = () => {
 
   it('Launch app with dappkit deep link', async () => {
     await device.terminateApp()
+    // I think at least on android we need this sleep because the
+    // OS has a timeout period in between closing and reopening an app
+    await sleep(5000)
     await device.launchApp({ url: DAPPKIT_URL, newInstance: true })
+    // this second sleep is to allow for navigation to reach the desired deep link handler
+    await sleep(5000)
 
     // press Allow button on DappKitSignTxScreen
     await element(by.id('DappkitAllow')).tap()
