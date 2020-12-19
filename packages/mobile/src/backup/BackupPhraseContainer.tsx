@@ -30,6 +30,7 @@ type Props = {
   showCopy?: boolean
   style?: ViewStyle
   onChangeText?: (value: string) => void
+  includeHeader?: boolean
   testID?: string
 } & WithTranslation
 
@@ -66,20 +67,17 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   render() {
-    const { t, value: words, showCopy, style, mode, type, testID } = this.props
+    const { t, value: words, showCopy, style, mode, type, includeHeader, testID } = this.props
 
     return (
       <View style={style}>
         <View style={styles.headerContainer}>
-          {type === BackupPhraseType.BACKUP_KEY &&
-            (BackupPhraseContainerMode.INPUT ? (
-              <View style={styles.writeDownKeyContainer}>
-                <Text style={styles.writeDownKey}>{t('writeDownKey')}</Text>
-                <Text style={fontStyles.label}>{t('yourAccountKey')}</Text>
-              </View>
-            ) : (
-              <Text style={styles.headerText}>{t('yourAccountKey')}</Text>
-            ))}
+          {type === BackupPhraseType.BACKUP_KEY && includeHeader !== false && (
+            <View style={styles.writeDownKeyContainer}>
+              <Text style={styles.writeDownKey}>{t('writeDownKey')}</Text>
+              <Text style={fontStyles.label}>{t('yourAccountKey')}</Text>
+            </View>
+          )}
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
               <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
@@ -141,6 +139,8 @@ const styles = StyleSheet.create({
   phraseContainer: {
     marginTop: 8,
     backgroundColor: colors.beige,
+    borderWidth: 1,
+    borderColor: colors.dark,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
@@ -148,15 +148,14 @@ const styles = StyleSheet.create({
   },
   phraseText: {
     ...fontStyles.regular,
+    fontSize: 22,
+    lineHeight: 32,
   },
   phraseInputContainer: {
     marginTop: 10,
   },
   phraseInputText: {
     ...fontStyles.regular,
-    borderWidth: 1,
-    borderColor: colors.gray2,
-    borderRadius: 4,
     minHeight: 125,
     padding: 14,
     paddingTop: 16,
