@@ -16,7 +16,7 @@ export default class ElectionCurrent extends BaseCommand {
     'Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     valset: flags.boolean({
       description:
         'Show currently used signers from valset (by default the authorized validator signers are shown). Useful for checking if keys have been rotated.',

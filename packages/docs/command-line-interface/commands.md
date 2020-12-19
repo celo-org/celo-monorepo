@@ -1,27 +1,31 @@
----
-description: A list of the commands available in celocli
----
+# `celocli commands`
 
-# Celo CLI commands
+list all the commands
 
-Celo CLI includes the following commands:
+- [`celocli commands`](#celocli-commands)
 
-- [Account](account.md)
-- [Config](config.md)
-- [DKG](dkg.md)
-- [Election](election.md)
-- [Exchange](exchange.md)
-- [Governance](governance.md)
-- [Identity](identity.md)
-- [LockedGold](lockedgold.md)
-- [Multisig](multisig.md)
-- [Network](network.md)
-- [Node](node.md)
-- [Oracle](oracle.md)
-- [ReleaseGold](releasegold.md)
-- [Reserve](reserve.md)
-- [Rewards](rewards.md)
-- [Transfer](transfer.md)
-- [Validator](validator.md)
-- [ValidatorGroup](validatorgroup.md)
-- [Help](help.md)
+## `celocli commands`
+
+list all the commands
+
+```
+list all the commands
+
+USAGE
+  $ celocli commands
+
+OPTIONS
+  -h, --help              show CLI help
+  -j, --json              display unfiltered api data in json format
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --hidden                show hidden commands
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
+```
+
+_See code: [@oclif/plugin-commands](https://github.com/oclif/plugin-commands/blob/v1.3.0/src/commands/commands.ts)_
