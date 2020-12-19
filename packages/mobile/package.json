@@ -122,7 +122,7 @@
     "react-native-progress": "^4.1.2",
     "react-native-qrcode-svg": "^6.0.6",
     "react-native-randombytes": "^3.6.0",
-    "react-native-reanimated": "https://github.com/celo-org/react-native-reanimated/releases/download/2.0.0-rc.0-75bfa3a/react-native-reanimated-2.0.0-rc.0-75bfa3a.tgz",
+    "react-native-reanimated": "^2.0.0-rc.1",
     "react-native-restart-android": "^0.0.7",
     "react-native-safe-area-context": "^3.0.6",
     "react-native-screens": "^2.7.0",
