@@ -44,7 +44,8 @@
     ],
     "nohoist": [
       "**/openzeppelin-solidity",
-      "**/solidity-bytes-utils"
+      "**/solidity-bytes-utils",
+      "**/@apollo/react-testing"
     ]
   },
   "devDependencies": {
