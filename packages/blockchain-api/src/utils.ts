@@ -1,9 +1,10 @@
 /* tslint:disable:no-console */
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import * as utf8 from 'utf8'
 import Web3 from 'web3'
-import coder from 'web3-eth-abi'
 import { WEB3_PROVIDER_URL } from './config'
+
+// to get rid of 18 extra 0s in the values
+export const WEI_PER_GOLD = Math.pow(10, 18)
 
 export function randomTimestamp() {
   const start = new Date(2018, 0, 1)
@@ -22,50 +23,46 @@ export function randomAddr() {
   return randomString
 }
 
-export function formatCommentString(functionCallHex: string): string {
-  // '0xe1d6aceb' is the function selector for the transfer with comment function
-  if (functionCallHex.length < 10 || functionCallHex.slice(0, 10) !== '0xe1d6aceb') {
-    return ''
-  }
-  let comment
-  try {
-    const data = '0x' + functionCallHex.slice(10)
-    comment = coder.decodeParameters(['address', 'uint256', 'string'], data)[2]
-    return utf8.decode(comment)
-  } catch (e) {
-    // TODO: add logging to blockchain-api
-    console.log(`Error decoding comment ${functionCallHex}: ${e.message}`)
-    return ''
-  }
-}
-
 // Returns date string in YYYY-MM-DD
 export function formatDateString(date: Date) {
   return date.toISOString().split('T')[0]
 }
 
-let attestationsAddress: string
-let escrowAddress: string
+export enum Contracts {
+  Attestations = 'Attestations',
+  Escrow = 'Escrow',
+  Exchange = 'Exchange',
+  Governance = 'Governance',
+  Reserve = 'Reserve',
+}
 
-export async function getContractAddresses() {
-  if (attestationsAddress && escrowAddress) {
+export interface ContractAddresses {
+  [Contracts.Attestations]: string
+  [Contracts.Escrow]: string
+  [Contracts.Exchange]: string
+  [Contracts.Governance]: string
+  [Contracts.Reserve]: string
+}
+
+let contractAddresses: ContractAddresses
+
+export async function getContractAddresses(): Promise<ContractAddresses> {
+  if (contractAddresses) {
     console.info('Already got token addresses')
-    return {
-      attestationsAddress,
-      escrowAddress,
-    }
+    return contractAddresses
   }
+
   try {
     const kit = await getContractKit()
-    attestationsAddress = (await kit.registry.addressFor(CeloContract.Attestations)).toLowerCase()
-    escrowAddress = (await kit.registry.addressFor(CeloContract.Escrow)).toLowerCase()
-    console.info(
-      'Got token addresses. Attestations: ' + attestationsAddress + ' Escrow: ' + escrowAddress
-    )
-    return {
-      attestationsAddress,
-      escrowAddress,
+    contractAddresses = {
+      Attestations: (await kit.registry.addressFor(CeloContract.Attestations)).toLowerCase(),
+      Escrow: (await kit.registry.addressFor(CeloContract.Escrow)).toLowerCase(),
+      Exchange: (await kit.registry.addressFor(CeloContract.Exchange)).toLowerCase(),
+      Governance: (await kit.registry.addressFor(CeloContract.Governance)).toLowerCase(),
+      Reserve: (await kit.registry.addressFor(CeloContract.Reserve)).toLowerCase(),
     }
+    console.info('Got token addresses. Attestations: ', contractAddresses)
+    return contractAddresses
   } catch (e) {
     console.error('@getContractAddresses() error', e)
     throw new Error('Unable to fetch contract addresses')

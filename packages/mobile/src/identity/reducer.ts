@@ -46,8 +46,13 @@ export interface AddressToDataEncryptionKeyType {
   [address: string]: string | null // null means no DEK registered
 }
 
+export interface AddressInfoToDisplay {
+  name: string
+  imageUrl: string | null
+}
+
 export interface AddressToDisplayNameType {
-  [address: string]: string | undefined
+  [address: string]: AddressInfoToDisplay | undefined
 }
 
 export interface WalletToAccountAddressType {
@@ -246,6 +251,14 @@ export const reducer = (
         isFetchingAddresses: false,
       }
     }
+    case Actions.CANCEL_VERIFICATION:
+      return {
+        ...state,
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          isActive: false,
+        },
+      }
     case Actions.RESET_VERIFICATION:
       return {
         ...state,
@@ -309,7 +322,7 @@ export const reducer = (
         feelessVerificationStatus: action.status,
         feelessVerificationState: {
           ...state.feelessVerificationState,
-          isActive: action.status > 0 && action.status !== VerificationStatus.Done,
+          isActive: action.status !== VerificationStatus.Done,
           isLoading: action.status === VerificationStatus.GettingStatus,
         },
       }
@@ -392,11 +405,21 @@ export const reducer = (
       if (!action.recipient.address) {
         return state
       }
+      action = {
+        type: Actions.UPDATE_KNOWN_ADDRESSES,
+        knownAddresses: {
+          [action.recipient.address]: {
+            name: action.recipient.displayName,
+            imageUrl: null,
+          },
+        },
+      }
+    case Actions.UPDATE_KNOWN_ADDRESSES:
       return {
         ...state,
         addressToDisplayName: {
           ...state.addressToDisplayName,
-          [action.recipient.address]: action.recipient.displayName,
+          ...action.knownAddresses,
         },
       }
     case Actions.IMPORT_CONTACTS:

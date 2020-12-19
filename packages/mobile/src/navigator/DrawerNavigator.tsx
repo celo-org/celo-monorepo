@@ -111,7 +111,11 @@ function CustomDrawerItemList({
       if (protectedRoutes.includes(route.name) && activeRouteName !== route.name) {
         // Route should be protected by PIN code
         ensurePincode()
-          .then(navigateToItem)
+          .then((pinIsCorrect) => {
+            if (pinIsCorrect) {
+              navigateToItem()
+            }
+          })
           .catch((error) => {
             Logger.error(`${TAG}@onPress`, 'PIN ensure error', error)
           })

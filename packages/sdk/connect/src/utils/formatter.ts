@@ -92,7 +92,7 @@ export function outputCeloTxReceiptFormatter(receipt: any): CeloTxReceipt {
   }
 
   if (typeof receipt.status !== 'undefined' && receipt.status !== null) {
-    receipt.status = Boolean(parseInt(receipt.status, 10))
+    receipt.status = Boolean(parseInt(trimLeading0x(receipt.status), 10))
   }
 
   return receipt as CeloTxReceipt

@@ -4,6 +4,7 @@ export enum ErrorMessages {
   EXCHANGE_FAILED = 'exchangeFailed',
   INVALID_INVITATION = 'invalidInvite',
   INCORRECT_PIN = 'incorrectPin',
+  PIN_INPUT_CANCELED = 'pinInputCanceled',
   SET_PIN_FAILED = 'setPinFailed',
   NSF_GOLD = 'notEnoughGoldError',
   NSF_DOLLARS = 'notEnoughDollarsError',

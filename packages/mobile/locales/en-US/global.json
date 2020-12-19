@@ -52,6 +52,7 @@
   "readCodesAuto": "Read Codes Automatically",
   "enterManually": "Enter Manually",
   "incorrectPin": "Incorrect PIN",
+  "pinInputCanceled": "The PIN is necessary. Please try again.",
   "setPinFailed": "Failed to set PIN",
   "createPin": "Create Pin",
   "optIn": "Opt In",

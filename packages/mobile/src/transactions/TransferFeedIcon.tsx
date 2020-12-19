@@ -12,10 +12,11 @@ interface Props {
   type: TokenTransactionType
   recipient?: Recipient
   address?: string
+  imageUrl?: string | null
 }
 
 export default function TransferFeedIcon(props: Props) {
-  const { recipient, address, type } = props
+  const { recipient, address, type, imageUrl } = props
 
   switch (type) {
     case TokenTransactionType.VerificationFee: // fallthrough
@@ -42,7 +43,7 @@ export default function TransferFeedIcon(props: Props) {
           address={address}
           name={recipient ? recipient.displayName : null}
           size={AVATAR_SIZE}
-          thumbnailPath={getRecipientThumbnail(recipient)}
+          thumbnailPath={imageUrl || getRecipientThumbnail(recipient)}
         />
       )
     }

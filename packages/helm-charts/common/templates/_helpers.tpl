@@ -55,7 +55,12 @@ release: {{ .Release.Name }}
         wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
         wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
       fi
-      geth init /root/.celo/genesis.json
+      # There are issues with running geth init over existing chaindata around the use of forks.
+      # The case that this could cause problems is when a network is set up with Base64 genesis files & chaindata
+      # as that could interfere with accessing bootnodes for newly created nodes.
+      if [ "{{ .Values.geth.use_gstorage_data | default false }}" == "false" ]; then
+        geth init /root/.celo/genesis.json
+      fi
   volumeMounts:
   - name: data
     mountPath: /root/.celo
@@ -429,4 +434,37 @@ Annotations to indicate to the prometheus server that this node should be scrape
 prometheus.io/scrape: "true"
 prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
+{{- end -}}
+
+{{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
+{{- define "common.gsutil-sync-data-init-container" -}}
+- name: gsutil-sync-data
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+  imagePullPolicy: Always
+  command:
+  - /bin/sh
+  - -c
+  args:
+  - |
+     # If older than upload period, remove the chain data dir.
+     if [ -d /root/.celo/celo/chaindata ]; then
+       mtime=$(stat --format "%Y" /root/.celo/celo/chaindata)
+       day=$(date +%s)
+       diff=$(($day - $mtime))
+       # If mtime is older than 1 day old, pull the chaindata rather than using the current PVC.
+       if [ "$diff" -gt 86400 ]; then
+         echo Chaindata is more than one day out of date. Wiping to use saved chaindata.
+         rm -rf /root/.celo/celo/chaindata
+       else
+         echo Chaindata is less than one day out of date. Using existing chaindata.
+         exit 0
+       fi
+     fi
+     mkdir -p /root/.celo/celo
+     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
+     tar -xzvf chaindata.tar.gz -C /root/.celo/celo
+     rm chaindata.tar.gz
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
 {{- end -}}

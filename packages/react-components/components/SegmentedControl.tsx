@@ -1,4 +1,3 @@
-import interpolateColors from '@celo/react-components/components/interpolateColors'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -24,22 +23,26 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
   }
 
   const inputRange = values.map((_, i) => i)
-  const translateX = Animated.interpolate(position, {
+  const translateX = Animated.interpolateNode(position, {
     inputRange,
     outputRange: inputRange.map((i) => i * segmentWidth),
   })
 
   // TODO: color should be dependant on the style for the value
   // here it's assuming value at index 0 is green and index 1 (or above) is white
-  const color = interpolateColors(position, {
+  // TODO: remove 'as any' when this is released:
+  // https://github.com/software-mansion/react-native-reanimated/issues/1354
+  const color = Animated.interpolateColors(position, {
     inputRange: [0.5, 1],
     outputColorRange: [colors.greenUI, colors.light],
-  })
+  }) as any
 
-  const colorInverted = interpolateColors(position, {
+  // TODO: remove 'as any' when this is released:
+  // https://github.com/software-mansion/react-native-reanimated/issues/1354
+  const colorInverted = Animated.interpolateColors(position, {
     inputRange: [0.5, 1],
     outputColorRange: [colors.light, colors.dark],
-  })
+  }) as any
 
   const onLayout = ({
     nativeEvent: {
@@ -98,12 +101,13 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
       </MaskedView>
       {values.map((value, index) => {
         const isFocused = index === selectedIndex
+        const state = { selected: isFocused }
         const onPress = () => handleChange(index)
         return (
           <Touchable
             key={value}
             accessibilityRole="button"
-            accessibilityStates={isFocused ? ['selected'] : []}
+            accessibilityState={state}
             accessibilityLabel={value}
             onPress={onPress}
             style={styles.value}
