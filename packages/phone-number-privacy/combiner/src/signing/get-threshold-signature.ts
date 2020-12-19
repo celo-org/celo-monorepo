@@ -103,7 +103,7 @@ async function requestSignatures(request: Request, response: Response) {
         )
         if (res.ok) {
           await handleSuccessResponse(
-            res,
+            data,
             res.status,
             response,
             sentResult,
@@ -144,7 +144,7 @@ async function requestSignatures(request: Request, response: Response) {
 }
 
 async function handleSuccessResponse(
-  res: FetchResponse,
+  data: string,
   status: number,
   response: Response,
   sentResult: { sent: boolean },
@@ -154,7 +154,7 @@ async function handleSuccessResponse(
   blindedQueryPhoneNumber: string
 ) {
   const logger: Logger = response.locals.logger
-  const signResponse = (await res.json()) as SignerResponse
+  const signResponse = JSON.parse(data) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
     logger.error(
