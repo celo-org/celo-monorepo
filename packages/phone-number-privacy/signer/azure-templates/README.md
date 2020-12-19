@@ -114,10 +114,16 @@ We use prometheus metrics to collect real time data from signers. The prometheus
 
 To deploy the prometheus server and sidecar you must first find the `prometheus-service-account-key` json and paste it into the `prometheus-service-account-key.json` file. Make sure you remember to delete this key from the file again after you finish the deployment and before you push to github! The key can be found by searching for `Service Accounts` in GCP and then creating a service account with `metrics write` permissions if one does not already exist. To get the key, go to the `Actions` tab on the service account and select `Create key`. This should download some JSON to your computer that you can copy and paste into the `prometheus-service-account-key.json` file.
 
-Once you have the service account key, you should fill in the missing fields labeled `"TODO"` in `prometheus-parameters.yaml`. The location parameters should be filled in with the location of the resource group. For the `prometheus.yaml` and `prometheus-service-account-key.json` parameters, you must base64 encode the contents of the `prometheus.yaml` and `prometheus-service-account-key.json` files respectively, and then paste the results into the file. If the `prometheus.yaml`parameter is already filled in and you haven't changed the contents of the `prometheus.yaml` file, then you can leave what is there.
+Once you have the service account key, you should fill in the missing fields labeled `"TODO"` in `prometheus-parameters.yaml`. The location parameters should be filled in with the location of the resource group. For the `prometheus.yaml` and `prometheus-service-account-key.json` parameters, you must base64 encode the contents of the `prometheus-<network>.yaml` and `prometheus-service-account-key.json` files respectively, and then paste the results into the file.
 
 ```bash
 cat <filename> | base64
+```
+
+Then run the following command to deploy the containers
+
+```bash
+az deployment group create --resource-group $RESOURCE_GROUP --template-file prometheus-template.json --parameters @prometheus-parameters.json
 ```
 
 Make sure to change all these values back to `"TODO"` after you deploy and before committing to master. If you accidentally push the service account key to github, simply delete the service account and create a new one. Then, use the new service account to generate a key and repeat the steps above to redeploy the prometheus server and sidecar.
