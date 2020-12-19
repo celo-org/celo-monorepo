@@ -1,9 +1,9 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
-import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class RevokeVotes extends ReleaseGoldBaseCommand {
   static description =
