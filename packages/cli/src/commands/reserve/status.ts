@@ -5,7 +5,7 @@ export default class ReserveStatus extends BaseCommand {
   static description = 'Shows information about reserve'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   static examples = ['status']
