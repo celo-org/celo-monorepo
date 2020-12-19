@@ -5,7 +5,7 @@ export default class Set extends BaseCommand {
   static description = 'Configure running node information for propogating transactions to network'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     node: {
       ...BaseCommand.flags.node,
       hidden: false,
