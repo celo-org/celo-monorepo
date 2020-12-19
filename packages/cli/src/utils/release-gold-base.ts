@@ -1,8 +1,8 @@
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { ParserOutput } from '@oclif/parser/lib/parse'
-import { BaseCommand } from './base'
-import { Flags } from './utils/command'
+import { BaseCommand } from '../base'
+import { Flags } from './command'
 
 export abstract class ReleaseGoldBaseCommand extends BaseCommand {
   static flags = {
