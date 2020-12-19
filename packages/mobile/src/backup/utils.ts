@@ -139,7 +139,7 @@ export function onGetMnemonicFail(viewError: (error: ErrorMessages) => void, con
   })
 }
 
-export function useAccountKey() {
+export function useAccountKey(): string | null {
   const dispatch = useDispatch()
   const account = useSelector(currentAccountSelector)
   const asyncAccountKey = useAsync(getStoredMnemonic, [account])
@@ -148,7 +148,7 @@ export function useAccountKey() {
     onGetMnemonicFail((error) => dispatch(showError(error)), 'useAccountKey')
   }
 
-  return asyncAccountKey.result
+  return asyncAccountKey.result || null
 }
 
 // Because of a RN bug, we can't fully clean the text as the user types
