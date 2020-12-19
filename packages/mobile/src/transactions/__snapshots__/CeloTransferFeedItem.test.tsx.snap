@@ -7,6 +7,7 @@ exports[`CeloTransferFeedItem renders correctly 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
