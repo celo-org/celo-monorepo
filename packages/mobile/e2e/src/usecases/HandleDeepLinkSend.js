@@ -1,4 +1,4 @@
-import { quote } from '../utils/utils'
+import { quote, sleep } from '../utils/utils'
 
 export default HandleDeepLinkSend = () => {
   const PAY_URL = quote(
