@@ -29,7 +29,7 @@ const persistConfig: any = {
     const stringifiedData = JSON.stringify(data)
     // if data._persist or any other key is present the whole state is present (the content of the keys are
     // sometimes serialized independently).
-    if (data._persist && lastEventTime + timeBetweenStoreSizeEvents > Date.now()) {
+    if (data._persist && Date.now() > lastEventTime + timeBetweenStoreSizeEvents) {
       lastEventTime = Date.now()
       ValoraAnalytics.track(PerformanceEvents.redux_store_size, {
         size: stringifiedData.length,
