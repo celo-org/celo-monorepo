@@ -889,6 +889,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -939,6 +940,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -989,6 +991,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1039,6 +1042,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1089,6 +1093,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1139,6 +1144,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

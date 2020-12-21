@@ -104,6 +104,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -322,6 +323,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -362,6 +364,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -506,6 +509,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }

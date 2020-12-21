@@ -6,7 +6,7 @@ export default class ValidatorRequirements extends BaseCommand {
     'List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of CELO that needs to be locked in order to register, and a duration, which is the amount of time that CELO must stay locked following the deregistration of the Validator.'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   static examples = ['requirements']

@@ -41,3 +41,6 @@
 -keep class com.facebook.crypto.** {
    *;
 }
+
+# react-native-reanimated
+-keep class com.facebook.react.turbomodule.** { *; }

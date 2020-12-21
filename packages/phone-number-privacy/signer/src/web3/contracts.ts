@@ -11,6 +11,7 @@ export function getContractKit(): ContractKit {
 }
 
 export async function getBlockNumber(): Promise<number> {
+  // TODO(Alec): suppress console.info statements from these calls
   return retryAsyncWithBackOff(
     () => getContractKit().connection.getBlockNumber(),
     RETRY_COUNT,

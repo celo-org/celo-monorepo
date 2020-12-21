@@ -134,6 +134,7 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -170,6 +171,7 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
