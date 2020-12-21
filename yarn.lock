@@ -29573,15 +29573,7 @@ react-native-exit-app@^1.1.0:
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"
 
-react-native-fs@*, react-native-fs@^2.16.6:
-  version "2.16.6"
-  resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.16.6.tgz#2901789a43210a35a0ef0a098019bbef3af395fd"
-  integrity sha512-ZWOooD1AuFoAGY3HS2GY7Qx2LZo4oIg6AK0wbC68detxwvX75R/q9lRqThXNKP6vIo2VHWa0fYUo/SrLw80E8w==
-  dependencies:
-    base-64 "^0.1.0"
-    utf8 "^3.0.0"
-
-"react-native-fs@git+https://github.com/celo-org/react-native-fs#aa6db0f":
+react-native-fs@*, "react-native-fs@git+https://github.com/celo-org/react-native-fs#aa6db0f":
   version "2.16.6"
   resolved "git+https://github.com/celo-org/react-native-fs#aa6db0f1d9b82bfdf58ebf72450c28311414f45f"
   dependencies:

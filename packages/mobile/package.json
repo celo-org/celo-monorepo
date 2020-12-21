@@ -109,7 +109,7 @@
     "react-native-email-link": "^1.9.1",
     "react-native-exit-app": "^1.1.0",
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
-    "react-native-fs": "^2.16.6",
+    "react-native-fs": "git+https://github.com/celo-org/react-native-fs#aa6db0f",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-geth": "https://github.com/celo-org/react-native-geth#5864c09",
     "react-native-google-safetynet": "https://github.com/celo-org/react-native-google-safetynet#8a0355f",
@@ -173,7 +173,6 @@
     "@types/lodash": "^4.14.136",
     "@types/react": "^16.9.34",
     "@types/react-native": "^0.63.37",
-
     "@types/react-native-fs": "^2.13.0",
     "@types/react-native-keep-awake": "^2.0.1",
     "@types/react-redux": "^7.1.7",
