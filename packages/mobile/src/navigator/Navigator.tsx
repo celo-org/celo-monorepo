@@ -2,7 +2,6 @@ import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
-import { useAsync } from 'react-async-hook'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
@@ -83,7 +82,6 @@ import PaymentRequestUnavailable, {
 } from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
-import { waitForRehydrateAsync } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
 import Send from 'src/send/Send'
@@ -97,11 +95,14 @@ import ValidateRecipientIntro, {
 } from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
+import Logger from 'src/utils/Logger'
 import { getDatetimeDisplayString } from 'src/utils/time'
 import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
+
+const TAG = 'Navigator'
 
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
@@ -483,9 +484,9 @@ const mapStateToProps = (state: RootState) => {
 type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
-  const initialRouteName = useAsync(async () => {
-    await waitForRehydrateAsync()
+  const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
 
+  React.useEffect(() => {
     const {
       choseToRestoreAccount,
       language,
@@ -513,18 +514,19 @@ export function MainStackScreen() {
       initialRoute = Screens.DrawerNavigator
     }
 
+    setInitialRoute(initialRoute)
+    Logger.info(`${TAG}@MainStackScreen`, `Initial route: ${initialRoute}`)
+
     // Wait for next frame to avoid slight gap when hiding the splash
     requestAnimationFrame(() => SplashScreen.hide())
-
-    return initialRoute
   }, [])
 
-  if (initialRouteName.loading) {
+  if (!initialRouteName) {
     return <AppLoading />
   }
 
   return (
-    <Stack.Navigator initialRouteName={initialRouteName.result} screenOptions={emptyHeader}>
+    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={emptyHeader}>
       <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}

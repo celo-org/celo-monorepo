@@ -143,7 +143,7 @@
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
-    "redux-persist-fs-storage": "^1.3.0",
+    "redux-persist-fs-storage": "git+https://github.com/celo-org/redux-persist-fs-storage#54ffc50",
     "redux-saga": "^1.1.3",
     "reselect": "^4.0.0",
     "sleep-promise": "^8.0.1",
@@ -173,6 +173,7 @@
     "@types/lodash": "^4.14.136",
     "@types/react": "^16.9.34",
     "@types/react-native": "^0.63.37",
+
     "@types/react-native-fs": "^2.13.0",
     "@types/react-native-keep-awake": "^2.0.1",
     "@types/react-redux": "^7.1.7",

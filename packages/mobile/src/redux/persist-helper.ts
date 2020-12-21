@@ -1,4 +1,3 @@
-import { sleep } from '@celo/utils/lib/async'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { take } from 'redux-saga/effects'
 
@@ -25,10 +24,4 @@ export function* waitForRehydrate() {
   yield take(REHYDRATE)
   didRehydrate = true
   return
-}
-
-export async function waitForRehydrateAsync() {
-  while (!didRehydrate) {
-    await sleep(100)
-  }
 }
