@@ -16,6 +16,7 @@ import ErrorBoundary from 'src/app/ErrorBoundary'
 import { isE2EEnv } from 'src/config'
 import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
+import { waitForRehydrateAsync } from 'src/redux/persist-helper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
@@ -93,7 +94,8 @@ export class App extends React.Component<Props> {
     Linking.removeEventListener('url', this.handleOpenURL)
   }
 
-  handleOpenURL = (event: any) => {
+  handleOpenURL = async (event: any) => {
+    await waitForRehydrateAsync()
     store.dispatch(openDeepLink(event.url))
   }
 
