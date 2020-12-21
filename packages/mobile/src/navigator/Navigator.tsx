@@ -2,6 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
+import { useAsync } from 'react-async-hook'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
@@ -82,6 +83,7 @@ import PaymentRequestUnavailable, {
 } from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
+import { waitForRehydrateAsync } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
 import Send from 'src/send/Send'
@@ -481,9 +483,9 @@ const mapStateToProps = (state: RootState) => {
 type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
-  const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+  const initialRouteName = useAsync(async () => {
+    await waitForRehydrateAsync()
 
-  React.useEffect(() => {
     const {
       choseToRestoreAccount,
       language,
@@ -511,18 +513,18 @@ export function MainStackScreen() {
       initialRoute = Screens.DrawerNavigator
     }
 
-    setInitialRoute(initialRoute)
-
     // Wait for next frame to avoid slight gap when hiding the splash
     requestAnimationFrame(() => SplashScreen.hide())
+
+    return initialRoute
   }, [])
 
-  if (!initialRouteName) {
+  if (initialRouteName.loading) {
     return <AppLoading />
   }
 
   return (
-    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={emptyHeader}>
+    <Stack.Navigator initialRouteName={initialRouteName.result} screenOptions={emptyHeader}>
       <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}
