@@ -68,7 +68,7 @@ function* loggerSaga() {
   })
 }
 
-export let sagasFinishedLoading = false
+let sagasFinishedLoading = false
 export async function waitUntilSagasFinishLoading() {
   while (!sagasFinishedLoading) {
     await sleep(100)
