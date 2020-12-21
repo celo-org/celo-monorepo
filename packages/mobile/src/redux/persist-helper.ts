@@ -29,6 +29,6 @@ export function* waitForRehydrate() {
 
 export async function waitForRehydrateAsync() {
   while (!didRehydrate) {
-    await sleep(1000)
+    await sleep(100)
   }
 }
