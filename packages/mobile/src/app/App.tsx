@@ -61,6 +61,7 @@ export class App extends React.Component<Props> {
 
   async componentDidMount() {
     await ValoraAnalytics.init()
+    this.logAppLoadTime()
 
     Linking.addEventListener('url', this.handleOpenURL)
 
@@ -68,8 +69,6 @@ export class App extends React.Component<Props> {
     if (url) {
       await this.handleOpenURL({ url })
     }
-
-    this.logAppLoadTime()
   }
 
   logAppLoadTime() {
