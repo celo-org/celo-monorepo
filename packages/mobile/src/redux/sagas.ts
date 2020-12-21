@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/lib/async'
 import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
 import { accountSaga } from 'src/account/saga'
@@ -67,6 +68,13 @@ function* loggerSaga() {
   })
 }
 
+export let sagasFinishedLoading = false
+export async function waitUntilSagasFinishLoading() {
+  while (!sagasFinishedLoading) {
+    await sleep(100)
+  }
+}
+
 export function* rootSaga() {
   // Delay all sagas until rehydrate is done
   // This prevents them from running with missing state
@@ -99,4 +107,6 @@ export function* rootSaga() {
   yield spawn(importSaga)
   yield spawn(dappKitSaga)
   yield spawn(checkAccountExistenceSaga)
+
+  sagasFinishedLoading = true
 }

@@ -16,7 +16,7 @@ import ErrorBoundary from 'src/app/ErrorBoundary'
 import { isE2EEnv } from 'src/config'
 import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
-import { waitForRehydrateAsync } from 'src/redux/persist-helper'
+import { waitUntilSagasFinishLoading } from 'src/redux/sagas'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
@@ -66,7 +66,7 @@ export class App extends React.Component<Props> {
 
     const url = await Linking.getInitialURL()
     if (url) {
-      this.handleOpenURL({ url })
+      await this.handleOpenURL({ url })
     }
 
     this.logAppLoadTime()
@@ -95,7 +95,7 @@ export class App extends React.Component<Props> {
   }
 
   handleOpenURL = async (event: any) => {
-    await waitForRehydrateAsync()
+    await waitUntilSagasFinishLoading()
     store.dispatch(openDeepLink(event.url))
   }
 
