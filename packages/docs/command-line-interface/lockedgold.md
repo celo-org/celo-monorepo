@@ -1,45 +1,39 @@
----
-description: View and manage locked CELO
----
+# `celocli lockedgold`
 
-## Commands
+View and manage locked CELO
 
-### Lock
+- [`celocli lockedgold:lock`](#celocli-lockedgoldlock)
+- [`celocli lockedgold:show ACCOUNT`](#celocli-lockedgoldshow-account)
+- [`celocli lockedgold:unlock`](#celocli-lockedgoldunlock)
+- [`celocli lockedgold:withdraw`](#celocli-lockedgoldwithdraw)
+
+## `celocli lockedgold:lock`
 
 Locks CELO to be used in governance and validator elections.
 
 ```
+Locks CELO to be used in governance and validator elections.
+
 USAGE
   $ celocli lockedgold:lock
 
 OPTIONS
-  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
-  --from=from                                    (required)
-
-  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
-                                                 for local signing
-
-  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
-                                                 ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
-                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --useLedger                                    Set it to use a ledger wallet
-
-  --value=value                                  (required) The unit amount of CELO
+  --from=from    (required)
+  --value=value  (required) The unit amount of CELO
 
 EXAMPLE
   lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/lockedgold/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/lock.ts)_
+_See code: [src/commands/lockedgold/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/lock.ts)_
 
-### Show
+## `celocli lockedgold:show ACCOUNT`
 
 Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
 
 ```
+Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
+
 USAGE
   $ celocli lockedgold:show ACCOUNT
 
@@ -47,66 +41,43 @@ EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [packages/cli/src/commands/lockedgold/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/show.ts)_
+_See code: [src/commands/lockedgold/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/show.ts)_
 
-### Unlock
+## `celocli lockedgold:unlock`
 
 Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
 
 ```
+Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
+
 USAGE
   $ celocli lockedgold:unlock
 
 OPTIONS
-  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
-                                                     addresses for local signing
-
-  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
-                                                     the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
-                                                     index addresses for local signing. Example --ledgerCustomAddresses
-                                                     "[4,99]"
-
-  --useLedger                                        Set it to use a ledger wallet
-
   --value=value                                      (required) The unit amount of CELO
 
 EXAMPLE
   unlock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 500000000
 ```
 
-_See code: [packages/cli/src/commands/lockedgold/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/unlock.ts)_
+_See code: [src/commands/lockedgold/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/unlock.ts)_
 
-### Withdraw
+## `celocli lockedgold:withdraw`
 
 Withdraw any pending withdrawals created via "lockedgold:unlock" that have become available.
 
 ```
+Withdraw any pending withdrawals created via "lockedgold:unlock" that have become available.
+
 USAGE
   $ celocli lockedgold:withdraw
 
 OPTIONS
-  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
-                                                     addresses for local signing
-
-  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
-                                                     the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
-                                                     index addresses for local signing. Example --ledgerCustomAddresses
-                                                     "[4,99]"
-
-  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
   withdraw --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [packages/cli/src/commands/lockedgold/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/withdraw.ts)_
+_See code: [src/commands/lockedgold/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/withdraw.ts)_

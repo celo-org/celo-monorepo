@@ -131,6 +131,7 @@
     "location": "packages/protocol",
     "dependencies": [
       "@celo/base",
+      "@celo/connect",
       "@celo/flake-tracker",
       "@celo/typescript",
       "@celo/utils"

@@ -13,7 +13,7 @@ import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage;
-import io.sentry.RNSentryPackage;
+import io.sentry.react.RNSentryPackage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;

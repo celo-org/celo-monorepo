@@ -34,7 +34,6 @@
   "paste": "Paste",
   "choose": "Choose",
   "receivedPayment": "Received Payment",
-  "readOnlyState": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getStarted": "Get Started",
   "manageCeloDollars": "Manage {{CeloDollars}}",
   "sendCeloDollars": "Send {{CeloDollars}}",
