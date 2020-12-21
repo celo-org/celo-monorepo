@@ -29573,7 +29573,7 @@ react-native-exit-app@^1.1.0:
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"
 
-react-native-fs@*, "react-native-fs@git+https://github.com/celo-org/react-native-fs#aa6db0f":
+react-native-fs@*, react-native-fs@^2.14.1, "react-native-fs@git+https://github.com/celo-org/react-native-fs#aa6db0f":
   version "2.16.6"
   resolved "git+https://github.com/celo-org/react-native-fs#aa6db0f1d9b82bfdf58ebf72450c28311414f45f"
   dependencies:
@@ -30273,11 +30273,12 @@ redux-mock-store@^1.5.3:
   dependencies:
     lodash.isplainobject "^4.0.6"
 
-"redux-persist-fs-storage@git+https://github.com/celo-org/redux-persist-fs-storage#54ffc50":
+redux-persist-fs-storage@^1.3.0:
   version "1.3.0"
-  resolved "git+https://github.com/celo-org/redux-persist-fs-storage#54ffc501d7cb99856de6ad770d0689a450bcea57"
+  resolved "https://registry.yarnpkg.com/redux-persist-fs-storage/-/redux-persist-fs-storage-1.3.0.tgz#395d0c4b40985e04c480512ee1c469d6d2a9abd9"
+  integrity sha512-32FMEF5apIwlm7bnBq6VTmbK7sVVZ0bpTpMt8CUw5MMDXcsSfT4BSM5t6Y15V6KBRL9O11GDKAAV8a3/Hfj2Tg==
   dependencies:
-    react-native-fs "git+https://github.com/celo-org/react-native-fs#aa6db0f"
+    react-native-fs "^2.14.1"
 
 redux-persist@^6.0.0:
   version "6.0.0"
