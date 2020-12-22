@@ -31,8 +31,6 @@
   "enableSystemScreenLockFailedMessage": "Falha ao ativar o bloqueio de tela",
   "initKeystoreFailureMessage": "Falha ao iniciar o keystore",
   "pinLostForeverMessage": "Você removeu o bloqueio de tela, o PIN foi perdido",
-  "enableScreenLockMessage":
-    "Ative o bloqueio de tela para usar o {{appName}}. Se você desativar o bloqueio de tela no futuro, precisará da sua chave de backup para acessar sua conta.",
   "importContactsPermission": {
     "title": "Importar contatos",
     "0": "Conectar seu catálogo de endereços facilita o envio e a solicitação de pagamentos dos seus amigos. Caso contrário, você terá que inserir essas informações individualmente.",

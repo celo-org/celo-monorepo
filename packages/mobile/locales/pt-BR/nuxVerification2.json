@@ -6,6 +6,7 @@
   "repeatVerificationCode": "Código de verificação repetido",
   "revealAttestationFailure": "Erro ao solicitar mensagem de SMS",
   "verificationFailure": "Falha na verificação",
+  "cantVerifyRevokedAccount": "Essa conta já foi revogada uma vez. Por favor, crie uma nova conta e tente novamente.",
   "verificationTimeout": "A verificação expirou",
   "errorRequestCode": "Falha ao solicitar códigos.",
   "errorRedeemingCode": "Falha ao resgatar código.",

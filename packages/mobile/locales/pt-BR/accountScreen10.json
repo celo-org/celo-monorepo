@@ -36,6 +36,11 @@
     "body": "Você não poderá mais acessar seus fundos ou sua Chave da Conta a partir deste dispositivo. Não há como recuperar sua Chave da Conta se você não a anotou.",
     "resetNow": "Redefinir agora"
   },
+  "promptConfirmRevokeModal": {
+    "header": "Tem certeza de que quer desvincular o seu número de celular da sua conta da Valora?",
+    "body": "Se a conta for desvinculada, ela não poderá mais ser associada a um número novamente. Apenas desvincule uma conta se você tiver certeza de que nunca mais precisará dela.",
+    "revoke": "Desvincular"
+  },
   "testFaqLink": " Perguntas frequentes do {{appName}} ",
   "termsOfServiceLink": "Termos de Serviço",
   "editProfile": "Editar perfil",

@@ -12,8 +12,6 @@
   "outgoingPaymentRequestsSummaryDetails_moreThan3Items": "Você está esperando pagamentos de <0></0>, <1></1> e outros",
   "SMSError": "Erro ao enviar SMS",
   "notifications": "Notificações",
-  "getBackupKey": "Obtenha a chave de backup",
-  "setBackupKey": "Configure sua chave de backup para permitir a recuperação da conta e melhorar sua segurança",
   "activity": "Atividades",
   "wallet": "Conta",
   "send": "Enviar",
