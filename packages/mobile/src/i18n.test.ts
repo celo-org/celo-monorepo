@@ -1,6 +1,7 @@
+import i18next from 'i18next'
 import 'react-native'
 
-let i18n
+let i18n: typeof i18next
 let enLoaded = false
 let esLoaded = false
 let ptLoaded = false
@@ -10,7 +11,6 @@ describe('i18n', () => {
     enLoaded = false
     esLoaded = false
     ptLoaded = false
-    // i18nInstance
 
     jest.resetModules()
 
@@ -40,8 +40,8 @@ describe('i18n', () => {
     expect(ptLoaded).toBe(false)
   })
 
-  it('only loads the selected language, but loads the default language when accessing a missing key', () => {
-    i18n.changeLanguage('es-419')
+  it('only loads the selected language, but loads the default language when accessing a missing key', async () => {
+    await i18n.changeLanguage('es-419')
     expect(i18n.t('global:someKey')).toEqual('¡Hola!')
     expect(enLoaded).toBe(false)
     expect(esLoaded).toBe(true)
