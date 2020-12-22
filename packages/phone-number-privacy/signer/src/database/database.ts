@@ -1,4 +1,4 @@
-import { logger } from '@celo/phone-number-privacy-common'
+import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import knex from 'knex'
 import Knex from 'knex/types'
 import config, { DEV_MODE, SupportedDatabase } from '../config'

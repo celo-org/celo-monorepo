@@ -1,14 +1,16 @@
----
-description: display help for celocli
----
+# `celocli help`
 
-## Commands
+display help for celocli
 
-### Help
+- [`celocli help [COMMAND]`](#celocli-help-command)
+
+## `celocli help [COMMAND]`
 
 display help for celocli
 
 ```
+display help for <%= config.bin %>
+
 USAGE
   $ celocli help [COMMAND]
 
@@ -19,4 +21,4 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [packages/cli/@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.0/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v1.2.11/src/commands/help.ts)_

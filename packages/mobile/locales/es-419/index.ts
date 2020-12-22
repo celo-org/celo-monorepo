@@ -9,7 +9,6 @@ import global from './global.json'
 import goldEducation from './goldEducation.json'
 import inviteFlow11 from './inviteFlow11.json'
 import nuxNamePin1 from './nuxNamePin1.json'
-import nuxRestoreWallet3 from './nuxRestoreWallet3.json'
 import nuxVerification2 from './nuxVerification2.json'
 import onboarding from './onboarding.json'
 import paymentRequestFlow from './paymentRequestFlow.json'
@@ -25,7 +24,6 @@ export default {
   inviteFlow11,
   goldEducation,
   nuxNamePin1,
-  nuxRestoreWallet3,
   nuxVerification2,
   paymentRequestFlow,
   receiveFlow8,

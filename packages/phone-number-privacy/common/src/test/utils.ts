@@ -36,7 +36,15 @@ export function createMockContractKit(
     registry: {
       addressFor: async () => 1000,
     },
-    web3: mockWeb3 ? mockWeb3 : new Web3(),
+    connection: createMockConnection(mockWeb3),
+  }
+}
+
+export function createMockConnection(mockWeb3?: any) {
+  mockWeb3 = mockWeb3 ?? new Web3()
+  return {
+    web3: mockWeb3,
+    getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
   }
 }
 
@@ -71,7 +79,7 @@ function uint8ArrayToBase64(bytes: Uint8Array) {
 export async function replenishQuota(account: string, contractKit: any) {
   const goldToken = await contractKit.contracts.getGoldToken()
   const selfTransferTx = goldToken.transfer(account, 1)
-  await selfTransferTx.sendAndWaitForReceipt()
+  await selfTransferTx.sendAndWaitForReceipt({ from: account })
 }
 
 export async function registerWalletAddress(

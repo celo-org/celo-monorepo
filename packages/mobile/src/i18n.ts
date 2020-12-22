@@ -22,7 +22,6 @@ export enum Namespaces {
   inviteFlow11 = 'inviteFlow11',
   goldEducation = 'goldEducation',
   nuxNamePin1 = 'nuxNamePin1',
-  nuxRestoreWallet3 = 'nuxRestoreWallet3',
   nuxVerification2 = 'nuxVerification2',
   receiveFlow8 = 'receiveFlow8',
   sendFlow7 = 'sendFlow7',

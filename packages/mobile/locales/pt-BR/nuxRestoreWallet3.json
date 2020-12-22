@@ -1,7 +1,0 @@
-{
-  "title": "Restaure sua conta do {{appName}} ",
-  "userYourBackupKey":
-    "Já tem uma conta do {{appName}}? Insira sua Chave da Conta para restaurá-la neste celular.",
-  "tip": "Dica: ",
-  "backupKeyTip": "As chaves de backup têm 24 palavras, separadas por um espaço."
-}

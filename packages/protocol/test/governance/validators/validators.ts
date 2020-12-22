@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -10,7 +11,6 @@ import {
   currentEpochNumber,
   mineBlocks,
   mineToNextEpoch,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'

@@ -1,8 +1,4 @@
-import {
-  ProposalBuilder,
-  proposalToJSON,
-  ProposalTransactionJSON,
-} from '@celo/contractkit/lib/governance/proposals'
+import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/governance'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'

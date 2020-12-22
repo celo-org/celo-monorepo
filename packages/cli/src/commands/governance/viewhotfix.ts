@@ -8,7 +8,7 @@ export default class ViewHotfix extends BaseCommand {
   static description = 'View information associated with hotfix'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     hash: flags.string({ required: true, description: 'Hash of hotfix transactions' }),
     whitelisters: flags.boolean({
       description: 'If set, displays validators that have whitelisted the hotfix.',

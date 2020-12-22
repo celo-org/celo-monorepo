@@ -12,8 +12,6 @@
   "outgoingPaymentRequestsSummaryDetails_moreThan3Items": "You're waiting for payments from <0></0>, <1></1> and others",
   "SMSError": "Error sending SMS",
   "notifications": "Notifications",
-  "getBackupKey": "Get Backup Key",
-  "setBackupKey": "Set up your Backup Key to enable account recovery and improve account security",
   "activity": "Activity",
   "wallet": "Wallet",
   "send": "Send",

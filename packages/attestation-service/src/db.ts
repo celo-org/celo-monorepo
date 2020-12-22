@@ -1,9 +1,10 @@
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { eqAddress } from '@celo/utils/lib/address'
 import Logger from 'bunyan'
 import moment from 'moment'
 import { FindOptions, Op, Sequelize, Transaction } from 'sequelize'
+import Web3 from 'web3'
 import { fetchEnv, fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
 import { Gauges } from './metrics'
@@ -70,12 +71,12 @@ export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
 }
 
 export async function isNodeSyncing() {
-  const syncProgress = await useKit((k) => k.web3.eth.isSyncing())
+  const syncProgress = await useKit((k) => k.connection.isSyncing())
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
 export async function getAgeOfLatestBlock() {
-  const latestBlock = await useKit((k) => k.web3.eth.getBlock('latest'))
+  const latestBlock = await useKit((k) => k.connection.getBlock('latest'))
   const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
   return {
     ageOfLatestBlock,
@@ -86,7 +87,7 @@ export async function getAgeOfLatestBlock() {
 export async function isAttestationSignerUnlocked() {
   // The only way to see if a key is unlocked is to try to sign something
   try {
-    await useKit((k) => k.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress()))
+    await useKit((k) => k.connection.sign('DO_NOT_USE', getAttestationSignerAddress()))
     return true
   } catch {
     return false
@@ -136,10 +137,10 @@ export async function verifyConfigurationAndGetURL() {
 
 export async function initializeKit(force: boolean = false) {
   if (kit === undefined || force) {
-    kit = newKit(fetchEnv('CELO_PROVIDER'))
+    kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
     // Copied from @celo/cli/src/utils/helpers
     try {
-      await kit.web3.eth.getBlock('latest')
+      await kit.connection.getBlock('latest')
       rootLogger.info(`Connected to Celo node at ${fetchEnv('CELO_PROVIDER')}`)
     } catch (error) {
       kit = undefined

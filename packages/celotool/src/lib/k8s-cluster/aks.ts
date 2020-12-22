@@ -44,6 +44,10 @@ export class AksClusterManager extends BaseClusterManager {
       `aad-pod-identity exists, skipping install`
     )
     if (!aadPodIdentityExists) {
+      console.info('Adding aad-pod-identity helm repository to local helm')
+      await execCmdWithExitOnFailure(
+        `helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts`
+      )
       console.info('Installing aad-pod-identity')
       await execCmdWithExitOnFailure(
         `helm install aad-pod-identity aad-pod-identity/aad-pod-identity`
