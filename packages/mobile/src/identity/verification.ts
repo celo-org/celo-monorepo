@@ -804,7 +804,7 @@ export function* revealAttestations(
       isFeelessVerification
     )
     // TODO (i1skn): remove this clause when
-    // https://github.com/celo-org/celo-labs/issues/578 is resolved.
+    // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
     // This sends messages with 5000ms delay on Android if reveals is successful
     if (success && Platform.OS === 'android') {
       Logger.debug(

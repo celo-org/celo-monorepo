@@ -673,7 +673,7 @@ describe(doVerificationFlow, () => {
         [select(verificationStateSelector), mockVerificationStateUnverified],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [
@@ -730,7 +730,7 @@ describe(doVerificationFlow, () => {
         [select(verificationStateSelector), mockVerificationStatePartlyVerified],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [
@@ -834,7 +834,7 @@ describe(doVerificationFlow, () => {
         ],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [

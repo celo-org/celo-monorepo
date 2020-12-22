@@ -37,6 +37,11 @@ const persistConfig: any = {
     }
     return stringifiedData
   },
+  deserialize: (data: string) => {
+    // This is the default implementation, but overriding to maintain compatibility with the serialize function
+    // in case the library changes.
+    return JSON.parse(data)
+  },
   timeout: null,
 }
 
