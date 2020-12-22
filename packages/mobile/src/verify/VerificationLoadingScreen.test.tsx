@@ -7,13 +7,6 @@ import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import { createMockStore } from 'test/utils'
 import { mockNavigation } from 'test/values'
 
-// Mock AnimatedScrollView this way otherwise we get a
-// `JavaScript heap out of memory` error when ref is set (?!)
-jest.mock(
-  'react-native/Libraries/Animated/src/components/AnimatedScrollView.js',
-  () => 'RCTScrollView'
-)
-
 // Lock time so snapshots always show the same countdown value
 jest.spyOn(Date, 'now').mockImplementation(() => 1487076708000)
 

@@ -41,14 +41,18 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "left": 0,
-          "marginBottom": 0,
-          "marginLeft": 16,
-          "opacity": 1,
-          "padding": 0,
-          "position": "absolute",
-        }
+        Array [
+          Object {
+            "left": 0,
+            "marginBottom": 0,
+            "marginLeft": 16,
+            "padding": 0,
+            "position": "absolute",
+          },
+          Object {
+            "opacity": 1,
+          },
+        ]
       }
       testID="Hamburguer"
     >
@@ -446,14 +450,18 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "left": 0,
-          "marginBottom": 0,
-          "marginLeft": 16,
-          "opacity": 1,
-          "padding": 0,
-          "position": "absolute",
-        }
+        Array [
+          Object {
+            "left": 0,
+            "marginBottom": 0,
+            "marginLeft": 16,
+            "padding": 0,
+            "position": "absolute",
+          },
+          Object {
+            "opacity": 1,
+          },
+        ]
       }
       testID="Hamburguer"
     >
@@ -851,14 +859,18 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "left": 0,
-          "marginBottom": 0,
-          "marginLeft": 16,
-          "opacity": 1,
-          "padding": 0,
-          "position": "absolute",
-        }
+        Array [
+          Object {
+            "left": 0,
+            "marginBottom": 0,
+            "marginLeft": 16,
+            "padding": 0,
+            "position": "absolute",
+          },
+          Object {
+            "opacity": 1,
+          },
+        ]
       }
       testID="Hamburguer"
     >
