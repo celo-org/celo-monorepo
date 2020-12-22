@@ -1,18 +1,46 @@
 {
   "addFunds": "Adicionar fundos",
-  "exchanges": "Fazer câmbio",
-  "buySellOnExchanges": "Comprar/Vender em Bolsas",
-  "cashOut": "Sacar",
-  "cashOutComingSoon": "Sacar (muito em breve)",
-  "celoDollarsAt": "Celo Dollars @ <1></1>",
-  "amountCelo": "Montante (CELO)",
-  "disclaimerCeloDollars": "Os valores em celo dólares são estimativas.",
-  "dollarsNotYetEnabledNote": "Os Celo Dólares ainda não estão disponíveis em nenhum provedor. Para adquirir Celo Dólares, compre CELO e troque-os por Celo Dólares no Valora, na guia CELO.",
-  "pleaseSelectProvider": "Selecione um provedor a seguir. Esses links conectam você a um serviço de terceiros.",
-  "explanationModal": {
-    "title": "Sobre os provedores",
-    "body": "Os provedores permitem que você adicione fundos ou saque dinheiro da sua conta. Eles determinam suas próprias taxas e restrições com base na localização, quantidade e outros fatores. Visite o site do provedor para ter suporte específico. Visite as perguntas frequentes para obter mais informações."
+  "addFundsSubtitle": "Compre cUSD ou CELO",
+  "exchanges": "Exchanges",
+  "buySellOnExchanges": "Comprar/Vender em exchanges",
+  "cashOut": "Sacar fundos",
+  "cashOutSubtitle": "Troque cUSD ou CELO por outra moeda",
+  "cashOutComingSoon": "Sacar fundos (em breve)",
+  "spend": "Gastos",
+  "spendSubtitle": "Use seu saldo com comerciantes apoiadores",
+  "celoDollarsAt": "Celo Dólares @ <1></1>",
+  "amountCelo": "Quantia (CELO)",
+  "onlyCeloDollars": "Somente cUSD",
+  "onlyCelo": "Somente CELO",
+  "celoDollar": "Celo Dólar",
+  "celoDollars": "Celo Dólares",
+  "tapToCopyCeloDollarsAddress": "Toque para copiar seu endereço cUSD do {{appName}} ",
+  "disclaimerCeloDollars": "Os valores em Celo Dólares são estimativas.",
+  "dollarsNotYetEnabledNote": "Os Celo Dólares ainda não estão disponíveis em nenhum provedor. Para obter Celo Dólares, adquira o CELO e troque por Celo Dólares na aba CELO.",
+  "selectDigitalCurrency": "Selecione uma moeda digital",
+  "selectPaymentMethod": "Pagar com:",
+  "payWithFiat": "Cartão de débito ou conta bancária",
+  "payWithExchange": "Exchange de criptomoeda",
+  "selectCashOutMethod": "Receber fundos em:",
+  "receiveOnAddress": "Endereço cUSD/CELO",
+  "receiveWithPonto": "GCash (com Ponto)",
+  "receiveWithKotani": "M-PESA (com Kotani Pay)",
+  "fundingEducationDialog": {
+    "title": "Adicionar fundos com {{appName}} ",
+    "body": "{{appName}} é alimentado pela Rede Celo. O {{appName}} gerencia Celo Dólares (cUSD), uma moeda digital estável que acompanha o dólar americano.Para adicionar fundos à sua conta do {{appName}}, compre o cUSD de um dos fornecedores terceirizados disponíveis em sua localidade. Para mais informações visite <0>{{link}}</0>",
+    "dismiss": "OK"
   },
-  "otherFundingOptions": "Para descobrir mais maneiras de adicionar e sacar fundos, visite <0>Como depositar fundos na minha conta</0>",
-  "youCanTransfer": "Você pode transferir Celo Dólares e CELO de/para as seguintes bolsas usando o seu Número de Conta (também conhecido como endereço Celo) – toque abaixo para copiar."
+  "cashOutEducationDialog": {
+    "title": "Sacar do {{appName}} ",
+    "body": "{{appName}} é alimentado pela Rede Celo. O {{appName}} gerencia Celo Dólares (cUSD), uma moeda digital estável que acompanha o dólar americano.Para sacar seu saldo do {{appName}}, venda cUSD com um dos fornecedores terceirizados disponíveis em sua localidade. Para mais informações visite <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
+  "explanationModal": {
+    "title": "Sobre os fornecedores",
+    "body": "Os fornecedores permitem que você adicione ou saque fundos da sua conta. Eles determinam suas próprias taxas e restrições dependendo da localidade, quantidade e outros fatores. Visite o site do fornecedor para obter ajuda específica. Visite as Perguntas frequentes para saber mais."
+  },
+  "otherFundingOptions": "Para conhecer mais maneiras de adicionar e sacar fundos, visite <0>Como adicionar fundos à sua conta</0>",
+  "youCanTransfer": "Você pode transferir {{currency}} de ou para os seguintes exchanges. Você precisará do seu Número da Conta (também conhecido como endereço) – toque abaixo para copiar.",
+  "useBalanceWithMerchants": "Use seu saldo com comerciantes apoiadores",
+  "findMerchants": "Encontre comerciantes locais perto de você"
 }

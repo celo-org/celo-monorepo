@@ -1,21 +1,32 @@
 {
   "cancel": "Cancelar",
-  "inviteWithWhatsapp": "Convidar pelo WhatsApp",
-  "inviteWithSMS": "Convidar por SMS",
-  "inviteFee": "Comissão de convite",
-  "whySendFees": "Essa comissão cobre os custos de verificação do número de telefone do novo usuário",
-  "whyReceiveFees": "Foi enviado dinheiro para você verificar sua conta",
+  "inviteWithWhatsapp": "Convidar com o WhatsApp",
+  "inviteWithSMS": "Convidar com SMS",
+  "inviteFee": "Taxa de convite",
+  "whySendFees": "Esta taxa cobre os custos para o novo usuário verificar seu número de telefone",
+  "whyReceiveFees": "Você recebeu dinheiro para verificar sua conta",
   "edit": "Editar",
   "to": "Para",
   "inviteSent": "Convite enviado",
-  "searchForSomeone": "Pesquise alguém pelo nome ou número de telefone",
-  "redeemFailed": "Não foi possível validar o código do convite",
-  "redeemInviteTimeout": "Trocar convite esgotado",
-  "accountSetupFailed": "Não foi possível criar sua carteira",
-  "emptyInviteCode": "O código do convite está sem fundos",
-  "transferDollarsToAccount": "Dólares transferidos para a sua conta!",
-  "inviteFriendsToCelo": "Convide amigos para o {{appName}} ",
+  "searchForSomeone": "Pesquise alguém usando o nome ou número de telefone",
+  "redeemFailed": "Falha ao resgatar o código ",
+  "redeemInviteTimeout": "O convite para resgatar expirou",
+  "accountSetupFailed": "Falha ao criar sua conta",
+  "emptyInviteCode": "O código do convite não tem fundos",
+  "transferDollarsToAccount": "Dólares transferidos para sua conta!",
+  "inviteFriendsToCelo": "Convide amigos para {{appName}} ",
   "inviteAnyone": "Envie facilmente para seus amigos adicionando seus contatos",
   "inviteReceived": "Convite recebido",
-  "escrowPaymentNotificationTitle": "Convidado e pago {{mobile}} (<3></3>)"
+  "escrowPaymentNotificationTitle": "{{mobile}} foi convidado",
+  "inviteDialog": {
+    "title": "Convide um amigo",
+    "body": "Conecte-se e compartilhe valor com seus amigos e familiares no Valora.",
+    "button": "Convidar"
+  },
+  "sendAndInvite": "Enviar e convidar",
+  "inviteAndSendDialog": {
+    "title": "Convidar e enviar",
+    "body": "Seu pagamento para {{name}} estará esperando por ele(a) assim que o número de telefone for verificado. Compartilhe uma mensagem de convite com eles para se inscrever no {{appName}} e reivindicar seu pagamento!",
+    "button": "Convidar"
+  }
 }

@@ -1,4 +1,3 @@
 {
-  "firebaseDisabled":
-    "O FireBase está desativado, o carregamento de notificações e registros não funcionará"
+  "firebaseDisabled": "O Firebase está desativado, o upload de notificações e registros não funcionará"
 }
