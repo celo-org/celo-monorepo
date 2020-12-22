@@ -1,10 +1,6 @@
 {
   "name": "@celo/mobile",
-<<<<<<< HEAD
   "version": "1.7.2",
-=======
-  "version": "1.7.1",
->>>>>>> master
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
