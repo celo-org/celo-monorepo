@@ -414,7 +414,7 @@ THE SOFTWARE.
 
 -----
 
-The following software may be included in this product: @ava/write-file-atomic, write-file-atomic. A copy of the source code may be downloaded from git+https://github.com/avajs/write-file-atomic (@ava/write-file-atomic), git@github.com:iarna/write-file-atomic.git (write-file-atomic). This software contains the following license and notice below:
+The following software may be included in this product: @ava/write-file-atomic, write-file-atomic. A copy of the source code may be downloaded from git+https://github.com/avajs/write-file-atomic (@ava/write-file-atomic), git://github.com/npm/write-file-atomic.git (write-file-atomic). This software contains the following license and notice below:
 
 Copyright (c) 2015, Rebecca Turner
 
@@ -424,7 +424,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 -----
 
-The following software may be included in this product: @azure/abort-controller, @azure/core-asynciterator-polyfill, @azure/logger, @azure/ms-rest-azure-env, @azure/ms-rest-js, @azure/ms-rest-nodeauth, @types/abstract-leveldown, @types/accepts, @types/airtable, @types/async-polling, @types/bignumber.js, @types/bn.js, @types/body-parser, @types/btoa, @types/bunyan, @types/caseless, @types/cli-table, @types/command-exists, @types/content-disposition, @types/country-data, @types/debug, @types/dotenv, @types/duplexify, @types/elliptic, @types/eslint-visitor-keys, @types/ethereumjs-util, @types/events, @types/express, @types/fs-capacitor, @types/graphql, @types/hammerjs, @types/hdkey, @types/hex-rgba, @types/hoist-non-react-statics, @types/http-assert, @types/http-proxy-agent, @types/inquirer, @types/isomorphic-fetch, @types/istanbul-lib-report, @types/json-stable-stringify, @types/keygrip, @types/koa-compose, @types/levelup, @types/lodash.zipobject, @types/long, @types/mathjs, @types/minimatch, @types/mkdirp, @types/mocha, @types/node, @types/nodemailer, @types/normalize-package-data, @types/p-defer, @types/parse-json, @types/pg-types, @types/prettier, @types/promise.allsettled, @types/prompts, @types/prop-types, @types/randombytes, @types/range-parser, @types/react-css-modules, @types/react-native-autocomplete-input, @types/react-native-fs, @types/react-native-keep-awake, @types/redux-mock-store, @types/resolve, @types/secp256k1, @types/solidity-parser-antlr, @types/stack-utils, @types/string-hash, @types/tar-stream, @types/targz, @types/through, @types/tmp, @types/tough-cookie, @types/tunnel, @types/twilio, @types/unist, @types/utf8, @types/uuid-js, @types/web3, @types/web3-provider-engine, @types/yargs-parser. A copy of the source code may be downloaded from git+https://github.com/Azure/azure-sdk-for-js.git (@azure/abort-controller), git@github.com:Azure/azure-sdk-for-js.git (@azure/core-asynciterator-polyfill), git+https://github.com/Azure/azure-sdk-for-js.git (@azure/logger), git@github.com:Azure/ms-rest-azure-env.git (@azure/ms-rest-azure-env), git@github.com:Azure/ms-rest-js.git (@azure/ms-rest-js), git@github.com:Azure/ms-rest-nodeauth.git (@azure/ms-rest-nodeauth), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/abstract-leveldown), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/accepts), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/airtable), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/async-polling), https://github.com/MikeMcl/bignumber.js/ (@types/bignumber.js), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/bn.js), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/body-parser), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/btoa), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/bunyan), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/caseless), https://github.com/DefinitelyTyped/DefinitelyTyped.git.git (@types/cli-table), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/command-exists), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/content-disposition), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/country-data), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/debug), https://github.com/motdotla/dotenv (@types/dotenv), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/duplexify), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/elliptic), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/eslint-visitor-keys), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/ethereumjs-util), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/events), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/express), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/fs-capacitor), https://github.com/graphql/graphql-js (@types/graphql), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hammerjs), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hdkey), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hex-rgba), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hoist-non-react-statics), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/http-assert), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/http-proxy-agent), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/inquirer), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/isomorphic-fetch), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/istanbul-lib-report), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/json-stable-stringify), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/keygrip), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/koa-compose), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/levelup), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/lodash.zipobject), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/long), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/mathjs), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/minimatch), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/mkdirp), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/mocha), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/node), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/nodemailer), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/normalize-package-data), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/p-defer), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/parse-json), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/pg-types), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/prettier), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/promise.allsettled), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/prompts), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/prop-types), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/randombytes), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/range-parser), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/react-css-modules), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/react-native-autocomplete-input), https://github.com/itinance/react-native-fs (@types/react-native-fs), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/react-native-keep-awake), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/redux-mock-store), https://github.com/DefinitelyTyped/DefinitelyTyped.git.git (@types/resolve), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/secp256k1), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/solidity-parser-antlr), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/stack-utils), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/string-hash), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tar-stream), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/targz), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/through), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tmp), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tough-cookie), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tunnel), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/twilio), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/unist), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/utf8), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/uuid-js), https://github.com/ethereum/web3.js (@types/web3), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/web3-provider-engine), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/yargs-parser). This software contains the following license and notice below:
+The following software may be included in this product: @azure/abort-controller, @azure/core-asynciterator-polyfill, @azure/logger, @azure/ms-rest-azure-env, @azure/ms-rest-js, @azure/ms-rest-nodeauth, @types/abstract-leveldown, @types/accepts, @types/airtable, @types/async-polling, @types/bignumber.js, @types/bn.js, @types/body-parser, @types/btoa, @types/bunyan, @types/caseless, @types/cli-table, @types/command-exists, @types/content-disposition, @types/country-data, @types/debug, @types/dotenv, @types/duplexify, @types/elliptic, @types/eslint-visitor-keys, @types/ethereumjs-util, @types/events, @types/express, @types/fs-capacitor, @types/graphql, @types/hammerjs, @types/hdkey, @types/hex-rgba, @types/hoist-non-react-statics, @types/http-assert, @types/http-proxy-agent, @types/inquirer, @types/isomorphic-fetch, @types/istanbul-lib-report, @types/json-stable-stringify, @types/keygrip, @types/koa-compose, @types/levelup, @types/lodash.zipobject, @types/long, @types/mathjs, @types/minimatch, @types/mkdirp, @types/mocha, @types/node, @types/nodemailer, @types/normalize-package-data, @types/p-defer, @types/parse-json, @types/pg-types, @types/prettier, @types/promise.allsettled, @types/prompts, @types/prop-types, @types/randombytes, @types/range-parser, @types/react-css-modules, @types/react-native-autocomplete-input, @types/react-native-fs, @types/react-native-keep-awake, @types/redux-mock-store, @types/resolve, @types/secp256k1, @types/solidity-parser-antlr, @types/stack-utils, @types/string-hash, @types/tar-stream, @types/targz, @types/through, @types/tmp, @types/tough-cookie, @types/tunnel, @types/twilio, @types/unist, @types/utf8, @types/uuid-js, @types/web3, @types/web3-provider-engine, @types/yargs-parser. A copy of the source code may be downloaded from git+https://github.com/Azure/azure-sdk-for-js.git (@azure/abort-controller), git@github.com:Azure/azure-sdk-for-js.git (@azure/core-asynciterator-polyfill), git+https://github.com/Azure/azure-sdk-for-js.git (@azure/logger), git@github.com:Azure/ms-rest-azure-env.git (@azure/ms-rest-azure-env), git@github.com:Azure/ms-rest-js.git (@azure/ms-rest-js), git@github.com:Azure/ms-rest-nodeauth.git (@azure/ms-rest-nodeauth), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/abstract-leveldown), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/accepts), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/airtable), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/async-polling), https://github.com/MikeMcl/bignumber.js/ (@types/bignumber.js), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/bn.js), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/body-parser), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/btoa), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/bunyan), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/caseless), https://github.com/DefinitelyTyped/DefinitelyTyped.git.git (@types/cli-table), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/command-exists), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/content-disposition), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/country-data), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/debug), https://github.com/motdotla/dotenv (@types/dotenv), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/duplexify), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/elliptic), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/eslint-visitor-keys), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/ethereumjs-util), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/events), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/express), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/fs-capacitor), https://github.com/graphql/graphql-js (@types/graphql), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hammerjs), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hdkey), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hex-rgba), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/hoist-non-react-statics), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/http-assert), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/http-proxy-agent), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/inquirer), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/isomorphic-fetch), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/istanbul-lib-report), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/json-stable-stringify), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/keygrip), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/koa-compose), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/levelup), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/lodash.zipobject), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/long), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/mathjs), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/minimatch), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/mkdirp), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/mocha), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/node), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/nodemailer), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/normalize-package-data), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/p-defer), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/parse-json), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/pg-types), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/prettier), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/promise.allsettled), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/prompts), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/prop-types), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/randombytes), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/range-parser), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/react-css-modules), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/react-native-autocomplete-input), https://github.com/itinance/react-native-fs (@types/react-native-fs), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/react-native-keep-awake), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/redux-mock-store), https://github.com/DefinitelyTyped/DefinitelyTyped.git.git (@types/resolve), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/secp256k1), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/solidity-parser-antlr), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/stack-utils), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/string-hash), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tar-stream), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/targz), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/through), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tmp), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tough-cookie), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/tunnel), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/twilio), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/unist), https://www.github.com/DefinitelyTyped/DefinitelyTyped.git (@types/utf8), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/uuid-js), https://github.com/ethereum/web3.js (@types/web3), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/web3-provider-engine), https://github.com/DefinitelyTyped/DefinitelyTyped.git (@types/yargs-parser). This software contains the following license and notice below:
 
 MIT License
 
@@ -2128,7 +2128,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 The following software may be included in this product: @hapi/hoek. A copy of the source code may be downloaded from git://github.com/hapijs/hoek. This software contains the following license and notice below:
 
-Copyright (c) 2011-2019, Sideway Inc, and project contributors  
+Copyright (c) 2011-2020, Sideway Inc, and project contributors  
 Copyright (c) 2011-2014, Walmart  
 Copyright (c) 2011, Yahoo Inc.
 
@@ -2145,7 +2145,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 The following software may be included in this product: @hapi/hoek. A copy of the source code may be downloaded from git://github.com/hapijs/hoek. This software contains the following license and notice below:
 
-Copyright (c) 2011-2020, Sideway Inc, and project contributors  
+Copyright (c) 2011-2019, Sideway Inc, and project contributors  
 Copyright (c) 2011-2014, Walmart  
 Copyright (c) 2011, Yahoo Inc.
 
@@ -4994,6 +4994,26 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 -----
 
+The following software may be included in this product: abbrev, chownr, color-support, dezalgo, exit-code, foreground-child, fs-minipass, fs-write-stream-atomic, fstream, glob, ignore-walk, ini, isexe, json-stringify-safe, lockfile, lru-cache, minimatch, minipass-collect, minipass-flush, minipass-pipeline, mute-stream, nopt, npm-packlist, npm-registry-client, npmlog, once, osenv, proto-list, pseudomap, read, read-package-tree, readdir-scoped-modules, rimraf, semver, sigmund, spawn-wrap, tar, which, wrappy, yallist. A copy of the source code may be downloaded from http://github.com/isaacs/abbrev-js (abbrev), git://github.com/isaacs/chownr.git (chownr), git+https://github.com/isaacs/color-support.git (color-support), https://github.com/npm/dezalgo (dezalgo), git+https://github.com/isaacs/exit-code.git (exit-code), git+https://github.com/tapjs/foreground-child.git (foreground-child), git+https://github.com/npm/fs-minipass.git (fs-minipass), https://github.com/npm/fs-write-stream-atomic (fs-write-stream-atomic), https://github.com/npm/fstream.git (fstream), git://github.com/isaacs/node-glob.git (glob), git+https://github.com/isaacs/ignore-walk.git (ignore-walk), git://github.com/isaacs/ini.git (ini), git+https://github.com/isaacs/isexe.git (isexe), git://github.com/isaacs/json-stringify-safe (json-stringify-safe), https://github.com/npm/lockfile.git (lockfile), git://github.com/isaacs/node-lru-cache.git (lru-cache), git://github.com/isaacs/minimatch.git (minimatch), git+https://github.com/isaacs/minipass-flush.git (minipass-flush), git://github.com/isaacs/mute-stream (mute-stream), https://github.com/npm/nopt.git (nopt), git+https://github.com/npm/npm-packlist.git (npm-packlist), https://github.com/npm/npm-registry-client.git (npm-registry-client), https://github.com/npm/npmlog.git (npmlog), git://github.com/isaacs/once (once), https://github.com/npm/osenv (osenv), https://github.com/isaacs/proto-list (proto-list), git+https://github.com/isaacs/pseudomap.git (pseudomap), git://github.com/isaacs/read.git (read), https://github.com/npm/read-package-tree (read-package-tree), https://github.com/npm/readdir-scoped-modules (readdir-scoped-modules), git://github.com/isaacs/rimraf.git (rimraf), https://github.com/npm/node-semver (semver), git://github.com/isaacs/sigmund (sigmund), git+https://github.com/isaacs/spawn-wrap.git (spawn-wrap), https://github.com/npm/node-tar.git (tar), git://github.com/isaacs/node-which.git (which), https://github.com/npm/wrappy (wrappy), git+https://github.com/isaacs/yallist.git (yallist). This software contains the following license and notice below:
+
+The ISC License
+
+Copyright (c) Isaac Z. Schlueter and Contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+-----
+
 The following software may be included in this product: abbrev. A copy of the source code may be downloaded from http://github.com/isaacs/abbrev-js. This software contains the following license and notice below:
 
 This software is dual-licensed under the ISC and MIT licenses.
@@ -5042,26 +5062,6 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
------
-
-The following software may be included in this product: abbrev, chownr, color-support, dezalgo, exit-code, foreground-child, fs-minipass, fs-write-stream-atomic, fstream, glob, ignore-walk, ini, isexe, json-stringify-safe, lockfile, lru-cache, minimatch, minipass-collect, minipass-flush, minipass-pipeline, mute-stream, nopt, npm-packlist, npm-registry-client, npmlog, once, osenv, proto-list, pseudomap, read, read-package-tree, readdir-scoped-modules, rimraf, semver, sigmund, spawn-wrap, tar, which, wrappy, yallist. A copy of the source code may be downloaded from http://github.com/isaacs/abbrev-js (abbrev), git://github.com/isaacs/chownr.git (chownr), git+https://github.com/isaacs/color-support.git (color-support), https://github.com/npm/dezalgo (dezalgo), git+https://github.com/isaacs/exit-code.git (exit-code), git+https://github.com/tapjs/foreground-child.git (foreground-child), git+https://github.com/npm/fs-minipass.git (fs-minipass), https://github.com/npm/fs-write-stream-atomic (fs-write-stream-atomic), https://github.com/npm/fstream.git (fstream), git://github.com/isaacs/node-glob.git (glob), git+https://github.com/isaacs/ignore-walk.git (ignore-walk), git://github.com/isaacs/ini.git (ini), git+https://github.com/isaacs/isexe.git (isexe), git://github.com/isaacs/json-stringify-safe (json-stringify-safe), https://github.com/npm/lockfile.git (lockfile), git://github.com/isaacs/node-lru-cache.git (lru-cache), git://github.com/isaacs/minimatch.git (minimatch), git+https://github.com/isaacs/minipass-flush.git (minipass-flush), git://github.com/isaacs/mute-stream (mute-stream), https://github.com/npm/nopt.git (nopt), git+https://github.com/npm/npm-packlist.git (npm-packlist), https://github.com/npm/npm-registry-client.git (npm-registry-client), https://github.com/npm/npmlog.git (npmlog), git://github.com/isaacs/once (once), https://github.com/npm/osenv (osenv), https://github.com/isaacs/proto-list (proto-list), git+https://github.com/isaacs/pseudomap.git (pseudomap), git://github.com/isaacs/read.git (read), https://github.com/npm/read-package-tree (read-package-tree), https://github.com/npm/readdir-scoped-modules (readdir-scoped-modules), git://github.com/isaacs/rimraf.git (rimraf), https://github.com/npm/node-semver (semver), git://github.com/isaacs/sigmund (sigmund), git+https://github.com/isaacs/spawn-wrap.git (spawn-wrap), https://github.com/npm/node-tar.git (tar), git://github.com/isaacs/node-which.git (which), https://github.com/npm/wrappy (wrappy), git+https://github.com/isaacs/yallist.git (yallist). This software contains the following license and notice below:
-
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 -----
 
@@ -5237,11 +5237,9 @@ THE SOFTWARE.
 
 -----
 
-The following software may be included in this product: acorn. A copy of the source code may be downloaded from https://github.com/acornjs/acorn.git. This software contains the following license and notice below:
+The following software may be included in this product: acorn. A copy of the source code may be downloaded from https://github.com/ternjs/acorn.git. This software contains the following license and notice below:
 
-MIT License
-
-Copyright (C) 2012-2018 by various contributors (see AUTHORS)
+Copyright (C) 2012-2016 by various contributors (see AUTHORS)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -5263,8 +5261,15 @@ THE SOFTWARE.
 
 -----
 
+<<<<<<< HEAD
 The following software may be included in this product: acorn, acorn-walk. A copy of the source code may be downloaded from https://github.com/acornjs/acorn.git (acorn), https://github.com/acornjs/acorn.git (acorn-walk). This software contains the following license and notice below:
 
+=======
+The following software may be included in this product: acorn. A copy of the source code may be downloaded from https://github.com/acornjs/acorn.git. This software contains the following license and notice below:
+
+MIT License
+
+>>>>>>> master
 Copyright (C) 2012-2018 by various contributors (see AUTHORS)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -6041,7 +6046,7 @@ THE SOFTWARE.
 
 -----
 
-The following software may be included in this product: anymatch. A copy of the source code may be downloaded from https://github.com/micromatch/anymatch. This software contains the following license and notice below:
+The following software may be included in this product: anymatch. A copy of the source code may be downloaded from https://github.com/es128/anymatch. This software contains the following license and notice below:
 
 The ISC License
 
@@ -6643,11 +6648,44 @@ SOFTWARE.
 
 -----
 
+<<<<<<< HEAD
 The following software may be included in this product: arr-diff, arr-union, array-unique, extend-shallow, get-value, is-extglob, is-glob, is-number, is-primitive, isobject, longest, micromatch, mixin-object, object.omit, parse-filepath, relative, write. A copy of the source code may be downloaded from https://github.com/jonschlinkert/arr-diff.git (arr-diff), git://github.com/jonschlinkert/arr-union.git (arr-union), git://github.com/jonschlinkert/array-unique.git (array-unique), git://github.com/jonschlinkert/extend-shallow.git (extend-shallow), https://github.com/jonschlinkert/get-value.git (get-value), https://github.com/jonschlinkert/is-extglob.git (is-extglob), https://github.com/jonschlinkert/is-glob.git (is-glob), https://github.com/jonschlinkert/is-number.git (is-number), git://github.com/jonschlinkert/is-primitive.git (is-primitive), git://github.com/jonschlinkert/isobject.git (isobject), https://github.com/jonschlinkert/longest.git (longest), https://github.com/jonschlinkert/micromatch.git (micromatch), https://github.com/jonschlinkert/mixin-object.git (mixin-object), git://github.com/jonschlinkert/object.omit.git (object.omit), https://github.com/jonschlinkert/parse-filepath.git (parse-filepath), https://github.com/jonschlinkert/relative.git (relative), https://github.com/jonschlinkert/write.git (write). This software contains the following license and notice below:
+=======
+The following software may be included in this product: arr-diff. A copy of the source code may be downloaded from https://github.com/jonschlinkert/arr-diff.git. This software contains the following license and notice below:
 
 The MIT License (MIT)
 
-Copyright (c) 2014-2015, Jon Schlinkert.
+Copyright (c) 2014-2015 Jon Schlinkert.
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+-----
+
+The following software may be included in this product: arr-diff, fill-range, for-in, has-value, has-values, kind-of, normalize-path, word-wrap. A copy of the source code may be downloaded from https://github.com/jonschlinkert/arr-diff.git (arr-diff), https://github.com/jonschlinkert/fill-range.git (fill-range), https://github.com/jonschlinkert/for-in.git (for-in), https://github.com/jonschlinkert/has-value.git (has-value), https://github.com/jonschlinkert/has-values.git (has-values), https://github.com/jonschlinkert/kind-of.git (kind-of), https://github.com/jonschlinkert/normalize-path.git (normalize-path), https://github.com/jonschlinkert/word-wrap.git (word-wrap). This software contains the following license and notice below:
+>>>>>>> master
+
+The MIT License (MIT)
+
+Copyright (c) 2014-2017, Jon Schlinkert
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -6669,11 +6707,11 @@ THE SOFTWARE.
 
 -----
 
-The following software may be included in this product: arr-diff, fill-range, for-in, has-value, has-values, kind-of, normalize-path, word-wrap. A copy of the source code may be downloaded from https://github.com/jonschlinkert/arr-diff.git (arr-diff), https://github.com/jonschlinkert/fill-range.git (fill-range), https://github.com/jonschlinkert/for-in.git (for-in), https://github.com/jonschlinkert/has-value.git (has-value), https://github.com/jonschlinkert/has-values.git (has-values), https://github.com/jonschlinkert/kind-of.git (kind-of), https://github.com/jonschlinkert/normalize-path.git (normalize-path), https://github.com/jonschlinkert/word-wrap.git (word-wrap). This software contains the following license and notice below:
+The following software may be included in this product: arr-diff, arr-union, array-unique, extend-shallow, get-value, is-extglob, is-glob, is-number, is-primitive, isobject, longest, micromatch, mixin-object, object.omit, parse-filepath, relative, write. A copy of the source code may be downloaded from https://github.com/jonschlinkert/arr-diff.git (arr-diff), git://github.com/jonschlinkert/arr-union.git (arr-union), git://github.com/jonschlinkert/array-unique.git (array-unique), https://github.com/jonschlinkert/extend-shallow.git (extend-shallow), https://github.com/jonschlinkert/get-value.git (get-value), https://github.com/jonschlinkert/is-extglob.git (is-extglob), https://github.com/jonschlinkert/is-glob.git (is-glob), https://github.com/jonschlinkert/is-number.git (is-number), git://github.com/jonschlinkert/is-primitive.git (is-primitive), git://github.com/jonschlinkert/isobject.git (isobject), https://github.com/jonschlinkert/longest.git (longest), https://github.com/jonschlinkert/micromatch.git (micromatch), https://github.com/jonschlinkert/mixin-object.git (mixin-object), git://github.com/jonschlinkert/object.omit.git (object.omit), https://github.com/jonschlinkert/parse-filepath.git (parse-filepath), https://github.com/jonschlinkert/relative.git (relative), https://github.com/jonschlinkert/write.git (write). This software contains the following license and notice below:
 
 The MIT License (MIT)
 
-Copyright (c) 2014-2017, Jon Schlinkert
+Copyright (c) 2014-2015, Jon Schlinkert.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -7211,7 +7249,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -----
 
-The following software may be included in this product: assert, path, readable-stream, util, util-extend. A copy of the source code may be downloaded from git://github.com/browserify/commonjs-assert.git (assert), git://github.com/jinder/path.git (path), git://github.com/nodejs/readable-stream (readable-stream), git://github.com/defunctzombie/node-util (util), git://github.com/isaacs/util-extend (util-extend). This software contains the following license and notice below:
+The following software may be included in this product: assert, path, readable-stream, util, util-extend. A copy of the source code may be downloaded from git://github.com/browserify/commonjs-assert.git (assert), git://github.com/jinder/path.git (path), git://github.com/isaacs/readable-stream (readable-stream), git://github.com/defunctzombie/node-util (util), git://github.com/isaacs/util-extend (util-extend). This software contains the following license and notice below:
 
 Copyright Joyent, Inc. and other Node contributors. All rights reserved.
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -10131,7 +10169,7 @@ The following software may be included in this product: browserslist. A copy of 
 
 The MIT License (MIT)
 
-Copyright 2014 Andrey Sitnik <andrey@sitnik.ru> and other contributors
+Copyright 2014 Andrey Sitnik <andrey@sitnik.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -10156,7 +10194,7 @@ The following software may be included in this product: browserslist. A copy of 
 
 The MIT License (MIT)
 
-Copyright 2014 Andrey Sitnik <andrey@sitnik.ru>
+Copyright 2014 Andrey Sitnik <andrey@sitnik.ru> and other contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -11798,7 +11836,11 @@ SOFTWARE.
 
 -----
 
+<<<<<<< HEAD
 The following software may be included in this product: cheerio-select-tmp, css-select, css-what, domelementtype, domhandler, domutils, entities, nth-check. A copy of the source code may be downloaded from git://github.com/cheeriojs/cheerio-select.git (cheerio-select-tmp), git://github.com/fb55/css-select.git (css-select), https://github.com/fb55/css-what (css-what), git://github.com/fb55/domelementtype.git (domelementtype), git://github.com/fb55/domhandler.git (domhandler), git://github.com/FB55/domutils.git (domutils), git://github.com/fb55/entities.git (entities), https://github.com/fb55/nth-check (nth-check). This software contains the following license and notice below:
+=======
+The following software may be included in this product: cheerio-select-tmp, css-select, css-what, domelementtype, domhandler, domutils, entities, nth-check. A copy of the source code may be downloaded from git://github.com/cheeriojs/cheerio-select.git (cheerio-select-tmp), git://github.com/fb55/css-select.git (css-select), https://github.com/fb55/css-what (css-what), git://github.com/fb55/domelementtype.git (domelementtype), git://github.com/fb55/domhandler.git (domhandler), git://github.com/fb55/domutils.git (domutils), git://github.com/fb55/entities.git (entities), https://github.com/fb55/nth-check (nth-check). This software contains the following license and notice below:
+>>>>>>> master
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -12333,7 +12375,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 -----
 
-The following software may be included in this product: cliui. A copy of the source code may be downloaded from https://github.com/yargs/cliui.git. This software contains the following license and notice below:
+The following software may be included in this product: cliui. A copy of the source code may be downloaded from http://github.com/yargs/cliui.git. This software contains the following license and notice below:
 
 Copyright (c) 2015, Contributors
 
@@ -14315,9 +14357,9 @@ SOFTWARE.
 
 -----
 
-The following software may be included in this product: core-js, core-js-compat, core-js-pure. A copy of the source code may be downloaded from https://github.com/zloirock/core-js.git (core-js), https://github.com/zloirock/core-js.git (core-js-compat), https://github.com/zloirock/core-js.git (core-js-pure). This software contains the following license and notice below:
+The following software may be included in this product: core-js. A copy of the source code may be downloaded from https://github.com/zloirock/core-js.git. This software contains the following license and notice below:
 
-Copyright (c) 2014-2020 Denis Pushkarev
+Copyright (c) 2015 Denis Pushkarev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -14339,9 +14381,9 @@ THE SOFTWARE.
 
 -----
 
-The following software may be included in this product: core-js. A copy of the source code may be downloaded from https://github.com/zloirock/core-js.git. This software contains the following license and notice below:
+The following software may be included in this product: core-js, core-js-compat, core-js-pure. A copy of the source code may be downloaded from https://github.com/zloirock/core-js.git (core-js), https://github.com/zloirock/core-js.git (core-js-compat), https://github.com/zloirock/core-js.git (core-js-pure). This software contains the following license and notice below:
 
-Copyright (c) 2015 Denis Pushkarev
+Copyright (c) 2014-2020 Denis Pushkarev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -15062,9 +15104,9 @@ PERFORMANCE OF THIS SOFTWARE.
 
 -----
 
-The following software may be included in this product: d3-array. A copy of the source code may be downloaded from https://github.com/d3/d3-array.git. This software contains the following license and notice below:
+The following software may be included in this product: d3-array, d3-color, d3-interpolate, d3-time, d3-timer. A copy of the source code may be downloaded from https://github.com/d3/d3-array.git (d3-array), https://github.com/d3/d3-color.git (d3-color), https://github.com/d3/d3-interpolate.git (d3-interpolate), https://github.com/d3/d3-time.git (d3-time), https://github.com/d3/d3-timer.git (d3-timer). This software contains the following license and notice below:
 
-Copyright 2010-2020 Mike Bostock
+Copyright 2010-2016 Mike Bostock
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -15094,9 +15136,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -----
 
-The following software may be included in this product: d3-array, d3-color, d3-interpolate, d3-time, d3-timer. A copy of the source code may be downloaded from https://github.com/d3/d3-array.git (d3-array), https://github.com/d3/d3-color.git (d3-color), https://github.com/d3/d3-interpolate.git (d3-interpolate), https://github.com/d3/d3-time.git (d3-time), https://github.com/d3/d3-timer.git (d3-timer). This software contains the following license and notice below:
+The following software may be included in this product: d3-array. A copy of the source code may be downloaded from https://github.com/d3/d3-array.git. This software contains the following license and notice below:
 
-Copyright 2010-2016 Mike Bostock
+Copyright 2010-2020 Mike Bostock
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -16243,7 +16285,7 @@ The following software may be included in this product: detect-file. A copy of t
 
 The MIT License (MIT)
 
-Copyright (c) 2016, .
+Copyright (c) 2016-2017, Brian Woodward.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -16269,7 +16311,7 @@ The following software may be included in this product: detect-file. A copy of t
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2017, Brian Woodward.
+Copyright (c) 2016, .
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -16633,10 +16675,7 @@ END OF TERMS AND CONDITIONS
 
 -----
 
-The following software may be included in this product: doctrine. A copy of the source code may be downloaded from https://github.com/eslint/doctrine.git. This software contains the following license and notice below:
-
-Doctrine
-Copyright jQuery Foundation and other contributors, https://jquery.org/
+The following software may be included in this product: doctrine, escodegen, estraverse, esutils, regjsparser. A copy of the source code may be downloaded from http://github.com/eslint/doctrine.git (doctrine), http://github.com/estools/escodegen.git (escodegen), http://github.com/estools/estraverse.git (estraverse), http://github.com/Constellation/esutils.git (esutils), git@github.com:jviereck/regjsparser.git (regjsparser). This software contains the following license and notice below:
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -16660,7 +16699,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -----
 
-The following software may be included in this product: doctrine, escodegen, estraverse, esutils, regjsparser. A copy of the source code may be downloaded from http://github.com/eslint/doctrine.git (doctrine), http://github.com/estools/escodegen.git (escodegen), http://github.com/estools/estraverse.git (estraverse), http://github.com/estools/esutils.git (esutils), git@github.com:jviereck/regjsparser.git (regjsparser). This software contains the following license and notice below:
+The following software may be included in this product: doctrine. A copy of the source code may be downloaded from https://github.com/eslint/doctrine.git. This software contains the following license and notice below:
+
+Doctrine
+Copyright jQuery Foundation and other contributors, https://jquery.org/
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -18334,7 +18376,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The following software may be included in this product: esprima. A copy of the source code may be downloaded from https://github.com/jquery/esprima.git. This software contains the following license and notice below:
 
-Copyright (c) jQuery Foundation, Inc. and Contributors, All Rights Reserved.
+Copyright JS Foundation and other contributors, https://js.foundation/
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -18360,7 +18402,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The following software may be included in this product: esprima. A copy of the source code may be downloaded from https://github.com/jquery/esprima.git. This software contains the following license and notice below:
 
-Copyright JS Foundation and other contributors, https://js.foundation/
+Copyright (c) jQuery Foundation, Inc. and Contributors, All Rights Reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23131,7 +23173,7 @@ The following software may be included in this product: graphql. A copy of the s
 
 MIT License
 
-Copyright (c) 2019 GraphQL Contributors
+Copyright (c) GraphQL Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23157,7 +23199,7 @@ The following software may be included in this product: graphql. A copy of the s
 
 MIT License
 
-Copyright (c) GraphQL Contributors
+Copyright (c) 2019 GraphQL Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23257,11 +23299,11 @@ SOFTWARE.
 
 -----
 
-The following software may be included in this product: graphql-tag. A copy of the source code may be downloaded from git+https://github.com/apollostack/graphql-tag.git. This software contains the following license and notice below:
+The following software may be included in this product: graphql-tag. A copy of the source code may be downloaded from git+https://github.com/apollographql/graphql-tag.git. This software contains the following license and notice below:
 
 The MIT License (MIT)
 
-Copyright (c) 2015 - 2018 Meteor Development Group, Inc.
+Copyright (c) 2020 Meteor Development Group, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23283,11 +23325,11 @@ SOFTWARE.
 
 -----
 
-The following software may be included in this product: graphql-tag. A copy of the source code may be downloaded from git+https://github.com/apollographql/graphql-tag.git. This software contains the following license and notice below:
+The following software may be included in this product: graphql-tag. A copy of the source code may be downloaded from git+https://github.com/apollostack/graphql-tag.git. This software contains the following license and notice below:
 
 The MIT License (MIT)
 
-Copyright (c) 2020 Meteor Development Group, Inc.
+Copyright (c) 2015 - 2018 Meteor Development Group, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26084,7 +26126,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -----
 
+<<<<<<< HEAD
 The following software may be included in this product: istanbul-lib-coverage, istanbul-lib-hook, istanbul-lib-instrument, istanbul-lib-report, istanbul-reports. A copy of the source code may be downloaded from git+ssh://git@github.com/istanbuljs/istanbuljs.git (istanbul-lib-coverage), git+ssh://git@github.com/istanbuljs/istanbuljs.git (istanbul-lib-hook), git+ssh://git@github.com/istanbuljs/istanbuljs.git (istanbul-lib-instrument), git+ssh://git@github.com/istanbuljs/istanbuljs.git (istanbul-lib-report), git@github.com:istanbuljs/istanbuljs (istanbul-reports). This software contains the following license and notice below:
+=======
+The following software may be included in this product: istanbul-lib-coverage, istanbul-lib-hook, istanbul-lib-instrument, istanbul-lib-report, istanbul-reports. A copy of the source code may be downloaded from git@github.com:istanbuljs/istanbuljs.git (istanbul-lib-coverage), git+ssh://git@github.com/istanbuljs/istanbuljs.git (istanbul-lib-hook), git@github.com:istanbuljs/istanbuljs.git (istanbul-lib-instrument), git@github.com:istanbuljs/istanbuljs.git (istanbul-lib-report), git+ssh://git@github.com/istanbuljs/istanbuljs.git (istanbul-reports). This software contains the following license and notice below:
+>>>>>>> master
 
 Copyright 2012-2015 Yahoo! Inc.
 All rights reserved.
@@ -26799,7 +26845,11 @@ SOFTWARE.
 
 The following software may be included in this product: js-sha3. A copy of the source code may be downloaded from https://github.com/emn178/js-sha3.git. This software contains the following license and notice below:
 
+<<<<<<< HEAD
 Copyright 2015-2017 Chen, Yi-Cyuan
+=======
+Copyright 2015-2018 Chen, Yi-Cyuan
+>>>>>>> master
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -26824,7 +26874,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 The following software may be included in this product: js-sha3. A copy of the source code may be downloaded from https://github.com/emn178/js-sha3.git. This software contains the following license and notice below:
 
-Copyright 2015-2018 Chen, Yi-Cyuan
+Copyright 2015-2017 Chen, Yi-Cyuan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -36092,6 +36142,39 @@ Located in ./vendor/QRCode
 
 The following software may be included in this product: qs. A copy of the source code may be downloaded from https://github.com/ljharb/qs.git. This software contains the following license and notice below:
 
+Copyright (c) 2014 Nathan LaFreniere and other contributors.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * The names of any contributors may not be used to endorse or promote
+      products derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS AND CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+                                  *   *   *
+
+The complete list of contributors can be found at: https://github.com/hapijs/qs/graphs/contributors
+
+-----
+
+The following software may be included in this product: qs. A copy of the source code may be downloaded from https://github.com/ljharb/qs.git. This software contains the following license and notice below:
+
 BSD 3-Clause License
 
 Copyright (c) 2014, Nathan LaFreniere and other [contributors](https://github.com/ljharb/qs/graphs/contributors)
@@ -36121,39 +36204,6 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
------
-
-The following software may be included in this product: qs. A copy of the source code may be downloaded from https://github.com/ljharb/qs.git. This software contains the following license and notice below:
-
-Copyright (c) 2014 Nathan LaFreniere and other contributors.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The names of any contributors may not be used to endorse or promote
-      products derived from this software without specific prior written
-      permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS AND CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-                                  *   *   *
-
-The complete list of contributors can be found at: https://github.com/hapijs/qs/graphs/contributors
 
 -----
 
@@ -36682,7 +36732,11 @@ SOFTWARE.
 
 -----
 
+<<<<<<< HEAD
 The following software may be included in this product: react-native-blind-threshold-bls, workspace-aggregator-346c5c0d-887c-44cb-a5b2-a293b485e2b7. A copy of the source code may be downloaded from git+https://github.com/celo-org/react-native-blind-threshold-bls.git (react-native-blind-threshold-bls). This software contains the following license and notice below:
+=======
+The following software may be included in this product: react-native-blind-threshold-bls, workspace-aggregator-d8cb3b28-8951-4b8b-a32b-e3600f7fb51d. A copy of the source code may be downloaded from git+https://github.com/celo-org/react-native-blind-threshold-bls.git (react-native-blind-threshold-bls). This software contains the following license and notice below:
+>>>>>>> master
 
 Apache License
                            Version 2.0, January 2004
@@ -38631,6 +38685,31 @@ SOFTWARE.
 
 -----
 
+The following software may be included in this product: replace-ext. A copy of the source code may be downloaded from git://github.com/wearefractal/replace-ext.git. This software contains the following license and notice below:
+
+Copyright (c) 2014 Fractal <contact@wearefractal.com>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-----
+
 The following software may be included in this product: replace-ext. A copy of the source code may be downloaded from https://github.com/gulpjs/replace-ext.git. This software contains the following license and notice below:
 
 The MIT License (MIT)
@@ -38654,31 +38733,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
------
-
-The following software may be included in this product: replace-ext. A copy of the source code may be downloaded from git://github.com/wearefractal/replace-ext.git. This software contains the following license and notice below:
-
-Copyright (c) 2014 Fractal <contact@wearefractal.com>
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 -----
 
@@ -41925,6 +41979,31 @@ THE SOFTWARE.
 
 -----
 
+The following software may be included in this product: string_decoder. A copy of the source code may be downloaded from git://github.com/rvagg/string_decoder.git. This software contains the following license and notice below:
+
+Copyright Joyent, Inc. and other Node contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-----
+
 The following software may be included in this product: string_decoder. A copy of the source code may be downloaded from git://github.com/nodejs/string_decoder.git. This software contains the following license and notice below:
 
 Node.js is licensed for use as follows:
@@ -41974,31 +42053,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-
------
-
-The following software may be included in this product: string_decoder. A copy of the source code may be downloaded from git://github.com/rvagg/string_decoder.git. This software contains the following license and notice below:
-
-Copyright Joyent, Inc. and other Node contributors.
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the
-following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 -----
 
@@ -43670,6 +43724,23 @@ SOFTWARE.
 
 -----
 
+The following software may be included in this product: tslib. A copy of the source code may be downloaded from https://github.com/Microsoft/tslib.git. This software contains the following license and notice below:
+
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+-----
+
 The following software may be included in this product: tslib, typescript. A copy of the source code may be downloaded from https://github.com/Microsoft/tslib.git (tslib), https://github.com/Microsoft/TypeScript.git (typescript). This software contains the following license and notice below:
 
 Apache License
@@ -43727,23 +43798,6 @@ If the Work includes a "NOTICE" text file as part of its distribution, then any 
 9. Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
 
 END OF TERMS AND CONDITIONS
-
------
-
-The following software may be included in this product: tslib. A copy of the source code may be downloaded from https://github.com/Microsoft/tslib.git. This software contains the following license and notice below:
-
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
 
 -----
 
@@ -47229,7 +47283,11 @@ Apache License
 
 -----
 
+<<<<<<< HEAD
 The following software may be included in this product: web3, web3-bzz, web3-core, web3-core-helpers, web3-core-method, web3-core-promievent, web3-core-requestmanager, web3-core-subscriptions, web3-eth, web3-eth-abi, web3-eth-accounts, web3-eth-contract, web3-eth-ens, web3-eth-iban, web3-eth-personal, web3-net, web3-providers-http, web3-providers-ipc, web3-providers-ws, web3-shh, web3-utils. A copy of the source code may be downloaded from https://github.com/ethereum/web3.js (web3), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-bzz (web3-bzz), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core (web3-core), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-helpers (web3-core-helpers), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-method (web3-core-method), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-promievent (web3-core-promievent), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-requestmanager (web3-core-requestmanager), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-subscriptions (web3-core-subscriptions), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth (web3-eth), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-abi (web3-eth-abi), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-accounts (web3-eth-accounts), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-contract (web3-eth-contract), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-ens (web3-eth-ens), https://github.com/ethereum/web3.js/tree/1.0/packages/web3-eth-iban (web3-eth-iban), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-personal (web3-eth-personal), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-net (web3-net), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-http (web3-providers-http), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-ipc (web3-providers-ipc), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-ws (web3-providers-ws), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-shh (web3-shh), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-utils (web3-utils). This software contains the following license and notice below:
+=======
+The following software may be included in this product: web3, web3-bzz, web3-core, web3-core-helpers, web3-core-method, web3-core-promievent, web3-core-requestmanager, web3-core-subscriptions, web3-eth, web3-eth-abi, web3-eth-accounts, web3-eth-contract, web3-eth-ens, web3-eth-iban, web3-eth-personal, web3-net, web3-providers-http, web3-providers-ipc, web3-providers-ws, web3-shh, web3-utils. A copy of the source code may be downloaded from https://github.com/ethereum/web3.js (web3), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-bzz (web3-bzz), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core (web3-core), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-helpers (web3-core-helpers), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-method (web3-core-method), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-promievent (web3-core-promievent), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-requestmanager (web3-core-requestmanager), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-core-subscriptions (web3-core-subscriptions), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth (web3-eth), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-abi (web3-eth-abi), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-accounts (web3-eth-accounts), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-contract (web3-eth-contract), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-ens (web3-eth-ens), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-iban (web3-eth-iban), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-eth-personal (web3-eth-personal), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-net (web3-net), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-http (web3-providers-http), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-ipc (web3-providers-ipc), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-ws (web3-providers-ws), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-shh (web3-shh), https://github.com/ethereum/web3.js/tree/1.x/packages/web3-utils (web3-utils). This software contains the following license and notice below:
+>>>>>>> master
 
 This file is part of web3.js.
 
@@ -47768,15 +47826,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 The following software may be included in this product: xmldom. A copy of the source code may be downloaded from git://github.com/xmldom/xmldom.git. This software contains the following license and notice below:
 
-You can choose any one of these licenses:
-
-- MIT: https://opensource.org/licenses/MIT
-- LGPL: http://www.gnu.org/licenses/lgpl.html
-
------
-
-The following software may be included in this product: xmldom. A copy of the source code may be downloaded from git://github.com/xmldom/xmldom.git. This software contains the following license and notice below:
-
 You can choose any one of those:
 
 The MIT License (MIT):
@@ -47785,6 +47834,15 @@ link:http://opensource.org/licenses/MIT
 
 LGPL:
 http://www.gnu.org/licenses/lgpl.html
+
+-----
+
+The following software may be included in this product: xmldom. A copy of the source code may be downloaded from git://github.com/xmldom/xmldom.git. This software contains the following license and notice below:
+
+You can choose any one of these licenses:
+
+- MIT: https://opensource.org/licenses/MIT
+- LGPL: http://www.gnu.org/licenses/lgpl.html
 
 -----
 
