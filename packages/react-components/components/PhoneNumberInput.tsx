@@ -97,9 +97,6 @@ export default function PhoneNumberInput({
               <Text style={styles.flag} testID={'countryCodeFlag'}>
                 {flagEmoji}
               </Text>
-              <Text style={styles.phoneCountryCode} testID={'countryCodeText'}>
-                {countryCallingCode}
-              </Text>
             </Expandable>
           </View>
         </Touchable>
@@ -128,7 +125,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   countryCodeContainer: {
-    width: 112,
+    width: 80,
     paddingHorizontal: 12,
     alignItems: 'stretch',
     backgroundColor: colors.light,

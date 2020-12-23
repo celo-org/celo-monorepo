@@ -77,7 +77,8 @@ function getPhoneNumberState(
 
   if (phoneDetails) {
     return {
-      nationalPhoneNumber: phoneDetails.displayNumber,
+      // Show international display number to avoid confusion
+      nationalPhoneNumber: phoneDetails.displayNumberInternational,
       e164Number: phoneDetails.e164Number,
       isValidNumber: true,
       countryCodeAlpha2: phoneDetails.regionCode!,
