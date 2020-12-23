@@ -639,12 +639,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return this.sortedQueue(queue)
   }
 
-  private async lesserAndGreaterAfterRevoke(upvoter: Address) {
+  public async lesserAndGreaterAfterRevoke(upvoter: Address) {
     const { queue, upvoteRecord } = await this.withUpvoteRevoked(upvoter)
     return this.lesserAndGreater(upvoteRecord.proposalID, queue)
   }
 
-  private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
+  public async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
     const recordQueued = await this.isQueued(upvoteRecord.proposalID)
     // if existing upvote exists in queue, revoke it before applying new upvote
