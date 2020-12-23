@@ -98,7 +98,7 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
         setAddressesFetched(false)
       })
 
-      return removeButtonFocusListener()
+      return removeButtonFocusListener
     }, [])
   )
 
