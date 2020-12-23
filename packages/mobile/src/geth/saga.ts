@@ -30,7 +30,6 @@ import {
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { store } from 'src/redux/store'
-import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
@@ -240,7 +239,6 @@ export function* initGethSaga() {
     }
   }
 
-  let restartAppAutomatically: boolean = false
   let errorContext: string
 
   switch (failureResult) {
@@ -249,14 +247,12 @@ export function* initGethSaga() {
         'Could not fetch genesis block from the network. Tell user to check data connection.'
       Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
-      restartAppAutomatically = false
       break
     }
     case GethInitOutcomes.IRRECOVERABLE_FAILURE: {
       errorContext = 'Could not initialize geth. Will retry.'
       Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.INITIALIZE_ERROR))
-      restartAppAutomatically = true
       break
     }
     // We assume it's a timeout if it hits this case. It's possible though, if
@@ -266,7 +262,6 @@ export function* initGethSaga() {
       errorContext = 'Geth initializtion timed out. Will retry.'
       Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.INITIALIZE_ERROR))
-      restartAppAutomatically = true
     }
   }
 
@@ -275,22 +270,18 @@ export function* initGethSaga() {
     context: errorContext,
   })
 
-  if (restartAppAutomatically) {
-    Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    ValoraAnalytics.track(GethEvents.geth_restart_to_fix_init)
-    deleteChainDataAndRestartApp()
+  Logger.error(TAG, 'Geth initialization failed')
+  ValoraAnalytics.track(GethEvents.geth_restart_to_fix_init)
+  // Suggest switch to forno for network-related errors
+  if (yield select(promptFornoIfNeededSelector)) {
+    ValoraAnalytics.track(GethEvents.prompt_forno, {
+      error: failureResult,
+      context: 'Geth init error',
+    })
+    yield put(setPromptForno(false))
+    navigate(Screens.Settings, { promptFornoModal: true })
   } else {
-    // Suggest switch to forno for network-related errors
-    if (yield select(promptFornoIfNeededSelector)) {
-      ValoraAnalytics.track(GethEvents.prompt_forno, {
-        error: failureResult,
-        context: 'Geth init error',
-      })
-      yield put(setPromptForno(false))
-      navigate(Screens.Settings, { promptFornoModal: true })
-    } else {
-      navigateToError('networkConnectionFailed')
-    }
+    navigateToError('networkConnectionFailed')
   }
 
   return GethInitOutcomes.IRRECOVERABLE_FAILURE
