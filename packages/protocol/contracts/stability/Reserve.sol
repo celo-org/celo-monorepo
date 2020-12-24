@@ -362,7 +362,6 @@ contract Reserve is
   function transferExchangeGold(address payable to, uint256 value)
     external
     returns (
-      // onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
       bool
     )
   {
