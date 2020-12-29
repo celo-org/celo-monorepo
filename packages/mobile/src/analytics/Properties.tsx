@@ -13,6 +13,7 @@ import {
   InviteEvents,
   NetworkEvents,
   OnboardingEvents,
+  PerformanceEvents,
   RequestEvents,
   SendEvents,
   SettingsEvents,
@@ -54,6 +55,9 @@ interface AppEventsProperties {
   [AppEvents.fetch_balance_error]: {
     dollarBalance?: string
     goldBalance?: string
+  }
+  [AppEvents.redux_keychain_mismatch]: {
+    account: string
   }
 }
 
@@ -779,6 +783,12 @@ interface ContractKitEventsProperties {
   [ContractKitEvents.init_contractkit_finish]: undefined
 }
 
+interface PerformanceProperties {
+  [PerformanceEvents.redux_store_size]: {
+    size: number
+  }
+}
+
 export type AnalyticsPropertiesList = AppEventsProperties &
   HomeEventsProperties &
   SettingsEventsProperties &
@@ -796,4 +806,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FiatExchangeEventsProperties &
   GethEventsProperties &
   NetworkEventsProperties &
-  ContractKitEventsProperties
+  ContractKitEventsProperties &
+  PerformanceProperties

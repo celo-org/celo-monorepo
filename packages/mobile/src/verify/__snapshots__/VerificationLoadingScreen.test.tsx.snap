@@ -244,11 +244,15 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
           <View
             accessible={true}
             style={
-              Object {
-                "alignItems": "center",
-                "opacity": 1,
-                "paddingVertical": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "paddingVertical": 8,
+                },
+                Object {
+                  "opacity": 1,
+                },
+              ]
             }
           >
             <svg
@@ -1131,11 +1135,15 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
           <View
             accessible={true}
             style={
-              Object {
-                "alignItems": "center",
-                "opacity": 1,
-                "paddingVertical": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "paddingVertical": 8,
+                },
+                Object {
+                  "opacity": 1,
+                },
+              ]
             }
           >
             <svg

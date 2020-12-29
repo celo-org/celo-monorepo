@@ -49,6 +49,7 @@
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
     "@celo/base": "1.0.0-dev",
+    "@celo/connect": "1.0.0-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#e933297",
     "@celo/utils": "1.0.0-dev",
     "@openzeppelin/upgrades": "^2.8.0",
