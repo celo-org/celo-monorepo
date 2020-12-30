@@ -1,8 +1,8 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import * as React from 'react'
 import { ViewStyle } from 'react-native'
 import { useSelector } from 'react-redux'
 import { nameSelector, pictureSelector, userContactDetailsSelector } from 'src/account/selectors'
+import ContactCircle from 'src/components/ContactCircle'
 
 interface Props {
   style?: ViewStyle

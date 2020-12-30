@@ -1040,24 +1040,12 @@ exports[`transfer feed item renders correctly for received 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="none"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1330,24 +1318,12 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="none"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1492,24 +1468,12 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="none"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1540,7 +1504,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             }
           }
         >
-          feedItemSentTitle
+          feedItemAddress
         </Text>
         <Text
           numberOfLines={1}
@@ -1776,24 +1740,12 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="none"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1824,7 +1776,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             }
           }
         >
-          feedItemSentTitle
+          feedItemAddress
         </Text>
         <Text
           numberOfLines={1}
@@ -1935,24 +1887,12 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="none"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1983,7 +1923,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             }
           }
         >
-          feedItemSentTitle
+          feedItemAddress
         </Text>
         <Text
           numberOfLines={1}

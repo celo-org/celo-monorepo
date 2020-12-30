@@ -1,7 +1,7 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useSelector } from 'react-redux'
+import ContactCircle from 'src/components/ContactCircle'
 import ContactCircleSelf from 'src/components/ContactCircleSelf'
 import CircleArrowIcon from 'src/icons/CircleArrowIcon'
 import { addressToDisplayNameSelector } from 'src/identity/reducer'

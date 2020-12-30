@@ -35,14 +35,6 @@ exports[`Profile renders correctly 1`] = `
           onGestureHandlerStateChange={[Function]}
           onHandlerStateChange={[Function]}
           rippleColor={0}
-          style={
-            Array [
-              Object {
-                "overflow": "hidden",
-              },
-              undefined,
-            ]
-          }
         >
           <View
             accessible={true}
@@ -411,7 +403,6 @@ exports[`Profile renders correctly 1`] = `
                     "justifyContent": "center",
                   },
                   Object {
-                    "flex": 0,
                     "justifyContent": "flex-end",
                     "paddingLeft": 16,
                   },
@@ -440,7 +431,6 @@ exports[`Profile renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#9CA4A9",
-                        "flex": 0,
                         "minWidth": 160,
                         "paddingVertical": 0,
                         "textAlign": "right",

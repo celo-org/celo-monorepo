@@ -179,24 +179,12 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-                      }
-                    }
-                    style={
-                      Array [
-                        Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
-                        },
-                        Object {
-                          "height": 40,
-                          "width": 40,
-                        },
-                      ]
-                    }
+                  <svg
+                    fill="none"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
                   />
                 </View>
               </View>
@@ -1107,24 +1095,12 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-                      }
-                    }
-                    style={
-                      Array [
-                        Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
-                        },
-                        Object {
-                          "height": 40,
-                          "width": 40,
-                        },
-                      ]
-                    }
+                  <svg
+                    fill="none"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
                   />
                 </View>
               </View>
@@ -1584,24 +1560,12 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-                      }
-                    }
-                    style={
-                      Array [
-                        Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
-                        },
-                        Object {
-                          "height": 40,
-                          "width": 40,
-                        },
-                      ]
-                    }
+                  <svg
+                    fill="none"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
                   />
                 </View>
               </View>
@@ -2063,24 +2027,12 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-                      }
-                    }
-                    style={
-                      Array [
-                        Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
-                        },
-                        Object {
-                          "height": 40,
-                          "width": 40,
-                        },
-                      ]
-                    }
+                  <svg
+                    fill="none"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
                   />
                 </View>
               </View>
@@ -2786,24 +2738,12 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-                      }
-                    }
-                    style={
-                      Array [
-                        Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
-                        },
-                        Object {
-                          "height": 40,
-                          "width": 40,
-                        },
-                      ]
-                    }
+                  <svg
+                    fill="none"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
                   />
                 </View>
               </View>

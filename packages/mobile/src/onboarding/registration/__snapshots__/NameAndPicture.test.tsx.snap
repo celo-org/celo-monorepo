@@ -53,14 +53,6 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
         onGestureHandlerStateChange={[Function]}
         onHandlerStateChange={[Function]}
         rippleColor={0}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
-        }
       >
         <View
           accessible={true}
@@ -476,6 +468,7 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -589,14 +582,6 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
         onGestureHandlerStateChange={[Function]}
         onHandlerStateChange={[Function]}
         rippleColor={0}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
-        }
       >
         <View
           accessible={true}
@@ -1012,6 +997,7 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
