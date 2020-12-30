@@ -2,6 +2,8 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { fireEvent, render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { ErrorDisplayType } from 'src/alert/reducer'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
 import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -79,9 +81,9 @@ describe('SendConfirmation', () => {
     // expect(toJSON()).toMatchSnapshot()
   })
 
-  it('renders correctly for send payment confirmation when fee calculation fails', async () => {
+  it('shows a generic `calculateFeeFailed` error when fee estimate fails due to an unknown error', async () => {
     mockedGetSendFee.mockImplementation(async () => {
-      throw new Error('Calculate fee failed')
+      throw new Error('Unknown error message')
     })
 
     const store = createMockStore({
@@ -96,21 +98,61 @@ describe('SendConfirmation', () => {
       </Provider>
     )
 
-    // Initial render
-    expect(tree).toMatchSnapshot()
-
-    // TODO: figure out why fee line items arent rendering
-    // fireEvent.press(tree.getByText('feeEstimate'))
-    // Run timers, because Touchable adds some delay
-    // jest.runAllTimers()
-    // TODO: figure out why onPress function of Touchable isn't being called
-    // expect(tree.queryByText('securityFee')).not.toBeNull()
-    // expect(tree.queryByText('0.0100')).toBeNull()
+    store.clearActions()
 
     // Wait for fee error
     await waitForElement(() => tree.getByText('---'))
 
-    expect(tree).toMatchSnapshot()
+    expect(store.getActions()).toEqual([
+      {
+        action: null,
+        alertType: 'error',
+        buttonMessage: null,
+        dismissAfter: 5000,
+        displayMethod: ErrorDisplayType.BANNER,
+        message: 'calculateFeeFailed',
+        title: null,
+        type: 'ALERT/SHOW',
+        underlyingError: 'calculateFeeFailed',
+      },
+    ])
+  })
+
+  it('shows an `insufficientBalance` error when fee estimate fails due insufficient user balance', async () => {
+    mockedGetSendFee.mockImplementation(async () => {
+      throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    })
+
+    const store = createMockStore({
+      stableToken: {
+        balance: '0',
+      },
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <SendConfirmation {...mockScreenProps} />
+      </Provider>
+    )
+
+    store.clearActions()
+
+    // Wait for fee error
+    await waitForElement(() => tree.getByText('---'))
+
+    expect(store.getActions()).toEqual([
+      {
+        action: null,
+        alertType: 'error',
+        buttonMessage: null,
+        dismissAfter: 5000,
+        displayMethod: ErrorDisplayType.BANNER,
+        message: 'insufficientBalance',
+        title: null,
+        type: 'ALERT/SHOW',
+        underlyingError: 'insufficientBalance',
+      },
+    ])
   })
 
   it('renders correctly when there are multiple user addresses (should show edit button)', async () => {

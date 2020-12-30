@@ -1,6 +1,6 @@
-import { CeloTransactionObject } from '@celo/contractkit'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { CeloTransactionObject } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { UnlockableWallet } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
 import { Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -95,9 +95,13 @@ export async function getInviteFee(
   account: string,
   currency: CURRENCY_ENUM,
   amount: string,
+  dollarBalance: string,
   comment: string
 ) {
   try {
+    if (new BigNumber(amount).isGreaterThan(new BigNumber(dollarBalance))) {
+      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
     const gas = await getInviteTxGas(account, currency, amount, comment)
     return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
   } catch (error) {

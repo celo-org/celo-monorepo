@@ -52,6 +52,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -414,6 +415,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -980,6 +982,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1456,6 +1459,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1932,6 +1936,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -2294,6 +2299,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -2653,6 +2659,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -3015,6 +3022,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }

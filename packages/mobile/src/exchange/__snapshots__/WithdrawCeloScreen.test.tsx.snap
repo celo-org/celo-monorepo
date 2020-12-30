@@ -90,6 +90,7 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -183,6 +184,7 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
       >
         <TextInput
           allowFontScaling={true}
+          autoCapitalize="words"
           keyboardType="decimal-pad"
           onChangeText={[Function]}
           placeholder="0"
@@ -222,9 +224,12 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "opacity": 1,
-            }
+            Array [
+              undefined,
+              Object {
+                "opacity": 1,
+              },
+            ]
           }
           testID="MaxAmount"
         >
@@ -279,6 +284,7 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
