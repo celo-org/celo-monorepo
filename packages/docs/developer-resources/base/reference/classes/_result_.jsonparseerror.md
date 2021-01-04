@@ -32,7 +32,7 @@
 
 *Overrides [RootError](_result_.rooterror.md).[constructor](_result_.rooterror.md#constructor)*
 
-*Defined in [packages/sdk/base/src/result.ts:79](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L79)*
+*Defined in [packages/sdk/base/src/result.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L79)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **error**: *[Error](_result_.rooterror.md#static-error)*
 
-*Defined in [packages/sdk/base/src/result.ts:80](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L80)*
+*Defined in [packages/sdk/base/src/result.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L80)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[errorType](_result_.rooterror.md#readonly-errortype)*
 
-*Defined in [packages/sdk/base/src/result.ts:67](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L67)*
+*Defined in [packages/sdk/base/src/result.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L67)*
 
 ___
 

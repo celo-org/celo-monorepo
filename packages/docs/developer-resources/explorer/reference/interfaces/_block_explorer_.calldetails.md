@@ -19,7 +19,7 @@
 
 • **argList**: *any[]*
 
-*Defined in [block-explorer.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L20)*
+*Defined in [block-explorer.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L20)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **contract**: *string*
 
-*Defined in [block-explorer.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L17)*
+*Defined in [block-explorer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L17)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **function**: *string*
 
-*Defined in [block-explorer.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L18)*
+*Defined in [block-explorer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L18)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **paramMap**: *Record‹string, any›*
 
-*Defined in [block-explorer.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L19)*
+*Defined in [block-explorer.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L19)*

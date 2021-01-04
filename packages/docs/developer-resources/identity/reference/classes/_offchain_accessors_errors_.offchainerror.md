@@ -32,7 +32,7 @@
 
 *Overrides void*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L19)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L19)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **error**: *[OffchainErrors](../modules/_offchain_data_wrapper_.md#offchainerrors)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L20)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L20)*
 
 ___
 

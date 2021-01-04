@@ -65,7 +65,7 @@ ___
 
 ▸ **LocalSigner**(`privateKey`: string): *Signer*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L61)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L61)*
 
 **Parameters:**
 
@@ -81,7 +81,7 @@ ___
 
 ▸ **addressToPublicKey**(`signer`: string, `signFn`: function): *Promise‹string›*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L35)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L35)*
 
 **Parameters:**
 
@@ -106,7 +106,7 @@ ___
 
 ▸ **guessSigner**(`message`: string, `signature`: string): *string*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:148](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L148)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L148)*
 
 **Parameters:**
 
@@ -123,7 +123,7 @@ ___
 
 ▸ **hashMessage**(`message`: string): *string*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:31](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L31)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L31)*
 
 **Parameters:**
 
@@ -139,7 +139,7 @@ ___
 
 ▸ **hashMessageWithPrefix**(`message`: string): *string*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L26)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L26)*
 
 **Parameters:**
 
@@ -155,7 +155,7 @@ ___
 
 ▸ **parseSignature**(`message`: string, `signature`: string, `signer`: string): *object*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:111](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L111)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L111)*
 
 **Parameters:**
 
@@ -179,7 +179,7 @@ ___
 
 ▸ **parseSignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *object*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:115](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L115)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L115)*
 
 **Parameters:**
 
@@ -203,7 +203,7 @@ ___
 
 ▸ **recoverEIP712TypedDataSigner**(`typedData`: [EIP712TypedData](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712typeddata.md), `signature`: string): *string*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:133](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L133)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L133)*
 
 **Parameters:**
 
@@ -220,7 +220,7 @@ ___
 
 ▸ **signMessage**(`message`: string, `privateKey`: string, `address`: string): *object*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:80](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L80)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L80)*
 
 **Parameters:**
 
@@ -244,7 +244,7 @@ ___
 
 ▸ **signMessageWithoutPrefix**(`messageHash`: string, `privateKey`: string, `address`: string): *object*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:84](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L84)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L84)*
 
 **Parameters:**
 
@@ -268,7 +268,7 @@ ___
 
 ▸ **signedMessageToPublicKey**(`message`: string, `v`: number, `r`: string, `s`: string): *string*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L70)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L70)*
 
 **Parameters:**
 
@@ -287,7 +287,7 @@ ___
 
 ▸ **verifySignature**(`message`: string, `signature`: string, `signer`: string): *boolean*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:102](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L102)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L102)*
 
 **Parameters:**
 
@@ -305,46 +305,46 @@ Name | Type |
 
 ### ▪ **SignatureUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:195](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L195)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:195](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L195)*
 
 ###  LocalSigner
 
 • **LocalSigner**: *[LocalSigner](_packages_sdk_utils_src_signatureutils_.md#localsigner)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:197](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L197)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L197)*
 
 ###  NativeSigner
 
 • **NativeSigner**: *NativeSigner*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:196](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L196)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:196](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L196)*
 
 ###  parseSignature
 
 • **parseSignature**: *[parseSignature](_packages_sdk_utils_src_signatureutils_.md#parsesignature)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:200](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L200)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:200](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L200)*
 
 ###  parseSignatureWithoutPrefix
 
 • **parseSignatureWithoutPrefix**: *[parseSignatureWithoutPrefix](_packages_sdk_utils_src_signatureutils_.md#parsesignaturewithoutprefix)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:201](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L201)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L201)*
 
 ###  serializeSignature
 
 • **serializeSignature**: *serializeSignature*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:202](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L202)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L202)*
 
 ###  signMessage
 
 • **signMessage**: *[signMessage](_packages_sdk_utils_src_signatureutils_.md#signmessage)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:198](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L198)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:198](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L198)*
 
 ###  signMessageWithoutPrefix
 
 • **signMessageWithoutPrefix**: *[signMessageWithoutPrefix](_packages_sdk_utils_src_signatureutils_.md#signmessagewithoutprefix)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:199](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L199)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:199](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L199)*
