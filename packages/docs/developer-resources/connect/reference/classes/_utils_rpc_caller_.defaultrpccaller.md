@@ -30,7 +30,7 @@
 
 \+ **new DefaultRpcCaller**(`defaultProvider`: [Provider](../interfaces/_types_.provider.md), `jsonrpcVersion`: string): *[DefaultRpcCaller](_utils_rpc_caller_.defaultrpccaller.md)*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:67](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L67)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L67)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ Name | Type | Default |
 
 • **defaultProvider**: *[Provider](../interfaces/_types_.provider.md)*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L68)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L68)*
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **jsonrpcVersion**: *string*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L68)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L68)*
 
 ## Methods
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **call**(`method`: string, `params`: any[]): *Promise‹[JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)›*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L70)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L70)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **send**(`payload`: [JsonRpcPayload](../interfaces/_types_.jsonrpcpayload.md), `callback`: [Callback](../modules/_types_.md#callback)‹[JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)›): *void*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:88](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L88)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L88)*
 
 **Parameters:**
 

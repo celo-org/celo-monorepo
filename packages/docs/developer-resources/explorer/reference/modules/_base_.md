@@ -18,7 +18,7 @@
 
 ▸ **getContractDetailsFromContract**(`kit`: ContractKit, `celoContract`: CeloContract, `address?`: undefined | string): *Promise‹object›*
 
-*Defined in [base.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L11)*
+*Defined in [base.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L11)*
 
 **Parameters:**
 
@@ -36,7 +36,7 @@ ___
 
 ▸ **mapFromPairs**<**A**, **B**>(`pairs`: Array‹[A, B]›): *Map‹A, B›*
 
-*Defined in [base.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L30)*
+*Defined in [base.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L30)*
 
 **Type parameters:**
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **obtainKitContractDetails**(`kit`: ContractKit): *Promise‹[ContractDetails](../interfaces/_base_.contractdetails.md)[]›*
 
-*Defined in [base.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L24)*
+*Defined in [base.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L24)*
 
 **Parameters:**
 

@@ -78,7 +78,7 @@ ___
 
 ▸ **attestToIdentifier**(`identifier`: string, `account`: string, `privateKey`: string): *Signature*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:52](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L52)*
+*Defined in [packages/sdk/utils/src/attestations.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L52)*
 
 **Parameters:**
 
@@ -96,7 +96,7 @@ ___
 
 ▸ **getAttestationMessageToSignFromIdentifier**(`identifier`: string, `account`: string): *string*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L33)*
+*Defined in [packages/sdk/utils/src/attestations.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L33)*
 
 **Parameters:**
 
@@ -113,7 +113,7 @@ ___
 
 ▸ **getAttestationMessageToSignFromPhoneNumber**(`phoneNumber`: string, `account`: string, `phoneSalt?`: undefined | string): *string*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L41)*
+*Defined in [packages/sdk/utils/src/attestations.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L41)*
 
 **Parameters:**
 
@@ -131,7 +131,7 @@ ___
 
 ▸ **hashIdentifier**(`identifier`: string, `type`: [IdentifierType](_packages_sdk_utils_src_attestations_.md#identifiertype), `salt?`: undefined | string): *string*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:29](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L29)*
+*Defined in [packages/sdk/utils/src/attestations.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L29)*
 
 **Parameters:**
 
@@ -149,70 +149,70 @@ Name | Type |
 
 ### ▪ **AttestationUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:66](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L66)*
+*Defined in [packages/sdk/utils/src/attestations.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L66)*
 
 ###  IdentifierType
 
 • **IdentifierType**: *IdentifierType*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:67](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L67)*
+*Defined in [packages/sdk/utils/src/attestations.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L67)*
 
 ###  attestToIdentifier
 
 • **attestToIdentifier**: *[attestToIdentifier](_packages_sdk_utils_src_attestations_.md#attesttoidentifier)*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:73](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L73)*
+*Defined in [packages/sdk/utils/src/attestations.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L73)*
 
 ###  base64ToHex
 
 • **base64ToHex**: *base64ToHex*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:72](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L72)*
+*Defined in [packages/sdk/utils/src/attestations.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L72)*
 
 ###  extractAttestationCodeFromMessage
 
 • **extractAttestationCodeFromMessage**: *extractAttestationCodeFromMessage*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:76](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L76)*
+*Defined in [packages/sdk/utils/src/attestations.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L76)*
 
 ###  getAttestationMessageToSignFromIdentifier
 
 • **getAttestationMessageToSignFromIdentifier**: *[getAttestationMessageToSignFromIdentifier](_packages_sdk_utils_src_attestations_.md#getattestationmessagetosignfromidentifier)*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L70)*
+*Defined in [packages/sdk/utils/src/attestations.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L70)*
 
 ###  getAttestationMessageToSignFromPhoneNumber
 
 • **getAttestationMessageToSignFromPhoneNumber**: *[getAttestationMessageToSignFromPhoneNumber](_packages_sdk_utils_src_attestations_.md#getattestationmessagetosignfromphonenumber)*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:71](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L71)*
+*Defined in [packages/sdk/utils/src/attestations.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L71)*
 
 ###  getIdentifierPrefix
 
 • **getIdentifierPrefix**: *getIdentifierPrefix*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L68)*
+*Defined in [packages/sdk/utils/src/attestations.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L68)*
 
 ###  hashIdentifier
 
 • **hashIdentifier**: *[hashIdentifier](_packages_sdk_utils_src_attestations_.md#hashidentifier)*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:69](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L69)*
+*Defined in [packages/sdk/utils/src/attestations.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L69)*
 
 ###  isAccountConsideredVerified
 
 • **isAccountConsideredVerified**: *isAccountConsideredVerified*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:77](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L77)*
+*Defined in [packages/sdk/utils/src/attestations.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L77)*
 
 ###  messageContainsAttestationCode
 
 • **messageContainsAttestationCode**: *messageContainsAttestationCode*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L75)*
+*Defined in [packages/sdk/utils/src/attestations.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L75)*
 
 ###  sanitizeMessageBase64
 
 • **sanitizeMessageBase64**: *sanitizeMessageBase64*
 
-*Defined in [packages/sdk/utils/src/attestations.ts:74](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L74)*
+*Defined in [packages/sdk/utils/src/attestations.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L74)*

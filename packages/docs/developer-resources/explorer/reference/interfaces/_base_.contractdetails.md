@@ -18,7 +18,7 @@
 
 • **address**: *Address*
 
-*Defined in [base.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L7)*
+*Defined in [base.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L7)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **jsonInterface**: *AbiItem[]*
 
-*Defined in [base.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L8)*
+*Defined in [base.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L8)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **name**: *string*
 
-*Defined in [base.ts:6](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L6)*
+*Defined in [base.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/base.ts#L6)*

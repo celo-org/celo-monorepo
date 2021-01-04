@@ -21,7 +21,7 @@
 
 • **call**: *function*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:64](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L64)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L64)*
 
 #### Type declaration:
 
@@ -40,7 +40,7 @@ ___
 
 • **send**: *function*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:65](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L65)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L65)*
 
 #### Type declaration:
 
