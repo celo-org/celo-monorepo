@@ -359,12 +359,8 @@ contract Reserve is
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferExchangeGold(address payable to, uint256 value)
-    external
-    returns (
-      bool
-    )
-  {
+  function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
+    //require (to == msg.sender, 'an exchange can only send fund to itself');
     require(isExchangeSpender[msg.sender], "can't send to a non-exchange");
     return _transferGold(to, value);
   }
