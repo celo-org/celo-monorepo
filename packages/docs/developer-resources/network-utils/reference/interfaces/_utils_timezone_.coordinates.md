@@ -17,7 +17,7 @@
 
 • **latitude**: *number*
 
-*Defined in [utils/timezone.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/network-utils/src/utils/timezone.ts#L12)*
+*Defined in [utils/timezone.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/network-utils/src/utils/timezone.ts#L12)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **longitude**: *number*
 
-*Defined in [utils/timezone.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/network-utils/src/utils/timezone.ts#L13)*
+*Defined in [utils/timezone.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/network-utils/src/utils/timezone.ts#L13)*

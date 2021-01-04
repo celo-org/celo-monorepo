@@ -24,4 +24,4 @@
 
 *Inherited from [DecodedParamsArray](_abi_types_.decodedparamsarray.md).[__length__](_abi_types_.decodedparamsarray.md#__length__)*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L8)*
+*Defined in [packages/sdk/connect/src/abi-types.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L8)*

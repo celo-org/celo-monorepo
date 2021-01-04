@@ -22,7 +22,7 @@
 
 \+ **new Lock**(): *[Lock](_lock_.lock.md)*
 
-*Defined in [packages/sdk/base/src/lock.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L12)*
+*Defined in [packages/sdk/base/src/lock.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L12)*
 
 **Returns:** *[Lock](_lock_.lock.md)*
 
@@ -32,7 +32,7 @@
 
 ▸ **acquire**(): *Promise‹void›*
 
-*Defined in [packages/sdk/base/src/lock.ts:29](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L29)*
+*Defined in [packages/sdk/base/src/lock.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L29)*
 
 **Returns:** *Promise‹void›*
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **release**(): *void*
 
-*Defined in [packages/sdk/base/src/lock.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L54)*
+*Defined in [packages/sdk/base/src/lock.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L54)*
 
 **Returns:** *void*
 
@@ -52,6 +52,6 @@ ___
 
 ▸ **tryAcquire**(): *boolean*
 
-*Defined in [packages/sdk/base/src/lock.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L20)*
+*Defined in [packages/sdk/base/src/lock.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/lock.ts#L20)*
 
 **Returns:** *boolean*
