@@ -360,7 +360,7 @@ contract Reserve is
    * @return Returns true if the transaction succeeds.
    */
   function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
-    // require (to == msg.sender, 'an exchange can only send funds to itself');
+    require(to == msg.sender, "an exchange can only send funds to itself");
     require(isExchangeSpender[msg.sender], "a non-exchangeSpender can't start a transfer");
     return _transferGold(to, value);
   }
