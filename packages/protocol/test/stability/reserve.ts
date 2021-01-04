@@ -331,9 +331,18 @@ contract('Reserve', (accounts: string[]) => {
       await reserve.addExchangeSpender(exchangeAddress)
     })
 
-    it('should allow an exchange to call transferExchangeGold', async () => {
+    // test to upgrade
+    it('should allow a exchange to call transferExchangeGold', async () => {
       await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
     })
+
+    // it('1', async () => {
+    //   await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
+    // })
+
+    // it('2', async () => {
+    //   await assertRevert(reserve.transferExchangeGold(exchangeAddress, aValue, { from: exchangeAddress }))
+    // })
 
     it('should not allow spenders to call transferExchangeGold', async () => {
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: spender }))
