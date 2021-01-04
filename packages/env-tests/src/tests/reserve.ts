@@ -20,9 +20,14 @@ export function runReserveTest(context: EnvTestContext) {
       const reserve = await context.kit.contracts.getReserve()
       const goldToken = await context.kit.contracts.getGoldToken()
 
-      const spenders = await reserve.getSpenders()
-      expect(spenders).toHaveLength(1)
-      const spenderMultiSigAddress = spenders[0]
+      // Find an alternate way to get the reserve spender address
+      let spenderMultiSigAddress = context.reserveSpenderMultiSigAddress
+
+      if (!spenderMultiSigAddress) {
+        const spenders = await reserve.getSpenders()
+        expect(spenders).toHaveLength(1)
+        spenderMultiSigAddress = spenders[0]
+      }
 
       const custodians = await reserve.getOtherReserveAddresses()
       expect(custodians).toContain(custodian.address)
