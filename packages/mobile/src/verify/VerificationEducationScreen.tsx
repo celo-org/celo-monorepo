@@ -235,7 +235,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           label={t('nuxNamePin1:phoneNumber')}
           style={styles.phoneNumber}
           country={country}
-          nationalPhoneNumber={getDisplayNumberInternational(e164PhoneNumber || '')}
+          internationalPhoneNumber={getDisplayNumberInternational(e164PhoneNumber || '')}
           editable={false}
         />
         {firstButton}

@@ -18666,15 +18666,10 @@ google-gax@~1.12.0:
     semver "^6.0.0"
     walkdir "^0.4.0"
 
-google-libphonenumber@^3.2.15:
+google-libphonenumber@^3.2.15, google-libphonenumber@^3.2.4:
   version "3.2.15"
   resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.15.tgz#3a01dc554dbf83c754f249c16df3605e5d154bb9"
   integrity sha512-tbCIuzMoH34RdrbFRw5kijAZn/p6JMQvsgtr1glg2ugbwqrMPlOL8pHNK8cyGo9B6SXpcMm4hdyDqwomR+HPRg==
-
-google-libphonenumber@^3.2.4:
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.4.tgz#91d3fe62ca531f154165e6580b1c55ff6bd53abf"
-  integrity sha512-gxUVpo/3+ZlUdbvE/u9E0VoKjimLhugw0pWD4I/j4cRF1jh+1wNzQXcCmf2mMa726ai39o5N7DcXCW3Shv0s3A==
 
 google-p12-pem@^1.0.0:
   version "1.0.2"

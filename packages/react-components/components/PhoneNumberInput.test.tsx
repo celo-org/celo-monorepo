@@ -24,7 +24,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={countries.getCountryByCodeAlpha2('FR')}
-        nationalPhoneNumber=""
+        internationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={onPressCountry}
       />
@@ -53,7 +53,7 @@ describe('PhoneNumberInput', () => {
         <PhoneNumberInput
           label="Phone number"
           country={undefined}
-          nationalPhoneNumber=""
+          internationalPhoneNumber=""
           onChange={onChange}
           onPressCountry={jest.fn()}
         />
@@ -70,7 +70,7 @@ describe('PhoneNumberInput', () => {
         <PhoneNumberInput
           label="Phone number"
           country={undefined}
-          nationalPhoneNumber=""
+          internationalPhoneNumber=""
           onChange={onChange}
           onPressCountry={jest.fn()}
         />
@@ -88,7 +88,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={undefined}
-        nationalPhoneNumber="123"
+        internationalPhoneNumber="123"
         onChange={onChange}
         onPressCountry={jest.fn()}
       />
@@ -105,7 +105,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={undefined}
-        nationalPhoneNumber=""
+        internationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={jest.fn()}
       />
@@ -124,7 +124,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={undefined}
-        nationalPhoneNumber=""
+        internationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={jest.fn()}
       />
