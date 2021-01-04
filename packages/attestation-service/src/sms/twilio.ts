@@ -59,7 +59,7 @@ export class TwilioSmsProvider extends SmsProvider {
     return AttestationStatus.Other
   }
 
-  supportsDeliveryStatus = () => true
+  deliveryStatusMethod = () => 'POST'
 
   deliveryStatusHandlers() {
     return [

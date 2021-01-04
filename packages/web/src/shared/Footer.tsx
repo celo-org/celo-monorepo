@@ -37,6 +37,7 @@ const RESOURCE_MENU = [
   menu.EVENTS_KIT,
   menu.BRAND,
   menu.MERCHANTS,
+  menu.GRANT_KIT,
   { name: 'Ecosystem Fund', link: ecoFundLink },
 ]
 

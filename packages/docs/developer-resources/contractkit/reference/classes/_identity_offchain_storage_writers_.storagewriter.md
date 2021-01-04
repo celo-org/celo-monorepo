@@ -16,15 +16,15 @@
 
 ### `Abstract` write
 
-▸ **write**(`_data`: string, `_dataPath`: string): *Promise‹void›*
+▸ **write**(`_data`: Buffer, `_dataPath`: string): *Promise‹void›*
 
-*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L6)*
+*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L9)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`_data` | string |
+`_data` | Buffer |
 `_dataPath` | string |
 
 **Returns:** *Promise‹void›*

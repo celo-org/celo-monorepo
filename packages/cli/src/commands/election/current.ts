@@ -21,6 +21,7 @@ export default class ElectionCurrent extends BaseCommand {
       description:
         'Show currently used signers from valset (by default the authorized validator signers are shown). Useful for checking if keys have been rotated.',
     }),
+    ...(cli.table.flags() as object),
   }
 
   async run() {
@@ -37,13 +38,13 @@ export default class ElectionCurrent extends BaseCommand {
         })
       )
       cli.action.stop()
-      cli.table(validatorList, otherValidatorTable, { 'no-truncate': !res.flags.truncate })
+      cli.table(validatorList, otherValidatorTable, res.flags)
     } else {
       const validatorList = await Promise.all(
         signers.map((addr) => validators.getValidatorFromSigner(addr))
       )
       cli.action.stop()
-      cli.table(validatorList, validatorTable, { 'no-truncate': !res.flags.truncate })
+      cli.table(validatorList, validatorTable, res.flags)
     }
   }
 }

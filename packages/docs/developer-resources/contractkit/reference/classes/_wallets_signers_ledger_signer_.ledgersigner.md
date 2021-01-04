@@ -18,6 +18,7 @@ Signs the EVM transaction with a Ledger device
 
 ### Methods
 
+* [computeSharedSecret](_wallets_signers_ledger_signer_.ledgersigner.md#computesharedsecret)
 * [decrypt](_wallets_signers_ledger_signer_.ledgersigner.md#decrypt)
 * [getNativeKey](_wallets_signers_ledger_signer_.ledgersigner.md#getnativekey)
 * [signPersonalMessage](_wallets_signers_ledger_signer_.ledgersigner.md#signpersonalmessage)
@@ -53,6 +54,22 @@ Name | Type |
 **Returns:** *[LedgerSigner](_wallets_signers_ledger_signer_.ledgersigner.md)*
 
 ## Methods
+
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
+
+*Defined in [packages/contractkit/src/wallets/signers/ledger-signer.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L197)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_publicKey` | string |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  decrypt
 

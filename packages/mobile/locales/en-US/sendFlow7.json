@@ -46,8 +46,8 @@
   "sentEscrowPayment": "Sent Escrow Payment",
   "mobileNumber": "Mobile #",
   "walletAddress": "Wallet Address",
-  "inviteSMS": "Welcome to {{appName}}! Get {{appName}} at {{link}} and enter your code to get started: {{code}}",
-  "inviteSMSWithEscrowedPayment": "Welcome to {{appName}}! I've sent you Celo Dollars. Go to {{link}} and enter your code to get started: {{code}}",
+  "inviteWithoutPayment": "Hi! I’ve been using {{appName}} to send money worldwide. It’s easy to try and I want to invite you to check it out with this link: {{link}}",
+  "inviteWithEscrowedPayment": "Hi! I’ve been using {{appName}} to send money worldwide. I just sent you {{amount}} Celo Dollars. Please download the {{appName}} App and redeem your Celo Dollars using this link: {{link}}",
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
@@ -119,7 +119,7 @@
   "encryption": {
     "warningLabel": "This comment will not be encrypted",
     "warningModalHeader": "About Encryption",
-    "warningModalBody": "Encryption ensures your comments are kept private. Valora uses encryption on transaction comments when both the sender and receiver have this feature set up. Set up will normally occur automatically once a user sends their first transaction.",
+    "warningModalBody": "Encryption ensures your comments are kept private. {{appName}} uses encryption on transaction comments when both the sender and receiver have this feature set up. Set up will normally occur automatically once a user sends their first transaction.",
     "feeLabel": "One-Time Encryption Fee",
     "feeModalHeader": "One-Time Encryption Fee",
     "feeModalBody": "Encryption helps keep your sensitive data private. A small one-time fee is added to your first transaction to setup encryption. This ensures your comments will be sent securely and privately."

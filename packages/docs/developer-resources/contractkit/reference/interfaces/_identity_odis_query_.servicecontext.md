@@ -17,7 +17,7 @@
 
 • **odisPubKey**: *string*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L70)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L76)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **odisUrl**: *string*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L69)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L75)*

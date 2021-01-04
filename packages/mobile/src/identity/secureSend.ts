@@ -27,7 +27,7 @@ function last4DigitsAreUnique(addressArr: string[]) {
   return last4DigitArr.length === last4DigitSet.size
 }
 
-// Check if there are multiple addresses but somehow a preferred addresses hasn't been set yet
+// Check if there are multiple addresses but somehow a preferred address hasn't been set yet
 // Should never happen in production but makes the change backwards compatible for testing env
 function accidentallyBypassedValidation(
   newAddresses: string[] | null,

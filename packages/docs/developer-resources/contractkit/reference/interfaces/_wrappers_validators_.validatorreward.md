@@ -20,7 +20,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L51)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L53)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **group**: *[ValidatorGroup](_wrappers_validators_.validatorgroup.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L49)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L51)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **groupPayment**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L50)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L52)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **validator**: *[Validator](_wrappers_validators_.validator.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L47)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L49)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **validatorPayment**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L48)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L50)*

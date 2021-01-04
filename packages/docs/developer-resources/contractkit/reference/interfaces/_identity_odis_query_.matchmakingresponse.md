@@ -17,7 +17,7 @@
 
 • **matchedContacts**: *Array‹object›*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L56)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L62)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **success**: *boolean*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L55)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L61)*

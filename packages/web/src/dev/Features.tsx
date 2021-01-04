@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Feature from 'src/dev/Feature'
 import { H3 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 const stableImg = require('src/dev/features/stable.png')
@@ -22,7 +22,7 @@ export default withNamespaces('dev')(
   React.memo(function Features({ t }: Props) {
     return (
       <View style={styles.darkBackground}>
-        <Fade bottom={true} distance={'40px'}>
+        <Fade distance={'40px'}>
           <View nativeID={hashNav.build.features}>
             <GridRow
               desktopStyle={standardStyles.sectionMarginTop}

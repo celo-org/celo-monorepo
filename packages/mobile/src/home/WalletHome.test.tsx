@@ -33,7 +33,6 @@ describe('Testnet banner', () => {
         <WalletHome
           refreshAllBalances={jest.fn()}
           initializeSentryUserContext={jest.fn()}
-          exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
           showMessage={showMessageMock}
           loading={false}
@@ -50,7 +49,13 @@ describe('Testnet banner', () => {
     )
 
     expect(tree).toMatchSnapshot()
-    expect(showMessageMock).toHaveBeenCalledWith('testnetAlert.1', 5000, null, 'testnetAlert.0')
+    expect(showMessageMock).toHaveBeenCalledWith(
+      'testnetAlert.1',
+      5000,
+      null,
+      null,
+      'testnetAlert.0'
+    )
   })
   it('Renders when disconnected', async () => {
     const store = createMockStoreAppDisconnected()
@@ -59,7 +64,6 @@ describe('Testnet banner', () => {
         <WalletHome
           refreshAllBalances={jest.fn()}
           initializeSentryUserContext={jest.fn()}
-          exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
           showMessage={jest.fn()}
           loading={false}
@@ -83,7 +87,6 @@ describe('Testnet banner', () => {
         <WalletHome
           refreshAllBalances={jest.fn()}
           initializeSentryUserContext={jest.fn()}
-          exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
           showMessage={jest.fn()}
           loading={false}

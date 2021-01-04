@@ -1,4 +1,8 @@
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
 apiVersion: networking.k8s.io/v1beta1
+{{ else }}
+apiVersion: extensions/v1beta1
+{{ end -}}
 kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-forno-ingress
@@ -8,6 +12,9 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
+    # Allows WS connections to be 20 minutes long, see https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/#websockets
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1200"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "1200"
 spec:
   tls:
   - hosts:
@@ -21,3 +28,7 @@ spec:
         backend:
           serviceName: tx-nodes
           servicePort: 8545
+      - path: /ws
+        backend:
+          serviceName: tx-nodes
+          servicePort: 8546

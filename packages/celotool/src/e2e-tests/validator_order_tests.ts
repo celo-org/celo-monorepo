@@ -4,7 +4,7 @@ import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
-const VALIDATORS = 10
+const VALIDATORS = 5
 const EPOCH = 20
 const EPOCHS_TO_WAIT = 3
 const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT

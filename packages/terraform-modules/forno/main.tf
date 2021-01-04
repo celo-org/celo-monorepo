@@ -49,6 +49,7 @@ module "ws_backends" {
   context_info = var.context_info_ws
   health_check_destination_port = 6001
   type = "ws"
+  timeout_sec = 1200 # 20 minutes
 }
 
 resource "google_compute_global_address" "global_address" {

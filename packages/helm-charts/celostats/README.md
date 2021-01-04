@@ -12,6 +12,6 @@ clients can report/connect with that endpoint.
 
 To upgrade from an exisiting `ethstats` package, the easiest way is:
 
-1.  Remove the old `ethstats` package: `helm delete --purge ${env}-ethstats`
+1.  Remove the old `ethstats` package: `helm uninstall --purge ${env}-ethstats`
 
 2.  Deploy the new package: `celotool deploy initial celostats -e ${env}`

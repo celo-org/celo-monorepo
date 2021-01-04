@@ -22,6 +22,9 @@ module.exports = {
   moduleNameMapper: {
     '@celo/mobile': '<rootDir>',
     '^crypto-js$': '<rootDir>/../../node_modules/crypto-js',
+    // Jest isn't able to use the react-native field of package.json and tries to use the main field
+    // which then causes other import errors
+    'react-native-bip39': '<rootDir>/../../node_modules/react-native-bip39/src',
     'react-native-svg': '<rootDir>/../../node_modules/react-native-svg-mock',
   },
   modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],

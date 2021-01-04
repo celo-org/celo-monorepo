@@ -45,14 +45,18 @@ async function init() {
 
   await startPeriodicHealthCheck()
 
+  const rateLimitReqsPerMin = parseInt(fetchEnvOrDefault('RATE_LIMIT_REQS_PER_MIN', '100'), 10)
   const rateLimiter = rateLimit({
-    windowMs: 5 * 60 * 100, // 5 minutes
-    max: 100,
+    windowMs: 60 * 1000, // 1 minute
+    max: rateLimitReqsPerMin,
   })
+
   const app = express()
   app.use([requestIdMiddleware(), loggerMiddleware, rateLimiter])
   const port = process.env.PORT || 3000
-  app.listen(port, () => rootLogger.info({ port }, 'Attestation Service started'))
+  app.listen(port, () =>
+    rootLogger.info({ port, rateLimitReqsPerMin }, 'Attestation Service started')
+  )
 
   app.get('/metrics', (_req, res) => {
     res.send(PromClient.register.metrics())
@@ -79,11 +83,18 @@ async function init() {
 
   for (const p of smsProvidersWithDeliveryStatus()) {
     const path = `/delivery_status_${p.type}`
+    const method = p.deliveryStatusMethod()
     rootLogger.info(
-      { url: deliveryStatusURLForProviderType(p.type) },
+      { method, url: deliveryStatusURLForProviderType(p.type) },
       'Registered delivery status handler'
     )
-    app.post(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+    if (method === 'POST') {
+      app.post(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+    } else if (method === 'GET') {
+      app.get(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+    } else {
+      throw new Error(`Unknown method ${method} for ${path}`)
+    }
   }
 }
 

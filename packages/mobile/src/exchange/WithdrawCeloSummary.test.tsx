@@ -15,7 +15,11 @@ describe('WithdrawCeloSummary', () => {
   it('renders correctly', () => {
     const tree = render(
       <Provider store={store}>
-        <WithdrawCeloSummary amount={SAMPLE_AMOUNT} recipientAddress={SAMPLE_ADDRESS} />
+        <WithdrawCeloSummary
+          amount={SAMPLE_AMOUNT}
+          recipientAddress={SAMPLE_ADDRESS}
+          feeEstimate={new BigNumber(1)}
+        />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

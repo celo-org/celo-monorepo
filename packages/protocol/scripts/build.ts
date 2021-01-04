@@ -1,13 +1,13 @@
 /* tslint:disable no-console */
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
+import fs from 'fs'
+import path from 'path'
 import { tsGenerator } from 'ts-generator'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, 'build')
-const CONTRACTKIT_GEN_DIR = path.normalize(path.join(ROOT_DIR, '../contractkit/src/generated'))
+const CONTRACTKIT_GEN_DIR = path.normalize(path.join(ROOT_DIR, '../sdk/contractkit/src/generated'))
 
 export const ProxyContracts = [
   'AccountsProxy',
@@ -44,6 +44,7 @@ export const CoreContracts = [
   'MultiSig',
   'Registry',
   'Freezer',
+  'MetaTransactionWallet',
   'TransferWhitelist',
 
   // governance

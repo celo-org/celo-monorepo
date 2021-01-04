@@ -1,0 +1,37 @@
+{
+  "pageTitle": "The Plumo Ceremony",
+  "pageDescription": "A SNARK-based ultralight client protocol on Celo",
+  "navSignup": "Sign up",
+  "coverTitle": "Plumo",
+  "coverSubtitle": "A SNARK-based ultralight client protocol on Celo",
+  "coverBtn": "Join the Ceremony",
+  "figureHeading1": "Fast",
+  "figureHeading2": "Featherweight",
+  "figureHeading3": "Forward-Looking",
+  "figureSubheading1": "With SNARK verification of 100+ epoch headers, instantaneously",
+  "figureSubheading2": "A 17,000x reduction in the lightclient data to download with epoch-based syncing, and 10x reduction thanks to BLS aggregation",
+  "figureSubheading3": "A multi-party computation for cutting-edge cryptography",
+  "mainHeader": "The Plumo Ceremony",
+  "mainBody1": "The SNARK to be secured by the Plumo Ceremony is one of the most complex yet powerful SNARKs to ever be secured. The outcome can be used not only by cLabs & the Plumo construction, but also by any project that uses the BW6 curve with the Groth16 proving system or any other based on polynomial commitments. By participating in this Ceremony, participants can be part of something that is a public good, and will hopefully be used to power many more systems to come.",
+  "mainBody2": "For the Plumo Ceremony, we’re excited to award the following prizes:",
+  "prizes": [
+    {
+      "title": "Fastest Contribution (Desktop)",
+      "amount": "1000 CELO"
+    },
+    {
+      "title": "Fastest Contribution (Cloud)",
+      "amount": "1000 CELO"
+    },
+    {
+      "title": "Most Creative Source of Entropy",
+      "amount": "1000 CELO"
+    },
+    {
+      "title": "Most Secure Machine Setup",
+      "amount": "1000 CELO"
+    }
+  ],
+  "ctaHeader": "Join the ceremony",
+  "ctaBtn": "Read more"
+}

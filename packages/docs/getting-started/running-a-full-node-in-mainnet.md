@@ -27,8 +27,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for the `mainnet` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
-export NETWORK_ID=42220
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 ```
 
 ## Pull the Celo Docker image
@@ -72,26 +71,13 @@ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
 This environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile`
 {% endhint %}
 
-## Configure the node
-
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for mainnet and uses it to initialize your nodes' data directory.
-
-```bash
-docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
-```
-
-In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
-
-```bash
-export BOOTNODE_ENODES=$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)
-```
 
 ## Start the node
 
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --bootnodes $BOOTNODE_ENODES --nousb
+docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --datadir /root/.celo --nousb
 ```
 
 You'll start seeing some output. After a few minutes, you should see lines that look like this. This means your node has started syncing with the network and is receiving blocks.

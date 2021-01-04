@@ -16,6 +16,7 @@
 
 ### Properties
 
+* [computeSharedSecret](_wallets_signers_signer_.signer.md#computesharedsecret)
 * [decrypt](_wallets_signers_signer_.signer.md#decrypt)
 * [getNativeKey](_wallets_signers_signer_.signer.md#getnativekey)
 * [signPersonalMessage](_wallets_signers_signer_.signer.md#signpersonalmessage)
@@ -23,6 +24,24 @@
 * [signTypedData](_wallets_signers_signer_.signer.md#signtypeddata)
 
 ## Properties
+
+###  computeSharedSecret
+
+• **computeSharedSecret**: *function*
+
+*Defined in [packages/contractkit/src/wallets/signers/signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L18)*
+
+#### Type declaration:
+
+▸ (`publicKey`: string): *Promise‹Buffer›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`publicKey` | string |
+
+___
 
 ###  decrypt
 

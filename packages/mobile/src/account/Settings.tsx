@@ -118,6 +118,7 @@ const mapDispatchToProps = {
 interface State {
   fornoSwitchOffWarning: boolean
   showAccountKeyModal: boolean
+  showRevokeModal: boolean
 }
 
 export class Account extends React.Component<Props, State> {
@@ -167,6 +168,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   revokeNumberVerification = () => {
+    this.hideConfirmRevokeModal()
     if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
       Logger.showError('Cannot revoke verificaton: number invalid')
       return
@@ -205,7 +207,7 @@ export class Account extends React.Component<Props, State> {
             </TouchableOpacity>
           </View>
           <View style={styles.devSettingsItem}>
-            <TouchableOpacity onPress={this.revokeNumberVerification}>
+            <TouchableOpacity onPress={this.showConfirmRevokeModal}>
               <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
           </View>
@@ -307,6 +309,14 @@ export class Account extends React.Component<Props, State> {
   confirmAccountRemoval = () => {
     ValoraAnalytics.track(SettingsEvents.completed_account_removal)
     this.props.clearStoredAccount(this.props.account || '')
+  }
+
+  showConfirmRevokeModal = () => {
+    this.setState({ showRevokeModal: true })
+  }
+
+  hideConfirmRevokeModal = () => {
+    this.setState({ showRevokeModal: false })
   }
 
   render() {
@@ -411,6 +421,17 @@ export class Account extends React.Component<Props, State> {
             testID="ConfirmAccountRemovalModal"
           >
             {t('promptConfirmRemovalModal.body')}
+          </Dialog>
+          <Dialog
+            isVisible={this.state?.showRevokeModal}
+            title={t('promptConfirmRevokeModal.header')}
+            actionText={t('promptConfirmRevokeModal.revoke')}
+            actionPress={this.revokeNumberVerification}
+            secondaryActionText={t('global:cancel')}
+            secondaryActionPress={this.hideConfirmRevokeModal}
+            testID="ConfirmAccountRevokeModal"
+          >
+            {t('promptConfirmRevokeModal.body')}
           </Dialog>
         </ScrollView>
       </SafeAreaView>

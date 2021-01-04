@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
 

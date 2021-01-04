@@ -22,7 +22,7 @@ export function CheckboxWithLabel({
       <Checkbox checked={checked} onPress={onPress} name={name} />
 
       <Text style={[fonts.a, textStyles.medium, checkBoxStyles.labelArea]}>
-        <Label for={name} onPress={onPress} style={checkBoxStyles.label}>
+        <Label htmlFor={name} onPress={onPress} style={checkBoxStyles.label}>
           {label}
         </Label>
       </Text>
@@ -45,6 +45,7 @@ function Checkbox({ checked, onPress, name }: CheckboxProps) {
         type: 'checkbox',
         name,
         checked,
+        onChange: () => true,
         onClick: onPress,
         style: checkBoxStyles.hidden,
       })}

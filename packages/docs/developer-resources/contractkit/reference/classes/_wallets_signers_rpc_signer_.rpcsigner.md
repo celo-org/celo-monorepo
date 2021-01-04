@@ -18,6 +18,7 @@ Implements the signer interface on top of the JSON-RPC interface.
 
 ### Methods
 
+* [computeSharedSecret](_wallets_signers_rpc_signer_.rpcsigner.md#computesharedsecret)
 * [decrypt](_wallets_signers_rpc_signer_.rpcsigner.md#decrypt)
 * [getNativeKey](_wallets_signers_rpc_signer_.rpcsigner.md#getnativekey)
 * [init](_wallets_signers_rpc_signer_.rpcsigner.md#init)
@@ -51,6 +52,22 @@ Name | Type | Default | Description |
 **Returns:** *[RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)*
 
 ## Methods
+
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
+
+*Defined in [packages/contractkit/src/wallets/signers/rpc-signer.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L171)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_publicKey` | string |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  decrypt
 

@@ -76,12 +76,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": 0,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -161,12 +156,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": 0,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -4040,12 +4030,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -4489,12 +4474,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <svg
                   fill="none"
@@ -4562,12 +4542,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <svg
                   fill="none"
@@ -4635,12 +4610,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <svg
                   fill="none"
@@ -4709,12 +4679,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -4811,12 +4776,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         </div>
       </div>
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -4933,12 +4893,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -5154,12 +5109,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           className="css-view-1dbjc4n"
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -6084,12 +6034,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-text-901oao"
@@ -6109,12 +6054,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   </div>
                 </div>
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -6136,12 +6076,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               className="css-view-1dbjc4n"
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -6431,12 +6366,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-text-901oao"
@@ -6456,12 +6386,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   </div>
                 </div>
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -6483,12 +6408,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               className="css-view-1dbjc4n"
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -6821,12 +6741,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -7350,12 +7265,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": 0,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -7435,12 +7345,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": 0,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -11314,12 +11219,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -11763,12 +11663,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <svg
                   fill="none"
@@ -11836,12 +11731,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <svg
                   fill="none"
@@ -11909,12 +11799,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             >
               <div
-                className="react-reveal"
-                style={
-                  Object {
-                    "opacity": undefined,
-                  }
-                }
+                className="css-q7lffx"
               >
                 <svg
                   fill="none"
@@ -11983,12 +11868,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -12085,12 +11965,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         </div>
       </div>
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -12207,12 +12082,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <div
           className="css-view-1dbjc4n"
@@ -12428,12 +12298,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           className="css-view-1dbjc4n"
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -13226,30 +13091,26 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           >
             <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
+              className="css-q7lffx"
             >
               <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "WebkitBoxPack": "center",
-                    "WebkitJustifyContent": "center",
-                    "alignItems": "center",
-                    "height": "200px",
-                    "justifyContent": "center",
-                    "msFlexAlign": "center",
-                    "msFlexPack": "center",
-                    "paddingBottom": "20px",
-                    "paddingLeft": "20px",
-                    "paddingRight": "20px",
-                    "paddingTop": "20px",
+                    "0": Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "center",
+                      "WebkitJustifyContent": "center",
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "center",
+                    },
+                    "1": Object {
+                      "height": 200,
+                      "padding": 20,
+                    },
                   }
                 }
               >
@@ -13400,12 +13261,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"

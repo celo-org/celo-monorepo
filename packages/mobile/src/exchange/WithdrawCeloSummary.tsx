@@ -16,16 +16,16 @@ interface WithdrawCeloProps {
   style?: ViewStyle
   amount: BigNumber
   recipientAddress: string
+  feeEstimate: BigNumber
 }
 
 export default function WithdrawCeloSummary({
   style,
   amount,
   recipientAddress,
+  feeEstimate,
 }: WithdrawCeloProps) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
-  // TODO: Estimate real fee.
-  const fee = new BigNumber(0)
 
   return (
     <View style={style}>
@@ -46,8 +46,8 @@ export default function WithdrawCeloSummary({
         currency={CURRENCY_ENUM.GOLD}
         isExchange={false}
         isEstimate={true}
-        securityFee={fee}
-        totalFee={fee}
+        securityFee={feeEstimate}
+        totalFee={feeEstimate}
       />
       <TotalLineItem
         amount={{

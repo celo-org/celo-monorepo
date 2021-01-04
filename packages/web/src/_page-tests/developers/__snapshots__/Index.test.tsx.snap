@@ -264,12 +264,7 @@ exports[`DevelopersPage renders 1`] = `
       </div>
     </div>
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": 0,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -2271,12 +2266,7 @@ exports[`DevelopersPage renders 1`] = `
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -3586,12 +3576,7 @@ exports[`DevelopersPage renders 1`] = `
           Alfajores Testnet
         </div>
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -3824,12 +3809,7 @@ Build dApps for the Celo platform.
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -4080,12 +4060,7 @@ Build dApps for the Celo platform.
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"

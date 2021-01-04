@@ -1,7 +1,6 @@
 import { ApolloProvider, Query } from '@apollo/react-components'
 import ApolloClient from 'apollo-boost'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import fetch from 'cross-fetch'
 import gql from 'graphql-tag'
 import getConfig from 'next/config'
 import { Router, withRouter } from 'next/router'

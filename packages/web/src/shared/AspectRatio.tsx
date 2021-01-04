@@ -7,7 +7,7 @@ import {
 } from 'react-native-web'
 
 interface Props {
-  onLayout?: () => void
+  onLayout?: (event) => void
   ratio: number
   style?: ViewStyle | ViewStyle[]
 }

@@ -1,4 +1,4 @@
-# External module: "wallets/signers/aws-hsm-signer"
+# Module: "wallets/signers/aws-hsm-signer"
 
 ## Index
 

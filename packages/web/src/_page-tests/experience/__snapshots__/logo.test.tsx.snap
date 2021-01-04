@@ -477,6 +477,83 @@ exports[`Experience/Logo renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
+                    href="/experience/grants"
+                    onClick={[Function]}
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(129,134,139,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    GrantKit
+                  </a>
+                </div>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
                     href="/experience/merchant"
                     onClick={[Function]}
                     role="link"
@@ -1392,7 +1469,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.title
+                Logo
               </h1>
               <h4
                 aria-level="4"
@@ -1412,7 +1489,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.overviewCopy
+                The Celo logo is a universal signature uniting community efforts and bringing prosperity to the world.
               </h4>
               <div
                 className="css-view-1dbjc4n"
@@ -1475,7 +1552,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  logo.overviewBtn
+                  Download Logo Package
                 </a>
               </div>
               <div
@@ -1494,7 +1571,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                licenseTitle
+                Usage & License Note
               </div>
               <div
                 className="css-text-901oao"
@@ -1512,6 +1589,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
+                The use of the Celo logo requires following the Celo Community Code of Conduct as provided 
                 <div
                   className="css-view-1dbjc4n"
                   onClick={[Function]}
@@ -1542,7 +1620,7 @@ exports[`Experience/Logo renders 1`] = `
                       }
                     }
                   >
-                    here
+                    here.
                   </a>
                 </div>
               </div>
@@ -1610,7 +1688,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.logoTitle
+                Logo
               </div>
               <div
                 className="css-text-901oao"
@@ -1626,7 +1704,9 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.logoText
+                The Celo logo is composed of a glyph and wordmark. All aspects of its construction are intentional, so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.
+
+Please use the full-color logo whenever possible.
               </div>
             </div>
             <div
@@ -1740,7 +1820,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  logo.fullColorOnLightCaption
+                  Full color logo for lighter backgrounds
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -1796,7 +1876,7 @@ exports[`Experience/Logo renders 1`] = `
                       }
                     }
                   >
-                    downloadAssetBtn
+                    Download
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -1919,7 +1999,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  logo.fullColorOnDarkCaption
+                  Full color logo for darker backgrounds
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -1975,7 +2055,7 @@ exports[`Experience/Logo renders 1`] = `
                       }
                     }
                   >
-                    downloadAssetBtn
+                    Download
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -2106,7 +2186,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  logo.monochromeCaption
+                  Monochrome logo
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -2162,7 +2242,7 @@ exports[`Experience/Logo renders 1`] = `
                       }
                     }
                   >
-                    downloadAssetBtn
+                    Download
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -2285,7 +2365,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  logo.monochromeInverseCaption
+                  Monochrome logo (inverse)
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -2341,7 +2421,7 @@ exports[`Experience/Logo renders 1`] = `
                       }
                     }
                   >
-                    downloadAssetBtn
+                    Download
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -2408,7 +2488,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.glyphTitle
+                Glyph
               </div>
               <div
                 className="css-text-901oao"
@@ -2424,7 +2504,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.glyphText
+                Utilize the glyph when the full logo is too small to achieve maximum impact. It works best on Celo brand colors. Be sure to use the monochrome glyphs on other custom colors.
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -2480,7 +2560,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  downloadAssetBtn
+                  Download
                   <div
                     className="css-view-1dbjc4n"
                     style={
@@ -2792,7 +2872,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.spaceSizeTitle
+                Space and Sizing
               </h2>
             </div>
           </div>
@@ -2815,7 +2895,7 @@ exports[`Experience/Logo renders 1`] = `
               }
             }
           >
-            logo.clearspaceTitle
+            Clearspace
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -2840,7 +2920,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              logo.clearspaceText
+              Clearspace is the protected area around the logo. This space must be kept free of all other graphics and text, including other logos. The Celo logo has allotted Clearspace based on the height of the “o” in Celo.  Please use the below image as a guide.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2959,7 +3039,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              logo.sizeTitle
+              Size
             </div>
             <div
               className="css-text-901oao"
@@ -2977,7 +3057,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              logo.sizeText
+              The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3282,7 +3362,7 @@ exports[`Experience/Logo renders 1`] = `
                     }
                   }
                 >
-                  logo.backgroundsTitle
+                  Backgrounds
                 </h2>
               </div>
             </div>
@@ -3311,7 +3391,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                logo.backgroundsTextTop
+                The Celo logo works best on these brand background colors.
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -4509,7 +4589,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              logo.colorBackgroundsTitle
+              Color Backgrounds
             </div>
             <div
               className="css-text-901oao"
@@ -4527,7 +4607,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              logo.colorBackgroundsText
+              When it comes to applying the Celo brand to your own projects, the monochrome Celo logo works well on a variety of backgrounds. Use the dark logo on lighter backgrounds and the inverse logo on darker and more colorful backgrounds.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -5202,7 +5282,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              logo.backgroundDoNotAndDo
+              Do not overlay any of the logos of glyphs on top of images. Do not overlay the two-color logo ontop of unpreferred light colors.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -6268,7 +6348,7 @@ exports[`Experience/Logo renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -6287,6 +6367,7 @@ exports[`Experience/Logo renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -6796,7 +6877,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -7044,7 +7125,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -7457,6 +7538,61 @@ exports[`Experience/Logo renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
+                  href="/experience/grants"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  GrantKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
                   href="/community#fund"
                   onClick={[Function]}
                   rel=" noopener noreferrer"
@@ -7512,7 +7648,7 @@ exports[`Experience/Logo renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -8160,7 +8296,7 @@ exports[`Experience/Logo renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

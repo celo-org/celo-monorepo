@@ -1,10 +1,10 @@
 import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import { SectionList, SectionListRenderItemInfo, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import EventRow from 'src/community/connect/EventRow'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import Spinner from 'src/shared/Spinner'
@@ -77,7 +77,7 @@ class Events extends React.PureComponent<Props, State> {
 
   renderItem = ({ item, section }: SectionListRenderItemInfo<EventProps>) => {
     return (
-      <Fade bottom={true} distance="20px">
+      <Fade distance="20px">
         <EventRow {...item} key={item.name} section={section.title} />
       </Fade>
     )

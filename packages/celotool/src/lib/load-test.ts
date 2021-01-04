@@ -4,7 +4,7 @@ import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart,
+  upgradeGenericHelmChart
 } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 
@@ -39,7 +39,7 @@ export async function upgradeHelmChart(
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(celoEnv + '-load-test')
+  return removeGenericHelmChart(`${celoEnv}-load-test`, celoEnv)
 }
 
 async function helmParameters(

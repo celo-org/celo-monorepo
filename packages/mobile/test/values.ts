@@ -7,18 +7,24 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { StackParamList } from 'src/navigator/types'
 import { NotificationTypes } from 'src/notifications/types'
 import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
+import { UriData } from 'src/qrcode/schema'
 import {
   RecipientKind,
   RecipientWithContact,
   RecipientWithMobileNumber,
+  RecipientWithQrCode,
 } from 'src/recipients/recipient'
+
+export const nullAddress = '0x0'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
 export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
+export const mockAccount3 = '0x1230000000000000000000000000000000007E57'
 
 export const mockMnemonic =
   'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
@@ -125,6 +131,12 @@ export const mockTransactionData = {
   recipient: mockInvitableRecipient2,
   amount: new BigNumber(1),
   type: TokenTransactionType.Sent,
+}
+
+export const mockInviteTransactionData = {
+  recipient: mockInvitableRecipient2,
+  amount: new BigNumber(1),
+  type: TokenTransactionType.InviteSent,
 }
 
 export const mockInvitableRecipient3: RecipientWithContact = {
@@ -284,3 +296,71 @@ export const mockPaymentRequests: PaymentRequest[] = [
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
 ]
+
+export const mockUriData: UriData[] = [
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'CELO',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: undefined,
+    amount: undefined,
+    comment: undefined,
+    token: 'CELO',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'BTC',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: undefined,
+    comment: undefined,
+    token: undefined,
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: undefined,
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'cUSD',
+  },
+]
+
+export const mockQRCodeRecipient: RecipientWithQrCode = {
+  kind: RecipientKind.QrCode,
+  address: mockUriData[3].address.toLowerCase(),
+  displayId: mockUriData[3].e164PhoneNumber,
+  displayName: mockUriData[3].displayName || 'anonymous',
+  e164PhoneNumber: mockUriData[3].e164PhoneNumber,
+  phoneNumberLabel: undefined,
+  thumbnailPath: undefined,
+  contactId: undefined,
+}

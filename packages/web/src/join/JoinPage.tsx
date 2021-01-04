@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import analytics from 'src/analytics/analytics'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
@@ -13,6 +12,7 @@ import ImagePanes from 'src/join/ImagePanes'
 import previewImage from 'src/join/preview.png'
 import Rise from 'src/join/Rise'
 import ThreePillars from 'src/join/ThreePillars'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
@@ -56,7 +56,7 @@ class JoinPage extends React.PureComponent<Props> {
           <View style={styles.cover}>
             <View style={styles.heading}>
               <View style={[standardStyles.centered, styles.cloud, styles.inside]}>
-                <Fade ssrReveal={true} bottom={true} delay={10} distance={'20px'}>
+                <Fade delay={10} distance={'20px'}>
                   <View style={standardStyles.centered}>
                     <H1
                       ariaLevel="2"
@@ -71,7 +71,7 @@ class JoinPage extends React.PureComponent<Props> {
                 </Fade>
               </View>
               <View style={[styles.cloud]}>
-                <Fade ssrReveal={true} bottom={true} delay={20} distance={'20px'}>
+                <Fade delay={20} distance={'20px'}>
                   <Button
                     kind={BTN.PRIMARY}
                     text={t('exploreRoles')}

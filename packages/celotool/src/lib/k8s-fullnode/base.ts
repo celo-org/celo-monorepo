@@ -6,7 +6,7 @@ import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart,
+  upgradeGenericHelmChart
 } from '../helm_deploy'
 import { scaleResource } from '../kubernetes'
 
@@ -65,7 +65,7 @@ export abstract class BaseFullNodeDeployer {
       this.kubeNamespace,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(),
     )
 
     await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, this._deploymentConfig.replicas)
@@ -75,7 +75,7 @@ export abstract class BaseFullNodeDeployer {
   }
 
   async removeChart() {
-    await removeGenericHelmChart(this.releaseName)
+    await removeGenericHelmChart(this.releaseName, this.kubeNamespace)
     await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
     await this.deallocateAllIPs()
   }

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H1 } from 'src/fonts/Fonts'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import { standardStyles, textStyles } from 'src/styles'
 
 interface Props {

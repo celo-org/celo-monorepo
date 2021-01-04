@@ -1,6 +1,7 @@
-import { render, waitForElement } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import 'jest-fetch-mock'
 import * as React from 'react'
+import { TestProvider } from 'src/_page-tests/test-utils'
 import Team from 'src/about/Team'
 
 const CONTRIBUTORS = [
@@ -16,17 +17,25 @@ const CONTRIBUTORS = [
 
 describe(Team, () => {
   it('displays an image for each contributor', async () => {
-    const { getByText, getByAltText } = render(<Team contributors={CONTRIBUTORS} />)
+    const { getByText, getByAltText } = render(
+      <TestProvider>
+        <Team contributors={CONTRIBUTORS} />
+      </TestProvider>
+    )
 
-    await waitForElement(() => getByText('johnny'))
+    await waitFor(() => getByText('johnny'))
 
     expect(getByAltText('Photo of johnny').getAttribute('src')).toEqual('x.jpg')
   })
 
   it('displays company name', async () => {
-    const { getByText } = render(<Team contributors={CONTRIBUTORS} />)
+    const { getByText } = render(
+      <TestProvider>
+        <Team contributors={CONTRIBUTORS} />
+      </TestProvider>
+    )
 
-    await waitForElement(() => getByText('johnny'))
+    await waitFor(() => getByText('johnny'))
 
     expect(getByText('Decentralized ltd')).toBeTruthy()
   })

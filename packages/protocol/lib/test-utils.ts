@@ -1,12 +1,12 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
+import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
-import * as chai from 'chai'
-import * as chaiSubset from 'chai-subset'
+import chai from 'chai'
+import chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
-const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
@@ -20,7 +20,6 @@ const assert = chai.assert
 
 // hard coded in ganache
 export const EPOCH = 100
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function stripHexEncoding(hexString: string) {
   return hexString.substr(0, 2) === '0x' ? hexString.substr(2) : hexString
@@ -41,7 +40,7 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
           params,
           // salt id generation, milliseconds might not be
           // enough to generate unique ids
-          id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
+          id: new Date().getTime() + Math.floor(Math.random() * (1 + 100 - 1)),
         },
         // @ts-ignore
         (err: any, result: any) => {
@@ -128,7 +127,8 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound = error.message.search('VM Exception while processing transaction: revert') >= 0
+    const revertFound =
+      error.message.search('VM Exception while processing transaction: revert') >= 0
     const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
@@ -152,11 +152,7 @@ export async function exec(command: string, args: string[]) {
   })
 }
 
-function execCmd(
-  cmd: string,
-  args: string[],
-  options?: SpawnOptions & { silent?: boolean }
-) {
+function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?: boolean }) {
   return new Promise<number>(async (resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
     if (!silent) {
@@ -299,10 +295,15 @@ export function assertAlmostEqualBN(
   margin: number | BN | BigNumber,
   msg?: string
 ) {
-  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
+  const diff = web3.utils
+    .toBN(actual)
+    .sub(web3.utils.toBN(expected))
+    .abs()
   assert(
     web3.utils.toBN(margin).gte(diff),
-    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(10)}. ${msg || ''}`
+    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(
+      10
+    )}. ${msg || ''}`
   )
 }
 
@@ -320,8 +321,11 @@ export function assertEqualDpBN(
   )
 }
 
-
-export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
+export function assertEqualBNArray(
+  value: number[] | BN[] | BigNumber[],
+  expected: number[] | BN[] | BigNumber[],
+  msg?: string
+) {
   assert.equal(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }

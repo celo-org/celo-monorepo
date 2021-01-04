@@ -38,7 +38,7 @@
   "verificationFee": "Tasa de Verificación",
   "networkFee": "Tasa de Red",
   "networkFeeExplanation": {
-    "0": "Cada semana, se utiliza una tarifa muy pequeña (menos del 0.01%) del saldo de Celo Dollar de cada usuario para mantener estable el valor del Celo Dollar. Para obtener más información sobre las tarifas de Celo, visite ",
+    "0": "Cada semana, se utiliza una tarifa muy pequeña (menos del 0.01%) del saldo de Celo Dollar de cada usuario para mantener estable el valor del Celo Dollar. Para obtener más información sobre las tarifas de Celo, visita ",
     "1": "las Preguntas frecuentes."
   },
   "confirmingTransaction": "Confirmando…",

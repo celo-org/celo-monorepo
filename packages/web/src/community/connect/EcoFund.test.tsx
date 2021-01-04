@@ -1,12 +1,17 @@
-import { fireEvent, render, wait } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import * as React from 'react'
 import { ApplicationFields, RecommendationFields } from 'src/../fullstack/EcoFundFields'
+import { TestProvider } from 'src/_page-tests/test-utils'
 import EcoFund from 'src/community/EcoFund'
 
 describe('EcoFund', () => {
   describe('on first render', () => {
     it('is all clear', async () => {
-      const { queryAllByText } = render(<EcoFund />)
+      const { queryAllByText } = render(
+        <TestProvider>
+          <EcoFund />
+        </TestProvider>
+      )
 
       queryAllByText('common:validationErrors:email').forEach((element) =>
         expect(element).not.toBeVisible()
@@ -20,9 +25,13 @@ describe('EcoFund', () => {
 
   describe('when visitor tries submiting without filling out form', () => {
     it('shows validation errors', async () => {
-      const { getByText, queryAllByText, queryByText } = render(<EcoFund />)
+      const { getByText, queryAllByText, queryByText } = render(
+        <TestProvider>
+          <EcoFund />
+        </TestProvider>
+      )
 
-      const submitButton = getByText('apply')
+      const submitButton = getByText('Apply')
 
       fireEvent.click(submitButton)
 
@@ -33,13 +42,17 @@ describe('EcoFund', () => {
       queryAllByText('common:validationErrors:generic').forEach((element) =>
         expect(element).toBeVisible()
       )
-      expect(queryByText('common:applicationSubmitted')).not.toBeVisible()
+      expect(queryByText('Application Submitted')).not.toBeVisible()
     })
   })
 
   describe('when visitor presses submit after filling out the form', () => {
     function submitSuccess() {
-      const options = render(<EcoFund />)
+      const options = render(
+        <TestProvider>
+          <EcoFund />
+        </TestProvider>
+      )
       const { getByText, getByLabelText } = options
 
       fireEvent.change(getByLabelText(ApplicationFields.about), { target: { value: 'UBI' } })
@@ -55,7 +68,7 @@ describe('EcoFund', () => {
 
       fireEvent.change(getByLabelText(ApplicationFields.video), { target: { value: 'video.mov' } })
 
-      const submitButton = getByText('apply')
+      const submitButton = getByText('Apply')
       fireEvent.click(submitButton)
       expect(submitButton).toBeVisible()
       return options
@@ -71,15 +84,19 @@ describe('EcoFund', () => {
     })
     it('Shows a Success Message', async () => {
       const { queryByText } = submitSuccess()
-      await wait()
-      expect(queryByText('common:applicationSubmitted')).toBeVisible()
+      await waitFor(() => true)
+      expect(queryByText('Application Submitted')).toBeVisible()
     })
   })
   describe('when the Recomendations Button is Pressed', () => {
     function renderAndPressRecomendation() {
-      const all = render(<EcoFund />)
+      const all = render(
+        <TestProvider>
+          <EcoFund />
+        </TestProvider>
+      )
 
-      fireEvent.click(all.getByText('ecoFund.recommendProject'))
+      fireEvent.click(all.getByText('Recommend a Project'))
 
       return all
     }

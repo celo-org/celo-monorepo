@@ -1,7 +1,8 @@
-import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { BlockHeader } from '@celo/connect'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { UnlockableWallet } from '@celo/wallet-base'
+import { RpcWalletErrors } from '@celo/wallet-rpc/src/rpc-wallet'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -34,9 +35,8 @@ import {
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector, fornoSelector, mtwAddressSelector } from 'src/web3/selectors'
 import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
-import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
@@ -81,7 +81,9 @@ export function* checkWeb3SyncProgress() {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
           if (status !== SyncStatus.WAITING) {
             status = SyncStatus.WAITING
-            ValoraAnalytics.track(NetworkEvents.network_sync_waiting)
+            ValoraAnalytics.track(NetworkEvents.network_sync_waiting, {
+              latestBlock: latestBlock?.number,
+            })
           }
         }
       } else if (typeof syncProgress === 'object') {
@@ -255,10 +257,10 @@ export function* getAccount() {
   }
 }
 
-export function* unlockAccount(account: string) {
+export function* unlockAccount(account: string, force: boolean = false) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   const wallet: UnlockableWallet = yield call(getWallet)
-  if (wallet.isAccountUnlocked(account)) {
+  if (!force && wallet.isAccountUnlocked(account)) {
     return true
   }
 
@@ -294,6 +296,16 @@ export function* getConnectedUnlockedAccount() {
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
   }
+}
+
+// This will return MTW if there is one and the EOA if
+// there isn't. Eventually need to change naming convention
+// used elsewhere that errouneously refers to the EOA
+// as `account`
+export function* getAccountAddress() {
+  const walletAddress: string = yield call(getAccount)
+  const mtwAddress: string | null = yield select(mtwAddressSelector)
+  return mtwAddress ?? walletAddress
 }
 
 export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {
