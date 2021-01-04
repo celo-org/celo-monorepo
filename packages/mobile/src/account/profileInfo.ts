@@ -21,11 +21,10 @@ import { isProfileUploadedSelector, nameSelector } from 'src/account/selectors'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getWallet } from 'src/web3/contracts'
 import { currentAccountSelector, dataEncryptionKeySelector } from 'src/web3/selectors'
-
 const TAG = 'account/profileInfo'
 
 const authorizerUrl = 'https://kel03d4ef0.execute-api.eu-west-1.amazonaws.com/dev/authorize'
-const valoraMetadataUrl = 'https://stokado-storage-dev.s3-eu-west-1.amazonaws.com'
+const valoraMetadataUrl = 'https://d2uaxwjh0f8rcm.cloudfront.net'
 
 async function makeCall(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
   const response = await fetch(authorizerUrl, {
@@ -250,13 +249,14 @@ export function* uploadSymmetricKeys(recipientAddresses: string[]) {
 }
 
 export function* getProfileInfo(address: string) {
+  // TODO: check if we already have profile info of address
   const account = yield select(currentAccountSelector)
   const contractKit = yield call(getContractKit)
   yield call(unlockDEK)
 
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
   const nameAccessor = new PrivateNameAccessor(offchainWrapper)
-  console.log('READING NAME FOR', address)
+
   try {
     const result = yield call([nameAccessor, 'read'], address)
     console.log(result)
