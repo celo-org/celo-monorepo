@@ -27,7 +27,7 @@
 
 Ƭ **TransactionInput**: *CeloTxObject‹T› | [TransactionObjectWithValue](../interfaces/_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)‹T› | [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
 
-*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:27](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L27)*
+*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L27)*
 
 ## Functions
 
@@ -35,7 +35,7 @@
 
 ▸ **buildMetaTxTypedData**(`walletAddress`: Address, `tx`: [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md), `nonce`: number, `chainId`: number): *EIP712TypedData*
 
-*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:255](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L255)*
+*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L255)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ ___
 
 ▸ **toRawTransaction**(`tx`: [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any›): *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
 
-*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:210](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L210)*
+*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:210](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L210)*
 
 Turns any possible way to pass in a transaction into the raw values
 that are actually required. This is used both internally to normalize
@@ -78,7 +78,7 @@ ___
 
 ▸ **toTransactionBatch**(`txs`: Array‹[TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any››): *object*
 
-*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:238](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L238)*
+*Defined in [contractkit/src/wrappers/MetaTransactionWallet.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts#L238)*
 
 Turns an array of transaction inputs into the argument that
 need to be passed to the executeTransactions call.

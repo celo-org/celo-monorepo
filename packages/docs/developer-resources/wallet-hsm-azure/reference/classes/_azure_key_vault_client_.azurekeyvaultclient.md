@@ -27,7 +27,7 @@ Provides an abstraction on Azure Key Vault for performing signing operations
 
 \+ **new AzureKeyVaultClient**(`vaultName`: string, `credential?`: TokenCredential): *[AzureKeyVaultClient](_azure_key_vault_client_.azurekeyvaultclient.md)*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L30)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L30)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ Name | Type |
 
 ▸ **getKeyId**(`keyName`: string): *Promise‹string›*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L63)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L63)*
 
 **Parameters:**
 
@@ -60,7 +60,7 @@ ___
 
 ▸ **getKeys**(): *Promise‹string[]›*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:42](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L42)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L42)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **getPublicKey**(`keyName`: string): *Promise‹BigNumber›*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:50](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L50)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L50)*
 
 **Parameters:**
 
@@ -86,7 +86,7 @@ ___
 
 ▸ **getSecret**(`secretName`: string): *Promise‹string›*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:118](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L118)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L118)*
 
 **Parameters:**
 
@@ -102,7 +102,7 @@ ___
 
 ▸ **hasKey**(`keyName`: string): *Promise‹boolean›*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:106](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L106)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L106)*
 
 **Parameters:**
 
@@ -118,7 +118,7 @@ ___
 
 ▸ **signMessage**(`message`: Buffer, `keyName`: string): *Promise‹Signature›*
 
-*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L70)*
+*Defined in [wallet-hsm-azure/src/azure-key-vault-client.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-key-vault-client.ts#L70)*
 
 **Parameters:**
 

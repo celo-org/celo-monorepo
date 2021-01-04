@@ -12,7 +12,7 @@
 
 ▸ **compareBN**(`a`: BN, `b`: BN): *0 | 1 | -1*
 
-*Defined in [packages/sdk/utils/src/bn.ts:3](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/bn.ts#L3)*
+*Defined in [packages/sdk/utils/src/bn.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bn.ts#L3)*
 
 **Parameters:**
 
