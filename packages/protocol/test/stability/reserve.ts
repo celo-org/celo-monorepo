@@ -331,7 +331,7 @@ contract('Reserve', (accounts: string[]) => {
       await reserve.addExchangeSpender(exchangeAddress)
     })
 
-    it('should allow a exchange to call transferExchangeGold', async () => {
+    it('should allow an exchange to call transferExchangeGold', async () => {
       await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
     })
 
