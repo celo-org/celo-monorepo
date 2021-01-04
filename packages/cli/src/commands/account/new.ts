@@ -114,8 +114,8 @@ export default class NewAccount extends BaseCommand {
     const keys = await generateKeys(
       mnemonic,
       passphrase,
-      res.flags.addressIndex,
       res.flags.changeIndex,
+      res.flags.addressIndex,
       undefined,
       derivationPath
     )
