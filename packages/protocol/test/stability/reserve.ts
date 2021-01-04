@@ -343,7 +343,7 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
     })
 
-    it('should not allow removed removed exchange spender addresses to call transferExchangeGold', async () => {
+    it('should not allow removed exchange spender addresses to call transferExchangeGold', async () => {
       await reserve.removeExchangeSpender(exchangeAddress)
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
     })
