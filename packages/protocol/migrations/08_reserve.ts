@@ -80,11 +80,5 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
     >(CeloContractName.ReserveSpenderMultiSig, artifacts)
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
-
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await reserve.addExchangeSpender(await registry.getAddressFor(CeloContractName.Exchange))
   }
 )

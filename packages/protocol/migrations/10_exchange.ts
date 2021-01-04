@@ -7,7 +7,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { ExchangeInstance, FreezerInstance, StableTokenInstance } from 'types'
+import { ExchangeInstance, FreezerInstance, ReserveInstance, StableTokenInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
@@ -37,5 +37,12 @@ module.exports = deploymentForCoreContract<ExchangeInstance>(
       )
       await freezer.freeze(exchange.address)
     }
+
+    const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
+      'Reserve',
+      artifacts
+    )
+
+    await reserve.addExchangeSpender(exchange.address)
   }
 )
