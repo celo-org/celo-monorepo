@@ -1,14 +1,19 @@
----
-description: Exchange Celo Dollars and CELO via the stability mechanism
----
+# `celocli exchange`
 
-## Commands
+Exchange Celo Dollars and CELO via the stability mechanism
 
-### Celo
+- [`celocli exchange:celo`](#celocli-exchangecelo)
+- [`celocli exchange:dollars`](#celocli-exchangedollars)
+- [`celocli exchange:gold`](#celocli-exchangegold)
+- [`celocli exchange:show`](#celocli-exchangeshow)
+
+## `celocli exchange:celo`
 
 Exchange CELO for Celo Dollars via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)
 
 ```
+Exchange CELO for Celo Dollars via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)
+
 USAGE
   $ celocli exchange:celo
 
@@ -25,17 +30,20 @@ OPTIONS
 
 EXAMPLES
   celo --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+
   celo --value 5000000000000 --forAtLeast 100000000000000 --from
   0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/src/commands/exchange/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/celo.ts)_
+_See code: [src/commands/exchange/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/celo.ts)_
 
-### Dollars
+## `celocli exchange:dollars`
 
 Exchange Celo Dollars for CELO via the stability mechanism
 
 ```
+Exchange Celo Dollars for CELO via the stability mechanism
+
 USAGE
   $ celocli exchange:dollars
 
@@ -51,17 +59,20 @@ OPTIONS
 
 EXAMPLES
   dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+
   dollars --value 10000000000000 --forAtLeast 50000000000000 --from
   0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/src/commands/exchange/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/dollars.ts)_
+_See code: [src/commands/exchange/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/dollars.ts)_
 
-### Gold
+## `celocli exchange:gold`
 
 Exchange CELO for Celo Dollars via the stability mechanism. _DEPRECATION WARNING_ Use the "exchange:celo" command instead
 
 ```
+Exchange CELO for Celo Dollars via the stability mechanism. *DEPRECATION WARNING* Use the "exchange:celo" command instead
+
 USAGE
   $ celocli exchange:gold
 
@@ -78,17 +89,20 @@ OPTIONS
 
 EXAMPLES
   gold --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+
   gold --value 5000000000000 --forAtLeast 100000000000000 --from
   0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/src/commands/exchange/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)_
+_See code: [src/commands/exchange/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)_
 
-### Show
+## `celocli exchange:show`
 
 Show the current exchange rates offered by the Exchange
 
 ```
+Show the current exchange rates offered by the Exchange
+
 USAGE
   $ celocli exchange:show
 
@@ -100,4 +114,4 @@ EXAMPLE
   list
 ```
 
-_See code: [packages/cli/src/commands/exchange/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/show.ts)_
+_See code: [src/commands/exchange/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/show.ts)_
