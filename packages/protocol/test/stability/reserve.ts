@@ -48,7 +48,7 @@ contract('Reserve', (accounts: string[]) => {
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
-    // await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
+
     await reserve.initialize(
       registry.address,
       aTobinTaxStalenessThreshold,
