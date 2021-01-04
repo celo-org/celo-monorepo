@@ -32,7 +32,7 @@
 
 \+ **new Future**(): *[Future](_future_.future.md)*
 
-*Defined in [packages/sdk/base/src/future.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L7)*
+*Defined in [packages/sdk/base/src/future.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L7)*
 
 **Returns:** *[Future](_future_.future.md)*
 
@@ -42,7 +42,7 @@
 
 • **get error**(): *any*
 
-*Defined in [packages/sdk/base/src/future.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L20)*
+*Defined in [packages/sdk/base/src/future.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L20)*
 
 **Returns:** *any*
 
@@ -52,7 +52,7 @@ ___
 
 • **get finished**(): *boolean*
 
-*Defined in [packages/sdk/base/src/future.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L16)*
+*Defined in [packages/sdk/base/src/future.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L16)*
 
 **Returns:** *boolean*
 
@@ -62,7 +62,7 @@ ___
 
 ▸ **asPromise**(): *Promise‹T›*
 
-*Defined in [packages/sdk/base/src/future.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L40)*
+*Defined in [packages/sdk/base/src/future.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L40)*
 
 **Returns:** *Promise‹T›*
 
@@ -72,7 +72,7 @@ ___
 
 ▸ **reject**(`error`: any): *void*
 
-*Defined in [packages/sdk/base/src/future.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L30)*
+*Defined in [packages/sdk/base/src/future.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L30)*
 
 **Parameters:**
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **resolve**(`value`: T): *void*
 
-*Defined in [packages/sdk/base/src/future.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L24)*
+*Defined in [packages/sdk/base/src/future.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L24)*
 
 **Parameters:**
 
@@ -104,6 +104,6 @@ ___
 
 ▸ **wait**(): *Promise‹T›*
 
-*Defined in [packages/sdk/base/src/future.ts:36](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L36)*
+*Defined in [packages/sdk/base/src/future.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L36)*
 
 **Returns:** *Promise‹T›*

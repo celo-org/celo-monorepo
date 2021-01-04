@@ -1,31 +1,25 @@
-# `celocli network`
+---
+description: View details about the network, like contracts and parameters
+---
 
-View details about the network, like contracts and parameters
+## Commands
 
-- [`celocli network:contracts`](#celocli-networkcontracts)
-- [`celocli network:info`](#celocli-networkinfo)
-- [`celocli network:parameters`](#celocli-networkparameters)
-
-## `celocli network:contracts`
+### Contracts
 
 Lists Celo core contracts and their addesses.
 
 ```
-Lists Celo core contracts and their addesses.
-
 USAGE
   $ celocli network:contracts
 ```
 
-_See code: [src/commands/network/contracts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/contracts.ts)_
+_See code: [packages/cli/src/commands/network/contracts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/contracts.ts)_
 
-## `celocli network:info`
+### Info
 
 View general network information such as the current block number
 
 ```
-View general network information such as the current block number
-
 USAGE
   $ celocli network:info
 
@@ -33,15 +27,13 @@ OPTIONS
   -n, --lastN=lastN  [default: 1] Fetch info about the last n epochs
 ```
 
-_See code: [src/commands/network/info.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/info.ts)_
+_See code: [packages/cli/src/commands/network/info.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/info.ts)_
 
-## `celocli network:parameters`
+### Parameters
 
 View parameters of the network, including but not limited to configuration for the various Celo core smart contracts.
 
 ```
-View parameters of the network, including but not limited to configuration for the various Celo core smart contracts.
-
 USAGE
   $ celocli network:parameters
 
@@ -49,4 +41,4 @@ OPTIONS
   --raw  Display raw numerical configuration
 ```
 
-_See code: [src/commands/network/parameters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/parameters.ts)_
+_See code: [packages/cli/src/commands/network/parameters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/parameters.ts)_

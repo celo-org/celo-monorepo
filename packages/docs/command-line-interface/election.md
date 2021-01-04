@@ -1,22 +1,14 @@
-# `celocli election`
+---
+description: Participate in and view the state of Validator Elections
+---
 
-Participate in and view the state of Validator Elections
+## Commands
 
-- [`celocli election:activate`](#celocli-electionactivate)
-- [`celocli election:current`](#celocli-electioncurrent)
-- [`celocli election:list`](#celocli-electionlist)
-- [`celocli election:revoke`](#celocli-electionrevoke)
-- [`celocli election:run`](#celocli-electionrun)
-- [`celocli election:show ADDRESS`](#celocli-electionshow-address)
-- [`celocli election:vote`](#celocli-electionvote)
-
-## `celocli election:activate`
+### Activate
 
 Activate pending votes in validator elections to begin earning rewards. To earn rewards as a voter, it is required to activate your pending votes at some point after the end of the epoch in which they were made.
 
 ```
-Activate pending votes in validator elections to begin earning rewards. To earn rewards as a voter, it is required to activate your pending votes at some point after the end of the epoch in which they were made.
-
 USAGE
   $ celocli election:activate
 
@@ -28,19 +20,16 @@ OPTIONS
 
 EXAMPLES
   activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1
-
   activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --wait
 ```
 
-_See code: [src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
+_See code: [packages/cli/src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
 
-## `celocli election:current`
+### Current
 
 Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
 
 ```
-Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
-
 USAGE
   $ celocli election:current
 
@@ -59,15 +48,13 @@ OPTIONS
                           if keys have been rotated.
 ```
 
-_See code: [src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
+_See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
 
-## `celocli election:list`
+### List
 
 Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators.
 
 ```
-Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators.
-
 USAGE
   $ celocli election:list
 
@@ -85,15 +72,13 @@ EXAMPLE
   list
 ```
 
-_See code: [src/commands/election/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/list.ts)_
+_See code: [packages/cli/src/commands/election/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/list.ts)_
 
-## `celocli election:revoke`
+### Revoke
 
 Revoke votes for a Validator Group in validator elections.
 
 ```
-Revoke votes for a Validator Group in validator elections.
-
 USAGE
   $ celocli election:revoke
 
@@ -107,15 +92,13 @@ EXAMPLE
   0x932fee04521f5fcb21949041bf161917da3f588b, --value 1000000
 ```
 
-_See code: [src/commands/election/revoke.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/revoke.ts)_
+_See code: [packages/cli/src/commands/election/revoke.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/revoke.ts)_
 
-## `celocli election:run`
+### Run
 
 Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.
 
 ```
-Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.
-
 USAGE
   $ celocli election:run
 
@@ -130,15 +113,13 @@ OPTIONS
   --sort=sort             property to sort by (prepend '-' for descending)
 ```
 
-_See code: [src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
+_See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
 
-## `celocli election:show ADDRESS`
+### Show
 
 Show election information about a voter or registered Validator Group
 
 ```
-Show election information about a voter or registered Validator Group
-
 USAGE
   $ celocli election:show ADDRESS
 
@@ -151,19 +132,16 @@ OPTIONS
 
 EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter
-
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --group
 ```
 
-_See code: [src/commands/election/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/show.ts)_
+_See code: [packages/cli/src/commands/election/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/show.ts)_
 
-## `celocli election:vote`
+### Vote
 
 Vote for a Validator Group in validator elections.
 
 ```
-Vote for a Validator Group in validator elections.
-
 USAGE
   $ celocli election:vote
 
@@ -179,4 +157,4 @@ EXAMPLE
   0x932fee04521f5fcb21949041bf161917da3f588b, --value 1000000
 ```
 
-_See code: [src/commands/election/vote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/vote.ts)_
+_See code: [packages/cli/src/commands/election/vote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/vote.ts)_

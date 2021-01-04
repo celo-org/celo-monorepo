@@ -14,7 +14,7 @@
 
 ▸ **decodeStringParameter**(`ethAbi`: [AbiCoder](../interfaces/_abi_types_.abicoder.md), `str`: string): *any*
 
-*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L20)*
+*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L20)*
 
 **Parameters:**
 
@@ -31,7 +31,7 @@ ___
 
 ▸ **getAbiTypes**(`abi`: AbiItem[], `methodName`: string): *string[]*
 
-*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L4)*
+*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L4)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **parseDecodedParams**(`params`: [DecodedParamsObject](../interfaces/_abi_types_.decodedparamsobject.md)): *object*
 
-*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L7)*
+*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L7)*
 
 **Parameters:**
 

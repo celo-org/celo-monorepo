@@ -12,4 +12,4 @@
 
 • **PHONE_NUMBER**: = 0
 
-*Defined in [packages/sdk/base/src/attestations.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L8)*
+*Defined in [packages/sdk/base/src/attestations.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L8)*

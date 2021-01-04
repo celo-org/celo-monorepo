@@ -13,7 +13,7 @@
 
 • **DOLLAR**: = "Celo Dollar"
 
-*Defined in [packages/sdk/base/src/currencies.ts:3](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L3)*
+*Defined in [packages/sdk/base/src/currencies.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L3)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **GOLD**: = "Celo Gold"
 
-*Defined in [packages/sdk/base/src/currencies.ts:2](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L2)*
+*Defined in [packages/sdk/base/src/currencies.ts:2](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L2)*

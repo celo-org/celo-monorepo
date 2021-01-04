@@ -1,28 +1,14 @@
-# `celocli validator`
+---
+description: View and manage Validators
+---
 
-View and manage Validators
+## Commands
 
-- [`celocli validator:affiliate GROUPADDRESS`](#celocli-validatoraffiliate-groupaddress)
-- [`celocli validator:deaffiliate`](#celocli-validatordeaffiliate)
-- [`celocli validator:deregister`](#celocli-validatorderegister)
-- [`celocli validator:downtime-slash`](#celocli-validatordowntime-slash)
-- [`celocli validator:force-deaffiliate`](#celocli-validatorforce-deaffiliate)
-- [`celocli validator:list`](#celocli-validatorlist)
-- [`celocli validator:register`](#celocli-validatorregister)
-- [`celocli validator:requirements`](#celocli-validatorrequirements)
-- [`celocli validator:set-bitmaps`](#celocli-validatorset-bitmaps)
-- [`celocli validator:show VALIDATORADDRESS`](#celocli-validatorshow-validatoraddress)
-- [`celocli validator:signed-blocks`](#celocli-validatorsigned-blocks)
-- [`celocli validator:status`](#celocli-validatorstatus)
-- [`celocli validator:update-bls-public-key`](#celocli-validatorupdate-bls-public-key)
-
-## `celocli validator:affiliate GROUPADDRESS`
+### Affiliate
 
 Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members.
 
 ```
-Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members.
-
 USAGE
   $ celocli validator:affiliate GROUPADDRESS
 
@@ -40,15 +26,13 @@ EXAMPLE
   0x97f7333c51897469e8d98e7af8653aab468050a3
 ```
 
-_See code: [src/commands/validator/affiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/affiliate.ts)_
+_See code: [packages/cli/src/commands/validator/affiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/affiliate.ts)_
 
-## `celocli validator:deaffiliate`
+### Deaffiliate
 
 Deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.
 
 ```
-Deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.
-
 USAGE
   $ celocli validator:deaffiliate
 
@@ -60,15 +44,13 @@ EXAMPLE
   deaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
-_See code: [src/commands/validator/deaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deaffiliate.ts)_
+_See code: [packages/cli/src/commands/validator/deaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deaffiliate.ts)_
 
-## `celocli validator:deregister`
+### Deregister
 
 Deregister a Validator. Approximately 60 days after the validator is no longer part of any group, it will be possible to deregister the validator and start unlocking the CELO. If you wish to deregister your validator, you must first remove it from it's group, such as by deaffiliating it, then wait the required 60 days before running this command.
 
 ```
-Deregister a Validator. Approximately 60 days after the validator is no longer part of any group, it will be possible to deregister the validator and start unlocking the CELO. If you wish to deregister your validator, you must first remove it from it's group, such as by deaffiliating it, then wait the required 60 days before running this command.
-
 USAGE
   $ celocli validator:deregister
 
@@ -80,15 +62,13 @@ EXAMPLE
   deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
-_See code: [src/commands/validator/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deregister.ts)_
+_See code: [packages/cli/src/commands/validator/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deregister.ts)_
 
-## `celocli validator:downtime-slash`
+### Downtime-slash
 
 Downtime slash a validator
 
 ```
-Downtime slash a validator
-
 USAGE
   $ celocli validator:downtime-slash
 
@@ -112,20 +92,17 @@ OPTIONS
 EXAMPLES
   downtime-slash     --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95     --validator
   0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD     --intervals "[100:150), [150:200)"
-
   downtime-slash     --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95     --validator
   0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD     --slashableDowntimeBeforeBlock 200
 ```
 
-_See code: [src/commands/validator/downtime-slash.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/downtime-slash.ts)_
+_See code: [packages/cli/src/commands/validator/downtime-slash.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/downtime-slash.ts)_
 
-## `celocli validator:force-deaffiliate`
+### Force-deaffiliate
 
 Force deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member. Used by stake-off admins in order to remove validators from the next epoch's validator set if they are down and consistently unresponsive, in order to preserve the health of the network. This feature will be removed once slashing for downtime is implemented.
 
 ```
-Force deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.  Used by stake-off admins in order to remove validators from the next epoch's validator set if they are down and consistently unresponsive, in order to preserve the health of the network. This feature will be removed once slashing for downtime is implemented.
-
 USAGE
   $ celocli validator:force-deaffiliate
 
@@ -138,15 +115,13 @@ EXAMPLE
   0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD
 ```
 
-_See code: [src/commands/validator/force-deaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/force-deaffiliate.ts)_
+_See code: [packages/cli/src/commands/validator/force-deaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/force-deaffiliate.ts)_
 
-## `celocli validator:list`
+### List
 
 List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
 
 ```
-List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
-
 USAGE
   $ celocli validator:list
 
@@ -164,15 +139,13 @@ EXAMPLE
   list
 ```
 
-_See code: [src/commands/validator/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list.ts)_
+_See code: [packages/cli/src/commands/validator/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list.ts)_
 
-## `celocli validator:register`
+### Register
 
 Register a new Validator
 
 ```
-Register a new Validator
-
 USAGE
   $ celocli validator:register
 
@@ -197,15 +170,13 @@ EXAMPLE
   664ea3923900
 ```
 
-_See code: [src/commands/validator/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/register.ts)_
+_See code: [packages/cli/src/commands/validator/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/register.ts)_
 
-## `celocli validator:requirements`
+### Requirements
 
 List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of CELO that needs to be locked in order to register, and a duration, which is the amount of time that CELO must stay locked following the deregistration of the Validator.
 
 ```
-List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of CELO that needs to be locked in order to register, and a duration, which is the amount of time that CELO must stay locked following the deregistration of the Validator.
-
 USAGE
   $ celocli validator:requirements
 
@@ -213,15 +184,13 @@ EXAMPLE
   requirements
 ```
 
-_See code: [src/commands/validator/requirements.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/requirements.ts)_
+_See code: [packages/cli/src/commands/validator/requirements.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/requirements.ts)_
 
-## `celocli validator:set-bitmaps`
+### Set-bitmaps
 
 Set validator signature bitmaps for provided intervals
 
 ```
-Set validator signature bitmaps for provided intervals
-
 USAGE
   $ celocli validator:set-bitmaps
 
@@ -245,20 +214,17 @@ OPTIONS
 EXAMPLES
   set-bitmaps --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
   --slashableDowntimeBeforeBlock 10000
-
   set-bitmaps --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --intervals "[0:100],
   (100:200]"
 ```
 
-_See code: [src/commands/validator/set-bitmaps.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/set-bitmaps.ts)_
+_See code: [packages/cli/src/commands/validator/set-bitmaps.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/set-bitmaps.ts)_
 
-## `celocli validator:show VALIDATORADDRESS`
+### Show
 
 Show information about a registered Validator.
 
 ```
-Show information about a registered Validator.
-
 USAGE
   $ celocli validator:show VALIDATORADDRESS
 
@@ -269,15 +235,13 @@ EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
+_See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
 
-## `celocli validator:signed-blocks`
+### Signed-blocks
 
 Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block.
 
 ```
-Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block.
-
 USAGE
   $ celocli validator:signed-blocks
 
@@ -306,26 +270,20 @@ OPTIONS
 
 EXAMPLES
   signed-blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
-
   signed-blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631 --follow
-
   signed-blocks --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
-
   signed-blocks --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
-
   signed-blocks --lookback 50 --width 10 --signer
   0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
-_See code: [src/commands/validator/signed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/signed-blocks.ts)_
+_See code: [packages/cli/src/commands/validator/signed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/signed-blocks.ts)_
 
-## `celocli validator:status`
+### Status
 
 Shows the consensus status of a validator. This command will show whether a validator is currently elected, would be elected if an election were to be run right now, and the percentage of blocks signed and number of blocks successfully proposed within a given window.
 
 ```
-Shows the consensus status of a validator. This command will show whether a validator is currently elected, would be elected if an election were to be run right now, and the percentage of blocks signed and number of blocks successfully proposed within a given window.
-
 USAGE
   $ celocli validator:status
 
@@ -374,25 +332,17 @@ OPTIONS
 
 EXAMPLES
   status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
-
   status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631 --start 1480000
-
   status --all --start 1480000 --end 1490000
 ```
 
-_See code: [src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
+_See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
 
-## `celocli validator:update-bls-public-key`
+### Update-bls-public-key
 
 Update the BLS public key for a Validator to be used in consensus.
 
 ```
-Update the BLS public key for a Validator to be used in consensus.
-
-Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
-
-WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result, rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration. Use this method only if you know what you are doing.
-
 USAGE
   $ celocli validator:update-bls-public-key
 
@@ -402,7 +352,6 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
 
 DESCRIPTION
-
   Regular (ECDSA and BLS) key rotation is recommended for Validator operational
   security.
 
@@ -420,4 +369,4 @@ EXAMPLE
   664ea3923900
 ```
 
-_See code: [src/commands/validator/update-bls-public-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/update-bls-public-key.ts)_
+_See code: [packages/cli/src/commands/validator/update-bls-public-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/update-bls-public-key.ts)_

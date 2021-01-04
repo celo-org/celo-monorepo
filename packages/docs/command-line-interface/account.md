@@ -1,41 +1,14 @@
-# `celocli account`
+---
+description: Manage your account, keys, and metadata
+---
 
-Manage your account, keys, and metadata
+## Commands
 
-- [`celocli account:authorize`](#celocli-accountauthorize)
-- [`celocli account:balance ADDRESS`](#celocli-accountbalance-address)
-- [`celocli account:claim-account FILE`](#celocli-accountclaim-account-file)
-- [`celocli account:claim-attestation-service-url FILE`](#celocli-accountclaim-attestation-service-url-file)
-- [`celocli account:claim-domain FILE`](#celocli-accountclaim-domain-file)
-- [`celocli account:claim-keybase FILE`](#celocli-accountclaim-keybase-file)
-- [`celocli account:claim-name FILE`](#celocli-accountclaim-name-file)
-- [`celocli account:claim-storage FILE`](#celocli-accountclaim-storage-file)
-- [`celocli account:create-metadata FILE`](#celocli-accountcreate-metadata-file)
-- [`celocli account:get-metadata ADDRESS`](#celocli-accountget-metadata-address)
-- [`celocli account:list`](#celocli-accountlist)
-- [`celocli account:lock ACCOUNT`](#celocli-accountlock-account)
-- [`celocli account:new`](#celocli-accountnew)
-- [`celocli account:offchain-read`](#celocli-accountoffchain-read)
-- [`celocli account:offchain-write`](#celocli-accountoffchain-write)
-- [`celocli account:proof-of-possession`](#celocli-accountproof-of-possession)
-- [`celocli account:recover-old`](#celocli-accountrecover-old)
-- [`celocli account:register`](#celocli-accountregister)
-- [`celocli account:register-data-encryption-key`](#celocli-accountregister-data-encryption-key)
-- [`celocli account:register-metadata`](#celocli-accountregister-metadata)
-- [`celocli account:set-name`](#celocli-accountset-name)
-- [`celocli account:show ADDRESS`](#celocli-accountshow-address)
-- [`celocli account:show-claimed-accounts ADDRESS`](#celocli-accountshow-claimed-accounts-address)
-- [`celocli account:show-metadata FILE`](#celocli-accountshow-metadata-file)
-- [`celocli account:unlock ACCOUNT`](#celocli-accountunlock-account)
-- [`celocli account:verify-proof-of-possession`](#celocli-accountverify-proof-of-possession)
-
-## `celocli account:authorize`
+### Authorize
 
 Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
 
 ```
-Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
-
 USAGE
   $ celocli account:authorize
 
@@ -65,7 +38,6 @@ EXAMPLES
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6
   c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb
-
   authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role validator --signer
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6
@@ -77,15 +49,13 @@ EXAMPLES
   664ea3923900
 ```
 
-_See code: [src/commands/account/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/authorize.ts)_
+_See code: [packages/cli/src/commands/account/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/authorize.ts)_
 
-## `celocli account:balance ADDRESS`
+### Balance
 
 View Celo Dollar and Gold balances for an address
 
 ```
-View Celo Dollar and Gold balances for an address
-
 USAGE
   $ celocli account:balance ADDRESS
 
@@ -93,15 +63,13 @@ EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
+_See code: [packages/cli/src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
 
-## `celocli account:claim-account FILE`
+### Claim-account
 
 Claim another account, and optionally its public key, and add the claim to a local metadata file
 
 ```
-Claim another account, and optionally its public key, and add the claim to a local metadata file
-
 USAGE
   $ celocli account:claim-account FILE
 
@@ -126,15 +94,13 @@ EXAMPLE
   --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/claim-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-account.ts)_
+_See code: [packages/cli/src/commands/account/claim-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-account.ts)_
 
-## `celocli account:claim-attestation-service-url FILE`
+### Claim-attestation-service-url
 
 Claim the URL of the attestation service and add the claim to a local metadata file
 
 ```
-Claim the URL of the attestation service and add the claim to a local metadata file
-
 USAGE
   $ celocli account:claim-attestation-service-url FILE
 
@@ -157,15 +123,13 @@ EXAMPLE
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/claim-attestation-service-url.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-attestation-service-url.ts)_
+_See code: [packages/cli/src/commands/account/claim-attestation-service-url.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-attestation-service-url.ts)_
 
-## `celocli account:claim-domain FILE`
+### Claim-domain
 
 Claim a domain and add the claim to a local metadata file
 
 ```
-Claim a domain and add the claim to a local metadata file
-
 USAGE
   $ celocli account:claim-domain FILE
 
@@ -186,15 +150,13 @@ EXAMPLE
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/claim-domain.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-domain.ts)_
+_See code: [packages/cli/src/commands/account/claim-domain.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-domain.ts)_
 
-## `celocli account:claim-keybase FILE`
+### Claim-keybase
 
 Claim a keybase username and add the claim to a local metadata file
 
 ```
-Claim a keybase username and add the claim to a local metadata file
-
 USAGE
   $ celocli account:claim-keybase FILE
 
@@ -215,15 +177,13 @@ EXAMPLE
   --username myusername
 ```
 
-_See code: [src/commands/account/claim-keybase.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-keybase.ts)_
+_See code: [packages/cli/src/commands/account/claim-keybase.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-keybase.ts)_
 
-## `celocli account:claim-name FILE`
+### Claim-name
 
 Claim a name and add the claim to a local metadata file
 
 ```
-Claim a name and add the claim to a local metadata file
-
 USAGE
   $ celocli account:claim-name FILE
 
@@ -244,15 +204,13 @@ EXAMPLE
   myname
 ```
 
-_See code: [src/commands/account/claim-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-name.ts)_
+_See code: [packages/cli/src/commands/account/claim-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-name.ts)_
 
-## `celocli account:claim-storage FILE`
+### Claim-storage
 
 Claim a storage root and add the claim to a local metadata file
 
 ```
-Claim a storage root and add the claim to a local metadata file
-
 USAGE
   $ celocli account:claim-storage FILE
 
@@ -273,15 +231,13 @@ EXAMPLE
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/claim-storage.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-storage.ts)_
+_See code: [packages/cli/src/commands/account/claim-storage.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-storage.ts)_
 
-## `celocli account:create-metadata FILE`
+### Create-metadata
 
 Create an empty identity metadata file. Use this metadata file to store claims attesting to ownership of off-chain resources. Claims can be generated with the account:claim-\* commands.
 
 ```
-Create an empty identity metadata file. Use this metadata file to store claims attesting to ownership of off-chain resources. Claims can be generated with the account:claim-* commands.
-
 USAGE
   $ celocli account:create-metadata FILE
 
@@ -298,15 +254,13 @@ EXAMPLE
   create-metadata ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/create-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/create-metadata.ts)_
+_See code: [packages/cli/src/commands/account/create-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/create-metadata.ts)_
 
-## `celocli account:get-metadata ADDRESS`
+### Get-metadata
 
 Show information about an address. Retreives the metadata URL for an account from the on-chain, then fetches the metadata file off-chain and verifies proofs as able.
 
 ```
-Show information about an address. Retreives the metadata URL for an account from the on-chain, then fetches the metadata file off-chain and verifies proofs as able.
-
 USAGE
   $ celocli account:get-metadata ADDRESS
 
@@ -327,32 +281,28 @@ EXAMPLE
   get-metadata 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [src/commands/account/get-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-metadata.ts)_
+_See code: [packages/cli/src/commands/account/get-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-metadata.ts)_
 
-## `celocli account:list`
+### List
 
 List the addresses from the node and the local instance
 
 ```
-List the addresses from the node and the local instance
-
 USAGE
   $ celocli account:list
 
 OPTIONS
-  --local  If set, only show local and hardware wallet accounts. Use no-local to only
-           show keystore addresses.
+  --[no-]local  If set, only show local and hardware wallet accounts. Use no-local to
+                only show keystore addresses.
 ```
 
-_See code: [src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
+_See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
 
-## `celocli account:lock ACCOUNT`
+### Lock
 
 Lock an account which was previously unlocked
 
 ```
-Lock an account which was previously unlocked
-
 USAGE
   $ celocli account:lock ACCOUNT
 
@@ -363,15 +313,13 @@ EXAMPLE
   lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [src/commands/account/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/lock.ts)_
+_See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/lock.ts)_
 
-## `celocli account:new`
+### New
 
 Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
 
 ```
-Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
-
 USAGE
   $ celocli account:new
 
@@ -406,27 +354,21 @@ OPTIONS
 
 EXAMPLES
   new
-
   new --passphrasePath myFolder/my_passphrase_file
-
   new --language spanish
-
   new --passphrasePath some_folder/my_passphrase_file --language japanese --addressIndex
   5
-
   new --passphrasePath some_folder/my_passphrase_file --mnemonicPath
   some_folder/my_mnemonic_file --addressIndex 5
 ```
 
-_See code: [src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
+_See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
-## `celocli account:offchain-read`
+### Offchain-read
 
 DEV: Reads the name from offchain storage
 
 ```
-DEV: Reads the name from offchain storage
-
 USAGE
   $ celocli account:offchain-read
 
@@ -439,15 +381,13 @@ EXAMPLE
   offchain-read --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [src/commands/account/offchain-read.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-read.ts)_
+_See code: [packages/cli/src/commands/account/offchain-read.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-read.ts)_
 
-## `celocli account:offchain-write`
+### Offchain-write
 
 DEV: Writes a name to offchain storage
 
 ```
-DEV: Writes a name to offchain storage
-
 USAGE
   $ celocli account:offchain-write
 
@@ -465,19 +405,16 @@ OPTIONS
 
 EXAMPLES
   offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
-
   offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
-_See code: [src/commands/account/offchain-write.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-write.ts)_
+_See code: [packages/cli/src/commands/account/offchain-write.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-write.ts)_
 
-## `celocli account:proof-of-possession`
+### Proof-of-possession
 
 Generate proof-of-possession to be used to authorize a signer. See the "account:authorize" command for more details.
 
 ```
-Generate proof-of-possession to be used to authorize a signer. See the "account:authorize" command for more details.
-
 USAGE
   $ celocli account:proof-of-possession
 
@@ -494,15 +431,13 @@ EXAMPLE
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb
 ```
 
-_See code: [src/commands/account/proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/proof-of-possession.ts)_
+_See code: [packages/cli/src/commands/account/proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/proof-of-possession.ts)_
 
-## `celocli account:recover-old`
+### Recover-old
 
 Recovers the Valora old account and print out the key information. The old Valora app (in a beta state) generated the user address using a seed of 32 bytes, instead of 64 bytes. As the app fixed that, some old accounts were left with some funds. This command allows the user to recover those funds.
 
 ```
-Recovers the Valora old account and print out the key information. The old Valora app (in a beta state) generated the user address using a seed of 32 bytes, instead of 64 bytes. As the app fixed that, some old accounts were left with some funds. This command allows the user to recover those funds.
-
 USAGE
   $ celocli account:recover-old
 
@@ -536,28 +471,22 @@ OPTIONS
 
 EXAMPLES
   recover-old --mnemonicPath some_folder/my_mnemonic_file
-
   recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath
   myFolder/my_passphrase_file
-
   recover-old --mnemonicPath some_folder/my_mnemonic_file --language spanish
-
   recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath
   some_folder/my_passphrase_file --language japanese --addressIndex 5
-
   recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath
   some_folder/my_passphrase_file --addressIndex 5
 ```
 
-_See code: [src/commands/account/recover-old.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/recover-old.ts)_
+_See code: [packages/cli/src/commands/account/recover-old.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/recover-old.ts)_
 
-## `celocli account:register`
+### Register
 
 Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
 
 ```
-Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
-
 USAGE
   $ celocli account:register
 
@@ -567,19 +496,16 @@ OPTIONS
 
 EXAMPLES
   register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
-
   register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
-_See code: [src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
+_See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
 
-## `celocli account:register-data-encryption-key`
+### Register-data-encryption-key
 
 Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments
 
 ```
-Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments
-
 USAGE
   $ celocli account:register-data-encryption-key
 
@@ -595,15 +521,13 @@ EXAMPLE
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/register-data-encryption-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-data-encryption-key.ts)_
+_See code: [packages/cli/src/commands/account/register-data-encryption-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-data-encryption-key.ts)_
 
-## `celocli account:register-metadata`
+### Register-metadata
 
 Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
 
 ```
-Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
-
 USAGE
   $ celocli account:register-metadata
 
@@ -643,15 +567,13 @@ EXAMPLE
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [src/commands/account/register-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-metadata.ts)_
+_See code: [packages/cli/src/commands/account/register-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-metadata.ts)_
 
-## `celocli account:set-name`
+### Set-name
 
 Sets the name of a registered account on-chain. An account's name is an optional human readable identifier
 
 ```
-Sets the name of a registered account on-chain. An account's name is an optional human readable identifier
-
 USAGE
   $ celocli account:set-name
 
@@ -663,15 +585,13 @@ EXAMPLE
   set-name --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
-_See code: [src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_
+_See code: [packages/cli/src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_
 
-## `celocli account:show ADDRESS`
+### Show
 
 Show information for an account, including name, authorized vote, validator, and attestation signers, the URL at which account metadata is hosted, the address the account is using with the mobile wallet, and a public key that can be used to encrypt information for the account.
 
 ```
-Show information for an account, including name, authorized vote, validator, and attestation signers, the URL at which account metadata is hosted, the address the account is using with the mobile wallet, and a public key that can be used to encrypt information for the account.
-
 USAGE
   $ celocli account:show ADDRESS
 
@@ -679,15 +599,13 @@ EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [src/commands/account/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show.ts)_
+_See code: [packages/cli/src/commands/account/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show.ts)_
 
-## `celocli account:show-claimed-accounts ADDRESS`
+### Show-claimed-accounts
 
 Show information about claimed accounts
 
 ```
-Show information about claimed accounts
-
 USAGE
   $ celocli account:show-claimed-accounts ADDRESS
 
@@ -695,15 +613,13 @@ EXAMPLE
   show-claimed-accounts 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [src/commands/account/show-claimed-accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-claimed-accounts.ts)_
+_See code: [packages/cli/src/commands/account/show-claimed-accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-claimed-accounts.ts)_
 
-## `celocli account:show-metadata FILE`
+### Show-metadata
 
 Show the data in a local metadata file
 
 ```
-Show the data in a local metadata file
-
 USAGE
   $ celocli account:show-metadata FILE
 
@@ -724,15 +640,13 @@ EXAMPLE
   show-metadata ~/metadata.json
 ```
 
-_See code: [src/commands/account/show-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-metadata.ts)_
+_See code: [packages/cli/src/commands/account/show-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-metadata.ts)_
 
-## `celocli account:unlock ACCOUNT`
+### Unlock
 
 Unlock an account address to send transactions or validate blocks
 
 ```
-Unlock an account address to send transactions or validate blocks
-
 USAGE
   $ celocli account:unlock ACCOUNT
 
@@ -748,19 +662,16 @@ OPTIONS
 
 EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
-
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631 --duration 600
 ```
 
-_See code: [src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
+_See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
 
-## `celocli account:verify-proof-of-possession`
+### Verify-proof-of-possession
 
 Verify a proof-of-possession. See the "account:proof-of-possession" command for more details.
 
 ```
-Verify a proof-of-possession. See the "account:proof-of-possession" command for more details.
-
 USAGE
   $ celocli account:verify-proof-of-possession
 
@@ -784,4 +695,4 @@ EXAMPLE
   23305e87fc2896808467c4081d9524a84c01b89ec91ca3
 ```
 
-_See code: [src/commands/account/verify-proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/verify-proof-of-possession.ts)_
+_See code: [packages/cli/src/commands/account/verify-proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/verify-proof-of-possession.ts)_

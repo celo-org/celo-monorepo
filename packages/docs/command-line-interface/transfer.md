@@ -1,18 +1,14 @@
-# `celocli transfer`
+---
+description: Transfer CELO and Celo Dollars
+---
 
-Transfer CELO and Celo Dollars
+## Commands
 
-- [`celocli transfer:celo`](#celocli-transfercelo)
-- [`celocli transfer:dollars`](#celocli-transferdollars)
-- [`celocli transfer:gold`](#celocli-transfergold)
-
-## `celocli transfer:celo`
+### Celo
 
 Transfer CELO to a specified address. (Note: this is the equivalent of the old transfer:gold)
 
 ```
-Transfer CELO to a specified address. (Note: this is the equivalent of the old transfer:gold)
-
 USAGE
   $ celocli transfer:celo
 
@@ -29,15 +25,13 @@ EXAMPLE
   0x5409ed021d9299bf6814279a6a1411a7e866a631 --value 10000000000000000000
 ```
 
-_See code: [src/commands/transfer/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/celo.ts)_
+_See code: [packages/cli/src/commands/transfer/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/celo.ts)_
 
-## `celocli transfer:dollars`
+### Dollars
 
 Transfer Celo Dollars to a specified address.
 
 ```
-Transfer Celo Dollars to a specified address.
-
 USAGE
   $ celocli transfer:dollars
 
@@ -54,15 +48,13 @@ EXAMPLE
   0x5409ed021d9299bf6814279a6a1411a7e866a631 --value 1000000000000000000
 ```
 
-_See code: [src/commands/transfer/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/dollars.ts)_
+_See code: [packages/cli/src/commands/transfer/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/dollars.ts)_
 
-## `celocli transfer:gold`
+### Gold
 
 Transfer CELO to a specified address. _DEPRECATION WARNING_ Use the "transfer:celo" command instead
 
 ```
-Transfer CELO to a specified address. *DEPRECATION WARNING* Use the "transfer:celo" command instead
-
 USAGE
   $ celocli transfer:gold
 
@@ -79,4 +71,4 @@ EXAMPLE
   0x5409ed021d9299bf6814279a6a1411a7e866a631 --value 10000000000000000000
 ```
 
-_See code: [src/commands/transfer/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/gold.ts)_
+_See code: [packages/cli/src/commands/transfer/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/gold.ts)_

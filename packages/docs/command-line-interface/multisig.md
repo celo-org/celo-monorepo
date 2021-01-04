@@ -1,16 +1,14 @@
-# `celocli multisig`
+---
+description: Shows information about multi-sig contract
+---
 
-Shows information about multi-sig contract
+## Commands
 
-- [`celocli multisig:show ADDRESS`](#celocli-multisigshow-address)
-
-## `celocli multisig:show ADDRESS`
+### Show
 
 Shows information about multi-sig contract
 
 ```
-Shows information about multi-sig contract
-
 USAGE
   $ celocli multisig:show ADDRESS
 
@@ -21,10 +19,8 @@ OPTIONS
 
 EXAMPLES
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
-
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631 --tx 3
-
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631 --all --raw
 ```
 
-_See code: [src/commands/multisig/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/multisig/show.ts)_
+_See code: [packages/cli/src/commands/multisig/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/multisig/show.ts)_

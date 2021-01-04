@@ -1,19 +1,14 @@
-# `celocli identity`
+---
+description: Interact with ODIS and the attestations service
+---
 
-Interact with ODIS and the attestations service
+## Commands
 
-- [`celocli identity:current-attestation-services`](#celocli-identitycurrent-attestation-services)
-- [`celocli identity:identifier`](#celocli-identityidentifier)
-- [`celocli identity:test-attestation-service`](#celocli-identitytest-attestation-service)
-- [`celocli identity:withdraw-attestation-rewards`](#celocli-identitywithdraw-attestation-rewards)
-
-## `celocli identity:current-attestation-services`
+### Current-attestation-services
 
 Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
 
 ```
-Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
-
 USAGE
   $ celocli identity:current-attestation-services
 
@@ -28,15 +23,13 @@ OPTIONS
   --sort=sort             property to sort by (prepend '-' for descending)
 ```
 
-_See code: [src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
+_See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
 
-## `celocli identity:identifier`
+### Identifier
 
 Queries ODIS for the on-chain identifier and pepper corresponding to a given phone number.
 
 ```
-Queries ODIS for the on-chain identifier and pepper corresponding to a given phone number.
-
 USAGE
   $ celocli identity:identifier
 
@@ -57,15 +50,13 @@ EXAMPLE
   0x5409ed021d9299bf6814279a6a1411a7e866a631 --context alfajores
 ```
 
-_See code: [src/commands/identity/identifier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/identifier.ts)_
+_See code: [packages/cli/src/commands/identity/identifier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/identifier.ts)_
 
-## `celocli identity:test-attestation-service`
+### Test-attestation-service
 
 Tests whether the account has setup the attestation service properly by calling the test endpoint on it
 
 ```
-Tests whether the account has setup the attestation service properly by calling the test endpoint on it
-
 USAGE
   $ celocli identity:test-attestation-service
 
@@ -85,15 +76,13 @@ EXAMPLE
   test-attestation-service --from 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [src/commands/identity/test-attestation-service.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/test-attestation-service.ts)_
+_See code: [packages/cli/src/commands/identity/test-attestation-service.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/test-attestation-service.ts)_
 
-## `celocli identity:withdraw-attestation-rewards`
+### Withdraw-attestation-rewards
 
 Withdraw accumulated attestation rewards for a given currency
 
 ```
-Withdraw accumulated attestation rewards for a given currency
-
 USAGE
   $ celocli identity:withdraw-attestation-rewards
 
@@ -109,4 +98,4 @@ OPTIONS
                                                              Defaults to cUSD
 ```
 
-_See code: [src/commands/identity/withdraw-attestation-rewards.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/withdraw-attestation-rewards.ts)_
+_See code: [packages/cli/src/commands/identity/withdraw-attestation-rewards.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/withdraw-attestation-rewards.ts)_

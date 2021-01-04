@@ -1,21 +1,14 @@
-# `celocli dkg`
+---
+description: Publish your locally computed DKG results to the blockchain
+---
 
-Publish your locally computed DKG results to the blockchain
+## Commands
 
-- [`celocli dkg:deploy`](#celocli-dkgdeploy)
-- [`celocli dkg:get`](#celocli-dkgget)
-- [`celocli dkg:publish`](#celocli-dkgpublish)
-- [`celocli dkg:register`](#celocli-dkgregister)
-- [`celocli dkg:start`](#celocli-dkgstart)
-- [`celocli dkg:whitelist`](#celocli-dkgwhitelist)
-
-## `celocli dkg:deploy`
+### Deploy
 
 Deploys the DKG smart contract
 
 ```
-Deploys the DKG smart contract
-
 USAGE
   $ celocli dkg:deploy
 
@@ -29,15 +22,13 @@ OPTIONS
                                                      the DKG
 ```
 
-_See code: [src/commands/dkg/deploy.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/deploy.ts)_
+_See code: [packages/cli/src/commands/dkg/deploy.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/deploy.ts)_
 
-## `celocli dkg:get`
+### Get
 
 Gets data from the contract to run the next phase
 
 ```
-Gets data from the contract to run the next phase
-
 USAGE
   $ celocli dkg:get
 
@@ -49,15 +40,13 @@ OPTIONS
                                                                        method to call
 ```
 
-_See code: [src/commands/dkg/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/get.ts)_
+_See code: [packages/cli/src/commands/dkg/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/get.ts)_
 
-## `celocli dkg:publish`
+### Publish
 
 Publishes data for each phase of the DKG
 
 ```
-Publishes data for each phase of the DKG
-
 USAGE
   $ celocli dkg:publish
 
@@ -70,15 +59,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 ```
 
-_See code: [src/commands/dkg/publish.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/publish.ts)_
+_See code: [packages/cli/src/commands/dkg/publish.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/publish.ts)_
 
-## `celocli dkg:register`
+### Register
 
 Register a public key in the DKG
 
 ```
-Register a public key in the DKG
-
 USAGE
   $ celocli dkg:register
 
@@ -88,15 +75,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 ```
 
-_See code: [src/commands/dkg/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/register.ts)_
+_See code: [packages/cli/src/commands/dkg/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/register.ts)_
 
-## `celocli dkg:start`
+### Start
 
 Starts the DKG
 
 ```
-Starts the DKG
-
 USAGE
   $ celocli dkg:start
 
@@ -105,15 +90,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 ```
 
-_See code: [src/commands/dkg/start.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/start.ts)_
+_See code: [packages/cli/src/commands/dkg/start.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/start.ts)_
 
-## `celocli dkg:whitelist`
+### Whitelist
 
 Whitelist an address in the DKG
 
 ```
-Whitelist an address in the DKG
-
 USAGE
   $ celocli dkg:whitelist
 
@@ -125,4 +108,4 @@ OPTIONS
                                                         participant to whitelist
 ```
 
-_See code: [src/commands/dkg/whitelist.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/whitelist.ts)_
+_See code: [packages/cli/src/commands/dkg/whitelist.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/whitelist.ts)_
