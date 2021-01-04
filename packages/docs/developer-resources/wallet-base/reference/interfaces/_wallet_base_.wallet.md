@@ -28,7 +28,7 @@
 
 • **addAccount**: *addInMemoryAccount | addRemoteAccount*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L11)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L11)*
 
 ___
 

@@ -80,7 +80,7 @@ ___
 
 *Overrides void*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:60](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L60)*
+*Defined in [wallet-remote/src/remote-wallet.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L60)*
 
 Get a list of accounts in the remote wallet
 
@@ -94,7 +94,7 @@ ___
 
 *Overrides void*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:69](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L69)*
+*Defined in [wallet-remote/src/remote-wallet.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L69)*
 
 Returns true if account is in the remote wallet
 
@@ -112,7 +112,7 @@ ___
 
 ▸ **init**(): *Promise‹void›*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L19)*
+*Defined in [wallet-remote/src/remote-wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L19)*
 
 Discovers wallet accounts and caches results in memory
 Idempotent to ensure multiple calls are benign
@@ -125,7 +125,7 @@ ___
 
 ▸ **isSetupFinished**(): *boolean*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:109](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L109)*
+*Defined in [wallet-remote/src/remote-wallet.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L109)*
 
 **Returns:** *boolean*
 
@@ -157,7 +157,7 @@ ___
 
 *Overrides void*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:88](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L88)*
+*Defined in [wallet-remote/src/remote-wallet.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L88)*
 
 **Parameters:**
 
@@ -178,7 +178,7 @@ ___
 
 *Overrides void*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L78)*
+*Defined in [wallet-remote/src/remote-wallet.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L78)*
 
 Signs the EVM transaction using the signer pulled from the from field
 
@@ -198,7 +198,7 @@ ___
 
 *Overrides void*
 
-*Defined in [wallet-remote/src/remote-wallet.ts:98](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L98)*
+*Defined in [wallet-remote/src/remote-wallet.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-remote/src/remote-wallet.ts#L98)*
 
 **Parameters:**
 

@@ -22,7 +22,7 @@
 
 \+ **new Signature**(`v`: number, `r`: Buffer, `s`: Buffer): *[Signature](_signature_utils_.signature.md)*
 
-*Defined in [signature-utils.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L46)*
+*Defined in [signature-utils.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L46)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ Name | Type |
 
 • **r**: *Buffer*
 
-*Defined in [signature-utils.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L45)*
+*Defined in [signature-utils.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L45)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **s**: *Buffer*
 
-*Defined in [signature-utils.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L46)*
+*Defined in [signature-utils.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L46)*
 
 ___
 
@@ -56,4 +56,4 @@ ___
 
 • **v**: *number*
 
-*Defined in [signature-utils.ts:44](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L44)*
+*Defined in [signature-utils.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L44)*
