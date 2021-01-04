@@ -1,7 +1,7 @@
-import { CommonActions } from '@react-navigation/native'
 import * as React from 'react'
 import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { navigateClearingStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
@@ -56,13 +56,7 @@ describe('Pincode', () => {
     jest.runAllTimers()
     await flushMicrotasksQueue()
 
-    const dispatchAction = mockDispatch.mock.calls[0][0]()
-    expect(dispatchAction).toEqual(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: Screens.VerificationEducationScreen }],
-      })
-    )
+    expect(navigateClearingStack).toBeCalledWith(Screens.VerificationEducationScreen)
   })
 
   it("displays an error text when the pins don't match", async () => {

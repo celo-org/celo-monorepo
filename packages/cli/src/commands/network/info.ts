@@ -6,7 +6,7 @@ export default class Info extends BaseCommand {
   static description = 'View general network information such as the current block number'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     lastN: flags.integer({
       char: 'n',
       description: 'Fetch info about the last n epochs',

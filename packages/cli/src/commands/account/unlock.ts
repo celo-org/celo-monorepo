@@ -8,7 +8,7 @@ export default class Unlock extends BaseCommand {
   static description = 'Unlock an account address to send transactions or validate blocks'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     password: flags.string({
       required: false,
       description:
