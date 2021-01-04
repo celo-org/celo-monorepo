@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -47,7 +47,7 @@
     "@celo/network-utils": "1.0.0-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-fast-crypto": "^1.8.4",
-    "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
+    "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#11e078e",
     "@celo/utils": "1.0.0-dev",
     "@celo/wallet-rpc": "1.0.0-dev",
     "@react-native-community/async-storage": "^1.9.0",
@@ -109,7 +109,7 @@
     "react-native-email-link": "^1.9.1",
     "react-native-exit-app": "^1.1.0",
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
-    "react-native-fs": "^2.16.6",
+    "react-native-fs": "git+https://github.com/celo-org/react-native-fs#aa6db0f",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-geth": "https://github.com/celo-org/react-native-geth#5864c09",
     "react-native-google-safetynet": "https://github.com/celo-org/react-native-google-safetynet#8a0355f",
@@ -198,6 +198,9 @@
     "redux-saga-test-plan": "^4.0.0-beta.2",
     "remote-redux-devtools": "^0.5.12",
     "tslint-react-native": "^0.0.7"
+  },
+  "resolutions": {
+    "react-native-fs": "git+https://github.com/celo-org/react-native-fs#aa6db0f"
   },
   "detox": {
     "test-runner": "jest",
