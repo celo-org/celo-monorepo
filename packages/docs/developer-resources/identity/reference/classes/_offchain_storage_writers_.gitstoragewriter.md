@@ -28,7 +28,7 @@
 
 *Inherited from [LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md).[constructor](_offchain_storage_writers_.localstoragewriter.md#constructor)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L12)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L12)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ Name | Type |
 
 *Inherited from [LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md).[root](_offchain_storage_writers_.localstoragewriter.md#readonly-root)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L13)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L13)*
 
 ## Methods
 
@@ -56,7 +56,7 @@ Name | Type |
 
 *Overrides [LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md).[write](_offchain_storage_writers_.localstoragewriter.md#write)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L28)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L28)*
 
 **Parameters:**
 

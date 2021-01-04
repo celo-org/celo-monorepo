@@ -13,7 +13,7 @@
 
 • **s128_12words**: = 128
 
-*Defined in [packages/sdk/base/src/account.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L4)*
+*Defined in [packages/sdk/base/src/account.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L4)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **s256_24words**: = 256
 
-*Defined in [packages/sdk/base/src/account.ts:5](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L5)*
+*Defined in [packages/sdk/base/src/account.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L5)*

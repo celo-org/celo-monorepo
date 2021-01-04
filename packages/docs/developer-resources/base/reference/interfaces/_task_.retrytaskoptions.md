@@ -28,7 +28,7 @@
 
 *Inherited from [TaskOptions](_task_.taskoptions.md).[logger](_task_.taskoptions.md#optional-logger)*
 
-*Defined in [packages/sdk/base/src/task.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L20)*
+*Defined in [packages/sdk/base/src/task.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L20)*
 
 Logger function
 
@@ -38,7 +38,7 @@ ___
 
 • **maxAttemps**: *number*
 
-*Defined in [packages/sdk/base/src/task.ts:123](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L123)*
+*Defined in [packages/sdk/base/src/task.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L123)*
 
 Maximum number of attemps
 
@@ -50,7 +50,7 @@ ___
 
 *Inherited from [TaskOptions](_task_.taskoptions.md).[name](_task_.taskoptions.md#name)*
 
-*Defined in [packages/sdk/base/src/task.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L18)*
+*Defined in [packages/sdk/base/src/task.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L18)*
 
 Name for the task. To be used in logging messages
 
@@ -60,7 +60,7 @@ ___
 
 • **timeInBetweenMS**: *number*
 
-*Defined in [packages/sdk/base/src/task.ts:121](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L121)*
+*Defined in [packages/sdk/base/src/task.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L121)*
 
 seconds between repetition
 
@@ -70,7 +70,7 @@ ___
 
 • **tryGetValue**: *function*
 
-*Defined in [packages/sdk/base/src/task.ts:125](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L125)*
+*Defined in [packages/sdk/base/src/task.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L125)*
 
 Function that tries to obtain a value A or returns null
 

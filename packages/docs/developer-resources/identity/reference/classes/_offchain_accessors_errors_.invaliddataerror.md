@@ -31,7 +31,7 @@
 
 *Overrides void*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L13)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L13)*
 
 **Returns:** *[InvalidDataError](_offchain_accessors_errors_.invaliddataerror.md)*
 
