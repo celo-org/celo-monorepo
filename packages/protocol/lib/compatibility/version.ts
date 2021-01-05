@@ -30,7 +30,7 @@ export class ContractVersion {
   }
 
   /**
-   * @param version A 256 byte buffer containing the 32 byte storage, major, minor, and patch
+   * @param version A 128 byte buffer containing the 32 byte storage, major, minor, and patch
    * version numbers.
    */
   static fromGetVersionNumberReturnValue = (version: Buffer): ContractVersion => {
