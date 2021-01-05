@@ -22,7 +22,7 @@
 
 ▸ **conditionWatcher**(`opts`: RepeatTaskOptions & object): *[RunningTask](../interfaces/_task_.runningtask.md)*
 
-*Defined in [packages/sdk/base/src/task.ts:100](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L100)*
+*Defined in [packages/sdk/base/src/task.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L100)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **repeatTask**(`opts`: RepeatTaskOptions, `fn`: function): *[RunningTask](../interfaces/_task_.runningtask.md)*
 
-*Defined in [packages/sdk/base/src/task.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L54)*
+*Defined in [packages/sdk/base/src/task.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L54)*
 
 Runs an async function eternally until stopped
 
@@ -66,7 +66,7 @@ ___
 
 ▸ **tryObtainValueWithRetries**<**A**>(`opts`: [RetryTaskOptions](../interfaces/_task_.retrytaskoptions.md)‹A›): *[RunningTaskWithValue](../interfaces/_task_.runningtaskwithvalue.md)‹A›*
 
-*Defined in [packages/sdk/base/src/task.ts:128](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L128)*
+*Defined in [packages/sdk/base/src/task.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L128)*
 
 **Type parameters:**
 

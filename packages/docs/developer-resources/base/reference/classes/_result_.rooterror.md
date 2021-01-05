@@ -36,7 +36,7 @@
 
 \+ **new RootError**(`errorType`: T): *[RootError](_result_.rooterror.md)*
 
-*Defined in [packages/sdk/base/src/result.ts:66](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L66)*
+*Defined in [packages/sdk/base/src/result.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L66)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ Name | Type |
 
 *Implementation of [BaseError](../interfaces/_result_.baseerror.md).[errorType](../interfaces/_result_.baseerror.md#errortype)*
 
-*Defined in [packages/sdk/base/src/result.ts:67](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L67)*
+*Defined in [packages/sdk/base/src/result.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L67)*
 
 ___
 

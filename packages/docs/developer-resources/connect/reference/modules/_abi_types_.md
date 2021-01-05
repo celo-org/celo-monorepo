@@ -19,4 +19,4 @@
 
 Ƭ **ABIType**: *"uint256" | "boolean" | "string" | "bytes" | string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L4)*
+*Defined in [packages/sdk/connect/src/abi-types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L4)*

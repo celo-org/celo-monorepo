@@ -26,7 +26,7 @@
 
 • **publicKeyPrefix**: *number* = 4
 
-*Defined in [signature-utils.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L9)*
+*Defined in [signature-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L9)*
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **sixtyFour**: *number* = 64
 
-*Defined in [signature-utils.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L10)*
+*Defined in [signature-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L10)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **thirtyTwo**: *number* = 32
 
-*Defined in [signature-utils.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L11)*
+*Defined in [signature-utils.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L11)*
 
 ## Functions
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **bigNumberToBuffer**(`input`: BigNumber, `lengthInBytes`: number): *Buffer*
 
-*Defined in [signature-utils.ts:34](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L34)*
+*Defined in [signature-utils.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L34)*
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **bufferToBigNumber**(`input`: Buffer): *BigNumber*
 
-*Defined in [signature-utils.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L30)*
+*Defined in [signature-utils.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L30)*
 
 **Parameters:**
 
@@ -83,7 +83,7 @@ ___
 
 ▸ **getAddressFromPublicKey**(`publicKey`: BigNumber): *Address*
 
-*Defined in [signature-utils.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L78)*
+*Defined in [signature-utils.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L78)*
 
 **Parameters:**
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **makeCanonical**(`S`: BigNumber): *BigNumber*
 
-*Defined in [signature-utils.ts:21](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L21)*
+*Defined in [signature-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L21)*
 
 If the signature is in the "bottom" of the curve, it is non-canonical
 Non-canonical signatures are illegal in Ethereum and therefore the S value
@@ -120,7 +120,7 @@ ___
 
 ▸ **recoverKeyIndex**(`signature`: Uint8Array, `publicKey`: BigNumber, `hash`: Uint8Array): *number*
 
-*Defined in [signature-utils.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L58)*
+*Defined in [signature-utils.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm/src/signature-utils.ts#L58)*
 
 Attempts each recovery key to find a match
 

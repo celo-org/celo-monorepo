@@ -19,7 +19,7 @@
 
 • **completed**: *number*
 
-*Defined in [packages/sdk/base/src/attestations.ts:71](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L71)*
+*Defined in [packages/sdk/base/src/attestations.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L71)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **isVerified**: *boolean*
 
-*Defined in [packages/sdk/base/src/attestations.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L68)*
+*Defined in [packages/sdk/base/src/attestations.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L68)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **numAttestationsRemaining**: *number*
 
-*Defined in [packages/sdk/base/src/attestations.ts:69](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L69)*
+*Defined in [packages/sdk/base/src/attestations.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L69)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **total**: *number*
 
-*Defined in [packages/sdk/base/src/attestations.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L70)*
+*Defined in [packages/sdk/base/src/attestations.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L70)*

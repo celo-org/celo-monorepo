@@ -17,4 +17,4 @@
 
 Ƭ **NameType**: *t.TypeOf‹typeof NameSchema›*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L9)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L9)*

@@ -22,7 +22,7 @@
 
 ▸ **anonymizedPhone**(`phoneNumber`: string): *string*
 
-*Defined in [packages/sdk/base/src/phoneNumbers.ts:31](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L31)*
+*Defined in [packages/sdk/base/src/phoneNumbers.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L31)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **getPhoneHash**(`sha3`: function, `phoneNumber`: string, `salt?`: undefined | string): *string*
 
-*Defined in [packages/sdk/base/src/phoneNumbers.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L14)*
+*Defined in [packages/sdk/base/src/phoneNumbers.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L14)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **isE164Number**(`phoneNumber`: string): *boolean*
 
-*Defined in [packages/sdk/base/src/phoneNumbers.ts:27](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L27)*
+*Defined in [packages/sdk/base/src/phoneNumbers.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L27)*
 
 **Parameters:**
 
@@ -80,16 +80,16 @@ Name | Type |
 
 ### ▪ **PhoneNumberBase**: *object*
 
-*Defined in [packages/sdk/base/src/phoneNumbers.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L35)*
+*Defined in [packages/sdk/base/src/phoneNumbers.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L35)*
 
 ###  getPhoneHash
 
 • **getPhoneHash**: *getPhoneHash*
 
-*Defined in [packages/sdk/base/src/phoneNumbers.ts:36](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L36)*
+*Defined in [packages/sdk/base/src/phoneNumbers.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L36)*
 
 ###  isE164Number
 
 • **isE164Number**: *[isE164Number](_phonenumbers_.md#ise164number)*
 
-*Defined in [packages/sdk/base/src/phoneNumbers.ts:37](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L37)*
+*Defined in [packages/sdk/base/src/phoneNumbers.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L37)*

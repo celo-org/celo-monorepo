@@ -21,7 +21,7 @@
 
 ▸ **validateDecimal**(`input`: string, `decimalSeparator`: string): *string*
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L19)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L19)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **validateInteger**(`input`: string): *string*
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L15)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L15)*
 
 **Parameters:**
 

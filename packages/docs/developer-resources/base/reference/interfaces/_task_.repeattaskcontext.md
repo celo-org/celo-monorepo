@@ -20,7 +20,7 @@
 
 • **executionNumber**: *number*
 
-*Defined in [packages/sdk/base/src/task.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L45)*
+*Defined in [packages/sdk/base/src/task.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L45)*
 
 Number of times the task has been executed (starts in 1)
 
@@ -30,7 +30,7 @@ Number of times the task has been executed (starts in 1)
 
 ▸ **stopTask**(): *void*
 
-*Defined in [packages/sdk/base/src/task.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L47)*
+*Defined in [packages/sdk/base/src/task.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L47)*
 
 Flag task to be stopped. Might not be inmediate
 
