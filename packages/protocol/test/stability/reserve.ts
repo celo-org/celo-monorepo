@@ -332,11 +332,7 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it('should allow an exchange to call transferExchangeGold', async () => {
-      await reserve.transferExchangeGold(exchangeAddress, aValue, { from: exchangeAddress })
-    })
-
-    it('should allow an exchange to send to a non-exchange', async () => {
-      await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress }))
+      await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
     })
 
     it('should not allow spenders to call transferExchangeGold', async () => {
