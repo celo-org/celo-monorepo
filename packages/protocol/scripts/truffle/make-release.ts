@@ -2,7 +2,7 @@
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
@@ -52,8 +52,6 @@ class ContractAddresses {
   }
 }
 
-const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
-
 const isProxiedContract = (contractName: string) => {
   if (contractName.endsWith('Proxy')) {
     return false
@@ -77,7 +75,7 @@ const deployImplementation = async (
 ) => {
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  const contract = await (dryRun ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
+  const contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -102,7 +100,7 @@ const deployProxy = async (contractName: string, addresses: ContractAddresses, d
   console.log(`Deploying ${contractName}Proxy`)
   const Proxy = await artifacts.require(`${contractName}Proxy`)
   // Hack to trick truffle, which checks that the provided address has code
-  const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
+  const proxy = await (dryRun ? Proxy.at(celoRegistryAddress) : Proxy.new())
 
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
@@ -134,7 +132,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
     )
-    const registry = await artifacts.require('Registry').at(REGISTRY_ADDRESS)
+    const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
