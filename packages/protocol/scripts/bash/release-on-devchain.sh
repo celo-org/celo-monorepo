@@ -10,8 +10,6 @@ source ./scripts/bash/utils.sh
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
-NETWORK=""
-FORNO=""
 BUILD_DIR=""
 RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
