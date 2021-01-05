@@ -16,7 +16,7 @@ NETWORK=""
 FORNO=""
 LOG_FILE="/tmp/celo-verify-deployed.log"
 
-while getopts 'b:n:rfl:' flag; do
+while getopts 'b:n:fl:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;

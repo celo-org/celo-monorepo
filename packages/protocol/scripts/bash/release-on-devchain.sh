@@ -14,7 +14,7 @@ BUILD_DIR=""
 RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
-while getopts ':b:rl:d:' flag; do
+while getopts 'b:l:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
