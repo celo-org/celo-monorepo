@@ -55,12 +55,10 @@ export async function generateMnemonic(
 }
 
 export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrapper) {
-  const mnemonicWords = mnemonic.trim().split(' ')
   const languages = getAllLanguages()
   for (const language of languages) {
-    const wordList = getWordList(language)
-    if (mnemonicWords.some((word) => wordList.includes(word))) {
-      return bip39ToUse.validateMnemonic(mnemonic, wordList)
+    if (bip39ToUse.validateMnemonic(mnemonic, getWordList(language))) {
+      return true
     }
   }
 
