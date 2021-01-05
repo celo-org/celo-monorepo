@@ -30,7 +30,6 @@ if [ -z "$BUILD_DIR" ]
 then
     RE_BUILD_REPO="yes"
     BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-    # yarn test:generate-old-devchain-and-build -b $BRANCH -d $BUILD_DIR -l $LOG_FILE
 fi
 
 echo "- Run local network"
