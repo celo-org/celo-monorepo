@@ -18,10 +18,6 @@ import { Twilio } from 'twilio'
 
 const POLLING_WAIT = 300
 
-
-
-
-
 export async function requestAttestationsFromIssuers(
   attestationsToReveal: ActionableAttestation[],
   attestations: AttestationsWrapper,
