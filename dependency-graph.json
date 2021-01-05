@@ -29,6 +29,7 @@
       "@celo/connect",
       "@celo/contractkit",
       "@celo/dev-utils",
+      "@celo/env-tests",
       "@celo/explorer",
       "@celo/flake-tracker",
       "@celo/governance",
