@@ -1,10 +1,3 @@
-import {
-  getIdentifierAndPepper,
-  pollForMessagesAndCompleteAttestations,
-  reportErrors,
-  requestAttestationsFromIssuers,
-  requestMoreAttestations,
-} from '@celo/celotool/src/lib/attestation'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { generateKeys, generateMnemonic } from '@celo/utils/lib/account'
@@ -19,7 +12,14 @@ import { IncomingPhoneNumberInstance } from 'twilio/lib/rest/api/v2010/account/i
 import { EnvTestContext } from '../context'
 import { envVar, fetchEnv } from '../env'
 import { getKey, ONE, TestAccounts } from '../scaffold'
-import { getPhoneNumber } from '../shared/attestation'
+import {
+  getIdentifierAndPepper,
+  getPhoneNumber,
+  pollForMessagesAndCompleteAttestations,
+  reportErrors,
+  requestAttestationsFromIssuers,
+  requestMoreAttestations,
+} from '../shared/attestation'
 
 async function fundAttestationAccount(
   context: EnvTestContext,

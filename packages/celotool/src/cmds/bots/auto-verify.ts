@@ -1,4 +1,10 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
+import {
+  getIdentifierAndPepper,
+  pollForMessagesAndCompleteAttestations,
+  requestAttestationsFromIssuers,
+  requestMoreAttestations,
+} from '@celo/env-tests/lib/shared/attestation'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { notEmpty } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
@@ -6,13 +12,7 @@ import Logger, { createLogger, stdSerializers } from 'bunyan'
 import { createStream } from 'bunyan-gke-stackdriver'
 import { Level } from 'bunyan-gke-stackdriver/dist/types'
 import sleep from 'sleep-promise'
-import {
-  getIdentifierAndPepper,
-  getPhoneNumber,
-  pollForMessagesAndCompleteAttestations,
-  requestAttestationsFromIssuers,
-  requestMoreAttestations,
-} from 'src/lib/attestation'
+import { getPhoneNumber } from 'src/lib/attestation'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, generatePrivateKey } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
