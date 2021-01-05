@@ -32,7 +32,6 @@ describe('PhoneNumberInput', () => {
     expect(toJSON()).toMatchSnapshot()
 
     expect(getByText('🇫🇷')).toBeTruthy()
-    expect(getByText('+33')).toBeTruthy()
     expect(getByTestId('PhoneNumberField').props.placeholder).toBe('00 00 00 00 00')
     fireEvent.press(getByTestId('CountrySelectionButton'))
     await flushMicrotasksQueue()
