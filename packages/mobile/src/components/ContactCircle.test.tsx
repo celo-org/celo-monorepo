@@ -1,7 +1,7 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
+import ContactCircle from 'src/components/ContactCircle'
 
 const testContact = {
   recordID: '1',
