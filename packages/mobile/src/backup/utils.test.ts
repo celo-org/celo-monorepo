@@ -96,7 +96,11 @@ describe('Mnemonic validation and formatting', () => {
     'NFD'
   )
 
-  const BAD_SPANISH_MNEMONIC = 'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín'.normalize(
+  const SPANISH_MNEMONIC_NO_ACCENTS = 'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebe oral miembro gato suelo violin'.normalize(
+    'NFD'
+  )
+
+  const BAD_SPANISH_MNEMONIC = 'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebé oralio miembro gato suelo violín'.normalize(
     'NFD'
   )
 
@@ -134,6 +138,10 @@ inner surprise invest`
 
   it('validates spanish successfully', () => {
     expect(validateMnemonic(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC))).toBeTruthy()
+  })
+
+  it('validates spanish successfully without mnemonic accents', () => {
+    expect(validateMnemonic(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC_NO_ACCENTS))).toBeTruthy()
   })
 
   it('validates english successfully', () => {
