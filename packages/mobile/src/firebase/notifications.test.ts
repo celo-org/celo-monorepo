@@ -10,6 +10,10 @@ import { Screens } from 'src/navigator/Screens'
 import { NotificationReceiveState, NotificationTypes } from 'src/notifications/types'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 
+jest.mock('src/identity/saga', () => ({
+  isCeloRewardSender: () => false,
+}))
+
 describe(handleNotification, () => {
   beforeEach(() => {
     jest.clearAllMocks()

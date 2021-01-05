@@ -1,24 +1,30 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
-import { FAQ_LINK } from 'src/config'
+import { CELO_REWARDS_LINK, FAQ_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { isCeloRewardSender } from 'src/identity/saga'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import BottomText from 'src/transactions/BottomText'
 import CommentSection from 'src/transactions/CommentSection'
 import TransferAvatars from 'src/transactions/TransferAvatars'
+import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import UserSection from 'src/transactions/UserSection'
 import { navigateToURI } from 'src/utils/linking'
 
@@ -218,6 +224,31 @@ function PaymentReceivedContent({ address, recipient, e164PhoneNumber, amount, c
   )
 }
 
+function CeloRewardContent({ address, amount }: Props) {
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  const totalAmount = amount
+
+  const openLearnMore = () => {
+    navigate(Screens.WebViewScreen, { uri: CELO_REWARDS_LINK })
+  }
+
+  return (
+    <>
+      <UserSection
+        type="received"
+        address={address}
+        expandable={false}
+        avatar={<TransferFeedIcon type={TokenTransactionType.Faucet} />}
+      />
+      <TouchableOpacity onPress={openLearnMore}>
+        <Text style={styles.learnMore}>{t('learnMore')}</Text>
+      </TouchableOpacity>
+      <HorizontalLine />
+      <TotalLineItem amount={totalAmount} />
+    </>
+  )
+}
+
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 export default function TransferConfirmationCard(props: Props) {
   let content
@@ -244,7 +275,11 @@ export default function TransferConfirmationCard(props: Props) {
       break
     case TokenTransactionType.EscrowReceived:
     case TokenTransactionType.Received:
-      content = <PaymentReceivedContent {...props} />
+      content = isCeloRewardSender(props.address || '') ? (
+        <CeloRewardContent {...props} />
+      ) : (
+        <PaymentReceivedContent {...props} />
+      )
       break
   }
 
@@ -262,5 +297,10 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: 16,
+  },
+  learnMore: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    textDecorationLine: 'underline',
   },
 })

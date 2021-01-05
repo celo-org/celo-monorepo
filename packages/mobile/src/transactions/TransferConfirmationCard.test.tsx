@@ -19,6 +19,10 @@ const store = createMockStore({
   },
 })
 
+jest.mock('src/identity/saga', () => ({
+  isCeloRewardSender: () => false,
+}))
+
 describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {
     const props = {

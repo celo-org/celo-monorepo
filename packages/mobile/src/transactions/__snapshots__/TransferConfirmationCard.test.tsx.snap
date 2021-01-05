@@ -109,26 +109,6 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -1039,26 +1019,6 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -1516,26 +1476,6 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -1992,26 +1932,6 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     />
                   </svg>
                 </View>
-              </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
               </View>
             </View>
           </View>
@@ -2715,26 +2635,6 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     />
                   </svg>
                 </View>
-              </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
               </View>
             </View>
           </View>

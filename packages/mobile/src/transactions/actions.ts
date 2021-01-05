@@ -2,6 +2,7 @@ import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
+import { isCeloRewardSender } from 'src/identity/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -138,7 +139,9 @@ export const navigateToPaymentTransferReview = (
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')
       break
     case TokenTransactionType.Received:
-      headerText = i18n.t('walletFlow5:transactionHeaderReceived')
+      headerText = isCeloRewardSender(confirmationProps.address || '')
+        ? i18n.t('walletFlow5:transactionHeaderCeloReward')
+        : i18n.t('walletFlow5:transactionHeaderReceived')
       break
     case TokenTransactionType.EscrowReceived:
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowReceived')
