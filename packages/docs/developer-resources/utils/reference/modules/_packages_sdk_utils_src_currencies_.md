@@ -8,7 +8,6 @@
 * [CURRENCY_ENUM](_packages_sdk_utils_src_currencies_.md#currency_enum)
 * [SHORT_CURRENCIES](_packages_sdk_utils_src_currencies_.md#short_currencies)
 * [currencyToShortMap](_packages_sdk_utils_src_currencies_.md#currencytoshortmap)
-* [currencyTranslations](_packages_sdk_utils_src_currencies_.md#currencytranslations)
 * [resolveCurrency](_packages_sdk_utils_src_currencies_.md#resolvecurrency)
 
 ## References
@@ -34,12 +33,6 @@ ___
 ###  currencyToShortMap
 
 • **currencyToShortMap**:
-
-___
-
-###  currencyTranslations
-
-• **currencyTranslations**:
 
 ___
 

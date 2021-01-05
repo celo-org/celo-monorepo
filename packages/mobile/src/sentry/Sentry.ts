@@ -13,7 +13,11 @@ export async function installSentry() {
     Logger.info(TAG, 'installSentry', 'Sentry URL not found, skiping instalation')
     return
   }
-  Sentry.init({ dsn: SENTRY_URL, environment: DeviceInfo.getBundleId() })
+  Sentry.init({
+    dsn: SENTRY_URL,
+    environment: DeviceInfo.getBundleId(),
+    enableAutoSessionTracking: true,
+  })
   Logger.info(TAG, 'installSentry', 'Sentry installation complete')
 }
 

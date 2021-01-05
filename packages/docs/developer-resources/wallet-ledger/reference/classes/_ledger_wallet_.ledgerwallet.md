@@ -44,7 +44,7 @@
 
 \+ **new LedgerWallet**(`derivationPathIndexes`: number[], `baseDerivationPath`: string, `transport`: any, `ledgerAddressValidation`: [AddressValidation](../enums/_ledger_wallet_.addressvalidation.md)): *[LedgerWallet](_ledger_wallet_.ledgerwallet.md)*
 
-*Defined in [wallet-ledger/src/ledger-wallet.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L45)*
+*Defined in [wallet-ledger/src/ledger-wallet.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L45)*
 
 **Parameters:**
 
@@ -63,7 +63,7 @@ Name | Type | Default | Description |
 
 • **baseDerivationPath**: *string*
 
-*Defined in [wallet-ledger/src/ledger-wallet.ts:57](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L57)*
+*Defined in [wallet-ledger/src/ledger-wallet.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L57)*
 
 base derivation path. Default: "44'/52752'/0'/0"
 
@@ -73,7 +73,7 @@ ___
 
 • **derivationPathIndexes**: *number[]*
 
-*Defined in [wallet-ledger/src/ledger-wallet.ts:56](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L56)*
+*Defined in [wallet-ledger/src/ledger-wallet.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L56)*
 
 number array of "address_index" for the base derivation path.
 Default: Array[0..9].
@@ -100,7 +100,7 @@ ___
 
 • **ledgerAddressValidation**: *[AddressValidation](../enums/_ledger_wallet_.addressvalidation.md)*
 
-*Defined in [wallet-ledger/src/ledger-wallet.ts:59](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L59)*
+*Defined in [wallet-ledger/src/ledger-wallet.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L59)*
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 • **transport**: *any*
 
-*Defined in [wallet-ledger/src/ledger-wallet.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L58)*
+*Defined in [wallet-ledger/src/ledger-wallet.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L58)*
 
 Transport to connect the ledger device
 

@@ -2372,9 +2372,9 @@
     buffer "^5.0.8"
     rfc4648 "^1.0.0"
 
-"@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
+"@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#11e078e":
   version "1.0.3"
-  resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
+  resolved "git+https://github.com/celo-org/react-native-sms-retriever#11e078e7631348d27bf7a0e8d0e172701ae30ea8"
 
 "@celo/typechain-target-web3-v1-celo@0.1.0-beta3":
   version "0.1.0-beta3"
@@ -6009,6 +6009,16 @@
     "@sentry/utils" "5.20.1"
     tslib "^1.9.3"
 
+"@sentry/browser@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-5.28.0.tgz#f4c094bb97070442d95d51966a5e4dc8b92f586f"
+  integrity sha512-u1W47fgYFGWTV+RRQtNBzPZMXfR4MqCYSpuUVSpWQ+riITH7pvjG1cnBYDGT7+Q1s1wGrAL/9ElJfF795VVT9g==
+  dependencies:
+    "@sentry/core" "5.28.0"
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
+    tslib "^1.9.3"
+
 "@sentry/cli@^1.52.4":
   version "1.55.0"
   resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-1.55.0.tgz#0da95cd9491e11da52b15796bded72480f69591b"
@@ -6020,7 +6030,7 @@
     progress "^2.0.3"
     proxy-from-env "^1.1.0"
 
-"@sentry/core@5.20.1", "@sentry/core@^5.20.1":
+"@sentry/core@5.20.1":
   version "5.20.1"
   resolved "https://registry.yarnpkg.com/@sentry/core/-/core-5.20.1.tgz#857cc7186931c37ff032a1bcb573600ebacde961"
   integrity sha512-gG622/UY2TePruF6iUzgVrbIX5vN8w2cjlWFo1Est8MvCfQsz8agGaLMCAyl5hCGJ6K2qTUZDOlbCNIKoMclxg==
@@ -6031,7 +6041,18 @@
     "@sentry/utils" "5.20.1"
     tslib "^1.9.3"
 
-"@sentry/hub@5.20.1", "@sentry/hub@^5.20.1":
+"@sentry/core@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-5.28.0.tgz#2b5ee2b76f0ccd73545eac61c3c2d72d7c76f531"
+  integrity sha512-hLAUFauqX+v/ap8ATJFdp392ZvfFoR0Gb4pyRkzOeWWs5ZYuqyb9Dsjtwsb61HH/XHQGW/BKZJR2dgIjQq4JGA==
+  dependencies:
+    "@sentry/hub" "5.28.0"
+    "@sentry/minimal" "5.28.0"
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
+    tslib "^1.9.3"
+
+"@sentry/hub@5.20.1":
   version "5.20.1"
   resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-5.20.1.tgz#05e83ba972a96e9d7225a64c7d3728aa9fcefc4e"
   integrity sha512-Nv5BXf14BEc08acDguW6eSqkAJLVf8wki283FczEvTsQZZuSBHM9cJ5Hnehr6n+mr8wWpYLgUUYM0oXXigUmzQ==
@@ -6040,13 +6061,23 @@
     "@sentry/utils" "5.20.1"
     tslib "^1.9.3"
 
-"@sentry/integrations@^5.20.1":
-  version "5.20.1"
-  resolved "https://registry.yarnpkg.com/@sentry/integrations/-/integrations-5.20.1.tgz#c42dd53c2162b96bf4da641cd1c2bd53c0bbdce3"
-  integrity sha512-VpeZHYT8Fvw1J5478MqXXORf3Ftpt34YM4e+sTPuGrmf4Gro7lXdyownqiSaa7kwwNVQEV3zMlRDczVZzXQThw==
+"@sentry/hub@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-5.28.0.tgz#6a00b1011c0492b6acbaf0e24961fbd1c7edd1c1"
+  integrity sha512-1k19yJJcKoHbw12FET35t0m86lx/X6eJ6r4qM13eb2WN/OpoFtsgs1IjQOhGFL3OfVMcfh800Lc57ga04RLjLA==
   dependencies:
-    "@sentry/types" "5.20.1"
-    "@sentry/utils" "5.20.1"
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
+    tslib "^1.9.3"
+
+"@sentry/integrations@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/integrations/-/integrations-5.28.0.tgz#6740af0cdd51242bb2b223be98921128bc448469"
+  integrity sha512-2WjCYHrItzrHYUoRUV8Hjt2DXEekiV7i/2RfxLhVVVU8382FKyKMTMdimKog3SAgOqPjJFpWqEQ3OWErZ4HMqA==
+  dependencies:
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
+    localforage "1.8.1"
     tslib "^1.9.3"
 
 "@sentry/minimal@5.20.1":
@@ -6056,6 +6087,15 @@
   dependencies:
     "@sentry/hub" "5.20.1"
     "@sentry/types" "5.20.1"
+    tslib "^1.9.3"
+
+"@sentry/minimal@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/minimal/-/minimal-5.28.0.tgz#bfa63f5961988e6652207c77b3ea46d89f2d52bf"
+  integrity sha512-HzFrJx0xe5KETEZc7RxlH+1TfmH3q8w35ILOP5HGvk3+lG1DR25wHbMFmuUqNqVXrl26t0z32UBI30G1MxmTfA==
+  dependencies:
+    "@sentry/hub" "5.28.0"
+    "@sentry/types" "5.28.0"
     tslib "^1.9.3"
 
 "@sentry/node@^5.20.1":
@@ -6073,30 +6113,42 @@
     lru_map "^0.3.3"
     tslib "^1.9.3"
 
-"@sentry/react-native@^1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@sentry/react-native/-/react-native-1.7.1.tgz#208ab7547d720ef89fb98532af66755cc5c27bfc"
-  integrity sha512-UmGuCX51Mf9Ry2vD/6Ep98jRbm0PiNi1oVi7Ke2gaoVS3YhwbTqx8eTHpHvFm0kEGQbuM8MkYdD1s6oMCvmeHg==
+"@sentry/react-native@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react-native/-/react-native-2.1.0.tgz#8d9640fbad37555008c284ab82fa82a3e6f7aa5c"
+  integrity sha512-2sSXYiqZzNJ6z9V556UjZaG1kDAKQAMCySxXg69DLU60G+H5YbGM3HDykypO5DXZWqrMsP5q0WOSHZAb8KkHWQ==
   dependencies:
-    "@sentry/browser" "^5.20.1"
-    "@sentry/core" "^5.20.1"
-    "@sentry/hub" "^5.20.1"
-    "@sentry/integrations" "^5.20.1"
-    "@sentry/react" "^5.20.1"
-    "@sentry/types" "^5.20.1"
-    "@sentry/utils" "^5.20.1"
+    "@sentry/browser" "5.28.0"
+    "@sentry/core" "5.28.0"
+    "@sentry/hub" "5.28.0"
+    "@sentry/integrations" "5.28.0"
+    "@sentry/react" "5.28.0"
+    "@sentry/tracing" "5.28.0"
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
     "@sentry/wizard" "^1.1.4"
 
-"@sentry/react@^5.20.1":
-  version "5.20.1"
-  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-5.20.1.tgz#b6da27a87e3301f9eb7e5960f8b5591f4ce4d811"
-  integrity sha512-NT0y8fqAaNHHdj+eLN2sjc/MDQgi5RLstpAqQkxNbfl+AEp0S0Naho6rMhTUd2kZVg0GwPi0snePw7HSjxpUHg==
+"@sentry/react@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-5.28.0.tgz#75c7ac3b9af1c34997ff9304c7bea46edc8f17f2"
+  integrity sha512-WWUhnnAlAIHj5gwP4qRg440TA7s/VRu19zh+59wrTzc2x9LrxiCe0jLs21jcKKVDCW6u8UPVIkrmSYEPT9/gcw==
   dependencies:
-    "@sentry/browser" "5.20.1"
-    "@sentry/minimal" "5.20.1"
-    "@sentry/types" "5.20.1"
-    "@sentry/utils" "5.20.1"
+    "@sentry/browser" "5.28.0"
+    "@sentry/minimal" "5.28.0"
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
     hoist-non-react-statics "^3.3.2"
+    tslib "^1.9.3"
+
+"@sentry/tracing@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-5.28.0.tgz#c61338f7766e17f0d3a9262b1f895f5a66c6d64f"
+  integrity sha512-7UOgwpMTcSDrWDORY5PpOgw+yzJ9GcyKfqWK7eBqn2NqMdjVNvkZ51eOCSrNUuQ6Nrk7Q7uoPe/hW32Ch/zxvA==
+  dependencies:
+    "@sentry/hub" "5.28.0"
+    "@sentry/minimal" "5.28.0"
+    "@sentry/types" "5.28.0"
+    "@sentry/utils" "5.28.0"
     tslib "^1.9.3"
 
 "@sentry/types@5.20.1", "@sentry/types@^5.20.1":
@@ -6104,12 +6156,25 @@
   resolved "https://registry.yarnpkg.com/@sentry/types/-/types-5.20.1.tgz#ccc4fa4c9d0f94d93014b04e674762d5d5cd30a2"
   integrity sha512-OU+i/lcjGpDJv0XkNpsKrI2r1VPp8qX0H6Knq8NuZrlZe3AbvO3jRJJK0pH14xFv8Xok5jbZZpKKoQLxYfxqsw==
 
-"@sentry/utils@5.20.1", "@sentry/utils@^5.20.1":
+"@sentry/types@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-5.28.0.tgz#242131fef910bded53350a36ffd7df240cfb8dcf"
+  integrity sha512-nNhoZEXdqM2xivxJBrLhxtJ2+s6FfKXUw5yBf0Jf/RBrBnH5fggPNImmyfpOoysl72igWcMWk4nnfyP5iDrriQ==
+
+"@sentry/utils@5.20.1":
   version "5.20.1"
   resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-5.20.1.tgz#68cfae0d0e3b321b4649b59f30265024b29eae63"
   integrity sha512-dhK6IdO6g7Q2CoxCbB+q8gwUapDUH5VjraFg0UBzgkrtNhtHLylqmwx0sWQvXCcp14Q/3MuzEbb4euvoh8o8oA==
   dependencies:
     "@sentry/types" "5.20.1"
+    tslib "^1.9.3"
+
+"@sentry/utils@5.28.0":
+  version "5.28.0"
+  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-5.28.0.tgz#a30e36afd7094ced8d585c9fde2df2636cca6cf5"
+  integrity sha512-LW+ReVw9JG6g8Bvp2I1ThMDPATlisvkde+1WykxGqRhu2YIO+PvWhnoFhr9RD0ia3rYVlJkgkuTshMbPJ8HVwA==
+  dependencies:
+    "@sentry/types" "5.28.0"
     tslib "^1.9.3"
 
 "@sentry/wizard@^1.1.4":
@@ -19696,6 +19761,11 @@ immediate@^3.2.2, immediate@^3.2.3, immediate@~3.2.3:
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.2.3.tgz#d140fa8f614659bd6541233097ddaac25cdd991c"
   integrity sha1-0UD6j2FGWb1lQSMwl92qwlzdmRw=
 
+immediate@~3.0.5:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
+  integrity sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=
+
 immutable@~3.7.6:
   version "3.7.6"
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.7.6.tgz#13b4d3cb12befa15482a26fe1b2ebae640071e4b"
@@ -23184,6 +23254,13 @@ libphonenumber-js@^1.7.22:
     minimist "^1.2.0"
     xml2js "^0.4.17"
 
+lie@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/lie/-/lie-3.1.1.tgz#9a436b2cc7746ca59de7a41fa469b3efb76bd87e"
+  integrity sha1-mkNrLMd0bKWd56QfpGmz77dr2H4=
+  dependencies:
+    immediate "~3.0.5"
+
 liftoff@3.1.0, liftoff@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/liftoff/-/liftoff-3.1.0.tgz#c9ba6081f908670607ee79062d700df062c52ed3"
@@ -23344,6 +23421,13 @@ loader-utils@^0.2.16:
     emojis-list "^2.0.0"
     json5 "^0.5.0"
     object-assign "^4.0.1"
+
+localforage@1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/localforage/-/localforage-1.8.1.tgz#f6c0a24b41ab33b10e4dc84342dd696f6f3e3433"
+  integrity sha512-azSSJJfc7h4bVpi0PGi+SmLQKJl2/8NErI+LhJsrORNikMZnhaQ7rv9fHj+ofwgSHrKRlsDCL/639a6nECIKuQ==
+  dependencies:
+    lie "3.1.1"
 
 locate-path@^2.0.0:
   version "2.0.0"
@@ -29489,10 +29573,9 @@ react-native-exit-app@^1.1.0:
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"
 
-react-native-fs@*, react-native-fs@^2.16.6:
+react-native-fs@*, react-native-fs@^2.14.1, "react-native-fs@git+https://github.com/celo-org/react-native-fs#aa6db0f":
   version "2.16.6"
-  resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.16.6.tgz#2901789a43210a35a0ef0a098019bbef3af395fd"
-  integrity sha512-ZWOooD1AuFoAGY3HS2GY7Qx2LZo4oIg6AK0wbC68detxwvX75R/q9lRqThXNKP6vIo2VHWa0fYUo/SrLw80E8w==
+  resolved "git+https://github.com/celo-org/react-native-fs#aa6db0f1d9b82bfdf58ebf72450c28311414f45f"
   dependencies:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
@@ -30189,6 +30272,13 @@ redux-mock-store@^1.5.3:
   integrity sha512-ryhkkb/4D4CUGpAV2ln1GOY/uh51aczjcRz9k2L2bPx/Xja3c5pSGJJPyR25GNVRXtKIExScdAgFdiXp68GmJA==
   dependencies:
     lodash.isplainobject "^4.0.6"
+
+redux-persist-fs-storage@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/redux-persist-fs-storage/-/redux-persist-fs-storage-1.3.0.tgz#395d0c4b40985e04c480512ee1c469d6d2a9abd9"
+  integrity sha512-32FMEF5apIwlm7bnBq6VTmbK7sVVZ0bpTpMt8CUw5MMDXcsSfT4BSM5t6Y15V6KBRL9O11GDKAAV8a3/Hfj2Tg==
+  dependencies:
+    react-native-fs "^2.14.1"
 
 redux-persist@^6.0.0:
   version "6.0.0"

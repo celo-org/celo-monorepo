@@ -28,7 +28,7 @@
 
 • **_parent**: *Contract*
 
-*Defined in [packages/sdk/connect/src/types.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L20)*
+*Defined in [packages/sdk/connect/src/types.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L20)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **arguments**: *any[]*
 
-*Defined in [packages/sdk/connect/src/types.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L15)*
+*Defined in [packages/sdk/connect/src/types.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L15)*
 
 ## Methods
 
@@ -44,7 +44,7 @@ ___
 
 ▸ **call**(`tx?`: [CeloTx](../modules/_types_.md#celotx)): *Promise‹T›*
 
-*Defined in [packages/sdk/connect/src/types.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L16)*
+*Defined in [packages/sdk/connect/src/types.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L16)*
 
 **Parameters:**
 
@@ -60,7 +60,7 @@ ___
 
 ▸ **encodeABI**(): *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L19)*
+*Defined in [packages/sdk/connect/src/types.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L19)*
 
 **Returns:** *string*
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **estimateGas**(`tx?`: [CeloTx](../modules/_types_.md#celotx)): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/types.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L18)*
+*Defined in [packages/sdk/connect/src/types.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L18)*
 
 **Parameters:**
 
@@ -86,7 +86,7 @@ ___
 
 ▸ **send**(`tx?`: [CeloTx](../modules/_types_.md#celotx)): *PromiEvent‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt)›*
 
-*Defined in [packages/sdk/connect/src/types.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L17)*
+*Defined in [packages/sdk/connect/src/types.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L17)*
 
 **Parameters:**
 
