@@ -1611,7 +1611,6 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(newDequeueFrequency, web3)
         await governance.approve(proposalId1, index1)
-        const stage1 = await governance.getProposalStage(proposalId1)
         await governance.propose(
           [transactionSuccess2.value],
           [transactionSuccess2.destination],
