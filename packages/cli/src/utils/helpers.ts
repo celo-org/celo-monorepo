@@ -1,5 +1,5 @@
+import { Block } from '@celo/connect'
 import Web3 from 'web3'
-import { Block } from 'web3-eth'
 import { failWith } from './cli'
 
 export async function nodeIsSynced(web3: Web3): Promise<boolean> {
@@ -44,5 +44,3 @@ export async function requireNodeIsSynced(web3: Web3) {
     failWith('Node is not currently synced. Run node:synced to check its status.')
   }
 }
-
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'

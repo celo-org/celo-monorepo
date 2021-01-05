@@ -43,11 +43,17 @@ import {
 import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import {
+  getConnectedAccount,
+  getConnectedUnlockedAccount,
+  unlockAccount,
+  UnlockResult,
+} from 'src/web3/saga'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
 import {
   mockAccount,
+  mockAccount2,
   mockE164Number,
   mockE164NumberHash,
   mockE164NumberPepper,
@@ -59,10 +65,13 @@ const MockedAnalytics = ValoraAnalytics as any
 
 jest.mock('src/web3/saga', () => ({
   ...jest.requireActual('src/web3/saga'),
-  unlockAccount: jest.fn(async () => true),
+  unlockAccount: jest.fn(),
 }))
 
-const { unlockAccount } = require('src/web3/saga')
+const mockUnlockAccount = unlockAccount as jest.MockedFunction<typeof unlockAccount>
+mockUnlockAccount.mockImplementation(function*() {
+  return UnlockResult.SUCCESS
+})
 
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),
@@ -165,6 +174,43 @@ const mockAttestationsWrapperPartlyVerified = {
     completed: 2,
   })),
   getActionableAttestations: jest.fn(() => [mockActionableAttestations[0]]),
+  lookupAccountsForIdentifier: jest.fn(() => [mockAccount]),
+}
+
+const mockAttestationsWrapperPartlyVerifiedNonAssociated = {
+  ...mockAttestationsWrapperUnverified,
+  getVerifiedStatus: jest.fn(() => ({
+    isVerified: false,
+    numAttestationsRemaining: mockAttestationsRemainingForPartialVerified,
+    total: 3,
+    completed: 2,
+  })),
+  getActionableAttestations: jest.fn(() => [mockActionableAttestations[0]]),
+  lookupAccountsForIdentifier: jest.fn(() => [mockAccount2]),
+}
+
+const mockAttestationsWrapperVerified = {
+  ...mockAttestationsWrapperUnverified,
+  getVerifiedStatus: jest.fn(() => ({
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 3,
+    completed: 3,
+  })),
+  getActionableAttestations: jest.fn(() => []),
+  lookupAccountsForIdentifier: jest.fn(() => [mockAccount]),
+}
+
+const mockAttestationsWrapperVerifiedNonAssociated = {
+  ...mockAttestationsWrapperUnverified,
+  getVerifiedStatus: jest.fn(() => ({
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 3,
+    completed: 3,
+  })),
+  getActionableAttestations: jest.fn(() => []),
+  lookupAccountsForIdentifier: jest.fn(() => [mockAccount2]),
 }
 
 const mockAccountsWrapper = {
@@ -238,8 +284,8 @@ const mockVerificationStateVerified: VerificationState = {
   status: {
     isVerified: true,
     numAttestationsRemaining: 0,
-    total: 0,
-    completed: 0,
+    total: 3,
+    completed: 3,
   },
   isBalanceSufficient: true,
 }
@@ -261,6 +307,10 @@ const mockVerificationStateInsufficientBalance: VerificationState = {
   },
   isBalanceSufficient: false,
 }
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
 
 describe(startVerification, () => {
   beforeEach(() => {
@@ -327,8 +377,6 @@ describe(startVerification, () => {
 describe(fetchVerificationState, () => {
   it('fetches unverified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -368,13 +416,12 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches partly verified', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -414,13 +461,105 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
+  })
+
+  it('fetches verified', async () => {
+    const contractKit = await getContractKitAsync()
+    await expectSaga(fetchVerificationState)
+      .provide([
+        [call(getConnectedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperVerified,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          {
+            phoneHash: mockE164NumberHash,
+            e164Number: mockE164Number,
+            pepper: mockE164NumberPepper,
+          },
+        ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
+      ])
+      .put(setVerificationStatus(VerificationStatus.GettingStatus))
+      .put(
+        udpateVerificationState({
+          phoneHashDetails: mockVerificationStateVerified.phoneHashDetails,
+          actionableAttestations: [],
+          status: mockVerificationStateVerified.status,
+        })
+      )
+      .run()
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
+  })
+
+  it('fetches verified but sets `isVerified` to false if the account has been revoked', async () => {
+    const contractKit = await getContractKitAsync()
+    await expectSaga(fetchVerificationState)
+      .provide([
+        [call(getConnectedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperVerifiedNonAssociated,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          {
+            phoneHash: mockE164NumberHash,
+            e164Number: mockE164Number,
+            pepper: mockE164NumberPepper,
+          },
+        ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
+      ])
+      .put(setVerificationStatus(VerificationStatus.GettingStatus))
+      .put(
+        udpateVerificationState({
+          phoneHashDetails: mockVerificationStateVerified.phoneHashDetails,
+          actionableAttestations: [],
+          status: {
+            ...mockVerificationStateVerified.status,
+            isVerified: false,
+          },
+        })
+      )
+      .run()
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches with forcing unlock account', async () => {
     const contractKit = await getContractKitAsync()
-    const unlockAccountMock = jest.fn(async () => true)
-    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState, true)
       .provide([
         [call(getConnectedAccount), mockAccount],
@@ -460,7 +599,8 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, true)
+    expect(mockUnlockAccount).toBeCalledTimes(1)
+    expect(mockUnlockAccount).toBeCalledWith(mockAccount, true)
   })
 
   it('catches insufficient balance for sig retrieval', async () => {
@@ -533,7 +673,7 @@ describe(doVerificationFlow, () => {
         [select(verificationStateSelector), mockVerificationStateUnverified],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [
@@ -590,7 +730,7 @@ describe(doVerificationFlow, () => {
         [select(verificationStateSelector), mockVerificationStatePartlyVerified],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [
@@ -613,6 +753,24 @@ describe(doVerificationFlow, () => {
       .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
+      .run()
+  })
+
+  it('show error when attempting to reverify a previously revoked account', async () => {
+    const contractKit = await getContractKitAsync()
+    await expectSaga(doVerificationFlow)
+      .provide([
+        [select(verificationStateSelector), mockVerificationStatePartlyVerified],
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperPartlyVerifiedNonAssociated,
+        ],
+      ])
+      .put(setVerificationStatus(VerificationStatus.Prepping))
+      .put(showError(ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT, 10000))
+      .put(setVerificationStatus(VerificationStatus.Failed))
+      .returns(ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT)
       .run()
   })
 
@@ -676,7 +834,7 @@ describe(doVerificationFlow, () => {
         ],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [

@@ -18,15 +18,15 @@
 
 • **active**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L46)*
+*Defined in [contractkit/src/wrappers/Election.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L42)*
 
 ___
 
 ###  group
 
-• **group**: *[Address](../modules/_base_.md#address)*
+• **group**: *Address*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L44)*
+*Defined in [contractkit/src/wrappers/Election.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L40)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **pending**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L45)*
+*Defined in [contractkit/src/wrappers/Election.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L41)*

@@ -16,9 +16,9 @@
 
 ###  address
 
-• **address**: *[Address](../modules/_base_.md#address)*
+• **address**: *Address*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L41)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L40)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **rate**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L42)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L41)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **timestamp**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L43)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L42)*

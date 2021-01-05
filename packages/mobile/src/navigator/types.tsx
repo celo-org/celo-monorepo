@@ -46,6 +46,7 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
+  [Screens.BackupForceScreen]: undefined
   [Screens.BackupQuiz]:
     | undefined
     | {
@@ -153,6 +154,7 @@ export type StackParamList = {
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
+    onCancel?: () => void
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.SelectCountry]: {

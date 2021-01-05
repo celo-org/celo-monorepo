@@ -19,7 +19,7 @@ export async function fundAccount(
     value: value.toString(),
     address: recipient.address,
   })
-  context.kit.addAccount(root.privateKey)
+  context.kit.connection.addAccount(root.privateKey)
 
   const stableToken = await context.kit.contracts.getStableToken()
 
@@ -71,7 +71,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext) {
       return
     }
     const account = await getKey(context.mnemonic, index)
-    context.kit.addAccount(account.privateKey)
+    context.kit.connection.addAccount(account.privateKey)
 
     const celoBalance = await goldToken.balanceOf(account.address)
     if (celoBalance.gt(ONE)) {

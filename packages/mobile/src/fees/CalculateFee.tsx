@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import React, { FunctionComponent, useEffect } from 'react'
 import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { useDispatch } from 'react-redux'
-import { showError } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
@@ -23,6 +23,7 @@ interface InviteProps extends CommonProps {
   account: string
   amount: BigNumber
   comment?: string
+  dollarBalance: string
 }
 
 interface SendProps extends CommonProps {
@@ -33,6 +34,7 @@ interface SendProps extends CommonProps {
   comment?: string
   includeDekFee: boolean
   currency?: CURRENCY_ENUM
+  dollarBalance?: string
 }
 
 interface ExchangeProps extends CommonProps {
@@ -65,13 +67,9 @@ function useAsyncShowError<R, Args extends any[]>(
   const dispatch = useDispatch()
 
   useEffect(() => {
-    // Generic error banner
     if (asyncResult.error) {
       Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-      const errMsg = asyncResult.error.message?.includes('insufficientBalance')
-        ? ErrorMessages.INSUFFICIENT_BALANCE
-        : ErrorMessages.CALCULATE_FEE_FAILED
-      dispatch(showError(errMsg))
+      dispatch(showErrorOrFallback(asyncResult.error, ErrorMessages.CALCULATE_FEE_FAILED))
     }
   }, [asyncResult.error])
 
@@ -81,7 +79,7 @@ function useAsyncShowError<R, Args extends any[]>(
 const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   const asyncResult = useAsyncShowError(
     (account: string, amount: BigNumber, comment: string = MAX_PLACEHOLDER_COMMENT) =>
-      getInviteFee(account, CURRENCY_ENUM.DOLLAR, amount.valueOf(), comment),
+      getInviteFee(account, CURRENCY_ENUM.DOLLAR, amount.valueOf(), props.dollarBalance, comment),
     [props.account, props.amount, props.comment]
   )
   return props.children(asyncResult) as React.ReactElement
@@ -93,6 +91,7 @@ export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<B
       account: string,
       recipientAddress: string,
       amount: string,
+      dollarBalance?: string,
       comment: string = MAX_PLACEHOLDER_COMMENT,
       includeDekFee: boolean = false,
       currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
@@ -105,12 +104,14 @@ export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<B
           amount,
           comment,
         },
-        includeDekFee
+        includeDekFee,
+        dollarBalance
       ),
     [
       props.account,
       props.recipientAddress,
       props.amount,
+      props.dollarBalance,
       props.comment,
       props.includeDekFee,
       props.currency,

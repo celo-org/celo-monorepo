@@ -36,6 +36,11 @@
     "body": "Ya no podrás acceder a tu dinero ni a tu Clave de Cuenta desde este dispositivo. No hay forma de recuperar tu Clave de Cuenta si no la has guardado.",
     "resetNow": "Reinicializar Ahora"
   },
+  "promptConfirmRevokeModal": {
+    "header": "¿Estás seguro de que quieres revocar tu cuenta de Valora?",
+    "body": "Una vez revocada, esta cuenta no podrá volver a verificar. Revoque solo si está seguro de que nunca volverá a necesitar esta cuenta.",
+    "revoke": "Revocar"
+  },
   "testFaqLink": "Las Preguntas Frecuentes del {{appName}}",
   "termsOfServiceLink": "Condiciones de Servicio",
   "editProfile": "Editar perfil",

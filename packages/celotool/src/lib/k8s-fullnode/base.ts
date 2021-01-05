@@ -102,6 +102,8 @@ export abstract class BaseFullNodeDeployer {
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
       `--set geth.flags=${this.celoEnv === 'baklava' ? '--baklava' : ''}`,
+      `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
+      `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
       ...(await this.additionalHelmParameters()),
       (nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '')
     ]

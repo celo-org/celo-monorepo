@@ -1,4 +1,4 @@
-import { logger, toBool } from '@celo/phone-number-privacy-common'
+import { rootLogger as logger, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 export const VERSION = process.env.npm_package_version
 export const DEV_MODE =

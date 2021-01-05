@@ -245,6 +245,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -281,6 +282,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -317,6 +319,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -364,6 +367,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -400,6 +404,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -436,6 +441,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -483,6 +489,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -519,6 +526,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -555,6 +563,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -617,6 +626,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -653,6 +663,7 @@ exports[`PincodeLock renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

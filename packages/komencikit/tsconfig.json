@@ -6,6 +6,6 @@
     "outDir": "lib",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "types/**/*", "src/utils/timezones.json"],
-  "references": [{ "path": "../utils" }]
+  "include": ["src/**/*", "types/**/*"],
+  "references": [{ "path": "../sdk/utils" }]
 }

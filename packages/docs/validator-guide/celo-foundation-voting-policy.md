@@ -50,14 +50,25 @@ To support effective and responsible validators, the Foundation considers the fo
 
 * **Attestation Performance.** Attestation Performance (attestations fulfilled / requests served) over the past 30 days on Mainnet (or Baklava if not elected Mainnet)
 
-
 ### Additional Criteria
 
 In addition to meeting the standard criteria, outlined above, the Foundation anticipates prioritizing validator groups who are mission aligned and/or will provide greater network resilience. These criteria may include:
+
 * The geographical location of the validator group
+
 * Non-profit organizations
+
 * Organizations who commit to donating a percentage of rewards to non-profit organizations
+
 * The likelihood of the validator group having substantial network support from other voters
+
+#### Notes On Improving Your Standard Criteria
+
+* More points are given to those who have performed an external security audit on their infrastructure over those who have self-audited.
+
+* If you are NOT ELECTED on Mainnet, you must be validating on Baklava testnet for at least 30 days. If you are ELECTED you must run validators and attestation service for at least one month (30 days) on  Mainnet. If you are ELECTED on mainnet but for less than 30 days, you must be validating on Baklava for 30 days at least.
+
+* Mission statement and community contributions may make a big difference in whether your application is approved or not.
 
 ## Application
 
@@ -101,8 +112,9 @@ Before applying be ready to share the following:
 
 Past Foundation votes recipients:
 * **Cohort 1:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 26-50 -- votes will expire on Aug 1, 2020
+* **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 -- votes will expire on Nov 1, 2020
 
 Currently receiving Foundation votes: 
-* **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 -- votes will expire on Nov 1, 2020
 * **Cohort 3:** [6 validator groups](https://docs.google.com/spreadsheets/d/1OkWnr6EOeFn4pIv0zxmXFNtHLmKWf_qCJOJ4iacov-A/edit?usp=sharing) -- votes will expire on Feb 1, 2021
 * **Cohort 4:** [22 validator groups](https://docs.google.com/spreadsheets/d/1bp2nJUxqhWner-uOffBohKQc3N93e--eMpP7XOBrbGI/edit?usp=sharing) -- votes will expire on May 1, 2021
+* **Cohort 5:** [25 validator groups](https://docs.google.com/spreadsheets/d/1n2lwFsAsFaohng4Bo_FEWcoXzZl5CrLFxA6EK0nuFSA/edit#gid=0) -- votes will expire on Aug 1, 2021 

@@ -175,6 +175,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -215,6 +216,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }

@@ -40,6 +40,7 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }

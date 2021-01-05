@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { navigateClearingStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
@@ -10,6 +11,16 @@ const mockStore = createMockStore()
 const mockPin = '112233'
 
 describe('Pincode', () => {
+  const mockDispatch = jest.fn()
+  let dispatchSpy: any
+  beforeAll(() => {
+    dispatchSpy = jest
+      .spyOn(mockScreenProps.navigation, 'dispatch')
+      .mockImplementation(mockDispatch)
+  })
+
+  afterAll(() => dispatchSpy.mockRestore())
+
   it('renders correctly', () => {
     const { toJSON } = render(
       <Provider store={mockStore}>
@@ -44,7 +55,8 @@ describe('Pincode', () => {
     mockPin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
     jest.runAllTimers()
     await flushMicrotasksQueue()
-    expect(mockScreenProps.navigation.navigate).toBeCalledWith(Screens.VerificationEducationScreen)
+
+    expect(navigateClearingStack).toBeCalledWith(Screens.VerificationEducationScreen)
   })
 
   it("displays an error text when the pins don't match", async () => {
