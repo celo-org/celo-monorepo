@@ -29,7 +29,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
   Logger.debug(TAG + '@importBackupPhraseSaga', 'Importing backup phrase')
   yield call(waitWeb3LastBlock)
   try {
-    if (!validateMnemonic(phrase)) {
+    if (!validateMnemonic(phrase, bip39)) {
       Logger.error(TAG + '@importBackupPhraseSaga', 'Invalid mnemonic')
       yield put(showError(ErrorMessages.INVALID_BACKUP_PHRASE))
       yield put(importBackupPhraseFailure())
