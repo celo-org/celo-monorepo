@@ -5,6 +5,7 @@ import {
   MnemonicStrength,
   RandomNumberGenerator,
 } from '@celo/base/lib/account'
+import { normalizeAccents } from '@celo/base/lib/string'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import { keccak256 } from 'ethereumjs-util'
@@ -56,8 +57,14 @@ export async function generateMnemonic(
 
 export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrapper) {
   const languages = getAllLanguages()
+  const normalizedMnemonic = normalizeAccents(mnemonic)
+
   for (const language of languages) {
-    if (bip39ToUse.validateMnemonic(mnemonic, getWordList(language))) {
+    const wordList = getWordList(language)
+    const normalizedWordList = isLatinBasedLanguage(language)
+      ? wordList.map((word) => normalizeAccents(word))
+      : wordList
+    if (bip39ToUse.validateMnemonic(normalizedMnemonic, normalizedWordList)) {
       return true
     }
   }
@@ -122,6 +129,18 @@ export function generateKeysFromSeed(
     publicKey: newNode.publicKey.toString('hex'),
     address: privateKeyToAddress(newNode.privateKey.toString('hex')),
   }
+}
+
+function isLatinBasedLanguage(language: MnemonicLanguages) {
+  if (
+    language === MnemonicLanguages.chinese_simplified ||
+    language === MnemonicLanguages.chinese_traditional ||
+    language === MnemonicLanguages.japanese ||
+    language === MnemonicLanguages.korean
+  ) {
+    return false
+  }
+  return true
 }
 
 // Unify the bip39.wordlists (otherwise depends on the instance of the bip39)
