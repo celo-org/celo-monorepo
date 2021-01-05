@@ -31,7 +31,7 @@ export default class RecoverOld extends NewAccount {
     const res = this.parse(RecoverOld)
     const mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
     if (mnemonic) {
-      if (!validateMnemonic(mnemonic, NewAccount.languageOptions(res.flags.language!))) {
+      if (!validateMnemonic(mnemonic)) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }
     } else {

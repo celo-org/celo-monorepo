@@ -54,21 +54,16 @@ export async function generateMnemonic(
   return bip39ToUse.generateMnemonic(strength, undefined, getWordList(language))
 }
 
-export function validateMnemonic(
-  mnemonic: string,
-  defaultLanguage?: MnemonicLanguages,
-  bip39ToUse: Bip39 = bip39Wrapper
-) {
+export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrapper) {
   const mnemonicWords = mnemonic.trim().split(' ')
-  const languages = defaultLanguage
-    ? [defaultLanguage]
-    : getAllLanguages().filter((lang) => lang !== defaultLanguage)
+  const languages = getAllLanguages()
   for (const language of languages) {
     const wordList = getWordList(language)
-    if (mnemonicWords.every((word) => wordList.includes(word))) {
-      return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
+    if (mnemonicWords.some((word) => wordList.includes(word))) {
+      return bip39ToUse.validateMnemonic(mnemonic, wordList)
     }
   }
+
   return false
 }
 

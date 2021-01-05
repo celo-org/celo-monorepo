@@ -1,10 +1,4 @@
-import {
-  generateKeys,
-  generateMnemonic,
-  MnemonicLanguages,
-  MnemonicStrength,
-  validateMnemonic,
-} from './account'
+import { generateKeys, generateMnemonic, MnemonicStrength, validateMnemonic } from './account'
 
 describe('Mnemonic validation', () => {
   it('should generate 24 word mnemonic', async () => {
@@ -213,7 +207,7 @@ describe('Mnemonic validation', () => {
       const password = await generateKeys(mnemonics[i], 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys[i])
     }
-    expect(validateMnemonic(spanishMnemonic, MnemonicLanguages.english)).toBeFalsy()
+    expect(validateMnemonic(spanishMnemonic)).toBeFalsy()
     expect(validateMnemonic(spanishMnemonic)).toBeTruthy()
   })
 })

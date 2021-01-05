@@ -1,5 +1,4 @@
-import { MnemonicLanguages, validateMnemonic } from '@celo/utils/src/account'
-import * as bip39 from 'react-native-bip39'
+import { validateMnemonic } from '@celo/utils/src/account'
 import {
   createQuizWordList,
   formatBackupPhraseOnEdit,
@@ -106,8 +105,8 @@ describe('Mnemonic validation and formatting', () => {
 
   const MULTILINE_ENGLISH_MNEMONIC = `there resist cinnamon water salmon
 spare thumb explain equip uniform control
-divorce mushroom head vote below 
-setup marriage oval topic husband 
+divorce mushroom head vote below
+setup marriage oval topic husband
 inner surprise invest`
 
   const MULTILINE_ENGLISH_MNEMONIC_EXTRA_SPACES = MULTILINE_ENGLISH_MNEMONIC.replace(
@@ -134,40 +133,22 @@ inner surprise invest`
   })
 
   it('validates spanish successfully', () => {
-    expect(
-      validateMnemonic(
-        formatBackupPhraseOnSubmit(SPANISH_MNEMONIC),
-        MnemonicLanguages.spanish,
-        bip39
-      )
-    ).toBeTruthy()
+    expect(validateMnemonic(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC))).toBeTruthy()
   })
 
   it('validates english successfully', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC), undefined, bip39)
-    ).toBeTruthy()
+    expect(validateMnemonic(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC))).toBeTruthy()
   })
 
   it('validates english multiline successfully', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC), undefined, bip39)
-    ).toBeTruthy()
+    expect(validateMnemonic(formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC))).toBeTruthy()
   })
 
   it('does not validate bad english', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC), undefined, bip39)
-    ).toBeFalsy()
+    expect(validateMnemonic(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC))).toBeFalsy()
   })
 
   it('does not validate bad spanish', () => {
-    expect(
-      validateMnemonic(
-        formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC),
-        MnemonicLanguages.spanish,
-        bip39
-      )
-    ).toBeFalsy()
+    expect(validateMnemonic(formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC))).toBeFalsy()
   })
 })
