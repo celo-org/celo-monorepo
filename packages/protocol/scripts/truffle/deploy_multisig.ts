@@ -4,17 +4,17 @@ import { MultiSigContract, ProxyContract } from 'types'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
-    const argv = require('minimist')(process.argv.slice(5), {
+    const argv = require('minimist')(process.argv.slice(4), {
       string: ['from', 'owners', 'required', 'internalRequired'],
     })
-    const MultSig: MultiSigContract = artifacts.require('MultiSig')
+    const multSig: MultiSigContract = artifacts.require('MultiSig')
     const Proxy: ProxyContract = artifacts.require('Proxy')
 
     console.info('  Deploying MultiSigProxy...')
     const proxy = await retryTx(Proxy.new, [{ from: argv.from }])
     console.info('  Deploying MultiSig...')
-    const multiSig = await retryTx(MultiSig.new, [{ from: argv.from }])
-    const initializationTxHash = await _setInitialProxyImplementation(
+    const multiSig = await retryTx(multSig.new, [{ from: argv.from }])
+    await _setInitialProxyImplementation(
       web3,
       multiSig,
       proxy,
@@ -38,6 +38,6 @@ module.exports = async (callback: (error?: any) => number) => {
     callback()
   } catch (e) {
     console.error('Something went wrong')
-    callback(error)
+    callback(e)
   }
 }
