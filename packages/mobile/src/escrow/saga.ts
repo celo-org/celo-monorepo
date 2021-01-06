@@ -515,14 +515,20 @@ export function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     const account = yield call(getConnectedUnlockedAccount)
 
     const reclaimTx = yield call(createReclaimTransaction, paymentID)
-    yield call(
-      sendTransaction,
-      reclaimTx,
-      account,
-      newTransactionContext(TAG, 'Reclaim escrowed funds'),
-      undefined,
-      EscrowActions.RECLAIM_PAYMENT_CANCEL
-    )
+    const { cancel } = yield race({
+      success: call(
+        sendTransaction,
+        reclaimTx,
+        account,
+        newTransactionContext(TAG, 'Reclaim escrowed funds')
+      ),
+      cancel: take(EscrowActions.RECLAIM_PAYMENT_CANCEL),
+    })
+    if (cancel) {
+      Logger.warn(TAG + '@reclaimFromEscrow', 'Reclaiming escrow cancelled')
+      return
+    }
+    Logger.debug(TAG + '@reclaimFromEscrow', 'Done reclaiming escrow')
 
     yield put(fetchDollarBalance())
     yield put(reclaimEscrowPaymentSuccess())

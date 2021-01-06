@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import { getReclaimEscrowFee, reclaimFromEscrow } from 'src/escrow/saga'
-import { SHORT_CURRENCIES, WEI_PER_TOKEN } from 'src/geth/consts'
+import { CURRENCY_ENUM, SHORT_CURRENCIES, WEI_PER_TOKEN } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number } from 'test/values'
@@ -122,7 +122,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   })
 
   it('shows the activity indicator when a reclaim is in progress', async () => {
-    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
+    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE_INFO_CUSD)
 
     const tree = render(
       <Provider store={store}>
@@ -134,7 +134,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   })
 
   it('clears the activity indicator when a reclaim fails', async () => {
-    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
+    mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE_INFO_CUSD)
     mockedReclaimPayment.mockImplementation(async () => {
       throw Error(ErrorMessages.TRANSACTION_FAILED)
     })

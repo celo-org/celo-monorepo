@@ -490,7 +490,6 @@ export function* moveAllFundsFromAccount(
     comment,
   })
 
-  // Temporarily hardcoding gas estimate to save time on estimation
   const { cancel } = yield race({
     success: call(
       sendTransaction,
@@ -505,6 +504,7 @@ export function* moveAllFundsFromAccount(
   })
   if (cancel) {
     Logger.warn(TAG + '@moveAllFundsFromAccount', 'Withdrawal cancelled')
+    return
   }
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
