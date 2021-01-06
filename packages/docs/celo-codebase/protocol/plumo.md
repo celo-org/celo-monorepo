@@ -78,6 +78,7 @@ The first step to participating is generating your Celo address in a secure loca
     * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/.
     * `git clone https://github.com/celo-org/snark-setup-operator`
     * `cd snark-setup-operator`
+    * `git checkout 9851cc0f56c8209c8e9cc1808264a0beb4d125ba`
     * `cargo build --release --bin generate`
     * Now you can use `./target/release/generate`
   * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.0).
@@ -100,6 +101,7 @@ cLabs is running the coordinator server, which has a list of approved participan
     * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/.
     * `git clone https://github.com/celo-org/snark-setup-operator`
     * `cd snark-setup-operator`
+    * `git checkout 9851cc0f56c8209c8e9cc1808264a0beb4d125ba`
     * `cargo build --release --bin contribute`
     * Now you can use `./target/release/contribute`
   * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.0).
