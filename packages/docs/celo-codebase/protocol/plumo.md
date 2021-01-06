@@ -73,7 +73,16 @@ The instructions below are for the first phase of the Plumo setup, Powers of Tau
 
 The first step to participating is generating your Celo address in a secure location.
 
-* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
+* Obtain the `generate` binary:
+  * Option one - compile the `generate` binary:
+    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/.
+    * `git clone https://github.com/celo-org/snark-setup-operator`
+    * `cd snark-setup-operator`
+    * `git checkout 9851cc0f56c8209c8e9cc1808264a0beb4d125ba`
+    * `cargo build --release --bin generate`
+    * Now you can use `./target/release/generate`
+  * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.0).
+* Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
     * Make sure to save your passphrase - you will need it later.
@@ -83,11 +92,20 @@ The first step to participating is generating your Celo address in a secure loca
 
 ### Run the Contributor software
 
-Next you'll download the `contribute` binary and begin contributing to the Plumo setup. 
+Next you'll obtain the `contribute` binary and begin contributing to the Plumo setup.
 
 cLabs is running the coordinator server, which has a list of approved participant addresses. Additionally, cLabs is running a few verifiers that verify contributions on-demand, allowing the setup to make progress.
 
-* After receiving confirmation from cLabs, download the `contribute` binary from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
+* After receiving confirmation from cLabs, obtain the `contribute` binary:
+  * Option one - compile the `contribute` binary:
+    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/.
+    * `git clone https://github.com/celo-org/snark-setup-operator`
+    * `cd snark-setup-operator`
+    * `git checkout 9851cc0f56c8209c8e9cc1808264a0beb4d125ba`
+    * `cargo build --release --bin contribute`
+    * Now you can use `./target/release/contribute`
+  * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.0).
+* Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
 * Run it as follows, assuming your keys reside in KEYS_PATH:
     * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
     * macOS users: `./contribute-macos --keys-path KEYS_PATH`
@@ -102,7 +120,9 @@ Once this is running, you can leave the machine running -- no direct action is n
 
 ### Publish your attestation
 
-The `contribute` binary produces a `plumo.attestation` file that contains a signature with your address. After your participation finishes (and not before!), please post it (here)[https://github.com/celo-org/plumo-ceremony-attestations] by creating a new issue! If you don't have access to the `plumo.attestation` anymore, that's still OK, you can fill in the other details in the issue.
+The `contribute` binary produces a `plumo.attestation` file that contains a signature with your address. After your participation finishes (and not before!), please post it (here)[https://github.com/celo-org/plumo-ceremony-attestations] by creating a new issue! If you use precompiled binaries, be sure to mention you've verified the binary hashes posted on the releases page match the downloaded files.
+
+If you don't have access to the `plumo.attestation` anymore, that's still OK, you can fill in the other details in the issue.
 
 ### Troubleshooting
 

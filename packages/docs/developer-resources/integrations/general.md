@@ -52,7 +52,7 @@ Alfajores = 'https://alfajores-forno.celo-testnet.org'
 
 Baklava = 'https://baklava-forno.celo-testnet.org'
 
-Mainnet = 'https://rc1-forno.celo-testnet.org'
+Mainnet = 'https://forno.celo.org'
 ```
 
 ### Blockscout

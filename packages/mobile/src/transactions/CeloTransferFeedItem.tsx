@@ -26,6 +26,7 @@ type Props = TransferItemFragment & {
 
 export function CeloTransferFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
   const { address, amount, comment, status, timestamp, type } = props
   const addressToDisplayName = useSelector(addressToDisplayNameSelector)
 
@@ -49,6 +50,7 @@ export function CeloTransferFeedItem(props: Props) {
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, i18n)
   const isPending = status === TransactionStatus.Pending
   const isWithdrawal = new BigNumber(amount.value).isNegative()
+  const displayName = addressToDisplayName[address]?.name || formatShortenedAddress(address)
 
   return (
     <Touchable onPress={onPress}>
@@ -57,7 +59,7 @@ export function CeloTransferFeedItem(props: Props) {
           <View style={styles.desc}>
             <Text style={styles.txMode}>
               {t(isWithdrawal ? 'feedItemGoldWithdrawal' : 'feedItemGoldReceived', {
-                address: formatShortenedAddress(address),
+                displayName,
               })}
             </Text>
           </View>
