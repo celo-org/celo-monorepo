@@ -8,12 +8,14 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TransferItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { Namespaces } from 'src/i18n'
+import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/types'
 import { getDatetimeDisplayString } from 'src/utils/time'
@@ -24,6 +26,7 @@ type Props = TransferItemFragment & {
 
 export function CeloTransferFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
   const { address, amount, comment, status, timestamp, type } = props
   const onPress = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_transaction_select)
@@ -40,6 +43,7 @@ export function CeloTransferFeedItem(props: Props) {
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, i18n)
   const isPending = status === TransactionStatus.Pending
   const isWithdrawal = new BigNumber(amount.value).isNegative()
+  const displayName = addressToDisplayName[address]?.name || formatShortenedAddress(address)
 
   return (
     <Touchable onPress={onPress}>
@@ -48,7 +52,7 @@ export function CeloTransferFeedItem(props: Props) {
           <View style={styles.desc}>
             <Text style={styles.txMode}>
               {t(isWithdrawal ? 'feedItemGoldWithdrawal' : 'feedItemGoldReceived', {
-                address: formatShortenedAddress(address),
+                displayName,
               })}
             </Text>
           </View>
