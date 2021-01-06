@@ -2,6 +2,20 @@ import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { MultiSigContract, ProxyContract } from 'types'
 
+/*
+ * A simple script to deploy a multisig contract.
+ *
+ * Expects the following flags:
+ * from: address of the account to making the request (should be unlocked for the running fullnode)
+ * owners: comma delimited list of multisig owners
+ * required: number of required owners needed to execute a call
+ * internalRequired: number of required owners needed to make internal changes to the multisig (eg. adding/removing owners)
+ * network: name of the network defined in truffle-config.js to deploy to
+ *
+ * Run using truffle exec, e.g.:
+ * yarn run truffle exec ./scripts/truffle/deploy_multisig.js --from 0xdead --owners 0xdead,0xf00d,0xd8a3 --required 2 --internalRequired 2 --network rc1
+ *
+ */
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(4), {
