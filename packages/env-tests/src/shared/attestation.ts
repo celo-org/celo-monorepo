@@ -91,7 +91,7 @@ export async function requestAttestationsFromIssuers(
       const revealRequest: AttestationRequest = {
         phoneNumber,
         account,
-        issuer: account,
+        issuer: attestation.issuer,
         salt: pepper,
         smsRetrieverAppSig: undefined,
         securityCodePrefix: undefined,

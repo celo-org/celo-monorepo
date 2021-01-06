@@ -39,6 +39,7 @@ const renderNodes = (reactNodes) => {
 // Without this it's impossible to check if the used value is the cached one since it only prints the i18n key.
 const printParamInsteadOfKey = {
   feedItemSentTitle: 'nameOrNumber',
+  feedItemGoldReceived: 'displayName',
 }
 const translationFunction = (key, params) => {
   const paramToPrint = printParamInsteadOfKey[key]

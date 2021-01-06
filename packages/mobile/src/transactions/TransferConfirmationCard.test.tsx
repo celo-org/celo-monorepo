@@ -28,12 +28,6 @@ const store = createMockStore({
     },
   },
 })
-const mockStore = store
-jest.mock('src/redux/store', () => ({
-  store: {
-    getState: () => mockStore.getState(),
-  },
-}))
 
 describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {

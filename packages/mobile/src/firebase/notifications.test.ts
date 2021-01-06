@@ -4,19 +4,11 @@ import { select } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
 import { openUrl } from 'src/app/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { NotificationReceiveState, NotificationTypes } from 'src/notifications/types'
 import { recipientCacheSelector } from 'src/recipients/reducer'
-import { createMockStore } from 'test/utils'
-
-const mockStore = createMockStore({})
-jest.mock('src/redux/store', () => ({
-  store: {
-    getState: () => mockStore.getState(),
-  },
-}))
 
 describe(handleNotification, () => {
   beforeEach(() => {
@@ -89,6 +81,7 @@ describe(handleNotification, () => {
         .provide([
           [select(addressToE164NumberSelector), {}],
           [select(recipientCacheSelector), {}],
+          [select(addressToDisplayNameSelector), {}],
         ])
         .run()
 
