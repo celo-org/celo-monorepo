@@ -227,7 +227,8 @@ function SendConfirmation(props: Props) {
   const renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const fee = getFeeInTokens(asyncFee.result?.fee)
 
-    // Set the fee info included in the component state for use in sending.
+    // Check if the fee info has been updated and set it in the component state for use in sending.
+    const feeInfoUpdated = feeInfo?.fee !== asyncFee.result?.fee
     if (asyncFee.result) {
       setFeeInfo(asyncFee.result)
     }
@@ -285,11 +286,13 @@ function SendConfirmation(props: Props) {
         dekFee = fee.dividedBy(2)
       }
 
-      // DO NOT MERGE: Reduce the noisiness of this call to only emit if the fee has changed.
-      ValoraAnalytics.track(FeeEvents.fee_rendered, {
-        feeType: 'Security',
-        fee: securityFee?.toString(),
-      })
+      // DO NOT MERGE: Test this out.
+      if (feeInfoUpdated) {
+        ValoraAnalytics.track(FeeEvents.fee_rendered, {
+          feeType: 'Security',
+          fee: securityFee?.toString(),
+        })
+      }
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
