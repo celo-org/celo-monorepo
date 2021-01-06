@@ -57,19 +57,55 @@ export async function generateMnemonic(
 
 export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrapper) {
   const languages = getAllLanguages()
-  const normalizedMnemonic = normalizeAccents(mnemonic)
-
   for (const language of languages) {
-    const wordList = getWordList(language)
-    const normalizedWordList = isLatinBasedLanguage(language)
-      ? wordList.map((word) => normalizeAccents(word))
-      : wordList
-    if (bip39ToUse.validateMnemonic(normalizedMnemonic, normalizedWordList)) {
+    if (bip39ToUse.validateMnemonic(mnemonic, getWordList(language))) {
       return true
     }
   }
 
   return false
+}
+
+export function formatNonAccentedCharacters(mnemonic: string) {
+  const languages = getAllLanguages()
+  const normMnemonicArr = normalizeAccents(mnemonic)
+    .trim()
+    .split(' ')
+
+  for (const language of languages) {
+    if (isLatinBasedLanguage(language)) {
+      const wordList = getWordList(language)
+      const normalizedWordList = wordList.map((word) => normalizeAccents(word))
+      const languageMatches = normMnemonicArr.every((word) => normalizedWordList.includes(word))
+      if (languageMatches) {
+        return replaceIncorrectlyAccentedWords(
+          mnemonic,
+          normMnemonicArr,
+          wordList,
+          normalizedWordList
+        )
+      }
+    }
+  }
+
+  return mnemonic
+}
+
+function replaceIncorrectlyAccentedWords(
+  mnemonic: string,
+  normMnemonicArr: string[],
+  wordList: string[],
+  normalizedWordList: string[]
+) {
+  const mnemonicArr = [...mnemonic.trim().split(' ')]
+  for (let i = 0; i < normMnemonicArr.length; i += 1) {
+    const index = normalizedWordList.indexOf(normMnemonicArr[i])
+    if (index >= 0) {
+      mnemonicArr[i] = wordList[index]
+    }
+  }
+
+  return mnemonicArr.join(' ')
 }
 
 export async function generateKeys(
