@@ -15,7 +15,7 @@ import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPayme
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
 import { dismissNotification } from 'src/home/actions'
-import { IdToNotification, Notification, NotificationTexts } from 'src/home/reducers'
+import { IdToNotification } from 'src/home/reducers'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   backupKey,
@@ -217,9 +217,8 @@ export class NotificationBox extends React.Component<Props, State> {
       if (!notification || notification.dismissed) {
         continue
       }
-      const texts = notification[
-        i18n.language.slice(0, 2) as keyof Notification
-      ] as NotificationTexts
+      const texts =
+        notification.content[i18n.language] || notification.content[i18n.language.slice(0, 2)]
       if (!texts) continue
 
       actions.push({
