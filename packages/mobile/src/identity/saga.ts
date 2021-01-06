@@ -39,7 +39,6 @@ import {
   reportRevealStatusSaga,
   startVerification,
 } from 'src/identity/verification'
-import { store } from 'src/redux/store'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
@@ -128,10 +127,6 @@ function* fetchKnownAddresses() {
       addressesChannel.close()
     }
   }
-}
-
-export function isCeloRewardSender(address: string) {
-  return store.getState().identity.addressToDisplayName[address]?.isCeloRewardSender
 }
 
 function* watchVerification() {

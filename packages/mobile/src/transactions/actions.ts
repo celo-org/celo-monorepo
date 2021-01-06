@@ -2,6 +2,7 @@ import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
+import { AddressToDisplayNameType } from 'src/identity/reducer'
 import { isCeloRewardSender } from 'src/identity/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -122,7 +123,8 @@ export const newTransactionsInFeed = (
 export const navigateToPaymentTransferReview = (
   type: TokenTransactionType,
   timestamp: number,
-  confirmationProps: TransferConfirmationCardProps
+  confirmationProps: TransferConfirmationCardProps,
+  addressToDisplayName: AddressToDisplayNameType
 ) => {
   let headerText = ''
   switch (type) {

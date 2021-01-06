@@ -8,12 +8,14 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TransferItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { Namespaces } from 'src/i18n'
+import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/types'
 import { getDatetimeDisplayString } from 'src/utils/time'
@@ -25,16 +27,23 @@ type Props = TransferItemFragment & {
 export function CeloTransferFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
   const { address, amount, comment, status, timestamp, type } = props
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
+
   const onPress = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_transaction_select)
 
-    navigateToPaymentTransferReview(type, timestamp, {
-      address,
-      comment,
-      amount,
+    navigateToPaymentTransferReview(
       type,
-      // fee TODO: add fee here.
-    })
+      timestamp,
+      {
+        address,
+        comment,
+        amount,
+        type,
+        // fee TODO: add fee here.
+      },
+      addressToDisplayName
+    )
   }
 
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, i18n)

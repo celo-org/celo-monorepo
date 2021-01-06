@@ -45,16 +45,22 @@ function navigateToTransactionReview({
 
   const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
   const e164PhoneNumber = addressToE164Number[address] || undefined
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
 
-  navigateToPaymentTransferReview(type, timestamp, {
-    address,
-    comment: getDecryptedTransferFeedComment(comment, commentKey, type),
-    amount,
-    recipient,
+  navigateToPaymentTransferReview(
     type,
-    e164PhoneNumber,
-    // fee TODO: add fee here.
-  })
+    timestamp,
+    {
+      address,
+      comment: getDecryptedTransferFeedComment(comment, commentKey, type),
+      amount,
+      recipient,
+      type,
+      e164PhoneNumber,
+      // fee TODO: add fee here.
+    },
+    addressToDisplayName
+  )
 }
 
 export function TransferFeedItem(props: Props) {
