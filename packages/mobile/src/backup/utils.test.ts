@@ -1,4 +1,4 @@
-import { validateMnemonic } from '@celo/utils/src/account'
+import { formatNonAccentedCharacters, validateMnemonic } from '@celo/utils/src/account'
 import * as bip39 from 'react-native-bip39'
 import {
   createQuizWordList,
@@ -138,30 +138,36 @@ inner surprise invest`
   })
 
   it('validates spanish successfully', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC), bip39)).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('validates spanish successfully without mnemonic accents', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC_NO_ACCENTS), bip39)
-    ).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(
+      formatBackupPhraseOnSubmit(SPANISH_MNEMONIC_NO_ACCENTS)
+    )
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('validates english successfully', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC), bip39)).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('validates english multiline successfully', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC), bip39)
-    ).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(
+      formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC)
+    )
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('does not validate bad english', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC), bip39)).toBeFalsy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeFalsy()
   })
 
   it('does not validate bad spanish', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC), bip39)).toBeFalsy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeFalsy()
   })
 })
