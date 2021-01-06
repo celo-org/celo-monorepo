@@ -11,7 +11,7 @@ export interface NotificationTexts {
 export interface Notification {
   ctaUri: string
   darkMode: boolean
-  content: { [lang: string] : NotificationTexts | undefined }
+  content: { [lang: string]: NotificationTexts | undefined }
   dismissed?: boolean
 }
 
