@@ -13,14 +13,26 @@ import {
   mockE164Number,
 } from 'test/values'
 
+const celoRewardSenderAddress = '0x123456'
+
 const store = createMockStore({
   account: {
     defaultCountryCode: mockCountryCode,
   },
+  identity: {
+    addressToDisplayName: {
+      [celoRewardSenderAddress]: {
+        name: 'CELO Rewards',
+        isCeloRewardSender: true,
+      },
+    },
+  },
 })
-
-jest.mock('src/identity/saga', () => ({
-  isCeloRewardSender: () => false,
+const mockStore = store
+jest.mock('src/redux/store', () => ({
+  store: {
+    getState: () => mockStore.getState(),
+  },
 }))
 
 describe('TransferConfirmationCard', () => {
@@ -67,6 +79,23 @@ describe('TransferConfirmationCard', () => {
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
+    }
+
+    const tree = renderer.create(
+      <Provider store={store}>
+        <TransferConfirmationCard {...props} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly for received CELO reward', () => {
+    const props = {
+      type: TokenTransactionType.Received,
+      addressHasChanged: false,
+      address: celoRewardSenderAddress,
+      comment: '',
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(

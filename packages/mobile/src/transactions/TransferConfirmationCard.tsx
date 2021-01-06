@@ -226,7 +226,6 @@ function PaymentReceivedContent({ address, recipient, e164PhoneNumber, amount, c
 
 function CeloRewardContent({ address, amount }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const totalAmount = amount
 
   const openLearnMore = () => {
     navigate(Screens.WebViewScreen, { uri: CELO_REWARDS_LINK })
@@ -244,7 +243,7 @@ function CeloRewardContent({ address, amount }: Props) {
         <Text style={styles.learnMore}>{t('learnMore')}</Text>
       </TouchableOpacity>
       <HorizontalLine />
-      <TotalLineItem amount={totalAmount} />
+      <TotalLineItem amount={amount} />
     </>
   )
 }

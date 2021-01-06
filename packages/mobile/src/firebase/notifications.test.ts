@@ -9,9 +9,13 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { NotificationReceiveState, NotificationTypes } from 'src/notifications/types'
 import { recipientCacheSelector } from 'src/recipients/reducer'
+import { createMockStore } from 'test/utils'
 
-jest.mock('src/identity/saga', () => ({
-  isCeloRewardSender: () => false,
+const mockStore = createMockStore({})
+jest.mock('src/redux/store', () => ({
+  store: {
+    getState: () => mockStore.getState(),
+  },
 }))
 
 describe(handleNotification, () => {
