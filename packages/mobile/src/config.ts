@@ -108,6 +108,16 @@ export const RECAPTCHA_SITE_KEY_MAINNET = keyOrUndefined(
 )
 export const SAFETYNET_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SAFETYNET_KEY')
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
+export const BIDALI_URL_ALFAJORES = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'BIDALI_URL_ALFAJORES'
+)
+export const BIDALI_URL_MAINNET = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'BIDALI_URL_MAINNET'
+)
 
 export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
