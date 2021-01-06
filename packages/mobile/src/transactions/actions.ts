@@ -3,7 +3,6 @@ import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmation
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { AddressToDisplayNameType } from 'src/identity/reducer'
-import { isCeloRewardSender } from 'src/identity/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -141,7 +140,7 @@ export const navigateToPaymentTransferReview = (
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')
       break
     case TokenTransactionType.Received:
-      headerText = isCeloRewardSender(confirmationProps.address || '')
+      headerText = addressToDisplayName[confirmationProps.address || '']?.isCeloRewardSender
         ? i18n.t('walletFlow5:transactionHeaderCeloReward')
         : i18n.t('walletFlow5:transactionHeaderReceived')
       break
