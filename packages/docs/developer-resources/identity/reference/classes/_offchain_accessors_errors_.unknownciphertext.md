@@ -31,7 +31,7 @@
 
 *Overrides void*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:25](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L25)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L25)*
 
 **Returns:** *[UnknownCiphertext](_offchain_accessors_errors_.unknownciphertext.md)*
 

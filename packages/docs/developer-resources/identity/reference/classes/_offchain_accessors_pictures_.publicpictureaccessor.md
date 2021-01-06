@@ -35,7 +35,7 @@
 
 *Overrides [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[constructor](_offchain_accessors_binary_.publicbinaryaccessor.md#constructor)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/pictures.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/pictures.ts#L4)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/pictures.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/pictures.ts#L4)*
 
 **Parameters:**
 
@@ -53,7 +53,7 @@ Name | Type |
 
 *Inherited from [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[dataPath](_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-datapath)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 *Inherited from [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[read](_offchain_accessors_binary_.publicbinaryaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L35)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L35)*
 
 #### Type declaration:
 
@@ -85,7 +85,7 @@ ___
 
 *Overrides [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[wrapper](_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-wrapper)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/pictures.ts:5](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/pictures.ts#L5)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/pictures.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/pictures.ts#L5)*
 
 ## Methods
 
@@ -95,7 +95,7 @@ ___
 
 *Inherited from [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[readAsResult](_offchain_accessors_binary_.publicbinaryaccessor.md#readasresult)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L26)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L26)*
 
 **Parameters:**
 
@@ -113,7 +113,7 @@ ___
 
 *Inherited from [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[write](_offchain_accessors_binary_.publicbinaryaccessor.md#write)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L14)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L14)*
 
 **Parameters:**
 

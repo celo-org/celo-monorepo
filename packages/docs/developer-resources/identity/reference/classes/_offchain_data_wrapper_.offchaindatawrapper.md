@@ -29,7 +29,7 @@
 
 \+ **new OffchainDataWrapper**(`self`: string, `kit`: ContractKit, `signer?`: undefined | string): *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:56](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L56)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L56)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ Name | Type |
 
 • **kit**: *ContractKit*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L58)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L58)*
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **readDataFrom**: *Object* = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:93](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L93)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L93)*
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • **self**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:58](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L58)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L58)*
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 • **signer**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:56](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L56)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L56)*
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 • **storageWriter**: *[StorageWriter](_offchain_storage_writers_.storagewriter.md) | undefined*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:55](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L55)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L55)*
 
 ## Methods
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **readDataFromAsResult**<**DataType**>(`account`: Address, `dataPath`: string, `checkOffchainSigners`: boolean, `type?`: t.Type‹DataType›): *Promise‹Result‹Buffer, [OffchainErrors](../modules/_offchain_data_wrapper_.md#offchainerrors)››*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:62](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L62)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L62)*
 
 **Type parameters:**
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **writeDataTo**(`data`: Buffer, `signature`: Buffer, `dataPath`: string): *Promise‹[OffchainErrors](../modules/_offchain_data_wrapper_.md#offchainerrors) | void›*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:95](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L95)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L95)*
 
 **Parameters:**
 
