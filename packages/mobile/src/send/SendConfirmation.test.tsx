@@ -19,7 +19,19 @@ import {
   mockTransactionData,
 } from 'test/values'
 
-const TEST_FEE = new BigNumber(10000000000000000)
+const TEST_FEE_INFO_CUSD = {
+  fee: new BigNumber(10).pow(16),
+  gas: new BigNumber(200000),
+  gasPrice: new BigNumber(10).pow(9).times(5),
+  currency: CURRENCY_ENUM.DOLLAR,
+}
+
+const TEST_FEE_INFO_CELO = {
+  fee: new BigNumber(10).pow(16),
+  gas: new BigNumber(200000),
+  gasPrice: new BigNumber(10).pow(9).times(5),
+  currency: CURRENCY_ENUM.GOLD,
+}
 
 jest.mock('src/send/saga')
 
@@ -49,8 +61,41 @@ describe('SendConfirmation', () => {
     mockedGetSendFee.mockClear()
   })
 
-  it('renders correctly for send payment confirmation', async () => {
-    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
+  it('renders correctly for send payment confirmation with cUSD fees', async () => {
+    mockedGetSendFee.mockImplementation(async () => TEST_FEE_INFO_CUSD)
+
+    const store = createMockStore({
+      stableToken: {
+        balance: '200',
+      },
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <SendConfirmation {...mockScreenProps} />
+      </Provider>
+    )
+
+    // Initial render
+    expect(tree).toMatchSnapshot()
+    // DO NOT MERGE: Look into this TODO
+    // TODO: figure out why fee line items arent rendering
+    // fireEvent.press(tree.getByText('feeEstimate'))
+    // Run timers, because Touchable adds some delay
+    // jest.runAllTimers()
+    // expect(tree.queryByText('securityFee')).not.toBeNull()
+    // expect(tree.queryByText('0.0100')).toBeNull()
+
+    // TODO figure out why this waitForElement isn't working here and in tests below.
+    // Wait for fee to be calculated and displayed
+    // await waitForElement(() => getByText('0.001'))
+    // expect(queryByText('0.001')).not.toBeNull()
+
+    // expect(toJSON()).toMatchSnapshot()
+  })
+
+  it('renders correctly for send payment confirmation with CELO fees', async () => {
+    mockedGetSendFee.mockImplementation(async () => TEST_FEE_INFO_CELO)
 
     const store = createMockStore({
       stableToken: {
@@ -289,7 +334,7 @@ describe('SendConfirmation with Komenci enabled', () => {
   })
 
   it('renders correct modal for invitations', async () => {
-    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
+    mockedGetSendFee.mockImplementation(async () => TEST_FEE_INFO_CUSD)
 
     const store = createMockStore({
       stableToken: {

@@ -70,7 +70,7 @@ jest.mock('src/account/actions', () => ({
 }))
 
 jest.mock('src/transactions/send', () => ({
-  sendTransaction: async () => true,
+  sendTransaction: async () => mockReceipt,
 }))
 
 jest.mock('src/config', () => {
