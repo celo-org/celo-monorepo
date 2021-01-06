@@ -25,7 +25,6 @@ import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import BottomText from 'src/transactions/BottomText'
 import CommentSection from 'src/transactions/CommentSection'
 import TransferAvatars from 'src/transactions/TransferAvatars'
-import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import UserSection from 'src/transactions/UserSection'
 import { navigateToURI } from 'src/utils/linking'
 
@@ -225,7 +224,7 @@ function PaymentReceivedContent({ address, recipient, e164PhoneNumber, amount, c
   )
 }
 
-function CeloRewardContent({ address, amount }: Props) {
+function CeloRewardContent({ address, amount, recipient }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const openLearnMore = () => {
@@ -238,7 +237,7 @@ function CeloRewardContent({ address, amount }: Props) {
         type="received"
         address={address}
         expandable={false}
-        avatar={<TransferFeedIcon type={TokenTransactionType.Faucet} />}
+        avatar={<TransferAvatars type="received" address={address} recipient={recipient} />}
       />
       <TouchableOpacity onPress={openLearnMore}>
         <Text style={styles.learnMore}>{t('learnMore')}</Text>

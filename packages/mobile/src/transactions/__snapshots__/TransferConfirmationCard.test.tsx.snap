@@ -1005,21 +1005,154 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               }
             }
           >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/transaction-network.png",
-                }
-              }
+            <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  false,
+                ]
               }
-            />
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#FEB45E",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                >
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
+                  />
+                </View>
+              </View>
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "white",
+                      "borderRadius": 12,
+                      "elevation": 3,
+                      "height": 24,
+                      "justifyContent": "center",
+                      "shadowColor": "black",
+                      "shadowOffset": Object {
+                        "height": 1.5,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0.3,
+                      "shadowRadius": 2.4000000000000004,
+                      "width": 24,
+                    },
+                    Object {
+                      "marginHorizontal": -8,
+                      "zIndex": 1,
+                    },
+                  ]
+                }
+              >
+                <svg
+                  fill="none"
+                  height={9}
+                  viewBox="0 0 13 9"
+                  width={13}
+                >
+                  <path
+                    d="M1 4.5h11m0 0L8.264 1M12 4.5L8.264 8"
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                  />
+                </svg>
+              </View>
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
+                        },
+                        Object {
+                          "fontSize": 20,
+                        },
+                      ]
+                    }
+                  >
+                    J
+                  </Text>
+                </View>
+              </View>
+            </View>
           </View>
         </View>
       </View>
