@@ -25,4 +25,4 @@
 
 • **errorType**: *T*
 
-*Defined in [packages/sdk/base/src/result.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L63)*
+*Defined in [packages/sdk/base/src/result.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L63)*

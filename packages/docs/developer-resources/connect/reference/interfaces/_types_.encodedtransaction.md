@@ -17,7 +17,7 @@
 
 • **raw**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L28)*
+*Defined in [packages/sdk/connect/src/types.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L28)*
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **tx**: *object*
 
-*Defined in [packages/sdk/connect/src/types.ts:29](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L29)*
+*Defined in [packages/sdk/connect/src/types.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L29)*
 
 #### Type declaration:
 

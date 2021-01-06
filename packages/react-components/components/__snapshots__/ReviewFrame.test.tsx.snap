@@ -68,17 +68,29 @@ exports[`ReviewFrame renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 25,
-            "borderWidth": 0,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-            "width": 50,
-          }
+          Array [
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#42D689",
+              },
+              Object {
+                "borderWidth": 0,
+              },
+              Object {
+                "borderColor": "#42D689",
+                "borderRadius": 25,
+                "height": 50,
+                "width": 50,
+              },
+            ],
+            Object {
+              "opacity": 1,
+            },
+          ]
         }
       >
         <svg

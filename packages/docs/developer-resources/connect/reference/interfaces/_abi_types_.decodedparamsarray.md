@@ -22,4 +22,4 @@
 
 • **__length__**: *number*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L8)*
+*Defined in [packages/sdk/connect/src/abi-types.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L8)*

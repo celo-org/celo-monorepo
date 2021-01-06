@@ -26,7 +26,7 @@
 
 Ƭ **Comparator**: *function*
 
-*Defined in [packages/sdk/base/src/collections.ts:50](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L50)*
+*Defined in [packages/sdk/base/src/collections.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L50)*
 
 #### Type declaration:
 
@@ -45,7 +45,7 @@ Name | Type |
 
 ▸ **intersection**<**T**>(`arrays`: T[][]): *T[]*
 
-*Defined in [packages/sdk/base/src/collections.ts:32](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L32)*
+*Defined in [packages/sdk/base/src/collections.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L32)*
 
 **Type parameters:**
 
@@ -65,7 +65,7 @@ ___
 
 ▸ **linkedListChange**<**T**>(`sortedList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `change`: [AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T›, `comparator`: [Comparator](_collections_.md#comparator)‹T›): *object*
 
-*Defined in [packages/sdk/base/src/collections.ts:90](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L90)*
+*Defined in [packages/sdk/base/src/collections.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L90)*
 
 **Type parameters:**
 
@@ -93,7 +93,7 @@ ___
 
 ▸ **linkedListChanges**<**T**>(`sortedList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `changeList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `comparator`: [Comparator](_collections_.md#comparator)‹T›): *object*
 
-*Defined in [packages/sdk/base/src/collections.ts:100](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L100)*
+*Defined in [packages/sdk/base/src/collections.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L100)*
 
 **Type parameters:**
 
@@ -121,7 +121,7 @@ ___
 
 ▸ **notEmpty**<**TValue**>(`value`: TValue | null | undefined): *value is TValue*
 
-*Defined in [packages/sdk/base/src/collections.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L28)*
+*Defined in [packages/sdk/base/src/collections.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L28)*
 
 **Type parameters:**
 
@@ -141,7 +141,7 @@ ___
 
 ▸ **zeroRange**(`to`: number): *number[]*
 
-*Defined in [packages/sdk/base/src/collections.ts:23](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L23)*
+*Defined in [packages/sdk/base/src/collections.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L23)*
 
 **Parameters:**
 
@@ -157,7 +157,7 @@ ___
 
 ▸ **zip**<**A**, **B**, **C**>(`fn`: function, `as`: A[], `bs`: B[]): *C[]*
 
-*Defined in [packages/sdk/base/src/collections.ts:3](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L3)*
+*Defined in [packages/sdk/base/src/collections.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L3)*
 
 **Type parameters:**
 
@@ -192,7 +192,7 @@ ___
 
 ▸ **zip3**<**A**, **B**, **C**>(`as`: A[], `bs`: B[], `cs`: C[]): *[A, B, C][]*
 
-*Defined in [packages/sdk/base/src/collections.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L13)*
+*Defined in [packages/sdk/base/src/collections.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L13)*
 
 **Type parameters:**
 

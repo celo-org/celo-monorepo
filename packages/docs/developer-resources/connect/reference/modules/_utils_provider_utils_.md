@@ -13,7 +13,7 @@
 
 ▸ **hasProperty**<**T**>(`object`: any, `property`: string): *object is T*
 
-*Defined in [packages/sdk/connect/src/utils/provider-utils.ts:3](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L3)*
+*Defined in [packages/sdk/connect/src/utils/provider-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L3)*
 
 **Type parameters:**
 
@@ -34,7 +34,7 @@ ___
 
 ▸ **stopProvider**(`defaultProvider`: [Provider](../interfaces/_types_.provider.md)): *void*
 
-*Defined in [packages/sdk/connect/src/utils/provider-utils.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L7)*
+*Defined in [packages/sdk/connect/src/utils/provider-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L7)*
 
 **Parameters:**
 
