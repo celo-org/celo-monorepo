@@ -288,8 +288,8 @@ contract('Reserve', (accounts: string[]) => {
   describe('addExchangeSpender & removeExchangeSpender', () => {
     it('should emit addExchangeSpender event on add', async () => {
       const resp = await reserve.addExchangeSpender(exchangeAddress)
-
       const log = resp.logs[0]
+      assert.equal(resp.logs.length, 1)
       assertLogMatches2(log, {
         event: 'ExchangeSpenderAdded',
         args: {
@@ -300,8 +300,8 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should emit removeExchangeSpender event on remove', async () => {
       const resp = await reserve.removeExchangeSpender(exchangeAddress)
-
       const log = resp.logs[0]
+      assert.equal(resp.logs.length, 1)
       assertLogMatches2(log, {
         event: 'ExchangeSpenderRemoved',
         args: {
