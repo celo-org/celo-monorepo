@@ -17,7 +17,7 @@
 
 • **authenticationMethod**: *[ENCRYPTION_KEY](../enums/_odis_query_.authenticationmethod.md#encryption_key)*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L19)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L19)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **rawKey**: *string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L20)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L20)*

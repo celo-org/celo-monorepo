@@ -27,7 +27,7 @@
 
 \+ **new AuthorizedSignerAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)): *[AuthorizedSignerAccessor](_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L17)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L17)*
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ Name | Type |
 
 • **basePath**: *string* = "/account/authorizedSigners"
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L17)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L17)*
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L35)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L35)*
 
 #### Type declaration:
 
@@ -69,7 +69,7 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L18)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L18)*
 
 ## Methods
 
@@ -77,7 +77,7 @@ ___
 
 ▸ **readAsResult**(`account`: Address, `signer`: Address): *Promise‹Result‹object, [SchemaErrors](../modules/_offchain_accessors_errors_.md#schemaerrors)››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L20)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L20)*
 
 **Parameters:**
 
@@ -94,7 +94,7 @@ ___
 
 ▸ **write**(`signer`: Address, `proofOfPossession`: string, `filteredDataPaths`: string): *Promise‹[OffchainErrors](../modules/_offchain_data_wrapper_.md#offchainerrors) | void›*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:37](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L37)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L37)*
 
 **Parameters:**
 

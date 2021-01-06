@@ -35,7 +35,7 @@ Schema for writing any generic binary data
 
 \+ **new PublicBinaryAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md), `dataPath`: string): *[PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L11)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L11)*
 
 **Parameters:**
 
@@ -52,7 +52,7 @@ Name | Type |
 
 • **dataPath**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 *Implementation of [PublicAccessor](../interfaces/_offchain_accessors_interfaces_.publicaccessor.md).[read](../interfaces/_offchain_accessors_interfaces_.publicaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L35)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L35)*
 
 #### Type declaration:
 
@@ -80,7 +80,7 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
 
 ## Methods
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **readAsResult**(`account`: Address): *Promise‹ErrorResult‹[OffchainError](_offchain_accessors_errors_.offchainerror.md)‹›› | OkResult‹Buffer‹›››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L26)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L26)*
 
 **Parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **write**(`data`: Buffer): *Promise‹undefined | [OffchainError](_offchain_accessors_errors_.offchainerror.md)‹››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L14)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L14)*
 
 **Parameters:**
 

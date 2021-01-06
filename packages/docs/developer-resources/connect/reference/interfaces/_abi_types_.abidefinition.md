@@ -97,7 +97,7 @@ ___
 
 • **signature**: *string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L18)*
+*Defined in [packages/sdk/connect/src/abi-types.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L18)*
 
 ___
 

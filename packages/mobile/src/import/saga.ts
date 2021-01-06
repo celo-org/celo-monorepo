@@ -17,7 +17,7 @@ import {
   importBackupPhraseSuccess,
 } from 'src/import/actions'
 import { redeemInviteSuccess } from 'src/invite/actions'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateClearingStack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
@@ -82,7 +82,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       yield put(setHasSeenVerificationNux(true))
       navigateHome()
     } else {
-      navigate(Screens.VerificationEducationScreen)
+      navigateClearingStack(Screens.VerificationEducationScreen)
     }
 
     yield put(importBackupPhraseSuccess())

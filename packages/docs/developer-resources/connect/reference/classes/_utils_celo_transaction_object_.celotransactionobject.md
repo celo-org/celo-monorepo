@@ -30,7 +30,7 @@
 
 \+ **new CeloTransactionObject**(`connection`: [Connection](_connection_.connection.md), `txo`: [CeloTxObject](../interfaces/_types_.celotxobject.md)‹O›, `defaultParams?`: [CeloTransactionParams](../modules/_utils_celo_transaction_object_.md#celotransactionparams)): *[CeloTransactionObject](_utils_celo_transaction_object_.celotransactionobject.md)*
 
-*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L15)*
+*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L15)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **defaultParams**? : *[CeloTransactionParams](../modules/_utils_celo_transaction_object_.md#celotransactionparams)*
 
-*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L19)*
+*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L19)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **txo**: *[CeloTxObject](../interfaces/_types_.celotxobject.md)‹O›*
 
-*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L18)*
+*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L18)*
 
 ## Methods
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **send**(`params?`: [CeloTransactionParams](../modules/_utils_celo_transaction_object_.md#celotransactionparams)): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:23](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L23)*
+*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L23)*
 
 send the transaction to the chain
 
@@ -82,7 +82,7 @@ ___
 
 ▸ **sendAndWaitForReceipt**(`params?`: [CeloTransactionParams](../modules/_utils_celo_transaction_object_.md#celotransactionparams)): *Promise‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt)›*
 
-*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L28)*
+*Defined in [packages/sdk/connect/src/utils/celo-transaction-object.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/celo-transaction-object.ts#L28)*
 
 send the transaction and waits for the receipt
 

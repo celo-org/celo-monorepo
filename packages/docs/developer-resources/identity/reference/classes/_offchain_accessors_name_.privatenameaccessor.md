@@ -36,7 +36,7 @@
 
 *Overrides [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[constructor](_offchain_accessors_simple_.privatesimpleaccessor.md#constructor)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L17)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L17)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ Name | Type |
 
 *Inherited from [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[dataPath](_offchain_accessors_simple_.privatesimpleaccessor.md#readonly-datapath)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:72](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L72)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L72)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 *Inherited from [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[read](_offchain_accessors_simple_.privatesimpleaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:93](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L93)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L93)*
 
 #### Type declaration:
 
@@ -86,7 +86,7 @@ ___
 
 *Inherited from [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[type](_offchain_accessors_simple_.privatesimpleaccessor.md#readonly-type)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:71](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L71)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L71)*
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 *Overrides [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[wrapper](_offchain_accessors_simple_.privatesimpleaccessor.md#readonly-wrapper)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L18)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L18)*
 
 ## Methods
 
@@ -106,7 +106,7 @@ ___
 
 *Inherited from [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[readAsResult](_offchain_accessors_simple_.privatesimpleaccessor.md#readasresult)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:83](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L83)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L83)*
 
 **Parameters:**
 
@@ -124,7 +124,7 @@ ___
 
 *Inherited from [PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md).[write](_offchain_accessors_simple_.privatesimpleaccessor.md#write)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L75)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L75)*
 
 **Parameters:**
 
