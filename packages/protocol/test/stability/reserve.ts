@@ -1,6 +1,7 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
+  assertLogMatches2,
   assertRevert,
   assertSameAddress,
   timeTravel,
@@ -285,22 +286,28 @@ contract('Reserve', (accounts: string[]) => {
   })
 
   describe('addExchangeSpender & removeExchangeSpender', () => {
-    it('emits on add', async () => {
-      const addExchangeSpenderTx = await reserve.addExchangeSpender(exchangeAddress)
+    it('should emit addExchangeSpender event on add', async () => {
+      const resp = await reserve.addExchangeSpender(exchangeAddress)
 
-      const addExchangeSpenderTxLogs = addExchangeSpenderTx.logs.filter(
-        (x) => x.event === 'ExchangeSpenderAdded'
-      )
-      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'ExchangeSpenderAdded',
+        args: {
+          exchangeSpender: exchangeAddress,
+        },
+      })
     })
 
-    it('emits on remove', async () => {
-      const addExchangeSpenderTx = await reserve.removeExchangeSpender(exchangeAddress)
+    it('should emit removeExchangeSpender event on remove', async () => {
+      const resp = await reserve.removeExchangeSpender(exchangeAddress)
 
-      const addExchangeSpenderTxLogs = addExchangeSpenderTx.logs.filter(
-        (x) => x.event === 'ExchangeSpenderRemoved'
-      )
-      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'ExchangeSpenderRemoved',
+        args: {
+          exchangeSpender: exchangeAddress,
+        },
+      })
     })
   })
 
