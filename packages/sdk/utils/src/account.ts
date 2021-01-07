@@ -75,15 +75,11 @@ export function formatNonAccentedCharacters(mnemonic: string) {
   for (const language of languages) {
     if (isLatinBasedLanguage(language)) {
       const wordList = getWordList(language)
-      const normalizedWordList = wordList.map((word) => normalizeAccents(word))
-      const languageMatches = normMnemonicArr.every((word) => normalizedWordList.includes(word))
+      const normWordListMap = createNormalizedWordListMap(wordList)
+      const languageMatches = arrayContainedInMap(normMnemonicArr, normWordListMap)
+
       if (languageMatches) {
-        return replaceIncorrectlyAccentedWords(
-          mnemonic,
-          normMnemonicArr,
-          wordList,
-          normalizedWordList
-        )
+        return replaceIncorrectlyAccentedWords(mnemonic, normMnemonicArr, normWordListMap)
       }
     }
   }
@@ -91,17 +87,36 @@ export function formatNonAccentedCharacters(mnemonic: string) {
   return mnemonic
 }
 
-function replaceIncorrectlyAccentedWords(
+const createNormalizedWordListMap = (wordList: string[]) => {
+  const normWordListMap = new Map()
+  for (const word of wordList) {
+    const noramlizedWord = normalizeAccents(word)
+    normWordListMap.set(noramlizedWord, word)
+  }
+  return normWordListMap
+}
+
+const arrayContainedInMap = (array: string[], map: Map<string, string>) => {
+  for (const item of array) {
+    if (!map.has(item)) {
+      return false
+    }
+  }
+  return true
+}
+
+const replaceIncorrectlyAccentedWords = (
   mnemonic: string,
   normMnemonicArr: string[],
-  wordList: string[],
-  normalizedWordList: string[]
-) {
+  normWordListMap: Map<string, string>
+) => {
   const mnemonicArr = [...mnemonic.trim().split(' ')]
   for (let i = 0; i < normMnemonicArr.length; i += 1) {
-    const index = normalizedWordList.indexOf(normMnemonicArr[i])
-    if (index >= 0) {
-      mnemonicArr[i] = wordList[index]
+    const noramlizedWord = normMnemonicArr[i]
+    const nonNormalizedWord = normWordListMap.get(noramlizedWord)
+    console.log(nonNormalizedWord)
+    if (nonNormalizedWord) {
+      mnemonicArr[i] = nonNormalizedWord
     }
   }
 
