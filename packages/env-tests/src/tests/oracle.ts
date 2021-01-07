@@ -44,7 +44,7 @@ export function runOracleTest(context: EnvTestContext) {
       }
 
       // Move the rate in one direction or another
-      rateToReport = rateToReport.times(0.95 + Math.random() * 0.1)
+      rateToReport = rateToReport.times(0.95 + Math.random() * 0.1).decimalPlaces(10)
 
       const reportTx = await oracles.report(CeloContract.StableToken, rateToReport, from.address)
       const reportTxReceipt = await reportTx.sendAndWaitForReceipt({ from: from.address })
