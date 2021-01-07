@@ -18,7 +18,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
-import { navigate } from 'src/navigator/NavigationService'
+import { ensurePincode, navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/IncomingPaymentRequestSummaryNotification'
 import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/OutgoingPaymentRequestSummaryNotification'
@@ -28,6 +28,9 @@ import {
 } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
+
+const TAG = 'NotificationBox'
 
 export enum NotificationBannerTypes {
   incoming_tx_request = 'incoming_tx_request',
@@ -160,7 +163,15 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.backup_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.BackupIntroduction)
+              ensurePincode()
+                .then((pinIsCorrect) => {
+                  if (pinIsCorrect) {
+                    navigate(Screens.BackupIntroduction)
+                  }
+                })
+                .catch((error) => {
+                  Logger.error(`${TAG}@backupNotification`, 'PIN ensure error', error)
+                })
             },
           },
         ],
