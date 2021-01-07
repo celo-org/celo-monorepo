@@ -39,7 +39,6 @@ done
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$INITIALIZE_DATA" ] && echo "Need to set the initialization data via the -i flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
-[ -z "$FROM" ] && echo "Need to set the from address via the -f flag" && exit 1;
 
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
 git fetch --all --tags
