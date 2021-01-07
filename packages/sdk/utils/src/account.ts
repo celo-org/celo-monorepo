@@ -69,6 +69,7 @@ export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrap
 export function formatNonAccentedCharacters(mnemonic: string) {
   const languages = getAllLanguages()
   const normMnemonicArr = normalizeAccents(mnemonic)
+    .toLowerCase()
     .trim()
     .split(' ')
 
