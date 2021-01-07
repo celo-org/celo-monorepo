@@ -73,8 +73,10 @@ const isCoreContract = (contractName: string) =>
 const deployImplementation = async (
   contractName: string,
   Contract: Truffle.Contract<Truffle.ContractInstance>,
-  dryRun: boolean
+  dryRun: boolean,
+  from: string
 ) => {
+  Contract.defaults({ from })
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
@@ -90,18 +92,30 @@ const deployImplementation = async (
 
 const deployProxy = async (
   contractName: string,
-  Proxy: Truffle.Contract<Truffle.ContractInstance>,
-  governanceAddress: string,
-  dryRun: boolean
+  addresses: ContractAddresses,
+  dryRun: boolean,
+  from: string
 ) => {
+  // Explicitly forbid upgrading to a new Governance proxy contract.
+  // Upgrading to a new Governance proxy contract would require ownership of all
+  // contracts to be moved to the new governance contract, possibly including contracts
+  // deployed in this script.
+  // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
+  // before or after other contracts in this script?), and that ordering is not being
+  // checked, fail if there are storage incompatible changes to Governance.
+  if (contractName === 'Governance') {
+    throw new Error(`Storage incompatible changes to Governance are not yet supported`)
+  }
   console.log(`Deploying ${contractName}Proxy`)
+  const Proxy = await artifacts.require(`${contractName}Proxy`)
+  Proxy.defaults({ from })
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
 
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
   if (!dryRun) {
-    await proxy._transferOwnership(governanceAddress)
+    await proxy._transferOwnership(addresses.get('Governance'))
   }
 
   return proxy
@@ -121,7 +135,6 @@ module.exports = async (callback: (error?: any) => number) => {
       string: ['report', 'from', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
-    const from = argv.from
     const fullReport = readJsonSync(argv.report)
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
@@ -145,14 +158,18 @@ module.exports = async (callback: (error?: any) => number) => {
         }
         // 2. Link dependencies.
         const Contract = await artifacts.require(contractName)
-        Contract.defaults({ from }) // override network default from
         await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
 
         // 3. Deploy new versions of the contract, if needed.
         const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
         const isLibrary = linkedLibraries[contractName]
         if (shouldDeployImplementation) {
-          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const contract = await deployImplementation(
+            contractName,
+            Contract,
+            argv.dry_run,
+            argv.from
+          )
           const setImplementationTx: ProposalTx = {
             contract: `${contractName}Proxy`,
             function: '_setImplementation',
@@ -165,20 +182,7 @@ module.exports = async (callback: (error?: any) => number) => {
           if (!shouldDeployProxy) {
             proposal.push(setImplementationTx)
           } else {
-            // Explicitly forbid upgrading to a new Governance proxy contract.
-            // Upgrading to a new Governance proxy contract would require ownership of all
-            // contracts to be moved to the new governance contract, possibly including contracts
-            // deployed in this script.
-            // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
-            // before or after other contracts in this script?), and that ordering is not being
-            // checked, fail if there are storage incompatible changes to Governance.
-            if (contractName === 'Governance') {
-              throw new Error(`Storage incompatible changes to Governance are not yet supported`)
-            }
-            const governanceAddress = addresses.get('Governance')
-            const Proxy = await artifacts.require(`${contractName}Proxy`)
-            Proxy.defaults({ from }) // override network default from
-            const proxy = await deployProxy(contractName, Proxy, governanceAddress, argv.dry_run)
+            const proxy = await deployProxy(contractName, addresses, argv.dry_run, argv.from)
 
             // 5. Update the contract's address to the new proxy in the proposal
             addresses.set(contractName, proxy.address)
@@ -209,7 +213,12 @@ module.exports = async (callback: (error?: any) => number) => {
             }
           }
         } else if (isLibrary) {
-          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const contract = await deployImplementation(
+            contractName,
+            Contract,
+            argv.dry_run,
+            argv.from
+          )
           addresses.set(contractName, contract.address)
         }
         // 7. Mark the contract as released
