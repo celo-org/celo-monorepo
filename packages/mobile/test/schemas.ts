@@ -476,6 +476,10 @@ export const v7Schema = {
     ...v6Schema.account,
     backupRequiredTime: null,
   },
+  home: {
+    loading: false,
+    notifications: {},
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
