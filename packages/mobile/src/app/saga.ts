@@ -1,3 +1,4 @@
+import URLSearchParamsReal from '@ungap/url-search-params'
 import { AppState } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import {
@@ -32,6 +33,7 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { handlePaymentDeeplink } from 'src/send/utils'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
@@ -113,6 +115,26 @@ export function* appRemoteFeatureFlagSaga() {
   }
 }
 
+function parseValue(value: string) {
+  if (['true', 'false'].indexOf(value) >= 0) {
+    return value === 'true'
+  }
+  const number = parseFloat(value)
+  if (!isNaN(number)) {
+    return number
+  }
+  return value
+}
+
+function parseQuery(query: string) {
+  const decodedParams = new URLSearchParamsReal(decodeURIComponent(query))
+  const params: { [key: string]: any } = {}
+  for (const [key, value] of decodedParams.entries()) {
+    params[key] = parseValue(value)
+  }
+  return params
+}
+
 export function* handleDeepLink(action: OpenDeepLink) {
   const { deepLink } = action
   Logger.debug(TAG, 'Handling deep link', deepLink)
@@ -124,6 +146,9 @@ export function* handleDeepLink(action: OpenDeepLink) {
       yield call(handlePaymentDeeplink, deepLink)
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
+    } else if (rawParams.path.startsWith('/openScreen') && rawParams.query) {
+      const params = parseQuery(rawParams.query)
+      navigate(params['screen'] as keyof StackParamList, params)
     }
   }
 }
