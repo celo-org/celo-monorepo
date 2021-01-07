@@ -23,7 +23,6 @@ const contextAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig
 const contextAwsClusterConfigDynamicEnvVars: { [k in keyof Omit<AwsClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
   clusterRegion: DynamicEnvVar.AWS_CLUSTER_REGION,
-  resourceGroupTag: DynamicEnvVar.AWS_RESOURCE_GROUP_TAG,
 }
 
 /**

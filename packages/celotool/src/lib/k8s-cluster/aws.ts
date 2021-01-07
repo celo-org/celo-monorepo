@@ -8,7 +8,6 @@ import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
  */
 export interface AwsClusterConfig extends BaseClusterConfig {
   clusterRegion: string,
-  resourceGroupTag: string
 }
 
 export class AwsClusterManager extends BaseClusterManager {
