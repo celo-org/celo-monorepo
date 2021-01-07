@@ -87,7 +87,7 @@ export function* handleNotification(
   message: FirebaseMessagingTypes.RemoteMessage,
   notificationState: NotificationReceiveState
 ) {
-  // See if this is a notification with an open url or webview action (`ou` or `ow` prop in the data)
+  // See if this is a notification with an open url or webview action (`ou` prop in the data)
   const urlToOpen = message.data?.ou
   const openExternal = message.data?.openExternal === 'true'
   const openUrlAction = urlToOpen ? openUrl(urlToOpen, openExternal) : null
