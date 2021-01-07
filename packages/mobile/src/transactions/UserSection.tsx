@@ -54,6 +54,7 @@ interface Props {
   e164PhoneNumber?: string
   recipient?: Recipient
   avatar: React.ReactNode
+  expandable?: boolean
 }
 
 export default function UserSection({
@@ -63,9 +64,10 @@ export default function UserSection({
   recipient,
   e164PhoneNumber,
   avatar,
+  expandable = true,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const [expanded, setExpanded] = useState(addressHasChanged)
+  const [expanded, setExpanded] = useState(expandable && addressHasChanged)
 
   const addressToDisplayName = useSelector(addressToDisplayNameSelector)
   const userName = addressToDisplayName[address || '']?.name
@@ -90,14 +92,16 @@ export default function UserSection({
       <View style={styles.header}>
         <View style={styles.userContainer}>
           <Text style={styles.sectionLabel}>{sectionLabel}</Text>
-          <Touchable onPress={toggleExpanded}>
+          <Touchable onPress={toggleExpanded} disabled={!expandable}>
             <>
-              <Expandable isExpandable={!e164Number} isExpanded={expanded}>
+              <Expandable isExpandable={expandable && !e164Number} isExpanded={expanded}>
                 <Text style={styles.username}>{displayName}</Text>
               </Expandable>
-              <Expandable isExpandable={!!e164Number} isExpanded={expanded}>
-                <Text style={styles.phoneNumber}>{e164Number}</Text>
-              </Expandable>
+              {e164Number && (
+                <Expandable isExpandable={expandable && !!e164Number} isExpanded={expanded}>
+                  <Text style={styles.phoneNumber}>{e164Number}</Text>
+                </Expandable>
+              )}
             </>
           </Touchable>
         </View>
