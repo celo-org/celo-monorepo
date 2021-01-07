@@ -1,4 +1,9 @@
-import { generateKeysFromSeed, generateSeed, validateMnemonic } from '@celo/utils/lib/account'
+import {
+  formatNonAccentedCharacters,
+  generateKeysFromSeed,
+  generateSeed,
+  validateMnemonic,
+} from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
@@ -29,9 +34,10 @@ export default class RecoverOld extends NewAccount {
 
   async run() {
     const res = this.parse(RecoverOld)
-    const mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
+    let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
     if (mnemonic) {
-      if (!validateMnemonic(mnemonic, NewAccount.languageOptions(res.flags.language!))) {
+      mnemonic = formatNonAccentedCharacters(mnemonic)
+      if (!validateMnemonic(mnemonic)) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }
     } else {
