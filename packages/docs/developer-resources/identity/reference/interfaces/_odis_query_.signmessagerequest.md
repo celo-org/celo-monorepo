@@ -14,6 +14,7 @@
 * [authenticationMethod](_odis_query_.signmessagerequest.md#authenticationmethod)
 * [blindedQueryPhoneNumber](_odis_query_.signmessagerequest.md#blindedqueryphonenumber)
 * [hashedPhoneNumber](_odis_query_.signmessagerequest.md#optional-hashedphonenumber)
+* [sessionID](_odis_query_.signmessagerequest.md#optional-sessionid)
 * [timestamp](_odis_query_.signmessagerequest.md#optional-timestamp)
 * [version](_odis_query_.signmessagerequest.md#optional-version)
 
@@ -25,7 +26,7 @@
 
 *Inherited from [PhoneNumberPrivacyRequest](_odis_query_.phonenumberprivacyrequest.md).[account](_odis_query_.phonenumberprivacyrequest.md#account)*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:38](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L38)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L38)*
 
 ___
 
@@ -35,7 +36,7 @@ ___
 
 *Inherited from [PhoneNumberPrivacyRequest](_odis_query_.phonenumberprivacyrequest.md).[authenticationMethod](_odis_query_.phonenumberprivacyrequest.md#authenticationmethod)*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L39)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L39)*
 
 ___
 
@@ -43,7 +44,7 @@ ___
 
 • **blindedQueryPhoneNumber**: *string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:44](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L44)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L45)*
 
 ___
 
@@ -51,7 +52,17 @@ ___
 
 • **hashedPhoneNumber**? : *undefined | string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L46)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L47)*
+
+___
+
+### `Optional` sessionID
+
+• **sessionID**? : *undefined | string*
+
+*Inherited from [PhoneNumberPrivacyRequest](_odis_query_.phonenumberprivacyrequest.md).[sessionID](_odis_query_.phonenumberprivacyrequest.md#optional-sessionid)*
+
+*Defined in [packages/sdk/identity/src/odis/query.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L41)*
 
 ___
 
@@ -59,7 +70,7 @@ ___
 
 • **timestamp**? : *undefined | number*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:45](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L45)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L46)*
 
 ___
 
@@ -69,4 +80,4 @@ ___
 
 *Inherited from [PhoneNumberPrivacyRequest](_odis_query_.phonenumberprivacyrequest.md).[version](_odis_query_.phonenumberprivacyrequest.md#optional-version)*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L40)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L40)*

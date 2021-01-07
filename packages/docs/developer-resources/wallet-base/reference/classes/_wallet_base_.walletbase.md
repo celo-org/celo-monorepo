@@ -31,7 +31,7 @@
 
 ▸ **computeSharedSecret**(`address`: Address, `publicKey`: string): *Promise‹Buffer›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:140](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L140)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L140)*
 
 Computes the shared secret (an ECDH key exchange object) between two accounts
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:132](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L132)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:132](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L132)*
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **getAccounts**(): *Address[]*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:27](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L27)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L27)*
 
 Gets a list of accounts that have been registered
 
@@ -79,7 +79,7 @@ ___
 
 ▸ **hasAccount**(`address?`: Address): *boolean*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:43](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L43)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L43)*
 
 Returns true if account has been registered
 
@@ -97,7 +97,7 @@ ___
 
 ▸ **removeAccount**(`_address`: string): *void*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L35)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L35)*
 
 Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
 
@@ -115,7 +115,7 @@ ___
 
 ▸ **signPersonalMessage**(`address`: Address, `data`: string): *Promise‹string›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:96](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L96)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L96)*
 
 Sign a personal Ethereum signed message.
 
@@ -136,7 +136,7 @@ ___
 
 ▸ **signTransaction**(`txParams`: CeloTx): *Promise‹EncodedTransaction›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L75)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L75)*
 
 Gets the signer based on the 'from' field in the tx body
 
@@ -154,7 +154,7 @@ ___
 
 ▸ **signTypedData**(`address`: Address, `typedData`: EIP712TypedData): *Promise‹string›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:113](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L113)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L113)*
 
 Sign an EIP712 Typed Data message.
 

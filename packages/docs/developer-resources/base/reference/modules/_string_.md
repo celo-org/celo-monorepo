@@ -16,7 +16,7 @@
 
 ▸ **appendPath**(`baseUrl`: string, `path`: string): *string*
 
-*Defined in [packages/sdk/base/src/string.ts:1](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L1)*
+*Defined in [packages/sdk/base/src/string.ts:1](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L1)*
 
 **Parameters:**
 
@@ -33,10 +33,10 @@ Name | Type |
 
 ### ▪ **StringBase**: *object*
 
-*Defined in [packages/sdk/base/src/string.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L9)*
+*Defined in [packages/sdk/base/src/string.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L9)*
 
 ###  appendPath
 
 • **appendPath**: *[appendPath](_string_.md#appendpath)*
 
-*Defined in [packages/sdk/base/src/string.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L10)*
+*Defined in [packages/sdk/base/src/string.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L10)*

@@ -13,7 +13,7 @@
 
 • **DOLLAR**: = "dollar"
 
-*Defined in [packages/sdk/base/src/currencies.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L39)*
+*Defined in [packages/sdk/base/src/currencies.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L39)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **GOLD**: = "gold"
 
-*Defined in [packages/sdk/base/src/currencies.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L40)*
+*Defined in [packages/sdk/base/src/currencies.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L40)*

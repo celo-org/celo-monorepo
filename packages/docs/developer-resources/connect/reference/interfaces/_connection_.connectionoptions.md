@@ -19,7 +19,7 @@
 
 • **feeCurrency**? : *[Address](../modules/_types_.md#address)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:42](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L42)*
+*Defined in [packages/sdk/connect/src/connection.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L42)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **from**? : *[Address](../modules/_types_.md#address)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:43](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L43)*
+*Defined in [packages/sdk/connect/src/connection.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L43)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **gasInflationFactor**: *number*
 
-*Defined in [packages/sdk/connect/src/connection.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L40)*
+*Defined in [packages/sdk/connect/src/connection.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L40)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **gasPrice**: *string*
 
-*Defined in [packages/sdk/connect/src/connection.ts:41](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L41)*
+*Defined in [packages/sdk/connect/src/connection.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L41)*

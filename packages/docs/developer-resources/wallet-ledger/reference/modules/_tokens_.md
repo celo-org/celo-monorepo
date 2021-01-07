@@ -19,7 +19,7 @@
 
 ▸ **compareLedgerAppVersions**(`version1`: string, `version2`: string): *number*
 
-*Defined in [wallet-ledger/src/tokens.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/tokens.ts#L33)*
+*Defined in [wallet-ledger/src/tokens.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/tokens.ts#L33)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ ___
 
 ▸ **list**(): *[TokenInfo](../interfaces/_tokens_.tokeninfo.md)[]*
 
-*Defined in [wallet-ledger/src/tokens.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/tokens.ts#L16)*
+*Defined in [wallet-ledger/src/tokens.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/tokens.ts#L16)*
 
 list all the ERC20 tokens informations
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **tokenInfoByAddressAndChainId**(`contract`: Address, `chainId`: number): *[TokenInfo](../interfaces/_tokens_.tokeninfo.md) | null | undefined*
 
-*Defined in [wallet-ledger/src/tokens.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/tokens.ts#L8)*
+*Defined in [wallet-ledger/src/tokens.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/tokens.ts#L8)*
 
 Retrieve the token information by a given contract address and chainId if any
 
