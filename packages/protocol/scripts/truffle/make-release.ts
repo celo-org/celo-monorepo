@@ -88,26 +88,20 @@ const deployImplementation = async (
   return contract
 }
 
-const deployProxy = async (contractName: string, addresses: ContractAddresses, dryRun: boolean) => {
-  // Explicitly forbid upgrading to a new Governance proxy contract.
-  // Upgrading to a new Governance proxy contract would require ownership of all
-  // contracts to be moved to the new governance contract, possibly including contracts
-  // deployed in this script.
-  // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
-  // before or after other contracts in this script?), and that ordering is not being
-  // checked, fail if there are storage incompatible changes to Governance.
-  if (contractName === 'Governance') {
-    throw new Error(`Storage incompatible changes to Governance are not yet supported`)
-  }
+const deployProxy = async (
+  contractName: string,
+  Proxy: Truffle.Contract<Truffle.ContractInstance>,
+  governanceAddress: string,
+  dryRun: boolean
+) => {
   console.log(`Deploying ${contractName}Proxy`)
-  const Proxy = await artifacts.require(`${contractName}Proxy`)
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
 
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
   if (!dryRun) {
-    await proxy._transferOwnership(addresses.get('Governance'))
+    await proxy._transferOwnership(governanceAddress)
   }
 
   return proxy
@@ -124,9 +118,10 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'network', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
+      string: ['report', 'from', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
+    const from = argv.from
     const fullReport = readJsonSync(argv.report)
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
@@ -150,6 +145,7 @@ module.exports = async (callback: (error?: any) => number) => {
         }
         // 2. Link dependencies.
         const Contract = await artifacts.require(contractName)
+        Contract.defaults({ from }) // override network default from
         await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
 
         // 3. Deploy new versions of the contract, if needed.
@@ -169,7 +165,20 @@ module.exports = async (callback: (error?: any) => number) => {
           if (!shouldDeployProxy) {
             proposal.push(setImplementationTx)
           } else {
-            const proxy = await deployProxy(contractName, addresses, argv.dry_run)
+            // Explicitly forbid upgrading to a new Governance proxy contract.
+            // Upgrading to a new Governance proxy contract would require ownership of all
+            // contracts to be moved to the new governance contract, possibly including contracts
+            // deployed in this script.
+            // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
+            // before or after other contracts in this script?), and that ordering is not being
+            // checked, fail if there are storage incompatible changes to Governance.
+            if (contractName === 'Governance') {
+              throw new Error(`Storage incompatible changes to Governance are not yet supported`)
+            }
+            const governanceAddress = addresses.get('Governance')
+            const Proxy = await artifacts.require(`${contractName}Proxy`)
+            Proxy.defaults({ from }) // override network default from
+            const proxy = await deployProxy(contractName, Proxy, governanceAddress, argv.dry_run)
 
             // 5. Update the contract's address to the new proxy in the proposal
             addresses.set(contractName, proxy.address)
