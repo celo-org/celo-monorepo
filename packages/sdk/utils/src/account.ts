@@ -114,7 +114,7 @@ const replaceIncorrectlyAccentedWords = (
   for (let i = 0; i < normMnemonicArr.length; i += 1) {
     const noramlizedWord = normMnemonicArr[i]
     const nonNormalizedWord = normWordListMap.get(noramlizedWord)
-    console.log(nonNormalizedWord)
+
     if (nonNormalizedWord) {
       mnemonicArr[i] = nonNormalizedWord
     }
