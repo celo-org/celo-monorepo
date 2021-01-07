@@ -1,7 +1,7 @@
 import {
+  formatNonAccentedCharacters,
   generateKeys,
   generateMnemonic,
-  MnemonicLanguages,
   MnemonicStrength,
   validateMnemonic,
 } from './account'
@@ -213,7 +213,41 @@ describe('Mnemonic validation', () => {
       const password = await generateKeys(mnemonics[i], 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys[i])
     }
-    expect(validateMnemonic(spanishMnemonic, MnemonicLanguages.english)).toBeFalsy()
     expect(validateMnemonic(spanishMnemonic)).toBeTruthy()
+  })
+
+  it('should generate the same keys for a mnemonic with and without accents', async () => {
+    const spanishMnemonics = [
+      'avance colmo poema momia cofre pata res verso secta cinco tubería yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín',
+      'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebe oral miembro gato suelo violin',
+      'avance colmo poema momia cofre pata res verso secta cinco tubería yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violin',
+    ]
+
+    const expectedPrivateKeys = {
+      derivation0: {
+        address: '0xB49cb22C4e392b2A738B64D40Cc4C62793e4EAa0',
+        privateKey: '63ecbc2975ef76257a9a9571e4bdcd5b48363422d82ba7317a33499afae1b931',
+        publicKey: '0318ccbbb9fabe4505009735de92d10062880507cc556274d6ca8629e323488e53',
+      },
+      derivation1: {
+        address: '0x49Bc3DE20a93eCd6469711Cf100ac7c2AC7C3Ada',
+        privateKey: '0ae744c1ea19c92b0078612ea5a832c037bc9c4591cc357e23e69f95bdee33ef',
+        publicKey: '02f95265f5e68529b67858c5353b51efecbfd3864c41355684b44c72d84316436d',
+      },
+      password: {
+        address: '0xF34a69ACD7112591cAAfB0e9F2D54B00aEeb6073',
+        privateKey: 'bd26487c13a7c4fca1d960415c7f7cbb5e2814ac30ce82f084c04dfd503a09e7',
+        publicKey: '03ec45bfcf67678782e4c0e8bc9ceea0c2861f939db9433d0b513598baf3721d4d',
+      },
+    }
+
+    for (let mnemonic of spanishMnemonics) {
+      mnemonic = formatNonAccentedCharacters(mnemonic)
+      expect(validateMnemonic(mnemonic)).toBeTruthy()
+      const derivation0 = await generateKeys(mnemonic)
+      const derivation1 = await generateKeys(mnemonic, undefined, 0, 1)
+      const password = await generateKeys(mnemonic, 'password')
+      expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys)
+    }
   })
 })
