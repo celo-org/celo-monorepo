@@ -219,7 +219,9 @@ export class NotificationBox extends React.Component<Props, State> {
       }
       const texts =
         notification.content[i18n.language] || notification.content[i18n.language.slice(0, 2)]
-      if (!texts) continue
+      if (!texts) {
+        continue
+      }
 
       actions.push({
         text: texts.body,

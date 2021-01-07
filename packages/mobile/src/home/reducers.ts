@@ -48,13 +48,15 @@ export const homeReducer = (state: State = initialState, action: ActionTypes | R
     case Actions.UPDATE_NOTIFICATIONS:
       // Doing it this way removes any notifications not received on the action.
       let updatedNotifications = {}
-      for (const [id, notification] of Object.entries(action.notifications)) {
-        if (!notification) continue
+      for (const [id, updatedNotification] of Object.entries(action.notifications)) {
+        if (!updatedNotification) {
+          continue
+        }
         updatedNotifications = {
           ...updatedNotifications,
           [id]: {
             ...(state.notifications[id] || {}),
-            ...notification,
+            ...updatedNotification,
           },
         }
       }
