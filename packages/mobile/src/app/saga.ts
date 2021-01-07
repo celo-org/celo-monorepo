@@ -124,6 +124,8 @@ export function* handleDeepLink(action: OpenDeepLink) {
       yield call(handlePaymentDeeplink, deepLink)
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
+    } else if (rawParams.path === '/cashIn') {
+      navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
     }
   }
 }
@@ -133,9 +135,13 @@ export function* watchDeepLinks() {
 }
 
 export function* handleOpenUrl(action: OpenUrlAction) {
-  const { url } = action
+  const { url, openExternal } = action
   Logger.debug(TAG, 'Handling url', url)
-  yield call(navigateToURI, url)
+  if (openExternal) {
+    yield call(navigateToURI, url)
+  } else {
+    navigate(Screens.WebViewScreen, { uri: url })
+  }
 }
 
 export function* watchOpenUrl() {
