@@ -14,8 +14,16 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
+import { dismissNotification } from 'src/home/actions'
+import { IdToNotification } from 'src/home/reducers'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import {
+  backupKey,
+  getVerified,
+  inviteFriends,
+  learnCelo,
+  remoteNotification,
+} from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -38,6 +46,7 @@ export enum NotificationBannerTypes {
   invite_prompt = 'invite_prompt',
   verification_prompt = 'verification_prompt',
   backup_prompt = 'backup_prompt',
+  remote_notification = 'remote_notification',
 }
 
 export enum NotificationBannerCTATypes {
@@ -47,6 +56,7 @@ export enum NotificationBannerCTATypes {
   reclaim = 'reclaim',
   remind = 'remind',
   pay = 'pay',
+  remote_notification_cta = 'remote_notification_cta',
 }
 
 interface StateProps {
@@ -59,11 +69,13 @@ interface StateProps {
   dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
+  extraNotifications: IdToNotification
   reclaimableEscrowPayments: EscrowedPayment[]
   invitees: InviteDetails[]
 }
 
 interface DispatchProps {
+  dismissNotification: typeof dismissNotification
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
   dismissGoldEducation: typeof dismissGoldEducation
@@ -77,6 +89,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   goldEducationCompleted: state.goldToken.educationCompleted,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
+  extraNotifications: state.home.notifications,
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   verificationPossible: verificationPossibleSelector(state),
@@ -86,6 +99,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 const mapDispatchToProps = {
+  dismissNotification,
   dismissInviteFriends,
   dismissGetVerified,
   dismissGoldEducation,
@@ -193,6 +207,46 @@ export class NotificationBox extends React.Component<Props, State> {
                 selectedAction: NotificationBannerCTATypes.decline,
               })
               this.props.dismissGetVerified()
+            },
+          },
+        ],
+      })
+    }
+
+    for (const [id, notification] of Object.entries(this.props.extraNotifications)) {
+      if (!notification || notification.dismissed) {
+        continue
+      }
+      const texts =
+        notification.content[i18n.language] || notification.content[i18n.language.slice(0, 2)]
+      if (!texts) {
+        continue
+      }
+
+      actions.push({
+        text: texts.body,
+        icon: remoteNotification,
+        darkMode: notification.darkMode,
+        callToActions: [
+          {
+            text: texts.cta,
+            onPress: () => {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.remote_notification,
+                selectedAction: NotificationBannerCTATypes.remote_notification_cta,
+              })
+              navigate(Screens.WebViewScreen, { uri: notification.ctaUri })
+            },
+          },
+          {
+            text: texts.dismiss,
+            dim: notification.darkMode,
+            onPress: () => {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.remote_notification,
+                selectedAction: NotificationBannerCTATypes.decline,
+              })
+              this.props.dismissNotification(id)
             },
           },
         ],
