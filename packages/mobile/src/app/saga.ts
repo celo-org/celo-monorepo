@@ -133,9 +133,13 @@ export function* watchDeepLinks() {
 }
 
 export function* handleOpenUrl(action: OpenUrlAction) {
-  const { url } = action
+  const { url, inWebView } = action
   Logger.debug(TAG, 'Handling url', url)
-  yield call(navigateToURI, url)
+  if (inWebView) {
+    navigate(Screens.WebViewScreen, { uri: url })
+  } else {
+    yield call(navigateToURI, url)
+  }
 }
 
 export function* watchOpenUrl() {
