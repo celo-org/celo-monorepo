@@ -102,8 +102,8 @@
   "feedItemGenericTitle_noRecipientDetails": "Desconocido",
   "feedItemGoldSold": "Vendido",
   "feedItemGoldPurchased": "Comprado",
-  "feedItemGoldWithdrawal": "Retiro en {{address}}",
-  "feedItemGoldReceived": "Recibido de {{address}}",
+  "feedItemGoldWithdrawal": "Retiro a {{displayName}}",
+  "feedItemGoldReceived": "Recibido de {{displayName}}",
   "transactionHeaderVerificationFee": "Verificación",
   "transactionHeaderNetworkFee": "Red",
   "transactionHeaderFaucet": "Faucet",
@@ -113,6 +113,7 @@
   "transactionHeaderWithdrewCelo": "Retiro de CELO",
   "transactionHeaderEscrowSent": "Escrow Pago Enviado",
   "transactionHeaderReceived": "Pago Recibido",
+  "transactionHeaderCeloReward": "Recompensa Recibida",
   "transactionHeaderEscrowReceived": "Escrow Pago Recibido",
   "feedSectionHeaderRecent": "Recientes"
 }
