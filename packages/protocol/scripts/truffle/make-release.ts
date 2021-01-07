@@ -7,6 +7,7 @@ import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
 
 /*
@@ -72,7 +73,7 @@ const isCoreContract = (contractName: string) =>
 
 const deployImplementation = async (
   contractName: string,
-  Contract: Truffle.Contract<Truffle.ContractInstance>,
+  Contract: TruffleContract<Truffle.ContractInstance>,
   dryRun: boolean,
   from: string
 ) => {
