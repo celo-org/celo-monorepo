@@ -97,7 +97,7 @@ export interface SetSessionId {
 export interface OpenUrlAction {
   type: Actions.OPEN_URL
   url: string
-  inWebView: boolean
+  openExternal: boolean
 }
 
 interface MinAppVersionDeterminedAction {
@@ -194,10 +194,10 @@ export const setSessionId = (sessionId: string) => ({
   sessionId,
 })
 
-export const openUrl = (url: string, inWebView: boolean = false): OpenUrlAction => ({
+export const openUrl = (url: string, openExternal: boolean = false): OpenUrlAction => ({
   type: Actions.OPEN_URL,
   url,
-  inWebView,
+  openExternal,
 })
 
 export const minAppVersionDetermined = (
