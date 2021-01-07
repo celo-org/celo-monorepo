@@ -16,7 +16,6 @@ const now = Date.now()
 Date.now = jest.fn(() => now)
 
 const BALANCE = '1'
-const BALANCE_IN_WEI = '100000000'
 const TX_ID = '1234'
 const COMMENT = 'a comment'
 
@@ -44,7 +43,7 @@ describe('stableToken saga', () => {
       .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(fetchDollarBalance())
-      .put(setBalance(BALANCE_IN_WEI))
+      .put(setBalance(BALANCE))
       .run()
   })
 

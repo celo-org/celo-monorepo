@@ -473,12 +473,13 @@ export function* moveAllFundsFromAccount(
     amount: tempAccountBalance,
     comment,
   })
+  const sendFeeInTokens = divideByWei(sendTokenFee.fee)
 
-  if (sendTokenFee.fee.isGreaterThanOrEqualTo(tempAccountBalance)) {
+  if (sendFeeInTokens.isGreaterThanOrEqualTo(tempAccountBalance)) {
     throw new Error('Fee is too large for amount in temp wallet')
   }
 
-  const netSendAmount = tempAccountBalance.minus(sendTokenFee.fee)
+  const netSendAmount = tempAccountBalance.minus(sendFeeInTokens)
   Logger.debug(
     TAG + '@moveAllFundsFromAccount',
     `Withdrawing net amount of ${netSendAmount.toString()}`
@@ -490,6 +491,7 @@ export function* moveAllFundsFromAccount(
     comment,
   })
 
+  // DO NOT MERGE: Add a test for cancellation.
   const { cancel } = yield race({
     success: call(
       sendTransaction,

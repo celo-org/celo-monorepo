@@ -15,13 +15,13 @@ const StableToken = {
   balanceOf: jest.fn(async () => {
     return new BigNumber(1e18)
   }),
-  decimals: jest.fn(async () => '10'),
+  decimals: jest.fn(async () => '18'),
   transferWithComment: jest.fn(async () => ({ txo: txo() })),
 }
 
 const GoldToken = {
   balanceOf: jest.fn(async () => new BigNumber(1e18)),
-  decimals: jest.fn(async () => '10'),
+  decimals: jest.fn(async () => '18'),
   transferWithComment: jest.fn(async () => ({ txo: txo() })),
   approve: jest.fn(() => ({ txo: txo() })),
 }

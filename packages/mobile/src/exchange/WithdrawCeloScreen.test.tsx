@@ -4,12 +4,14 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const SAMPLE_ADDRESS = '0xcc642068bdbbdeb91f348213492d2a80ab1ed23c'
 const SAMPLE_BALANCE = '55.00001'
+const SAMPLE_BALANCE_MINUS_FEES = '54.99001'
 
 const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloScreen, { isCashOut: false })
 
@@ -17,10 +19,16 @@ const store = createMockStore({
   goldToken: { balance: SAMPLE_BALANCE },
 })
 
-const mockResult = new BigNumber(10)
+const mockFeeInfo = {
+  fee: new BigNumber(10).pow(16),
+  gas: new BigNumber(200000),
+  gasPrice: new BigNumber(10).pow(9).times(5),
+  currency: CURRENCY_ENUM.GOLD,
+}
+
 jest.mock('src/fees/CalculateFee', () => ({
   useSendFee: () => ({
-    result: mockResult,
+    result: mockFeeInfo,
     loading: false,
   }),
 }))
@@ -70,7 +78,9 @@ describe('WithdrawCeloScreen', () => {
 
     expect(getByTestId('CeloAmount').props.value).toBe('')
     fireEvent.press(getByTestId('MaxAmount'))
-    expect(parseFloat(getByTestId('CeloAmount').props.value).toFixed(5)).toBe(SAMPLE_BALANCE)
+    expect(parseFloat(getByTestId('CeloAmount').props.value).toFixed(5)).toBe(
+      SAMPLE_BALANCE_MINUS_FEES
+    )
 
     expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
   })

@@ -59,6 +59,13 @@ const mockReceipt: CeloTxReceipt = {
   logsBloom: '',
 }
 
+const TEST_FEE_INFO_CUSD = {
+  fee: new BigNumber(10).pow(16),
+  gas: new BigNumber(200000),
+  gasPrice: new BigNumber(10).pow(9).times(5),
+  currency: CURRENCY_ENUM.DOLLAR,
+}
+
 jest.mock('src/firebase/dynamicLinks', () => ({
   ...jest.requireActual('src/firebase/dynamicLinks'),
   generateShortInviteLink: jest.fn(async () => 'http://celo.page.link/PARAMS'),
@@ -270,7 +277,7 @@ describe(watchRedeemInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getOrCreateAccount), mockAccount],
-        [matchers.call.fn(getSendFee), 0.1],
+        [matchers.call.fn(getSendFee), TEST_FEE_INFO_CUSD],
       ])
       .withState(state)
       .dispatch(redeemInvite(mockKey))
