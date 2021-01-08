@@ -110,27 +110,6 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -405,7 +384,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               ]
             }
           >
-
+            
             100.000
           </Text>
         </Text>
@@ -516,7 +495,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     ]
                   }
                 >
-
+                  
                 </Text>
               </View>
               <Text
@@ -543,8 +522,8 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     ]
                   }
                 >
-
-
+                  
+                  
                   0
                 </Text>
               </Text>
@@ -623,7 +602,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               ]
             }
           >
-
+            
             100.000
           </Text>
         </Text>
@@ -670,7 +649,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -682,7 +661,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -814,7 +793,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               ]
             }
           >
-
+            
             $
             133.00
           </Text>
@@ -862,7 +841,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -874,7 +853,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -909,7 +888,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               ]
             }
           >
-
+            
             100.00
           </Text>
         </Text>
@@ -1019,50 +998,6 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                 >
                   CELO Rewards
                 </Text>
-                <View
-                  style={
-                    Object {
-                      "transform": Array [
-                        Object {
-                          "rotate": "0deg",
-                        },
-                      ],
-                    }
-                  }
-                >
-                  <svg
-                    fill="none"
-                    height={16}
-                    viewBox="0 0 16 16"
-                    width={16}
-                  >
-                    <path
-                      d="M3 6l5 5 5-5"
-                      stroke="#B4B9BD"
-                    />
-                  </svg>
-                </View>
-              </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
               </View>
             </View>
           </View>
@@ -1340,7 +1275,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               ]
             }
           >
-
+            
             $
             133.00
           </Text>
@@ -1388,7 +1323,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -1400,7 +1335,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -1435,7 +1370,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               ]
             }
           >
-
+            
             100.00
           </Text>
         </Text>
@@ -1555,27 +1490,6 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -1819,7 +1733,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               ]
             }
           >
-
+            
             $
             133.00
           </Text>
@@ -1867,7 +1781,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -1879,7 +1793,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -1914,7 +1828,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               ]
             }
           >
-
+            
             100.00
           </Text>
         </Text>
@@ -2034,27 +1948,6 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -2298,7 +2191,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               ]
             }
           >
-
+            
             $
             133.00
           </Text>
@@ -2346,18 +2239,19 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -2392,7 +2286,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               ]
             }
           >
-
+            
             100.00
           </Text>
         </Text>
@@ -2471,6 +2365,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -2822,6 +2717,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "justifyContent": "center",
                 }
               }
             >
@@ -2895,7 +2791,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-
+                  
                 </Text>
               </View>
               <Text
@@ -2922,7 +2818,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-
+                  
                   $
                   0
                 </Text>
@@ -3049,7 +2945,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -3061,7 +2957,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -3215,27 +3111,6 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                   </svg>
                 </View>
               </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
-              </View>
             </View>
           </View>
           <View
@@ -3621,7 +3496,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-
+                  
                 </Text>
               </View>
               <Text
@@ -3648,7 +3523,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-
+                  
                   $
                   0
                 </Text>
@@ -3775,7 +3650,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -3787,7 +3662,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
@@ -3966,7 +3841,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
             }
           >
             Celo Dollars @
-
+             
             <Text
               numberOfLines={1}
               style={
@@ -3978,7 +3853,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
                 ]
               }
             >
-
+              
               $
               0.75
             </Text>
