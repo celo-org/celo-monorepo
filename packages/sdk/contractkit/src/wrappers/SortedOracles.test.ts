@@ -78,13 +78,18 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     const identifier = await sortedOraclesInstance.toCurrencyPairIdentifier(target)
     // @ts-ignore
     const sortedOraclesContract = sortedOraclesInstance.contract
+    // We're @ts-ignoring the above because there's no wrapper method
+    // defined in SortedOracles for the `addOracle` method, which is fine
+    // because this operation should only be executed via governance so
+    // there's not much use in exposing it, but we need it to setup tests.
     await sortedOraclesContract.methods.addOracle(identifier, oracle).send({
       from: owner,
     })
   }
 
-  // NOTE: These values are set in test-utils/network-config.json, and are derived
-  // from the MNEMONIC. If the MNEMONIC has changed, these will need to be reset.
+  // NOTE: These values are set in packages/dev-utils/src/migration-override.json,
+  // and are derived from the MNEMONIC.
+  // If the MNEMONIC has changed, these will need to be reset.
   // To do that, look at the output of web3.eth.getAccounts(), and pick a few
   // addresses from that set to be oracles
   const stableTokenOracles: Address[] = NetworkConfig.stableToken.oracles
