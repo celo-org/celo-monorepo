@@ -9,6 +9,15 @@ import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap, printValueMapRecursive } from '../../utils/cli'
 
 export default class Show extends BaseCommand {
+  static aliases = [
+    'governance:show',
+    'governance:showhotfix',
+    'governance:showaccount',
+    'governance:view',
+    'governance:viewhotfix',
+    'governance:viewaccount',
+  ]
+
   static description = 'Show information about a governance proposal, hotfix, or account.'
 
   static flags = {
@@ -89,15 +98,17 @@ export default class Show extends BaseCommand {
       const participationParams = await governance.getParticipationParameters()
       const constitution = await governance.getConstitution(proposal)
 
+      const schedule = await governance.humanReadableTimeUntilStages(id)
+
       printValueMapRecursive({
         ...record,
+        ...schedule,
         requirements: {
           participation: participationParams.baseline,
           agreement: constitution.times(100).toString() + '%',
         },
         isApproved: await governance.isApproved(id),
         isProposalPassing: await governance.isProposalPassing(id),
-        timeUntilStages: await governance.humanReadableTimeUntilStages(id),
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer
