@@ -9,19 +9,24 @@ import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
+import { parse } from 'url'
 
 type RouteProps = StackScreenProps<StackParamList, Screens.WebViewScreen>
 type Props = RouteProps
 
-export const webViewScreenNavOptions = {
-  ...emptyHeader,
-  headerLeft: () => (
-    <TopBarTextButton
-      title={i18n.t('global:close')}
-      onPress={navigateBack}
-      titleStyle={styles.close}
-    />
-  ),
+export const webViewScreenNavOptions = ({ route }: RouteProps) => {
+  const { hostname } = parse(route.params.uri)
+  return {
+    ...emptyHeader,
+    headerTitle: hostname,
+    headerLeft: () => (
+      <TopBarTextButton
+        title={i18n.t('global:close')}
+        onPress={navigateBack}
+        titleStyle={styles.close}
+      />
+    ),
+  }
 }
 
 function WebViewScreen({ route }: Props) {
