@@ -21,14 +21,14 @@ import {
 } from 'test/values'
 
 const TEST_FEE_INFO_CUSD = {
-  fee: new BigNumber(10).pow(16),
+  fee: new BigNumber(10).pow(15),
   gas: new BigNumber(200000),
   gasPrice: new BigNumber(10).pow(9).times(5),
   currency: CURRENCY_ENUM.DOLLAR,
 }
 
 const TEST_FEE_INFO_CELO = {
-  fee: new BigNumber(10).pow(16),
+  fee: new BigNumber(10).pow(15),
   gas: new BigNumber(200000),
   gasPrice: new BigNumber(10).pow(9).times(5),
   currency: CURRENCY_ENUM.GOLD,

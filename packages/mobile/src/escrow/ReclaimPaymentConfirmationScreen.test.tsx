@@ -8,18 +8,18 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import { getReclaimEscrowFee, reclaimFromEscrow } from 'src/escrow/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES, WEI_PER_TOKEN } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { createMockStore, getMockStackScreenProps, sleep } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number } from 'test/values'
 
 const TEST_FEE_INFO_CUSD = {
-  fee: new BigNumber(10).pow(16),
+  fee: new BigNumber(10).pow(15),
   gas: new BigNumber(200000),
   gasPrice: new BigNumber(10).pow(9).times(5),
   currency: CURRENCY_ENUM.DOLLAR,
 }
 
 const TEST_FEE_INFO_CELO = {
-  fee: new BigNumber(10).pow(16),
+  fee: new BigNumber(10).pow(15),
   gas: new BigNumber(200000),
   gasPrice: new BigNumber(10).pow(9).times(5),
   currency: CURRENCY_ENUM.GOLD,
@@ -53,48 +53,46 @@ describe('ReclaimPaymentConfirmationScreen', () => {
     mockedGetReclaimEscrowFee.mockClear()
   })
 
-  it('renders correctly in Celo dollars', async () => {
+  it('renders correctly with fee in Celo dollars', async () => {
     mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE_INFO_CUSD)
 
-    const { queryByText, queryAllByText, toJSON } = render(
+    const { getByText, queryByText, queryAllByText, toJSON } = render(
       <Provider store={store}>
         <ReclaimPaymentConfirmationScreen {...mockScreenProps} />
       </Provider>
     )
 
-    // Initial render
+    // Initial render should not contain a fee.
     expect(toJSON()).toMatchSnapshot()
     expect(queryAllByText('securityFee')).toHaveLength(2)
-    expect(queryByText('$0.001')).toBeNull()
+    expect(queryByText(/-\s*\$\s*0\.0013/s)).toBeNull()
 
-    // Wait for fee to be calculated and displayed
-    // TODO fix and re-enable, seeing the same issue as in TransferReviewCard
-    // await waitForElement(() => getByText('$0.001'))
-
-    // expect(queryByText('$9.99')).not.toBeNull()
-    // expect(toJSON()).toMatchSnapshot()
+    // Wait for fee to be calculated and displayed as "$0.0013"
+    // NOTE: Use regex here because the text may be split by a newline.
+    await waitForElement(() => getByText(/-\s*\$\s*0\.0013/s))
+    expect(toJSON()).toMatchSnapshot()
+    expect(queryByText(/\$\s*13\.29/s)).not.toBeNull()
   })
 
-  it('renders correctly in CELO', async () => {
+  it('renders correctly in with fee in CELO', async () => {
     mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE_INFO_CELO)
 
-    const { queryByText, queryAllByText, toJSON } = render(
+    const { getByText, queryByText, queryAllByText, toJSON } = render(
       <Provider store={store}>
         <ReclaimPaymentConfirmationScreen {...mockScreenProps} />
       </Provider>
     )
 
-    // Initial render
+    // Initial render should not contain a fee.
     expect(toJSON()).toMatchSnapshot()
     expect(queryAllByText('securityFee')).toHaveLength(2)
-    expect(queryByText('$0.001')).toBeNull()
+    expect(queryByText(/-\s*0\.001/s)).toBeNull()
 
-    // Wait for fee to be calculated and displayed
-    // TODO fix and re-enable, seeing the same issue as in TransferReviewCard
-    // await waitForElement(() => getByText('$0.001'))
-
-    // expect(queryByText('$9.99')).not.toBeNull()
-    // expect(toJSON()).toMatchSnapshot()
+    // Wait for fee to be calculated and displayed as "0.001"
+    // NOTE: Use regex here because the text may be split by a newline.
+    await waitForElement(() => getByText(/-\s*0\.001/s))
+    expect(toJSON()).toMatchSnapshot()
+    expect(queryByText(/\$\s*13\.29/s)).not.toBeNull()
   })
 
   it('renders correctly when fee calculation fails', async () => {
