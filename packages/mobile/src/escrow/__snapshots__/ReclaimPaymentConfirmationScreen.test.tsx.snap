@@ -193,7 +193,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  +1 (415) 555-0000
+                  +1 415-555-0000
                 </Text>
               </View>
             </View>
@@ -1213,7 +1213,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  +1 (415) 555-0000
+                  +1 415-555-0000
                 </Text>
               </View>
             </View>
@@ -2233,7 +2233,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  +1 (415) 555-0000
+                  +1 415-555-0000
                 </Text>
               </View>
             </View>

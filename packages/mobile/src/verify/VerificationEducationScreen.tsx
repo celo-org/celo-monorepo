@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { Spacing } from '@celo/react-components/styles/styles'
 import { Countries } from '@celo/utils/src/countries'
-import { getE164DisplayNumber, getRegionCode } from '@celo/utils/src/phoneNumbers'
+import { getDisplayNumberInternational, getRegionCode } from '@celo/utils/src/phoneNumbers'
 import { useFocusEffect } from '@react-navigation/native'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -235,7 +235,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           label={t('nuxNamePin1:phoneNumber')}
           style={styles.phoneNumber}
           country={country}
-          nationalPhoneNumber={getE164DisplayNumber(e164PhoneNumber || '')}
+          internationalPhoneNumber={getDisplayNumberInternational(e164PhoneNumber || '')}
           editable={false}
         />
         {firstButton}
