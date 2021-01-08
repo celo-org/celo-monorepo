@@ -1,12 +1,13 @@
 import { Address } from '@celo/connect'
+import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import SortedOraclesABI from '@celo/protocol/build/contracts/SortedOracles.json'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import {
-  newPairWithIdentifier,
+  CurrencyPair,
+  CurrencyPairIdentifier,
   OracleRate,
-  PairWithIdentifier,
   ReportTarget,
   SortedOraclesWrapper,
 } from './SortedOracles'
@@ -75,13 +76,13 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   async function addOracleForPair(
     sortedOraclesInstance: SortedOraclesWrapper,
-    pair: PairWithIdentifier,
+    identifier: CurrencyPairIdentifier,
     oracle: Address,
     owner: Address
   ): Promise<void> {
     // @ts-ignore
     const sortedOraclesContract = sortedOraclesInstance.contract
-    await sortedOraclesContract.methods.addOracle(pair.identifier, oracle).send({
+    await sortedOraclesContract.methods.addOracle(identifier, oracle).send({
       from: owner,
     })
   }
@@ -95,7 +96,6 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   const celoBtcOracles: Address[] = NetworkConfig.stableToken.oracles
   const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
 
-  const celoBtcPair = newPairWithIdentifier('CELO/BTC')
   let stableTokenSortedOracles: SortedOraclesWrapper
   let btcSortedOracles: SortedOraclesWrapper
 
@@ -108,50 +108,72 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     allAccounts = await web3.eth.getAccounts()
 
     btcOracleOwner = allAccounts[0]
+
     btcSortedOracles = await newSortedOracles(btcOracleOwner)
     stableTokenSortedOracles = await kit.contracts.getSortedOracles()
     stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
 
-    // For StableToken the oracles are setup in migrations, for our
-    // custom CELO/BTC oracle we need to add them manually
-    for (const oracle of celoBtcOracles) {
-      await addOracleForPair(btcSortedOracles, celoBtcPair, oracle, btcOracleOwner)
-    }
-
     nonOracleAddress = allAccounts.find((addr) => {
       return !stableTokenOracles.includes(addr)
     })!
+
+    // For StableToken the oracles are setup in migrations, for our
+    // custom CELO/BTC oracle we need to add them manually
+    for (const oracle of celoBtcOracles) {
+      await addOracleForPair(btcSortedOracles, CurrencyPair.CELOBTC, oracle, btcOracleOwner)
+    }
+    // And also report an initial price as happens in 09_stabletoken.ts
+    // So that we can share tests between the two oracles.
+    await (
+      await btcSortedOracles.report(
+        CurrencyPair.CELOBTC,
+        NetworkConfig.stableToken.goldPrice,
+        oracleAddress
+      )
+    ).sendAndWaitForReceipt()
   })
 
-  describe('reporting for the cUSD StableToken', () => {
+  const testCases: Array<{ label: string; reportTarget: ReportTarget }> = [
+    {
+      label: 'StableToken',
+      reportTarget: CeloContract.StableToken,
+    },
+    {
+      label: 'CELO/BTC',
+      reportTarget: CurrencyPair.CELOBTC,
+    },
+  ]
+
+  describeEach(testCases, ({ reportTarget }) => {
     let sortedOracles: SortedOraclesWrapper
-    beforeEach(() => (sortedOracles = stableTokenSortedOracles))
+    beforeEach(() => {
+      if (reportTarget === CurrencyPair.CELOBTC) {
+        sortedOracles = btcSortedOracles
+      } else if (reportTarget === CeloContract.StableToken) {
+        sortedOracles = stableTokenSortedOracles
+      } else {
+        throw new Error(`Unexpected report target: ${reportTarget}`)
+      }
+    })
 
     describe('#report', () => {
       const value = 16
 
       describe('when reporting from a whitelisted Oracle', () => {
         it('should be able to report a rate', async () => {
-          const initialRates: OracleRate[] = await sortedOracles.getRates(CeloContract.StableToken)
+          const initialRates: OracleRate[] = await sortedOracles.getRates(reportTarget)
 
-          const tx = await sortedOracles.report(CeloContract.StableToken, value, oracleAddress)
+          const tx = await sortedOracles.report(reportTarget, value, oracleAddress)
           await tx.sendAndWaitForReceipt()
 
-          const resultingRates: OracleRate[] = await sortedOracles.getRates(
-            CeloContract.StableToken
-          )
+          const resultingRates: OracleRate[] = await sortedOracles.getRates(reportTarget)
           expect(resultingRates).not.toMatchObject(initialRates)
         })
 
         describe('when inserting into the middle of the existing rates', () => {
           beforeEach(async () => {
             const rates = [15, 20, 17]
-            await reportAsOracles(
-              sortedOracles,
-              CeloContract.StableToken,
-              stableTokenOracles,
-              rates
-            )
+            await reportAsOracles(sortedOracles, reportTarget, stableTokenOracles, rates)
           })
 
           const expectedLesserKey = stableTokenOracles[0]
@@ -165,7 +187,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
           ]
 
           it('passes the correct lesserKey and greaterKey as args', async () => {
-            const tx = await sortedOracles.report(CeloContract.StableToken, value, oracleAddress)
+            const tx = await sortedOracles.report(reportTarget, value, oracleAddress)
             const actualArgs = tx.txo.arguments
             expect(actualArgs[2]).toEqual(expectedLesserKey)
             expect(actualArgs[3]).toEqual(expectedGreaterKey)
@@ -174,12 +196,10 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
           })
 
           it('inserts the new record in the right place', async () => {
-            const tx = await sortedOracles.report(CeloContract.StableToken, value, oracleAddress)
+            const tx = await sortedOracles.report(reportTarget, value, oracleAddress)
             await tx.sendAndWaitForReceipt()
 
-            const resultingRates: OracleRate[] = await sortedOracles.getRates(
-              CeloContract.StableToken
-            )
+            const resultingRates: OracleRate[] = await sortedOracles.getRates(reportTarget)
 
             expect(resultingRates.map((r) => r.address)).toEqual(expectedOracleOrder)
           })
@@ -188,20 +208,20 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
       describe('when reporting from a non-oracle address', () => {
         it('should raise an error', async () => {
-          const tx = await sortedOracles.report(CeloContract.StableToken, value, nonOracleAddress)
+          const tx = await sortedOracles.report(reportTarget, value, nonOracleAddress)
           await expect(tx.sendAndWaitForReceipt()).rejects.toThrow('sender was not an oracle')
         })
 
         it('should not change the list of rates', async () => {
-          const initialRates = await sortedOracles.getRates(CeloContract.StableToken)
+          const initialRates = await sortedOracles.getRates(reportTarget)
           try {
-            const tx = await sortedOracles.report(CeloContract.StableToken, value, nonOracleAddress)
+            const tx = await sortedOracles.report(reportTarget, value, nonOracleAddress)
             await tx.sendAndWaitForReceipt()
           } catch (err) {
             // We don't need to do anything with this error other than catch it so
             // it doesn't fail this test.
           } finally {
-            const resultingRates = await sortedOracles.getRates(CeloContract.StableToken)
+            const resultingRates = await sortedOracles.getRates(reportTarget)
             expect(resultingRates).toMatchObject(initialRates)
           }
         })
@@ -216,42 +236,40 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         beforeEach(async () => {
           await setupExpiredAndNotExpiredReports(
             sortedOracles,
-            CeloContract.StableToken,
+            reportTarget,
             expiredOracles,
             stableTokenOracles
           )
-          initialReportCount = await sortedOracles.numRates(CeloContract.StableToken)
+          initialReportCount = await sortedOracles.numRates(reportTarget)
         })
 
         it('should successfully remove a report', async () => {
-          const tx = await sortedOracles.removeExpiredReports(CeloContract.StableToken, 1)
+          const tx = await sortedOracles.removeExpiredReports(reportTarget, 1)
           await tx.sendAndWaitForReceipt({ from: oracleAddress })
 
-          expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqual(
-            initialReportCount - 1
-          )
+          expect(await sortedOracles.numRates(reportTarget)).toEqual(initialReportCount - 1)
         })
 
         it('removes only the expired reports, even if the number to remove is higher', async () => {
           const toRemove = expiredOracles.length + 1
-          const tx = await sortedOracles.removeExpiredReports(CeloContract.StableToken, toRemove)
+          const tx = await sortedOracles.removeExpiredReports(reportTarget, toRemove)
           await tx.sendAndWaitForReceipt({ from: oracleAddress })
 
-          expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqual(
+          expect(await sortedOracles.numRates(reportTarget)).toEqual(
             initialReportCount - expiredOracles.length
           )
         })
       })
 
       it('should not remove any reports when reports exist but are not expired', async () => {
-        await reportAsOracles(sortedOracles, CeloContract.StableToken, stableTokenOracles)
+        await reportAsOracles(sortedOracles, reportTarget, stableTokenOracles)
 
-        const initialReportCount = await sortedOracles.numRates(CeloContract.StableToken)
+        const initialReportCount = await sortedOracles.numRates(reportTarget)
 
-        const tx = await sortedOracles.removeExpiredReports(CeloContract.StableToken, 1)
+        const tx = await sortedOracles.removeExpiredReports(reportTarget, 1)
         await tx.sendAndWaitForReceipt({ from: oracleAddress })
 
-        expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqual(initialReportCount)
+        expect(await sortedOracles.numRates(reportTarget)).toEqual(initialReportCount)
       })
     })
 
@@ -260,23 +278,19 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         it('returns with true and the address of the last reporting oracle', async () => {
           await setupExpiredAndNotExpiredReports(
             sortedOracles,
-            CeloContract.StableToken,
+            reportTarget,
             [oracleAddress],
             stableTokenOracles
           )
-          const [isExpired, address] = await sortedOracles.isOldestReportExpired(
-            CeloContract.StableToken
-          )
+          const [isExpired, address] = await sortedOracles.isOldestReportExpired(reportTarget)
           expect(isExpired).toEqual(true)
           expect(address).toEqual(oracleAddress)
         })
       })
       describe('when the oldest is not expired', () => {
         it('returns with false and the address of the last reporting oracle', async () => {
-          await reportAsOracles(sortedOracles, CeloContract.StableToken, stableTokenOracles)
-          const [isExpired, address] = await sortedOracles.isOldestReportExpired(
-            CeloContract.StableToken
-          )
+          await reportAsOracles(sortedOracles, reportTarget, stableTokenOracles)
+          const [isExpired, address] = await sortedOracles.isOldestReportExpired(reportTarget)
           expect(isExpired).toEqual(false)
           expect(address).toEqual(stableTokenOracles[0])
         })
@@ -295,15 +309,10 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     describe('#getRates', () => {
       const expectedRates = [2, 1.5, 1, 0.5]
       beforeEach(async () => {
-        await reportAsOracles(
-          sortedOracles,
-          CeloContract.StableToken,
-          stableTokenOracles,
-          expectedRates
-        )
+        await reportAsOracles(sortedOracles, reportTarget, stableTokenOracles, expectedRates)
       })
       it('SBAT getRates', async () => {
-        const actualRates = await sortedOracles.getRates(CeloContract.StableToken)
+        const actualRates = await sortedOracles.getRates(reportTarget)
         expect(actualRates.length).toBeGreaterThan(0)
         for (const rate of actualRates) {
           expect(rate).toHaveProperty('address')
@@ -313,7 +322,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
       })
 
       it('returns the correct rate', async () => {
-        const response = await sortedOracles.getRates(CeloContract.StableToken)
+        const response = await sortedOracles.getRates(reportTarget)
         const actualRates = response.map((r) => r.rate.toNumber())
         expect(actualRates).toEqual(expectedRates)
       })
@@ -321,25 +330,23 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
     describe('#isOracle', () => {
       it('returns true when this address is a whitelisted oracle for this token', async () => {
-        expect(await sortedOracles.isOracle(CeloContract.StableToken, oracleAddress)).toEqual(true)
+        expect(await sortedOracles.isOracle(reportTarget, oracleAddress)).toEqual(true)
       })
       it('returns false when this address is not an oracle', async () => {
-        expect(await sortedOracles.isOracle(CeloContract.StableToken, nonOracleAddress)).toEqual(
-          false
-        )
+        expect(await sortedOracles.isOracle(reportTarget, nonOracleAddress)).toEqual(false)
       })
     })
 
     describe('#numRates', () => {
       it('returns a count of rates reported for the specified token', async () => {
-        // Why 1? In packages/protocol/08_stabletoken, a single rate is reported
-        expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqBigNumber(1)
+        // Why 1? In packages/protocol/09_stabletoken, a single rate is reported
+        expect(await sortedOracles.numRates(reportTarget)).toEqBigNumber(1)
       })
     })
 
     describe('#medianRate', () => {
       it('returns the key for the median', async () => {
-        const returnedMedian = await sortedOracles.medianRate(CeloContract.StableToken)
+        const returnedMedian = await sortedOracles.medianRate(reportTarget)
         expect(returnedMedian.rate).toEqBigNumber(NetworkConfig.stableToken.goldPrice)
       })
     })
@@ -350,122 +357,28 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         expect(result).toEqBigNumber(NetworkConfig.oracles.reportExpiry)
       })
     })
+  })
 
-    /**
-     * Helper Functions
-     *
-     * These are functions in the wrapper that call other functions, passing in
-     * some regularly used arguments. The purpose of these tests is to verify that
-     * those arguments are being set correctly.
-     */
-    describe('getStableTokenRates', () => {
-      it('gets rates for Stable Token', async () => {
-        const usdRatesResult = await sortedOracles.getStableTokenRates()
-        const getRatesResult = await sortedOracles.getRates(CeloContract.StableToken)
-        expect(usdRatesResult).toEqual(getRatesResult)
-      })
-    })
-
-    describe('reportStableToken', () => {
-      it('calls report with the address for StableToken', async () => {
-        const tx = await sortedOracles.reportStableToken(14, oracleAddress)
-        await tx.sendAndWaitForReceipt()
-        expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
-      })
+  /**
+   * Helper Functions
+   *
+   * These are functions in the wrapper that call other functions, passing in
+   * some regularly used arguments. The purpose of these tests is to verify that
+   * those arguments are being set correctly.
+   */
+  describe('#reportStableToken', () => {
+    it('calls report with the address for StableToken', async () => {
+      const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress)
+      await tx.sendAndWaitForReceipt()
+      expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
     })
   })
 
-  describe('reporting for a custom token pair (CELO/BTC)', () => {
-    let sortedOracles: SortedOraclesWrapper
-    beforeEach(() => (sortedOracles = btcSortedOracles))
-
-    describe('#report', () => {
-      const value = 16
-      describe('when reporting from a whitelisted Oracle', () => {
-        it('should be able to report a rate', async () => {
-          const initialRates: OracleRate[] = await sortedOracles.getRates(celoBtcPair)
-
-          const tx = await sortedOracles.report(celoBtcPair, value, oracleAddress)
-          await tx.sendAndWaitForReceipt()
-
-          const resultingRates: OracleRate[] = await sortedOracles.getRates(celoBtcPair)
-          expect(resultingRates).not.toMatchObject(initialRates)
-        })
-      })
-
-      describe('when reporting from a non-oracle address', () => {
-        it('should raise an error', async () => {
-          const tx = await sortedOracles.report(celoBtcPair, value, nonOracleAddress)
-          await expect(tx.sendAndWaitForReceipt()).rejects.toThrow('sender was not an oracle')
-        })
-      })
-    })
-
-    describe('#removeExpiredReports', () => {
-      describe('when expired reports exist', () => {
-        let expiredOracles: Address[]
-        let initialReportCount: number
-
-        beforeEach(async () => {
-          expiredOracles = celoBtcOracles.slice(0, 2)
-          await setupExpiredAndNotExpiredReports(
-            sortedOracles,
-            celoBtcPair,
-            expiredOracles,
-            celoBtcOracles
-          )
-          initialReportCount = await sortedOracles.numRates(celoBtcPair)
-        })
-
-        it('should successfully remove a report', async () => {
-          const tx = await sortedOracles.removeExpiredReports(celoBtcPair, 1)
-          await tx.sendAndWaitForReceipt({ from: oracleAddress })
-
-          expect(await sortedOracles.numRates(celoBtcPair)).toEqual(initialReportCount - 1)
-        })
-      })
-    })
-
-    /**
-     * Proxy Calls to view methods
-     *
-     * The purpose of these tests is to verify that these wrapper functions exist,
-     * are calling the contract methods correctly, and get some value back. The
-     * values checked here are often dependent on setup occuring in the protocol
-     * migrations run in `yarn test:reset`. If these tests are failing, the first
-     * thing to check is if there have been changes to the migrations
-     */
-    describe('#getRates', () => {
-      const expectedRates = [2, 1.5, 1, 0.5]
-
-      beforeEach(async () => {
-        await reportAsOracles(sortedOracles, celoBtcPair, celoBtcOracles, expectedRates)
-      })
-
-      it('SBAT getRates', async () => {
-        const actualRates = await sortedOracles.getRates(celoBtcPair)
-        expect(actualRates.length).toBeGreaterThan(0)
-        for (const rate of actualRates) {
-          expect(rate).toHaveProperty('address')
-          expect(rate).toHaveProperty('rate')
-          expect(rate).toHaveProperty('medianRelation')
-        }
-      })
-
-      it('returns the correct rate', async () => {
-        const response = await sortedOracles.getRates(celoBtcPair)
-        const actualRates = response.map((r) => r.rate.toNumber())
-        expect(actualRates).toEqual(expectedRates)
-      })
-    })
-
-    describe('#isOracle', () => {
-      it('returns true when this address is a whitelisted oracle for this token', async () => {
-        expect(await sortedOracles.isOracle(celoBtcPair, oracleAddress)).toEqual(true)
-      })
-      it('returns false when this address is not an oracle', async () => {
-        expect(await sortedOracles.isOracle(celoBtcPair, nonOracleAddress)).toEqual(false)
-      })
+  describe('#getStableTokenRates', () => {
+    it('gets rates for Stable Token', async () => {
+      const usdRatesResult = await stableTokenSortedOracles.getStableTokenRates()
+      const getRatesResult = await stableTokenSortedOracles.getRates(CeloContract.StableToken)
+      expect(usdRatesResult).toEqual(getRatesResult)
     })
   })
 })

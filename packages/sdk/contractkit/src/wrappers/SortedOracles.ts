@@ -4,6 +4,7 @@ import { Address, CeloTransactionObject, toTransactionObject } from '@celo/conne
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
+import { Branded } from 'io-ts'
 import { CeloContract, CeloToken } from '../base'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
@@ -53,25 +54,37 @@ export interface PairWithIdentifier {
   identifier: Address
 }
 
-export type ReportTarget = CeloToken | PairWithIdentifier
+export type CurrencyPairIdentifier = Branded<Address, 'PairIdentifier'>
 
 /**
- * Builds an object of type PairWithIdentifier which contains
- * the target pair and the identifier which is the keccak of the
- * pair string truncated as an Address.
- * @param pair a string of the form "<currency>/<currency", eg: "CELO/BTC"
- * @return PairWithIdentifier
+ * Used to construct the pair identifier from a pair label (e.g. CELO/BTC)
+ * The pair identifier needs to be a valid ethereum address, thus we
+ * truncate a keccak of the pair label.
+ * This function returns a branded type which can be fed into the wrapper.
+ * @param pair a string
  */
-export const newPairWithIdentifier = (pair: string): PairWithIdentifier => {
-  return {
-    pair,
-    identifier: ensureLeading0x(
-      keccak256(pair)
-        .slice(0, 20)
-        .toString('hex')
-    ),
-  }
+export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
+  return ensureLeading0x(
+    keccak256(pair)
+      .slice(0, 20)
+      .toString('hex')
+  ) as CurrencyPairIdentifier
 }
+
+/**
+ * This will act as an enum of common pairs.
+ * We can't use a straight enum because we want the value
+ * to be the branded type.
+ *
+ * E.g. usage: sortedOracles.getRates(CurrencyPair.CELOBTC)
+ */
+type defaultPairs = 'CELOBTC' | 'CELOETH'
+export const CurrencyPair: Record<defaultPairs, CurrencyPairIdentifier> = {
+  CELOBTC: pairIdentifier('CELO/BTC'),
+  CELOETH: pairIdentifier('CELO/ETH'),
+}
+
+export type ReportTarget = CeloToken | CurrencyPairIdentifier
 
 /**
  * Disambiguate a ReportTarget to a CeloToken
@@ -327,7 +340,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     if (isCeloToken(target)) {
       return this.kit.registry.addressFor(target)
     } else {
-      return target.identifier
+      return target
     }
   }
 }
