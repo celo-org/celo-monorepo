@@ -48,7 +48,9 @@ function WebViewScreen({ route }: Props) {
     <View style={styles.container}>
       <WebView
         style={styles.webView}
+        originWhitelist={['https://*', 'celo://*']}
         onShouldStartLoadWithRequest={handleLoadRequest}
+        setSupportMultipleWindows={false}
         source={{ uri }}
       />
     </View>
