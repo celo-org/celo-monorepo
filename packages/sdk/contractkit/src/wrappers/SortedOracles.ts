@@ -49,11 +49,6 @@ export interface MedianRate {
   rate: BigNumber
 }
 
-export interface PairWithIdentifier {
-  pair: string
-  identifier: Address
-}
-
 export type CurrencyPairIdentifier = Branded<Address, 'PairIdentifier'>
 
 /**
