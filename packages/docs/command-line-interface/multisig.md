@@ -2,8 +2,6 @@
 
 Shows information about multi-sig contract
 
-- [`celocli multisig:show ADDRESS`](#celocli-multisigshow-address)
-- [`celocli multisig:transfer ADDRESS`](#celocli-multisigtransfer-address)
 
 ## `celocli multisig:show ADDRESS`
 

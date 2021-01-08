@@ -2,10 +2,6 @@
 
 List oracle addresses for a given token
 
-- [`celocli oracle:list TOKEN`](#celocli-oraclelist-token)
-- [`celocli oracle:remove-expired-reports TOKEN`](#celocli-oracleremove-expired-reports-token)
-- [`celocli oracle:report TOKEN`](#celocli-oraclereport-token)
-- [`celocli oracle:reports TOKEN`](#celocli-oraclereports-token)
 
 ## `celocli oracle:list TOKEN`
 
