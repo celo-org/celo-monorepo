@@ -59,6 +59,28 @@ function BidaliScreen(props: Props) {
         const { amount, address, currency, description, chargeId } = data
         console.log(`Send ${amount} ${currency} to ${address} for ${description} (${chargeId})`)
         // Show a native send confirmation modal here
+        const recipient: RecipientWithAddress = {
+          kind: RecipientKind.Address,
+          address, // '0xa6d1e0bdb6960c3f1bda8ef8f1e91480cfc40dbb',
+          displayId: 'MyTestID',
+          displayName: 'Bidali',
+          // displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
+          // e164PhoneNumber: data.e164PhoneNumber,
+          // phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
+          // thumbnailPath: cachedRecipient?.thumbnailPath,
+          // contactId: cachedRecipient?.contactId,
+        }
+        const transactionData: TransactionDataInput = {
+          recipient,
+          amount: new BigNumber(amount),
+          reason: `${description} (${chargeId})`,
+          type: TokenTransactionType.PayPrefill,
+        }
+        navigate(Screens.SendConfirmationModal, {
+          transactionData,
+          isFromScan: true,
+          // currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
+        })
         break
       case 'openUrl':
         const { url } = data
@@ -73,7 +95,7 @@ function BidaliScreen(props: Props) {
   const jsonBalances = useMemo(
     () =>
       JSON.stringify({
-        cUSD: cusdBalance,
+        CUSD: cusdBalance,
         CELO: celoBalance,
       }),
     [cusdBalance, celoBalance]
@@ -114,6 +136,7 @@ BidaliScreen.navigationOptions = () => {
     ),
     // Temporary until we can test this e2e
     headerRight: () => {
+      return null
       const onPress = () => {
         const recipient: RecipientWithAddress = {
           kind: RecipientKind.Address,
@@ -132,7 +155,7 @@ BidaliScreen.navigationOptions = () => {
           reason: 'Bidali',
           type: TokenTransactionType.PayPrefill,
         }
-        navigate(Screens.SendConfirmation, {
+        navigate(Screens.SendConfirmationModal, {
           transactionData,
           isFromScan: true,
           // currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },

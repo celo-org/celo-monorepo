@@ -179,6 +179,12 @@ export type StackParamList = {
     isFromScan?: boolean
     currencyInfo?: CurrencyInfo
   }
+  [Screens.SendConfirmationModal]: {
+    transactionData: TransactionDataInput
+    addressJustValidated?: boolean
+    isFromScan?: boolean
+    currencyInfo?: CurrencyInfo
+  }
   [Screens.SetClock]: undefined
   [Screens.Settings]:
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }

@@ -52,6 +52,7 @@ export enum Screens {
   Send = 'Send',
   SendAmount = 'SendAmount',
   SendConfirmation = 'SendConfirmation',
+  SendConfirmationModal = 'SendConfirmationModal',
   SetClock = 'SetClock',
   Settings = 'Settings',
   Simplex = 'Simplex',
