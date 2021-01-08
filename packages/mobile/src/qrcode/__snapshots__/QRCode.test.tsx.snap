@@ -129,7 +129,7 @@ exports[`QRCode renders correctly 1`] = `
           ]
         }
       >
-        +1 (415) 555-6666
+        +1 415-555-6666
       </Text>
     </View>
   </View>
