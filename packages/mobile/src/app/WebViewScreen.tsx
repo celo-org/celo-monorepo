@@ -21,7 +21,7 @@ export const webViewScreenNavOptions = ({ route }: RouteProps) => {
   const { hostname } = parse(route.params.uri)
   return {
     ...emptyHeader,
-    headerTitle: hostname,
+    headerTitle: hostname || ' ',
     headerLeft: () => (
       <TopBarTextButton
         title={i18n.t('global:close')}
