@@ -77,7 +77,9 @@ const deployImplementation = async (
   dryRun: boolean,
   from: string
 ) => {
-  if (from) Contract.defaults({ from }) // override truffle with provided from address
+  if (from) {
+    Contract.defaults({ from }) // override truffle with provided from address
+  }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
@@ -109,7 +111,9 @@ const deployProxy = async (
   }
   console.log(`Deploying ${contractName}Proxy`)
   const Proxy = await artifacts.require(`${contractName}Proxy`)
-  if (from) Proxy.defaults({ from }) // override truffle with provided from address
+  if (from) {
+    Proxy.defaults({ from }) // override truffle with provided from address
+  }
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
 
