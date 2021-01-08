@@ -1,4 +1,5 @@
 import {
+  formatNonAccentedCharacters,
   generateKeys,
   generateMnemonic,
   MnemonicLanguages,
@@ -100,7 +101,8 @@ export default class NewAccount extends BaseCommand {
     const res = this.parse(NewAccount)
     let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
     if (mnemonic) {
-      if (!validateMnemonic(mnemonic, NewAccount.languageOptions(res.flags.language!))) {
+      mnemonic = formatNonAccentedCharacters(mnemonic)
+      if (!validateMnemonic(mnemonic)) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }
     } else {
@@ -114,8 +116,8 @@ export default class NewAccount extends BaseCommand {
     const keys = await generateKeys(
       mnemonic,
       passphrase,
-      res.flags.addressIndex,
       res.flags.changeIndex,
+      res.flags.addressIndex,
       undefined,
       derivationPath
     )

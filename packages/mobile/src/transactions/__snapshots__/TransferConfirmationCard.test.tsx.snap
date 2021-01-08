@@ -405,7 +405,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               ]
             }
           >
-            
+
             100.000
           </Text>
         </Text>
@@ -516,7 +516,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     ]
                   }
                 >
-                  
+
                 </Text>
               </View>
               <Text
@@ -543,8 +543,8 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     ]
                   }
                 >
-                  
-                  
+
+
                   0
                 </Text>
               </Text>
@@ -623,7 +623,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               ]
             }
           >
-            
+
             100.000
           </Text>
         </Text>
@@ -670,7 +670,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
@@ -682,7 +682,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                 ]
               }
             >
-              
+
               $
               0.75
             </Text>
@@ -814,7 +814,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               ]
             }
           >
-            
+
             $
             133.00
           </Text>
@@ -862,7 +862,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
@@ -874,7 +874,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
                 ]
               }
             >
-              
+
               $
               0.75
             </Text>
@@ -909,7 +909,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               ]
             }
           >
-            
+
             100.00
           </Text>
         </Text>
@@ -928,6 +928,518 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       >
         receiveFlow8:receivedAmountFromCelo
       </Text>
+    </RNCSafeAreaView>
+  </View>
+</RCTScrollView>
+`;
+
+exports[`TransferConfirmationCard renders correctly for received CELO reward 1`] = `
+<RCTScrollView
+  contentContainerStyle={
+    Object {
+      "flexGrow": 1,
+    }
+  }
+>
+  <View>
+    <RNCSafeAreaView
+      style={
+        Object {
+          "flexGrow": 1,
+          "padding": 16,
+        }
+      }
+    >
+      <View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginRight": 8,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#B4B9BD",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                  "marginBottom": 4,
+                }
+              }
+            >
+              receivedFrom
+            </Text>
+            <View
+              accessible={true}
+              focusable={false}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 7,
+                    }
+                  }
+                >
+                  CELO Rewards
+                </Text>
+                <View
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "rotate": "0deg",
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    viewBox="0 0 16 16"
+                    width={16}
+                  >
+                    <path
+                      d="M3 6l5 5 5-5"
+                      stroke="#B4B9BD"
+                    />
+                  </svg>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginRight": 7,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  false,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#FEB45E",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                >
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
+                  />
+                </View>
+              </View>
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "white",
+                      "borderRadius": 12,
+                      "elevation": 3,
+                      "height": 24,
+                      "justifyContent": "center",
+                      "shadowColor": "black",
+                      "shadowOffset": Object {
+                        "height": 1.5,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0.3,
+                      "shadowRadius": 2.4000000000000004,
+                      "width": 24,
+                    },
+                    Object {
+                      "marginHorizontal": -8,
+                      "zIndex": 1,
+                    },
+                  ]
+                }
+              >
+                <svg
+                  fill="none"
+                  height={9}
+                  viewBox="0 0 13 9"
+                  width={13}
+                >
+                  <path
+                    d="M1 4.5h11m0 0L8.264 1M12 4.5L8.264 8"
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                  />
+                </svg>
+              </View>
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
+                        },
+                        Object {
+                          "fontSize": 20,
+                        },
+                      ]
+                    }
+                  >
+                    J
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            undefined,
+            Object {
+              "opacity": 1,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+              "textDecorationLine": "underline",
+            }
+          }
+        >
+          learnMore
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "borderStyle": "solid",
+            "borderTopColor": "#F8F9F9",
+            "borderTopWidth": 1,
+            "marginBottom": 15,
+            "marginTop": 10,
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+              ]
+            }
+          >
+            total
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+
+            $
+            133.00
+          </Text>
+        </Text>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            Object {
+              "marginVertical": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+              ]
+            }
+          >
+            Celo Dollars @
+
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+
+              $
+              0.75
+            </Text>
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+
+            100.00
+          </Text>
+        </Text>
+      </View>
     </RNCSafeAreaView>
   </View>
 </RCTScrollView>
@@ -1307,7 +1819,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               ]
             }
           >
-            
+
             $
             133.00
           </Text>
@@ -1355,7 +1867,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
@@ -1367,7 +1879,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                 ]
               }
             >
-              
+
               $
               0.75
             </Text>
@@ -1402,7 +1914,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               ]
             }
           >
-            
+
             100.00
           </Text>
         </Text>
@@ -1786,7 +2298,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               ]
             }
           >
-            
+
             $
             133.00
           </Text>
@@ -1834,19 +2346,18 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
-                Array [
-                  undefined,
-                  Object {
-                    "color": undefined,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                }
               }
             >
-              
+
               $
               0.75
             </Text>
@@ -1881,7 +2392,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               ]
             }
           >
-            
+
             100.00
           </Text>
         </Text>
@@ -1960,7 +2471,6 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
-                    "justifyContent": "center",
                   }
                 }
               >
@@ -2000,27 +2510,6 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     />
                   </svg>
                 </View>
-              </View>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginRight": 7,
-                    }
-                  }
-                />
               </View>
             </View>
           </View>
@@ -2333,7 +2822,6 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
-                  "justifyContent": "center",
                 }
               }
             >
@@ -2407,7 +2895,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-                  
+
                 </Text>
               </View>
               <Text
@@ -2434,7 +2922,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-                  
+
                   $
                   0
                 </Text>
@@ -2561,7 +3049,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
@@ -2573,7 +3061,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 ]
               }
             >
-              
+
               $
               0.75
             </Text>
@@ -3133,7 +3621,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-                  
+
                 </Text>
               </View>
               <Text
@@ -3160,7 +3648,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-                  
+
                   $
                   0
                 </Text>
@@ -3287,7 +3775,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
@@ -3299,7 +3787,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                 ]
               }
             >
-              
+
               $
               0.75
             </Text>
@@ -3478,7 +3966,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
             }
           >
             Celo Dollars @
-             
+
             <Text
               numberOfLines={1}
               style={
@@ -3490,7 +3978,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
                 ]
               }
             >
-              
+
               $
               0.75
             </Text>

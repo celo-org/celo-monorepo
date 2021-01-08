@@ -28,7 +28,7 @@ Builder class to construct proposals from JSON or transaction objects.
 
 \+ **new ProposalBuilder**(`kit`: ContractKit, `builders`: Array‹function›, `registryAdditions`: RegistryAdditions): *[ProposalBuilder](_proposals_.proposalbuilder.md)*
 
-*Defined in [proposals.ts:136](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L136)*
+*Defined in [proposals.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L136)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ Name | Type | Default |
 
 ▸ **addJsonTx**(`tx`: [ProposalTransactionJSON](../interfaces/_proposals_.proposaltransactionjson.md)): *number*
 
-*Defined in [proposals.ts:243](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L243)*
+*Defined in [proposals.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L243)*
 
 **Parameters:**
 
@@ -62,7 +62,7 @@ ___
 
 ▸ **addProxyRepointingTx**(`contract`: CeloContract, `newImplementationAddress`: string): *void*
 
-*Defined in [proposals.ts:171](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L171)*
+*Defined in [proposals.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L171)*
 
 Adds a transaction to set the implementation on a proxy to the given address.
 
@@ -81,7 +81,7 @@ ___
 
 ▸ **addTx**(`tx`: CeloTransactionObject‹any›, `params`: Partial‹ProposalTxParams›): *void*
 
-*Defined in [proposals.ts:197](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L197)*
+*Defined in [proposals.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L197)*
 
 Adds a Celo transaction to the list for proposal construction.
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **addWeb3Tx**(`tx`: CeloTxObject‹any›, `params`: ProposalTxParams): *number*
 
-*Defined in [proposals.ts:189](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L189)*
+*Defined in [proposals.ts:189](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L189)*
 
 Adds a Web3 transaction to the list for proposal construction.
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **build**(): *Promise‹Pick‹CeloTxPending, "to" | "input" | "value"›[]›*
 
-*Defined in [proposals.ts:147](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L147)*
+*Defined in [proposals.ts:147](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L147)*
 
 Build calls all of the added build steps and returns the final proposal.
 
@@ -133,7 +133,7 @@ ___
 
 ▸ **fromJsonTx**(`tx`: [ProposalTransactionJSON](../interfaces/_proposals_.proposaltransactionjson.md)): *Promise‹Pick‹CeloTxPending, "to" | "input" | "value"››*
 
-*Defined in [proposals.ts:207](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L207)*
+*Defined in [proposals.ts:207](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L207)*
 
 **Parameters:**
 
@@ -149,7 +149,7 @@ ___
 
 ▸ **fromWeb3tx**(`tx`: CeloTxObject‹any›, `params`: ProposalTxParams): *ProposalTransaction*
 
-*Defined in [proposals.ts:160](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L160)*
+*Defined in [proposals.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L160)*
 
 Converts a Web3 transaction into a proposal transaction object.
 

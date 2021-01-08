@@ -30,7 +30,7 @@
 
 *Inherited from [Wallet](_wallet_base_.wallet.md).[addAccount](_wallet_base_.wallet.md#addaccount)*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L11)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L11)*
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 • **isAccountUnlocked**: *function*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L16)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L16)*
 
 #### Type declaration:
 
@@ -214,7 +214,7 @@ ___
 
 • **unlockAccount**: *function*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L15)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L15)*
 
 #### Type declaration:
 

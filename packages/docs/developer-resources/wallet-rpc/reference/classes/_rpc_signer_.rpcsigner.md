@@ -35,7 +35,7 @@ Implements the signer interface on top of the JSON-RPC interface.
 
 \+ **new RpcSigner**(`rpc`: RpcCaller, `account`: string, `unlockBufferSeconds`: number, `unlockTime?`: undefined | number, `unlockDuration?`: undefined | number): *[RpcSigner](_rpc_signer_.rpcsigner.md)*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L54)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L54)*
 
 Construct a new instance of the RPC signer
 
@@ -57,7 +57,7 @@ Name | Type | Default | Description |
 
 ▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:169](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L169)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:169](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L169)*
 
 **Parameters:**
 
@@ -73,7 +73,7 @@ ___
 
 ▸ **decrypt**(`ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:160](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L160)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L160)*
 
 **Parameters:**
 
@@ -89,7 +89,7 @@ ___
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:118](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L118)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L118)*
 
 **Returns:** *string*
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **init**(`privateKey`: string, `passphrase`: string): *Promise‹string›*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:74](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L74)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L74)*
 
 **Parameters:**
 
@@ -116,7 +116,7 @@ ___
 
 ▸ **isUnlocked**(): *boolean*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:142](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L142)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:142](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L142)*
 
 **Returns:** *boolean*
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:110](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L110)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L110)*
 
 **Parameters:**
 
@@ -142,7 +142,7 @@ ___
 
 ▸ **signRawTransaction**(`tx`: CeloTx): *Promise‹EncodedTransaction›*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:80](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L80)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L80)*
 
 **Parameters:**
 
@@ -158,7 +158,7 @@ ___
 
 ▸ **signTransaction**(): *Promise‹object›*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:97](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L97)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L97)*
 
 **Returns:** *Promise‹object›*
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **signTypedData**(`typedData`: EIP712TypedData): *Promise‹object›*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:101](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L101)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L101)*
 
 **Parameters:**
 
@@ -184,7 +184,7 @@ ___
 
 ▸ **unlock**(`passphrase`: string, `duration`: number): *Promise‹boolean›*
 
-*Defined in [wallet-rpc/src/rpc-signer.ts:120](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L120)*
+*Defined in [wallet-rpc/src/rpc-signer.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-rpc/src/rpc-signer.ts#L120)*
 
 **Parameters:**
 

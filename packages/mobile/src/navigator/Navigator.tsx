@@ -16,6 +16,7 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import { currentLanguageSelector } from 'src/app/reducers'
 import UpgradeScreen from 'src/app/UpgradeScreen'
+import WebViewScreen, { webViewScreenNavOptions } from 'src/app/WebViewScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupForceScreen from 'src/backup/BackupForceScreen'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
@@ -150,6 +151,11 @@ const commonScreens = (Navigator: typeof Stack) => {
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
         options={noHeaderGestureDisabled}
+      />
+      <Navigator.Screen
+        name={Screens.WebViewScreen}
+        component={WebViewScreen}
+        options={webViewScreenNavOptions}
       />
     </>
   )

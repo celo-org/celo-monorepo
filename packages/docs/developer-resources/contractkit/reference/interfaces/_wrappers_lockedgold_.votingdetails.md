@@ -18,7 +18,7 @@
 
 • **accountAddress**: *Address*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L30)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L30)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **voterAddress**: *Address*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:31](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L31)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L31)*
 
 ___
 
@@ -34,6 +34,6 @@ ___
 
 • **weight**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:33](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L33)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L33)*
 
 vote's weight

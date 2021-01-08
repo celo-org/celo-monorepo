@@ -15,7 +15,7 @@
 
 • **Custom**: = "custom"
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:2](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L2)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:2](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L2)*
 
 ___
 
@@ -23,7 +23,7 @@ ___
 
 • **Decimal**: = "decimal"
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:3](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L3)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L3)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **Integer**: = "integer"
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L4)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L4)*
 
 ___
 
@@ -39,4 +39,4 @@ ___
 
 • **Phone**: = "phone"
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:5](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L5)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L5)*
