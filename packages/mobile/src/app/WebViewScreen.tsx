@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes'
 import { useDispatch } from 'react-redux'
@@ -32,6 +32,13 @@ export const webViewScreenNavOptions = ({ route }: RouteProps) => {
   }
 }
 
+const shouldUseOpacityHack = () => {
+  if (Platform.OS === 'ios') {
+    return false
+  }
+  return Platform.Version >= 28
+}
+
 function WebViewScreen({ route }: Props) {
   const { uri } = route.params
   const dispatch = useDispatch()
@@ -47,7 +54,7 @@ function WebViewScreen({ route }: Props) {
   return (
     <View style={styles.container}>
       <WebView
-        style={styles.webView}
+        style={shouldUseOpacityHack() ? styles.webView : {}}
         originWhitelist={['https://*', 'celo://*']}
         onShouldStartLoadWithRequest={handleLoadRequest}
         setSupportMultipleWindows={false}
