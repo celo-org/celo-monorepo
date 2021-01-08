@@ -1,3 +1,4 @@
+import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
@@ -14,7 +15,13 @@ type Props = RouteProps
 
 export const webViewScreenNavOptions = {
   ...emptyHeader,
-  headerLeft: () => <TopBarTextButton title={i18n.t('global:done')} onPress={navigateBack} />,
+  headerLeft: () => (
+    <TopBarTextButton
+      title={i18n.t('global:close')}
+      onPress={navigateBack}
+      titleStyle={styles.close}
+    />
+  ),
 }
 
 function WebViewScreen({ route }: Props) {
@@ -35,6 +42,9 @@ const styles = StyleSheet.create({
   },
   webView: {
     opacity: 0.99,
+  },
+  close: {
+    color: colors.dark,
   },
 })
 
