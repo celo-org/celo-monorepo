@@ -186,7 +186,7 @@ export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?
 
   // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n default`,
     `cert-manager-cluster-issuers`,
     `cert-manager-cluster-issuers exists, skipping install`
   )
@@ -194,7 +194,7 @@ export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?
     await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n default`,
     `nginx-ingress-release`,
     `nginx-ingress-release exists, skipping install`
   )
@@ -280,7 +280,7 @@ export async function installCertManager() {
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
   console.info('Installing cert-manager-cluster-issuers')
   await execCmdWithExitOnFailure(
-    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
+    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath} -n default`
   )
 }
 
@@ -289,13 +289,13 @@ export async function installAndEnableMetricsDeps(
   clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n default`,
     `kube-state-metrics`,
     `kube-state-metrics exists, skipping install`
   )
   if (!kubeStateMetricsReleaseExists) {
     await execCmdWithExitOnFailure(
-      `helm install kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
+      `helm install kube-state-metrics stable/kube-state-metrics --set rbac.create=true -n default`
     )
   }
   if (installPrometheus) {

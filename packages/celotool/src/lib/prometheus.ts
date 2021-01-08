@@ -32,7 +32,7 @@ const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(clusterConfig?: BaseClusterConfig) {
   const prometheusExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n prometheus`,
     releaseName,
     `prometheus-stackdriver exists, skipping install`
   )

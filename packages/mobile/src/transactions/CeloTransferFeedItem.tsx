@@ -28,16 +28,22 @@ export function CeloTransferFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
   const addressToDisplayName = useSelector(addressToDisplayNameSelector)
   const { address, amount, comment, status, timestamp, type } = props
+
   const onPress = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_transaction_select)
 
-    navigateToPaymentTransferReview(type, timestamp, {
-      address,
-      comment,
-      amount,
+    navigateToPaymentTransferReview(
       type,
-      // fee TODO: add fee here.
-    })
+      timestamp,
+      {
+        address,
+        comment,
+        amount,
+        type,
+        // fee TODO: add fee here.
+      },
+      addressToDisplayName
+    )
   }
 
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, i18n)
