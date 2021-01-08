@@ -73,10 +73,10 @@ export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
  *
  * E.g. usage: sortedOracles.getRates(CurrencyPair.CELOBTC)
  */
-type defaultPairs = 'CELOBTC' | 'CELOETH'
-export const CurrencyPair: Record<defaultPairs, CurrencyPairIdentifier> = {
+type defaultPairs = 'CELOBTC' | 'CELOUSD'
+export const CurrencyPair: Record<defaultPairs, ReportTarget> = {
   CELOBTC: pairIdentifier('CELO/BTC'),
-  CELOETH: pairIdentifier('CELO/ETH'),
+  CELOUSD: CeloContract.StableToken,
 }
 
 export type ReportTarget = CeloToken | CurrencyPairIdentifier

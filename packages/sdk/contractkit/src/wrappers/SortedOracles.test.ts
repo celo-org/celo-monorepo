@@ -4,13 +4,7 @@ import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/
 import SortedOraclesABI from '@celo/protocol/build/contracts/SortedOracles.json'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
-import {
-  CurrencyPair,
-  CurrencyPairIdentifier,
-  OracleRate,
-  ReportTarget,
-  SortedOraclesWrapper,
-} from './SortedOracles'
+import { CurrencyPair, OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
 
 const truffleContract = require('@truffle/contract')
 
@@ -74,12 +68,14 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     return new SortedOraclesWrapper(kit, instance.contract)
   }
 
-  async function addOracleForPair(
+  async function addOracleForTarget(
     sortedOraclesInstance: SortedOraclesWrapper,
-    identifier: CurrencyPairIdentifier,
+    target: ReportTarget,
     oracle: Address,
     owner: Address
   ): Promise<void> {
+    // @ts-ignore
+    const identifier = await sortedOraclesInstance.toCurrencyPairIdentifier(target)
     // @ts-ignore
     const sortedOraclesContract = sortedOraclesInstance.contract
     await sortedOraclesContract.methods.addOracle(identifier, oracle).send({
@@ -120,7 +116,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     // For StableToken the oracles are setup in migrations, for our
     // custom CELO/BTC oracle we need to add them manually
     for (const oracle of celoBtcOracles) {
-      await addOracleForPair(btcSortedOracles, CurrencyPair.CELOBTC, oracle, btcOracleOwner)
+      await addOracleForTarget(btcSortedOracles, CurrencyPair.CELOBTC, oracle, btcOracleOwner)
     }
     // And also report an initial price as happens in 09_stabletoken.ts
     // So that we can share tests between the two oracles.
@@ -135,7 +131,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   const testCases: Array<{ label: string; reportTarget: ReportTarget }> = [
     {
-      label: 'StableToken',
+      label: 'StableToken (CELO/USD)',
       reportTarget: CeloContract.StableToken,
     },
     {
