@@ -1690,7 +1690,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly in with fee in CELO 
                 >
                   -
                   
-                  0.001
+                  0.01
                 </Text>
               </Text>
             </View>
@@ -1779,7 +1779,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly in with fee in CELO 
                 >
                   
                   $
-                  13.29
+                  13.28
                 </Text>
               </Text>
             </View>
@@ -5778,7 +5778,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly with fee in Celo dol
                 >
                   -
                   $
-                  0.0013
+                  0.0133
                 </Text>
               </Text>
             </View>
@@ -5867,7 +5867,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly with fee in Celo dol
                 >
                   
                   $
-                  13.29
+                  13.28
                 </Text>
               </Text>
             </View>

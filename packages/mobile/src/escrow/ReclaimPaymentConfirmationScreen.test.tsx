@@ -8,20 +8,22 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import { getReclaimEscrowFee, reclaimFromEscrow } from 'src/escrow/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES, WEI_PER_TOKEN } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockStackScreenProps, sleep } from 'test/utils'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number } from 'test/values'
 
+// A fee of 0.01 cUSD.
 const TEST_FEE_INFO_CUSD = {
-  fee: new BigNumber(10).pow(15),
+  fee: new BigNumber(10).pow(16),
   gas: new BigNumber(200000),
-  gasPrice: new BigNumber(10).pow(9).times(5),
+  gasPrice: new BigNumber(10).pow(10).times(5),
   currency: CURRENCY_ENUM.DOLLAR,
 }
 
+// A fee of 0.01 CELO.
 const TEST_FEE_INFO_CELO = {
-  fee: new BigNumber(10).pow(15),
+  fee: new BigNumber(10).pow(16),
   gas: new BigNumber(200000),
-  gasPrice: new BigNumber(10).pow(9).times(5),
+  gasPrice: new BigNumber(10).pow(10).times(5),
   currency: CURRENCY_ENUM.GOLD,
 }
 
@@ -65,13 +67,13 @@ describe('ReclaimPaymentConfirmationScreen', () => {
     // Initial render should not contain a fee.
     expect(toJSON()).toMatchSnapshot()
     expect(queryAllByText('securityFee')).toHaveLength(2)
-    expect(queryByText(/-\s*\$\s*0\.0013/s)).toBeNull()
+    expect(queryByText(/-\s*\$\s*0\.0133/s)).toBeNull()
 
-    // Wait for fee to be calculated and displayed as "$0.0013"
+    // Wait for fee to be calculated and displayed as "$0.013"
     // NOTE: Use regex here because the text may be split by a newline.
-    await waitForElement(() => getByText(/-\s*\$\s*0\.0013/s))
+    await waitForElement(() => getByText(/-\s*\$\s*0\.0133/s))
     expect(toJSON()).toMatchSnapshot()
-    expect(queryByText(/\$\s*13\.29/s)).not.toBeNull()
+    expect(queryByText(/\$\s*13\.28/s)).not.toBeNull()
   })
 
   it('renders correctly in with fee in CELO', async () => {
@@ -86,13 +88,13 @@ describe('ReclaimPaymentConfirmationScreen', () => {
     // Initial render should not contain a fee.
     expect(toJSON()).toMatchSnapshot()
     expect(queryAllByText('securityFee')).toHaveLength(2)
-    expect(queryByText(/-\s*0\.001/s)).toBeNull()
+    expect(queryByText(/-\s*0\.01/s)).toBeNull()
 
-    // Wait for fee to be calculated and displayed as "0.001"
+    // Wait for fee to be calculated and displayed as "0.01"
     // NOTE: Use regex here because the text may be split by a newline.
-    await waitForElement(() => getByText(/-\s*0\.001/s))
+    await waitForElement(() => getByText(/-\s*0\.01/s))
     expect(toJSON()).toMatchSnapshot()
-    expect(queryByText(/\$\s*13\.29/s)).not.toBeNull()
+    expect(queryByText(/\$\s*13\.28/s)).not.toBeNull()
   })
 
   it('renders correctly when fee calculation fails', async () => {

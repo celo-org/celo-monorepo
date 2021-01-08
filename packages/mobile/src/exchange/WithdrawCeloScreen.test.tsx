@@ -11,7 +11,7 @@ import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const SAMPLE_ADDRESS = '0xcc642068bdbbdeb91f348213492d2a80ab1ed23c'
 const SAMPLE_BALANCE = '55.00001'
-const SAMPLE_BALANCE_MINUS_FEES = '54.99001'
+const SAMPLE_BALANCE_MINUS_FEES = '54.99901'
 
 const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloScreen, { isCashOut: false })
 
