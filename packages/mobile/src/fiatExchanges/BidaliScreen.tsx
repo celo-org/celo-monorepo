@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { WebView, WebViewMessageEvent } from 'react-native-webview'
@@ -10,6 +10,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { TokenTransactionType } from 'src/apollo/types'
 import { openUrl } from 'src/app/actions'
 import networkConfig from 'src/geth/networkConfig'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -20,33 +21,29 @@ import { RecipientKind, RecipientWithAddress } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
-function useInitialJavaScript(cusdBalance: string | null, e164PhoneNumber: string | null) {
+function useInitialJavaScript(jsonBalances: string, e164PhoneNumber: string | null) {
   const [initialJavaScript, setInitialJavaScript] = useState<string | null>()
   useEffect(() => {
-    if (initialJavaScript) {
+    if (initialJavaScript || !e164PhoneNumber) {
       return
     }
 
-    if (cusdBalance && e164PhoneNumber) {
-      setInitialJavaScript(`
-        window.valora = {
-          phoneNumber: "${e164PhoneNumber}",
-          balances: {
-            "CUSD": ${cusdBalance}
-          },
-          onPaymentRequest: function (paymentRequest) {
-            var payload = { method: 'onPaymentRequest', data: paymentRequest };
-            window.ReactNativeWebView.postMessage(JSON.stringify(payload));
-          },
-          openUrl: function (url) {
-            var payload = { method: 'openUrl', data: { url } };
-            window.ReactNativeWebView.postMessage(JSON.stringify(payload));
-          }
-        };
-        true; // note: this is required, or you'll sometimes get silent failures
-      `)
-    }
-  }, [cusdBalance, e164PhoneNumber, initialJavaScript])
+    setInitialJavaScript(`
+      window.valora = {
+        phoneNumber: "${e164PhoneNumber}",
+        balances: ${jsonBalances},
+        onPaymentRequest: function (paymentRequest) {
+          var payload = { method: 'onPaymentRequest', data: paymentRequest };
+          window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+        },
+        openUrl: function (url) {
+          var payload = { method: 'openUrl', data: { url } };
+          window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+        }
+      };
+      true; // note: this is required, or you'll sometimes get silent failures
+    `)
+  }, [jsonBalances, e164PhoneNumber, initialJavaScript])
 
   return initialJavaScript
 }
@@ -66,25 +63,31 @@ function BidaliScreen(props: Props) {
       case 'openUrl':
         const { url } = data
         dispatch(openUrl(url))
-      default:
         break
     }
   }
 
   const webViewRef = useRef<WebView>(null)
   const cusdBalance = useSelector(stableTokenBalanceSelector)
+  const celoBalance = useSelector(celoTokenBalanceSelector)
+  const jsonBalances = useMemo(
+    () =>
+      JSON.stringify({
+        cUSD: cusdBalance,
+        CELO: celoBalance,
+      }),
+    [cusdBalance, celoBalance]
+  )
   const e164PhoneNumber = useSelector(e164NumberSelector)
-  const initialJavaScript = useInitialJavaScript(cusdBalance, e164PhoneNumber)
+  const initialJavaScript = useInitialJavaScript(jsonBalances, e164PhoneNumber)
   const dispatch = useDispatch()
 
+  // Update balances when they change
   useEffect(() => {
-    if (!cusdBalance) {
-      return
-    }
     webViewRef.current?.injectJavaScript(`
-      window.valora.balances.CUSD = ${cusdBalance}
+      window.valora.balances = ${jsonBalances}
     `)
-  }, [cusdBalance])
+  }, [jsonBalances])
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
