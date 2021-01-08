@@ -1,5 +1,5 @@
 import { PhoneNumberUtils } from '@celo/utils'
-import { publicKeyToAddress } from '@celo/utils/lib/address'
+import { isValidAddress, publicKeyToAddress } from '@celo/utils/lib/address'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
@@ -118,6 +118,7 @@ export async function handleGetAttestationRequest(
 
     const validSignature = [getRequest.account, walletAddress, dekAddress]
       .filter(Boolean)
+      .filter(isValidAddress)
       .find((address) => verifyEIP712TypedDataSigner(typedData, authentication as string, address))
     if (!validSignature) {
       respondWithError(res, 401, 'Invalid signature')

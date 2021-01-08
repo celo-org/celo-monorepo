@@ -210,18 +210,18 @@ export async function pollForMessagesAndCompleteAttestations(
   }
 }
 
-// Use the supplied salt, or if none supplied, go to ODIS and retrieve a pepper
+// Use the supplied pepper, or if none supplied, go to ODIS and retrieve a pepper
 export async function getIdentifierAndPepper(
   kit: ContractKit,
   context: string,
   account: string,
   phoneNumber: string,
-  salt: string | null
+  pepper: string | null
 ) {
-  if (salt) {
+  if (pepper) {
     return {
-      pepper: salt,
-      identifier: PhoneNumberUtils.getPhoneHash(phoneNumber, salt!),
+      pepper,
+      identifier: PhoneNumberUtils.getPhoneHash(phoneNumber, pepper),
     }
   } else {
     const authSigner: AuthSigner = {
