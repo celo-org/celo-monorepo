@@ -224,13 +224,16 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 18,
-                    "lineHeight": 24,
-                    "marginRight": 12,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 18,
+                      "lineHeight": 24,
+                      "marginRight": 12,
+                    },
+                    Object {},
+                  ]
                 }
                 testID="undefined/Text"
               >
@@ -364,13 +367,16 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 18,
-                    "lineHeight": 24,
-                    "marginRight": 12,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 18,
+                      "lineHeight": 24,
+                      "marginRight": 12,
+                    },
+                    Object {},
+                  ]
                 }
                 testID="undefined/Text"
               >
@@ -545,13 +551,16 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 18,
-                    "lineHeight": 24,
-                    "marginRight": 12,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 18,
+                      "lineHeight": 24,
+                      "marginRight": 12,
+                    },
+                    Object {},
+                  ]
                 }
                 testID="undefined/Text"
               >

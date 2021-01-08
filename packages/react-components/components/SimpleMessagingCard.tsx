@@ -1,5 +1,6 @@
 import CallToActionsBar, { CallToAction } from '@celo/react-components/components/CallToActionsBar'
 import MessagingCard from '@celo/react-components/components/MessagingCard'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
@@ -7,6 +8,7 @@ import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native
 interface Props {
   text: string
   icon?: ImageSourcePropType | React.ReactNode
+  darkMode?: boolean
   callToActions: CallToAction[]
   testID?: string
 }
@@ -14,6 +16,7 @@ interface Props {
 export default function SimpleMessagingCard({
   text,
   icon: iconProp,
+  darkMode = false,
   callToActions,
   testID,
 }: Props) {
@@ -25,13 +28,20 @@ export default function SimpleMessagingCard({
   )
 
   return (
-    <MessagingCard style={styles.container} testID={testID}>
+    <MessagingCard style={darkMode ? styles.darkModeContainer : styles.container} testID={testID}>
       <View style={styles.innerContainer}>
         <View style={styles.content}>
-          <Text style={styles.text} testID={`${testID}/Text`}>
+          <Text
+            style={[styles.text, darkMode ? styles.darkModeText : {}]}
+            testID={`${testID}/Text`}
+          >
             {text}
           </Text>
-          <CallToActionsBar callToActions={callToActions} testID={`${testID}/CallToActions`} />
+          <CallToActionsBar
+            callToActions={callToActions}
+            darkMode={darkMode}
+            testID={`${testID}/CallToActions`}
+          />
         </View>
         <View style={styles.iconContainer}>{icon}</View>
       </View>
@@ -41,6 +51,9 @@ export default function SimpleMessagingCard({
 
 const styles = StyleSheet.create({
   container: {},
+  darkModeContainer: {
+    backgroundColor: '#2C3D47',
+  },
   innerContainer: {
     flexDirection: 'row',
     flex: 1,
@@ -52,6 +65,9 @@ const styles = StyleSheet.create({
   text: {
     ...fontStyles.large,
     marginRight: 12,
+  },
+  darkModeText: {
+    color: colors.light,
   },
   iconContainer: {
     width: 80,

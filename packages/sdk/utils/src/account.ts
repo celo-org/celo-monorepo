@@ -5,6 +5,7 @@ import {
   MnemonicStrength,
   RandomNumberGenerator,
 } from '@celo/base/lib/account'
+import { normalizeAccents } from '@celo/base/lib/string'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import { keccak256 } from 'ethereumjs-util'
@@ -54,22 +55,73 @@ export async function generateMnemonic(
   return bip39ToUse.generateMnemonic(strength, undefined, getWordList(language))
 }
 
-export function validateMnemonic(
-  mnemonic: string,
-  defaultLanguage?: MnemonicLanguages,
-  bip39ToUse: Bip39 = bip39Wrapper
-) {
-  const mnemonicWords = mnemonic.trim().split(' ')
-  const languages = defaultLanguage
-    ? [defaultLanguage]
-    : getAllLanguages().filter((lang) => lang !== defaultLanguage)
+export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrapper) {
+  const languages = getAllLanguages()
   for (const language of languages) {
-    const wordList = getWordList(language)
-    if (mnemonicWords.every((word) => wordList.includes(word))) {
-      return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
+    if (bip39ToUse.validateMnemonic(mnemonic, getWordList(language))) {
+      return true
     }
   }
+
   return false
+}
+
+export function formatNonAccentedCharacters(mnemonic: string) {
+  const languages = getAllLanguages()
+  const normMnemonicArr = normalizeAccents(mnemonic)
+    .toLowerCase()
+    .trim()
+    .split(' ')
+
+  for (const language of languages) {
+    if (isLatinBasedLanguage(language)) {
+      const wordList = getWordList(language)
+      const normWordListMap = createNormalizedWordListMap(wordList)
+      const languageMatches = arrayContainedInMap(normMnemonicArr, normWordListMap)
+
+      if (languageMatches) {
+        return replaceIncorrectlyAccentedWords(mnemonic, normMnemonicArr, normWordListMap)
+      }
+    }
+  }
+
+  return mnemonic
+}
+
+const createNormalizedWordListMap = (wordList: string[]) => {
+  const normWordListMap = new Map()
+  for (const word of wordList) {
+    const noramlizedWord = normalizeAccents(word)
+    normWordListMap.set(noramlizedWord, word)
+  }
+  return normWordListMap
+}
+
+const arrayContainedInMap = (array: string[], map: Map<string, string>) => {
+  for (const item of array) {
+    if (!map.has(item)) {
+      return false
+    }
+  }
+  return true
+}
+
+const replaceIncorrectlyAccentedWords = (
+  mnemonic: string,
+  normMnemonicArr: string[],
+  normWordListMap: Map<string, string>
+) => {
+  const mnemonicArr = [...mnemonic.trim().split(' ')]
+  for (let i = 0; i < normMnemonicArr.length; i += 1) {
+    const noramlizedWord = normMnemonicArr[i]
+    const nonNormalizedWord = normWordListMap.get(noramlizedWord)
+
+    if (nonNormalizedWord) {
+      mnemonicArr[i] = nonNormalizedWord
+    }
+  }
+
+  return mnemonicArr.join(' ')
 }
 
 export async function generateKeys(
@@ -129,6 +181,18 @@ export function generateKeysFromSeed(
     publicKey: newNode.publicKey.toString('hex'),
     address: privateKeyToAddress(newNode.privateKey.toString('hex')),
   }
+}
+
+function isLatinBasedLanguage(language: MnemonicLanguages) {
+  if (
+    language === MnemonicLanguages.chinese_simplified ||
+    language === MnemonicLanguages.chinese_traditional ||
+    language === MnemonicLanguages.japanese ||
+    language === MnemonicLanguages.korean
+  ) {
+    return false
+  }
+  return true
 }
 
 // Unify the bip39.wordlists (otherwise depends on the instance of the bip39)
