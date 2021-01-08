@@ -69,12 +69,12 @@ export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
 /**
  * This will act as an enum of common pairs.
  * We can't use a straight enum because we want the value
- * to be the branded type.
+ * to be a ReportTarget
  *
- * E.g. usage: sortedOracles.getRates(CurrencyPair.CELOBTC)
+ * E.g. usage: sortedOracles.getRates(OracleCurrencyPair.CELOBTC)
  */
 type defaultPairs = 'CELOBTC' | 'CELOUSD'
-export const CurrencyPair: Record<defaultPairs, ReportTarget> = {
+export const OracleCurrencyPair: Record<defaultPairs, ReportTarget> = {
   CELOBTC: pairIdentifier('CELO/BTC'),
   CELOUSD: CeloContract.StableToken,
 }

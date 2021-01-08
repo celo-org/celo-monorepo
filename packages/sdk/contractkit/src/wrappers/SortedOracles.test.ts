@@ -4,7 +4,7 @@ import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/
 import SortedOraclesABI from '@celo/protocol/build/contracts/SortedOracles.json'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
-import { CurrencyPair, OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
+import { OracleCurrencyPair, OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
 
 const truffleContract = require('@truffle/contract')
 
@@ -121,13 +121,13 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     // For StableToken the oracles are setup in migrations, for our
     // custom CELO/BTC oracle we need to add them manually
     for (const oracle of celoBtcOracles) {
-      await addOracleForTarget(btcSortedOracles, CurrencyPair.CELOBTC, oracle, btcOracleOwner)
+      await addOracleForTarget(btcSortedOracles, OracleCurrencyPair.CELOBTC, oracle, btcOracleOwner)
     }
     // And also report an initial price as happens in 09_stabletoken.ts
     // So that we can share tests between the two oracles.
     await (
       await btcSortedOracles.report(
-        CurrencyPair.CELOBTC,
+        OracleCurrencyPair.CELOBTC,
         NetworkConfig.stableToken.goldPrice,
         oracleAddress
       )
@@ -141,14 +141,14 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     },
     {
       label: 'CELO/BTC',
-      reportTarget: CurrencyPair.CELOBTC,
+      reportTarget: OracleCurrencyPair.CELOBTC,
     },
   ]
 
   describeEach(testCases, ({ reportTarget }) => {
     let sortedOracles: SortedOraclesWrapper
     beforeEach(() => {
-      if (reportTarget === CurrencyPair.CELOBTC) {
+      if (reportTarget === OracleCurrencyPair.CELOBTC) {
         sortedOracles = btcSortedOracles
       } else if (reportTarget === CeloContract.StableToken) {
         sortedOracles = stableTokenSortedOracles
