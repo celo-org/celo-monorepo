@@ -29,7 +29,7 @@ function FiatExchange() {
 
   function goToCashOut() {
     // Temporary until we know where to integrate it
-    navigate(Screens.Bidali)
+    navigate(Screens.BidaliScreen)
     // navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
   }
 

@@ -52,7 +52,7 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
-  [Screens.Bidali]: undefined
+  [Screens.BidaliScreen]: undefined
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }

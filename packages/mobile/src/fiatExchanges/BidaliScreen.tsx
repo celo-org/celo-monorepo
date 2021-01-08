@@ -5,9 +5,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { WebView, WebViewMessageEvent } from 'react-native-webview'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { TokenTransactionType } from 'src/apollo/types'
+import { openUrl } from 'src/app/actions'
 import networkConfig from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -50,7 +51,7 @@ function useInitialJavaScript(cusdBalance: string | null, e164PhoneNumber: strin
   return initialJavaScript
 }
 
-type RouteProps = StackScreenProps<StackParamList, Screens.Bidali>
+type RouteProps = StackScreenProps<StackParamList, Screens.BidaliScreen>
 type Props = RouteProps
 
 function BidaliScreen(props: Props) {
@@ -64,9 +65,7 @@ function BidaliScreen(props: Props) {
         break
       case 'openUrl':
         const { url } = data
-        console.log(`Open ${url}`)
-      // Open the URL in a modal webview or in the native OS browser
-
+        dispatch(openUrl(url))
       default:
         break
     }
@@ -76,6 +75,7 @@ function BidaliScreen(props: Props) {
   const cusdBalance = useSelector(stableTokenBalanceSelector)
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const initialJavaScript = useInitialJavaScript(cusdBalance, e164PhoneNumber)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (!cusdBalance) {

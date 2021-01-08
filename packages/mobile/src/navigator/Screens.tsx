@@ -6,7 +6,7 @@ export enum Screens {
   BackupPhrase = 'BackupPhrase',
   BackupForceScreen = 'BackupForceScreen',
   BackupQuiz = 'BackupQuiz',
-  Bidali = 'Bidali',
+  BidaliScreen = 'BidaliScreen',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',
   DappKitTxDataScreen = 'DappKitTxDataScreen',

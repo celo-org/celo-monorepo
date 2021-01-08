@@ -446,7 +446,7 @@ const settingsScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
     <Navigator.Screen
       options={BidaliScreen.navigationOptions}
-      name={Screens.Bidali}
+      name={Screens.BidaliScreen}
       component={BidaliScreen}
     />
   </>
