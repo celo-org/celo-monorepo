@@ -180,6 +180,14 @@ yarn build --ignore docs
 
 To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](packages/mobile) directory.
 
+1. Make sure you have ran `yarn install` in the `/celo-monorepo` directory. 
+2. Install Google Cloud by running `brew install google-cloud-sdk`. 
+3. Run `yarn build:wallet` from the monorepo root `/celo-monorepo`.
+
+IOS: 
+Run `yarn dev:ios` in the `/celo-monorepo/packages/mobile/ios` folder. 
+
+
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
