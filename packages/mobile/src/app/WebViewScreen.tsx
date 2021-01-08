@@ -3,6 +3,9 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
+import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes'
+import { useDispatch } from 'react-redux'
+import { openDeepLink } from 'src/app/actions'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -31,10 +34,23 @@ export const webViewScreenNavOptions = ({ route }: RouteProps) => {
 
 function WebViewScreen({ route }: Props) {
   const { uri } = route.params
+  const dispatch = useDispatch()
+
+  const handleLoadRequest = (event: ShouldStartLoadRequest): boolean => {
+    if (event.url.startsWith('celo://')) {
+      dispatch(openDeepLink(event.url))
+      return false
+    }
+    return true
+  }
 
   return (
     <View style={styles.container}>
-      <WebView style={styles.webView} source={{ uri }} />
+      <WebView
+        style={styles.webView}
+        onShouldStartLoadWithRequest={handleLoadRequest}
+        source={{ uri }}
+      />
     </View>
   )
 }
