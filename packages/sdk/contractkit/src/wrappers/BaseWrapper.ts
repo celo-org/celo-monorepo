@@ -2,10 +2,9 @@ import { bufferToHex, ensureLeading0x } from '@celo/base/lib/address'
 import { zip } from '@celo/base/lib/collections'
 import {
   CeloTransactionObject,
+  CeloTx,
   CeloTxObject,
   Contract,
-  EventLog,
-  PastEventOptions,
   toTransactionObject,
 } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -18,13 +17,46 @@ type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
 
 type Events<T extends Contract> = keyof T['events']
 type Methods<T extends Contract> = keyof T['methods']
-type EventsEnum<T extends Contract> = {
-  [event in Events<T>]: event
+
+interface MethodType<C extends Contract, M extends Methods<C>> {
+  method: C['methods'][M]
+  params: Parameters<C['methods'][M]>
+  result: ReturnType<C['methods'][M]> extends CeloTxObject<infer U> ? U : never
+}
+
+abstract class MethodWrapper<MT extends MethodType<any, any>, Input, Output> {
+  constructor(readonly method: MT['method']) {}
+  protected abstract encodeInput(input: Input): MT['params']
+  protected abstract decodeOutput(result: MT['result']): Output
+  txo = (input: Input): CeloTxObject<any> => this.method(this.encodeInput(input))
+  call = (input: Input, options?: CeloTx) =>
+    this.txo(input)
+      .call(options)
+      .then(this.decodeOutput)
+  send = (input: Input, options?: CeloTx) => this.txo(input).send(options)
+}
+
+class DefaultMethodWrapper extends MethodWrapper<any, any, any> {
+  encodeInput = (_input: any) => _input
+  decodeOutput = (_result: any) => _result
+}
+
+// interface ContractWrapperInterface<C extends Contract> {
+// wait for https://github.com/microsoft/TypeScript/pull/26797 to be merged
+// and update to TS_4.2
+type ContractWrapper<C extends Contract> = {
+  [M in Methods<C>]: MethodWrapper<MethodType<C, M>, any, any>
 }
 
 /** Base ContractWrapper */
-export abstract class BaseWrapper<T extends Contract> {
-  constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
+export abstract class BaseWrapper<T extends Contract>
+// implements ContractWrapperInterface<T>
+{
+  constructor(protected readonly kit: ContractKit, protected readonly contract: T) {
+    // Object.keys(contract.methods).forEach((methodKey) => {
+    //   this.wrapper[methodKey as Methods<T>] = new DefaultMethodWrapper(contract.methods[methodKey])
+    // })
+  }
 
   /** Contract address */
   get address(): string {
