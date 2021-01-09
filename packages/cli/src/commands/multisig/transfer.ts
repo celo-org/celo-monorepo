@@ -5,7 +5,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
 export default class MultiSigTransfer extends BaseCommand {
-  static description = 'Ability approve CELO transfers to and from multisig'
+  static description =
+    'Ability to approve CELO transfers to and from multisig. Submit transaction or approve a matching existing transaction'
 
   static flags = {
     ...BaseCommand.flags,
@@ -19,8 +20,8 @@ export default class MultiSigTransfer extends BaseCommand {
   static args = [Args.address('address')]
 
   static examples = [
-    'transfer <multiSigAddr> --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --amount 200000e18',
-    'transfer <multiSigAddr> --transferFrom --sender 0x123abc --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --amount 200000e18',
+    'transfer <multiSigAddr> --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --amount 200000e18 --from 0x123abc',
+    'transfer <multiSigAddr> --transferFrom --sender 0x123abc --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --amount 200000e18 --from 0x123abc',
   ]
 
   async run() {
@@ -41,7 +42,7 @@ export default class MultiSigTransfer extends BaseCommand {
       // @ts-ignore - function will accept BigNumber
       transferTx = celoToken.transfer(to, amountBN)
     }
-    let multiSigTx = await multisig.submitOrConfirmTransaction(celoToken.address, transferTx.txo)
+    const multiSigTx = await multisig.submitOrConfirmTransaction(celoToken.address, transferTx.txo)
     await displaySendTx<any>('submitOrApproveTransfer', multiSigTx, { from }, 'tx Sent')
   }
 }
