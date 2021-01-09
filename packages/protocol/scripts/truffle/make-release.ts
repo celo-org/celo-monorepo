@@ -7,6 +7,7 @@ import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
 
 /*
@@ -72,9 +73,13 @@ const isCoreContract = (contractName: string) =>
 
 const deployImplementation = async (
   contractName: string,
-  Contract: Truffle.Contract<Truffle.ContractInstance>,
-  dryRun: boolean
+  Contract: TruffleContract<Truffle.ContractInstance>,
+  dryRun: boolean,
+  from: string
 ) => {
+  if (from) {
+    Contract.defaults({ from }) // override truffle with provided from address
+  }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
@@ -88,7 +93,12 @@ const deployImplementation = async (
   return contract
 }
 
-const deployProxy = async (contractName: string, addresses: ContractAddresses, dryRun: boolean) => {
+const deployProxy = async (
+  contractName: string,
+  addresses: ContractAddresses,
+  dryRun: boolean,
+  from: string
+) => {
   // Explicitly forbid upgrading to a new Governance proxy contract.
   // Upgrading to a new Governance proxy contract would require ownership of all
   // contracts to be moved to the new governance contract, possibly including contracts
@@ -101,6 +111,9 @@ const deployProxy = async (contractName: string, addresses: ContractAddresses, d
   }
   console.log(`Deploying ${contractName}Proxy`)
   const Proxy = await artifacts.require(`${contractName}Proxy`)
+  if (from) {
+    Proxy.defaults({ from }) // override truffle with provided from address
+  }
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
 
@@ -124,7 +137,7 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'network', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
+      string: ['report', 'from', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
@@ -156,7 +169,12 @@ module.exports = async (callback: (error?: any) => number) => {
         const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
         const isLibrary = linkedLibraries[contractName]
         if (shouldDeployImplementation) {
-          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const contract = await deployImplementation(
+            contractName,
+            Contract,
+            argv.dry_run,
+            argv.from
+          )
           const setImplementationTx: ProposalTx = {
             contract: `${contractName}Proxy`,
             function: '_setImplementation',
@@ -169,7 +187,7 @@ module.exports = async (callback: (error?: any) => number) => {
           if (!shouldDeployProxy) {
             proposal.push(setImplementationTx)
           } else {
-            const proxy = await deployProxy(contractName, addresses, argv.dry_run)
+            const proxy = await deployProxy(contractName, addresses, argv.dry_run, argv.from)
 
             // 5. Update the contract's address to the new proxy in the proposal
             addresses.set(contractName, proxy.address)
@@ -200,7 +218,12 @@ module.exports = async (callback: (error?: any) => number) => {
             }
           }
         } else if (isLibrary) {
-          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const contract = await deployImplementation(
+            contractName,
+            Contract,
+            argv.dry_run,
+            argv.from
+          )
           addresses.set(contractName, contract.address)
         }
         // 7. Mark the contract as released

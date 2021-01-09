@@ -228,7 +228,7 @@ function CeloRewardContent({ address, amount, recipient }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const openLearnMore = () => {
-    navigate(Screens.WebViewScreen, { uri: CELO_REWARDS_LINK })
+    navigate(Screens.WebViewScreen, { uri: `${CELO_REWARDS_LINK}?origin=transaction-detail` })
   }
 
   return (
