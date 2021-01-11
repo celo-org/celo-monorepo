@@ -63,6 +63,7 @@ export interface ActionableAttestation {
   blockNumber: number
   attestationServiceURL: string
   name: string | undefined
+  version: string
 }
 
 type AttestationServiceRunningCheckResult =
@@ -330,8 +331,16 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
         const nameClaim = metadata.findClaim(ClaimTypes.NAME)
 
-        // TODO: Once we have status indicators, we should check if service is up
-        // https://github.com/celo-org/celo-monorepo/issues/1586
+        const resp = await fetch(`${attestationServiceURLClaim.url}status`)
+        if (!resp.ok) {
+          throw new Error(`Request failed with status ${resp.status}`)
+        }
+        const { status, version } = await resp.json()
+
+        if (status !== 'ok') {
+          return { isValid: false, issuer: arg.issuer }
+        }
+
         return {
           isValid: true,
           result: {
@@ -339,6 +348,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
             issuer: arg.issuer,
             attestationServiceURL: attestationServiceURLClaim.url,
             name: nameClaim ? nameClaim.name : undefined,
+            version,
           },
         }
       } catch (error) {

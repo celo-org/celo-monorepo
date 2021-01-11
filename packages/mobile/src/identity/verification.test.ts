@@ -125,18 +125,21 @@ const mockActionableAttestations: ActionableAttestation[] = [
     blockNumber: 100,
     attestationServiceURL: 'https://fake.celo.org/0',
     name: '',
+    version: '',
   },
   {
     issuer: attestationCode1.issuer,
     blockNumber: 110,
     attestationServiceURL: 'https://fake.celo.org/1',
     name: '',
+    version: '',
   },
   {
     issuer: attestationCode2.issuer,
     blockNumber: 120,
     attestationServiceURL: 'https://fake.celo.org/2',
     name: '',
+    version: '',
   },
 ]
 
