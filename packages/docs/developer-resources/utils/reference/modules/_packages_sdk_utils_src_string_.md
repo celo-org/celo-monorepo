@@ -5,6 +5,7 @@
 ### References
 
 * [appendPath](_packages_sdk_utils_src_string_.md#appendpath)
+* [normalizeAccents](_packages_sdk_utils_src_string_.md#normalizeaccents)
 
 ### Object literals
 
@@ -15,6 +16,12 @@
 ###  appendPath
 
 • **appendPath**:
+
+___
+
+###  normalizeAccents
+
+• **normalizeAccents**:
 
 ## Object literals
 
@@ -32,6 +39,6 @@
 
 ###  normalizeAccents
 
-• **normalizeAccents**: *any*
+• **normalizeAccents**: *normalizeAccents*
 
 *Defined in [packages/sdk/utils/src/string.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/string.ts#L7)*
