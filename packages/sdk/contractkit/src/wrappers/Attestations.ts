@@ -6,6 +6,7 @@ import { appendPath } from '@celo/base/lib/string'
 import { Address, toTransactionObject } from '@celo/connect'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { AttestationRequest, GetAttestationRequest } from '@celo/utils/lib/io'
+import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { CeloContract } from '../base'
@@ -590,22 +591,47 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param serviceURL: validator's attestation service URL
    * @param body
    */
-  getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
+  async getAttestationForSecurityCode(
+    serviceURL: string,
+    requestBody: GetAttestationRequest
+  ): Promise<string> {
     const urlParams = new URLSearchParams({
       phoneNumber: requestBody.phoneNumber,
       account: requestBody.account,
       issuer: requestBody.issuer,
     })
+
+    let additionalHeaders = {}
     if (requestBody.salt) {
       urlParams.set('salt', requestBody.salt)
     }
     if (requestBody.securityCode) {
       urlParams.set('securityCode', requestBody.securityCode)
+      additionalHeaders = {
+        Authentication: SignatureUtils.serializeSignature(
+          await this.kit.signTypedData(
+            requestBody.account,
+            buildSecurityCodeTypedData(requestBody.securityCode)
+          )
+        ),
+      }
     }
-    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+
+    const response = await fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...additionalHeaders },
     })
+
+    const { ok, status } = response
+    if (ok) {
+      const body = await response.json()
+      if (body.attestationCode) {
+        return body.attestationCode
+      }
+    }
+    throw new Error(
+      `Error getting security code for ${requestBody.issuer}. ${status}: ${await response.text()}`
+    )
   }
 
   /**

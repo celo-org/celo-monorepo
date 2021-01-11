@@ -2,22 +2,6 @@
 
 Interact with on-chain governance proposals and hotfixes
 
-- [`celocli governance:build-proposal`](#celocli-governancebuild-proposal)
-- [`celocli governance:dequeue`](#celocli-governancedequeue)
-- [`celocli governance:execute`](#celocli-governanceexecute)
-- [`celocli governance:executehotfix`](#celocli-governanceexecutehotfix)
-- [`celocli governance:hashhotfix`](#celocli-governancehashhotfix)
-- [`celocli governance:list`](#celocli-governancelist)
-- [`celocli governance:preparehotfix`](#celocli-governancepreparehotfix)
-- [`celocli governance:propose`](#celocli-governancepropose)
-- [`celocli governance:revokeupvote`](#celocli-governancerevokeupvote)
-- [`celocli governance:show`](#celocli-governanceshow)
-- [`celocli governance:upvote`](#celocli-governanceupvote)
-- [`celocli governance:view`](#celocli-governanceview)
-- [`celocli governance:viewhotfix`](#celocli-governanceviewhotfix)
-- [`celocli governance:vote`](#celocli-governancevote)
-- [`celocli governance:whitelisthotfix`](#celocli-governancewhitelisthotfix)
-- [`celocli governance:withdraw`](#celocli-governancewithdraw)
 
 ## `celocli governance:build-proposal`
 
