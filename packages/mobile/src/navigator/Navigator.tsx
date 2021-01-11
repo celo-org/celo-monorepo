@@ -541,7 +541,10 @@ export function MainStackScreen() {
       initialRoute = Screens.Language
     } else if (!name || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
+      //
+      // TODO: Remove this mock
       initialRoute = Screens.OnboardingEducationScreen
+      // initialRoute = Screens.VerificationEducationScreen
     } else if (!redeemComplete) {
       initialRoute = choseToRestoreAccount
         ? Screens.ImportWallet
