@@ -161,11 +161,6 @@ const run = async () => {
     return
   }
 
-  const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
-  console.log(approveRes)
-  if (!approveRes.ok) {
-    return
-  }
   const statsBefore = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('Before ===== ')
   console.log(statsBefore)
