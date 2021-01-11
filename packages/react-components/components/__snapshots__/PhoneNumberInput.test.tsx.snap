@@ -57,7 +57,7 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
           "backgroundColor": "#FFFFFF",
           "borderRadius": 8,
           "paddingHorizontal": 12,
-          "width": 112,
+          "width": 80,
         }
       }
       testID="CountrySelectionButton"
@@ -75,6 +75,7 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
             Object {
               "alignItems": "center",
               "flexDirection": "row",
+              "justifyContent": "center",
             }
           }
         >
@@ -88,20 +89,6 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
             testID="countryCodeFlag"
           >
             🇫🇷
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-              }
-            }
-            testID="countryCodeText"
-          >
-            +33
           </Text>
           <View
             style={

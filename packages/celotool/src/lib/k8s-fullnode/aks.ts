@@ -22,7 +22,11 @@ export class AksFullNodeDeployer extends BaseFullNodeDeployer {
       `--set geth.public_ip_per_node='{${staticIps}}'`,
       // Azure has a special annotation to expose TCP and UDP on the same service.
       // Only TCP needs to be specified in that case.
-      `--set geth.service_protocols='{TCP}'`
+      `--set geth.service_protocols='{TCP}'`,
+      // Fix for LES server panic-- don't serve any LES clients!
+      `--set geth.maxpeers=150`,
+      `--set geth.light.maxpeers=0`,
+      `--set geth.light.serve=0`
     ]
   }
 
