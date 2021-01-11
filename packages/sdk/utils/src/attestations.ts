@@ -63,6 +63,14 @@ export function attestToIdentifier(
   return { v, r, s }
 }
 
+export function extractSecurityCodeWithPrefix(message: string) {
+  const matches = message.match('\\s(\\d{8})')
+  if (matches && matches.length === 2) {
+    return matches[1]
+  }
+  return null
+}
+
 export const AttestationUtils = {
   IdentifierType,
   getIdentifierPrefix,
@@ -75,4 +83,5 @@ export const AttestationUtils = {
   messageContainsAttestationCode,
   extractAttestationCodeFromMessage,
   isAccountConsideredVerified,
+  extractSecurityCodeWithPrefix,
 }
