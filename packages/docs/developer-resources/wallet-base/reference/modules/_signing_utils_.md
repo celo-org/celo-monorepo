@@ -27,7 +27,7 @@
 
 • **publicKeyPrefix**: *number* = 4
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L18)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L18)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **sixtyFour**: *number* = 64
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:19](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L19)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L19)*
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **thirtyTwo**: *number* = 32
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L20)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L20)*
 
 ## Functions
 
@@ -51,7 +51,7 @@ ___
 
 ▸ **chainIdTransformationForSigning**(`chainId`: number): *number*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:28](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L28)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L28)*
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **decodeSig**(`sig`: any): *object*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:240](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L240)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L240)*
 
 **Parameters:**
 
@@ -89,7 +89,7 @@ ___
 
 ▸ **encodeTransaction**(`rlpEncoded`: RLPEncodedTx, `signature`: object): *Promise‹EncodedTransaction›*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:121](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L121)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L121)*
 
 **Parameters:**
 
@@ -111,7 +111,7 @@ ___
 
 ▸ **extractSignature**(`rawTx`: string): *object*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:157](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L157)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L157)*
 
 **Parameters:**
 
@@ -133,7 +133,7 @@ ___
 
 ▸ **getHashFromEncoded**(`rlpEncode`: string): *string*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:32](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L32)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L32)*
 
 **Parameters:**
 
@@ -149,7 +149,7 @@ ___
 
 ▸ **recoverMessageSigner**(`signingDataHex`: string, `signedData`: string): *string*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:207](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L207)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:207](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L207)*
 
 **Parameters:**
 
@@ -166,7 +166,7 @@ ___
 
 ▸ **recoverTransaction**(`rawTx`: string): *[CeloTx, string]*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:175](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L175)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L175)*
 
 **Parameters:**
 
@@ -182,7 +182,7 @@ ___
 
 ▸ **rlpEncodedTx**(`tx`: CeloTx): *RLPEncodedTx*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L70)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L70)*
 
 **Parameters:**
 
@@ -198,7 +198,7 @@ ___
 
 ▸ **verifyEIP712TypedDataSigner**(`typedData`: EIP712TypedData, `signedData`: string, `expectedAddress`: string): *boolean*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:217](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L217)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:217](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L217)*
 
 **Parameters:**
 
@@ -216,7 +216,7 @@ ___
 
 ▸ **verifySignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *boolean*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:227](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L227)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:227](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L227)*
 
 **Parameters:**
 

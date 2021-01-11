@@ -17,7 +17,7 @@
 
 • **odisPubKey**: *string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:76](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L76)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L77)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **odisUrl**: *string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L75)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L76)*

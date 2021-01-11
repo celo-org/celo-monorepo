@@ -2,10 +2,6 @@
 
 Interact with ODIS and the attestations service
 
-- [`celocli identity:current-attestation-services`](#celocli-identitycurrent-attestation-services)
-- [`celocli identity:identifier`](#celocli-identityidentifier)
-- [`celocli identity:test-attestation-service`](#celocli-identitytest-attestation-service)
-- [`celocli identity:withdraw-attestation-rewards`](#celocli-identitywithdraw-attestation-rewards)
 
 ## `celocli identity:current-attestation-services`
 

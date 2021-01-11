@@ -2,8 +2,6 @@
 
 Manage your Celo node
 
-- [`celocli node:accounts`](#celocli-nodeaccounts)
-- [`celocli node:synced`](#celocli-nodesynced)
 
 ## `celocli node:accounts`
 
