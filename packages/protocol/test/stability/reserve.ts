@@ -8,13 +8,13 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import BN = require('bn.js')
 import {
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
@@ -285,7 +285,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe('addExchangeSpender & removeExchangeSpender', () => {
+  describe.only('#addExchangeSpender(exchangeAddress)', () => {
     it('should emit addExchangeSpender event on add', async () => {
       const resp = await reserve.addExchangeSpender(exchangeAddress)
       const log = resp.logs[0]
@@ -297,9 +297,19 @@ contract('Reserve', (accounts: string[]) => {
         },
       })
     })
+    // it('has the righth list of exchange spdners', async () => {
+    //   const spenders = await reserve.getExchangeSpenders()
+    //   assert.equal(assert.length, 0)
+    // })
+  })
+
+  describe.only('#removeExchangeSpender(exchangeAddress)', () => {
+    beforeEach(async () => {
+      await reserve.addExchangeSpender(exchangeAddress)
+    })
 
     it('should emit removeExchangeSpender event on remove', async () => {
-      const resp = await reserve.removeExchangeSpender(exchangeAddress)
+      const resp = await reserve.removeExchangeSpender(exchangeAddress, 0)
       const log = resp.logs[0]
       assert.equal(resp.logs.length, 1)
       assertLogMatches2(log, {
@@ -309,7 +319,16 @@ contract('Reserve', (accounts: string[]) => {
         },
       })
     })
+
+    it('has the righth list of exchange spenders', async () => {
+      const spenders = await reserve.getExchangeSpenders()
+      console.log(spenders)
+      assert.equal(spenders.length, 1)
+      assert.equal(spenders[0], exchangeAddress)
+    })
   })
+
+  // getExchangeSpenders
 
   describe('addSpender & removeSpender', () => {
     it('emits on add', async () => {
@@ -351,7 +370,7 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it('should not allow removed exchange spender addresses to call transferExchangeGold', async () => {
-      await reserve.removeExchangeSpender(exchangeAddress)
+      await reserve.removeExchangeSpender(exchangeAddress, 0)
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress }))
     })
 
