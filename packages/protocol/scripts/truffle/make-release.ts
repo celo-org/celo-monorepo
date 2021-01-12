@@ -154,16 +154,11 @@ const deployCoreContract = async (
     if (initializeAbi) {
       const args = initializationData[contractName]
       const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
-      console.log(`Add 'Initializing ${contractName} with: ${args}' to proposal`)
-      proposal.push({
-        contract: `${contractName}Proxy`,
-        function: '_setAndInitializeImplementation',
-        args: [contract.address, callData],
-        value: '0',
-      })
-    } else {
-      proposal.push(setImplementationTx)
+      setImplementationTx.function = '_setAndInitializeImplementation'
+      setImplementationTx.args.push(callData)
     }
+    console.log(`Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`)
+    proposal.push(setImplementationTx)
   }
 }
 
