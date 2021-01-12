@@ -14,7 +14,6 @@ import { getAppLocked, getAppState } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { doingBackupFlowSelector, shouldForceBackupSelector } from 'src/backup/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
-import { isVersionBelowMinimum } from 'src/firebase/firebase'
 import i18n from 'src/i18n'
 import InviteFriendModal from 'src/invite/InviteFriendModal'
 import { generateInviteLink } from 'src/invite/saga'
@@ -24,6 +23,7 @@ import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
 import useTypedSelector from 'src/redux/useSelector'
 import Logger from 'src/utils/Logger'
+import { isVersionBelowMinimum } from 'src/utils/versionCheck'
 
 // This uses RN Navigation's experimental nav state persistence
 // to improve the hot reloading experience when in DEV mode
