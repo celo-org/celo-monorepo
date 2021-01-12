@@ -77,7 +77,7 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
    * Getting the uptime lookback window.
    */
   getUptimeLookbackWindow = proxyCall(
-    this.contract.methods.uptimeLookbackWindow,
+    this.contract.methods.getUptimeLookbackWindow,
     undefined,
     valueToInt
   )
