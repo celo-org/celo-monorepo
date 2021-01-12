@@ -1,5 +1,11 @@
 # Voting on Governance Proposals
 
+{% hint style="info" %}
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+
+You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
+{% endhint %}
+
 Celo uses a formal on-chain governance mechanism to manage and upgrade the protocol. More information about the Governance system can be found in the [Governance section of the protocol documentation](../celo-codebase/protocol/governance.md).
 Here, we will discuss using the [Celo CLI](../command-line-interface/introduction.md) to participate in Governance as a voter as well as how to create a proposal.
 
