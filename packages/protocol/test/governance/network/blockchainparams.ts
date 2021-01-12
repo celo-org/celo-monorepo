@@ -169,17 +169,14 @@ contract('BlockchainParameters', (accounts: string[]) => {
       await mineBlocks(EPOCH, web3)
 
       await blockchainParameters.setUptimeLookbackWindow(lookbackWindow)
-      await blockchainParameters.setUptimeLookbackWindow(lookbackWindow + 100)
+      await blockchainParameters.setUptimeLookbackWindow(50)
 
       // current epoch still initial value
       assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 24)
 
       // after the epoch, find last value set
       await mineBlocks(EPOCH, web3)
-      assert.equal(
-        (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
-        lookbackWindow + 100
-      )
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 50)
     })
 
     it('should emit the corresponding event', async () => {
@@ -202,7 +199,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       )
     })
 
-    it('should fail when using value below minimum', async () => {
+    it('should fail when using value lower than safe minimum', async () => {
       await assertRevert(
         blockchainParameters.setUptimeLookbackWindow(11, {
           from: accounts[1],
@@ -210,9 +207,17 @@ contract('BlockchainParameters', (accounts: string[]) => {
       )
     })
 
-    it('should fail when using value above maximum', async () => {
+    it('should fail when using value greater than safe maximum', async () => {
       await assertRevert(
         blockchainParameters.setUptimeLookbackWindow(721, {
+          from: accounts[1],
+        })
+      )
+    })
+
+    it('should fail when using value greater than epochSize-2', async () => {
+      await assertRevert(
+        blockchainParameters.setUptimeLookbackWindow(EPOCH - 1, {
           from: accounts[1],
         })
       )

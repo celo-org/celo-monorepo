@@ -103,7 +103,12 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param window New window.
    */
   function setUptimeLookbackWindow(uint256 window) public onlyOwner {
-    require(window >= 12 && window <= 720, "uptimeLookbackWindow is out of range");
+    require(window >= 12 && window <= 720, "UptimeLookbackWindow must be within safe range");
+    require(
+      window <= getEpochSize() - 2,
+      "UptimeLookbackWindow must be smaller or equal to epochSize-2"
+    );
+
     uptimeLookbackWindow.oldValue = getUptimeLookbackWindow();
     uptimeLookbackWindow.nextValue = window;
 
@@ -122,19 +127,20 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   /**
    * @notice Gets the uptime lookback window.
    */
-  function getUptimeLookbackWindow() public view returns (uint256) {
+  function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
     // epoch 0 is the genesis block, thus implies it has not been initialized
     if (uptimeLookbackWindow.nextValueActivationEpoch == 0) {
       // since on mainet,baklava,alfajores we don't reinitialize the contract
       // we need to hardcode the default value here
       // can be removed after the deploy
-      return 12;
+      lookbackWindow = 12;
+    } else if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
+      lookbackWindow = uptimeLookbackWindow.nextValue;
+    } else {
+      lookbackWindow = uptimeLookbackWindow.oldValue;
     }
 
-    if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
-      return uptimeLookbackWindow.nextValue;
-    }
-    return uptimeLookbackWindow.oldValue;
+    return lookbackWindow;
   }
 
   /**
