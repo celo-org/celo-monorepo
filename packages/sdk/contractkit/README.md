@@ -54,7 +54,7 @@ async function getKit(myAddress: string, privateKey: string) {
   kit.defaultAccount = myAddress
   
   // add the account private key for tx signing when connecting to a remote node
-  kit.addAccount(privateKey)
+  kit.connection.addAccount(privateKey)
   
   // paid gas in celo dollars
   await kit.setFeeCurrency(CeloContract.StableToken)
@@ -82,7 +82,7 @@ const cusdBalance = await stableToken.balanceOf(someAddress)
 To send funds:
 
 ```ts
-const oneGold = kit.web3.utils.toWei('1', 'ether')
+const oneGold = kit.connection.web3.utils.toWei('1', 'ether')
 const tx = await goldToken.transfer(someAddress, oneGold).send({
   from: myAddress
 })
