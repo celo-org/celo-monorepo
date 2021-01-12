@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { TokenTransactionType } from 'src/apollo/types'
 import { openUrl } from 'src/app/actions'
+import { bidaliPaymentRequested } from 'src/fiatExchanges/actions'
 import networkConfig from 'src/geth/networkConfig'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import i18n from 'src/i18n'
@@ -57,30 +58,23 @@ function BidaliScreen(props: Props) {
     switch (method) {
       case 'onPaymentRequest':
         const { amount, address, currency, description, chargeId } = data
-        console.log(`Send ${amount} ${currency} to ${address} for ${description} (${chargeId})`)
-        // Show a native send confirmation modal here
-        const recipient: RecipientWithAddress = {
-          kind: RecipientKind.Address,
-          address, // '0xa6d1e0bdb6960c3f1bda8ef8f1e91480cfc40dbb',
-          displayId: 'MyTestID',
-          displayName: 'Bidali',
-          // displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
-          // e164PhoneNumber: data.e164PhoneNumber,
-          // phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
-          // thumbnailPath: cachedRecipient?.thumbnailPath,
-          // contactId: cachedRecipient?.contactId,
+        const onPaymentSent = () => {
+          webViewRef.current?.injectJavaScript(`window.valora.paymentSent();`)
         }
-        const transactionData: TransactionDataInput = {
-          recipient,
-          amount: new BigNumber(amount),
-          reason: `${description} (${chargeId})`,
-          type: TokenTransactionType.PayPrefill,
+        const onCancelled = () => {
+          webViewRef.current?.injectJavaScript(`window.valora.paymentCancelled();`)
         }
-        navigate(Screens.SendConfirmationModal, {
-          transactionData,
-          isFromScan: true,
-          // currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
-        })
+        dispatch(
+          bidaliPaymentRequested(
+            address,
+            amount,
+            currency,
+            description,
+            chargeId,
+            onPaymentSent,
+            onCancelled
+          )
+        )
         break
       case 'openUrl':
         const { url } = data
