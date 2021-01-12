@@ -603,7 +603,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    */
   async getAttestationForSecurityCode(
     serviceURL: string,
-    requestBody: GetAttestationRequest
+    requestBody: GetAttestationRequest,
+    signer: Address
   ): Promise<string> {
     const urlParams = new URLSearchParams({
       phoneNumber: requestBody.phoneNumber,
@@ -617,13 +618,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
     if (requestBody.securityCode) {
       urlParams.set('securityCode', requestBody.securityCode)
+      const signature = await this.kit.signTypedData(
+        signer,
+        buildSecurityCodeTypedData(requestBody.securityCode)
+      )
       additionalHeaders = {
-        Authentication: SignatureUtils.serializeSignature(
-          await this.kit.signTypedData(
-            requestBody.account,
-            buildSecurityCodeTypedData(requestBody.securityCode)
-          )
-        ),
+        Authentication: SignatureUtils.serializeSignature(signature),
       }
     }
 

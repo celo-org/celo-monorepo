@@ -467,6 +467,7 @@ export function* requestAndRetrieveAttestations(
   if (!isFeelessVerification) {
     yield put(setRetryVerificationWithForno(false))
   }
+
   while (attestations.length < attestationsNeeded) {
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_start, {
       currentAttestation: attestations.length,
@@ -687,6 +688,7 @@ export function attestationCodeReceiver(
     try {
       if (features.SHORT_VERIFICATION_CODES) {
         securityCodeWithPrefix = extractSecurityCodeWithPrefix(message)
+        const signer = yield call(getConnectedUnlockedAccount)
         if (securityCodeWithPrefix) {
           message = yield call(
             getAttestationCodeForSecurityCode,
@@ -694,7 +696,8 @@ export function attestationCodeReceiver(
             phoneHashDetails,
             account,
             attestations,
-            securityCodeWithPrefix
+            securityCodeWithPrefix,
+            signer
           )
         } else {
           Logger.error(TAG + '@attestationCodeReceiver', 'No security code in received message')

@@ -5,5 +5,6 @@ describe('Version check', () => {
     expect(isVersionBelowMinimum('1.4.0', '1.5.0')).toBe(true)
     expect(isVersionBelowMinimum('1.4.0', '1.4.0')).toBe(false)
     expect(isVersionBelowMinimum('1.4.0', '1.4.0.1')).toBe(true)
+    expect(isVersionBelowMinimum('1.4.0-unstable', '1.4.0')).toBe(false)
   })
 })
