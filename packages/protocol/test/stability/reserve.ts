@@ -297,10 +297,14 @@ contract('Reserve', (accounts: string[]) => {
         },
       })
     })
-    // it('has the righth list of exchange spdners', async () => {
-    //   const spenders = await reserve.getExchangeSpenders()
-    //   assert.equal(assert.length, 0)
-    // })
+    it('has the right list of exchange spenders after addition', async () => {
+      await reserve.addExchangeSpender(exchangeAddress)
+      await reserve.addExchangeSpender(accounts[1])
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 2)
+      assert.equal(spenders[0], exchangeAddress)
+      assert.equal(spenders[1], accounts[1])
+    })
   })
 
   describe.only('#removeExchangeSpender(exchangeAddress)', () => {
@@ -320,11 +324,39 @@ contract('Reserve', (accounts: string[]) => {
       })
     })
 
-    it('has the righth list of exchange spenders', async () => {
+    it('has the right list of exchange spenders', async () => {
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 1)
+      assert.equal(spenders[0], exchangeAddress)
+    })
+
+    it('has the right list of exchange after removing one', async () => {
+      await reserve.removeExchangeSpender(exchangeAddress, 0)
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 0)
+    })
+
+    it("can't be removed twice", async () => {
+      await reserve.removeExchangeSpender(exchangeAddress, 0)
+      await assertRevert(reserve.removeExchangeSpender(exchangeAddress, 0))
+    })
+
+    it("can't delete an index out of range", async () => {
+      await assertRevert(reserve.removeExchangeSpender(exchangeAddress, 1))
+    })
+
+    it('removes from a bigg array', async () => {
+      await reserve.addExchangeSpender(accounts[1])
+      await reserve.removeExchangeSpender(exchangeAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
       console.log(spenders)
       assert.equal(spenders.length, 1)
-      assert.equal(spenders[0], exchangeAddress)
+      assert.equal(spenders[0], accounts[1])
+    })
+
+    it("doesn't remove an address with the wrong index", async () => {
+      await reserve.addExchangeSpender(accounts[1])
+      assertRevert(reserve.removeExchangeSpender(exchangeAddress, 1))
     })
   })
 

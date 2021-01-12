@@ -322,7 +322,8 @@ contract Reserve is
   function addExchangeSpender(address spender) external onlyOwner {
     require(!isExchangeSpender.addresses[spender], "Address is already Exchange Spender");
     isExchangeSpender.addresses[spender] = true;
-    isExchangeSpender.addresses_array.push(spender);
+    // isExchangeSpender.addresses_array.push(spender);
+    isExchangeSpender.addresses_array.length = isExchangeSpender.addresses_array.push(spender);
     emit ExchangeSpenderAdded(spender);
     // TODO shall I add to the lenght?
   }
@@ -333,30 +334,21 @@ contract Reserve is
    */
   function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
     isExchangeSpender.addresses[spender] = false;
-    // isExchangeSpender.count--;
     uint256 numAddresses = isExchangeSpender.addresses_array.length;
     require(index < numAddresses, "Index is invalid");
     require(spender == isExchangeSpender.addresses_array[index], "Index does not match spender");
     uint256 newnumAddresses = numAddresses.sub(1);
-    if (index != newnumAddresses) {
-      isExchangeSpender.addresses_array[index] = isExchangeSpender.addresses_array[newnumAddresses];
-    }
-    isExchangeSpender.addresses_array[newnumAddresses] = address(0x0);
-    // TODO shall I substract from the lenght?
+    // swap with last
+    isExchangeSpender.addresses_array[index] = isExchangeSpender.addresses_array[newnumAddresses];
+    // delete the last
+    //delete isExchangeSpender.addresses_array[newnumAddresses];
+    isExchangeSpender.addresses_array.length = newnumAddresses;
     emit ExchangeSpenderRemoved(spender);
   }
 
   function getExchangeSpenders() public view returns (address[] memory) {
     return isExchangeSpender.addresses_array;
   }
-
-  // function getExchangeSpenders() public view returns (address[] memory) {
-  //   address[] memory exchangeSpenderAddresses = new address[](isExchangeSpender.count);
-  //   for (uint i = 0; i < isExchangeSpender.count; i++) {
-  //       exchangeSpenderAddresses[i] = isExchangeSpender.addresses[i];
-  //   }
-  //   return exchangeSpenderAddresses;
-  // }
 
   /**
    * @notice Transfer gold to a whitelisted address subject to reserve spending limits.
