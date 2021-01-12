@@ -95,7 +95,7 @@ celocli governance:vote --proposalID=<PROPOSAL_ID> --value=<Abstain|Yes|No> --fr
 If a Governance Proposal receives enough votes and passes in the Referendum phase, it can be executed by anyone.
 
 ```bash
-celocli governance:execute --proposalID:<PROPOSAL_ID> --from=<YOUR_VOTER_ADDRESS>
+celocli governance:execute --proposalID=<PROPOSAL_ID> --from=<YOUR_VOTER_ADDRESS>
 ```
 
 <!--
