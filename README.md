@@ -124,7 +124,6 @@ The repository has the following packages (sub projects):
 - [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
 - [typescript](packages/typescript) - no README available (improve?)
 - [utils](packages/utils) - no README available (improve?)
-- [web](packages/web) - Celo website ([live](https://celo.org/))
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
 

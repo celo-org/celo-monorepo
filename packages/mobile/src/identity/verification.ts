@@ -11,7 +11,11 @@ import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-ide
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { AttestationRequest } from '@celo/utils/lib/io'
 import { retryAsync } from '@celo/utils/src/async'
-import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import {
+  AttestationsStatus,
+  extractAttestationCodeFromMessage,
+  extractSecurityCodeWithPrefix,
+} from '@celo/utils/src/attestations'
 import functions from '@react-native-firebase/functions'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
@@ -70,10 +74,7 @@ import {
   VerificationState,
   verificationStateSelector,
 } from 'src/identity/reducer'
-import {
-  extractSecurityCodeWithPrefix,
-  getAttestationCodeForSecurityCode,
-} from 'src/identity/securityCode'
+import { getAttestationCodeForSecurityCode } from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'

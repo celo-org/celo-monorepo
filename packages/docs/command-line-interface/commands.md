@@ -2,7 +2,6 @@
 
 list all the commands
 
-- [`celocli commands`](#celocli-commands)
 
 ## `celocli commands`
 
