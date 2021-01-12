@@ -162,6 +162,13 @@ contract('BlockchainParameters', (accounts: string[]) => {
       await blockchainParameters.setUptimeLookbackWindow(24)
       assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 24)
     })
+    it('if unset, second set should set the variable for the next epoch', async () => {
+      await blockchainParameters.setUptimeLookbackWindow(24)
+      await blockchainParameters.setUptimeLookbackWindow(50)
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 24)
+      await mineBlocks(EPOCH, web3)
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 50)
+    })
 
     it('when doing 2 sets, should override the value for the next epoch', async () => {
       // enter steady state
