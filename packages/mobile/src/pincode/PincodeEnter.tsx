@@ -29,10 +29,11 @@ interface StateProps {
   currentAccount: string | null
 }
 
-type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
+type RouteProps = StackScreenProps<StackParamList, Screens.PincodeEnter>
+type Props = StateProps & WithTranslation & RouteProps
 
 class PincodeEnter extends React.Component<Props, State> {
-  static navigationOptions = (navOptions: Props) => ({
+  static navigationOptions = (navOptions: RouteProps) => ({
     ...modalScreenOptions(navOptions),
     ...headerWithBackButton,
     gestureEnabled: false,
