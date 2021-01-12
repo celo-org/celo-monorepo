@@ -127,7 +127,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-        +1 (415) 555-0000
+        +1 415-555-0000
       </Text>
     </View>
   </View>

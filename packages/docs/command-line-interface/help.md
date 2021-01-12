@@ -2,7 +2,6 @@
 
 display help for celocli
 
-- [`celocli help [COMMAND]`](#celocli-help-command)
 
 ## `celocli help [COMMAND]`
 
