@@ -285,7 +285,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#addExchangeSpender(exchangeAddress)', () => {
+  describe('#addExchangeSpender(exchangeAddress)', () => {
     it('should emit addExchangeSpender event on add', async () => {
       const resp = await reserve.addExchangeSpender(exchangeAddress)
       const log = resp.logs[0]
@@ -307,7 +307,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#removeExchangeSpender(exchangeAddress)', () => {
+  describe('#removeExchangeSpender(exchangeAddress)', () => {
     beforeEach(async () => {
       await reserve.addExchangeSpender(exchangeAddress)
     })
@@ -349,7 +349,6 @@ contract('Reserve', (accounts: string[]) => {
       await reserve.addExchangeSpender(accounts[1])
       await reserve.removeExchangeSpender(exchangeAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
-      console.log(spenders)
       assert.equal(spenders.length, 1)
       assert.equal(spenders[0], accounts[1])
     })
@@ -359,8 +358,6 @@ contract('Reserve', (accounts: string[]) => {
       assertRevert(reserve.removeExchangeSpender(exchangeAddress, 1))
     })
   })
-
-  // getExchangeSpenders
 
   describe('addSpender & removeSpender', () => {
     it('emits on add', async () => {

@@ -34,8 +34,8 @@ contract Reserve is
   }
 
   struct ExchangeSpender {
-    mapping(address => bool) addresses;
-    address[] addresses_array;
+    mapping(address => bool) isSpender;
+    address[] addresses;
   }
 
   mapping(address => bool) public isToken;
@@ -320,10 +320,10 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addExchangeSpender(address spender) external onlyOwner {
-    require(!isExchangeSpender.addresses[spender], "Address is already Exchange Spender");
-    isExchangeSpender.addresses[spender] = true;
-    // isExchangeSpender.addresses_array.push(spender);
-    isExchangeSpender.addresses_array.length = isExchangeSpender.addresses_array.push(spender);
+    require(!isExchangeSpender.isSpender[spender], "Address is already Exchange Spender");
+    isExchangeSpender.isSpender[spender] = true;
+    // isExchangeSpender.addresses.push(spender);
+    isExchangeSpender.addresses.length = isExchangeSpender.addresses.push(spender);
     emit ExchangeSpenderAdded(spender);
     // TODO shall I add to the lenght?
   }
@@ -333,21 +333,21 @@ contract Reserve is
    * @param spender The address that is to be no longer allowed to spend Reserve funds.
    */
   function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
-    isExchangeSpender.addresses[spender] = false;
-    uint256 numAddresses = isExchangeSpender.addresses_array.length;
+    isExchangeSpender.isSpender[spender] = false;
+    uint256 numAddresses = isExchangeSpender.addresses.length;
     require(index < numAddresses, "Index is invalid");
-    require(spender == isExchangeSpender.addresses_array[index], "Index does not match spender");
+    require(spender == isExchangeSpender.addresses[index], "Index does not match spender");
     uint256 newnumAddresses = numAddresses.sub(1);
     // swap with last
-    isExchangeSpender.addresses_array[index] = isExchangeSpender.addresses_array[newnumAddresses];
+    isExchangeSpender.addresses[index] = isExchangeSpender.addresses[newnumAddresses];
     // delete the last
-    //delete isExchangeSpender.addresses_array[newnumAddresses];
-    isExchangeSpender.addresses_array.length = newnumAddresses;
+    //delete isExchangeSpender.addresses[newnumAddresses];
+    isExchangeSpender.addresses.length = newnumAddresses;
     emit ExchangeSpenderRemoved(spender);
   }
 
   function getExchangeSpenders() public view returns (address[] memory) {
-    return isExchangeSpender.addresses_array;
+    return isExchangeSpender.addresses;
   }
 
   /**
@@ -391,7 +391,7 @@ contract Reserve is
    */
   function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
     require(
-      isExchangeSpender.addresses[msg.sender],
+      isExchangeSpender.isSpender[msg.sender],
       "a non-exchangeSpender can't start a transfer"
     );
     return _transferGold(to, value);
