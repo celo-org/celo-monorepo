@@ -2,26 +2,36 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
+import "../common/UsingPrecompiles.sol";
 
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
-contract BlockchainParameters is Ownable, Initializable {
+contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   struct ClientVersion {
     uint256 major;
     uint256 minor;
     uint256 patch;
   }
 
+  struct LookbackWindow {
+    // Value for lookbackWindow before `nextValueActivationBlock`
+    uint256 oldValue;
+    // Value for lookbackWindow after `nextValueActivationBlock`
+    uint256 nextValue;
+    // Epoch where next value is activated
+    uint256 nextValueActivationEpoch;
+  }
+
   ClientVersion private minimumClientVersion;
   uint256 public blockGasLimit;
   uint256 public intrinsicGasForAlternativeFeeCurrency;
-  uint256 public uptimeLookbackWindow;
+  LookbackWindow public uptimeLookbackWindow;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
-  event UptimeLookbackWindowSet(uint256 window);
+  event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -93,8 +103,38 @@ contract BlockchainParameters is Ownable, Initializable {
    * @param window New window.
    */
   function setUptimeLookbackWindow(uint256 window) public onlyOwner {
-    uptimeLookbackWindow = window;
-    emit UptimeLookbackWindowSet(window);
+    require(window >= 12 && window <= 720, "uptimeLookbackWindow is out of range");
+    uptimeLookbackWindow.oldValue = getUptimeLookbackWindow();
+    uptimeLookbackWindow.nextValue = window;
+
+    // epoch 0 is the genesis block, thus implies it has not been initialized
+    if (uptimeLookbackWindow.nextValueActivationEpoch == 0) {
+      // on initialize we set the value for the current epoch which configurer
+      // must make it so it's SAME as geth's chainConfig value
+      uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber();
+    } else {
+      // changes only take place on the next epoch
+      uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber() + 1;
+    }
+    emit UptimeLookbackWindowSet(window, uptimeLookbackWindow.nextValueActivationEpoch);
+  }
+
+  /**
+   * @notice Gets the uptime lookback window.
+   */
+  function getUptimeLookbackWindow() public view returns (uint256) {
+    // epoch 0 is the genesis block, thus implies it has not been initialized
+    if (uptimeLookbackWindow.nextValueActivationEpoch == 0) {
+      // since on mainet,baklava,alfajores we don't reinitialize the contract
+      // we need to hardcode the default value here
+      // can be removed after the deploy
+      return 12;
+    }
+
+    if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
+      return uptimeLookbackWindow.nextValue;
+    }
+    return uptimeLookbackWindow.oldValue;
   }
 
   /**

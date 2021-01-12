@@ -1,12 +1,22 @@
-import { assertContainSubset, assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertContainSubset,
+  assertEqualBN,
+  assertRevert,
+  mineBlocks,
+} from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
-import { BlockchainParametersContract, BlockchainParametersInstance } from 'types'
+import { BlockchainParametersInstance, BlockchainParametersTestContract } from 'types'
 
-const BlockchainParameters: BlockchainParametersContract = artifacts.require('BlockchainParameters')
+const BlockchainParameters: BlockchainParametersTestContract = artifacts.require(
+  'BlockchainParametersTest'
+)
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
 BlockchainParameters.numberFormat = 'BigNumber'
+
+// Hard coded in ganache.
+const EPOCH = 100
 
 contract('BlockchainParameters', (accounts: string[]) => {
   let blockchainParameters: BlockchainParametersInstance
@@ -17,7 +27,6 @@ contract('BlockchainParameters', (accounts: string[]) => {
   }
   const gasLimit = 7000000
   const gasForNonGoldCurrencies = 50000
-  const lookbackWindow = 12
 
   beforeEach(async () => {
     blockchainParameters = await BlockchainParameters.new()
@@ -116,11 +125,63 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
   })
 
-  describe('#setUptimeLookbackWindow()', () => {
-    it('should set the variable', async () => {
-      await blockchainParameters.setUptimeLookbackWindow(lookbackWindow)
-      assert.equal((await blockchainParameters.uptimeLookbackWindow()).toNumber(), lookbackWindow)
+  describe('#getUptimeLookbackWindow()', () => {
+    it('should return 12 if not initalized', async () => {
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 12)
     })
+
+    it('should return oldValue once it has been initialized', async () => {
+      await blockchainParameters.setUptimeLookbackWindow(20)
+      await mineBlocks(EPOCH, web3)
+      await blockchainParameters.setUptimeLookbackWindow(50)
+
+      // returns old value
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 20)
+    })
+  })
+
+  describe('#setUptimeLookbackWindow()', () => {
+    const lookbackWindow = 20
+
+    it('if set should set the variable for the next epoch', async () => {
+      // enter steady state
+      await blockchainParameters.setUptimeLookbackWindow(24)
+      await mineBlocks(EPOCH, web3)
+
+      await blockchainParameters.setUptimeLookbackWindow(40)
+
+      // still old value
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 24)
+
+      // wait an epoch to find new value
+      await mineBlocks(EPOCH, web3)
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 40)
+    })
+
+    it('if unset should set the variable for the current epoch', async () => {
+      await blockchainParameters.setUptimeLookbackWindow(24)
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 24)
+    })
+
+    it('when doing 2 sets, should override the value for the next epoch', async () => {
+      // enter steady state
+      await blockchainParameters.setUptimeLookbackWindow(24)
+      await mineBlocks(EPOCH, web3)
+
+      await blockchainParameters.setUptimeLookbackWindow(lookbackWindow)
+      await blockchainParameters.setUptimeLookbackWindow(lookbackWindow + 100)
+
+      // current epoch still initial value
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 24)
+
+      // after the epoch, find last value set
+      await mineBlocks(EPOCH, web3)
+      assert.equal(
+        (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
+        lookbackWindow + 100
+      )
+    })
+
     it('should emit the corresponding event', async () => {
       const resp = await blockchainParameters.setUptimeLookbackWindow(lookbackWindow)
       assert.equal(resp.logs.length, 1)
@@ -132,6 +193,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
         },
       })
     })
+
     it('only owner should be able to set', async () => {
       await assertRevert(
         blockchainParameters.setUptimeLookbackWindow(lookbackWindow, {
@@ -139,9 +201,27 @@ contract('BlockchainParameters', (accounts: string[]) => {
         })
       )
     })
+
+    it('should fail when using value below minimum', async () => {
+      await assertRevert(
+        blockchainParameters.setUptimeLookbackWindow(11, {
+          from: accounts[1],
+        })
+      )
+    })
+
+    it('should fail when using value above maximum', async () => {
+      await assertRevert(
+        blockchainParameters.setUptimeLookbackWindow(721, {
+          from: accounts[1],
+        })
+      )
+    })
   })
 
   describe('#initialize()', () => {
+    const lookbackWindow = 20
+
     it('should set the variables', async () => {
       await blockchainParameters.initialize(
         version.major,
@@ -156,7 +236,10 @@ contract('BlockchainParameters', (accounts: string[]) => {
       assert.equal(version.minor, versionQueried[1].toNumber())
       assert.equal(version.patch, versionQueried[2].toNumber())
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
-      assert.equal((await blockchainParameters.uptimeLookbackWindow()).toNumber(), lookbackWindow)
+      assert.equal(
+        (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
+        lookbackWindow
+      )
     })
     it('should emit correct events', async () => {
       const resp = await blockchainParameters.initialize(
