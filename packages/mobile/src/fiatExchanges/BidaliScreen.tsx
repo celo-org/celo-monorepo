@@ -1,14 +1,12 @@
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils'
 import { StackScreenProps } from '@react-navigation/stack'
-import BigNumber from 'bignumber.js'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { WebView, WebViewMessageEvent } from 'react-native-webview'
 import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
-import { TokenTransactionType } from 'src/apollo/types'
 import { openUrl } from 'src/app/actions'
 import { bidaliPaymentRequested } from 'src/fiatExchanges/actions'
 import networkConfig from 'src/geth/networkConfig'
@@ -19,8 +17,6 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
-import { RecipientKind, RecipientWithAddress } from 'src/recipients/recipient'
-import { TransactionDataInput } from 'src/send/SendAmount'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 function useInitialJavaScript(
@@ -139,35 +135,6 @@ BidaliScreen.navigationOptions = () => {
     headerLeft: () => (
       <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
     ),
-    // Temporary until we can test this e2e
-    headerRight: () => {
-      return null
-      const onPress = () => {
-        const recipient: RecipientWithAddress = {
-          kind: RecipientKind.Address,
-          address: '0xa6d1e0bdb6960c3f1bda8ef8f1e91480cfc40dbb',
-          displayId: 'MyTestID',
-          displayName: 'Bidali',
-          // displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
-          // e164PhoneNumber: data.e164PhoneNumber,
-          // phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
-          // thumbnailPath: cachedRecipient?.thumbnailPath,
-          // contactId: cachedRecipient?.contactId,
-        }
-        const transactionData: TransactionDataInput = {
-          recipient,
-          amount: new BigNumber(20),
-          reason: 'Bidali',
-          type: TokenTransactionType.PayPrefill,
-        }
-        navigate(Screens.SendConfirmationModal, {
-          transactionData,
-          isFromScan: true,
-          // currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
-        })
-      }
-      return <TopBarTextButton title="Simulate Pay" onPress={onPress} />
-    },
   }
 }
 
