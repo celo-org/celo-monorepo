@@ -24,6 +24,8 @@
     "@celo/wallet-base": "1.0.0-dev",
     "@celo/wallet-remote": "1.0.0-dev",
     "@celo/wallet-hsm": "1.0.0-dev",
+    "@types/debug": "^4.1.5",
+    "@types/secp256k1": "^4.0.0",
     "aws-sdk": "^2.705.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
@@ -33,7 +35,6 @@
   },
   "devDependencies": {
     "@celo/connect": "1.0.0-dev",
-    "@types/secp256k1": "^4.0.0",
     "elliptic": "6.5.3",
     "web3": "1.3.0"
   },
