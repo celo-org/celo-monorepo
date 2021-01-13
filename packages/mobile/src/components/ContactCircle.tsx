@@ -4,7 +4,9 @@ import { getContactNameHash } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
+import { useSelector } from 'react-redux'
 import DefaultAvatar from 'src/icons/DefaultAvatar'
+import { addressToDisplayNameSelector } from 'src/identity/reducer'
 
 interface Props {
   style?: ViewStyle
@@ -18,21 +20,31 @@ interface Props {
 const DEFAULT_ICON_SIZE = 40
 export const contactIconColors = [colors.teal, colors.orange, colors.purple]
 
-const getAddressColor = (address: string) =>
-  contactIconColors[parseInt(address.substring(0, 3), 16) % contactIconColors.length]
-const getContactColor = (contact: MinimalContact) => getAddressColor(getContactNameHash(contact))
+const getAddressBackgroundColor = (address: string) =>
+  `hsl(${parseInt(address.substring(0, 5), 16) % 360}, 53%, 93%)`
+const getAddressForegroundColor = (address: string) =>
+  `hsl(${parseInt(address.substring(0, 5), 16) % 360}, 67%, 24%)`
+const getContactColor = (contact: MinimalContact) =>
+  getAddressBackgroundColor(getContactNameHash(contact))
 const getContactInitial = (contact: MinimalContact) => getNameInitial(contact.displayName)
 const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
-export default class ContactCircle extends React.PureComponent<Props> {
-  getInitials = (): string => {
-    const { name, contact } = this.props
-    return (contact && getContactInitial(contact)) || (name && getNameInitial(name)) || '#'
-  }
+function ContactCircle({ contact, size, thumbnailPath, name, address, style }: Props) {
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
+  const addressInfo = addressToDisplayName[address || '']
+  const displayName = name || addressInfo?.name
+  const iconSize = size || DEFAULT_ICON_SIZE
+  const iconBackgroundColor =
+    (contact && getContactColor(contact)) ||
+    (address && getAddressBackgroundColor(address)) ||
+    contactIconColors[0]
 
-  renderThumbnail = () => {
-    const { contact, size, thumbnailPath, name } = this.props
-    const resolvedThumbnail = thumbnailPath || (contact && contact.thumbnailPath)
+  const getInitials = () =>
+    (contact && getContactInitial(contact)) || (displayName && getNameInitial(displayName)) || '#'
+
+  const renderThumbnail = () => {
+    const resolvedThumbnail =
+      thumbnailPath || (contact && contact.thumbnailPath) || addressInfo?.imageUrl
     const iconSize = size || DEFAULT_ICON_SIZE
 
     if (resolvedThumbnail) {
@@ -48,46 +60,40 @@ export default class ContactCircle extends React.PureComponent<Props> {
       )
     }
 
+    const fontColor = getAddressForegroundColor(address || '0x0')
     // Mobile # is what default display name when contact isn't saved
-    if (name && name !== 'Mobile #') {
-      const initials = this.getInitials()
+    if (displayName && displayName !== 'Mobile #') {
+      const initials = getInitials()
       return (
-        <Text style={[fontStyles.iconText, { fontSize: iconSize / 2.0 }]}>
+        <Text style={[fontStyles.iconText, { fontSize: iconSize / 2.0, color: fontColor }]}>
           {initials.toLocaleUpperCase()}
         </Text>
       )
     }
 
-    return <DefaultAvatar />
+    return <DefaultAvatar foregroundColor={fontColor} backgroundColor={iconBackgroundColor} />
   }
 
-  render() {
-    const { address, contact, size } = this.props
-    const iconSize = size || DEFAULT_ICON_SIZE
-    const iconColor =
-      (contact && getContactColor(contact)) ||
-      (address && getAddressColor(address)) ||
-      contactIconColors[0]
-
-    return (
-      <View style={[styles.container, this.props.style]}>
-        <View
-          style={[
-            styles.icon,
-            {
-              backgroundColor: iconColor,
-              height: iconSize,
-              width: iconSize,
-              borderRadius: iconSize / 2,
-            },
-          ]}
-        >
-          {this.renderThumbnail()}
-        </View>
+  return (
+    <View style={[styles.container, style]}>
+      <View
+        style={[
+          styles.icon,
+          {
+            backgroundColor: iconBackgroundColor,
+            height: iconSize,
+            width: iconSize,
+            borderRadius: iconSize / 2,
+          },
+        ]}
+      >
+        {renderThumbnail()}
       </View>
-    )
-  }
+    </View>
+  )
 }
+
+export default ContactCircle
 
 const styles = StyleSheet.create({
   container: {
