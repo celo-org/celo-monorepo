@@ -19,14 +19,17 @@ const TAG = 'NavigationService'
 type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
+export const isReadyRef = createRef() // TODO: type
 
 async function ensureNavigator() {
   let retries = 0
-  while (!navigationRef.current && retries < 3) {
+  Logger.debug(`${TAG}@ensureNavigator`, `waiting for navigator`)
+  while (!navigationRef.current && isReadyRef.current && retries < 30) {
+    Logger.debug(`${TAG}@ensureNavigator`, `waiting for navigator try: ${retries}`)
     await sleep(200)
     retries++
   }
-  if (!navigationRef.current) {
+  if (!navigationRef.current || !isReadyRef.current) {
     throw new Error('navigator is not initialized')
   }
 }
