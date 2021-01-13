@@ -1,6 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { getContactNameHash } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
@@ -18,26 +16,20 @@ interface Props {
 }
 
 const DEFAULT_ICON_SIZE = 40
-export const contactIconColors = [colors.teal, colors.orange, colors.purple]
 
 const getAddressBackgroundColor = (address: string) =>
   `hsl(${parseInt(address.substring(0, 5), 16) % 360}, 53%, 93%)`
 const getAddressForegroundColor = (address: string) =>
   `hsl(${parseInt(address.substring(0, 5), 16) % 360}, 67%, 24%)`
-const getContactColor = (contact: MinimalContact) =>
-  getAddressBackgroundColor(getContactNameHash(contact))
 const getContactInitial = (contact: MinimalContact) => getNameInitial(contact.displayName)
 const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
 function ContactCircle({ contact, size, thumbnailPath, name, address, style }: Props) {
   const addressToDisplayName = useSelector(addressToDisplayNameSelector)
-  const addressInfo = addressToDisplayName[address || '']
+  const addressInfo = address ? addressToDisplayName[address] : undefined
   const displayName = name || addressInfo?.name
   const iconSize = size || DEFAULT_ICON_SIZE
-  const iconBackgroundColor =
-    (contact && getContactColor(contact)) ||
-    (address && getAddressBackgroundColor(address)) ||
-    contactIconColors[0]
+  const iconBackgroundColor = getAddressBackgroundColor(address || '0x0')
 
   const getInitials = () =>
     (contact && getContactInitial(contact)) || (displayName && getNameInitial(displayName)) || '#'
@@ -45,7 +37,6 @@ function ContactCircle({ contact, size, thumbnailPath, name, address, style }: P
   const renderThumbnail = () => {
     const resolvedThumbnail =
       thumbnailPath || (contact && contact.thumbnailPath) || addressInfo?.imageUrl
-    const iconSize = size || DEFAULT_ICON_SIZE
 
     if (resolvedThumbnail) {
       return (

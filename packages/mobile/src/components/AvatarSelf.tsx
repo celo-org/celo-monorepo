@@ -36,5 +36,12 @@ export function AvatarSelf({ iconSize, displayNameStyle }: Props) {
     }
   }
 
-  return <Avatar recipient={recipient} iconSize={iconSize} displayNameStyle={displayNameStyle} />
+  return (
+    <Avatar
+      recipient={recipient}
+      iconSize={iconSize}
+      displayNameStyle={displayNameStyle}
+      address={account ?? undefined}
+    />
+  )
 }

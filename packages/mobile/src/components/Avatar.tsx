@@ -69,9 +69,9 @@ export function Avatar(props: Props) {
         />
       ) : null}
 
-      {!e164Number && address ? (
+      {!e164NumberToShow && address ? (
         <Text style={[fontStyles.small, styles.contactName]} numberOfLines={1} ellipsizeMode="tail">
-          {'#' + address}
+          {address}
         </Text>
       ) : null}
     </View>
