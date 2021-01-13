@@ -2,7 +2,7 @@
 
 import { NavigationActions, StackActions } from '@react-navigation/compat'
 import { CommonActions, NavigationContainerRef } from '@react-navigation/native'
-import { createRef } from 'react'
+import { createRef, MutableRefObject } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -19,7 +19,7 @@ const TAG = 'NavigationService'
 type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
-export const isReadyRef = createRef() // TODO: type
+export const isReadyRef: MutableRefObject<boolean | null> = createRef()
 
 async function ensureNavigator() {
   let retries = 0
