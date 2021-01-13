@@ -39,7 +39,7 @@ We will not be getting into the details of how to write Solidity in this exercis
 Our contract will just store a name for now:
 
 ```text
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.5.0 <0.8.0;
 
 contract HelloWorld {
   string name = 'Celo';
@@ -125,7 +125,7 @@ If you go to the [Alfajores Faucet Page](https://celo.org/build/faucet), you can
 Then add your account to the `kit` with the private key:
 
 ```javascript
-    kit.addAccount(account.privateKey)
+    kit.connection.addAccount(account.privateKey)
 ```
 
 ### Deploy the contract
@@ -142,7 +142,7 @@ const getAccount = require('./getAccount').getAccount
 
 async function awaitWrapper(){
     let account = await getAccount()
-    kit.addAccount(account.privateKey)
+    kit.connection.addAccount(account.privateKey)
 }
 awaitWrapper()
 ```
@@ -157,7 +157,7 @@ Then, in the `networks` object, we can add the initialized `kit`provider to an `
       network_id: "*"
     },
     alfajores: {
-      provider: kit.web3.currentProvider, // CeloProvider
+      provider: kit.connection.web3.currentProvider, // CeloProvider
       network_id: 44787                   // Alfajores network id
     }
   }
@@ -188,14 +188,14 @@ const HelloWorld = require('./build/contracts/HelloWorld.json')
 We are finally ready to deploy the contract. Use the `kit`to create a custom transaction that includes the contract bytecode.
 
 ```javascript
-    let tx = await kit.sendTransaction({
+    let tx = await kit.connection.sendTransaction({
         from: account.address,
         data: HelloWorld.bytecode // from ./build/contracts/HelloWorld.json
     })
 ```
 
 {% hint style="info" %}
-To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `to:` field and the contract bytecode in the `data` field. The account that you are sending the transaction from must have enough CELO to pay the transaction fee, unless you specify another currency as the `feeCurrency`, then you need enough of that currency to pay the transaction fee.
+To deploy a contract on Celo, use the `kit.connection.sendTransaction()` function with no `to:` field and the contract bytecode in the `data` field. The account that you are sending the transaction from must have enough CELO to pay the transaction fee, unless you specify another currency as the `feeCurrency`, then you need enough of that currency to pay the transaction fee.
 {% endhint %}
 
 The entire deployment script is less than 20 lines of code.
@@ -210,9 +210,9 @@ const getAccount = require('./getAccount').getAccount
 
 async function awaitWrapper(){
     let account = await getAccount()
-    kit.addAccount(account.privateKey) // this account must have a CELO balance to pay transaction fees
+    kit.connection.addAccount(account.privateKey) // this account must have a CELO balance to pay transaction fees
 
-    let tx = await kit.sendTransaction({
+    let tx = await kit.connection.sendTransaction({
         from: account.address,
         data: HelloWorld.bytecode
     })
