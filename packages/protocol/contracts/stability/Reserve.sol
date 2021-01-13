@@ -33,10 +33,10 @@ contract Reserve is
     uint128 timestamp;
   }
 
-  struct ExchangeSpender {
-    mapping(address => bool) isSpender;
-    address[] addresses;
-  }
+  // struct ExchangeSpender {
+  //   mapping(address => bool) isSpender;
+  //   address[] addresses;
+  // }
 
   mapping(address => bool) public isToken;
   address[] private _tokens;
@@ -60,7 +60,8 @@ contract Reserve is
   uint256 public frozenReserveGoldStartDay;
   uint256 public frozenReserveGoldDays;
 
-  ExchangeSpender private isExchangeSpender;
+  mapping(address => bool) public isExchangeSpender;
+  address[] public exchangeSpenderAddresses;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
@@ -320,10 +321,9 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addExchangeSpender(address spender) external onlyOwner {
-    require(!isExchangeSpender.isSpender[spender], "Address is already Exchange Spender");
-    isExchangeSpender.isSpender[spender] = true;
-    // isExchangeSpender.addresses.length = isExchangeSpender.addresses.push(spender);
-    isExchangeSpender.addresses.push(spender);
+    require(!isExchangeSpender[spender], "Address is already Exchange Spender");
+    isExchangeSpender[spender] = true;
+    exchangeSpenderAddresses.push(spender);
     emit ExchangeSpenderAdded(spender);
   }
 
@@ -332,22 +332,22 @@ contract Reserve is
    * @param spender The address that is to be no longer allowed to spend Reserve funds.
    */
   function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
-    isExchangeSpender.isSpender[spender] = false;
-    uint256 numAddresses = isExchangeSpender.addresses.length;
+    isExchangeSpender[spender] = false;
+    uint256 numAddresses = exchangeSpenderAddresses.length;
     require(index < numAddresses, "Index is invalid");
-    require(spender == isExchangeSpender.addresses[index], "Index does not match spender");
+    require(spender == exchangeSpenderAddresses[index], "Index does not match spender");
     uint256 newnumAddresses = numAddresses.sub(1);
 
     if (index != newnumAddresses) {
-      isExchangeSpender.addresses[index] = isExchangeSpender.addresses[newnumAddresses];
+      exchangeSpenderAddresses[index] = exchangeSpenderAddresses[newnumAddresses];
     }
 
-    isExchangeSpender.addresses.length = newnumAddresses;
+    exchangeSpenderAddresses.length = newnumAddresses;
     emit ExchangeSpenderRemoved(spender);
   }
 
   function getExchangeSpenders() public view returns (address[] memory) {
-    return isExchangeSpender.addresses;
+    return exchangeSpenderAddresses;
   }
 
   /**
@@ -390,10 +390,7 @@ contract Reserve is
    * @return Returns true if the transaction succeeds.
    */
   function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
-    require(
-      isExchangeSpender.isSpender[msg.sender],
-      "a non-exchangeSpender can't start a transfer"
-    );
+    require(isExchangeSpender[msg.sender], "a non-exchangeSpender can't start a transfer");
     return _transferGold(to, value);
   }
 
