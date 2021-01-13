@@ -44,7 +44,7 @@ target "celo" do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  use_flipper!
+  use_flipper!({ 'Flipper' => '~> 0.62.0' })
 end
 
 # Convert all permission pods into static libraries
