@@ -39,16 +39,24 @@ exports[`Profile renders correctly 1`] = `
           <View
             accessible={true}
             style={
-              Object {
-                "alignItems": "center",
-                "alignSelf": "center",
-                "backgroundColor": "#B4B9BD",
-                "borderRadius": 60,
-                "height": 120,
-                "justifyContent": "center",
-                "opacity": 1,
-                "width": 120,
-              }
+              Array [
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "borderRadius": 60,
+                    "height": 120,
+                    "justifyContent": "center",
+                    "width": 120,
+                  },
+                  Object {
+                    "backgroundColor": "#B4B9BD",
+                  },
+                ],
+                Object {
+                  "opacity": 1,
+                },
+              ]
             }
           >
             <Text
@@ -222,9 +230,12 @@ exports[`Profile renders correctly 1`] = `
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    Object {
-                      "opacity": 1,
-                    }
+                    Array [
+                      undefined,
+                      Object {
+                        "opacity": 1,
+                      },
+                    ]
                   }
                 >
                   <Text
@@ -268,9 +279,12 @@ exports[`Profile renders correctly 1`] = `
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    Object {
-                      "opacity": 1,
-                    }
+                    Array [
+                      undefined,
+                      Object {
+                        "opacity": 1,
+                      },
+                    ]
                   }
                 >
                   <Text
@@ -316,9 +330,12 @@ exports[`Profile renders correctly 1`] = `
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    Object {
-                      "opacity": 1,
-                    }
+                    Array [
+                      undefined,
+                      Object {
+                        "opacity": 1,
+                      },
+                    ]
                   }
                 >
                   <Text

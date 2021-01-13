@@ -19,7 +19,7 @@
 
 • **chinese_simplified**:
 
-*Defined in [packages/sdk/base/src/account.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L9)*
+*Defined in [packages/sdk/base/src/account.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L9)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **chinese_traditional**:
 
-*Defined in [packages/sdk/base/src/account.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L10)*
+*Defined in [packages/sdk/base/src/account.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L10)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **english**:
 
-*Defined in [packages/sdk/base/src/account.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L11)*
+*Defined in [packages/sdk/base/src/account.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L11)*
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **french**:
 
-*Defined in [packages/sdk/base/src/account.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L12)*
+*Defined in [packages/sdk/base/src/account.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L12)*
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **italian**:
 
-*Defined in [packages/sdk/base/src/account.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L13)*
+*Defined in [packages/sdk/base/src/account.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L13)*
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 • **japanese**:
 
-*Defined in [packages/sdk/base/src/account.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L14)*
+*Defined in [packages/sdk/base/src/account.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L14)*
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 • **korean**:
 
-*Defined in [packages/sdk/base/src/account.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L15)*
+*Defined in [packages/sdk/base/src/account.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L15)*
 
 ___
 
@@ -75,4 +75,4 @@ ___
 
 • **spanish**:
 
-*Defined in [packages/sdk/base/src/account.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L16)*
+*Defined in [packages/sdk/base/src/account.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L16)*

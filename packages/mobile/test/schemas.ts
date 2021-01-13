@@ -477,6 +477,10 @@ export const v7Schema = {
     backupRequiredTime: null,
     pictureUri: null,
   },
+  home: {
+    loading: false,
+    notifications: {},
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

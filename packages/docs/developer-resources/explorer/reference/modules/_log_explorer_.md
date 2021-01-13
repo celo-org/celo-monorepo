@@ -16,7 +16,7 @@
 
 ▸ **newLogExplorer**(`kit`: ContractKit): *Promise‹[LogExplorer](../classes/_log_explorer_.logexplorer.md)‹››*
 
-*Defined in [log-explorer.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/log-explorer.ts#L10)*
+*Defined in [log-explorer.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/log-explorer.ts#L10)*
 
 **Parameters:**
 

@@ -257,6 +257,14 @@ export function appRemoteFeatureFlagChannel() {
 }
 
 export async function knownAddressesChannel() {
+  return simpleReadChannel('addressesExtraInfo')
+}
+
+export async function notificationsChannel() {
+  return simpleReadChannel('notifications')
+}
+
+function simpleReadChannel(key: string) {
   if (!FIREBASE_ENABLED) {
     return null
   }
@@ -267,20 +275,20 @@ export async function knownAddressesChannel() {
 
   return eventChannel((emit: any) => {
     const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
-      const addresses = snapshot.val()
-      Logger.debug(`Got known addresses: ${JSON.stringify(addresses)}`)
-      emit(addresses)
+      const value = snapshot.val()
+      Logger.debug(`Got value from Firebase for key ${key}: ${JSON.stringify(value)}`)
+      emit(value || {})
     }
     const cancel = () => {
       firebase
         .database()
-        .ref('addressesExtraInfo')
+        .ref(key)
         .off(VALUE_CHANGE_HOOK, emitter)
     }
 
     firebase
       .database()
-      .ref('addressesExtraInfo')
+      .ref(key)
       .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
 
     return cancel

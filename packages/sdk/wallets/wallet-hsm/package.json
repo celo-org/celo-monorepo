@@ -30,7 +30,7 @@
   "devDependencies": {
     "@celo/connect": "1.0.0-dev",
     "@types/asn1js": "^0.0.2",
-    "@types/secp256k1": "^3.5.3"
+    "@types/secp256k1": "^4.0.0"
   },
   "engines": {
     "node": ">=8.13.0"

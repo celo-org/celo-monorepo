@@ -19,7 +19,7 @@
 
 • **countryCallingCode**? : *undefined | string*
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L11)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L11)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **customValidator**? : *undefined | function*
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L10)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L10)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **decimalSeparator**? : *undefined | string*
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L12)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L12)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **validator**? : *[ValidatorKind](../enums/_inputvalidation_.validatorkind.md)*
 
-*Defined in [packages/sdk/base/src/inputValidation.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L9)*
+*Defined in [packages/sdk/base/src/inputValidation.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/inputValidation.ts#L9)*

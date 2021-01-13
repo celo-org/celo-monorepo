@@ -30,7 +30,7 @@
 
 \+ **new BlockExplorer**(`kit`: ContractKit, `contractDetails`: [ContractDetails](../interfaces/_base_.contractdetails.md)[]): *[BlockExplorer](_block_explorer_.blockexplorer.md)*
 
-*Defined in [block-explorer.ts:52](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L52)*
+*Defined in [block-explorer.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L52)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ Name | Type |
 
 • **contractDetails**: *[ContractDetails](../interfaces/_base_.contractdetails.md)[]*
 
-*Defined in [block-explorer.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L54)*
+*Defined in [block-explorer.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L54)*
 
 ## Methods
 
@@ -55,7 +55,7 @@ Name | Type |
 
 ▸ **fetchBlock**(`blockNumber`: number): *Promise‹Block›*
 
-*Defined in [block-explorer.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L68)*
+*Defined in [block-explorer.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L68)*
 
 **Parameters:**
 
@@ -71,7 +71,7 @@ ___
 
 ▸ **fetchBlockByHash**(`blockHash`: string): *Promise‹Block›*
 
-*Defined in [block-explorer.ts:65](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L65)*
+*Defined in [block-explorer.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L65)*
 
 **Parameters:**
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **fetchBlockRange**(`from`: number, `to`: number): *Promise‹Block[]›*
 
-*Defined in [block-explorer.ts:72](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L72)*
+*Defined in [block-explorer.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L72)*
 
 **Parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **parseBlock**(`block`: Block): *Promise‹[ParsedBlock](../interfaces/_block_explorer_.parsedblock.md)›*
 
-*Defined in [block-explorer.ts:80](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L80)*
+*Defined in [block-explorer.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L80)*
 
 **Parameters:**
 
@@ -120,7 +120,7 @@ ___
 
 ▸ **tryParseTx**(`tx`: CeloTxPending): *Promise‹null | [ParsedTx](../interfaces/_block_explorer_.parsedtx.md)›*
 
-*Defined in [block-explorer.ts:97](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L97)*
+*Defined in [block-explorer.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L97)*
 
 **Parameters:**
 
@@ -136,7 +136,7 @@ ___
 
 ▸ **tryParseTxInput**(`address`: string, `input`: string): *Promise‹null | [CallDetails](../interfaces/_block_explorer_.calldetails.md)›*
 
-*Defined in [block-explorer.ts:109](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L109)*
+*Defined in [block-explorer.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L109)*
 
 **Parameters:**
 
@@ -153,7 +153,7 @@ ___
 
 ▸ **updateContractDetailsMapping**(`name`: string, `address`: string): *Promise‹void›*
 
-*Defined in [block-explorer.ts:60](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L60)*
+*Defined in [block-explorer.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L60)*
 
 **Parameters:**
 

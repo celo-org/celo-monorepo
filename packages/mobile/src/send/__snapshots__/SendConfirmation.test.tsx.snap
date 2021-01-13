@@ -717,6 +717,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "justifyContent": "center",
                 }
               }
             >
@@ -1866,6 +1867,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "justifyContent": "center",
                 }
               }
             >
@@ -2937,6 +2939,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "justifyContent": "center",
                 }
               }
             >

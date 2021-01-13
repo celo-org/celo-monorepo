@@ -221,7 +221,7 @@ exports[` renders correctly with number but without contact 1`] = `
         ]
       }
     >
-      +1 (415) 555-6666
+      +1 415-555-6666
     </Text>
   </View>
 </View>

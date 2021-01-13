@@ -369,7 +369,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -387,6 +387,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -400,20 +401,6 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -491,7 +478,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View
@@ -1422,7 +1409,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -1440,6 +1427,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -1453,20 +1441,6 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -1544,7 +1518,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View
@@ -2475,7 +2449,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -2493,6 +2467,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -2506,20 +2481,6 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -2597,7 +2558,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View
@@ -3528,7 +3489,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -3546,6 +3507,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -3559,20 +3521,6 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -3650,7 +3598,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View

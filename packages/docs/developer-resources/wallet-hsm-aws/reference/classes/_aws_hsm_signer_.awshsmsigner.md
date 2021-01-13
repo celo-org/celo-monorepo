@@ -29,7 +29,7 @@
 
 \+ **new AwsHsmSigner**(`kms`: KMS, `keyId`: string, `publicKey`: BigNumber): *[AwsHsmSigner](_aws_hsm_signer_.awshsmsigner.md)*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L24)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L24)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ Name | Type |
 
 ▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:115](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L115)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L115)*
 
 **Parameters:**
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:109](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L109)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L109)*
 
 **Parameters:**
 
@@ -79,7 +79,7 @@ ___
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:105](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L105)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L105)*
 
 **Returns:** *string*
 
@@ -89,7 +89,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹Signature›*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:82](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L82)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L82)*
 
 **Parameters:**
 
@@ -105,7 +105,7 @@ ___
 
 ▸ **signTransaction**(`addToV`: number, `encodedTx`: RLPEncodedTx): *Promise‹Signature›*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L70)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L70)*
 
 **Parameters:**
 
@@ -122,7 +122,7 @@ ___
 
 ▸ **signTypedData**(`typedData`: EIP712TypedData): *Promise‹Signature›*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:94](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L94)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-signer.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-signer.ts#L94)*
 
 **Parameters:**
 

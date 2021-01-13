@@ -132,7 +132,7 @@ export function getRecipientFromAddress(
 
 export function getDisplayName({ recipient, recipientAddress, t }: DisplayNameProps) {
   const { displayName, e164PhoneNumber } = recipient
-  if (displayName) {
+  if (displayName && displayName !== t('mobileNumber')) {
     return displayName
   }
   if (e164PhoneNumber) {
