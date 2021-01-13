@@ -1,3 +1,4 @@
+import { Address } from '@celo/connect'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -32,7 +33,8 @@ export async function getAttestationCodeForSecurityCode(
   phoneHashDetails: PhoneNumberHashDetails,
   account: string,
   attestations: ActionableAttestation[],
-  securityCodeWithPrefix: string
+  securityCodeWithPrefix: string,
+  signer: Address
 ) {
   const securityCodePrefix = securityCodeWithPrefix[0]
   const lookupAttestations = attestations.filter(
@@ -47,7 +49,8 @@ export async function getAttestationCodeForSecurityCode(
         account,
         phoneHashDetails,
         attestation,
-        securityCodeWithPrefix.substr(1) // remove prefix
+        securityCodeWithPrefix.substr(1), // remove prefix
+        signer
       )
     )
   )
@@ -58,7 +61,8 @@ async function requestValidator(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
-  securityCode: string
+  securityCode: string,
+  signer: Address
 ): Promise<string> {
   const issuer = attestation.issuer
   Logger.debug(
@@ -76,7 +80,8 @@ async function requestValidator(
 
     return attestationsWrapper.getAttestationForSecurityCode(
       attestation.attestationServiceURL,
-      requestBody
+      requestBody,
+      signer
     )
   } catch (error) {
     Logger.error(

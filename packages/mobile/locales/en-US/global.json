@@ -93,7 +93,7 @@
     "1": "some features disabled"
   },
   "networkConnectionFailed": "Could not connect with the network, please check your data connection",
-  "firebaseFailed": "Could not connect to Firebase",
+  "firebaseFailed": "Internet connection is weak. Account information cannot be updated until connection is restored.",
   "gasPriceUpdateFailed": "Could not update fee",
   "appUpdateAvailable": "App Update Available",
   "appIsOutdated": "Your current version is out of date, please update to the latest version",
