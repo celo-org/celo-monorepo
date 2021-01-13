@@ -286,6 +286,10 @@ contract('Reserve', (accounts: string[]) => {
   })
 
   describe('#addExchangeSpender(exchangeAddress)', () => {
+    it('only allows owner', async () => {
+      await assertRevert(reserve.addExchangeSpender(nonOwner, { from: nonOwner }))
+    })
+
     it('should emit addExchangeSpender event on add', async () => {
       const resp = await reserve.addExchangeSpender(exchangeAddress)
       const log = resp.logs[0]
@@ -311,6 +315,10 @@ contract('Reserve', (accounts: string[]) => {
   describe('#removeExchangeSpender(exchangeAddress)', () => {
     beforeEach(async () => {
       await reserve.addExchangeSpender(exchangeAddress)
+    })
+
+    it('only allows owner', async () => {
+      await assertRevert(reserve.removeExchangeSpender(nonOwner, 0, { from: nonOwner }))
     })
 
     it('should emit removeExchangeSpender event on remove', async () => {
@@ -367,13 +375,22 @@ contract('Reserve', (accounts: string[]) => {
       const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderAdded')
       assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
     })
+
+    it('only allows owner', async () => {
+      await assertRevert(reserve.addSpender(nonOwner, { from: nonOwner }))
+    })
   })
+
   describe('#removeSpender(spender)', () => {
     it('emits on remove', async () => {
       const addSpenderTx = await reserve.removeSpender(spender)
 
       const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderRemoved')
       assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+
+    it('only allows owner', async () => {
+      await assertRevert(reserve.removeSpender(nonOwner, { from: nonOwner }))
     })
   })
 
