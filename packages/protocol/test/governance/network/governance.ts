@@ -1646,8 +1646,6 @@ contract('Governance', (accounts: string[]) => {
           await governance.vote(proposalId2, index2, value)
           await governance.vote(proposalId1, index1, value)
           await timeTravel(referendumStageDuration - 10, web3)
-
-          assert.isTrue
         })
 
         it('should still return true on `isVoting`', async () => {
