@@ -1,5 +1,6 @@
 pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
@@ -8,6 +9,8 @@ import "../common/UsingPrecompiles.sol";
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
 contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
+  using SafeMath for uint256;
+
   struct ClientVersion {
     uint256 major;
     uint256 minor;
@@ -105,7 +108,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   function setUptimeLookbackWindow(uint256 window) public onlyOwner {
     require(window >= 12 && window <= 720, "UptimeLookbackWindow must be within safe range");
     require(
-      window <= getEpochSize() - 2,
+      window <= getEpochSize().sub(2),
       "UptimeLookbackWindow must be smaller or equal to epochSize-2"
     );
 
@@ -119,7 +122,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
       uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber();
     } else {
       // changes only take place on the next epoch
-      uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber() + 1;
+      uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber().add(1);
     }
     emit UptimeLookbackWindowSet(window, uptimeLookbackWindow.nextValueActivationEpoch);
   }
@@ -130,17 +133,15 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
     // epoch 0 is the genesis block, thus implies it has not been initialized
     if (uptimeLookbackWindow.nextValueActivationEpoch == 0) {
-      // since on mainet,baklava,alfajores we don't reinitialize the contract
+      // since on mainet, baklava, alfajores we haven't initialized the contract with lookbackWindow
       // we need to hardcode the default value here
       // can be removed after the deploy
-      lookbackWindow = 12;
+      return 12;
     } else if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
-      lookbackWindow = uptimeLookbackWindow.nextValue;
+      return uptimeLookbackWindow.nextValue;
     } else {
-      lookbackWindow = uptimeLookbackWindow.oldValue;
+      return uptimeLookbackWindow.oldValue;
     }
-
-    return lookbackWindow;
   }
 
   /**
