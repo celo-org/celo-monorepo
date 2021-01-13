@@ -1,8 +1,9 @@
 import BigNumber from 'bignumber.js'
-import { call, race, spawn, take, takeLeading } from 'redux-saga/effects'
+import { call, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
 import { TokenTransactionType } from 'src/apollo/types'
 import { Actions as AppActions, ActionTypes as AppActionTypes } from 'src/app/actions'
 import { Actions, BidaliPaymentRequestedAction } from 'src/fiatExchanges/actions'
+import { updateKnownAddresses } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RecipientKind, RecipientWithAddress } from 'src/recipients/recipient'
@@ -37,11 +38,8 @@ function* bidaliPaymentRequest({
     address,
     displayId: 'BIDALI',
     displayName: 'Bidali',
-    // displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
-    // e164PhoneNumber: data.e164PhoneNumber,
-    // phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
-    // thumbnailPath: cachedRecipient?.thumbnailPath,
-    // contactId: cachedRecipient?.contactId,
+    thumbnailPath:
+      'https://firebasestorage.googleapis.com/v0/b/celo-mobile-mainnet.appspot.com/o/images%2Fbidali.png?alt=media',
   }
   const transactionData: TransactionDataInput = {
     recipient,
@@ -78,6 +76,13 @@ function* bidaliPaymentRequest({
     if (success) {
       Logger.debug(`${TAG}@bidaliPaymentRequest`, 'Payment Sent')
       yield call(onPaymentSent)
+
+      // Keep address mapping locally
+      yield put(
+        updateKnownAddresses({
+          [address]: { name: recipient.displayName, imageUrl: recipient.thumbnailPath || null },
+        })
+      )
       break
     }
 

@@ -52,6 +52,7 @@ export interface RecipientWithQrCode extends IRecipient {
 export interface RecipientWithAddress extends IRecipient {
   kind: RecipientKind.Address
   address: string
+  thumbnailPath?: string
 }
 
 export interface NumberToRecipient {
@@ -170,7 +171,12 @@ export function getRecipientVerificationStatus(
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {
-  return recipient && recipient.kind === RecipientKind.Contact ? recipient.thumbnailPath : undefined
+  switch (recipient?.kind) {
+    case RecipientKind.Contact:
+    case RecipientKind.Address:
+      return recipient.thumbnailPath
+  }
+  return undefined
 }
 
 type PreparedRecipient = Recipient & {
