@@ -28,9 +28,7 @@ function FiatExchange() {
   }
 
   function goToCashOut() {
-    // Temporary until we know where to integrate it
-    navigate(Screens.BidaliScreen)
-    // navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
+    navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
   }
 
   function goToSpend() {

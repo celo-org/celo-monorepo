@@ -25,6 +25,7 @@
   "receiveOnAddress": "cUSD/CELO address",
   "receiveWithPonto": "GCash (with Ponto)",
   "receiveWithKotani": "M-PESA (with Kotani Pay)",
+  "receiveGiftCard": "Gift Card",
   "fundingEducationDialog": {
     "title": "Funding {{appName}}",
     "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a stable digital currency tracking the US Dollar.\n\nTo fund your {{appName}} wallet, purchase cUSD from one of the 3rd party providers available in your location. For more information please visit <0>{{link}}</0>",

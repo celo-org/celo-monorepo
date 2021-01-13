@@ -26,6 +26,12 @@ function* bidaliPaymentRequest({
     `Send ${amount} ${currency} to ${address} for ${description} (${chargeId})`
   )
 
+  if (currency.toUpperCase() !== 'CUSD') {
+    // This is not supposed to happen in production, the current flow limits
+    // to cUSD only
+    throw new Error(`Unsupported payment currency from Bidali: ${currency}`)
+  }
+
   const recipient: RecipientWithAddress = {
     kind: RecipientKind.Address,
     address,

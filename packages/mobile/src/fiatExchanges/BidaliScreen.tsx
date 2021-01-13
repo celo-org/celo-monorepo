@@ -1,4 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -22,7 +23,11 @@ import { RecipientKind, RecipientWithAddress } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
-function useInitialJavaScript(jsonBalances: string, e164PhoneNumber: string | null) {
+function useInitialJavaScript(
+  currency: CURRENCY_ENUM,
+  jsonBalances: string,
+  e164PhoneNumber: string | null
+) {
   const [initialJavaScript, setInitialJavaScript] = useState<string | null>()
   useEffect(() => {
     if (initialJavaScript || !e164PhoneNumber) {
@@ -31,6 +36,7 @@ function useInitialJavaScript(jsonBalances: string, e164PhoneNumber: string | nu
 
     setInitialJavaScript(`
       window.valora = {
+        paymentCurrency: "${CURRENCIES[currency].code.toUpperCase()}",
         phoneNumber: "${e164PhoneNumber}",
         balances: ${jsonBalances},
         onPaymentRequest: function (paymentRequest) {
@@ -52,7 +58,7 @@ function useInitialJavaScript(jsonBalances: string, e164PhoneNumber: string | nu
 type RouteProps = StackScreenProps<StackParamList, Screens.BidaliScreen>
 type Props = RouteProps
 
-function BidaliScreen(props: Props) {
+function BidaliScreen({ route }: Props) {
   const onMessage = (event: WebViewMessageEvent) => {
     const { method, data } = JSON.parse(event.nativeEvent.data)
     switch (method) {
@@ -90,12 +96,17 @@ function BidaliScreen(props: Props) {
     () =>
       JSON.stringify({
         CUSD: cusdBalance,
-        CELO: celoBalance,
+        // We'll add CELO support later on
+        // CELO: celoBalance,
       }),
     [cusdBalance, celoBalance]
   )
   const e164PhoneNumber = useSelector(e164NumberSelector)
-  const initialJavaScript = useInitialJavaScript(jsonBalances, e164PhoneNumber)
+  const initialJavaScript = useInitialJavaScript(
+    route.params.currency,
+    jsonBalances,
+    e164PhoneNumber
+  )
   const dispatch = useDispatch()
 
   // Update balances when they change
