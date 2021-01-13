@@ -1,10 +1,10 @@
 {
   "addFunds": "Añadir Fondos",
-  "addFundsSubtitle": "Compra cUSD o CELO",
+  "addFundsSubtitle": "Agrega fondos a tu cuenta de Valora",
   "exchanges": "Intercambiar",
   "buySellOnExchanges": "Comprar/Vender en Intercambios",
   "cashOut": "Retirar",
-  "cashOutSubtitle": "Intercambia cUSD o CELO por otra moneda",
+  "cashOutSubtitle": "Envía fondos a un exchange o a otra cuenta",
   "cashOutComingSoon": "Retirar (Muy Pronto)",
   "spend": "Usar",
   "spendSubtitle": "Usa tu balance con comercios asociados",

@@ -106,15 +106,19 @@ async function findValidCode(
           await Promise.all(
             possibleIssuers.map((a) =>
               attestations
-                .getAttestationForSecurityCode(a.attestationServiceURL, {
-                  account,
-                  issuer: a.issuer,
-                  phoneNumber,
-                  salt: pepper,
-                  securityCode: securityCode.slice(1),
-                })
+                .getAttestationForSecurityCode(
+                  a.attestationServiceURL,
+                  {
+                    account,
+                    issuer: a.issuer,
+                    phoneNumber,
+                    salt: pepper,
+                    securityCode: securityCode.slice(1),
+                  },
+                  account
+                )
                 // hit the wrong service
-                .catch((_) => null)
+                .catch(() => null)
             )
           )
         ).find(Boolean)
@@ -285,7 +289,7 @@ async function chooseFromAvailablePhoneNumbers(twilioClient: Twilio) {
 async function createPhoneNumber(twilioClient: Twilio, addressSid: string) {
   const countryCodes = ['GB', 'US']
   const countryCode = sample(countryCodes)
-  const context = await twilioClient.availablePhoneNumbers.get(countryCode!)
+  const context = twilioClient.availablePhoneNumbers.get(countryCode!)
   const numbers = await context.mobile.list({ limit: 10 })
   const usableNumber = numbers[0]
   await twilioClient.incomingPhoneNumbers.create({
