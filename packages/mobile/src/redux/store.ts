@@ -65,7 +65,15 @@ declare var window: any
 
 export const configureStore = (initialState = {}) => {
   const sagaMiddleware = createSagaMiddleware()
-  const middlewares = [sagaMiddleware]
+  let middlewares = [sagaMiddleware]
+
+  if (__DEV__) {
+    const createDebugger = require('redux-flipper').default
+    // Sending the whole state makes the redux debugger in flipper super slow!!
+    // I suspect it's the exchange rates causing this!
+    // For now whitelisting a few things for testing
+    middlewares.push(createDebugger({ stateWhitelist: ['home', 'app', 'identity'] }))
+  }
 
   const enhancers = [applyMiddleware(...middlewares)]
 

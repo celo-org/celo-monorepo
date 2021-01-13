@@ -380,6 +380,8 @@ PODS:
     - React
   - react-native-fast-crypto (1.8.4):
     - React
+  - react-native-flipper (0.70.0):
+    - React
   - react-native-geth (1.0.0):
     - CeloBlockchain
     - React
@@ -633,6 +635,7 @@ DEPENDENCIES:
   - react-native-config (from `../../../node_modules/react-native-config`)
   - react-native-contacts (from `../../../node_modules/react-native-contacts`)
   - "react-native-fast-crypto (from `../../../node_modules/@celo/react-native-fast-crypto`)"
+  - react-native-flipper (from `../../../node_modules/react-native-flipper`)
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
@@ -776,6 +779,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-contacts"
   react-native-fast-crypto:
     :path: "../../../node_modules/@celo/react-native-fast-crypto"
+  react-native-flipper:
+    :path: "../../../node_modules/react-native-flipper"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -935,6 +940,7 @@ SPEC CHECKSUMS:
   react-native-config: e8c71f602c92ddd2f5c24b0b7a90d239ecab8d9f
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
   react-native-fast-crypto: 149fd8fd16e1f9bd6b6be2b8295fe0eb76923602
+  react-native-flipper: da8e630768f0a35153837df953d9781fa7f860ba
   react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: 88305252f4c3fb0157015ff8a7ac9c41b321a0dd
@@ -989,6 +995,6 @@ SPEC CHECKSUMS:
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 8991a71ff0a3417640843be60e361bfbc35676e7
+PODFILE CHECKSUM: 527c1da8fb8d4481659b5434c13d54905d38f5ef
 
 COCOAPODS: 1.10.0

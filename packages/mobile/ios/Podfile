@@ -7,7 +7,7 @@ source 'https://cdn.cocoapods.org/'
 $RNFirebaseAsStaticFramework = true
 
 # Workaround OpenSSL-Universal react-native-fast-crypto conflict
-$static_framework = ['react-native-fast-crypto', 'FlipperKit', 'Flipper', 'Flipper-Folly',
+$static_framework = ['react-native-flipper', 'react-native-fast-crypto', 'FlipperKit', 'Flipper', 'Flipper-Folly',
   'CocoaAsyncSocket', 'ComponentKit', 'Flipper-DoubleConversion',
   'Flipper-Glog', 'Flipper-PeerTalk', 'Flipper-RSocket',
   'CocoaLibEvent', 'OpenSSL-Universal']
