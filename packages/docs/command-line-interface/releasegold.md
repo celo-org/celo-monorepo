@@ -2,21 +2,6 @@
 
 View and manage Release Gold contracts
 
-- [`celocli releasegold:authorize`](#celocli-releasegoldauthorize)
-- [`celocli releasegold:create-account`](#celocli-releasegoldcreate-account)
-- [`celocli releasegold:locked-gold`](#celocli-releasegoldlocked-gold)
-- [`celocli releasegold:refund-and-finalize`](#celocli-releasegoldrefund-and-finalize)
-- [`celocli releasegold:revoke`](#celocli-releasegoldrevoke)
-- [`celocli releasegold:revoke-votes`](#celocli-releasegoldrevoke-votes)
-- [`celocli releasegold:set-account`](#celocli-releasegoldset-account)
-- [`celocli releasegold:set-account-wallet-address`](#celocli-releasegoldset-account-wallet-address)
-- [`celocli releasegold:set-beneficiary`](#celocli-releasegoldset-beneficiary)
-- [`celocli releasegold:set-can-expire`](#celocli-releasegoldset-can-expire)
-- [`celocli releasegold:set-liquidity-provision`](#celocli-releasegoldset-liquidity-provision)
-- [`celocli releasegold:set-max-distribution`](#celocli-releasegoldset-max-distribution)
-- [`celocli releasegold:show`](#celocli-releasegoldshow)
-- [`celocli releasegold:transfer-dollars`](#celocli-releasegoldtransfer-dollars)
-- [`celocli releasegold:withdraw`](#celocli-releasegoldwithdraw)
 
 ## `celocli releasegold:authorize`
 

@@ -9,14 +9,15 @@ export function getPhoneNumberState(
 
   if (phoneDetails) {
     return {
-      nationalPhoneNumber: phoneDetails.displayNumber,
+      // Show international display number to avoid confusion
+      internationalPhoneNumber: phoneDetails.displayNumberInternational,
       e164Number: phoneDetails.e164Number,
       isValidNumber: true,
       countryCodeAlpha2: phoneDetails.regionCode!,
     }
   } else {
     return {
-      nationalPhoneNumber: phoneNumber,
+      internationalPhoneNumber: phoneNumber,
       e164Number: '',
       isValidNumber: false,
       countryCodeAlpha2,

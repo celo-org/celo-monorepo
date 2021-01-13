@@ -91,7 +91,7 @@ You will now need to point the Celo CLI to a node that is synchronized with the 
   To use Forno, run this command:
 
   ```bash
-  celocli config:set --node https://rc1-forno.celo-testnet.org
+  celocli config:set --node https://forno.celo.org
   ```
 
 ## Locate and verify your `ReleaseGold` contract address

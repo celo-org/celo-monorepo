@@ -86,7 +86,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         countries.getCountryByCodeAlpha2(newCountryAlpha2)?.countryCallingCode ?? ''
       setPhoneNumberInfo(
         getPhoneNumberState(
-          phoneNumberInfo.nationalPhoneNumber,
+          phoneNumberInfo.internationalPhoneNumber,
           countryCallingCode,
           newCountryAlpha2
         )
@@ -221,10 +221,13 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     })
   }
 
-  const onChangePhoneNumberInput = (nationalPhoneNumber: string, countryCallingCode: string) => {
+  const onChangePhoneNumberInput = (
+    internationalPhoneNumber: string,
+    countryCallingCode: string
+  ) => {
     setPhoneNumberInfo(
       getPhoneNumberState(
-        nationalPhoneNumber,
+        internationalPhoneNumber,
         countryCallingCode,
         phoneNumberInfo.countryCodeAlpha2
       )
@@ -308,7 +311,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           label={t('nuxNamePin1:phoneNumber')}
           style={styles.phoneNumber}
           country={country}
-          nationalPhoneNumber={phoneNumberInfo.nationalPhoneNumber}
+          internationalPhoneNumber={phoneNumberInfo.internationalPhoneNumber}
           onPressCountry={onPressCountry}
           onChange={onChangePhoneNumberInput}
         />

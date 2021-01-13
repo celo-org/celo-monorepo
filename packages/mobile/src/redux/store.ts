@@ -21,7 +21,7 @@ const persistConfig: any = {
   version: 7, // default is -1, increment as we make migrations
   keyPrefix: `reduxStore-`, // the redux-persist default is `persist:` which doesn't work with some file systems.
   storage: FSStorage(),
-  blacklist: ['home', 'geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
+  blacklist: ['geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
   stateReconciler: autoMergeLevel2,
   migrate: createMigrate(migrations, { debug: true }),
   serialize: (data: any) => {
@@ -36,6 +36,11 @@ const persistConfig: any = {
       })
     }
     return stringifiedData
+  },
+  deserialize: (data: string) => {
+    // This is the default implementation, but overriding to maintain compatibility with the serialize function
+    // in case the library changes.
+    return JSON.parse(data)
   },
   timeout: null,
 }

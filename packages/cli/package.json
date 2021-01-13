@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.61-dev",
+  "version": "1.0.0-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -23,7 +23,7 @@
   "scripts": {
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
-    "docs": "export COLUMNS=88 && yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
+    "docs": "./generate_docs.sh",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
     "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",

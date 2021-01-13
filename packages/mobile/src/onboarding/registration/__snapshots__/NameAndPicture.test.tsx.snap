@@ -53,28 +53,28 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
         onGestureHandlerStateChange={[Function]}
         onHandlerStateChange={[Function]}
         rippleColor={0}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
-        }
       >
         <View
           accessible={true}
           style={
-            Object {
-              "alignItems": "center",
-              "alignSelf": "center",
-              "backgroundColor": "#A49B80",
-              "borderRadius": 60,
-              "height": 120,
-              "justifyContent": "center",
-              "opacity": 1,
-              "width": 120,
-            }
+            Array [
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "center",
+                  "borderRadius": 60,
+                  "height": 120,
+                  "justifyContent": "center",
+                  "width": 120,
+                },
+                Object {
+                  "backgroundColor": "#A49B80",
+                },
+              ],
+              Object {
+                "opacity": 1,
+              },
+            ]
           }
         >
           <Text
@@ -248,9 +248,12 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  Object {
-                    "opacity": 1,
-                  }
+                  Array [
+                    undefined,
+                    Object {
+                      "opacity": 1,
+                    },
+                  ]
                 }
               >
                 <Text
@@ -294,9 +297,12 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  Object {
-                    "opacity": 1,
-                  }
+                  Array [
+                    undefined,
+                    Object {
+                      "opacity": 1,
+                    },
+                  ]
                 }
               >
                 <Text
@@ -342,9 +348,12 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  Object {
-                    "opacity": 1,
-                  }
+                  Array [
+                    undefined,
+                    Object {
+                      "opacity": 1,
+                    },
+                  ]
                 }
               >
                 <Text
@@ -476,6 +485,7 @@ exports[`NameAndPictureScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -589,28 +599,28 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
         onGestureHandlerStateChange={[Function]}
         onHandlerStateChange={[Function]}
         rippleColor={0}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
-        }
       >
         <View
           accessible={true}
           style={
-            Object {
-              "alignItems": "center",
-              "alignSelf": "center",
-              "backgroundColor": "#A49B80",
-              "borderRadius": 60,
-              "height": 120,
-              "justifyContent": "center",
-              "opacity": 1,
-              "width": 120,
-            }
+            Array [
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "center",
+                  "borderRadius": 60,
+                  "height": 120,
+                  "justifyContent": "center",
+                  "width": 120,
+                },
+                Object {
+                  "backgroundColor": "#A49B80",
+                },
+              ],
+              Object {
+                "opacity": 1,
+              },
+            ]
           }
         >
           <Text
@@ -784,9 +794,12 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  Object {
-                    "opacity": 1,
-                  }
+                  Array [
+                    undefined,
+                    Object {
+                      "opacity": 1,
+                    },
+                  ]
                 }
               >
                 <Text
@@ -830,9 +843,12 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  Object {
-                    "opacity": 1,
-                  }
+                  Array [
+                    undefined,
+                    Object {
+                      "opacity": 1,
+                    },
+                  ]
                 }
               >
                 <Text
@@ -878,9 +894,12 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  Object {
-                    "opacity": 1,
-                  }
+                  Array [
+                    undefined,
+                    Object {
+                      "opacity": 1,
+                    },
+                  ]
                 }
               >
                 <Text
@@ -1012,6 +1031,7 @@ exports[`NameAndPictureScreen renders with an error 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
