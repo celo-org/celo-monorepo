@@ -885,7 +885,9 @@ export async function startGeth(
 
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
-  const etherbase = instance.etherbase || ''
+  // const etherbase = instance.etherbase || ''
+  const minerValidator = instance.minerValidator!
+  const txFeeRecipient = instance.txFeeRecipient || minerValidator
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
   let blocktime: number = 1
 
@@ -917,6 +919,10 @@ export async function startGeth(
     '--gcmode=archive', // Needed to retrieve historical state
     '--istanbul.blockperiod',
     blocktime.toString(),
+    '--miner.validator',
+    minerValidator,
+    '--tx-fee-recipient',
+    txFeeRecipient
   ]
 
   if (rpcport) {
@@ -937,10 +943,6 @@ export async function startGeth(
       wsport.toString(),
       '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
-  }
-
-  if (etherbase) {
-    gethArgs.push('--etherbase', etherbase)
   }
 
   if (lightserv) {
