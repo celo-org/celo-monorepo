@@ -21,7 +21,7 @@ exports[`ContactCircle renders correctly 1`] = `
           "justifyContent": "center",
         },
         Object {
-          "backgroundColor": "#7AD6FE",
+          "backgroundColor": "hsl(0, 53%, 93%)",
           "borderRadius": 15,
           "height": 30,
           "width": 30,

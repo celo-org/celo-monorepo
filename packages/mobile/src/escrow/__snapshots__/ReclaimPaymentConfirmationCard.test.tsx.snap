@@ -39,7 +39,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
+              "backgroundColor": "hsl(0, 53%, 93%)",
               "borderRadius": 20,
               "height": 40,
               "width": 40,

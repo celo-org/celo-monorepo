@@ -230,7 +230,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1116,7 +1116,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1596,7 +1596,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2043,7 +2043,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2492,7 +2492,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -3186,7 +3186,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,

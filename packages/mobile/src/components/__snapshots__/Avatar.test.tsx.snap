@@ -98,7 +98,7 @@ exports[` renders correctly with address but without contact 1`] = `
       ]
     }
   >
-    #0x0000000000000000000000000000000000007E57
+    0x0000000000000000000000000000000000007E57
   </Text>
 </View>
 `;
@@ -134,7 +134,7 @@ exports[` renders correctly with number but without contact 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#7AD6FE",
+            "backgroundColor": "hsl(0, 53%, 93%)",
             "borderRadius": 20,
             "height": 40,
             "width": 40,
@@ -260,7 +260,7 @@ exports[` renders correctly without contact and number 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#7AD6FE",
+            "backgroundColor": "hsl(0, 53%, 93%)",
             "borderRadius": 20,
             "height": 40,
             "width": 40,
