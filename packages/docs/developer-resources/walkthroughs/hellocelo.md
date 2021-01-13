@@ -42,7 +42,8 @@ We will be writing our Node.js app in the `helloCello.js` file.
 Import the contract kit into our script with
 
 ```javascript
-// 1. Import contractkit
+// 1. Import web3 and contractkit 
+const Web3 = require("web3")
 const ContractKit = require('@celo/contractkit')
 ```
 
@@ -50,7 +51,8 @@ Now we can use the ContractKit to connect to the network.
 
 ```javascript
 // 2. Init a new kit, connected to the alfajores testnet
-const kit = ContractKit.newKit('https://alfajores-forno.celo-testnet.org')
+const web3 = new Web3('https://alfajores-forno.celo-testnet.org')
+const kit = ContractKit.newKitFromWeb3(web3)
 ```
 
 {% hint style="info" %}
