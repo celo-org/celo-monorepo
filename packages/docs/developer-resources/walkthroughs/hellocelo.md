@@ -171,7 +171,7 @@ async function send(){
     let account = await getAccount()
     
     // 11. Add your account to ContractKit to sign transactions
-    kit.addAccount(account.privateKey)
+    kit.connection.addAccount(account.privateKey)
     
     // 12. Specify recipient Address
     let anAddress = '0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'
