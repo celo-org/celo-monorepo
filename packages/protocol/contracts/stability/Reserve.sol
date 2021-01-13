@@ -33,11 +33,6 @@ contract Reserve is
     uint128 timestamp;
   }
 
-  // struct ExchangeSpender {
-  //   mapping(address => bool) isSpender;
-  //   address[] addresses;
-  // }
-
   mapping(address => bool) public isToken;
   address[] private _tokens;
   TobinTaxCache public tobinTaxCache;
