@@ -297,6 +297,7 @@ contract('Reserve', (accounts: string[]) => {
         },
       })
     })
+
     it('has the right list of exchange spenders after addition', async () => {
       await reserve.addExchangeSpender(exchangeAddress)
       await reserve.addExchangeSpender(accounts[1])
@@ -345,7 +346,7 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.removeExchangeSpender(exchangeAddress, 1))
     })
 
-    it('removes from a bigg array', async () => {
+    it('removes from a big array', async () => {
       await reserve.addExchangeSpender(accounts[1])
       await reserve.removeExchangeSpender(exchangeAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
@@ -359,14 +360,15 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe('addSpender & removeSpender', () => {
+  describe('#addSpender(spender)', () => {
     it('emits on add', async () => {
       const addSpenderTx = await reserve.addSpender(spender)
 
       const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderAdded')
       assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
     })
-
+  })
+  describe('#removeSpender(spender)', () => {
     it('emits on remove', async () => {
       const addSpenderTx = await reserve.removeSpender(spender)
 

@@ -322,10 +322,9 @@ contract Reserve is
   function addExchangeSpender(address spender) external onlyOwner {
     require(!isExchangeSpender.isSpender[spender], "Address is already Exchange Spender");
     isExchangeSpender.isSpender[spender] = true;
-    // isExchangeSpender.addresses.push(spender);
-    isExchangeSpender.addresses.length = isExchangeSpender.addresses.push(spender);
+    // isExchangeSpender.addresses.length = isExchangeSpender.addresses.push(spender);
+    isExchangeSpender.addresses.push(spender);
     emit ExchangeSpenderAdded(spender);
-    // TODO shall I add to the lenght?
   }
 
   /**
@@ -338,10 +337,11 @@ contract Reserve is
     require(index < numAddresses, "Index is invalid");
     require(spender == isExchangeSpender.addresses[index], "Index does not match spender");
     uint256 newnumAddresses = numAddresses.sub(1);
-    // swap with last
-    isExchangeSpender.addresses[index] = isExchangeSpender.addresses[newnumAddresses];
-    // delete the last
-    //delete isExchangeSpender.addresses[newnumAddresses];
+
+    if (index != newnumAddresses) {
+      isExchangeSpender.addresses[index] = isExchangeSpender.addresses[newnumAddresses];
+    }
+
     isExchangeSpender.addresses.length = newnumAddresses;
     emit ExchangeSpenderRemoved(spender);
   }
