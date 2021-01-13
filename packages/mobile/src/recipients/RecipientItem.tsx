@@ -28,7 +28,6 @@ class RecipientItem extends React.PureComponent<Props> {
             name={recipient.displayName}
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
-            size={40}
           />
           <View style={styles.contentContainer}>
             <Text numberOfLines={1} ellipsizeMode={'tail'} style={styles.name}>

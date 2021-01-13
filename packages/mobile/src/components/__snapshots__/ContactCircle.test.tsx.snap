@@ -38,6 +38,7 @@ exports[`ContactCircle renders correctly 1`] = `
             "fontSize": 16,
           },
           Object {
+            "color": "hsl(0, 67%, 24%)",
             "fontSize": 15,
           },
         ]

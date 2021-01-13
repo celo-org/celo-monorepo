@@ -77,7 +77,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(195, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -94,6 +94,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(195, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -1165,7 +1166,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#D39CFE",
+                        "backgroundColor": "hsl(113, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1182,6 +1183,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(113, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -2328,7 +2330,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(195, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2345,6 +2347,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(195, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]

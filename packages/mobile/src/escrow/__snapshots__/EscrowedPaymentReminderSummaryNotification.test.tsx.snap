@@ -298,6 +298,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                       "fontSize": 16,
                     },
                     Object {
+                      "color": "hsl(0, 67%, 24%)",
                       "fontSize": 20,
                     },
                   ]

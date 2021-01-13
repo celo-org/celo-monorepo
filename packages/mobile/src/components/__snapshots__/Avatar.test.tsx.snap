@@ -31,7 +31,7 @@ exports[` renders correctly with address but without contact 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#7AD6FE",
+            "backgroundColor": "hsl(0, 53%, 93%)",
             "borderRadius": 20,
             "height": 40,
             "width": 40,
@@ -48,6 +48,7 @@ exports[` renders correctly with address but without contact 1`] = `
               "fontSize": 16,
             },
             Object {
+              "color": "hsl(0, 67%, 24%)",
               "fontSize": 20,
             },
           ]
@@ -150,6 +151,7 @@ exports[` renders correctly with number but without contact 1`] = `
               "fontSize": 16,
             },
             Object {
+              "color": "hsl(0, 67%, 24%)",
               "fontSize": 20,
             },
           ]
@@ -275,6 +277,7 @@ exports[` renders correctly without contact and number 1`] = `
               "fontSize": 16,
             },
             Object {
+              "color": "hsl(0, 67%, 24%)",
               "fontSize": 20,
             },
           ]

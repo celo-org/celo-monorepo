@@ -122,6 +122,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -1142,6 +1143,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -2162,6 +2164,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
