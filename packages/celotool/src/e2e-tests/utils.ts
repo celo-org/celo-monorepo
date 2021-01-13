@@ -272,7 +272,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
 
       if (!instance.minerValidator) {
-        instance.minerValidator = privateKeyToAddress(validatorPrivateKeys[validatorIndex])
+        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
       }
     }
 
