@@ -32,6 +32,7 @@
   "refreshFailedUnexpectedly": "Falha ao atualizar, verifique sua conectividade",
   "edit": "Editar",
   "paste": "Colar",
+  "choose": "Escolher",
   "receivedPayment": "Pagamento recebido",
   "getStarted": "Começar",
   "manageCeloDollars": "Gerenciar Celo Dólares ",
@@ -185,5 +186,6 @@
   "commentUnavailable": "Comentário indisponível",
   "accountClearFailed": "Ocorreu um erro ao remover a chave da sua conta. Pode ser necessário reinstalar o aplicativo para restaurar todas as funcionalidades.",
   "withdraw": "Sacar",
-  "countryNotAvailable": "{{appName}} não está disponível no seu país"
+  "countryNotAvailable": "{{appName}} não está disponível no seu país",
+  "pictureLoadFailed": "Ocorreu um erro ao carregar sua imagem"
 }
