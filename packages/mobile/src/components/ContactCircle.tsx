@@ -1,4 +1,3 @@
-import { unknownUserIcon } from '@celo/react-components/images/Images'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { getContactNameHash } from '@celo/utils/src/contacts'
@@ -49,10 +48,6 @@ export default class ContactCircle extends React.PureComponent<Props> {
       )
     }
 
-    if (!name) {
-      return <DefaultAvatar />
-    }
-
     // Mobile # is what default display name when contact isn't saved
     if (name && name !== 'Mobile #') {
       const initials = this.getInitials()
@@ -63,12 +58,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
       )
     }
 
-    return (
-      <Image
-        source={unknownUserIcon}
-        style={[styles.image, { height: iconSize, width: iconSize }]}
-      />
-    )
+    return <DefaultAvatar />
   }
 
   render() {
