@@ -23,9 +23,7 @@ export const isReadyRef: MutableRefObject<boolean | null> = createRef()
 
 async function ensureNavigator() {
   let retries = 0
-  Logger.debug(`${TAG}@ensureNavigator`, `waiting for navigator`)
   while (!navigationRef.current && !isReadyRef.current && retries < 30) {
-    Logger.debug(`${TAG}@ensureNavigator`, `waiting for navigator try: ${retries}`)
     await sleep(200)
     retries++
   }

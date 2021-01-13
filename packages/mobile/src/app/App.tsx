@@ -65,7 +65,6 @@ export class App extends React.Component<Props> {
     Linking.addEventListener('url', this.handleOpenURL)
 
     const url = await Linking.getInitialURL()
-    Logger.debug('App/componentDidMount', 'initial url: ' + url)
     if (url) {
       await this.handleOpenURL({ url })
     }
@@ -96,11 +95,8 @@ export class App extends React.Component<Props> {
   }
 
   handleOpenURL = async (event: any) => {
-    Logger.debug('App/handleOpenURL', 'top event: ' + event)
     await waitUntilSagasFinishLoading()
-    Logger.debug('App/handleOpenURL', 'after wait saga')
     store.dispatch(openDeepLink(event.url))
-    Logger.debug('App/handleOpenURL', 'dispatch done')
   }
 
   render() {
