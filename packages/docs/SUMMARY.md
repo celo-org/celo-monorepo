@@ -38,6 +38,7 @@
   - [Validator Signer Key Rotation](validator-guide/key-management/key-rotation.md)
 - [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
 - [Monitoring](validator-guide/monitoring.md)
+- [Devops Best Practices](devops-best-practices.md)
 - [Upgrading a Node](validator-guide/node-upgrades.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
