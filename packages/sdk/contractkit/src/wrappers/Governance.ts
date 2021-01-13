@@ -84,11 +84,18 @@ export const proposalToParams = (proposal: Proposal, descriptionURL: string): Pr
   ]
 }
 
+interface ApprovalStatus {
+  completion: string
+  confirmations: string[]
+  approvers: string[]
+}
+
 export interface ProposalRecord {
   stage: ProposalStage
   metadata: ProposalMetadata
-  upvotes: BigNumber
-  votes: Votes
+  approvalStatus?: ApprovalStatus
+  upvotes?: BigNumber
+  votes?: Votes
   proposal: Proposal
   passing: boolean
 }
@@ -419,6 +426,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return concurrentMap(4, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 
+  async getApprovalStatus(proposalID: BigNumber.Value): Promise<ApprovalStatus> {
+    const multisig = await this.getApproverMultisig()
+    const approveTx = await this.approve(proposalID)
+    const confirmations = (await multisig.getTransactionDataByContent(this.address, approveTx.txo))!
+      .confirmations
+    const approvers = await multisig.getOwners()
+    return {
+      completion: `${confirmations.length} / ${approvers.length}`,
+      confirmations,
+      approvers,
+    }
+  }
+
   /**
    * Returns the stage, metadata, upvotes, votes, and transactions associated with a given proposal.
    * @param proposalID Governance proposal UUID
@@ -429,10 +449,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const stage = await this.getProposalStage(proposalID)
     const passing = await this.isProposalPassing(proposalID)
 
-    let upvotes = ZERO_BN
-    let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
+    let upvotes = undefined
+    let votes = undefined
+    let approvalStatus = undefined
     if (stage === ProposalStage.Queued) {
       upvotes = await this.getUpvotes(proposalID)
+    } else if (stage === ProposalStage.Approval) {
+      approvalStatus = await this.getApprovalStatus(proposalID)
     } else if (stage !== ProposalStage.Expiration) {
       votes = await this.getVotes(proposalID)
     }
@@ -444,6 +467,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       upvotes,
       votes,
       passing,
+      approvalStatus,
     }
   }
 
