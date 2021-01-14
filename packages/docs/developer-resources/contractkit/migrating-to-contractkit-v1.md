@@ -16,7 +16,7 @@ ContractKit is now a [suite of packages](https://github.com/celo-org/celo-monore
 ### Main packages
 
  - `Connect` depends on the `web3` package and allows you to specify the connection provider and contains some configuration information for signing transactions.
- - `ContractKit` depends on `connect` and `wallet-local` and allows you to connect to the Celo network, locally sign transactions and has more configuration options than `connect`. It also contains a registry of [Celo core contracts](contracts-wrappers-registery.md) to make it easier to interact with them.
+ - `ContractKit` depends on `connect` and `wallet-local` and allows you to connect to the Celo network, locally sign transactions and has more configuration options than `connect`. It also contains a registry of [Celo core contracts](contracts-wrappers-registry.md) to make it easier to interact with them.
 
 ### Complementary Packages
 
