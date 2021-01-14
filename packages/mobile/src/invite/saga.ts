@@ -183,7 +183,6 @@ export function* sendInvite(
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
-    console.log(DYNAMIC_DOWNLOAD_LINK)
     const link = features.ESCROW_WITHOUT_CODE
       ? DYNAMIC_DOWNLOAD_LINK
       : yield call(generateInviteLink, inviteCode)
