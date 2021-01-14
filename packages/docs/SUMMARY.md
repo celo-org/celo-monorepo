@@ -72,7 +72,7 @@
   - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
   - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
   - [Querying on-chain identifiers with ODIS](developer-resources/contractkit/odis.md)
-  - [Migrating to ContractKit v1.0](developer-resources/contractkit/migrating-to-contract-v1.md)
+  - [Migrating to ContractKit v1.0](developer-resources/contractkit/migrating-to-contractkit-v1.md)
     <!-- - [Example of querying (web3, kit)]()
     - [Example of sending tx (kit)]() -->
   <!-- - [Using Truffle]()
