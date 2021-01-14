@@ -178,12 +178,14 @@ export const NavigatorWrapper = () => {
     await Share.share({ message })
   }
 
+  const onReady = () => {
+    isReadyRef.current = true
+  }
+
   return (
     <NavigationContainer
       ref={navigationRef}
-      onReady={() => {
-        isReadyRef.current = true
-      }}
+      onReady={onReady}
       onStateChange={handleStateChange}
       initialState={initialState}
       theme={AppTheme}
