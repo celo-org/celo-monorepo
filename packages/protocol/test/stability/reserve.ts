@@ -8,13 +8,13 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import BN = require('bn.js')
 import {
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
-import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
