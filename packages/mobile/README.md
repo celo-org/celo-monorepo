@@ -417,6 +417,12 @@ To attach:
 
 ### Troubleshooting
 
+If you're having an error with installing packages, or `secrets.json` not existing: 
+
+try to run `yarn postinstall` in the monorepo `/celo-monorepo` after running `yarn install`. 
+
+A successful `yarn postinstall` looks like: [this](https://files.slack.com/files-pri/T9SEZ6M9B-F01JP5VDLJF/screen_shot_2021-01-13_at_2.39.56_pm.png).
+
 #### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
 
 From time to time the app refuses to start showing this error:
