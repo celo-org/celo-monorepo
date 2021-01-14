@@ -94,8 +94,6 @@ export const NavigatorWrapper = () => {
         routeNameRef.current = getActiveRouteName(state)
       }
     }
-
-    navigatorIsReadyRef.current = false
   }, [])
 
   React.useEffect(() => {
@@ -133,6 +131,12 @@ export const NavigatorWrapper = () => {
       RNShake.removeEventListener('ShakeEvent')
     }
   }, [appState])
+
+  React.useEffect(() => {
+    return () => {
+      navigatorIsReadyRef.current = false
+    }
+  }, [])
 
   if (!isReady) {
     return null
