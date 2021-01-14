@@ -129,7 +129,7 @@ export const unixSecondsTimestampToDateString = (input: BigNumber.Value) =>
   moment
     .unix(valueToInt(input))
     .local()
-    .format('llll')
+    .format('llll [UTC]Z')
 
 // Type of bytes in solidity gets repesented as a string of number array by typechain and web3
 // Hopefull this will improve in the future, at which point we can make improvements here
