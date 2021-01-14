@@ -311,6 +311,11 @@ contract Reserve is
     emit SpenderRemoved(spender);
   }
 
+  function _isAllowedToSpendExchange(address spender) private view returns (bool) {
+    return
+      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender);
+  }
+
   /**
    * @notice Gives an address permission to spend Reserve without limit.
    * @param spender The address that is allowed to spend Reserve funds.
@@ -385,7 +390,7 @@ contract Reserve is
    * @return Returns true if the transaction succeeds.
    */
   function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
-    require(isExchangeSpender[msg.sender], "a non-exchangeSpender can't start a transfer");
+    require(_isAllowedToSpendExchange(msg.sender), "Address not allowed to spend");
     return _transferGold(to, value);
   }
 
