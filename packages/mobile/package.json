@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -30,7 +30,7 @@
     "test:e2e:packager": "export CELO_TEST_CONFIG=e2e && yarn react-native start",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
-    "deploy:update-disclaimer": "yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
+    "deploy:update-disclaimer": "yarn reset && git fetch —tags -f && yarn && yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
     "postinstall": "./scripts/sync_branding.sh && ./scripts/copy_license_to_android_assets.sh"
   },
   "rnpm": {
@@ -82,7 +82,7 @@
     "ethereumjs-util": "^6.2.0",
     "fp-ts": "2.1.1",
     "fuzzysort": "^1.1.4",
-    "google-libphonenumber": "^3.2.4",
+    "google-libphonenumber": "^3.2.15",
     "graphql": "^14.1.1",
     "hermes-engine": "0.5.2-rc1",
     "i18next": "^19.4.3",

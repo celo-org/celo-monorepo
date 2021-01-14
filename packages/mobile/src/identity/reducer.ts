@@ -49,6 +49,7 @@ export interface AddressToDataEncryptionKeyType {
 export interface AddressInfoToDisplay {
   name: string
   imageUrl: string | null
+  isCeloRewardSender?: boolean
 }
 
 export interface AddressToDisplayNameType {

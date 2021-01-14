@@ -12,6 +12,6 @@
 
 ▸ **globalSetup**(): *Promise‹void›*
 
-*Defined in [packages/sdk/identity/src/test-utils/setup.global.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/test-utils/setup.global.ts#L12)*
+*Defined in [packages/sdk/identity/src/test-utils/setup.global.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/test-utils/setup.global.ts#L12)*
 
 **Returns:** *Promise‹void›*

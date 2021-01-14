@@ -106,7 +106,7 @@ ___
 
 Ƭ **Address**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L4)*
+*Defined in [packages/sdk/connect/src/types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L4)*
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 Ƭ **Callback**: *function*
 
-*Defined in [packages/sdk/connect/src/types.ts:49](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L49)*
+*Defined in [packages/sdk/connect/src/types.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L49)*
 
 #### Type declaration:
 
@@ -133,7 +133,7 @@ ___
 
 Ƭ **CeloTx**: *TransactionConfig & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)›*
 
-*Defined in [packages/sdk/connect/src/types.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L12)*
+*Defined in [packages/sdk/connect/src/types.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L12)*
 
 ___
 
@@ -141,7 +141,7 @@ ___
 
 Ƭ **CeloTxPending**: *Transaction & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)›*
 
-*Defined in [packages/sdk/connect/src/types.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L46)*
+*Defined in [packages/sdk/connect/src/types.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L46)*
 
 ___
 
@@ -149,4 +149,4 @@ ___
 
 Ƭ **CeloTxReceipt**: *TransactionReceipt & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)›*
 
-*Defined in [packages/sdk/connect/src/types.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L47)*
+*Defined in [packages/sdk/connect/src/types.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L47)*
