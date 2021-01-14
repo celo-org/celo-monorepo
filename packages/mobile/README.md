@@ -423,6 +423,11 @@ try to run `yarn postinstall` in the monorepo `/celo-monorepo` after running `ya
 
 A successful `yarn postinstall` looks like: [this](https://files.slack.com/files-pri/T9SEZ6M9B-F01JP5VDLJF/screen_shot_2021-01-13_at_2.39.56_pm.png).
 
+#### Google Cloud Setup (for cLabs employees only) 
+ 
+Make sure to follow the steps [here](https://github.com/celo-org/celo-labs/blob/master/packages/docs/eng-setup.md) to set up Google Cloud correctly with the wallet. 
+
+
 #### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
 
 From time to time the app refuses to start showing this error:
