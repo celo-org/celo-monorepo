@@ -85,6 +85,7 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { isVersionBelowMinimum } from 'src/utils/versionCheck'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import {
@@ -95,6 +96,7 @@ import {
 } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
+const MINIMUM_VERSION_FOR_SHORT_CODES = '1.1.0'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const ESTIMATED_COST_PER_ATTESTATION = 0.051
@@ -465,6 +467,7 @@ export function* requestAndRetrieveAttestations(
   if (!isFeelessVerification) {
     yield put(setRetryVerificationWithForno(false))
   }
+
   while (attestations.length < attestationsNeeded) {
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_start, {
       currentAttestation: attestations.length,
@@ -495,6 +498,13 @@ export function* requestAndRetrieveAttestations(
 
     // Check if we have a sufficient set now by fetching the new total set
     attestations = yield call(getActionableAttestations, attestationsWrapper, phoneHash, account)
+    if (features.SHORT_VERIFICATION_CODES) {
+      // we only support attestation service 1.1.0 and above for short codes
+      attestations = attestations.filter(
+        (att) => !isVersionBelowMinimum(att.version, MINIMUM_VERSION_FOR_SHORT_CODES)
+      )
+    }
+
     ValoraAnalytics.track(
       VerificationEvents.verification_request_all_attestations_refresh_progress,
       {
@@ -678,6 +688,7 @@ export function attestationCodeReceiver(
     try {
       if (features.SHORT_VERIFICATION_CODES) {
         securityCodeWithPrefix = extractSecurityCodeWithPrefix(message)
+        const signer = yield call(getConnectedUnlockedAccount)
         if (securityCodeWithPrefix) {
           message = yield call(
             getAttestationCodeForSecurityCode,
@@ -685,7 +696,8 @@ export function attestationCodeReceiver(
             phoneHashDetails,
             account,
             attestations,
-            securityCodeWithPrefix
+            securityCodeWithPrefix,
+            signer
           )
         } else {
           Logger.error(TAG + '@attestationCodeReceiver', 'No security code in received message')
