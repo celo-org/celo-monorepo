@@ -91,24 +91,22 @@ export default class Show extends BaseCommand {
         }
       }
 
-      // Identify the transaction with the highest constitutional requirement.
-      const proposal = await governance.getProposal(id)
+      let requirements = {}
+      if (record.stage === 'Referendum' && !record.passed) {
+        // Identify the transaction with the highest constitutional requirement.
+        const constitutionThreshold = await governance.getConstitution(record.proposal)
+        const support = await governance.getSupport(id)
+        requirements = {
+          ...support,
+          constitutionThreshold,
+        }
+      }
 
-      // Get the minimum participation and agreement required to pass a proposal.
-      const participationParams = await governance.getParticipationParameters()
-      const constitution = await governance.getConstitution(proposal)
-
-      const schedule = await governance.humanReadableTimeUntilStages(id)
-
+      const schedule = await governance.humanReadableProposalSchedule(id)
       printValueMapRecursive({
         ...record,
         ...schedule,
-        requirements: {
-          participation: participationParams.baseline,
-          agreement: constitution.times(100).toString() + '%',
-        },
-        isApproved: await governance.isApproved(id),
-        isProposalPassing: await governance.isProposalPassing(id),
+        ...requirements,
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer

@@ -91,13 +91,14 @@ interface ApprovalStatus {
 }
 
 export interface ProposalRecord {
-  stage: ProposalStage
   metadata: ProposalMetadata
-  approvalStatus?: ApprovalStatus
-  upvotes?: BigNumber
-  votes?: Votes
   proposal: Proposal
-  passing: boolean
+  stage: ProposalStage
+  approved: boolean
+  passed: boolean
+  upvotes?: BigNumber
+  approvals?: ApprovalStatus
+  votes?: Votes
 }
 
 export interface UpvoteRecord {
@@ -113,9 +114,9 @@ export enum VoteValue {
 }
 
 export interface Votes {
-  [VoteValue.Yes]: BigNumber
-  [VoteValue.No]: BigNumber
   [VoteValue.Abstain]: BigNumber
+  [VoteValue.No]: BigNumber
+  [VoteValue.Yes]: BigNumber
 }
 
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
@@ -226,6 +227,28 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       baselineFloor: fromFixed(new BigNumber(res[1])),
       baselineUpdateFactor: fromFixed(new BigNumber(res[2])),
       baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
+    }
+  }
+
+  // simulates proposal.getSupportWithQuorumPadding
+  async getSupport(proposalID: BigNumber.Value) {
+    const participation = await this.getParticipationParameters()
+    const quorum = participation.baseline.times(participation.baselineQuorumFactor)
+    const votes = await this.getVotes(proposalID)
+    const total = votes.Yes.plus(votes.No).plus(votes.Abstain)
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    // NOTE: this networkWeight is not as governance calculates it,
+    // but we don't have access to proposal.networkWeight
+    const networkWeight = await lockedGold.getTotalLockedGold()
+    const required = networkWeight.times(quorum)
+    if (required.gt(total)) {
+      votes.No = votes.No.plus(required.minus(total))
+    }
+    const support = votes.Yes.div(votes.Yes.plus(votes.No))
+    return {
+      support,
+      required,
+      total,
     }
   }
 
@@ -447,28 +470,26 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const metadata = await this.getProposalMetadata(proposalID)
     const proposal = await this.getProposal(proposalID)
     const stage = await this.getProposalStage(proposalID)
-    const passing = await this.isProposalPassing(proposalID)
 
-    let upvotes = undefined
-    let votes = undefined
-    let approvalStatus = undefined
-    if (stage === ProposalStage.Queued) {
-      upvotes = await this.getUpvotes(proposalID)
-    } else if (stage === ProposalStage.Approval) {
-      approvalStatus = await this.getApprovalStatus(proposalID)
-    } else if (stage !== ProposalStage.Expiration) {
-      votes = await this.getVotes(proposalID)
-    }
-
-    return {
+    let record: ProposalRecord = {
       proposal,
       metadata,
       stage,
-      upvotes,
-      votes,
-      passing,
-      approvalStatus,
+      passed: false,
+      approved: false,
     }
+
+    if (stage === ProposalStage.Queued) {
+      record.upvotes = await this.getUpvotes(proposalID)
+    } else if (stage === ProposalStage.Approval) {
+      record.approved = await this.isApproved(proposalID)
+      record.approvals = !record.approved ? await this.getApprovalStatus(proposalID) : undefined
+    } else if (stage === ProposalStage.Referendum) {
+      record.passed = await this.isProposalPassing(proposalID)
+      record.votes = !record.passed ? await this.getVotes(proposalID) : undefined
+    }
+
+    return record
   }
 
   /**
