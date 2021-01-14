@@ -185,11 +185,13 @@ const SCORE_THRESHOLD = -6000
 const fuzzysortOptions = {
   keys: ['displayName', 'e164PhoneNumber', 'address'],
   threshold: SCORE_THRESHOLD,
+  allowTypo: false,
 }
 
 const fuzzysortPreparedOptions = {
   keys: ['displayPrepared', 'phonePrepared', 'addressPrepared'],
   threshold: SCORE_THRESHOLD,
+  allowTypo: false,
 }
 
 function fuzzysortToRecipients(
