@@ -408,10 +408,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
     if (stage === ProposalStage.Queued) {
       const queueExpiry = await this.queueExpiry()
-      const expiration = meta.timestamp.plus(queueExpiry)
+      const queueExpiration = meta.timestamp.plus(queueExpiry)
       return {
         [ProposalStage.Queued]: meta.timestamp,
-        [ProposalStage.Expiration]: expiration,
+        [ProposalStage.Expiration]: queueExpiration,
       }
     }
 
@@ -431,9 +431,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async humanReadableProposalSchedule(proposalID: BigNumber.Value) {
     const schedule = await this.proposalSchedule(proposalID)
 
-    let dates: Partial<StageDurations<string>> = {}
-    let stage: keyof typeof schedule
-    for (stage in schedule) {
+    const dates: Partial<StageDurations<string>> = {}
+    for (const stage of Object.keys(schedule) as Array<keyof StageDurations<any>>) {
       dates[stage] = unixSecondsTimestampToDateString(schedule[stage]!)
     }
     return dates
@@ -471,7 +470,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposal = await this.getProposal(proposalID)
     const stage = await this.getProposalStage(proposalID)
 
-    let record: ProposalRecord = {
+    const record: ProposalRecord = {
       proposal,
       metadata,
       stage,
