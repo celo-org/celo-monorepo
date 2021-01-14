@@ -39,7 +39,7 @@
     "@celo/wallet-local": "1.0.0-dev",
     "@celo/wallet-hsm-azure": "1.0.0-dev",
     "@celo/wallet-ledger": "1.0.0-dev",
-    "@ledgerhq/hw-transport-node-hid": "^5.11.0",
+    "@ledgerhq/hw-transport-node-hid": "~5.11.0",
     "@oclif/command": "^1.6.0",
     "@oclif/config": "^1.6.0",
     "@oclif/plugin-help": "^1.2.4",
