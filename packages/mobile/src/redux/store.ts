@@ -77,6 +77,11 @@ export const configureStore = (initialState = {}) => {
 
   const enhancers = [applyMiddleware(...middlewares)]
 
+  if (__DEV__) {
+    const Reactotron = require('src/reactotronConfig').default
+    enhancers.push(Reactotron.createEnhancer())
+  }
+
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   // @ts-ignore
   const createdStore = createStore(persistedReducer, initialState, composeEnhancers(...enhancers))
