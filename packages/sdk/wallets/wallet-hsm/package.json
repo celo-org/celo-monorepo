@@ -30,9 +30,6 @@
     "elliptic": "6.5.3",
     "secp256k1": "^4.0.0"
   },
-  "devDependencies": {
-    "@celo/connect": "1.0.0-dev"
-  },
   "engines": {
     "node": ">=8.13.0"
   }
