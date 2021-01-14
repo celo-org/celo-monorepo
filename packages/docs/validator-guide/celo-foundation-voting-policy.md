@@ -76,7 +76,12 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 Make sure to complete all prerequisites before applying. 
 {% endhint %}
 
-[APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/xcPM1pF9)
+{% hint style="info" %}
+Note: Application for Cohort 6 is now closed.
+{% endhint %}
+
+
+[APPLY FOR FOUNDATION VOTES HERE](https://forum.celo.org/t/foundation-voting-cohort-6-applications-are-open/693)
 
 ### Timings
 Cohort 5 application deadline: **Oct 9, 2020 at 23:59 UTC**
