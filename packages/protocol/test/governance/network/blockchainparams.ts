@@ -223,7 +223,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       ))
 
     it('should fail when using value lower than safe minimum', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(11)))
+      assertRevert(blockchainParameters.setUptimeLookbackWindow(2)))
 
     it('should fail when using value greater than safe maximum', () =>
       assertRevert(blockchainParameters.setUptimeLookbackWindow(721)))

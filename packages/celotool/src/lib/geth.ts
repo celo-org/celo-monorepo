@@ -1059,7 +1059,7 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   const genesis: string = generateGenesis({
     validators,
     epoch: 10,
-    lookbackwindow: 2,
+    lookbackwindow: 3,
     requestTimeout: 3000,
     chainId: gethConfig.networkId,
     ...gethConfig.genesisConfig,
@@ -1212,6 +1212,9 @@ export async function migrateContracts(
         validatorKeys: validatorPrivateKeys.map(ensure0x),
         attestationKeys: attestationKeys.map(ensure0x),
       },
+      blockchainParameters: {
+        uptimeLookbackWindow: 3, // same as our default in `writeGenesis()`
+      },      
     },
     overrides
   )

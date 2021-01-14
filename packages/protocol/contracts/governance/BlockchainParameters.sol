@@ -106,7 +106,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param window New window.
    */
   function setUptimeLookbackWindow(uint256 window) public onlyOwner {
-    require(window >= 12 && window <= 720, "UptimeLookbackWindow must be within safe range");
+    require(window >= 3 && window <= 720, "UptimeLookbackWindow must be within safe range");
     require(
       window <= getEpochSize().sub(2),
       "UptimeLookbackWindow must be smaller or equal to epochSize-2"
