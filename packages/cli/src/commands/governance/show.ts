@@ -75,9 +75,10 @@ export default class Show extends BaseCommand {
         .runChecks()
 
       const record = await governance.getProposalRecord(id)
+      const proposal = record.proposal
       if (!raw) {
         try {
-          const jsonproposal = await proposalToJSON(this.kit, record.proposal)
+          const jsonproposal = await proposalToJSON(this.kit, proposal)
           record.proposal = jsonproposal as any
 
           if (res.flags.jsonTransactions) {
@@ -92,21 +93,21 @@ export default class Show extends BaseCommand {
       }
 
       let requirements = {}
-      if (record.stage === 'Referendum' && !record.passed) {
+      if (record.stage === 'Referendum') {
         // Identify the transaction with the highest constitutional requirement.
-        const constitutionThreshold = await governance.getConstitution(record.proposal)
+        const constitutionThreshold = await governance.getConstitution(proposal)
         const support = await governance.getSupport(id)
         requirements = {
-          ...support,
           constitutionThreshold,
+          ...support,
         }
       }
 
       const schedule = await governance.humanReadableProposalSchedule(id)
       printValueMapRecursive({
         ...record,
-        ...schedule,
-        ...requirements,
+        schedule,
+        requirements,
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer

@@ -483,10 +483,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       record.upvotes = await this.getUpvotes(proposalID)
     } else if (stage === ProposalStage.Approval) {
       record.approved = await this.isApproved(proposalID)
-      record.approvals = !record.approved ? await this.getApprovalStatus(proposalID) : undefined
+      record.approvals = await this.getApprovalStatus(proposalID)
     } else if (stage === ProposalStage.Referendum) {
+      record.approved = true
       record.passed = await this.isProposalPassing(proposalID)
-      record.votes = !record.passed ? await this.getVotes(proposalID) : undefined
+      record.votes = await this.getVotes(proposalID)
     }
 
     return record
