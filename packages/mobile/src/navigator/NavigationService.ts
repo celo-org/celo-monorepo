@@ -22,6 +22,7 @@ type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
 export const navigatorIsReadyRef: MutableRefObject<boolean | null> = createRef()
+navigatorIsReadyRef.current = false
 
 async function ensureNavigator() {
   let retries = 0
