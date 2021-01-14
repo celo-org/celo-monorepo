@@ -4267,7 +4267,7 @@
     "@ledgerhq/errors" "^4.64.0"
     "@ledgerhq/hw-transport" "^4.64.0"
 
-"@ledgerhq/hw-app-eth@^5.11.0":
+"@ledgerhq/hw-app-eth@~5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-app-eth/-/hw-app-eth-5.11.0.tgz#5db6abe0ddf5b5266ed09868de12021f59c1a33e"
   integrity sha512-qgpPwZzM8UMHYMC5+9xYV2O+8kgkDAl9+38w9JiBksaGmUFqcS4najsB1nj6AWf2rGEuXdKMb2WEYRskVypJrA==
@@ -4311,7 +4311,7 @@
     node-hid "^0.7.9"
     usb "^1.6.0"
 
-"@ledgerhq/hw-transport-node-hid@^5.11.0":
+"@ledgerhq/hw-transport-node-hid@~5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-5.11.0.tgz#f2d3e0edc25840de4f452cf427a0482c65be8e86"
   integrity sha512-J/hP3IqcgZn/sTGblELkwZcH68Gbv3ZeaRWdhei6K2dAuxae4dxoVUf6PoOcupEOcXT5XzJBNMc5800AwFeOgg==
@@ -4342,7 +4342,7 @@
     "@ledgerhq/errors" "^4.64.0"
     events "^3.0.0"
 
-"@ledgerhq/hw-transport@^5.11.0":
+"@ledgerhq/hw-transport@^5.11.0", "@ledgerhq/hw-transport@~5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-5.11.0.tgz#f5c45a34d9b68d81fd2f6641b49815527720364b"
   integrity sha512-z56iwv0DZZu20T5q9sNMHFQNVuRKYqzCuNFhY9woWSpmOQkyVHCRiEgOQbN5h6kVri6fkfPkDzqqcsYjJlnT9g==
