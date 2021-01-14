@@ -46,7 +46,7 @@ ContractKit is now a [suite of packages](https://github.com/celo-org/celo-monore
 const ContractKit = require('@celo/contractkit')
 
 // Older versions create a new Web3 instance internally 
-const kit = ContractKit.newKit('https://alfajores-forno.celo-testnet.org')
+const kit = ContractKit.newKit('https://forno.celo.org')
 ```
 
 ### Version 1.0.0+
@@ -54,7 +54,7 @@ const kit = ContractKit.newKit('https://alfajores-forno.celo-testnet.org')
 ```javascript
 // Since ContractKit no longer instantiates web3, you'll need to explicitly require it 
 const Web3 = require('web3') 
-const web3 = new Web3('https://alfajores-forno.celo-testnet.org') 
+const web3 = new Web3('https://forno.celo.org') 
 
 // Require ContractKit and newKitFromWeb3 
 const { ContractKit, newKitFromWeb3 } = require('@celo/contractkit') 
