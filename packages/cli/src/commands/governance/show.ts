@@ -93,7 +93,7 @@ export default class Show extends BaseCommand {
       }
 
       let requirements = {}
-      if (record.stage === 'Referendum') {
+      if (record.stage === 'Referendum' || record.stage === 'Execution') {
         // Identify the transaction with the highest constitutional requirement.
         const constitutionThreshold = await governance.getConstitution(proposal)
         const support = await governance.getSupport(id)

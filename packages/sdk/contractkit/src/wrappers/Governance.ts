@@ -241,9 +241,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     // but we don't have access to proposal.networkWeight
     const networkWeight = await lockedGold.getTotalLockedGold()
     const required = networkWeight.times(quorum)
-    if (required.gt(total)) {
-      votes.No = votes.No.plus(required.minus(total))
-    }
     const support = votes.Yes.div(votes.Yes.plus(votes.No))
     return {
       support,
@@ -483,7 +480,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     } else if (stage === ProposalStage.Approval) {
       record.approved = await this.isApproved(proposalID)
       record.approvals = await this.getApprovalStatus(proposalID)
-    } else if (stage === ProposalStage.Referendum) {
+    } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
       record.approved = true
       record.passed = await this.isProposalPassing(proposalID)
       record.votes = await this.getVotes(proposalID)
