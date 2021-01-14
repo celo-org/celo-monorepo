@@ -35,8 +35,7 @@ git fetch --all --tags 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts
-# TODO: Move to yarn build:sol after the next contract release.
-yarn build >> $LOG_FILE
+yarn build:sol >> $LOG_FILE
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 # Move back to branch from which we started
