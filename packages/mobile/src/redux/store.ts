@@ -71,8 +71,33 @@ export const configureStore = (initialState = {}) => {
     const createDebugger = require('redux-flipper').default
     // Sending the whole state makes the redux debugger in flipper super slow!!
     // I suspect it's the exchange rates causing this!
-    // For now whitelisting a few things for testing
-    middlewares.push(createDebugger({ stateWhitelist: ['home', 'app', 'identity'] }))
+    // For now exclude the `exchange` reducer.
+    middlewares.push(
+      createDebugger({
+        stateWhitelist: [
+          'app',
+          'networkInfo',
+          'alert',
+          'goldToken',
+          'stableToken',
+          'send',
+          'home',
+          // "exchange",
+          'transactions',
+          'web3',
+          'identity',
+          'account',
+          'invite',
+          'geth',
+          'escrow',
+          'fees',
+          'recipients',
+          'localCurrency',
+          'imports',
+          'paymentRequest',
+        ],
+      })
+    )
   }
 
   const enhancers = [applyMiddleware(...middlewares)]
