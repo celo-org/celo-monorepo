@@ -111,6 +111,66 @@ const deployProxy = async (contractName: string, addresses: ContractAddresses, d
   return proxy
 }
 
+const deployCoreContract = async (
+  contractName: string,
+  instance: Truffle.Contract<Truffle.ContractInstance>,
+  proposal: ProposalTx[],
+  addresses: ContractAddresses,
+  report: ASTDetailedVersionedReport,
+  initializationData: any,
+  isDryRun: boolean
+) => {
+  const contract = await deployImplementation(contractName, instance, isDryRun)
+  const setImplementationTx: ProposalTx = {
+    contract: `${contractName}Proxy`,
+    function: '_setImplementation',
+    args: [contract.address],
+    value: '0',
+  }
+
+  // Deploy new versions of the proxy, if needed
+  const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
+  if (!shouldDeployProxy) {
+    proposal.push(setImplementationTx)
+  } else {
+    const proxy = await deployProxy(contractName, addresses, isDryRun)
+
+    // Update the contract's address to the new proxy in the proposal
+    addresses.set(contractName, proxy.address)
+    proposal.push({
+      contract: 'Registry',
+      function: 'setAddressFor',
+      args: [contractName, proxy.address],
+      value: '0',
+      description: `Registry: ${contractName} -> ${proxy.address}`,
+    })
+
+    // If the implementation has an initialize function, add it to the proposal
+    const initializeAbi = (contract as any).abi.find(
+      (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+    )
+    if (initializeAbi) {
+      const args = initializationData[contractName]
+      const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+      setImplementationTx.function = '_setAndInitializeImplementation'
+      setImplementationTx.args.push(callData)
+    }
+    console.log(`Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`)
+    proposal.push(setImplementationTx)
+  }
+}
+
+const deployLibrary = async (
+  contractName: string,
+  contractArtifact: Truffle.Contract<Truffle.ContractInstance>,
+  addresses: ContractAddresses,
+  isDryRun: boolean
+) => {
+  const contract = await deployImplementation(contractName, contractArtifact, isDryRun)
+  addresses.set(contractName, contract.address)
+  return
+}
+
 export interface ProposalTx {
   contract: string
   function: string
@@ -140,70 +200,36 @@ module.exports = async (callback: (error?: any) => number) => {
     const release = async (contractName: string) => {
       if (released.has(contractName)) {
         return
-      } else {
-        // 1. Release all dependencies.
-        const contractDependencies = dependencies.get(contractName)
-        for (const dependency of contractDependencies) {
-          await release(dependency)
-        }
-        // 2. Link dependencies.
-        const Contract = await artifacts.require(contractName)
-        await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
-
-        // 3. Deploy new versions of the contract, if needed.
-        const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
-        const isLibrary = linkedLibraries[contractName]
-        if (shouldDeployImplementation) {
-          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
-          const setImplementationTx: ProposalTx = {
-            contract: `${contractName}Proxy`,
-            function: '_setImplementation',
-            args: [contract.address],
-            value: '0',
-          }
-
-          // 4. Deploy new versions of the proxy, if needed
-          const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
-          if (!shouldDeployProxy) {
-            proposal.push(setImplementationTx)
-          } else {
-            const proxy = await deployProxy(contractName, addresses, argv.dry_run)
-
-            // 5. Update the contract's address to the new proxy in the proposal
-            addresses.set(contractName, proxy.address)
-            proposal.push({
-              contract: 'Registry',
-              function: 'setAddressFor',
-              args: [contractName, proxy.address],
-              value: '0',
-              description: `Registry: ${contractName} -> ${proxy.address}`,
-            })
-
-            // 6. If the implementation has an initialize function, add it to the proposal
-            const initializeAbi = (contract as any).abi.find(
-              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-            )
-            if (initializeAbi) {
-              const args = initializationData[contractName]
-              const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
-              console.log(`Add 'Initializing ${contractName} with: ${args}' to proposal`)
-              proposal.push({
-                contract: `${contractName}Proxy`,
-                function: '_setAndInitializeImplementation',
-                args: [contract.address, callData],
-                value: '0',
-              })
-            } else {
-              proposal.push(setImplementationTx)
-            }
-          }
-        } else if (isLibrary) {
-          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
-          addresses.set(contractName, contract.address)
-        }
-        // 7. Mark the contract as released
-        released.add(contractName)
       }
+      // 1. Release all dependencies.
+      const contractDependencies = dependencies.get(contractName)
+      for (const dependency of contractDependencies) {
+        await release(dependency)
+      }
+      // 2. Link dependencies.
+      const contractArtifact = await artifacts.require(contractName)
+      await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
+
+      // 3. Deploy new versions of the contract, if needed.
+      const shouldDeployCoreContractImplementation = Object.keys(report.contracts).includes(
+        contractName
+      )
+      const isLibrary = linkedLibraries[contractName]
+      if (shouldDeployCoreContractImplementation) {
+        await deployCoreContract(
+          contractName,
+          contractArtifact,
+          proposal,
+          addresses,
+          report,
+          initializationData,
+          argv.dry_run
+        )
+      } else if (isLibrary) {
+        await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run)
+      }
+      // Mark the contract as released
+      released.add(contractName)
     }
     for (const contractName of contracts) {
       if (isCoreContract(contractName) && isProxiedContract(contractName)) {
