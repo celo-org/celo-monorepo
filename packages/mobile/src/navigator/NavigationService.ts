@@ -19,15 +19,15 @@ const TAG = 'NavigationService'
 type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
-export const isReadyRef: MutableRefObject<boolean | null> = createRef()
+export const navigatorIsReadyRef: MutableRefObject<boolean | null> = createRef()
 
 async function ensureNavigator() {
   let retries = 0
-  while (!navigationRef.current && !isReadyRef.current && retries < 5) {
+  while (!navigationRef.current && !navigatorIsReadyRef.current && retries < 5) {
     await sleep(200)
     retries++
   }
-  if (!navigationRef.current || !isReadyRef.current) {
+  if (!navigationRef.current || !navigatorIsReadyRef.current) {
     throw new Error('navigator is not initialized')
   }
 }
