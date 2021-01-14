@@ -39,7 +39,7 @@ celocli <module>:<command> <...args> <...flags?>
 The `celocli` tool assumes that users are running a node which they have access to signing transactions on, or have another mechanism for signing transactions (such as a Ledger wallet or supplying the private key as an argument to the command). See the documentation on the [config](config.md) module for information about how to set which node commands are sent to.
 
 {% hint style="info" %}
-**All balances of CELO or Celo Dollars are expressed in units of 10-18**
+**All balances of CELO or Celo Dollars are expressed in units of 10^-18**
 {% endhint %}
 
 {% embed url="https://www.npmjs.com/package/@celo/celocli" caption="" %}

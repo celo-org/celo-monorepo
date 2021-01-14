@@ -29,6 +29,7 @@
       "@celo/connect",
       "@celo/contractkit",
       "@celo/dev-utils",
+      "@celo/env-tests",
       "@celo/explorer",
       "@celo/flake-tracker",
       "@celo/governance",
@@ -152,13 +153,6 @@
   "@celo/typescript": {
     "location": "packages/typescript",
     "dependencies": []
-  },
-  "@celo/web": {
-    "location": "packages/web",
-    "dependencies": [
-      "@celo/flake-tracker",
-      "@celo/utils"
-    ]
   },
   "@celo/phone-number-privacy-combiner": {
     "location": "packages/phone-number-privacy/combiner",

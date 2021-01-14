@@ -8,6 +8,8 @@ import config, { getVersion } from './config'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
 
+require('events').EventEmitter.defaultMaxListeners = 15
+
 export enum Endpoints {
   STATUS = '/status',
   METRICS = '/metrics',
