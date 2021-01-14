@@ -336,13 +336,14 @@ contract Reserve is
     uint256 numAddresses = exchangeSpenderAddresses.length;
     require(index < numAddresses, "Index is invalid");
     require(spender == exchangeSpenderAddresses[index], "Index does not match spender");
-    uint256 newnumAddresses = numAddresses.sub(1);
+    uint256 newNumAddresses = numAddresses.sub(1);
 
-    if (index != newnumAddresses) {
-      exchangeSpenderAddresses[index] = exchangeSpenderAddresses[newnumAddresses];
+    if (index != newNumAddresses) {
+      exchangeSpenderAddresses[index] = exchangeSpenderAddresses[newNumAddresses];
     }
 
-    exchangeSpenderAddresses.length = newnumAddresses;
+    exchangeSpenderAddresses[newNumAddresses] = address(0x0);
+    exchangeSpenderAddresses.length = newNumAddresses;
     emit ExchangeSpenderRemoved(spender);
   }
 
