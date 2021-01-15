@@ -46,7 +46,7 @@ type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 interface State {
   name: string
-  nationalPhoneNumber: string
+  internationalPhoneNumber: string
   e164Number: string
   isValidNumber: boolean
   countryCodeAlpha2: string
@@ -77,14 +77,15 @@ function getPhoneNumberState(
 
   if (phoneDetails) {
     return {
-      nationalPhoneNumber: phoneDetails.displayNumber,
+      // Show international display number to avoid confusion
+      internationalPhoneNumber: phoneDetails.displayNumberInternational,
       e164Number: phoneDetails.e164Number,
       isValidNumber: true,
       countryCodeAlpha2: phoneDetails.regionCode!,
     }
   } else {
     return {
-      nationalPhoneNumber: phoneNumber,
+      internationalPhoneNumber: phoneNumber,
       e164Number: '',
       isValidNumber: false,
       countryCodeAlpha2,
@@ -113,7 +114,11 @@ export class NameAndNumber extends React.Component<Props, State> {
       const countryCallingCode =
         this.countries.getCountryByCodeAlpha2(countryCodeAlpha2)?.countryCallingCode ?? ''
       this.setState((prevState) =>
-        getPhoneNumberState(prevState.nationalPhoneNumber, countryCallingCode, countryCodeAlpha2)
+        getPhoneNumberState(
+          prevState.internationalPhoneNumber,
+          countryCallingCode,
+          countryCodeAlpha2
+        )
       )
     }
   }
@@ -128,9 +133,9 @@ export class NameAndNumber extends React.Component<Props, State> {
     })
   }
 
-  onChangePhoneNumberInput = (nationalPhoneNumber: string, countryCallingCode: string) => {
+  onChangePhoneNumberInput = (internationalPhoneNumber: string, countryCallingCode: string) => {
     this.setState((prevState) =>
-      getPhoneNumberState(nationalPhoneNumber, countryCallingCode, prevState.countryCodeAlpha2)
+      getPhoneNumberState(internationalPhoneNumber, countryCallingCode, prevState.countryCodeAlpha2)
     )
   }
 
@@ -191,7 +196,7 @@ export class NameAndNumber extends React.Component<Props, State> {
 
   render() {
     const { t } = this.props
-    const { name, nationalPhoneNumber, countryCodeAlpha2 } = this.state
+    const { name, internationalPhoneNumber, countryCodeAlpha2 } = this.state
 
     // Lookup by countryCodeAlpha2 is cheap
     const country = countryCodeAlpha2
@@ -217,7 +222,7 @@ export class NameAndNumber extends React.Component<Props, State> {
             label={t('phoneNumber')}
             style={styles.phoneNumberInput}
             country={country}
-            nationalPhoneNumber={nationalPhoneNumber}
+            internationalPhoneNumber={internationalPhoneNumber}
             onPressCountry={this.onPressCountry}
             onChange={this.onChangePhoneNumberInput}
           />

@@ -1,5 +1,5 @@
 import React from 'react'
-import WebView from 'react-native-webview'
+import WebView from 'src/components/WebView'
 
 interface Props {
   onMessage: (any: any) => void
