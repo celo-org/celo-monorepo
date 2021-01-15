@@ -616,7 +616,7 @@ DEPENDENCIES:
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - lottie-ios (from `../../../node_modules/lottie-ios`)
   - lottie-react-native (from `../../../node_modules/lottie-react-native`)
-  - OpenSSL-Universal (from `./dummy-OpenSSL-Universal`)
+  - OpenSSL-Universal (from `https://github.com/celo-org/OpenSSL-headers.git`)
   - Permission-Camera (from `../../../node_modules/react-native-permissions/ios/Camera.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../../node_modules/react-native/Libraries/TypeSafety`)
@@ -746,7 +746,7 @@ EXTERNAL SOURCES:
   lottie-react-native:
     :path: "../../../node_modules/lottie-react-native"
   OpenSSL-Universal:
-    :path: "./dummy-OpenSSL-Universal"
+    :git: https://github.com/celo-org/OpenSSL-headers.git
   Permission-Camera:
     :path: "../../../node_modules/react-native-permissions/ios/Camera.podspec"
   RCTRequired:
@@ -880,6 +880,11 @@ EXTERNAL SOURCES:
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
+CHECKOUT OPTIONS:
+  OpenSSL-Universal:
+    :commit: ebd42d5076baee90288378bf778d2d63fef1313f
+    :git: https://github.com/celo-org/OpenSSL-headers.git
+
 SPEC CHECKSUMS:
   Analytics: 177da2c597aba83a6882b706ca6e0a071fd7cd26
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
@@ -995,6 +1000,6 @@ SPEC CHECKSUMS:
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 659c1933dacc9a2eef1c4d10ff08434dfe086db5
+PODFILE CHECKSUM: 7bf6250e6d195460f4cd2b6ea66d85aa1f3abf49
 
 COCOAPODS: 1.10.0

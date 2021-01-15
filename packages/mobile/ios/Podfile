@@ -20,8 +20,8 @@ platform :ios, '12.4'
 target "celo" do
   use_frameworks!
 
-  # Header only version of OpenSSL-Universal to workaround libcrypto / libssl conflict between Flipper and react-native-fast-crypto
-  pod 'OpenSSL-Universal', :path => "./dummy-OpenSSL-Universal"
+  # Headers only version of OpenSSL-Universal to workaround libcrypto / libssl conflict between Flipper and react-native-fast-crypto
+  pod 'OpenSSL-Universal', :git => "https://github.com/celo-org/OpenSSL-headers.git"
   
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
   pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
