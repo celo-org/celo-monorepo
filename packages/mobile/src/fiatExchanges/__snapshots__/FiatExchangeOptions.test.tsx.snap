@@ -339,7 +339,9 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                     "lineHeight": 18,
                     "marginLeft": 8,
                   },
-                  Object {},
+                  Object {
+                    "color": "#B4B9BD",
+                  },
                 ]
               }
             >

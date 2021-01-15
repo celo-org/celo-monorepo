@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import 'react-native'
@@ -12,6 +13,7 @@ const mockScreenProps = () =>
   getMockStackScreenProps(Screens.MoonPay, {
     localAmount: new BigNumber('1'),
     currencyCode: LocalCurrencyCode.USD,
+    currencyToBuy: CURRENCY_ENUM.GOLD,
   })
 
 describe('MoonPay', () => {
