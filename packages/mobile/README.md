@@ -278,7 +278,7 @@ As an alternative, Flipper can be used instead.
 brew install flipper
 ```
 
-As of Jan 2021, Flipper is not notarized and triggers MacOS Gatekeeper restriction to run it.
+As of Jan 2021, Flipper is not notarized and triggers a MacOS Gatekeeper popup when trying to run it for the first time.
 Follow [these steps to successfully launch it](https://github.com/facebook/flipper/issues/1308#issuecomment-652951556) (only needed the very first time it's run)
 
 The application currently makes use of 2 additional Flipper plugins to enable more detailed debugging:
