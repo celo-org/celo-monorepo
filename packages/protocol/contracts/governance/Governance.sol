@@ -187,7 +187,7 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 0, 1);
   }
 
   /**
@@ -464,15 +464,15 @@ contract Governance is
   /**
    * @notice Removes a proposal if it is queued and expired.
    * @param proposalId The ID of the proposal to remove.
-   * @return Whether the proposal was expired.
+   * @return Whether the proposal was removed.
    */
   function removeIfQueuedAndExpired(uint256 proposalId) private returns (bool) {
-    bool expired = isQueued(proposalId) && isQueuedProposalExpired(proposalId);
-    if (expired) {
+    if (isQueued(proposalId) && isQueuedProposalExpired(proposalId)) {
       queue.remove(proposalId);
       emit ProposalExpired(proposalId);
+      return true;
     }
-    return expired;
+    return false;
   }
 
   /**
@@ -541,11 +541,8 @@ contract Governance is
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
     } else if (isQueued(proposalId)) {
-      if (isQueuedProposalExpired(proposalId)) {
-        return Proposals.Stage.Expiration;
-      } else {
-        return Proposals.Stage.Queued;
-      }
+      return
+        isQueuedProposalExpired(proposalId) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
       return proposals[proposalId].getDequeuedStage(stageDurations);
     }
@@ -766,7 +763,9 @@ contract Governance is
   function isVoting(address account) external view returns (bool) {
     Voter storage voter = voters[account];
     uint256 upvotedProposal = voter.upvote.proposalId;
-    bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
+    bool isVotingQueue = upvotedProposal != 0 &&
+      isQueued(upvotedProposal) &&
+      !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
     bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
       Proposals.Stage.Referendum);
