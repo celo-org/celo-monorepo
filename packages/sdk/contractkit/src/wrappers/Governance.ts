@@ -388,6 +388,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   async getProposalStage(proposalID: BigNumber.Value): Promise<ProposalStage> {
     // NOTE: `methods.getProposalStage` is broken for case where proposal is queued and expired
+    // can be reverted once https://github.com/celo-org/celo-monorepo/pull/6502 is released
     const queue = await this.getQueue()
     const existsInQueue = queue.find((u) => u.proposalID === proposalID) !== undefined
     if (existsInQueue) {
