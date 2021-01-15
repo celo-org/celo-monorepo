@@ -271,7 +271,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         proxyIndex++
       }
 
-      if (!instance.minerValidator) {
+      if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
         instance.minerValidator = privateKeyToAddress(instance.privateKey!)
       }
     }
