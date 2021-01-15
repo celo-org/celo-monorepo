@@ -31,6 +31,7 @@ COPY packages/sdk/network-utils/package.json packages/sdk/network-utils/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/celotool/package.json packages/celotool/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
+COPY packages/env-tests/package.json packages/env-tests/package.json
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
@@ -49,6 +50,7 @@ COPY packages/sdk/network-utils packages/sdk/network-utils/
 COPY packages/protocol packages/protocol/
 COPY packages/celotool packages/celotool/
 COPY packages/flake-tracker packages/flake-tracker
+COPY packages/env-tests packages/env-tests
 
 RUN yarn build
 

@@ -2,10 +2,6 @@
 
 View and manage locked CELO
 
-- [`celocli lockedgold:lock`](#celocli-lockedgoldlock)
-- [`celocli lockedgold:show ACCOUNT`](#celocli-lockedgoldshow-account)
-- [`celocli lockedgold:unlock`](#celocli-lockedgoldunlock)
-- [`celocli lockedgold:withdraw`](#celocli-lockedgoldwithdraw)
 
 ## `celocli lockedgold:lock`
 
