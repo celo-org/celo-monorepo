@@ -37,8 +37,9 @@
   },
   "explanationModal": {
     "title": "Sobre os fornecedores",
-    "body": "Os fornecedores permitem que você adicione ou saque fundos da sua conta. Eles determinam suas próprias taxas e restrições dependendo da localidade, quantidade e outros fatores. Visite o site do fornecedor para obter ajuda específica. Visite as Perguntas frequentes para saber mais."
+    "body": "Os fornecedores permitem que você adicione ou retire fundos de sua conta. Eles determinam suas próprias taxas e restrições com base em vários fatores. Visite o site do provedor para obter ajuda específica."
   },
+  "pleaseSelectProvider": "Selecione um fornecedores. Esses links o conectarão a serviços externos.",
   "otherFundingOptions": "Para conhecer mais maneiras de adicionar e sacar fundos, visite <0>Como adicionar fundos à sua conta</0>",
   "youCanTransfer": "Você pode transferir {{currency}} de ou para os seguintes exchanges. Você precisará do seu Número da Conta (também conhecido como endereço) – toque abaixo para copiar.",
   "useBalanceWithMerchants": "Use seu saldo com comerciantes apoiadores",

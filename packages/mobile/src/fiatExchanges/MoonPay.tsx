@@ -6,6 +6,7 @@ import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -15,7 +16,10 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const celoCurrencyCode = 'celo'
+const currencyToCode = {
+  [CURRENCY_ENUM.GOLD]: 'celo',
+  [CURRENCY_ENUM.DOLLAR]: 'cusd',
+}
 
 export const moonPayOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
@@ -32,7 +36,7 @@ type Props = RouteProps
 
 function FiatExchangeWeb({ route }: Props) {
   const [uri, setUri] = React.useState('')
-  const { localAmount, currencyCode } = route.params
+  const { localAmount, currencyCode, currencyToBuy } = route.params
   const account = useSelector(currentAccountSelector)
 
   React.useEffect(() => {
@@ -44,7 +48,7 @@ function FiatExchangeWeb({ route }: Props) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          currency: celoCurrencyCode,
+          currency: currencyToCode[currencyToBuy],
           address: account,
           fiatCurrency: currencyCode,
           fiatAmount: localAmount?.toString(),

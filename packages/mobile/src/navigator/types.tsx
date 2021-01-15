@@ -94,6 +94,7 @@ export type StackParamList = {
   [Screens.MoonPay]: {
     localAmount: BigNumber
     currencyCode: LocalCurrencyCode
+    currencyToBuy: CURRENCY_ENUM
   }
   [Screens.GoldEducation]: undefined
   [Screens.ImportWallet]:
@@ -151,6 +152,9 @@ export type StackParamList = {
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
+  [Screens.ProviderOptionsScreen]: {
+    isAddFunds?: boolean
+  }
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment

@@ -41,6 +41,7 @@ export enum Screens {
   PincodeEnter = 'PincodeEnter',
   PincodeSet = 'PincodeSet',
   Profile = 'Profile',
+  ProviderOptionsScreen = 'ProviderOptionsScreen',
   QRCode = 'QRCode',
   QRNavigator = 'QRNavigator',
   QRScanner = 'QRScanner',

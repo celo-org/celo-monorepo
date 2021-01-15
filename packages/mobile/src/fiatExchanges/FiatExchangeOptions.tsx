@@ -6,7 +6,6 @@ import variables from '@celo/react-components/styles/variables'
 import { CURRENCY_ENUM } from '@celo/utils'
 import { RouteProp } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
-import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native'
@@ -14,8 +13,9 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
-import { KOTANI_URI, PONTO_URI, SIMPLEX_URI } from 'src/config'
+import { KOTANI_URI, PONTO_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
+import { openMoonpay } from 'src/fiatExchanges/utils'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
 import RadioIcon from 'src/icons/RadioIcon'
@@ -26,9 +26,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
-import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
@@ -118,14 +116,8 @@ function PaymentMethodRadioItem({
 function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const isAddFunds = route.params?.isAddFunds ?? true
-  const account = useSelector(currentAccountSelector)
   const localCurrency = useSelector(getLocalCurrencyCode)
-  const {
-    SIMPLEX_DISABLED,
-    MOONPAY_DISABLED,
-    KOTANI_SUPPORTED,
-    PONTO_SUPPORTED,
-  } = useCountryFeatures()
+  const { MOONPAY_DISABLED, KOTANI_SUPPORTED, PONTO_SUPPORTED } = useCountryFeatures()
   const pontoEnabled = useSelector(pontoEnabledSelector)
   const kotaniEnabled = useSelector(kotaniEnabledSelector)
   const showPonto = pontoEnabled && PONTO_SUPPORTED
@@ -133,11 +125,11 @@ function FiatExchangeOptions({ route, navigation }: Props) {
 
   Logger.debug(`Ponto: ${pontoEnabled} Kotani: ${kotaniEnabled}`)
 
+  const isCusdCashInOptionAvailable = !MOONPAY_DISABLED
+  const isCeloCashInOptionAvailable = !MOONPAY_DISABLED
   const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(CURRENCY_ENUM.DOLLAR)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
-    isAddFunds && !SIMPLEX_DISABLED && !MOONPAY_DISABLED
-      ? PaymentMethod.FIAT
-      : PaymentMethod.EXCHANGE
+    isAddFunds && isCusdCashInOptionAvailable ? PaymentMethod.FIAT : PaymentMethod.EXCHANGE
   )
   const [isEducationDialogVisible, setEducationDialogVisible] = useState(false)
 
@@ -153,12 +145,9 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
       navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
     } else if (selectedCurrency === CURRENCY_ENUM.DOLLAR) {
-      navigateToURI(`${SIMPLEX_URI}?address=${account}`)
+      navigate(Screens.ProviderOptionsScreen, { isAddFunds: true })
     } else {
-      navigate(Screens.MoonPay, {
-        localAmount: new BigNumber(0),
-        currencyCode: localCurrency || FALLBACK_CURRENCY,
-      })
+      openMoonpay(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.GOLD)
     }
   }
 
@@ -189,7 +178,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderTopRightRadius: 8,
             }}
             enabled={
-              (!SIMPLEX_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT) &&
+              (isCusdCashInOptionAvailable || selectedPaymentMethod !== PaymentMethod.FIAT) &&
               selectedPaymentMethod !== PaymentMethod.ADDRESS
             }
           />
@@ -203,7 +192,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderBottomLeftRadius: 8,
               borderBottomRightRadius: 8,
             }}
-            enabled={!MOONPAY_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT}
+            enabled={isCeloCashInOptionAvailable || selectedPaymentMethod !== PaymentMethod.FIAT}
           />
         </View>
       </ScrollView>
@@ -218,8 +207,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               selected={selectedPaymentMethod === PaymentMethod.FIAT}
               onSelect={onSelectPaymentMethod(PaymentMethod.FIAT)}
               enabled={
-                (!MOONPAY_DISABLED || selectedCurrency === CURRENCY_ENUM.DOLLAR) &&
-                (!SIMPLEX_DISABLED || selectedCurrency === CURRENCY_ENUM.GOLD)
+                (selectedCurrency === CURRENCY_ENUM.DOLLAR && isCusdCashInOptionAvailable) ||
+                (selectedCurrency === CURRENCY_ENUM.GOLD && isCeloCashInOptionAvailable)
               }
             />
           )}
