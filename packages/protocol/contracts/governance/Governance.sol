@@ -467,7 +467,7 @@ contract Governance is
    * @return Whether the proposal was expired.
    */
   function removeIfQueuedAndExpired(uint256 proposalId) private returns (bool) {
-    bool expired = queue.contains(proposalId) && isQueuedProposalExpired(proposalId);
+    bool expired = isQueued(proposalId) && isQueuedProposalExpired(proposalId);
     if (expired) {
       queue.remove(proposalId);
       emit ProposalExpired(proposalId);
@@ -541,7 +541,11 @@ contract Governance is
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
     } else if (isQueued(proposalId)) {
-      return Proposals.Stage.Queued;
+      if (isQueuedProposalExpired(proposalId)) {
+        return Proposals.Stage.Expiration;
+      } else {
+        return Proposals.Stage.Queued;
+      }
     } else {
       return proposals[proposalId].getDequeuedStage(stageDurations);
     }
@@ -1010,11 +1014,12 @@ contract Governance is
 
   /**
    * @notice Returns whether or not a proposal is in the queue.
+   * @dev NOTE: proposal may be expired
    * @param proposalId The ID of the proposal.
    * @return Whether or not the proposal is in the queue.
    */
   function isQueued(uint256 proposalId) public view returns (bool) {
-    return queue.contains(proposalId) && !isQueuedProposalExpired(proposalId);
+    return queue.contains(proposalId);
   }
 
   /**
