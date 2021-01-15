@@ -65,7 +65,7 @@ declare var window: any
 
 export const configureStore = (initialState = {}) => {
   const sagaMiddleware = createSagaMiddleware()
-  let middlewares = [sagaMiddleware]
+  const middlewares = [sagaMiddleware]
 
   if (__DEV__) {
     const createDebugger = require('redux-flipper').default
