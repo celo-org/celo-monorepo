@@ -5,16 +5,29 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.0.61--dev]**
+### **[1.0.0--dev]**
 Features
 - Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
+- CIP 8 Encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
+- Add authorized signers to release gold show - [#5596](https://github.com/celo-org/celo-monorepo/pull/5596)
+- Extract governance:build-proposal command - [#5847](https://github.com/celo-org/celo-monorepo/pull/5847)
 - Add downtime slashing commands - [#5632](https://github.com/celo-org/celo-monorepo/pull/5632)
+- Add ability to withdraw attestation rewards via CLI [#6176](https://github.com/celo-org/celo-monorepo/pull/6176)
+- Mnemonic validation flexibility within Valora - [#6372](https://github.com/celo-org/celo-monorepo/pull/6372)
+- Write transfer and transferFrom commands for MultiSig contract - [#6425](https://github.com/celo-org/celo-monorepo/pull/6425)
 
 Bug Fixes
-- [one-line summary] - ( [link PR] )
+- Fix param order on account:new internal call - [#6319](https://github.com/celo-org/celo-monorepo/pull/6319)
+- Remove broken header links in generated CLI docs - [#6415](https://github.com/celo-org/celo-monorepo/pull/6415)
 
 Other Changes
-- [one-line summary - ( [link PR] )
+- KomenciKit - [#5436](https://github.com/celo-org/celo-monorepo/pull/5436)
+- Update base and utils package versions [#5655](https://github.com/celo-org/celo-monorepo/pull/5655)
+- Parallelize and simplify fetching of comprensive registry address map - [#5568](https://github.com/celo-org/celo-monorepo/pull/5568)
+- Add readability to (big) number and timestamp/duration outputs in CK and CLI - [#5584](https://github.com/celo-org/celo-monorepo/pull/5584)
+- Rename build-proposal flag - [#5885](https://github.com/celo-org/celo-monorepo/pull/5885)
+- Compatibility with Sdk Modularization - [#4790](https://github.com/celo-org/celo-monorepo/pull/4790)
+- Adjust how CLI docs are generated - [#5882](https://github.com/celo-org/celo-monorepo/pull/5882)
 
 
 ## Published

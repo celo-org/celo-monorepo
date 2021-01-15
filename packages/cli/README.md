@@ -2,6 +2,18 @@
 
 Tool for interacting with the Celo Protocol.
 
+## Installation
+
+We are currently deploying the CLI with only Node v10.x LTS support.
+
+To install globally, run:
+
+```
+npm install -g @celo/celocli
+```
+
+If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
+
 ## Development
 
 ### Build
