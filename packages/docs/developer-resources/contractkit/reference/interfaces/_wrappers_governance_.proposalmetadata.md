@@ -20,7 +20,7 @@
 
 • **deposit**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L66)*
+*Defined in [contractkit/src/wrappers/Governance.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L63)*
 
 ___
 
@@ -28,15 +28,15 @@ ___
 
 • **descriptionURL**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L69)*
+*Defined in [contractkit/src/wrappers/Governance.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L66)*
 
 ___
 
 ###  proposer
 
-• **proposer**: *[Address](../modules/_base_.md#address)*
+• **proposer**: *Address*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L65)*
+*Defined in [contractkit/src/wrappers/Governance.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L62)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **timestamp**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L67)*
+*Defined in [contractkit/src/wrappers/Governance.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L64)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **transactionCount**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L68)*
+*Defined in [contractkit/src/wrappers/Governance.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L65)*

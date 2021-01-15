@@ -1,4 +1,4 @@
-import { MnemonicLanguages, validateMnemonic } from '@celo/utils/src/account'
+import { formatNonAccentedCharacters, validateMnemonic } from '@celo/utils/src/account'
 import * as bip39 from 'react-native-bip39'
 import {
   createQuizWordList,
@@ -97,7 +97,11 @@ describe('Mnemonic validation and formatting', () => {
     'NFD'
   )
 
-  const BAD_SPANISH_MNEMONIC = 'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín'.normalize(
+  const SPANISH_MNEMONIC_NO_ACCENTS = 'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebe oral miembro gato suelo violin'.normalize(
+    'NFD'
+  )
+
+  const BAD_SPANISH_MNEMONIC = 'avance colmo poema momia cofre pata res verso secta cinco tuberia yacer eterno observar ojo tabaco seta ruina bebé oralio miembro gato suelo violín'.normalize(
     'NFD'
   )
 
@@ -106,8 +110,8 @@ describe('Mnemonic validation and formatting', () => {
 
   const MULTILINE_ENGLISH_MNEMONIC = `there resist cinnamon water salmon
 spare thumb explain equip uniform control
-divorce mushroom head vote below 
-setup marriage oval topic husband 
+divorce mushroom head vote below
+setup marriage oval topic husband
 inner surprise invest`
 
   const MULTILINE_ENGLISH_MNEMONIC_EXTRA_SPACES = MULTILINE_ENGLISH_MNEMONIC.replace(
@@ -134,40 +138,36 @@ inner surprise invest`
   })
 
   it('validates spanish successfully', () => {
-    expect(
-      validateMnemonic(
-        formatBackupPhraseOnSubmit(SPANISH_MNEMONIC),
-        MnemonicLanguages.spanish,
-        bip39
-      )
-    ).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
+  })
+
+  it('validates spanish successfully without mnemonic accents', () => {
+    const mnemonic = formatNonAccentedCharacters(
+      formatBackupPhraseOnSubmit(SPANISH_MNEMONIC_NO_ACCENTS)
+    )
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('validates english successfully', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC), undefined, bip39)
-    ).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('validates english multiline successfully', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC), undefined, bip39)
-    ).toBeTruthy()
+    const mnemonic = formatNonAccentedCharacters(
+      formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC)
+    )
+    expect(validateMnemonic(mnemonic, bip39)).toBeTruthy()
   })
 
   it('does not validate bad english', () => {
-    expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC), undefined, bip39)
-    ).toBeFalsy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeFalsy()
   })
 
   it('does not validate bad spanish', () => {
-    expect(
-      validateMnemonic(
-        formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC),
-        MnemonicLanguages.spanish,
-        bip39
-      )
-    ).toBeFalsy()
+    const mnemonic = formatNonAccentedCharacters(formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC))
+    expect(validateMnemonic(mnemonic, bip39)).toBeFalsy()
   })
 })

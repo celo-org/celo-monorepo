@@ -159,6 +159,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -175,7 +176,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -193,6 +194,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -206,20 +208,6 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -297,7 +285,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View
@@ -340,6 +328,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -559,6 +548,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -575,7 +565,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -593,6 +583,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                   Object {
                     "alignItems": "center",
                     "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -606,20 +597,6 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -697,7 +674,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View
@@ -740,6 +717,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

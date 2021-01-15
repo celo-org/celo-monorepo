@@ -11,13 +11,14 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
-import DelayButton from 'src/backup/DelayButton'
+import BackupPhraseContainer, {
+  BackupPhraseContainerMode,
+  BackupPhraseType,
+} from 'src/backup/BackupPhraseContainer'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -27,14 +28,9 @@ interface StateProps {
   backupCompleted: boolean
 }
 
-interface DispatchProps {
-  enterBackupFlow: typeof enterBackupFlow
-  exitBackupFlow: typeof exitBackupFlow
-}
-
 type NavigationProps = StackScreenProps<StackParamList, Screens.BackupIntroduction>
 
-type Props = StateProps & DispatchProps & NavigationProps
+type Props = StateProps & NavigationProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -42,27 +38,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForAccount = ({ route }: NavigationProps) => {
-  if (route.params?.navigatedFromSettings) {
-    return headerWithBackButton
-  }
-
-  return {
-    ...emptyHeader,
-    headerTitle: '',
-    headerRight: () => <DelayButton />,
-  }
-}
-
 class BackupIntroduction extends React.Component<Props> {
-  componentDidMount() {
-    this.props.enterBackupFlow()
-  }
-
-  componentWillUnmount() {
-    this.props.exitBackupFlow()
-  }
-
   onPressBackup = () => {
     ValoraAnalytics.track(OnboardingEvents.backup_start)
     navigate(Screens.AccountKeyEducation)
@@ -106,12 +82,15 @@ function AccountKeyPostSetup() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
 
   return (
-    <ScrollView contentContainerStyle={styles.postSetupContainer}>
-      <View>
-        <Text style={fontStyles.h2}>{t('postSetupTitle')}</Text>
-        <View style={styles.keyArea}>
-          <Text style={fontStyles.large}>{accountKey}</Text>
-        </View>
+    <ScrollView contentContainerStyle={styles.postSetupContentContainer}>
+      <View style={styles.postSetupContainer}>
+        <Text style={styles.postSetupTitle}>{t('postSetupTitle')}</Text>
+        <BackupPhraseContainer
+          value={accountKey}
+          mode={BackupPhraseContainerMode.READONLY}
+          type={BackupPhraseType.BACKUP_KEY}
+          includeHeader={false}
+        />
         <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
       </View>
       <View style={styles.postSetupCTA}>
@@ -135,9 +114,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.Thick24,
     justifyContent: 'center',
   },
+  postSetupContentContainer: {
+    flex: 1,
+  },
   postSetupContainer: {
+    flex: 1,
     paddingTop: Spacing.Thick24,
     paddingHorizontal: Spacing.Regular16,
+  },
+  postSetupTitle: {
+    ...fontStyles.h2,
+    marginBottom: Spacing.Smallest8,
   },
   h1: {
     ...fontStyles.h1,
@@ -148,22 +135,16 @@ const styles = StyleSheet.create({
     ...fontStyles.large,
     paddingBottom: Spacing.Regular16,
   },
-  keyArea: {
-    padding: Spacing.Regular16,
-    backgroundColor: colors.beige,
-    marginTop: Spacing.Regular16,
-  },
   postSetupBody: {
     ...fontStyles.regular,
     marginVertical: Spacing.Regular16,
+    flexGrow: 1,
   },
   postSetupCTA: {
     alignSelf: 'center',
     paddingVertical: Spacing.Regular16,
+    marginBottom: Spacing.Regular16,
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  enterBackupFlow,
-  exitBackupFlow,
-})(BackupIntroduction)
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(BackupIntroduction)

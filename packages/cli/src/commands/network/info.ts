@@ -6,7 +6,7 @@ export default class Info extends BaseCommand {
   static description = 'View general network information such as the current block number'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     lastN: flags.integer({
       char: 'n',
       description: 'Fetch info about the last n epochs',
@@ -18,7 +18,7 @@ export default class Info extends BaseCommand {
   async run() {
     const res = this.parse(Info)
 
-    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    const blockNumber = await this.kit.connection.getBlockNumber()
     const latestEpochNumber = await this.kit.getEpochNumberOfBlock(blockNumber)
     const epochSize = await this.kit.getEpochSize()
 

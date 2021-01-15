@@ -6,6 +6,12 @@ The Baklava Testnet is a non-production Testnet for the Validator community. It 
 - **Detecting vulnerabilities**: Discover bugs in new software releases before they reach Mainnet.
 - **Testing ground**: Experiment with new infrastructure configurations in a low-risk environment.
 
+{% hint style="info" %}
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+
+You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
+{% endhint %}
+
 The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to [Mainnet](mainnet.md).
 
 {% hint style="info" %}

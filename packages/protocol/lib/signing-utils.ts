@@ -1,10 +1,10 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
+import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
 import _ from 'underscore'
 import Web3 from 'web3'
-import helpers from 'web3-core-helpers'
 import utils from 'web3-utils'
 
 function isNot(value: any) {
@@ -48,7 +48,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
     }
 
     try {
-      tx = helpers.formatters.inputCallFormatter(tx)
+      tx = inputCeloTxFormatter(tx)
 
       const transaction = tx
       transaction.to = tx.to || '0x'

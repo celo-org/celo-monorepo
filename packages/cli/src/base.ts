@@ -1,11 +1,8 @@
+import { ReadOnlyWallet } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
-import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
-import {
-  AddressValidation,
-  newLedgerWalletWithSetup,
-} from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { ReadOnlyWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
+import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
+import { LocalWallet } from '@celo/wallet-local'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -29,6 +26,7 @@ export abstract class BaseCommand extends Command {
     privateKey: flags.string({
       char: 'k',
       description: 'Use a private key to sign local transactions with',
+      hidden: true,
     }),
     node: flags.string({
       char: 'n',
@@ -43,18 +41,18 @@ export abstract class BaseCommand extends Command {
     }),
     useLedger: flags.boolean({
       default: false,
-      hidden: false,
+      hidden: true,
       description: 'Set it to use a ledger wallet',
     }),
     ledgerAddresses: flags.integer({
       default: 1,
-      hidden: false,
+      hidden: true,
       exclusive: ['ledgerCustomAddresses'],
       description: 'If --useLedger is set, this will get the first N addresses for local signing',
     }),
     ledgerCustomAddresses: flags.string({
       default: '[0]',
-      hidden: false,
+      hidden: true,
       exclusive: ['ledgerAddresses'],
       description:
         'If --useLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
@@ -70,20 +68,9 @@ export abstract class BaseCommand extends Command {
     }),
     ledgerConfirmAddress: flags.boolean({
       default: false,
-      hidden: false,
+      hidden: true,
       description: 'Set it to ask confirmation for the address of the transaction from the ledger',
     }),
-  }
-
-  static flagsWithoutLocalAddresses() {
-    return {
-      ...BaseCommand.flags,
-      privateKey: flags.string({ hidden: true }),
-      useLedger: flags.boolean({ hidden: true }),
-      ledgerAddresses: flags.integer({ hidden: true, default: 1 }),
-      ledgerCustomAddresses: flags.string({ hidden: true, default: '[0]' }),
-      ledgerConfirmAddress: flags.boolean({ hidden: true }),
-    }
   }
   // This specifies whether the node needs to be synced before the command
   // can be run. In most cases, this should be `true`, so that's the default.
@@ -118,12 +105,13 @@ export abstract class BaseCommand extends Command {
 
   get kit() {
     if (!this._kit) {
-      this._kit = newKitFromWeb3(this.web3, this._wallet)
+      this._kit = newKitFromWeb3(this.web3)
+      this._kit.connection.wallet = this._wallet
     }
 
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
-      this._kit.addAccount(res.flags.privateKey)
+      this._kit.connection.addAccount(res.flags.privateKey)
     }
     return this._kit
   }
@@ -168,6 +156,8 @@ export abstract class BaseCommand extends Command {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
+    } else {
+      this._wallet = new LocalWallet()
     }
 
     if (res.flags.from) {
@@ -178,7 +168,10 @@ export abstract class BaseCommand extends Command {
       ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
       : getGasCurrency(this.config.configDir)
 
-    const setUsdGas = () => this.kit.setFeeCurrency(CeloContract.StableToken)
+    const setUsdGas = async () => {
+      await this.kit.setFeeCurrency(CeloContract.StableToken)
+      await this.kit.updateGasPriceInConnectionLayer(CeloContract.StableToken)
+    }
     if (gasCurrencyConfig === GasOptions.cUSD) {
       await setUsdGas()
     } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
@@ -191,7 +184,7 @@ export abstract class BaseCommand extends Command {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      stopProvider(this.web3.currentProvider)
+      this.kit.connection.stop()
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

@@ -58,9 +58,12 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
-                "opacity": 1,
-              }
+              Array [
+                undefined,
+                Object {
+                  "opacity": 1,
+                },
+              ]
             }
             testID="ExchangeSwitchInput"
           >
@@ -82,6 +85,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         </View>
         <TextInput
           allowFontScaling={true}
+          autoCapitalize="words"
           autoFocus={true}
           keyboardType="decimal-pad"
           onChangeText={[Function]}
@@ -211,9 +215,12 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "opacity": 1,
-      }
+      Array [
+        undefined,
+        Object {
+          "opacity": 1,
+        },
+      ]
     }
   >
     <View
@@ -316,6 +323,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -522,6 +530,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

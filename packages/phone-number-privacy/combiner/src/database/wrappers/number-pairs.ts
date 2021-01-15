@@ -1,4 +1,5 @@
-import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
 
@@ -11,7 +12,8 @@ function numberPairs() {
  */
 export async function getNumberPairContacts(
   userPhone: string,
-  contactPhones: string[]
+  contactPhones: string[],
+  logger: Logger
 ): Promise<string[]> {
   try {
     const contentPairs = await numberPairs()
@@ -24,7 +26,7 @@ export async function getNumberPairContacts(
       .filter((number) => contactPhonesSet.has(number))
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error({ err })
+    logger.error(err)
     return []
   }
 }
@@ -34,7 +36,8 @@ export async function getNumberPairContacts(
  */
 export async function setNumberPairContacts(
   userPhone: string,
-  contactPhones: string[]
+  contactPhones: string[],
+  logger: Logger
 ): Promise<void> {
   const rows: any = []
   for (const contactPhone of contactPhones) {
@@ -47,7 +50,7 @@ export async function setNumberPairContacts(
     // ignore duplicate insertion error (23505)
     if (err.code !== '23505') {
       logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
-      logger.error({ err })
+      logger.error(err)
     }
   }
 }
