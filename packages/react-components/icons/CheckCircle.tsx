@@ -23,7 +23,7 @@ export default class CheckCircle extends React.PureComponent<Props> {
         viewBox="0 0 20 20"
       >
         <Circle cx="10" cy="10" r="6" fill={this.props.color} />
-        <Circle cx="10" cy="10" r="9" stroke={this.props.color} stroke-width="2" />
+        <Circle cx="10" cy="10" r="9" stroke={this.props.color} strokeWidth={2} />
       </Svg>
     )
   }

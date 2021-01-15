@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
   },
   circle: {
     paddingTop: 2,
-    height: 24,
-    width: 24,
+    height: 20,
+    width: 20,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: colors.gray4,
