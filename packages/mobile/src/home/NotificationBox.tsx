@@ -9,6 +9,7 @@ import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from '
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { openUrl } from 'src/app/actions'
 import { verificationPossibleSelector } from 'src/app/selectors'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
@@ -82,6 +83,7 @@ interface DispatchProps {
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
   dismissGoldEducation: typeof dismissGoldEducation
+  openUrl: typeof openUrl
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -106,6 +108,7 @@ const mapDispatchToProps = {
   dismissInviteFriends,
   dismissGetVerified,
   dismissGoldEducation,
+  openUrl,
 }
 
 interface State {
@@ -161,6 +164,7 @@ export class NotificationBox extends React.Component<Props, State> {
       dismissedGetVerified,
       verificationPossible,
       dismissedGoldEducation,
+      openUrl,
     } = this.props
     const actions = []
 
@@ -246,7 +250,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.remote_notification,
                 selectedAction: NotificationBannerCTATypes.remote_notification_cta,
               })
-              navigate(Screens.WebViewScreen, { uri: notification.ctaUri })
+              openUrl(notification.ctaUri)
             },
           },
           {

@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import { AppState } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import {
@@ -126,6 +127,8 @@ export function* handleDeepLink(action: OpenDeepLink) {
       handleDappkitDeepLink(deepLink)
     } else if (rawParams.path === '/cashIn') {
       navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
+    } else if (rawParams.pathname === '/bidali') {
+      navigate(Screens.BidaliScreen, { currency: CURRENCY_ENUM.DOLLAR })
     }
   }
 }
@@ -137,7 +140,7 @@ export function* watchDeepLinks() {
 export function* handleOpenUrl(action: OpenUrlAction) {
   const { url, openExternal } = action
   Logger.debug(TAG, 'Handling url', url)
-  if (openExternal) {
+  if (openExternal || /^https?:\/\//.test(url) === false) {
     yield call(navigateToURI, url)
   } else {
     navigate(Screens.WebViewScreen, { uri: url })
