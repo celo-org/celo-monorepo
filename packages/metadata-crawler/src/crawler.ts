@@ -220,6 +220,7 @@ async function processAttestationServiceStatusForValidator(
       status.state === AttestationServiceStatusState.Valid
 
     if (!currentValid) {
+      // see: https://discord.com/developers/docs/reference#message-formatting
       const content =
         `:no_mobile_phones: **Problem with Attestation Service!** @${status.name}\n` +
         `For validator \`${validator.address}\` in group \`${validator.affiliation}\`\n` +
