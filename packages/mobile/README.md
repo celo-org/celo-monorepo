@@ -278,15 +278,25 @@ As an alternative, Flipper can be used instead.
 brew install flipper
 ```
 
-As of Jan 2021, flipper is not notarized and triggers MacOS Gatekeep restriction to run it.
-Follow [the steps to successfully launch it](https://github.com/facebook/flipper/issues/1308#issuecomment-652951556) (only needed the very first time it's run)
+As of Jan 2021, Flipper is not notarized and triggers MacOS Gatekeeper restriction to run it.
+Follow [these steps to successfully launch it](https://github.com/facebook/flipper/issues/1308#issuecomment-652951556) (only needed the very first time it's run)
 
-The application currently makes use of 2 additional flipper plugins to enable more detailed debugging:
+The application currently makes use of 2 additional Flipper plugins to enable more detailed debugging:
 
 - Reactotron (Flipper -> Manage Plugins -> Install Plugins -> flipper-plugin-reactotron)
 - Redux Debugger (Flipper -> Manage Plugins > Install Plugins > search redux-debugger)
 
 Once installed, you should be able to see them and interact with them when the wallet is running (only in dev builds).
+
+This allows viewing / debugging the following:
+
+- Network connections
+- View hierarchy
+- Redux State / Actions
+- AsyncStorage
+- App preferences
+- Hermes
+- and more ;)
 
 ### App Profiling
 
