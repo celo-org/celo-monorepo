@@ -8,6 +8,8 @@ import { getAppLocked, getLastTimeBackgrounded, getRequirePinOnAppOpen } from 's
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { handlePaymentDeeplink } from 'src/send/utils'
 
 jest.mock('src/utils/time', () => ({
@@ -53,6 +55,12 @@ describe('App saga', () => {
     await expectSaga(handleDeepLink, openDeepLink(deepLink))
       .provide([[matchers.call.fn(handlePaymentDeeplink), deepLink]])
       .run()
+  })
+
+  it('Handles cash in deep link', async () => {
+    const deepLink = 'celo://wallet/cashIn'
+    await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
+    expect(navigate).toHaveBeenCalledWith(Screens.FiatExchangeOptions, { isAddFunds: true })
   })
 
   it('Handles set app state', async () => {

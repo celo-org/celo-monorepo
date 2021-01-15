@@ -54,6 +54,16 @@ describe(handleNotification, () => {
         .put(openUrl('https://celo.org'))
         .run()
     })
+
+    it('directly opens the url externally if the app is not already in the foreground and openExternal is true', async () => {
+      await expectSaga(
+        handleNotification,
+        { ...message, data: { ou: message.data.ou, openExternal: 'true' } },
+        NotificationReceiveState.APP_OPENED_FRESH
+      )
+        .put(openUrl(message.data.ou, true))
+        .run()
+    })
   })
 
   describe('with a payment received notification', () => {
