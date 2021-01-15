@@ -1,6 +1,6 @@
 ---
 description: >-
-  In this guide we are going to learn how to connect to the Celo test network
+  In this guide we are going to learn how to connect to the Celo test network and tranfer tokens
   using ContractKit.
 ---
 
@@ -64,7 +64,7 @@ At any point in the file you can `console.log()` variables to print their output
 ContractKit contains a `contracts` property that we can use to access certain information about deployed Celo contracts.
 
 {% hint style="info" %}
-The Celo blockchain has two native assets, CELO \(CELO\) and the Celo Dollar \(cUSD\). Both of these assets implement the [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) from Ethereum. The CELO asset is managed by the CELO smart contract and Celo Dollars is managed by the cUSD contract. We can access the CELO contract via the SDK with `kit.contracts.getGoldToken()` and the cUSD contract with `kit.contract.getStableToken()`. These function return promises, so we have to wait for them to resolve before we can interact with the token contracts. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
+The Celo blockchain has two native assets, CELO \(CELO\) and the Celo Dollar \(cUSD\). Both of these assets implement the [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) from Ethereum. The CELO asset is managed by the CELO smart contract and Celo Dollars is managed by the cUSD contract. We can access the CELO contract via the SDK with `kit.contracts.getGoldToken()` and the cUSD contract with `kit.contracts.getStableToken()`. These functions return promises, so we have to wait for them to resolve before we can interact with the token contracts. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
 {% endhint %}
 
 Let's read some token balances from the blockchain. Add the following line in the `readAccount()` function. 
@@ -75,7 +75,7 @@ let goldtoken = await kit.contracts.getGoldToken()
 let stabletoken = await kit.contracts.getStableToken()
 ```
 
-We can get the CELO balance of an account using the token wrappers like `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`
+We can get the CELO balance of an account using the token wrappers like `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`.
 
 ```javascript
 // 4. Address to look up
@@ -171,7 +171,7 @@ We have an account with CELO and cUSD in it, now how do we send tokens to anothe
 
 The token wrappers have a method called `transfer(address, amount)` that allows you to send value to the specified address \(line 14\).
 
-You need to `send()` the transaction to the network after you construct it. The `send()` methods accepts an option that allows you to specify the `feeCurrency`, which allows the sender to pay transaction fees in CELO or cUSD. The default `feeCurrency` is CELO. In the following example, let's pay transaction fees in CELO when we transfer CELO and pay in cUSD when we transfer cUSD.  
+You need to `send()` the transaction to the network after you construct it. The `send()` methods accepts an option that allows you to specify the `feeCurrency`, which allows the sender to pay transaction fees in CELO or cUSD. The default `feeCurrency` is CELO. In the following example, let's pay transaction fees in CELO when we transfer CELO and pay with cUSD when we transfer cUSD.  
 
 The `send()` method returns a transaction object. We will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\) and print it when we get it. This receipt contains information about the transaction.
 
