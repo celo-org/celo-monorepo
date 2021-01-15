@@ -221,7 +221,7 @@ async function processAttestationServiceStatusForValidator(
 
     if (!currentValid) {
       const content =
-        `:no_mobile_phones: **Problem with Attestation Service!** ${status.name} \n` +
+        `:no_mobile_phones: **Problem with Attestation Service!** @${status.name}\n` +
         `For validator \`${validator.address}\` in group \`${validator.affiliation}\`\n` +
         `\`${status.state}\` ${status.attestationServiceURL ?? ''}${
           status.error ? '\n`' + (status.error.message ?? status.error) + '`' : ''
