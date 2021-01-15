@@ -3,7 +3,7 @@ import Reactotron from 'reactotron-react-native'
 import ReactotronFlipper from 'reactotron-react-native/dist/flipper'
 import { reactotronRedux } from 'reactotron-redux'
 
-const reactotron = Reactotron.setAsyncStorageHandler(AsyncStorage)
+const reactotron = Reactotron.setAsyncStorageHandler?.(AsyncStorage)
   .configure({
     createSocket: (path) => new ReactotronFlipper(path),
   }) // controls connection & communication settings
