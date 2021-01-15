@@ -290,6 +290,7 @@ Once installed, you should be able to see them and interact with them when the w
 
 This allows viewing / debugging the following:
 
+- React DevTools (Components and Profiling)
 - Network connections
 - View hierarchy
 - Redux State / Actions
