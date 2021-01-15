@@ -922,11 +922,11 @@ export async function startGeth(
     '--gcmode=archive', // Needed to retrieve historical state
     '--istanbul.blockperiod',
     blocktime.toString(),
-    '--etherbase', //TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
+    '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
     minerValidator,
     // TODO(ponti): add flag after Donut fork
     // '--tx-fee-recipient',
-    //txFeeRecipient
+    // txFeeRecipient
   ]
 
   if (rpcport) {
