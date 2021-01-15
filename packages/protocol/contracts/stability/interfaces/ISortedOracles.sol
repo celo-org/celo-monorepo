@@ -10,4 +10,5 @@ interface ISortedOracles {
   function medianRate(address) external view returns (uint256, uint256);
   function numTimestamps(address) external view returns (uint256);
   function medianTimestamp(address) external view returns (uint256);
+  function getCurrencyPairIdentifier(string calldata) external pure returns (address);
 }

@@ -309,6 +309,16 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
+   * @notice Returns the identifier (address) from a human readable currency pair (eg. "CELO/BTC")
+   *         Can be used from other contracts to compute the identifier to read rates.
+   * @param currencyPair The string human readable currency pair
+   * @return The identifier as an address
+   */
+  function getCurrencyPairIdentifier(string calldata currencyPair) external pure returns (address) {
+    return address(bytes20(keccak256(abi.encodePacked(currencyPair))));
+  }
+
+  /**
    * @notice Removes an oracle value and updates the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.

@@ -1,4 +1,5 @@
-import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { normalizeAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import { pairIdentifier } from '@celo/contractkit/lib/wrappers/SortedOracles'
 import {
   assertEqualBN,
   assertLogMatches2,
@@ -591,6 +592,16 @@ contract('SortedOracles', (accounts: string[]) => {
         // the most recent timestamp, belonging to anOracle in both cases, should change
         assert.isTrue(resultTimestamps['1']['0'].gt(initialTimestamps['1']['0']))
       })
+    })
+  })
+
+  describe('#getCurrencyPairIdentifier', () => {
+    it('computes the identifier from a human readable pair', async () => {
+      const currencyPair = 'CELO/BTC'
+      assert.equal(
+        normalizeAddress(await sortedOracles.getCurrencyPairIdentifier(currencyPair)),
+        normalizeAddress(pairIdentifier(currencyPair))
+      )
     })
   })
 })
