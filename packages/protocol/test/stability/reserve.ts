@@ -322,8 +322,6 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.removeExchangeSpender(nonOwner, 0, { from: nonOwner }))
     })
 
-    // TODO should allow exchange
-
     it('should emit removeExchangeSpender event on remove', async () => {
       const resp = await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
       const log = resp.logs[0]
@@ -367,7 +365,7 @@ contract('Reserve', (accounts: string[]) => {
 
     it("doesn't remove an address with the wrong index", async () => {
       await reserve.addExchangeSpender(accounts[1])
-      assertRevert(reserve.removeExchangeSpender(exchangeSpenderAddress, 1))
+      await assertRevert(reserve.removeExchangeSpender(exchangeSpenderAddress, 1))
     })
   })
 
