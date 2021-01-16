@@ -19,9 +19,10 @@ function runTests() {
   }
   const kit = newKitFromWeb3(new Web3(process.env.CELO_PROVIDER || 'http://localhost:8545'))
   const mnemonic = process.env.MNEMONIC!
+  const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
 
   describe('Run tests in context of monorepo', () => {
-    const context = { kit, mnemonic, logger: rootLogger }
+    const context = { kit, mnemonic, logger: rootLogger, reserveSpenderMultiSigAddress }
     // TODO: Assert maximum loss after test
     runTransfercUSDTest(context)
     runExchangeTest(context)
@@ -33,7 +34,7 @@ function runTests() {
     // TODO: Validator election + Slashing
 
     afterAll(async () => {
-      await clearAllFundsToRoot({ kit, mnemonic, logger: rootLogger })
+      await clearAllFundsToRoot(context)
     })
   })
 }

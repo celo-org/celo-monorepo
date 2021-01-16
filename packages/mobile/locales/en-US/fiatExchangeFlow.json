@@ -1,10 +1,10 @@
 {
   "addFunds": "Add Funds",
-  "addFundsSubtitle": "Purchase cUSD or CELO",
+  "addFundsSubtitle": "Fund your Valora account",
   "exchanges": "Exchanges",
   "buySellOnExchanges": "Buy/Sell on Exchanges",
   "cashOut": "Cash Out",
-  "cashOutSubtitle": "Exchange cUSD or CELO for another currency",
+  "cashOutSubtitle": "Send funds to an exchange or another account",
   "cashOutComingSoon": "Cash Out (Coming Soon)",
   "spend": "Spend",
   "spendSubtitle": "Use your balance with supporting merchants",

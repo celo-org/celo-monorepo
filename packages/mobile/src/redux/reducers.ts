@@ -94,6 +94,7 @@ export interface PersistedRootState {
   send: SendState
   goldToken: GoldTokenState
   stableToken: StableTokenState
+  home: HomeState
   transactions: TransactionsState
   web3: Web3State
   identity: IdentityState

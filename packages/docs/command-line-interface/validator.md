@@ -2,19 +2,6 @@
 
 View and manage Validators
 
-- [`celocli validator:affiliate GROUPADDRESS`](#celocli-validatoraffiliate-groupaddress)
-- [`celocli validator:deaffiliate`](#celocli-validatordeaffiliate)
-- [`celocli validator:deregister`](#celocli-validatorderegister)
-- [`celocli validator:downtime-slash`](#celocli-validatordowntime-slash)
-- [`celocli validator:force-deaffiliate`](#celocli-validatorforce-deaffiliate)
-- [`celocli validator:list`](#celocli-validatorlist)
-- [`celocli validator:register`](#celocli-validatorregister)
-- [`celocli validator:requirements`](#celocli-validatorrequirements)
-- [`celocli validator:set-bitmaps`](#celocli-validatorset-bitmaps)
-- [`celocli validator:show VALIDATORADDRESS`](#celocli-validatorshow-validatoraddress)
-- [`celocli validator:signed-blocks`](#celocli-validatorsigned-blocks)
-- [`celocli validator:status`](#celocli-validatorstatus)
-- [`celocli validator:update-bls-public-key`](#celocli-validatorupdate-bls-public-key)
 
 ## `celocli validator:affiliate GROUPADDRESS`
 

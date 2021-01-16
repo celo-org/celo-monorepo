@@ -2,7 +2,7 @@
 
 import { NavigationActions, StackActions } from '@react-navigation/compat'
 import { CommonActions, NavigationContainerRef } from '@react-navigation/native'
-import { createRef } from 'react'
+import { createRef, MutableRefObject } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -16,17 +16,25 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
 
+const NAVIGATOR_INIT_RETRIES = 5
+
 type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
+export const navigatorIsReadyRef: MutableRefObject<boolean | null> = createRef()
+navigatorIsReadyRef.current = false
 
 async function ensureNavigator() {
   let retries = 0
-  while (!navigationRef.current && retries < 3) {
+  while (
+    !navigationRef.current &&
+    !navigatorIsReadyRef.current &&
+    retries < NAVIGATOR_INIT_RETRIES
+  ) {
     await sleep(200)
     retries++
   }
-  if (!navigationRef.current) {
+  if (!navigationRef.current || !navigatorIsReadyRef.current) {
     throw new Error('navigator is not initialized')
   }
 }
