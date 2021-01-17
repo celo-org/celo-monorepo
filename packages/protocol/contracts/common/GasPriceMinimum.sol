@@ -23,9 +23,9 @@ contract GasPriceMinimum is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  event TargetDensitySet(uint256 targetDensity);
+  event TargetDensitySet(uint256 targetDensityFraction);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
-  event AdjustmentSpeedSet(uint256 adjustmentSpeed);
+  event AdjustmentSpeedSet(uint256 adjustmentSpeedFraction);
   event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
 
   uint256 public gasPriceMinimum;

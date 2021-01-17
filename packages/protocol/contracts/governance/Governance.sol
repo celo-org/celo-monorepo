@@ -119,7 +119,11 @@ contract Governance is
 
   event ExecutionStageDurationSet(uint256 executionStageDuration);
 
-  event ConstitutionSet(address indexed destination, bytes4 indexed functionId, uint256 threshold);
+  event ConstitutionSet(
+    address indexed destination,
+    bytes4 indexed functionId,
+    uint256 thresholdFraction
+  );
 
   event ProposalQueued(
     uint256 indexed proposalId,
@@ -152,9 +156,9 @@ contract Governance is
 
   event ProposalExpired(uint256 indexed proposalId);
 
-  event ParticipationBaselineUpdated(uint256 participationBaseline);
+  event ParticipationBaselineUpdated(uint256 participationBaselineFraction);
 
-  event ParticipationFloorSet(uint256 participationFloor);
+  event ParticipationFloorSet(uint256 participationFloorFraction);
 
   event ParticipationBaselineUpdateFactorSet(uint256 baselineUpdateFactor);
 

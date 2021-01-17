@@ -42,10 +42,10 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     address indexed token,
     address indexed oracle,
     uint256 timestamp,
-    uint256 value
+    uint256 rate
   );
   event OracleReportRemoved(address indexed token, address indexed oracle);
-  event MedianUpdated(address indexed token, uint256 value);
+  event MedianUpdated(address indexed token, uint256 rate);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
 

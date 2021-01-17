@@ -33,7 +33,7 @@ contract Exchange is
   event UpdateFrequencySet(uint256 updateFrequency);
   event MinimumReportsSet(uint256 minimumReports);
   event StableTokenSet(address indexed stable);
-  event SpreadSet(uint256 spread);
+  event SpreadSet(uint256 spreadFraction);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
 
