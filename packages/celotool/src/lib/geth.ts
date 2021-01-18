@@ -886,7 +886,7 @@ export async function startGeth(
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const minerValidator = instance.minerValidator
-  if (!minerValidator) {
+  if (instance.validating && !minerValidator) {
     throw new Error('miner.validator address from the instance is required')
   }
   // TODO(ponti): add flag after Donut fork
@@ -921,13 +921,18 @@ export async function startGeth(
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
     '--istanbul.blockperiod',
-    blocktime.toString(),
-    '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
-    minerValidator,
+    blocktime.toString()
+  ]
+
+  if (minerValidator) {
+    gethArgs.push(
+      '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
+      minerValidator
+    )
     // TODO(ponti): add flag after Donut fork
     // '--tx-fee-recipient',
     // txFeeRecipient
-  ]
+  }
 
   if (rpcport) {
     gethArgs.push(
