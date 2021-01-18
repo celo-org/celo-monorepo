@@ -1177,6 +1177,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
             },
           ]
         }
+        testID="celoRewards/learnMore"
       >
         <Text
           style={
