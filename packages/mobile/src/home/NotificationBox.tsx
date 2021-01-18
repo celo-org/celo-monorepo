@@ -9,7 +9,7 @@ import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from '
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { openUrl } from 'src/app/actions'
+import { openUrl as openUrlAction } from 'src/app/actions'
 import { verificationPossibleSelector } from 'src/app/selectors'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
@@ -83,7 +83,7 @@ interface DispatchProps {
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
   dismissGoldEducation: typeof dismissGoldEducation
-  openUrl: typeof openUrl
+  openUrl: typeof openUrlAction
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -108,7 +108,7 @@ const mapDispatchToProps = {
   dismissInviteFriends,
   dismissGetVerified,
   dismissGoldEducation,
-  openUrl,
+  openUrl: openUrlAction,
 }
 
 interface State {
