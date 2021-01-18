@@ -28,6 +28,7 @@
     "@celo/base": "1.0.0-dev",
     "@celo/utils": "1.0.0-dev",
     "@celo/contractkit": "1.0.0-dev",
+    "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "cross-fetch": "3.0.4",
@@ -39,7 +40,6 @@
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/wallet-local": "1.0.0-dev",
-    "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",
     "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
