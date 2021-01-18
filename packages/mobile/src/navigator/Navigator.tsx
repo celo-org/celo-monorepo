@@ -115,11 +115,8 @@ export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
   Platform.select({
     // iOS 13 modal presentation
     ios: {
-      // headerShown: false,
       gestureEnabled: true,
       cardOverlayEnabled: true,
-      // headerStatusBarHeight:
-      //   navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
       headerStatusBarHeight: 0,
       ...TransitionPresets.ModalPresentationIOS,
     },
@@ -607,19 +604,7 @@ const mainScreenNavOptions = (navOptions: NavigationOptions) => ({
 
 function RootStackScreen() {
   return (
-    <RootStack.Navigator
-      mode="modal"
-      // screenOptions={({ route, navigation }) => ({
-      //   headerShown: false,
-      //   gestureEnabled: true,
-      //   cardOverlayEnabled: true,
-      //   headerStatusBarHeight:
-      //     navigation.dangerouslyGetState().routes.findIndex((r) => r.key === route.key) > 0
-      //       ? 0
-      //       : undefined,
-      //   ...TransitionPresets.ModalPresentationIOS,
-      // })}
-    >
+    <RootStack.Navigator mode="modal">
       <RootStack.Screen
         name={Screens.Main}
         component={MainStackScreen}

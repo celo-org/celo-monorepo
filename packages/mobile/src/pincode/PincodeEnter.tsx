@@ -37,11 +37,6 @@ class PincodeEnter extends React.Component<Props, State> {
     ...modalScreenOptions(navOptions),
     ...headerWithBackButton,
     gestureEnabled: false,
-    // cardStyleInterpolator: ({ current }: StackCardInterpolationProps) => ({
-    //   containerStyle: {
-    //     opacity: current.progress,
-    //   },
-    // }),
   })
 
   state = {
