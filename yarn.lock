@@ -7412,7 +7412,6 @@
 
 "@umpirsky/country-list@https://github.com/umpirsky/country-list#05fda51":
   version "1.0.0"
-  uid "05fda51cd97b3294e8175ffed06104c44b3c71d7"
   resolved "https://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
 
 "@ungap/url-search-params@^0.1.2":
