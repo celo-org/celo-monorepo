@@ -239,7 +239,7 @@ function CeloRewardContent({ address, amount, recipient }: Props) {
         expandable={false}
         avatar={<TransferAvatars type="received" address={address} recipient={recipient} />}
       />
-      <TouchableOpacity onPress={openLearnMore}>
+      <TouchableOpacity onPress={openLearnMore} testID={'celoRewards/learnMore'}>
         <Text style={styles.learnMore}>{t('learnMore')}</Text>
       </TouchableOpacity>
       <HorizontalLine />

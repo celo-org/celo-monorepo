@@ -121,9 +121,29 @@ export const BIDALI_URL_MAINNET = keyOrUndefined(
 
 export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
+    name: 'Binance',
+    link: 'https://www.binance.com/en/trade/CELO_USDT',
+    currencies: [CURRENCY_ENUM.GOLD],
+  },
+  {
     name: 'Bittrex',
     link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
+    currencies: [CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR],
+  },
+  {
+    name: 'Coinbase (CELO as CGLD)',
+    link: 'https://www.coinbase.com',
     currencies: [CURRENCY_ENUM.GOLD],
+  },
+  {
+    name: 'Coinbase Pro (CELO as CGLD)',
+    link: 'https://pro.coinbase.com/trade/CGLD-USD',
+    currencies: [CURRENCY_ENUM.GOLD],
+  },
+  {
+    name: 'CoinList Pro',
+    link: 'https://coinlist.co/asset/celo',
+    currencies: [CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR],
   },
   {
     name: 'OKCoin',
@@ -133,21 +153,6 @@ export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
     name: 'OKEx',
     link: 'https://www.okex.com/spot/trade/CELO-USDT',
-    currencies: [CURRENCY_ENUM.GOLD],
-  },
-  {
-    name: 'CoinList Pro',
-    link: 'https://coinlist.co/asset/celo',
-    currencies: [CURRENCY_ENUM.GOLD],
-  },
-  {
-    name: 'Coinbase Pro (CELO as CGLD)',
-    link: 'https://pro.coinbase.com/trade/CGLD-USD',
-    currencies: [CURRENCY_ENUM.GOLD],
-  },
-  {
-    name: 'Coinbase (CELO as CGLD)',
-    link: 'https://www.coinbase.com',
     currencies: [CURRENCY_ENUM.GOLD],
   },
 ]
