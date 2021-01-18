@@ -240,7 +240,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
                 enabled={selectedCurrency === CURRENCY_ENUM.GOLD}
               />
               <PaymentMethodRadioItem
-                text={t('receiveGiftCard')}
+                text={t('receiveWithBidali')}
                 selected={selectedPaymentMethod === PaymentMethod.GIFT_CARD}
                 onSelect={onSelectPaymentMethod(PaymentMethod.GIFT_CARD)}
                 enabled={selectedCurrency === CURRENCY_ENUM.DOLLAR}
