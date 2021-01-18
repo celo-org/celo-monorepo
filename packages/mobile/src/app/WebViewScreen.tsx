@@ -1,7 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
-import * as React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes'
 import { useDispatch } from 'react-redux'
