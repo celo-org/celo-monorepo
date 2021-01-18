@@ -25,6 +25,7 @@
   "receiveOnAddress": "Endereço cUSD/CELO",
   "receiveWithPonto": "GCash (com Ponto)",
   "receiveWithKotani": "M-PESA (com Kotani Pay)",
+  "receiveWithBidali": "Gift Cards and Mobile Top Up",
   "fundingEducationDialog": {
     "title": "Adicionar fundos com {{appName}} ",
     "body": "{{appName}} é alimentado pela Rede Celo. O {{appName}} gerencia Celo Dólares (cUSD), uma moeda digital estável que acompanha o dólar americano.Para adicionar fundos à sua conta do {{appName}}, compre o cUSD de um dos fornecedores terceirizados disponíveis em sua localidade. Para mais informações visite <0>{{link}}</0>",
