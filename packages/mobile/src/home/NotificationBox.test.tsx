@@ -281,6 +281,6 @@ describe('NotificationBox', () => {
     expect(store.getActions()).toEqual([])
 
     fireEvent.press(getByText('Press Remote'))
-    expect(store.getActions()).toEqual([openUrl(testNotification.ctaUri)])
+    expect(store.getActions()).toEqual([openUrl(testNotification.ctaUri, true)])
   })
 })

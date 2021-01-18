@@ -250,7 +250,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.remote_notification,
                 selectedAction: NotificationBannerCTATypes.remote_notification_cta,
               })
-              openUrl(notification.ctaUri)
+              openUrl(notification.ctaUri, true)
             },
           },
           {
