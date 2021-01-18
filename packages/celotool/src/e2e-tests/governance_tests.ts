@@ -923,6 +923,7 @@ describe('governance tests', () => {
           wsport: 8559,
           rpcport: 9559,
           privateKey: rotation0PrivateKey.slice(2),
+          minerValidator: privateKeyToAddress(rotation0PrivateKey.slice(2)),
         },
         {
           name: 'validator2KeyRotation1',
@@ -933,6 +934,7 @@ describe('governance tests', () => {
           wsport: 8561,
           rpcport: 9561,
           privateKey: rotation1PrivateKey.slice(2),
+          minerValidator: privateKeyToAddress(rotation1PrivateKey.slice(2)),
         },
       ]
 
