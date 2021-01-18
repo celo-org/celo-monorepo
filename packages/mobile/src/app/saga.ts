@@ -144,10 +144,12 @@ export function* handleOpenUrl(action: OpenUrlAction) {
   if (url.startsWith('celo:')) {
     // Handle celo links directly, this avoids showing the "Open with App" sheet on Android
     yield call(handleDeepLink, openDeepLink(url))
-  } else if (openExternal || /^https?:\/\//i.test(url) === false) {
-    yield call(navigateToURI, url)
-  } else {
+  } else if (/^https?:\/\//i.test(url) === true && !openExternal) {
+    // We display http or https links using our in app browser, unless openExternal is forced
     navigate(Screens.WebViewScreen, { uri: url })
+  } else {
+    // Fallback
+    yield call(navigateToURI, url)
   }
 }
 
