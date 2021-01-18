@@ -51,7 +51,9 @@ export class Connection {
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
-  constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet) {
+  constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
+    web3.eth.handleRevert = handleRevert
+
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
