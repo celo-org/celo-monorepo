@@ -244,7 +244,8 @@ describe('Transfer tests', function(this: any) {
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
     // light clients.
-    etherbase: FeeRecipientAddress,
+    minerValidator: FeeRecipientAddress,
+    txFeeRecipient: FeeRecipientAddress,
   }
 
   const restartWithCleanNodes = async () => {
