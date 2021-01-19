@@ -96,7 +96,7 @@ describe('IncomingPaymentRequestListItem', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-      origin: SendOrigin.DefaultRequestFlow,
+      origin: SendOrigin.AppRequestFlow,
       transactionData: mockTransactionData,
     })
   })
@@ -141,7 +141,7 @@ describe('IncomingPaymentRequestListItem', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
-      origin: SendOrigin.DefaultRequestFlow,
+      origin: SendOrigin.AppRequestFlow,
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.PARTIAL,
     })

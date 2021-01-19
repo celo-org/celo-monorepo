@@ -28,12 +28,12 @@ const mockedGetSendFee = getSendFee as jest.Mock
 
 const mockScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
   transactionData: mockTransactionData,
-  origin: SendOrigin.DefaultSendFlow,
+  origin: SendOrigin.AppSendFlow,
 })
 
 const mockInviteScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
   transactionData: mockInviteTransactionData,
-  origin: SendOrigin.DefaultSendFlow,
+  origin: SendOrigin.AppSendFlow,
 })
 
 describe('SendConfirmation', () => {
@@ -240,7 +240,7 @@ describe('SendConfirmation', () => {
 
     fireEvent.press(tree.getByTestId('accountEditButton'))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressValidationType: mockAddressValidationType,
     })

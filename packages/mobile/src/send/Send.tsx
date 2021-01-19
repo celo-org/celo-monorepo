@@ -249,7 +249,7 @@ class Send extends React.Component<Props, State> {
     navigate(Screens.SendAmount, {
       recipient,
       isOutgoingPaymentRequest,
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
     })
   }
 

@@ -143,7 +143,7 @@ describe(handleNotification, () => {
         .run()
 
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-        origin: SendOrigin.DefaultRequestFlow,
+        origin: SendOrigin.AppRequestFlow,
         transactionData: {
           amount: new BigNumber('10'),
           firebasePendingRequestUid: 'abc',

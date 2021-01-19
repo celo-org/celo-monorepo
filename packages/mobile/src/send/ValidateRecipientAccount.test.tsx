@@ -18,7 +18,7 @@ describe('ValidateRecipientAccount', () => {
           {...getMockStackScreenProps(Screens.ValidateRecipientAccount, {
             transactionData: mockTransactionData,
             addressValidationType: AddressValidationType.FULL,
-            origin: SendOrigin.DefaultSendFlow,
+            origin: SendOrigin.AppSendFlow,
           })}
         />
       </Provider>
@@ -34,7 +34,7 @@ describe('ValidateRecipientAccount', () => {
           {...getMockStackScreenProps(Screens.ValidateRecipientAccount, {
             transactionData: mockTransactionData,
             addressValidationType: AddressValidationType.PARTIAL,
-            origin: SendOrigin.DefaultSendFlow,
+            origin: SendOrigin.AppSendFlow,
           })}
         />
       </Provider>
@@ -57,7 +57,7 @@ describe('ValidateRecipientAccount', () => {
     const props = getMockStackScreenProps(Screens.ValidateRecipientAccount, {
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.PARTIAL,
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
     })
 
     const tree = render(
@@ -84,7 +84,7 @@ describe('ValidateRecipientAccount', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })
@@ -107,7 +107,7 @@ it('navigates to payment request confirmation when validation successful for req
     transactionData: mockTransactionData,
     addressValidationType: AddressValidationType.PARTIAL,
     isOutgoingPaymentRequest: true,
-    origin: SendOrigin.DefaultRequestFlow,
+    origin: SendOrigin.AppRequestFlow,
   })
 
   const tree = render(

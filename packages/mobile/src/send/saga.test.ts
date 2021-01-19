@@ -67,7 +67,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -100,7 +100,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -133,7 +133,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -202,7 +202,7 @@ describe(watchQrCodeDetections, () => {
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })

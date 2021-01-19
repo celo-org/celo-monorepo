@@ -81,7 +81,7 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
     const addressValidationType =
       secureSendDetails?.addressValidationType || AddressValidationType.NONE
 
-    const origin = SendOrigin.DefaultRequestFlow
+    const origin = SendOrigin.AppRequestFlow
     if (addressValidationType === AddressValidationType.NONE) {
       navigate(Screens.SendConfirmation, { transactionData, origin })
     } else {

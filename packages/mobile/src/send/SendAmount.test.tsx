@@ -54,7 +54,7 @@ const mockScreenProps = (isOutgoingPaymentRequest?: true) =>
   getMockStackScreenProps(Screens.SendAmount, {
     recipient: mockTransactionData.recipient,
     isOutgoingPaymentRequest,
-    origin: SendOrigin.DefaultSendFlow,
+    origin: SendOrigin.AppSendFlow,
   })
 
 const enterAmount = (wrapper: RenderAPI, text: string) => {
@@ -216,7 +216,7 @@ describe('SendAmount', () => {
       )
 
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
       })
     })
@@ -244,7 +244,7 @@ describe('SendAmount', () => {
       enterAmount(tree, AMOUNT_VALID)
       fireEvent.press(tree.getByTestId('Review'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
       })
@@ -271,7 +271,7 @@ describe('SendAmount', () => {
       enterAmount(tree, AMOUNT_VALID)
       fireEvent.press(tree.getByTestId('Review'))
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
       })
     })
@@ -300,7 +300,7 @@ describe('SendAmount', () => {
       fireEvent.press(tree.getByTestId('Review'))
 
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
         isOutgoingPaymentRequest: true,

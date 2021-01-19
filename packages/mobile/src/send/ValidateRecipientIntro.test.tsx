@@ -17,7 +17,7 @@ const mockRoute = {
   params: {
     transactionData: mockTransactionData,
     addressValidationType: AddressValidationType.FULL,
-    origin: SendOrigin.DefaultSendFlow,
+    origin: SendOrigin.AppSendFlow,
   },
 }
 
@@ -39,7 +39,7 @@ describe('ValidateRecipientIntro', () => {
     )
     fireEvent.press(tree.getByTestId('confirmAccountButton'))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientAccount, {
-      origin: SendOrigin.DefaultSendFlow,
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.FULL,
     })

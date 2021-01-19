@@ -153,7 +153,7 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), mockUriData[3].currencyCode]])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
-          origin: SendOrigin.DefaultSendFlow,
+          origin: SendOrigin.AppSendFlow,
           recipient: mockQRCodeRecipient,
           isOutgoingPaymentRequest: undefined,
         })
@@ -171,7 +171,7 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), '2']])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-          origin: SendOrigin.DefaultSendFlow,
+          origin: SendOrigin.AppSendFlow,
           transactionData: mockTransactionData,
           currencyInfo: { localCurrencyCode: mockUriData[4].currencyCode, localExchangeRate: '2' },
         })
@@ -189,7 +189,7 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), '2']])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
-          origin: SendOrigin.DefaultSendFlow,
+          origin: SendOrigin.AppSendFlow,
           transactionData: mockTransactionData,
           currencyInfo: { localCurrencyCode: mockUriData[5].currencyCode, localExchangeRate: '2' },
         })

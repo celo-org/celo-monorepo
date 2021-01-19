@@ -217,7 +217,7 @@ export function* handleSendPaymentData(
         transactionData,
         isFromScan,
         currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
       })
     }
   } else {
@@ -229,7 +229,7 @@ export function* handleSendPaymentData(
         recipient,
         isFromScan,
         isOutgoingPaymentRequest,
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
       })
     }
   }

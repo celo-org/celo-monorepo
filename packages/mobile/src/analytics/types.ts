@@ -8,8 +8,9 @@ export enum BackQuizProgress {
   backspace = 'backspace',
 }
 
+// Origin of Send actions
 export enum SendOrigin {
-  DefaultSendFlow = 'default_send_flow',
-  DefaultRequestFlow = 'default_request_flow',
-  Bidali = 'bidali',
+  AppSendFlow = 'app_send_flow', // Sending as part of the app send flow
+  AppRequestFlow = 'app_request_flow', // Sending because of a received payment request
+  Bidali = 'bidali', // Sending from Bidali
 }

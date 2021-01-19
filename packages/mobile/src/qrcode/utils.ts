@@ -130,7 +130,7 @@ export function* handleBarcode(
       navigate(Screens.SendConfirmation, {
         transactionData: secureSendTxData,
         addressJustValidated: true,
-        origin: SendOrigin.DefaultSendFlow,
+        origin: SendOrigin.AppSendFlow,
       })
     }
 
