@@ -43,7 +43,7 @@ echo "- Return to original git commit"
 git checkout - >> $LOG_FILE
 
 echo "- Build verification script"
-yarn build:ts >> $LOG_FILE
+yarn build >> $LOG_FILE
 
 echo "- Run verification script"
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $FORNO
