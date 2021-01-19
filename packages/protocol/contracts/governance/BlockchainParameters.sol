@@ -126,7 +126,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    */
   function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
     lookbackWindow = _getUptimeLookbackWindow();
-    require(lookbackwindow != 0, "UptimeLookbackWindow is not initialized");
+    require(lookbackWindow != 0, "UptimeLookbackWindow is not initialized");
   }
 
   /**

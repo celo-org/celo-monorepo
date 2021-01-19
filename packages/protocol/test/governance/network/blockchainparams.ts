@@ -126,81 +126,33 @@ contract('BlockchainParameters', (accounts: string[]) => {
   })
 
   describe('#getUptimeLookbackWindow()', () => {
-    it('should return 12 if not initalized', async () => {
-      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 12)
-    })
+    it('should fail if not initalized', async () =>
+      assertRevert(blockchainParameters.getUptimeLookbackWindow()))
 
-    it('should return oldValue once it has been initialized', async () => {
+    it('should fail if initialized, but still on current epoch', async () => {
       await blockchainParameters.setUptimeLookbackWindow(20)
-      await mineBlocks(EPOCH, web3)
-      await blockchainParameters.setUptimeLookbackWindow(50)
-
-      // returns old value
-      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 20)
+      assertRevert(blockchainParameters.getUptimeLookbackWindow())
     })
   })
 
   describe('#setUptimeLookbackWindow()', () => {
-    const initialValue = 24
     const newValue = 20
 
-    describe('when already initialized', () => {
-      beforeEach(async () => {
-        // initialize lookbackWindow
-        await blockchainParameters.setUptimeLookbackWindow(initialValue)
-        await mineBlocks(EPOCH, web3)
-      })
-
-      it('should set the value for the next epoch', async () => {
-        await blockchainParameters.setUptimeLookbackWindow(newValue)
-
-        // still old value
-        assert.equal(
-          (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
-          initialValue
-        )
-
-        // wait an epoch to find new value
-        await mineBlocks(EPOCH, web3)
-        assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), newValue)
-      })
-
-      it('multiple calls within epoch only applies last', async () => {
-        // make 2 calls
-        await blockchainParameters.setUptimeLookbackWindow(newValue)
-        await blockchainParameters.setUptimeLookbackWindow(50)
-
-        // current epoch still initial value
-        assert.equal(
-          (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
-          initialValue
-        )
-
-        // after the epoch, find last value set
-        await mineBlocks(EPOCH, web3)
-        assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 50)
-      })
+    it('should set the value for the next epoch', async () => {
+      await blockchainParameters.setUptimeLookbackWindow(newValue)
+      // wait an epoch to find new value
+      await mineBlocks(EPOCH, web3)
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), newValue)
     })
 
-    describe('when not initialized', () => {
-      it('should set the variable for the current epoch', async () => {
-        await blockchainParameters.setUptimeLookbackWindow(initialValue)
-        assert.equal(
-          (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
-          initialValue
-        )
-      })
+    it('multiple calls within epoch only applies last', async () => {
+      // make 2 calls
+      await blockchainParameters.setUptimeLookbackWindow(newValue)
+      await blockchainParameters.setUptimeLookbackWindow(50)
 
-      it('second set should set the variable for the next epoch', async () => {
-        await blockchainParameters.setUptimeLookbackWindow(initialValue)
-        await blockchainParameters.setUptimeLookbackWindow(newValue)
-        assert.equal(
-          (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
-          initialValue
-        )
-        await mineBlocks(EPOCH, web3)
-        assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), newValue)
-      })
+      // after the epoch, find last value set
+      await mineBlocks(EPOCH, web3)
+      assert.equal((await blockchainParameters.getUptimeLookbackWindow()).toNumber(), 50)
     })
 
     it('should emit the corresponding event', async () => {
@@ -249,6 +201,9 @@ contract('BlockchainParameters', (accounts: string[]) => {
       assert.equal(version.minor, versionQueried[1].toNumber())
       assert.equal(version.patch, versionQueried[2].toNumber())
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
+
+      // need to wait an epoch for uptimeLookbackWindow
+      await mineBlocks(EPOCH, web3)
       assert.equal(
         (await blockchainParameters.getUptimeLookbackWindow()).toNumber(),
         lookbackWindow
