@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, View } from 'react-native'
-import { WebView } from 'react-native-webview'
+import WebView from 'src/components/WebView'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   licensesWebView: {
-    opacity: 0.99,
     marginHorizontal: 20,
   },
 })

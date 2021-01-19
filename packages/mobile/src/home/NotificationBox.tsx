@@ -228,8 +228,8 @@ export class NotificationBox extends React.Component<Props, State> {
       if (!notification || notification.dismissed) {
         continue
       }
-      const texts =
-        notification.content[i18n.language] || notification.content[i18n.language.slice(0, 2)]
+      const language = i18n.language.toLowerCase()
+      const texts = notification.content[language] || notification.content[language.slice(0, 2)]
       if (!texts) {
         continue
       }
