@@ -6,7 +6,7 @@ If you are using a previous version of ContractKit, you can continue using that 
 
 The main benefit of using the new version include:
  - Reduced bundle size
- - Better typescript support
+ - Better Typescript support
  - Improved maintenance by making it easier to use other libraries
 
 ## ContractKit packages
@@ -15,8 +15,8 @@ ContractKit is now a [suite of packages](https://github.com/celo-org/celo-monore
 
 ### Main packages
 
- - `Connect` depends on the `web3` package and allows you to specify the connection provider and contains some configuration information for signing transactions.
- - `ContractKit` depends on `connect` and `wallet-local` and allows you to connect to the Celo network, locally sign transactions and has more configuration options than `connect`. It also contains a registry of [Celo core contracts](contracts-wrappers-registry.md) to make it easier to interact with them.
+ - `Connect` handles how we communicate to the our chain nodes. It wraps the `web3` library and has its own `rpcCaller` class, to make custom calls to the node. It's the layer in charge of knowing how and which parameters are added by Celo, connect to the node, build the message, send it and handle those responses.
+ - `ContractKit` is a reduced subset of the previous versions of ContractKit. This is the layer in charge of loading and using our [core contracts](contracts-wrappers-registry.md). Internally, uses the `connect` package described above. It has our contracts generated from the ABIs, their wrappers, and also the logic to make claims.
 
 ### Complementary Packages
 
@@ -39,13 +39,13 @@ ContractKit is now a [suite of packages](https://github.com/celo-org/celo-monore
 
 ## Connecting to the network
 
-### Older versions:
+### Older versions of ContractKit:
 
 ```javascript
 // version ^0.4.0 
 const ContractKit = require('@celo/contractkit')
 
-// Older versions create a new Web3 instance internally 
+// Older versions of ContractKit create a new Web3 instance internally 
 const kit = ContractKit.newKit('https://forno.celo.org')
 ```
 
@@ -66,10 +66,10 @@ You can access web3 functions through the `connection` module.
 
 ```javascript
 // version ^0.4.0 
-let accounts = await kit.web3.eth.getAccounts()
+let amount = kit.web3.utils.fromWei("1000000", "ether")
  
 // version 1.0.0 
-let accounts = await kit.connection.web3.eth.getAccounts()
+let amount = kit.connection.web3.utils.fromWei("1000000", "ether")
 ```
 ## Backward Compatibility
 
