@@ -596,12 +596,70 @@ contract('SortedOracles', (accounts: string[]) => {
   })
 
   describe('#getCurrencyPairIdentifier', () => {
-    it('computes the identifier from a human readable pair', async () => {
-      const currencyPair = 'CELO/BTC'
-      assert.equal(
-        normalizeAddress(await sortedOracles.getCurrencyPairIdentifier(currencyPair)),
-        normalizeAddress(pairIdentifier(currencyPair))
-      )
+    describe('when there is no override', () => {
+      it('computes the identifier from a human readable pair', async () => {
+        const currencyPair = 'CELO/BTC'
+        assert.equal(
+          normalizeAddress(await sortedOracles.getCurrencyPairIdentifier(currencyPair)),
+          normalizeAddress(pairIdentifier(currencyPair))
+        )
+      })
+
+      describe('when there is an override', () => {
+        it('returns the override instead of the computed identifier', async () => {
+          const override = Web3.utils.randomHex(20)
+          const currencyPair = 'CELO/BTC'
+
+          await sortedOracles.setIdentifierOverride(currencyPair, override)
+          const identifier = await sortedOracles.getCurrencyPairIdentifier(currencyPair)
+
+          assert.equal(normalizeAddress(identifier), normalizeAddress(override))
+
+          assert.notEqual(
+            normalizeAddress(identifier),
+            normalizeAddress(pairIdentifier(currencyPair))
+          )
+        })
+      })
+    })
+  })
+
+  describe('#setIdentifierOverride', () => {
+    const currencyPair = 'CELO/BTC'
+    const override = Web3.utils.randomHex(20)
+    const identifier = pairIdentifier(currencyPair)
+
+    const subject = async (from: string) => {
+      return sortedOracles.setIdentifierOverride(currencyPair, override, { from })
+    }
+
+    describe('when coming from the owner', () => {
+      const sender = accounts[0]
+
+      it('executes correctly', async () => {
+        const resp = await subject(sender)
+        assert.equal(resp.receipt.status, '0x1')
+      })
+
+      it('emits a IdentifierOverrideSet event', async () => {
+        const resp = await subject(sender)
+        assertLogMatches2(resp.logs[0], {
+          event: 'IdentifierOverrideSet',
+          args: {
+            identifier: Web3.utils.toChecksumAddress(identifier),
+            identifierOverride: Web3.utils.toChecksumAddress(override),
+            currencyPair,
+          },
+        })
+      })
+    })
+
+    describe('not coming from the owner', () => {
+      const sender = accounts[1]
+
+      it('reverts', async () => {
+        await assertRevert(subject(sender), 'Ownable: caller is not the owner')
+      })
     })
   })
 })

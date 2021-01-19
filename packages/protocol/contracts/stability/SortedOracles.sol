@@ -36,6 +36,16 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   uint256 public reportExpirySeconds;
   mapping(address => uint256) public tokenReportExpirySeconds;
 
+  // While extending our oracle implementation to support
+  // reporting for arbitrary currency pairs we need a temporary
+  // crutch that helps us with the "CELO/USD" pair which
+  // we're reporting to the cUSD token address.
+  // This override will be used to allows us to force
+  // "CELO/USD"'s identifier to be that cUSD token address
+  // instead of the computed identifier.
+  // see: #getCurrencyPairIdentifier
+  mapping(address => address) identifierOverride;
+
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
   event OracleReported(
@@ -48,6 +58,11 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event IdentifierOverrideSet(
+    address indexed identifier,
+    address indexed identifierOverride,
+    string currencyPair
+  );
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -95,6 +110,21 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     );
     tokenReportExpirySeconds[_token] = _reportExpirySeconds;
     emit TokenReportExpirySet(_token, _reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the identifier override for a currency pair
+   *         This affects the logic in #getCurrencyPairIdentifier
+   * @param currencyPair The currency pair that needs to be overwritten e.g. "CELO/USD"
+   * @param _identifier What address with which to override the identifier for that pair
+   */
+  function setIdentifierOverride(string calldata currencyPair, address _identifier)
+    external
+    onlyOwner
+  {
+    address identifier = buildCurrencyPairIdentifier(currencyPair);
+    identifierOverride[identifier] = _identifier;
+    emit IdentifierOverrideSet(identifier, _identifier, currencyPair);
   }
 
   /**
@@ -310,11 +340,41 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the identifier (address) from a human readable currency pair (eg. "CELO/BTC")
-   *         Can be used from other contracts to compute the identifier to read rates.
+   * or the override if one is defined. Should be used by other contracts which consume rates.
    * @param currencyPair The string human readable currency pair
    * @return The identifier as an address
    */
-  function getCurrencyPairIdentifier(string calldata currencyPair) external pure returns (address) {
+  function getCurrencyPairIdentifier(string calldata currencyPair) external view returns (address) {
+    // This function acts this way because historically we've been reporting
+    // CELO/USD prices using the cUSD token prices. For various reasons we want
+    // to move away from that in favour of using the logic in #buildCurrencyPairIdentifier
+    // to derive an identifier for any human readable currency pair like "CELO/BTC".
+    // So on-chain consumers of rates would need to do something like
+    // ```
+    // address identifier = sortedOracles.getCurrencyPairIdentifier("CELO/BTC")
+    // uint256 rate, uint256 numRates = sortedOracles.medianRate(identifier)
+    // ```
+    // In order for the API to be consistent we need to treat the special case where
+    // "CELO/USD" should actually result in the address of the cUSD token instead
+    // of the derived identifier.
+    // Exposing things this way will also allow us to switch to actually report
+    // to the identifier and drop the override without affecting consumers of the
+    // rates as long as the identifier is computed each time.
+    // When that happens we will probably deprecate this logic and make the function pure.
+    address identifier = buildCurrencyPairIdentifier(currencyPair);
+    if (identifierOverride[identifier] != address(0x0)) {
+      return identifierOverride[identifier];
+    }
+
+    return identifier;
+  }
+
+  /**
+   * @notice Returns the identifier (address) from a human readable currency pair (eg. "CELO/BTC")
+   * @param currencyPair The string human readable currency pair
+   * @return The identifier as an address
+   */
+  function buildCurrencyPairIdentifier(string memory currencyPair) private pure returns (address) {
     return address(uint160(uint256(keccak256(abi.encodePacked(currencyPair)))));
   }
 
