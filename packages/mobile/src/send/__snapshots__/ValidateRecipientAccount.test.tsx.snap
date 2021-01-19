@@ -162,6 +162,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -621,6 +622,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -994,6 +996,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -1453,6 +1456,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

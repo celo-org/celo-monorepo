@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Animated, { Easing, interpolate } from 'react-native-reanimated'
+import Animated, { EasingNode } from 'react-native-reanimated'
 import { circularProgressBig } from 'src/images/Images'
 import { loop } from 'src/utils/reanimated'
 
@@ -34,10 +34,10 @@ export default function VerificationCountdown({ onFinish, startTime }: Props) {
   const progressAnimatedStyle = useMemo(() => {
     const progress = loop({
       duration: 1000,
-      easing: Easing.linear,
+      easing: EasingNode.linear,
       autoStart: true,
     })
-    const rotate = interpolate(progress, {
+    const rotate = Animated.interpolateNode(progress, {
       inputRange: [0, 1],
       outputRange: [0, 2 * Math.PI],
     })

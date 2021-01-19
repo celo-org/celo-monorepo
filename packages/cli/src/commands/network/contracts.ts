@@ -5,7 +5,7 @@ export default class Contracts extends BaseCommand {
   static description = 'Lists Celo core contracts and their addesses.'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   async run() {

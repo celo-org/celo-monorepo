@@ -20,7 +20,7 @@ import { deleteChainData, isProviderConnectionError } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getPasswordSaga } from 'src/pincode/authentication'
+import { CANCELLED_PIN_INPUT, getPasswordSaga } from 'src/pincode/authentication'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 import {
@@ -219,7 +219,10 @@ export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: strin
     try {
       yield call([wallet, wallet.addAccount], privateKey, password)
     } catch (e) {
-      if (e === RpcWalletErrors.AccountAlreadyExists) {
+      if (
+        e.message === RpcWalletErrors.AccountAlreadyExists ||
+        e.message === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS
+      ) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
       } else {
         Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
@@ -257,26 +260,37 @@ export function* getAccount() {
   }
 }
 
+export enum UnlockResult {
+  SUCCESS,
+  FAILURE,
+  CANCELED,
+}
+
 export function* unlockAccount(account: string, force: boolean = false) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
+
   const wallet: UnlockableWallet = yield call(getWallet)
   if (!force && wallet.isAccountUnlocked(account)) {
-    return true
+    return UnlockResult.SUCCESS
   }
 
   try {
     const password: string = yield call(getPasswordSaga, account)
+
     const result = yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
     if (!result) {
       throw new Error('Unlock account result false')
     }
 
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
-    return true
+    return UnlockResult.SUCCESS
   } catch (error) {
+    if (error === CANCELLED_PIN_INPUT) {
+      return UnlockResult.CANCELED
+    }
     Logger.error(TAG + '@unlockAccount', 'Account unlock failed, clearing password caches', error)
     clearPasswordCaches()
-    return false
+    return UnlockResult.FAILURE
   }
 }
 
@@ -290,11 +304,15 @@ export function* getConnectedAccount() {
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)
-  const success: boolean = yield call(unlockAccount, account)
-  if (success) {
+  const result: UnlockResult = yield call(unlockAccount, account)
+  if (result === UnlockResult.SUCCESS) {
     return account
   } else {
-    throw new Error(ErrorMessages.INCORRECT_PIN)
+    throw new Error(
+      result === UnlockResult.FAILURE
+        ? ErrorMessages.INCORRECT_PIN
+        : ErrorMessages.PIN_INPUT_CANCELED
+    )
   }
 }
 

@@ -29,7 +29,7 @@ import {
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
-import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'
+import { DefaultRpcCaller, getRandomId, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
@@ -51,7 +51,9 @@ export class Connection {
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
-  constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet) {
+  constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
+    web3.eth.handleRevert = handleRevert
+
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
@@ -252,9 +254,10 @@ export class Connection {
     const signature = await new Promise<string>((resolve, reject) => {
       ;(this.web3.currentProvider as Provider).send(
         {
+          id: getRandomId(),
           jsonrpc: '2.0',
           method: 'eth_signTypedData',
-          params: [signer, typedData],
+          params: [inputAddressFormatter(signer), typedData],
         },
         (error, resp) => {
           if (error) {
@@ -279,6 +282,7 @@ export class Connection {
     const signature = await new Promise<string>((resolve, reject) => {
       ;(this.web3.currentProvider as Provider).send(
         {
+          id: getRandomId(),
           jsonrpc: '2.0',
           method: 'eth_sign',
           params: [inputAddressFormatter(address.toString()), inputSignFormatter(dataToSign)],
@@ -439,11 +443,16 @@ export class Connection {
     return outputCeloTxFormatter(response.result)
   }
 
-  getTransactionReceipt = async (txhash: string): Promise<CeloTxReceipt> => {
+  getTransactionReceipt = async (txhash: string): Promise<CeloTxReceipt | null> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getTransactionReceipt
     const response = await this.rpcCaller.call('eth_getTransactionReceipt', [
       ensureLeading0x(txhash),
     ])
+
+    if (response.result === null) {
+      return null
+    }
+
     return outputCeloTxReceiptFormatter(response.result)
   }
 

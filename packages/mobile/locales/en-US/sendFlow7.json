@@ -1,6 +1,6 @@
 {
   "cancel": "Cancel",
-  "dollarsSent": "{{Dollars}} Sent",
+  "dollarsSent": "Dollars Sent",
   "to": "To",
   "send": "Send",
   "payment": "Payment",
@@ -11,8 +11,8 @@
   "invite": "Invite",
   "payRequest": "Pay Request",
   "sendTo": "Send to",
-  "celoDollarAmount": "<0></0> {{CeloDollar}}",
-  "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
+  "celoDollarAmount": "<0></0> Celo Dollar",
+  "celoDollarAmount_plural": "<0></0> Celo Dollars",
   "addDescription": "Add description",
   "sentTo": "Sent To",
   "withdrawnTo": "Withdrawn to",

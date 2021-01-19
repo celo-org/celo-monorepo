@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@celo/contractkit": "1.0.0-beta3",
-    "@celo/phone-number-privacy-common": "1.0.15-beta2",
+    "@celo/phone-number-privacy-common": "1.0.23",
+    "@celo/identity": "1.0.0-beta3",
     "@celo/utils": "1.0.0-beta3",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "6.5.3",

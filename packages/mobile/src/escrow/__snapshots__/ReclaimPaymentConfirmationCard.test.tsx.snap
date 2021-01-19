@@ -127,7 +127,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-        +1 (415) 555-0000
+        +1 415-555-0000
       </Text>
     </View>
   </View>
@@ -333,6 +333,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -541,6 +542,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }

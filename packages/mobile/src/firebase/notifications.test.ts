@@ -4,7 +4,7 @@ import { select } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
 import { openUrl } from 'src/app/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { NotificationReceiveState, NotificationTypes } from 'src/notifications/types'
@@ -54,6 +54,16 @@ describe(handleNotification, () => {
         .put(openUrl('https://celo.org'))
         .run()
     })
+
+    it('directly opens the url externally if the app is not already in the foreground and openExternal is true', async () => {
+      await expectSaga(
+        handleNotification,
+        { ...message, data: { ou: message.data.ou, openExternal: 'true' } },
+        NotificationReceiveState.APP_OPENED_FRESH
+      )
+        .put(openUrl(message.data.ou, true))
+        .run()
+    })
   })
 
   describe('with a payment received notification', () => {
@@ -81,6 +91,7 @@ describe(handleNotification, () => {
         .provide([
           [select(addressToE164NumberSelector), {}],
           [select(recipientCacheSelector), {}],
+          [select(addressToDisplayNameSelector), {}],
         ])
         .run()
 

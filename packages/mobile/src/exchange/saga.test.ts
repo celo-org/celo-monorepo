@@ -2,14 +2,27 @@ import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
+import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
-import { Actions, ExchangeTokensAction, setTobinTax } from 'src/exchange/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import {
+  Actions,
+  ExchangeTokensAction,
+  setTobinTax,
+  WithdrawCeloAction,
+  withdrawCeloCanceled,
+} from 'src/exchange/actions'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
-import { doFetchTobinTax, exchangeGoldAndStableTokens } from 'src/exchange/saga'
+import { doFetchTobinTax, exchangeGoldAndStableTokens, withdrawCelo } from 'src/exchange/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import {
+  getConnectedAccount,
+  getConnectedUnlockedAccount,
+  unlockAccount,
+  UnlockResult,
+} from 'src/web3/saga'
 
 const SELL_AMOUNT = 50 // in dollars/gold (not wei)
 const account = '0x22c8a9178841ba95a944afd1a1faae517d3f5daa'
@@ -84,6 +97,40 @@ describe(exchangeGoldAndStableTokens, () => {
         fn: sendAndMonitorTransaction,
         args: [undefined, account, {}, undefined, CURRENCY_ENUM.GOLD],
       })
+      .run()
+  })
+
+  it('fails if user cancels PIN input', async () => {
+    const exchangeGoldAndStableTokensAction: ExchangeTokensAction = {
+      type: Actions.EXCHANGE_TOKENS,
+      makerToken: CURRENCY_ENUM.GOLD,
+      makerAmount: new BigNumber(SELL_AMOUNT),
+    }
+    await expectSaga(exchangeGoldAndStableTokens, exchangeGoldAndStableTokensAction)
+      .provide([
+        [call(getConnectedAccount), account],
+        [matchers.call.fn(unlockAccount), UnlockResult.CANCELED],
+      ])
+      .put(showError(ErrorMessages.PIN_INPUT_CANCELED))
+      .run()
+  })
+})
+
+describe(withdrawCelo, () => {
+  it('fails if user cancels PIN input', async () => {
+    const mockAddress = '0x1234'
+    const withdrawCeloAction: WithdrawCeloAction = {
+      type: Actions.WITHDRAW_CELO,
+      amount: new BigNumber(10),
+      recipientAddress: mockAddress,
+      isCashOut: false,
+    }
+    await expectSaga(withdrawCelo, withdrawCeloAction)
+      .provide([
+        [call(getConnectedAccount), account],
+        [matchers.call.fn(unlockAccount), UnlockResult.CANCELED],
+      ])
+      .put(withdrawCeloCanceled())
       .run()
   })
 })

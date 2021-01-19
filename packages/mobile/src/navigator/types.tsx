@@ -154,6 +154,7 @@ export type StackParamList = {
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
+    onCancel?: () => void
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.SelectCountry]: {
@@ -210,6 +211,7 @@ export type StackParamList = {
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+  [Screens.WebViewScreen]: { uri: string }
   [Screens.Welcome]: undefined
   [Screens.WithdrawCeloQrScannerScreen]: {
     onAddressScanned: (address: string) => void

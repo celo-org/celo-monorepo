@@ -78,7 +78,7 @@ project.ext.react = [
         hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
         hermesFlagsDebug: ["-w", "-O", "-output-source-map"],
         cliPath: "../../node_modules/react-native/cli.js",
-        hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes",
+        hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermesc",
         composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
         entryFile: "index.js",
 ]
@@ -159,7 +159,7 @@ android {
         minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.5.5"
+        versionName "1.7.2"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "app_name", project.env.get("APP_DISPLAY_NAME")
@@ -238,10 +238,8 @@ android {
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
         exclude 'META-INF/androidx.exifinterface_exifinterface.version'
-        pickFirst '**/libjsc.so'
         pickFirst '**/libc++_shared.so'
     }
-
     
     dexOptions {
        javaMaxHeapSize "3g"
@@ -267,6 +265,7 @@ dependencies {
     }
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'
+        exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'
@@ -295,13 +294,6 @@ if (enableFirebase.toBoolean()){
   apply plugin: 'com.google.gms.google-services'
 } else {
   println 'Info: Firebase is disabled in .env variable'
-}
-
-// https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
-configurations.all {
-     resolutionStrategy {
-       force "com.facebook.soloader:soloader:0.8.2"
-     }
 }
 
 apply from: file("../../../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

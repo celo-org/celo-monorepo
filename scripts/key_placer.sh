@@ -16,9 +16,7 @@ files=(
   "packages/mobile/ios/GoogleService-Info.mainnetdev.plist"
   "packages/mobile/ios/sentry.properties"
   "packages/mobile/secrets.json"
-  "packages/web/env-config.js"
   "packages/reserve-site/.env.local"
-  "packages/web/server-env-config.js"
   "packages/moonpay-auth/.env"
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
@@ -30,6 +28,7 @@ files=(
   ".env.mnemonic.pilotstaging"
   ".env.mnemonic.rc0"
   ".env.mnemonic.rc1"
+  ".env.mnemonic.staging"
 )
 
 if [[ -z "$1" ]]; then

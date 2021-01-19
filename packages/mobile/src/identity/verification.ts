@@ -11,7 +11,11 @@ import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-ide
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { AttestationRequest } from '@celo/utils/lib/io'
 import { retryAsync } from '@celo/utils/src/async'
-import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import {
+  AttestationsStatus,
+  extractAttestationCodeFromMessage,
+  extractSecurityCodeWithPrefix,
+} from '@celo/utils/src/attestations'
 import functions from '@react-native-firebase/functions'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
@@ -70,13 +74,10 @@ import {
   VerificationState,
   verificationStateSelector,
 } from 'src/identity/reducer'
-import {
-  extractSecurityCodeWithPrefix,
-  getAttestationCodeForSecurityCode,
-} from 'src/identity/securityCode'
+import { getAttestationCodeForSecurityCode } from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import { waitFor } from 'src/redux/sagas-helpers'
@@ -84,11 +85,18 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { isVersionBelowMinimum } from 'src/utils/versionCheck'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
+import {
+  getConnectedAccount,
+  getConnectedUnlockedAccount,
+  unlockAccount,
+  UnlockResult,
+} from 'src/web3/saga'
 
 const TAG = 'identity/verification'
+const MINIMUM_VERSION_FOR_SHORT_CODES = '1.1.0'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const ESTIMATED_COST_PER_ATTESTATION = 0.051
@@ -125,7 +133,13 @@ export function* fetchVerificationState(forceUnlockAccount?: boolean) {
       // we want to reset password before force unlock account
       clearPasswordCaches()
     }
-    yield call(unlockAccount, account, !!forceUnlockAccount)
+    const result: UnlockResult = yield call(unlockAccount, account, !!forceUnlockAccount)
+    if (result !== UnlockResult.SUCCESS) {
+      // This navigateBack has no effect if part of onboarding and returns to home or
+      // settings page if the user pressed on the back button when prompted for the PIN.
+      navigateBack()
+      return
+    }
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -453,6 +467,7 @@ export function* requestAndRetrieveAttestations(
   if (!isFeelessVerification) {
     yield put(setRetryVerificationWithForno(false))
   }
+
   while (attestations.length < attestationsNeeded) {
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_start, {
       currentAttestation: attestations.length,
@@ -483,6 +498,13 @@ export function* requestAndRetrieveAttestations(
 
     // Check if we have a sufficient set now by fetching the new total set
     attestations = yield call(getActionableAttestations, attestationsWrapper, phoneHash, account)
+    if (features.SHORT_VERIFICATION_CODES) {
+      // we only support attestation service 1.1.0 and above for short codes
+      attestations = attestations.filter(
+        (att) => !isVersionBelowMinimum(att.version, MINIMUM_VERSION_FOR_SHORT_CODES)
+      )
+    }
+
     ValoraAnalytics.track(
       VerificationEvents.verification_request_all_attestations_refresh_progress,
       {
@@ -666,6 +688,7 @@ export function attestationCodeReceiver(
     try {
       if (features.SHORT_VERIFICATION_CODES) {
         securityCodeWithPrefix = extractSecurityCodeWithPrefix(message)
+        const signer = yield call(getConnectedUnlockedAccount)
         if (securityCodeWithPrefix) {
           message = yield call(
             getAttestationCodeForSecurityCode,
@@ -673,7 +696,8 @@ export function attestationCodeReceiver(
             phoneHashDetails,
             account,
             attestations,
-            securityCodeWithPrefix
+            securityCodeWithPrefix,
+            signer
           )
         } else {
           Logger.error(TAG + '@attestationCodeReceiver', 'No security code in received message')
@@ -793,7 +817,7 @@ export function* revealAttestations(
       isFeelessVerification
     )
     // TODO (i1skn): remove this clause when
-    // https://github.com/celo-org/celo-labs/issues/578 is resolved.
+    // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
     // This sends messages with 5000ms delay on Android if reveals is successful
     if (success && Platform.OS === 'android') {
       Logger.debug(

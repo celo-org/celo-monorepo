@@ -44,7 +44,7 @@ export class LogExplorer {
     }
   }
 
-  async fetchTxReceipt(txhash: string): Promise<CeloTxReceipt> {
+  async fetchTxReceipt(txhash: string): Promise<CeloTxReceipt | null> {
     return this.kit.connection.getTransactionReceipt(txhash)
   }
 
