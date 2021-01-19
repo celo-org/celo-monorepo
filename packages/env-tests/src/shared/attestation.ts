@@ -106,17 +106,13 @@ async function findValidCode(
           await Promise.all(
             possibleIssuers.map((a) =>
               attestations
-                .getAttestationForSecurityCode(
-                  a.attestationServiceURL,
-                  {
-                    account,
-                    issuer: a.issuer,
-                    phoneNumber,
-                    salt: pepper,
-                    securityCode: securityCode.slice(1),
-                  },
-                  account
-                )
+                .getAttestationForSecurityCode(a.attestationServiceURL, {
+                  account,
+                  issuer: a.issuer,
+                  phoneNumber,
+                  salt: pepper,
+                  securityCode: securityCode.slice(1),
+                })
                 // hit the wrong service
                 .catch(() => null)
             )
