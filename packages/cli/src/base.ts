@@ -170,7 +170,9 @@ export abstract class BaseCommand extends Command {
 
     const setUsdGas = async () => {
       await this.kit.setFeeCurrency(CeloContract.StableToken)
-      await this.kit.updateGasPriceInConnectionLayer(CeloContract.StableToken)
+      await this.kit.updateGasPriceInConnectionLayer(
+        await this.kit.registry.addressFor(CeloContract.StableToken)
+      )
     }
     if (gasCurrencyConfig === GasOptions.cUSD) {
       await setUsdGas()

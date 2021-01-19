@@ -194,7 +194,7 @@ When interacting with a web3 contract object:
 
 ```ts
 const goldtoken = await kit._web3Contracts.getGoldToken()
-const oneGold = kit.web3.utils.toWei('1', 'ether')
+const oneGold = kit.connection.web3.utils.toWei('1', 'ether')
 
 const txo = await goldtoken.methods.transfer(someAddress, oneGold)
 const tx = await kit.sendTransactionObject(txo, { from: myAddress })

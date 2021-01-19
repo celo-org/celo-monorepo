@@ -2,10 +2,10 @@ import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import WebView from 'src/components/WebView'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -64,7 +64,7 @@ function FiatExchangeWeb({ route }: Props) {
       {uri === '' ? (
         <ActivityIndicator size="large" color={colors.greenBrand} />
       ) : (
-        <WebView style={styles.exchangeWebView} source={{ uri }} />
+        <WebView source={{ uri }} />
       )}
     </View>
   )
@@ -75,9 +75,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     justifyContent: 'center',
-  },
-  exchangeWebView: {
-    opacity: 0.99,
   },
 })
 
