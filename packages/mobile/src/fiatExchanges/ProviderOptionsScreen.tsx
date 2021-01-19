@@ -33,7 +33,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 type Props = StackScreenProps<StackParamList, Screens.ProviderOptionsScreen>
 
-export const providerOptionsNavOptions = ({
+ProviderOptionsScreen.navigationOptions = ({
   route,
 }: {
   route: RouteProp<StackParamList, Screens.ProviderOptionsScreen>
