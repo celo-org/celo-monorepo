@@ -155,7 +155,9 @@ const deployCoreContract = async (
       setImplementationTx.function = '_setAndInitializeImplementation'
       setImplementationTx.args.push(callData)
     }
-    console.log(`Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`)
+    console.log(
+      `Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`
+    )
     proposal.push(setImplementationTx)
   }
 }
