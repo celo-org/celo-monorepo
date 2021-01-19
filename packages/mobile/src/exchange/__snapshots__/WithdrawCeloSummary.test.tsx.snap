@@ -109,11 +109,13 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+              },
+              undefined,
+            ]
           }
         >
           <Text
