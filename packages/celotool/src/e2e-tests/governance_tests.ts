@@ -914,6 +914,7 @@ describe('governance tests', () => {
 
       await connectPeers([...gethConfig.instances, validatorGroup], verbose)
 
+      console.log('wait for validatorGroup to finish syncing')
       await waitToFinishInstanceSyncing(validatorGroup)
 
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
@@ -951,6 +952,7 @@ describe('governance tests', () => {
 
       await connectValidatorPeers([...gethConfig.instances, ...additionalValidatingNodes])
 
+      console.log('wait for new validators to sync')
       await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
 
       validatorAccounts = await getValidatorGroupMembers()
@@ -958,6 +960,7 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
+      console.log('wait for end of epoch')
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
 
