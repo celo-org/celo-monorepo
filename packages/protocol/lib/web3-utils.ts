@@ -173,7 +173,9 @@ export async function _setInitialProxyImplementation<
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
     console.log(`  Setting initial ${contractName} implementation on proxy`)
+    console.log('web3-utils' + args)
     receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
+    console.log(1)
   } else {
     if (txOptions.from != null) {
       receipt = await retryTx(proxy._setImplementation, [implementation.address, { from: txOptions.from }])
