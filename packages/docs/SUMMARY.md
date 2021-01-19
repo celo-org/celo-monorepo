@@ -46,7 +46,7 @@
 
 - [Overview](developer-resources/overview.md)
 - [Code Examples](developer-resources/start.md)
-  - [Sending CELO](developer-resources/walkthroughs/hellocelo.md)
+  - [Sending CELO & cUSD](developer-resources/walkthroughs/hellocelo.md)
   - [Deploy a Contract (local node)](developer-resources/walkthroughs/hellocontracts.md)
   - [Deploy a Contract (Forno)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
