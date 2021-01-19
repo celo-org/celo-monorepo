@@ -37,6 +37,20 @@ ContractKit is now a [suite of packages](https://github.com/celo-org/celo-monore
  - `Wallet-hsm` provides signature utilities for using HSMs.
  - `Wallet-remote` provides utilities for interacting with remote wallets. This is useful for interacting with wallets on secure remote servers.
 
+## Importing packages
+
+Importing the packages is slightly different now that many packages are separate from the main `ContractKit` package. You will have to explicitly import these packages instead of just importing all of them with `ContractKit`.
+
+For example:
+
+```javascript
+// Previously this would work to import the block-explorer
+import { newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
+
+// With ContractKit v1.0+, import the block-explorer explicitly
+import { newBlockExplorer } from '@celo/explorer/lib/block-explorer'
+```
+
 ## Connecting to the network
 
 ### Older versions of ContractKit:
@@ -62,7 +76,7 @@ let contractKit = newKitFromWeb3(web3)
 ```
 ## Accessing Web3 functions
 
-You can access web3 functions through the `connection` module.
+You can access `web3` functions through the `connection` module.
 
 ```javascript
 // version ^0.4.0 
@@ -82,3 +96,14 @@ kit.addAccount
 // recommended:
 kit.connection.addAccount
 ```
+
+## `Connection` package
+
+The `connection` package update includes changes to some common functions.
+
+ - `kit.web3.eth.isSyncing` --> `kit.connection.isSyncing`
+ - `kit.web3.eth.getBlock` --> `kit.connection.getBlock`
+ - `kit.web3.eth.getBlockNumber` --> `kit.connection.getBlockNumber`
+ - `kit.web3.eth.sign` --> `kit.connection.sign`
+ - `kit.isListening` --> `kit.connection.isListening`
+ - `kit.addAccount` --> `kit.connection.addAccount`
