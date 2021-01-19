@@ -109,21 +109,15 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
     require(window >= 3 && window <= 720, "UptimeLookbackWindow must be within safe range");
     require(
       window <= getEpochSize().sub(2),
-      "UptimeLookbackWindow must be smaller or equal to epochSize-2"
+      "UptimeLookbackWindow must be smaller or equal to epochSize - 2"
     );
 
-    uptimeLookbackWindow.oldValue = getUptimeLookbackWindow();
+    uptimeLookbackWindow.oldValue = _getUptimeLookbackWindow();
+
+    // changes only take place on the next epoch
+    uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber().add(1);
     uptimeLookbackWindow.nextValue = window;
 
-    // epoch 0 is the genesis block, thus implies it has not been initialized
-    if (uptimeLookbackWindow.nextValueActivationEpoch == 0) {
-      // on initialize we set the value for the current epoch which configurer
-      // must make it so it's SAME as geth's chainConfig value
-      uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber();
-    } else {
-      // changes only take place on the next epoch
-      uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber().add(1);
-    }
     emit UptimeLookbackWindowSet(window, uptimeLookbackWindow.nextValueActivationEpoch);
   }
 
@@ -131,13 +125,15 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @notice Gets the uptime lookback window.
    */
   function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
-    // epoch 0 is the genesis block, thus implies it has not been initialized
-    if (uptimeLookbackWindow.nextValueActivationEpoch == 0) {
-      // since on mainet, baklava, alfajores we haven't initialized the contract with lookbackWindow
-      // we need to hardcode the default value here
-      // can be removed after the deploy
-      return 12;
-    } else if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
+    lookbackWindow = _getUptimeLookbackWindow();
+    require(lookbackwindow != 0, "UptimeLookbackWindow is not initialized");
+  }
+
+  /**
+   * @notice Gets the uptime lookback window.
+   */
+  function _getUptimeLookbackWindow() internal view returns (uint256 lookbackWindow) {
+    if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
       return uptimeLookbackWindow.nextValue;
     } else {
       return uptimeLookbackWindow.oldValue;
