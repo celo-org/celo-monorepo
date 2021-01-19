@@ -155,7 +155,6 @@ describe('send/utils', () => {
         expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
           origin: SendOrigin.DefaultSendFlow,
           recipient: mockQRCodeRecipient,
-          isFromScan: true,
           isOutgoingPaymentRequest: undefined,
         })
       })
@@ -174,7 +173,6 @@ describe('send/utils', () => {
         expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
           origin: SendOrigin.DefaultSendFlow,
           transactionData: mockTransactionData,
-          isFromScan: true,
           currencyInfo: { localCurrencyCode: mockUriData[4].currencyCode, localExchangeRate: '2' },
         })
       })
@@ -193,7 +191,6 @@ describe('send/utils', () => {
         expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
           origin: SendOrigin.DefaultSendFlow,
           transactionData: mockTransactionData,
-          isFromScan: true,
           currencyInfo: { localCurrencyCode: mockUriData[5].currencyCode, localExchangeRate: '2' },
         })
       })

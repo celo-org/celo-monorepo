@@ -174,7 +174,8 @@ export function showLimitReachedError(
 export function* handleSendPaymentData(
   data: UriData,
   cachedRecipient?: RecipientWithContact,
-  isOutgoingPaymentRequest?: true
+  isOutgoingPaymentRequest?: true,
+  isFromScan?: true
 ) {
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
@@ -214,7 +215,7 @@ export function* handleSendPaymentData(
       }
       navigate(Screens.SendConfirmation, {
         transactionData,
-        isFromScan: true,
+        isFromScan,
         currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
         origin: SendOrigin.DefaultSendFlow,
       })
@@ -226,7 +227,7 @@ export function* handleSendPaymentData(
     } else if (data.token === 'cUSD' || !data.token) {
       navigate(Screens.SendAmount, {
         recipient,
-        isFromScan: true,
+        isFromScan,
         isOutgoingPaymentRequest,
         origin: SendOrigin.DefaultSendFlow,
       })

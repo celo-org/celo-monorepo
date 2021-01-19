@@ -143,5 +143,5 @@ export function* handleBarcode(
     recipientCache
   )
 
-  yield call(handleSendPaymentData, qrData, cachedRecipient, isOutgoingPaymentRequest)
+  yield call(handleSendPaymentData, qrData, cachedRecipient, isOutgoingPaymentRequest, true)
 }
