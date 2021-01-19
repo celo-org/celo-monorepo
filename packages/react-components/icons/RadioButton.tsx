@@ -1,13 +1,13 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import Svg, { Circle, Path } from 'svgs'
+import Svg, { Circle } from 'svgs'
 
 interface Props {
   height?: number
   color?: string
 }
 
-export default class CheckCircle extends React.PureComponent<Props> {
+export default class RadioButton extends React.PureComponent<Props> {
   static defaultProps = {
     width: 20,
     height: 20,

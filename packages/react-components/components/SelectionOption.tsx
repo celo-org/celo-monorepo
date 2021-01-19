@@ -1,5 +1,4 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import CheckCircle from '@celo/react-components/icons/CheckCircle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
@@ -33,7 +32,7 @@ export default function SelectionOption({
           <View style={styles.iconContainer}>
             {/* TODO: make proper checkbox */}
             {!isSelected && <View style={styles.circle} />}
-            {isSelected && <CheckCircle />}
+            {isSelected && <RadioButton />}
           </View>
         )}
         <Text style={styles.text} numberOfLines={1}>
