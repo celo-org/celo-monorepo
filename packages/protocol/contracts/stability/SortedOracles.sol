@@ -315,7 +315,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return The identifier as an address
    */
   function getCurrencyPairIdentifier(string calldata currencyPair) external pure returns (address) {
-    return address(bytes20(keccak256(abi.encodePacked(currencyPair))));
+    return address(uint160(uint256(keccak256(abi.encodePacked(currencyPair)))));
   }
 
   /**
