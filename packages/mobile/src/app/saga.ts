@@ -10,7 +10,7 @@ import {
   spawn,
   take,
   takeEvery,
-  takeLatest
+  takeLatest,
 } from 'redux-saga/effects'
 import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -25,7 +25,7 @@ import {
   setAppState,
   setKotaniFeatureFlag,
   setLanguage,
-  setPontoFeatureFlag
+  setPontoFeatureFlag,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
@@ -128,7 +128,8 @@ function parseValue(value: string) {
   return value
 }
 
-function parseQuery(query: string) {
+// Parses the query string into an object. Only works with built-in strings, booleans and numbers.
+function convertQueryToScreenParams(query: string) {
   const decodedParams = new URLSearchParamsReal(decodeURIComponent(query))
   const params: { [key: string]: any } = {}
   for (const [key, value] of decodedParams.entries()) {
@@ -152,8 +153,10 @@ export function* handleDeepLink(action: OpenDeepLink) {
       navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
     } else if (rawParams.pathname === '/bidali') {
       navigate(Screens.BidaliScreen, { currency: CURRENCY_ENUM.DOLLAR })
-    } else if (isSecureOrigin && rawParams.path.startsWith('/openScreen') && rawParams.query) {
-      const params = parseQuery(rawParams.query)
+    } else if (isSecureOrigin && rawParams.pathname === '/openScreen' && rawParams.query) {
+      // The isSecureOrigin is important. We don't want it to be possible to fire this deep link from outside
+      // of our own notifications for security reasons.
+      const params = convertQueryToScreenParams(rawParams.query)
       navigate(params['screen'] as keyof StackParamList, params)
     }
   }

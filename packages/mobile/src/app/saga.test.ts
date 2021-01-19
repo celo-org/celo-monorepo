@@ -83,10 +83,7 @@ describe('App saga', () => {
   it('Handles openScreen deep link without safe origin', async () => {
     const deepLink = `celo://wallet/openScreen?screen=${Screens.FiatExchangeOptions}&isAddFunds=true`
     await expectSaga(handleDeepLink, openDeepLink(deepLink, false)).run()
-    expect(navigate).not.toHaveBeenCalledWith(
-      Screens.FiatExchangeOptions,
-      expect.objectContaining({ isAddFunds: true })
-    )
+    expect(navigate).not.toHaveBeenCalled()
   })
 
   describe(handleOpenUrl, () => {
