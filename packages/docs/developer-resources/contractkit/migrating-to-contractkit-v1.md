@@ -1,6 +1,6 @@
 # Migrating to ContractKit v1.0.0
 
-cLabs recently released ContractKit version 1.0.0. This document explains the key differences and shows you how you can start using the updated package.
+cLabs recently released ContractKit version 1.0.0. In it, the original ContractKit package has been split into several separate packages that all make up the Celo SDK. This document explains the key differences and shows you how you can start using the updated SDK.
 
 If you are using a previous version of ContractKit, you can continue using that version and you will only need to make the following changes when you upgrade.
 
