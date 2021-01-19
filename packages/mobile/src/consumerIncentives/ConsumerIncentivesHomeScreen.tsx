@@ -45,7 +45,10 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   // Content key names are formatted like subtitleN and bodyN 1-indexed.
   // This is to allow an arbitrary number of sections.
   const sectionCount = content
-    ? Object.keys(content).reduce((max, item) => Math.max(max, parseInt(item.slice(-1)) || 0), 0)
+    ? Object.keys(content).reduce(
+        (max, item) => Math.max(max, parseInt(item.slice(-1), 10) || 0),
+        0
+      )
     : 0
 
   const onPressCTA = () => {
