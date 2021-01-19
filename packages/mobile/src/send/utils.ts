@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
@@ -215,6 +216,7 @@ export function* handleSendPaymentData(
         transactionData,
         isFromScan: true,
         currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
+        origin: SendOrigin.DefaultSendFlow,
       })
     }
   } else {
@@ -222,7 +224,12 @@ export function* handleSendPaymentData(
       Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
       return
     } else if (data.token === 'cUSD' || !data.token) {
-      navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+      navigate(Screens.SendAmount, {
+        recipient,
+        isFromScan: true,
+        isOutgoingPaymentRequest,
+        origin: SendOrigin.DefaultSendFlow,
+      })
     }
   }
 }
