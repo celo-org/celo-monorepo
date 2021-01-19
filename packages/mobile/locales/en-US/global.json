@@ -25,6 +25,7 @@
   "learnMore": "Learn More",
   "activity": "Activity",
   "history": "History",
+  "earnRewards": "Earn Rewards",
   "notEnoughDollarsError": "Not enough Celo Dollars to make exchange",
   "notEnoughGoldError": "Not enough CELO to make exchange",
   "exchangeFailed": "Exchange failed, please retry",

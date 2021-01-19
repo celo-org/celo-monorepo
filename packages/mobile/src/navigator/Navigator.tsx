@@ -23,6 +23,7 @@ import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackButton from 'src/components/BackButton'
 import CancelButton from 'src/components/CancelButton'
+import ConsumerIncentivesHomeScreen from 'src/consumerIncentives/ConsumerIncentivesHomeScreen'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -382,6 +383,16 @@ const exchangeScreens = (Navigator: typeof Stack) => (
   </>
 )
 
+const consumerIncentivesScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen
+      name={Screens.ConsumerIncentivesHomeScreen}
+      component={ConsumerIncentivesHomeScreen}
+      options={ConsumerIncentivesHomeScreen.navOptions}
+    />
+  </>
+)
+
 const backupScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
@@ -540,6 +551,7 @@ export function MainStackScreen() {
       {verificationScreens(Stack)}
       {exchangeScreens(Stack)}
       {backupScreens(Stack)}
+      {consumerIncentivesScreens(Stack)}
       {settingsScreens(Stack)}
       {generalScreens(Stack)}
     </Stack.Navigator>
