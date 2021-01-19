@@ -11,6 +11,7 @@ export class EventBuilder {
     transfer: BlockscoutCeloTransfer,
     eventType: string,
     address: string,
+    account?: string,
     fees?: Fee[]
   ) {
     const hash = transaction.transactionHash
@@ -27,6 +28,7 @@ export class EventBuilder {
       comment,
       hash,
       address,
+      account: account ? account : address,
       amount: {
         // Signed amount relative to the account currency
         value: new BigNumber(transfer.value)

@@ -41,6 +41,8 @@ export interface BlockscoutTransferTx {
 export interface BlockscoutCeloTransfer {
   fromAddressHash: string
   toAddressHash: string
+  fromAccountHash: string
+  toAccountHash: string
   token: string
   value: string
 }
@@ -80,6 +82,8 @@ export class BlockscoutAPI extends RESTDataSource {
                     node {
                       fromAddressHash
                       toAddressHash
+                      fromAccountHash
+                      toAccountHash
                       value
                       token
                     }

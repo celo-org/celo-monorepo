@@ -43,6 +43,7 @@ export interface TransferEvent {
   block: number
   value: number
   address: string
+  account: string
   comment: string
   symbol: string
   hash: string
@@ -171,6 +172,7 @@ export const typeDefs = gql`
     # signed amount (+/-)
     amount: MoneyAmount!
     address: Address!
+    account: Address!
     comment: String
     token: Token!
     hash: String!

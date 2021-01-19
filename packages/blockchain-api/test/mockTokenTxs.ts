@@ -358,6 +358,7 @@ const mockTokenTxs = {
                 {
                   node: {
                     fromAddressHash: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
+                    fromAccountHash: '0xf4314cb9046bece6aa54bb9533155434d0c76910', // this should go to the `account` field
                     toAddressHash: '0x0000000000000000000000000000000000007E57',
                     token: 'cUSD',
                     value: '10000000000000000000',
@@ -367,6 +368,7 @@ const mockTokenTxs = {
                   node: {
                     fromAddressHash: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
                     toAddressHash: '0xa12a699c641cc875a7ca57495861c79c33d293b4',
+                    toAccountHash: null,
                     token: 'cUSD',
                     value: '1297230000000000',
                   },
@@ -375,6 +377,7 @@ const mockTokenTxs = {
                   node: {
                     fromAddressHash: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
                     toAddressHash: '0x2a43f97f8bf959e31f69a894ebd80a88572c8553',
+                    toAccountHash: null,
                     token: 'cUSD',
                     value: '5188920000000000',
                   },
@@ -383,6 +386,7 @@ const mockTokenTxs = {
                   node: {
                     fromAddressHash: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
                     toAddressHash: '0xfcf7fc2f0c1f06fb6314f9fa2a53e9805aa863e0',
+                    toAccountHash: null,
                     token: 'cUSD',
                     value: '0',
                   },
@@ -409,6 +413,7 @@ const mockTokenTxs = {
                   node: {
                     fromAddressHash: '0x0000000000000000000000000000000000007E57',
                     toAddressHash: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
+                    toAccountHash: '0xf4314cb9046bece6aa54bb9533155434d0c76910', // this should go to the `account` field
                     token: 'cGLD',
                     value: '1000000000000000000',
                   },

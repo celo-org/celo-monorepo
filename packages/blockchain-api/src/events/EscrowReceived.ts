@@ -23,7 +23,8 @@ export class EscrowReceived extends TransactionType {
       transaction,
       transfer,
       EventTypes.ESCROW_RECEIVED,
-      transfer.fromAddressHash
+      transfer.fromAddressHash,
+      transfer.fromAccountHash
     )
   }
 

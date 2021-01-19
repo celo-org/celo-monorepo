@@ -22,7 +22,8 @@ export class TokenReceived extends TransactionType {
       transaction,
       transfer,
       EventTypes.RECEIVED,
-      transfer.fromAddressHash
+      transfer.fromAddressHash,
+      transfer.fromAccountHash
     )
   }
 

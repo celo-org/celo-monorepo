@@ -19,7 +19,8 @@ export class Faucet extends TransactionType {
       transaction,
       transfer,
       EventTypes.FAUCET,
-      transfer.fromAddressHash
+      transfer.fromAddressHash,
+      transfer.fromAccountHash
     )
   }
 

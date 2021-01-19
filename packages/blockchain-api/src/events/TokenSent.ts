@@ -23,6 +23,7 @@ export class TokenSent extends TransactionType {
       transfer,
       EventTypes.SENT,
       transfer.toAddressHash,
+      transfer.toAccountHash,
       transaction.fees
     )
   }

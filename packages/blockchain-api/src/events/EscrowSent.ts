@@ -24,6 +24,7 @@ export class EscrowSent extends TransactionType {
       transfer,
       EventTypes.ESCROW_SENT,
       transfer.toAddressHash,
+      transfer.toAccountHash,
       transaction.fees
     )
   }
