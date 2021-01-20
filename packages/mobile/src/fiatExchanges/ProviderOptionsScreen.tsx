@@ -14,6 +14,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { FiatExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
 import { openMoonpay, openSimplex } from 'src/fiatExchanges/utils'
@@ -46,6 +48,7 @@ ProviderOptionsScreen.navigationOptions = ({
 }
 
 interface Provider {
+  name: string
   enabled: boolean
   image: React.ReactNode
   onSelected: () => void
@@ -75,20 +78,22 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         />
       ),
     })
-  }, [navigation])
+  }, [])
 
   const providers: {
     cashOut: Provider[]
-    addFunds: Provider[]
+    cashIn: Provider[]
   } = {
     cashOut: [],
-    addFunds: [
+    cashIn: [
       {
+        name: 'Moonpay',
         enabled: !MOONPAY_DISABLED,
         image: <Image source={moonpayLogo} style={styles.logo} resizeMode={'contain'} />,
         onSelected: () => openMoonpay(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.DOLLAR),
       },
       {
+        name: 'Simplex',
         enabled: true,
         image: <Image source={simplexLogo} style={styles.logo} resizeMode={'contain'} />,
         onSelected: () => openSimplex(account),
@@ -96,17 +101,28 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
     ],
   }
 
+  const providerOnPress = (provider: Provider) => () => {
+    ValoraAnalytics.track(FiatExchangeEvents.provider_chosen, {
+      isCashIn,
+      provider: provider.name,
+    })
+  }
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
         <View style={styles.providersContainer}>
-          {providers[isCashIn ? 'addFunds' : 'cashOut']
+          {providers[isCashIn ? 'cashIn' : 'cashOut']
             .filter((provider) => provider.enabled)
             .map((provider, idx) => {
               return (
                 <>
-                  <TouchableOpacity key={idx} onPress={provider.onSelected} style={styles.provider}>
+                  <TouchableOpacity
+                    key={idx}
+                    onPress={providerOnPress(provider)}
+                    style={styles.provider}
+                  >
                     {provider.image}
                   </TouchableOpacity>
                   <View style={styles.separator} />

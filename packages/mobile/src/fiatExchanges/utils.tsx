@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js'
 import { SIMPLEX_URI } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -8,7 +7,7 @@ import { navigateToURI } from 'src/utils/linking'
 
 export const openMoonpay = (currencyCode: LocalCurrencyCode, currencyToBuy: CURRENCY_ENUM) => {
   navigate(Screens.MoonPay, {
-    localAmount: new BigNumber(0),
+    localAmount: 0,
     currencyCode,
     currencyToBuy,
   })

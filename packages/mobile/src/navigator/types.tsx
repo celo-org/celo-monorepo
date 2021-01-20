@@ -92,7 +92,7 @@ export type StackParamList = {
     amount?: BigNumber
   }
   [Screens.MoonPay]: {
-    localAmount: BigNumber
+    localAmount: number
     currencyCode: LocalCurrencyCode
     currencyToBuy: CURRENCY_ENUM
   }

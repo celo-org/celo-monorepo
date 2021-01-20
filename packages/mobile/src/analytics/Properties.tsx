@@ -22,6 +22,7 @@ import {
 } from 'src/analytics/Events'
 import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { PaymentMethod } from 'src/fiatExchanges/FiatExchangeOptions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
@@ -711,6 +712,15 @@ interface FiatExchangeEventsProperties {
   [FiatExchangeEvents.spend_merchant_link]: {
     name: string
     link: string
+  }
+  [FiatExchangeEvents.cico_option_chosen]: {
+    isCashIn: boolean
+    paymentMethod: PaymentMethod
+    currency: CURRENCY_ENUM
+  }
+  [FiatExchangeEvents.provider_chosen]: {
+    isCashIn: boolean
+    provider: string
   }
 }
 

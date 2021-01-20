@@ -1,5 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { useSelector } from 'react-redux'
@@ -51,7 +52,7 @@ function FiatExchangeWeb({ route }: Props) {
           currency: currencyToCode[currencyToBuy],
           address: account,
           fiatCurrency: currencyCode,
-          fiatAmount: localAmount?.toString(),
+          fiatAmount: new BigNumber(localAmount).toString(),
         }),
       })
       const json = await response.json()

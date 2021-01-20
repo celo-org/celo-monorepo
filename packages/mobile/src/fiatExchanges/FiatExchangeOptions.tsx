@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
+import { FiatExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import { KOTANI_URI, PONTO_URI } from 'src/config'
@@ -33,7 +35,7 @@ const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 type RouteProps = StackScreenProps<StackParamList, Screens.FiatExchangeOptions>
 type Props = RouteProps
 
-enum PaymentMethod {
+export enum PaymentMethod {
   FIAT = 'FIAT',
   EXCHANGE = 'EXCHANGE',
   ADDRESS = 'ADDRESS',
@@ -133,6 +135,11 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const [isEducationDialogVisible, setEducationDialogVisible] = useState(false)
 
   const goToProvider = () => {
+    ValoraAnalytics.track(FiatExchangeEvents.cico_option_chosen, {
+      isCashIn,
+      paymentMethod: selectedPaymentMethod,
+      currency: selectedCurrency,
+    })
     if (selectedPaymentMethod === PaymentMethod.EXCHANGE) {
       navigate(Screens.ExternalExchanges, {
         currency: selectedCurrency,
