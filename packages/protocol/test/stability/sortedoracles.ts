@@ -1,5 +1,5 @@
 import { normalizeAddress, NULL_ADDRESS } from '@celo/base/lib/address'
-import { pairIdentifier } from '@celo/contractkit/lib/wrappers/SortedOracles'
+import { oracleCurrencyPairIdentifier } from '@celo/base/lib/currencies'
 import {
   assertEqualBN,
   assertLogMatches2,
@@ -601,7 +601,7 @@ contract('SortedOracles', (accounts: string[]) => {
         const currencyPair = 'CELO/BTC'
         assert.equal(
           normalizeAddress(await sortedOracles.getCurrencyPairIdentifier(currencyPair)),
-          normalizeAddress(pairIdentifier(currencyPair))
+          normalizeAddress(oracleCurrencyPairIdentifier(currencyPair))
         )
       })
 
@@ -617,7 +617,7 @@ contract('SortedOracles', (accounts: string[]) => {
 
           assert.notEqual(
             normalizeAddress(identifier),
-            normalizeAddress(pairIdentifier(currencyPair))
+            normalizeAddress(oracleCurrencyPairIdentifier(currencyPair))
           )
         })
       })
@@ -627,7 +627,7 @@ contract('SortedOracles', (accounts: string[]) => {
   describe('#setIdentifierOverride', () => {
     const currencyPair = 'CELO/BTC'
     const override = Web3.utils.randomHex(20)
-    const identifier = pairIdentifier(currencyPair)
+    const identifier = oracleCurrencyPairIdentifier(currencyPair)
 
     const subject = async (from: string) => {
       return sortedOracles.setIdentifierOverride(currencyPair, override, { from })

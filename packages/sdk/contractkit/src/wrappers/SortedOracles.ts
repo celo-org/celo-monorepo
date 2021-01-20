@@ -1,5 +1,5 @@
-import { oracleCurrencyPairIdentifier } from '@celo/base'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import { oracleCurrencyPairIdentifier } from '@celo/base/lib/currencies'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -49,11 +49,10 @@ export interface MedianRate {
 }
 
 export type CurrencyPairIdentifier = Branded<Address, 'PairIdentifier'>
-
 /**
- * Used to construct the pair identifier from a pair label (e.g. CELO/BTC)
- * This function returns a branded type so we can have a safer interface
- * for the wrapper which only accepts Addresses constructed by this function.
+ * Constructs the identifier for a currency pair and returns it as a
+ * branded type which prevents arbitrary addresses from being passed
+ * to the wrapper.
  * @param pair a string
  */
 export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
