@@ -403,7 +403,7 @@ contract Validators is
     uint256 numerator;
     uint256 denominator;
     uint256 grace_period=6250000000000000000000;
-    uptime = uptime + grace_period > FixidityLib.fixed1().unwrap() ? FixidityLib.fixed1().unwrap() : uptime + grace_period;
+    uptime = Math.min(uptime + grace_period, FixidityLib.fixed1().unwrap());
     (numerator, denominator) = fractionMulExp(
       FixidityLib.fixed1().unwrap(),
       FixidityLib.fixed1().unwrap(),
