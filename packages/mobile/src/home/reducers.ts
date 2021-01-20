@@ -55,11 +55,17 @@ export const homeReducer = (state: State = initialState, action: ActionTypes | R
         if (!updatedNotification) {
           continue
         }
+        const existingNotification = state.notifications[id]
         updatedNotifications = {
           ...updatedNotifications,
           [id]: {
-            ...(state.notifications[id] || {}),
             ...updatedNotification,
+            // Keep locally modified fields
+            ...(existingNotification
+              ? {
+                  dismissed: existingNotification.dismissed,
+                }
+              : undefined),
           },
         }
       }
