@@ -392,7 +392,7 @@ contract Validators is
     return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp, history.tail);
   }
 
- /**
+  /**
    * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @dev epoch_score = uptime ** exponent
@@ -402,7 +402,8 @@ contract Validators is
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
-    uint256 grace_period=6250000000000000000000;
+    // Grace period of 0.625%
+    uint256 grace_period = 6250000000000000000000;
     uptime = Math.min(uptime + grace_period, FixidityLib.fixed1().unwrap());
     (numerator, denominator) = fractionMulExp(
       FixidityLib.fixed1().unwrap(),
