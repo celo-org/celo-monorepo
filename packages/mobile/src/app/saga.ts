@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import { AppState } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import {
@@ -17,6 +18,7 @@ import {
   appLock,
   minAppVersionDetermined,
   OpenDeepLink,
+  openDeepLink,
   OpenUrlAction,
   SetAppState,
   setAppState,
@@ -126,6 +128,8 @@ export function* handleDeepLink(action: OpenDeepLink) {
       handleDappkitDeepLink(deepLink)
     } else if (rawParams.path === '/cashIn') {
       navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
+    } else if (rawParams.pathname === '/bidali') {
+      navigate(Screens.BidaliScreen, { currency: CURRENCY_ENUM.DOLLAR })
     }
   }
 }
@@ -137,10 +141,15 @@ export function* watchDeepLinks() {
 export function* handleOpenUrl(action: OpenUrlAction) {
   const { url, openExternal } = action
   Logger.debug(TAG, 'Handling url', url)
-  if (openExternal) {
-    yield call(navigateToURI, url)
-  } else {
+  if (url.startsWith('celo:')) {
+    // Handle celo links directly, this avoids showing the "Open with App" sheet on Android
+    yield call(handleDeepLink, openDeepLink(url))
+  } else if (/^https?:\/\//i.test(url) === true && !openExternal) {
+    // We display http or https links using our in app browser, unless openExternal is forced
     navigate(Screens.WebViewScreen, { uri: url })
+  } else {
+    // Fallback
+    yield call(navigateToURI, url)
   }
 }
 

@@ -47,6 +47,7 @@ import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
+import { modalScreenOptions } from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -65,10 +66,16 @@ export interface CurrencyInfo {
   localExchangeRate: string
 }
 
-type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
+type OwnProps = StackScreenProps<
+  StackParamList,
+  Screens.SendConfirmation | Screens.SendConfirmationModal
+>
 type Props = OwnProps
 
-export const sendConfirmationScreenNavOptions = () => ({
+export const sendConfirmationScreenNavOptions = (navOptions: Props) => ({
+  ...(navOptions.route.name === Screens.SendConfirmationModal
+    ? modalScreenOptions(navOptions)
+    : undefined),
   ...emptyHeader,
   headerLeft: () => <BackButton eventName={SendEvents.send_confirm_back} />,
 })
@@ -81,6 +88,7 @@ function SendConfirmation(props: Props) {
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.sendFlow7)
 
+  const fromModal = props.route.name === Screens.SendConfirmationModal
   const { transactionData, addressJustValidated, currencyInfo } = props.route.params
   const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
@@ -175,7 +183,8 @@ function SendConfirmation(props: Props) {
         recipient,
         recipientAddress,
         inviteMethod,
-        firebasePendingRequestUid
+        firebasePendingRequestUid,
+        fromModal
       )
     )
   }

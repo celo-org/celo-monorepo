@@ -257,6 +257,7 @@ describe(sendPaymentOrInviteSaga, () => {
       comment: '',
       recipient: mockQRCodeRecipient,
       firebasePendingRequestUid: null,
+      fromModal: false,
     }
     await expectSaga(sendPaymentOrInviteSaga, sendPaymentOrInviteAction)
       .provide([
