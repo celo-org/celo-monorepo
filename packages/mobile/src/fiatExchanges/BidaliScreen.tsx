@@ -132,6 +132,7 @@ BidaliScreen.navigationOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
   return {
     ...emptyHeader,
+    headerTitle: 'Bidali',
     headerLeft: () => (
       <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
     ),
