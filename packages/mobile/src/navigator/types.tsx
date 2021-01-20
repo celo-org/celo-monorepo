@@ -52,6 +52,7 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
+  [Screens.BidaliScreen]: { currency: CURRENCY_ENUM }
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -173,6 +174,12 @@ export type StackParamList = {
     isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
+    transactionData: TransactionDataInput
+    addressJustValidated?: boolean
+    isFromScan?: boolean
+    currencyInfo?: CurrencyInfo
+  }
+  [Screens.SendConfirmationModal]: {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
     isFromScan?: boolean
