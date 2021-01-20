@@ -1883,7 +1883,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#calculateEpochScore', () => {
+  describe('#calculateEpochScore', () => {
     describe('when uptime is in the interval [0, 1.0]', () => {
       it('should calculate the score correctly', async () => {
         // Compare expected and actual to 8 decimal places.
@@ -1916,7 +1916,7 @@ contract('Validators', (accounts: string[]) => {
       const testGroupUptimeCalculation = (_uptimes) => {
         const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
-          .map((uptime) => uptime.pow(validatorScoreParameters.exponent.toNumber()))
+          .map((uptime) => calculateScore(uptime))
           .reduce((sum, n) => sum.plus(n))
           .div(_uptimes.length)
         it('should calculate the group score correctly', async () => {
@@ -1966,7 +1966,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#updateValidatorScoreFromSigner', () => {
+  describe('#updateValidatorScoreFromSigner', () => {
     const validator = accounts[0]
     beforeEach(async () => {
       await registerValidator(validator)
@@ -1982,7 +1982,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should update the validator score', async () => {
-        const expectedScore = adjustmentSpeed.times(epochScore)
+        const expectedScore = adjustmentSpeed.times(epochScore).decimalPlaces(12)
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assertEqualBN(parsedValidator.score, toFixed(expectedScore))
       })
@@ -1993,7 +1993,7 @@ contract('Validators', (accounts: string[]) => {
         })
 
         it('should update the validator score', async () => {
-          let expectedScore = adjustmentSpeed.times(epochScore)
+          let expectedScore = adjustmentSpeed.times(epochScore).decimalPlaces(12)
           expectedScore = new BigNumber(1)
             .minus(adjustmentSpeed)
             .times(expectedScore)
@@ -2189,7 +2189,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#distributeEpochPaymentsFromSigner', () => {
+  describe('#distributeEpochPaymentsFromSigner', () => {
     const validator = accounts[0]
     const group = accounts[1]
     const maxPayment = new BigNumber(20122394876)
