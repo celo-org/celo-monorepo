@@ -115,11 +115,11 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         <View style={styles.providersContainer}>
           {providers[isCashIn ? 'cashIn' : 'cashOut']
             .filter((provider) => provider.enabled)
-            .map((provider, idx) => {
+            .map((provider) => {
               return (
                 <>
                   <TouchableOpacity
-                    key={idx}
+                    key={provider.name}
                     onPress={providerOnPress(provider)}
                     style={styles.provider}
                   >
