@@ -16,6 +16,7 @@ export interface Notification {
   iconUrl?: string
   minVersion?: string
   maxVersion?: string
+  countries?: string[]
 }
 
 export interface IdToNotification {

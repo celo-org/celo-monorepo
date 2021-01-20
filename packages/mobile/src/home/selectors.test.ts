@@ -6,8 +6,11 @@ describe(getExtraNotifications, () => {
   const mockedVersion = DeviceInfo.getVersion as jest.MockedFunction<typeof DeviceInfo.getVersion>
   mockedVersion.mockImplementation(() => '1.8.0')
 
-  it('only returns notifications that are not dismissed and within the compatible with the current app version', () => {
+  it('only returns notifications that are not dismissed, compatible with the current app version and country', () => {
     const state = getMockStoreData({
+      account: {
+        defaultCountryCode: '+63', // PH
+      },
       home: {
         notifications: {
           notif1: {
@@ -57,11 +60,33 @@ describe(getExtraNotifications, () => {
             },
             maxVersion: '1.7.9',
           },
+          notif6: {
+            ctaUri: 'https://celo.org',
+            content: {
+              en: {
+                body: 'A notification only for France',
+                cta: 'Start',
+                dismiss: 'Dismiss',
+              },
+            },
+            countries: ['FR'],
+          },
+          notif7: {
+            ctaUri: 'https://celo.org',
+            content: {
+              en: {
+                body: 'A notification only for the Philippines',
+                cta: 'Start',
+                dismiss: 'Dismiss',
+              },
+            },
+            countries: ['PH'],
+          },
         },
       },
     })
 
     const extraNotifications = getExtraNotifications(state)
-    expect(Object.keys(extraNotifications)).toEqual(['notif1', 'notif3'])
+    expect(Object.keys(extraNotifications)).toEqual(['notif1', 'notif3', 'notif7'])
   })
 })
