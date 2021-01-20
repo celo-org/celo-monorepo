@@ -131,7 +131,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
 
     it('should fail if initialized, but still on current epoch', async () => {
       await blockchainParameters.setUptimeLookbackWindow(20)
-      assertRevert(blockchainParameters.getUptimeLookbackWindow())
+      await assertRevert(blockchainParameters.getUptimeLookbackWindow())
     })
   })
 
