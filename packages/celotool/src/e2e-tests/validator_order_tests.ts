@@ -26,6 +26,8 @@ describe('governance tests', () => {
     })),
     genesisConfig: {
       epoch: EPOCH,
+      churritoBlock: 0,
+      donutBlock: 0,
     },
   }
 
