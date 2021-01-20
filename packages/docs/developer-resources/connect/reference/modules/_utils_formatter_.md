@@ -22,7 +22,7 @@
 
 ▸ **hexToNumber**(`hex?`: undefined | string): *number | undefined*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:159](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L159)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:159](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L159)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **inputAddressFormatter**(`address?`: undefined | string): *string | undefined*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:204](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L204)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:204](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L204)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ ___
 
 ▸ **inputBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber)): *undefined | string | number | BN‹› | BigNumber‹›*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:109](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L109)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L109)*
 
 **Parameters:**
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **inputCeloTxFormatter**(`tx`: [CeloTx](_types_.md#celotx)): *[CeloTx](_types_.md#celotx)*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L11)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L11)*
 
 Formats the input of a transaction and converts all values to HEX
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **inputDefaultBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber) | null | undefined): *undefined | string | number | BN‹› | BigNumber‹›*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:101](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L101)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L101)*
 
 **Parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **inputSignFormatter**(`data`: string): *string*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:214](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L214)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:214](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L214)*
 
 **Parameters:**
 
@@ -120,7 +120,7 @@ ___
 
 ▸ **outputBigNumberFormatter**(`hex`: string): *string*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:200](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L200)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:200](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L200)*
 
 **Parameters:**
 
@@ -136,7 +136,7 @@ ___
 
 ▸ **outputBlockFormatter**(`block`: any): *Block*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:127](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L127)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:127](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L127)*
 
 **Parameters:**
 
@@ -152,7 +152,7 @@ ___
 
 ▸ **outputCeloTxFormatter**(`tx`: any): *[CeloTxPending](_types_.md#celotxpending)*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:38](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L38)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L38)*
 
 **Parameters:**
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **outputCeloTxReceiptFormatter**(`receipt`: any): *[CeloTxReceipt](_types_.md#celotxreceipt)*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:72](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L72)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L72)*
 
 **Parameters:**
 
@@ -184,7 +184,7 @@ ___
 
 ▸ **outputLogFormatter**(`log`: any): *Log*
 
-*Defined in [packages/sdk/connect/src/utils/formatter.ts:166](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L166)*
+*Defined in [packages/sdk/connect/src/utils/formatter.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L166)*
 
 **Parameters:**
 

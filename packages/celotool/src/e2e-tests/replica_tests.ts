@@ -1,5 +1,6 @@
 import { BlockHeader } from '@celo/connect'
 import { DefaultRpcCaller, RpcCaller } from '@celo/connect/lib/utils/rpc-caller'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -138,6 +139,7 @@ describe('replica swap tests', () => {
         port: 30315,
         rpcport: 8555,
         privateKey: gethConfig.instances[0].privateKey,
+        minerValidator: privateKeyToAddress(gethConfig.instances[0].privateKey!),
         proxy: 'validator0-proxy0',
         isProxied: true,
         proxyport: 30304,

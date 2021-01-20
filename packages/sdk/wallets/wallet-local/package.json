@@ -21,12 +21,13 @@
   },
   "dependencies": {
     "@celo/utils": "1.0.0-dev",
+    "@celo/connect": "1.0.0-dev",
     "@celo/wallet-base": "1.0.0-dev",
+    "@types/ethereumjs-util": "^5.2.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0"
   },
   "devDependencies": {
-    "@celo/connect": "1.0.0-dev"
   },
   "engines": {
     "node": ">=8.13.0"

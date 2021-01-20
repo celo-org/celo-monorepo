@@ -885,7 +885,12 @@ export async function startGeth(
 
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
-  const etherbase = instance.etherbase || ''
+  const minerValidator = instance.minerValidator
+  if (instance.validating && !minerValidator) {
+    throw new Error('miner.validator address from the instance is required')
+  }
+  // TODO(ponti): add flag after Donut fork
+  // const txFeeRecipient = instance.txFeeRecipient || minerValidator
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
   let blocktime: number = 1
 
@@ -916,8 +921,18 @@ export async function startGeth(
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
     '--istanbul.blockperiod',
-    blocktime.toString(),
+    blocktime.toString()
   ]
+
+  if (minerValidator) {
+    gethArgs.push(
+      '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
+      minerValidator
+    )
+    // TODO(ponti): add flag after Donut fork
+    // '--tx-fee-recipient',
+    // txFeeRecipient
+  }
 
   if (rpcport) {
     gethArgs.push(
@@ -937,10 +952,6 @@ export async function startGeth(
       wsport.toString(),
       '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
-  }
-
-  if (etherbase) {
-    gethArgs.push('--etherbase', etherbase)
   }
 
   if (lightserv) {

@@ -11,7 +11,7 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts.
 # -r: Path to the contract compatibility report.
 # -d: Whether to dry-run this deploy
-# -t: Whether to dry-run this deploy
+# -f: Address to sign transactions from.
 
 NETWORK=""
 PROPOSAL=""
@@ -19,9 +19,9 @@ BRANCH=""
 INITIALIZE_DATA=""
 REPORT=""
 DRYRUN=""
-TRUFFLE_OVERRIDE=""
+FROM=""
 
-while getopts 'b:n:p:i:r:dt:' flag; do
+while getopts 'b:n:p:i:r:df:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
@@ -29,7 +29,7 @@ while getopts 'b:n:p:i:r:dt:' flag; do
     i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     d) DRYRUN="--dry_run" ;;
-    t) TRUFFLE_OVERRIDE="${OPTARG}" ;;
+    f) FROM="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -57,7 +57,7 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --build_directory $BUILD_DIR \
   --report $REPORT \
   --proposal $PROPOSAL \
-  --truffle_override $TRUFFLE_OVERRIDE \
+  --from $FROM \
   --initialize_data $INITIALIZE_DATA $DRYRUN
 
 git checkout migrationsConfig.js

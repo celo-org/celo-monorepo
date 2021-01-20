@@ -67,7 +67,7 @@ exports[`ignores failed standby transactions 1`] = `
             "type": "EXCHANGE",
           },
         ],
-        "title": "January",
+        "title": "January 2020",
       },
     ]
   }
@@ -122,7 +122,7 @@ exports[`ignores failed standby transactions 1`] = `
             }
           }
         >
-          January
+          January 2020
         </Text>
       </View>
     </View>
@@ -136,6 +136,7 @@ exports[`ignores failed standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -296,6 +297,7 @@ exports[`ignores failed standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -502,7 +504,7 @@ exports[`ignores pending standby transactions that are completed in the response
             "type": "EXCHANGE",
           },
         ],
-        "title": "January",
+        "title": "January 2020",
       },
     ]
   }
@@ -557,7 +559,7 @@ exports[`ignores pending standby transactions that are completed in the response
             }
           }
         >
-          January
+          January 2020
         </Text>
       </View>
     </View>
@@ -571,6 +573,7 @@ exports[`ignores pending standby transactions that are completed in the response
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -731,6 +734,7 @@ exports[`ignores pending standby transactions that are completed in the response
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -937,7 +941,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
             "type": "EXCHANGE",
           },
         ],
-        "title": "January",
+        "title": "January 2020",
       },
       Object {
         "data": Array [
@@ -1083,7 +1087,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
             }
           }
         >
-          January
+          January 2020
         </Text>
       </View>
     </View>
@@ -1097,6 +1101,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -1257,6 +1262,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -1435,6 +1441,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -1595,6 +1602,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -1720,6 +1728,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }

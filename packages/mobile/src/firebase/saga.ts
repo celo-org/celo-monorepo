@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/src/async'
 import firebase from '@react-native-firebase/app'
 import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
 import { eventChannel } from 'redux-saga'
@@ -11,12 +12,14 @@ import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'sr
 import { Actions, firebaseAuthorized } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
+import { getRemoteTime } from 'src/utils/time'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'firebase/saga'
 const EXCHANGE_RATES = 'exchangeRates'
 const VALUE_CHANGE_HOOK = 'value'
+const FIREBASE_CONNECT_RETRIES = 3
 
 let firebaseAlreadyAuthorized = false
 export function* waitForFirebaseAuth() {
@@ -38,17 +41,25 @@ function* initializeFirebase() {
 
   Logger.info(TAG, 'Firebase enabled')
   try {
-    const app = firebase.app()
-    Logger.info(
-      TAG,
-      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${app.options.databaseURL}`
-    )
-    yield call(initializeAuth, firebase, address)
-    yield put(firebaseAuthorized())
-    yield call(initializeCloudMessaging, firebase, address)
-    Logger.info(TAG, `Firebase initialized`)
+    for (let i = 0; i < FIREBASE_CONNECT_RETRIES; i += 1) {
+      try {
+        const app = firebase.app()
+        Logger.info(TAG, `Attempt ${i + 1} to initialize db ${app.options.databaseURL}`)
 
-    return
+        yield call(initializeAuth, firebase, address)
+        yield put(firebaseAuthorized())
+        yield call(initializeCloudMessaging, firebase, address)
+        Logger.info(TAG, `Firebase initialized`)
+
+        return
+      } catch (error) {
+        if (i + 1 === FIREBASE_CONNECT_RETRIES) {
+          throw error
+        }
+
+        yield sleep(2 ** i * 5000)
+      }
+    }
   } catch (error) {
     Logger.error(TAG, 'Error while initializing firebase', error)
     yield put(showError(ErrorMessages.FIREBASE_FAILED))
@@ -68,7 +79,7 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
-function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
+function celoGoldExchangeRateHistoryChannel(lastTimeUpdated: number) {
   const errorCallback = (error: Error) => {
     Logger.warn(TAG, error.toString())
   }
@@ -86,9 +97,7 @@ function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
     }
 
     // timestamp + 1 is used because .startAt is inclusive
-    const startAt = latestExchangeRate
-      ? latestExchangeRate.timestamp + 1
-      : now - MAX_HISTORY_RETENTION
+    const startAt = lastTimeUpdated + 1 || now - MAX_HISTORY_RETENTION
 
     const cancel = () => {
       firebase
@@ -112,12 +121,11 @@ function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
 export function* subscribeToCeloGoldExchangeRateHistory() {
   yield call(waitForFirebaseAuth)
   const history = yield select(exchangeHistorySelector)
-  const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
-  const chan = yield call(celoGoldExchangeRateHistoryChannel, latestExchangeRate)
+  const chan = yield call(celoGoldExchangeRateHistoryChannel, history.lastTimeUpdated)
   try {
     while (true) {
       const exchangeRates = yield take(chan)
-      const now = Date.now()
+      const now = getRemoteTime()
       yield put(updateCeloGoldExchangeRateHistory(exchangeRates, now))
     }
   } catch (error) {

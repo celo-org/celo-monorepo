@@ -6,7 +6,7 @@ export default class Reports extends BaseCommand {
   static description = 'List oracle reports for a given token'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     ...(cli.table.flags() as object),
   }
 

@@ -1,5 +1,6 @@
 import {
   extractAttestationCodeFromMessage,
+  extractSecurityCodeWithPrefix,
   messageContainsAttestationCode,
   sanitizeMessageBase64,
 } from './attestations'
@@ -47,6 +48,19 @@ describe('Attestation Utils', () => {
       expect(extractAttestationCodeFromMessage(MESSAGE_3)).toBe(MESSAGE_3_DECODED)
       expect(extractAttestationCodeFromMessage(MESSAGE_3_WITH_LINK)).toBe(MESSAGE_3_DECODED)
       expect(extractAttestationCodeFromMessage(MESSAGE_4_UNSANITIZED)).toBe(MESSAGE_4_DECODED)
+    })
+  })
+
+  describe('extractSecurityCodeWithPrefix', () => {
+    it('should extract 8 digit code', () => {
+      expect(extractSecurityCodeWithPrefix('<#> Celo security code: 51365977 5yaJvJcZt2P')).toEqual(
+        '51365977'
+      )
+    })
+    it('should NOT extract not 8 digit code', () => {
+      expect(extractSecurityCodeWithPrefix('<#> Celo security code: 5136597 5yaJvJcZt2P')).toEqual(
+        null
+      )
     })
   })
 

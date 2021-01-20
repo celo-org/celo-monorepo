@@ -194,6 +194,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -219,6 +220,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "justifyContent": "center",
                 }
               }
             >
@@ -531,6 +533,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }

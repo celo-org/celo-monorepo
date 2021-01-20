@@ -166,8 +166,8 @@ release: {{ .Release.Name }}
     exec geth \
       --port $PORT  \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
-      --light.serve {{ .light_serve | default 90 }} \
-      --light.maxpeers {{ .light_maxpeers | default 1000 }} \
+      --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
+      --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
       --networkid=${NETWORK_ID} \
       --nousb \
@@ -179,6 +179,8 @@ release: {{ .Release.Name }}
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
       --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
+      --datadir=/root/.celo \
+      --ipcpath=geth.ipc \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -436,6 +438,33 @@ prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}
 
+{{- define "common.remove-old-chaindata" -}}
+- name: remove-old-chaindata
+  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+  imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
+  command: ["/bin/sh"]
+  args:
+  - "-c"
+  - |
+    if [ -d /root/.celo/celo/chaindata ]; then
+      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      day=$(date +%s)
+      diff=$(($day - $lastBlockTimestamp))
+      # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
+      if [ "$diff" -gt 86400 ]; then
+        echo Chaindata is more than one day out of date. Wiping existing chaindata.
+        rm -rf /root/.celo/celo/chaindata
+      else
+        echo Chaindata is less than one day out of date. Using existing chaindata.
+      fi
+    else
+      echo No chaindata at all.
+    fi
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}
+
 {{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
 {{- define "common.gsutil-sync-data-init-container" -}}
 - name: gsutil-sync-data
@@ -446,19 +475,9 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - -c
   args:
   - |
-     # If older than upload period, remove the chain data dir.
      if [ -d /root/.celo/celo/chaindata ]; then
-       mtime=$(stat --format "%Y" /root/.celo/celo/chaindata)
-       day=$(date +%s)
-       diff=$(($day - $mtime))
-       # If mtime is older than 1 day old, pull the chaindata rather than using the current PVC.
-       if [ "$diff" -gt 86400 ]; then
-         echo Chaindata is more than one day out of date. Wiping to use saved chaindata.
-         rm -rf /root/.celo/celo/chaindata
-       else
-         echo Chaindata is less than one day out of date. Using existing chaindata.
-         exit 0
-       fi
+       echo Using pre-existing chaindata
+       exit 0
      fi
      mkdir -p /root/.celo/celo
      gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
