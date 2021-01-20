@@ -313,11 +313,20 @@ export const generateGenesis = ({
   requestTimeout,
   enablePetersburg = true,
   timestamp = 0,
+  churritoBlock,
+  donutBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
     genesis.config = GETH_CONFIG_OLD
+  }
+
+  if (typeof churritoBlock === 'number') {
+    genesis.config.churritoBlock = churritoBlock;
+  }
+  if (typeof donutBlock === 'number') {
+    genesis.config.donutBlock = donutBlock;
   }
 
   genesis.config.chainId = chainId
