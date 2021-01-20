@@ -5,6 +5,7 @@ import Svg, { Circle } from 'svgs'
 interface Props {
   height?: number
   color?: string
+  selected?: boolean
 }
 
 export default class RadioButton extends React.PureComponent<Props> {
@@ -12,6 +13,7 @@ export default class RadioButton extends React.PureComponent<Props> {
     width: 20,
     height: 20,
     color: colors.greenUI,
+    selected: false, 
   }
 
   render() {

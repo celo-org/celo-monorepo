@@ -1,5 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import Touchable from '@celo/react-components/components/Touchable'
+import RadioButton from '@celo/react-components/icons/RadioButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -18,7 +19,6 @@ import { KOTANI_URI, PONTO_URI, SIMPLEX_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
-import RadioButton from 'src/icons/RadioButton'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -29,6 +29,7 @@ import { useCountryFeatures } from 'src/utils/countryFeatures'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
+
 
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
