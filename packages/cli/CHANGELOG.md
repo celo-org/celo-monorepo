@@ -5,7 +5,17 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.0--dev]**
+### **[1.0.1--dev]**
+Features
+- [one-line summary] - [link PR]
+
+Bug Fixes
+- [one-line summary] - [link PR]
+
+Other Changes
+- [one-line summary] - [link PR]
+## Published
+### **[1.0.0]** -- 2021-01-19
 Features
 - Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
 - CIP 8 Encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
@@ -19,6 +29,8 @@ Features
 Bug Fixes
 - Fix param order on account:new internal call - [#6319](https://github.com/celo-org/celo-monorepo/pull/6319)
 - Remove broken header links in generated CLI docs - [#6415](https://github.com/celo-org/celo-monorepo/pull/6415)
+- Fix @ledgerhq package version in CK and CLI  - [#6496](https://github.com/celo-org/celo-monorepo/pull/6496)
+- Fix call to set gas currency in CLI base - [#6505](https://github.com/celo-org/celo-monorepo/pull/6505)
 
 Other Changes
 - KomenciKit - [#5436](https://github.com/celo-org/celo-monorepo/pull/5436)
@@ -28,9 +40,7 @@ Other Changes
 - Rename build-proposal flag - [#5885](https://github.com/celo-org/celo-monorepo/pull/5885)
 - Compatibility with Sdk Modularization - [#4790](https://github.com/celo-org/celo-monorepo/pull/4790)
 - Adjust how CLI docs are generated - [#5882](https://github.com/celo-org/celo-monorepo/pull/5882)
-
-
-## Published
+- Add install instructions for CLI readme - [#6466](https://github.com/celo-org/celo-monorepo/pull/6466)
 
 ### **[0.0.60]** -- 2020-10-27
 Bug Fixes

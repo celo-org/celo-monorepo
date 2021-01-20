@@ -937,7 +937,7 @@
 - [Release Process](community/release-process/README.md)
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
-  - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
+  - [Celocli and ContractKit](community/release-process/base-cli-contractkit-dappkit-utils.md)
   - [Attestation Service](community/release-process/attestation-service.md)
 
 ## Important Information
