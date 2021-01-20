@@ -2,11 +2,11 @@ import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@cel
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
+import { ContractEventLog } from '@celo/contractkit/lib/generated/types'
 import {
   MetaTransactionWalletWrapper,
   toRawTransaction,
 } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
-import { ContractEventLog } from '@celo/contractkit/src/generated/types'
 import { BlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import {
   getBlindedPhoneNumber,
