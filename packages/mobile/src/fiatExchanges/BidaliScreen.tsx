@@ -54,7 +54,13 @@ function useInitialJavaScript(
 type RouteProps = StackScreenProps<StackParamList, Screens.BidaliScreen>
 type Props = RouteProps
 
-function BidaliScreen({ route }: Props) {
+function BidaliScreen({ route, navigation }: Props) {
+  const onLoadEnd = () => {
+    // Remove loading indicator
+    navigation.setOptions({
+      headerRight: undefined,
+    })
+  }
   const onMessage = (event: WebViewMessageEvent) => {
     const { method, data } = JSON.parse(event.nativeEvent.data)
     switch (method) {
@@ -114,15 +120,14 @@ function BidaliScreen({ route }: Props) {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      {initialJavaScript ? (
+      {initialJavaScript && (
         <WebView
           ref={webViewRef}
           source={{ uri: networkConfig.bidaliUrl }}
+          onLoadEnd={onLoadEnd}
           onMessage={onMessage}
           injectedJavaScriptBeforeContentLoaded={initialJavaScript}
         />
-      ) : (
-        <ActivityIndicator size="large" color={colors.greenBrand} />
       )}
     </SafeAreaView>
   )
@@ -136,13 +141,22 @@ BidaliScreen.navigationOptions = () => {
     headerLeft: () => (
       <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
     ),
+    headerRight: () => (
+      <ActivityIndicator
+        style={styles.headerActivityIndicator}
+        size="small"
+        color={colors.greenBrand}
+      />
+    ),
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  headerActivityIndicator: {
+    marginRight: 16,
   },
 })
 
