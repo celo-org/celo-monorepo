@@ -24,7 +24,7 @@ export interface State {
   notifications: IdToNotification
 }
 
-const initialState = {
+export const initialState = {
   loading: false,
   notifications: {},
 }
