@@ -159,7 +159,7 @@ async function calculateUptime(
   }
 
   const maxPotentialUpBlocks = monitoringWindowSize
-  return upBlocks.map((upBlocks) => new BigNumber(upBlocks / maxPotentialUpBlocks))
+  return upBlocks.map((x) => new BigNumber(x / maxPotentialUpBlocks))
 }
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
