@@ -27,6 +27,7 @@ Features
 - IP712 signature over attestation security code - [#6209](https://github.com/celo-org/celo-monorepo/pull/6209)
 - Enable 8 digit code verification and ignore attestation services below 1.1.0 - [#6437](https://github.com/celo-org/celo-monorepo/pull/6437)
 - Handle revert flag from web3 for contract calls - [#6515](https://github.com/celo-org/celo-monorepo/pull/6515)
+- CIP-21: Governable LookbackWindow Smart Contract changes - [#4747](https://github.com/celo-org/celo-monorepo/pull/4747)
 
 Bug Fixes
 - Reverted PR #5709, "Add CUSD transfer to MTW" - [#5982](https://github.com/celo-org/celo-monorepo/pull/5982)
