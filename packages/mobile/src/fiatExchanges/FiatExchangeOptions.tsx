@@ -18,7 +18,7 @@ import { KOTANI_URI, PONTO_URI, SIMPLEX_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
-import RadioIcon from 'src/icons/RadioIcon'
+import RadioButton from 'src/icons/RadioButton'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -82,7 +82,7 @@ function CurrencyRadioItem({
           { borderColor: currencyBorderColor(selected) },
         ]}
       >
-        <RadioIcon selected={selected} />
+        <RadioButton selected={selected} />
         <Text style={[styles.currencyItemTitle, enabled ? {} : { color: colors.gray3 }]}>
           {title}
         </Text>
@@ -106,7 +106,7 @@ function PaymentMethodRadioItem({
   return (
     <TouchableWithoutFeedback onPress={onSelect} disabled={!enabled}>
       <View style={styles.paymentMethodItemContainer}>
-        <RadioIcon selected={selected} />
+        <RadioButton selected={selected} />
         <Text style={[styles.paymentMethodItemText, enabled ? {} : { color: colors.gray3 }]}>
           {text}
         </Text>
