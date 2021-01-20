@@ -6,8 +6,6 @@
 * @asaj @cmcewen @timmoreton
 
 # directory and file-level owners. Feel free to add to this!
-/packages/attestation-proxy/ @jmrossy 
-/packages/attestation-service/ @nambrot
 /packages/azure/ @codyborn
 /packages/blockchain-api/ @jmrossy @cmcewen @i1skn @jeanregisser
 /packages/celotool/ @asaj
@@ -18,12 +16,19 @@
 /packages/docs/ @timmoreton @barbaraliau @critesjosh 
 /packages/faucet/ @eelanagaraj @celo-org/devx
 /packages/helm-charts/ @nambrot @timmoreton
-/packages/metadata-crawler/ @aaitor
 /packages/mobile/ @jeanregisser @cmcewen @jmrossy @i1skn 
 /packages/moonpay-auth/ @annakaz @i1skn 
 /packages/notification-service/ @annakaz @cmcewen @i1skn @jeanregisser
-/packages/phone-number-privacy/ @jmrossy
-/packages/protocol/ @asaj @nategraf
+/packages/flake-tracker @alecps
+
+/packages/protocol/ @celo-org/cap
+/packages/sdk/contractkit/ @celo-org/cap
+packages/komencikit/ @celo-org/cap
+/packages/phone-number-privacy/ @celo-org/cap
+/packages/attestation-proxy/ @celo-org/cap
+/packages/attestation-service/ @celo-org/cap
+/packages/metadata-crawler/ @celo-org/cap
+
 /packages/react-components/ @jmrossy @aaronmgdr
 /packages/reserve-site/ @aaronmgdr
 /packages/terraform-modules-public/ @tkporter

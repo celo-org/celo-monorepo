@@ -26,6 +26,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "@types/debug": "^4.1.5",
     "@celo/base": "1.0.0-dev",
     "@celo/connect": "1.0.0-dev",
     "@celo/utils": "1.0.0-dev",
