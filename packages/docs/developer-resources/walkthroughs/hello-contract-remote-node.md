@@ -6,7 +6,7 @@ description: >-
 
 # Hello Contract \(Truffle + Remote Node\)
 
-This guide walks you through the basics of how to deploy your own smart contracts on Celo networks. As Celo is fully EVM compatible, we inherit the rich developer ecosystem and tooling of the Ethereum community. We will be deploying a typical hello world smart contract onto the Alfajores testnet with typical Ethereum tools like Truffle and Ganache.
+This guide walks you through the basics of how to deploy your own smart contracts on Celo networks. As Celo is fully EVM compatible, we inherit the rich developer ecosystem and tooling of the Ethereum community. You will be deploying a typical hello world smart contract onto the Alfajores testnet with typical Ethereum tools like Truffle and Ganache.
 
 ## Setup
 
@@ -24,19 +24,25 @@ As you may know, Truffle is built for Ethereum developers. Because Celo has a si
 
 {% page-ref page="../../overview.md" %}
 
-[Clone this Truffle project from GitHub to get started](https://github.com/critesjosh/hello_contract-truffle). This is a basic truffle project, with some additional files to help us with account management and deploying to a remote Celo test net node. Run `$ npm install` to install of the project dependencies.
+[Clone this Truffle project from GitHub to get started](https://github.com/critesjosh/hello_contract-truffle). 
+
+```
+git clone https://github.com/critesjosh/hello_contract-truffle.git
+```
+
+This is a basic truffle project, with some additional files to help us with account management and deploying to a remote Celo test net node. Run `npm install` to install of the project dependencies.
 
 ## Hello World!
 
-Let's add a contract with
+Add a contract with the command
 
 ```text
 truffle create contract HelloWorld
 ```
 
-We will not be getting into the details of how to write Solidity in this exercise, but you can learn more at the [Solidity documentation page](https://solidity.readthedocs.io/en/latest/).
+We will not go into the details of how to write Solidity in this exercise, but you can learn more at the [Solidity documentation page](https://solidity.readthedocs.io/en/latest/).
 
-Our contract will just store a name for now:
+The contract will just store a name for now:
 
 ```text
 pragma solidity >=0.5.0 <0.7.0;
@@ -84,9 +90,9 @@ You can [learn more about Truffle configuration options here.](https://www.truff
 
 ## Deploy to Alfajores \(Remotely\)
 
-When we deploy contracts to the Celo network with a remote node, we have to sign the contract deployment transaction locally before sending it to the remote node to be broadcast to the network. This presents some unique challenges when using Ethereum development tools \(like Truffle\) because Celo transaction objects are slightly different than Ethereum transaction objects.
+When you deploy contracts to the Celo network with a remote node, you have to sign the contract deployment transaction locally before sending it to the remote node to be broadcast to the network. This presents some unique challenges when using Ethereum development tools \(like Truffle\) because Celo transaction objects are slightly different than Ethereum transaction objects.
 
-When you are ready to deploy your contract to Alfajores, you'll need a Celo client connected to the testnet. In this exercise we are going to connect to a remote node to read and write to the public test net, but you could also run a test net node locally to perform the same actions.
+When you are ready to deploy your contract to Alfajores, you'll need a Celo client connected to the testnet. In this exercise we are going to connect to a remote node to read and write to the public testnet (Alfajores), but you could also run a testnet node locally to perform the same actions.
 
 Here are the steps to go through to deploy the contract to the Alfajores testnet.
 
@@ -145,7 +151,7 @@ kit.connection.addAccount(account.privateKey) // this account must have a CELO b
 
 #### Truffle Deployment
 
-Before we can use truffle for the migration, we need to set up the proper configuration in `./truffle-config.js`.  At the top of `./truffle-config.js`, set up the `kit` by connecting to the test network and adding the account we just funded.
+Before you can use truffle for the migration, you need to set up the proper configuration in `./truffle-config.js`.  At the top of `./truffle-config.js`, set up the `kit` by connecting to the test network and adding the account you just funded.
 
 ```javascript
 const Web3 = require('web3')
@@ -161,7 +167,7 @@ async function awaitWrapper(){
 awaitWrapper()
 ```
 
-Then, in the `networks` object, we can add the initialized `kit`provider to an `alfajores` property.
+Then, in the `networks` object, you can add the initialized `kit`provider to an `alfajores` property.
 
 ```javascript
   networks: {
@@ -177,7 +183,7 @@ Then, in the `networks` object, we can add the initialized `kit`provider to an `
   }
 ```
 
-Now, deploying the contracts to Alfajores with this command:
+Now, deploy the contracts to Alfajores with this command:
 
 ```javascript
 truffle migrate --network alfajores
@@ -185,7 +191,7 @@ truffle migrate --network alfajores
 
 #### Custom Node.js Deployment
 
-In this section, we will go over how to deploy a contract using a simple Node.js script to show how you can do it without using Truffle.
+In this section, you deploy a contract using a simple Node.js script to show how you can do it without using Truffle.
 
 You need to compile the `HelloWorld.sol` contract using \(if it isn't already\):
 
