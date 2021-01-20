@@ -14,6 +14,8 @@ export interface Notification {
   content: { [lang: string]: NotificationTexts | undefined }
   dismissed?: boolean
   iconUrl?: string
+  minVersion?: string
+  maxVersion?: string
 }
 
 export interface IdToNotification {

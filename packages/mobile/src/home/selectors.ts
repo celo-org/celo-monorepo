@@ -1,3 +1,5 @@
+import _ from 'lodash'
+import DeviceInfo from 'react-native-device-info'
 import { createSelector } from 'reselect'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import {
@@ -5,6 +7,7 @@ import {
   getOutgoingPaymentRequests,
 } from 'src/paymentRequest/selectors'
 import { RootState } from 'src/redux/reducers'
+import { isVersionInRange } from 'src/utils/versionCheck'
 
 // TODO: De-dupe this with NotificationBox
 // It's not great that we must edit this and NotificationBox whenever introducing new notifications
@@ -33,3 +36,19 @@ export const callToActNotificationSelector = (state: RootState) => {
     (!state.app.numberVerified && !state.account.dismissedGetVerified)
   )
 }
+
+const homeNotificationsSelector = (state: RootState) => state.home.notifications
+
+export const getExtraNotifications = createSelector(
+  [homeNotificationsSelector],
+  (notifications) => {
+    const version = DeviceInfo.getVersion()
+    return _.pickBy(notifications, (notification) => {
+      return (
+        !!notification &&
+        !notification.dismissed &&
+        isVersionInRange(version, notification.minVersion, notification.maxVersion)
+      )
+    })
+  }
+)

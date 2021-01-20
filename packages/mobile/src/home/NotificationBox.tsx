@@ -19,6 +19,7 @@ import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
 import { dismissNotification } from 'src/home/actions'
 import { IdToNotification } from 'src/home/reducers'
+import { getExtraNotifications } from 'src/home/selectors'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
@@ -90,7 +91,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   goldEducationCompleted: state.goldToken.educationCompleted,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
-  extraNotifications: state.home.notifications,
+  extraNotifications: getExtraNotifications(state),
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   verificationPossible: verificationPossibleSelector(state),
@@ -223,7 +224,7 @@ export class NotificationBox extends React.Component<Props, State> {
     }
 
     for (const [id, notification] of Object.entries(this.props.extraNotifications)) {
-      if (!notification || notification.dismissed) {
+      if (!notification) {
         continue
       }
       const language = i18n.language.toLowerCase()
