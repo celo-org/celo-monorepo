@@ -88,7 +88,7 @@ export type StackParamList = {
   }
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeOptions]: {
-    isAddFunds?: boolean
+    isCashIn?: boolean
     amount?: BigNumber
   }
   [Screens.MoonPay]: {
@@ -153,7 +153,7 @@ export type StackParamList = {
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
   [Screens.ProviderOptionsScreen]: {
-    isAddFunds?: boolean
+    isCashIn?: boolean
   }
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {

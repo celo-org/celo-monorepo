@@ -125,7 +125,7 @@ export function* handleDeepLink(action: OpenDeepLink) {
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
     } else if (rawParams.path === '/cashIn') {
-      navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
+      navigate(Screens.FiatExchangeOptions, { isCashIn: true })
     }
   }
 }

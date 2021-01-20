@@ -49,7 +49,7 @@ export const fiatExchangesOptionsScreenOptions = ({
   return {
     ...emptyHeader,
     headerLeft: () => <BackButton />,
-    headerTitle: i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`),
+    headerTitle: i18n.t(`fiatExchangeFlow:${route.params?.isCashIn ? 'addFunds' : 'cashOut'}`),
     headerRightContainerStyle: { paddingRight: 16 },
   }
 }
@@ -115,7 +115,7 @@ function PaymentMethodRadioItem({
 
 function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
-  const isAddFunds = route.params?.isAddFunds ?? true
+  const isCashIn = route.params?.isCashIn ?? true
   const localCurrency = useSelector(getLocalCurrencyCode)
   const { MOONPAY_DISABLED, KOTANI_SUPPORTED, PONTO_SUPPORTED } = useCountryFeatures()
   const pontoEnabled = useSelector(pontoEnabledSelector)
@@ -128,7 +128,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const isCeloCashInOptionAvailable = !MOONPAY_DISABLED
   const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(CURRENCY_ENUM.DOLLAR)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
-    isAddFunds ? PaymentMethod.FIAT : PaymentMethod.EXCHANGE
+    isCashIn ? PaymentMethod.FIAT : PaymentMethod.EXCHANGE
   )
   const [isEducationDialogVisible, setEducationDialogVisible] = useState(false)
 
@@ -144,7 +144,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
       navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
     } else if (selectedCurrency === CURRENCY_ENUM.DOLLAR) {
-      navigate(Screens.ProviderOptionsScreen, { isAddFunds: true })
+      navigate(Screens.ProviderOptionsScreen, { isCashIn: true })
     } else {
       openMoonpay(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.GOLD)
     }
@@ -194,10 +194,10 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       </ScrollView>
       <View style={styles.bottomContainer}>
         <Text style={styles.selectPaymentMethod}>
-          {t(isAddFunds ? 'selectPaymentMethod' : 'selectCashOutMethod')}
+          {t(isCashIn ? 'selectPaymentMethod' : 'selectCashOutMethod')}
         </Text>
         <View style={styles.paymentMethodsContainer}>
-          {isAddFunds && (
+          {isCashIn && (
             <PaymentMethodRadioItem
               text={t('payWithFiat')}
               selected={selectedPaymentMethod === PaymentMethod.FIAT}
@@ -213,7 +213,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
             selected={selectedPaymentMethod === PaymentMethod.EXCHANGE}
             onSelect={onSelectPaymentMethod(PaymentMethod.EXCHANGE)}
           />
-          {!isAddFunds && (
+          {!isCashIn && (
             <>
               <PaymentMethodRadioItem
                 text={t('receiveOnAddress')}
@@ -252,7 +252,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       <FundingEducationDialog
         isVisible={isEducationDialogVisible}
         onPressDismiss={onPressDismissEducationDialog}
-        isCashIn={isAddFunds}
+        isCashIn={isCashIn}
       />
     </SafeAreaView>
   )

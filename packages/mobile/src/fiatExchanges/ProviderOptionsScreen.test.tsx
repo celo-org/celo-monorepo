@@ -5,9 +5,9 @@ import ProviderOptionsScreen from 'src/fiatExchanges/ProviderOptionsScreen'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
-const mockScreenProps = (isAddFunds: boolean) =>
+const mockScreenProps = (isCashIn: boolean) =>
   getMockStackScreenProps(Screens.ProviderOptionsScreen, {
-    isAddFunds,
+    isCashIn,
   })
 
 describe('ProviderOptionsScreen', () => {

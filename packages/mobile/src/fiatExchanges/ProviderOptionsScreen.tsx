@@ -41,7 +41,7 @@ ProviderOptionsScreen.navigationOptions = ({
   return {
     ...emptyHeader,
     headerLeft: () => <BackButton />,
-    headerTitle: i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`),
+    headerTitle: i18n.t(`fiatExchangeFlow:${route.params?.isCashIn ? 'addFunds' : 'cashOut'}`),
   }
 }
 
@@ -60,7 +60,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const account = useSelector(currentAccountSelector)
   const localCurrency = useSelector(getLocalCurrencyCode)
-  const isAddFunds = route.params?.isAddFunds ?? true
+  const isCashIn = route.params?.isCashIn ?? true
   const { MOONPAY_DISABLED } = useCountryFeatures()
 
   useLayoutEffect(() => {
@@ -101,7 +101,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
         <View style={styles.providersContainer}>
-          {providers[isAddFunds ? 'addFunds' : 'cashOut']
+          {providers[isCashIn ? 'addFunds' : 'cashOut']
             .filter((provider) => provider.enabled)
             .map((provider, idx) => {
               return (
