@@ -21,7 +21,7 @@ You can find the npm packages in the following places:
 
 ### Github tags
 
-To identify the commits included in a specific release and see which new features were added or bugs fixed, please refer to the [release notes](https://github.com/celo-org/celo-monorepo/releases) in the monorepo. Also to keep track of continual updates to the stable and dev versions of the packages, each package has a `CHANGELOG.md` file: [Celocli](https://github.com/celo-org/celo-monorepo/blob/master/packages/cli/CHANGELOG.md) and [Contractkit](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/CHANGELOG.md).
+To identify the commits included in a specific release and see which new features were added or bugs fixed, please refer to the [release notes](https://github.com/celo-org/celo-monorepo/releases) in the monorepo. Also to keep track of continual updates to the stable and dev versions of the packages, each package has a `CHANGELOG.md` file: [Celocli](https://github.com/celo-org/celo-monorepo/blob/master/packages/cli/CHANGELOG.md) and [Contractkit](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/CHANGELOG.md).
 All releases should be tagged with the version number, e.g. `contractkit-vX.Y.Z`. Each release should include a summary of the release contents, including links to pull requests and issues with detailed description of any notable changes. 
 
 ### Communication
