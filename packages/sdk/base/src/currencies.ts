@@ -1,4 +1,4 @@
-import { sha3Raw } from 'web3-utils'
+import { keccak256 } from 'web3-utils'
 import { Address, ensureLeading0x, trimLeading0x } from './address'
 
 export enum CURRENCY_ENUM {
@@ -55,6 +55,6 @@ export const currencyToShortMap = {
  * @param pair a string
  */
 export const oracleCurrencyPairIdentifier = (pair: string): Address => {
-  const hash = Buffer.from(trimLeading0x(sha3Raw(pair)), 'hex')
+  const hash = Buffer.from(trimLeading0x(keccak256(pair)), 'hex')
   return ensureLeading0x(hash.slice(12, 32).toString('hex'))
 }
