@@ -300,6 +300,9 @@ export enum CeloExchangeEvents {
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
   spend_merchant_link = 'spend_merchant_link',
+
+  cico_option_chosen = 'cico_option_chosen',
+  provider_chosen = 'provider_chosen',
 }
 
 export enum GethEvents {

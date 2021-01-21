@@ -16,6 +16,10 @@ describe('attestations tests', () => {
     networkId: 1101,
     network: 'local',
     migrate: true,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator0',

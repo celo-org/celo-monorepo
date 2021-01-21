@@ -33,6 +33,7 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
 import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
 import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
+import BidaliScreen from 'src/fiatExchanges/BidaliScreen'
 import ExternalExchanges, {
   externalExchangesScreenOptions,
 } from 'src/fiatExchanges/ExternalExchanges'
@@ -43,6 +44,7 @@ import LocalProviderCashOut, {
   localProviderCashOutOptions,
 } from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
+import ProviderOptionsScreen from 'src/fiatExchanges/ProviderOptionsScreen'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -116,8 +118,7 @@ export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
     ios: {
       gestureEnabled: true,
       cardOverlayEnabled: true,
-      headerStatusBarHeight:
-        navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
+      headerStatusBarHeight: 0,
       ...TransitionPresets.ModalPresentationIOS,
     },
   })
@@ -443,6 +444,16 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={LocalProviderCashOut}
     />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
+    <Navigator.Screen
+      options={ProviderOptionsScreen.navigationOptions}
+      name={Screens.ProviderOptionsScreen}
+      component={ProviderOptionsScreen}
+    />
+    <Navigator.Screen
+      options={BidaliScreen.navigationOptions}
+      name={Screens.BidaliScreen}
+      component={BidaliScreen}
+    />
   </>
 )
 
@@ -583,6 +594,11 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
       name={Screens.SelectCountry}
       component={SelectCountry}
       options={SelectCountry.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.SendConfirmationModal}
+      component={SendConfirmation}
+      options={sendConfirmationScreenNavOptions}
     />
   </>
 )

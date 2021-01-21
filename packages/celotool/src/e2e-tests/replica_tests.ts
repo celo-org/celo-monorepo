@@ -42,6 +42,8 @@ describe('replica swap tests', () => {
     network: 'local',
     genesisConfig: {
       blockTime: 1,
+      churritoBlock: 0,
+      donutBlock: 0,
     },
     instances: [
       {

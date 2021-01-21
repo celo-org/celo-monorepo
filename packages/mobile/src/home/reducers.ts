@@ -13,6 +13,7 @@ export interface Notification {
   darkMode: boolean
   content: { [lang: string]: NotificationTexts | undefined }
   dismissed?: boolean
+  iconUrl?: string
 }
 
 export interface IdToNotification {
