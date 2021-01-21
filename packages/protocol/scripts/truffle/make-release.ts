@@ -183,10 +183,7 @@ const deployLibrary = async (
   isDryRun: boolean,
   from: string
 ) => {
-  if (from) {
-    Contract.defaults({ from }) // override truffle with provided from address
-  }
-  const contract = await deployImplementation(contractName, contractArtifact, isDryRun)
+  const contract = await deployImplementation(contractName, contractArtifact, isDryRun, from)
   addresses.set(contractName, contract.address)
   return
 }
