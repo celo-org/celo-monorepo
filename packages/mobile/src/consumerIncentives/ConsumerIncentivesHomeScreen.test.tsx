@@ -40,13 +40,16 @@ describe('ConsumerIncentivesHomeScreen', () => {
         <ConsumerIncentivesHomeScreen {...mockScreenProps} />
       </Provider>
     )
-    // This first one is loading.
-    expect(tree).toMatchSnapshot()
-    await waitForElement(() => tree.getByTestId('ConsumerIncentives/CTA'))
-    // This one is when items were fetched.
-    expect(tree).toMatchSnapshot()
 
+    expect(tree.queryByTestId('ConsumerIncentives/Loading')).toBeTruthy()
+    expect(tree.queryByTestId('ConsumerIncentives/CTA')).toBeFalsy()
+
+    await waitForElement(() => tree.queryByTestId('ConsumerIncentives/CTA'))
+
+    expect(tree.queryByTestId('ConsumerIncentives/Loading')).toBeFalsy()
+    expect(tree.queryByTestId('ConsumerIncentives/CTA')).toBeTruthy()
     expect(fetchConsumerRewardsContent).toHaveBeenCalledTimes(1)
+    expect(tree).toMatchSnapshot()
   })
 
   it('navigates to cash in screen if user is verified and CTA is tapped', async () => {

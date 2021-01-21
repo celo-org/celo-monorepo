@@ -22,44 +22,6 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
         ]
       }
     >
-      <ActivityIndicator
-        animating={true}
-        color="#42D689"
-        hidesWhenStopped={true}
-        size="large"
-        style={
-          Object {
-            "height": "100%",
-          }
-        }
-      />
-    </RNCSafeAreaView>
-  </View>
-</RCTScrollView>
-`;
-
-exports[`ConsumerIncentivesHomeScreen renders correctly 2`] = `
-<RCTScrollView
-  contentContainerStyle={
-    Object {
-      "flexGrow": 1,
-    }
-  }
-  style={
-    Object {
-      "flex": 1,
-      "marginHorizontal": 16,
-    }
-  }
->
-  <View>
-    <RNCSafeAreaView
-      edges={
-        Array [
-          "bottom",
-        ]
-      }
-    >
       <Text
         style={
           Object {

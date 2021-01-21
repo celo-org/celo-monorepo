@@ -8,30 +8,29 @@ import { useAsync } from 'react-async-hook'
 import { ActivityIndicator, ScrollView, StyleSheet, Text } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useDispatch } from 'react-redux'
+import { showError } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CELO_REWARDS_LINK } from 'src/brandingConfig'
 import { ContentType, fetchConsumerRewardsContent } from 'src/consumerIncentives/contentFetcher'
 import i18n from 'src/i18n'
 import { headerWithCloseButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useTypedSelector from 'src/redux/useSelector'
+import { fetchI18nContent } from 'src/utils/translationsFetcher'
 
 const useConsumerIncentivesContent = () => {
   const contentResult = useAsync<ContentType>(fetchConsumerRewardsContent, [])
   let texts
   if (contentResult.result) {
-    const content: ContentType = contentResult.result
-    const language = i18n.language.toLowerCase()
-    texts = content[language] || content[language.slice(0, 2)]
-    for (const key of Object.keys(texts)) {
-      // This is needed for some reason for newlines to show properly.
-      texts[key] = texts[key].replace(/\\n/g, '\n')
-    }
+    texts = fetchI18nContent(contentResult.result)
   }
   return {
     content: texts,
     loading: contentResult.loading,
+    error: contentResult.loading,
   }
 }
 
@@ -40,7 +39,14 @@ const range = (n: number) => (n === 0 ? [] : [...Array(n).keys()].map((i) => i +
 type Props = StackScreenProps<StackParamList, Screens.ConsumerIncentivesHomeScreen>
 export default function ConsumerIncentivesHomeScreen(props: Props) {
   const userIsVerified = useTypedSelector((state) => state.app.numberVerified)
-  const { content, loading } = useConsumerIncentivesContent()
+  const { content, loading, error } = useConsumerIncentivesContent()
+  const dispatch = useDispatch()
+
+  if (!loading && !!error) {
+    dispatch(showError(ErrorMessages.FIREBASE_FETCH_FAILED))
+    navigateBack()
+    return null
+  }
 
   // Content key names are formatted like subtitleN and bodyN 1-indexed.
   // This is to allow an arbitrary number of sections.
@@ -65,7 +71,12 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
       <SafeAreaView edges={['bottom']}>
         {loading && (
-          <ActivityIndicator size="large" color={colors.greenBrand} style={styles.loading} />
+          <ActivityIndicator
+            size="large"
+            color={colors.greenBrand}
+            style={styles.loading}
+            testID="ConsumerIncentives/Loading"
+          />
         )}
         {content && (
           <>
