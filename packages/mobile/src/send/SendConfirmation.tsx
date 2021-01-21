@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
@@ -17,6 +16,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton'
 import CommentTextInput from 'src/components/CommentTextInput'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import FeeDrawer from 'src/components/FeeDrawer'
@@ -407,9 +407,10 @@ function SendConfirmation(props: Props) {
         account,
         recipientAddress,
         amount: amount.valueOf(),
+        dollarBalance,
         includeDekFee: !isDekRegistered,
       }
-    : { feeType: FeeType.INVITE, account, amount }
+    : { feeType: FeeType.INVITE, account, amount, dollarBalance }
 
   return (
     // Note: intentionally passing a new child func here otherwise

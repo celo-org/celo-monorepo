@@ -5,10 +5,6 @@ import { Args } from '../../utils/command'
 export default class Balance extends BaseCommand {
   static description = 'View Celo Dollar and Gold balances for an address'
 
-  static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
-  }
-
   static args = [Args.address('address')]
 
   static examples = ['balance 0x5409ed021d9299bf6814279a6a1411a7e866a631']

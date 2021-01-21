@@ -18,7 +18,7 @@
 
 ▸ **getContactPhoneNumber**(`contact`: [MinimalContact](../interfaces/_contacts_.minimalcontact.md)): *undefined | null | string*
 
-*Defined in [packages/sdk/base/src/contacts.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L13)*
+*Defined in [packages/sdk/base/src/contacts.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L13)*
 
 **Parameters:**
 
@@ -34,7 +34,7 @@ ___
 
 ▸ **isContact**(`contactOrNumber`: any): *contactOrNumber is MinimalContact*
 
-*Defined in [packages/sdk/base/src/contacts.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L26)*
+*Defined in [packages/sdk/base/src/contacts.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L26)*
 
 **Parameters:**
 

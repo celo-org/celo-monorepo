@@ -16,6 +16,7 @@ Array [
     nativeBackgroundAndroid={
       Object {
         "attribute": "selectableItemBackgroundBorderless",
+        "rippleRadius": undefined,
         "type": "ThemeAttrAndroid",
       }
     }
@@ -224,6 +225,7 @@ Array [
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -277,6 +279,7 @@ Array [
     nativeBackgroundAndroid={
       Object {
         "attribute": "selectableItemBackgroundBorderless",
+        "rippleRadius": undefined,
         "type": "ThemeAttrAndroid",
       }
     }
@@ -485,6 +488,7 @@ Array [
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

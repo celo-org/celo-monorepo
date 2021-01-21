@@ -55,7 +55,8 @@ export async function getSendTxGas(
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
   } catch (error) {
-    throw Error(ErrorMessages.CALCULATE_FEE_FAILED)
+    Logger.error(`${TAG}/getSendTxGas`, 'Error', error)
+    throw error
   }
 }
 
@@ -63,9 +64,14 @@ export async function getSendFee(
   account: string,
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer,
-  includeDekFee: boolean = false
+  includeDekFee: boolean = false,
+  dollarBalance?: string
 ) {
   try {
+    if (dollarBalance && new BigNumber(params.amount).isGreaterThan(new BigNumber(dollarBalance))) {
+      throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
+
     let gas = await getSendTxGas(account, currency, params)
     if (includeDekFee) {
       const dekGas = await getRegisterDekTxGas(account, currency)

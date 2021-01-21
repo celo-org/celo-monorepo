@@ -95,3 +95,9 @@ export async function waitForElementId(elementId) {
     .toBeVisible()
     .withTimeout(10000)
 }
+
+export function quote(s) {
+  // on ios the command line uses double quotes around the string
+  // while on android it does not, so we add it
+  return device.getPlatform() === 'ios' ? s : `"${s}"`
+}

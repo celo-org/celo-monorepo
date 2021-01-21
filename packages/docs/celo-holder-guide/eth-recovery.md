@@ -37,7 +37,7 @@ Write your recovery phrase to a file using the following commands:
 Recover your Ethereum address on the Celo network:
 
 ```
-celocli account:new --indexAddress 0 --mnemonicPath recovery.txt --derivationPath "m/44'/60'/0'/0" --node https://rc1-forno.celo-testnet.org
+celocli account:new --indexAddress 0 --mnemonicPath recovery.txt --derivationPath "m/44'/60'/0'/0" --node https://forno.celo.org
 ```
 
 This command will return you with:
@@ -51,7 +51,7 @@ This command will return you with:
 Check your Celo account balance using this command:
 
 ```
-celocli account:balance <accountAddress> --node https://rc1-forno.celo-testnet.org
+celocli account:balance <accountAddress> --node https://forno.celo.org
 ```
 
 Replace `<accountAddress>` with the `accountAddress` you got from the previous step.
@@ -61,7 +61,7 @@ Replace `<accountAddress>` with the `accountAddress` you got from the previous s
 Now, you can transfer your CELO to an address of choice:
 
 ```
-celocli transfer:celo --from <accountAddress> --to <addressOfChoice> --value <valueInCeloWei> --privateKey <privateKey> --node https://rc1-forno.celo-testnet.org
+celocli transfer:celo --from <accountAddress> --to <addressOfChoice> --value <valueInCeloWei> --privateKey <privateKey> --node https://forno.celo.org
 ```
 
 - Replace `<accountAddress>` with the `accountAddress` you got from the previous step.

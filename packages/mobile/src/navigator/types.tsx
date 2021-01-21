@@ -109,12 +109,7 @@ export type StackParamList = {
         onPressSkip?: () => void
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.NameAndNumber]:
-    | {
-        selectedCountryCodeAlpha2: string
-        country: string
-      }
-    | undefined
+  [Screens.NameAndPicture]: undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList
@@ -154,6 +149,7 @@ export type StackParamList = {
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
+    onCancel?: () => void
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.SelectCountry]: {
@@ -203,13 +199,14 @@ export type StackParamList = {
     requesterAddress?: string
   }
   [Screens.VerificationEducationScreen]:
-    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
+    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean; selectedCountryCodeAlpha2?: string }
     | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+  [Screens.WebViewScreen]: { uri: string }
   [Screens.Welcome]: undefined
   [Screens.WithdrawCeloQrScannerScreen]: {
     onAddressScanned: (address: string) => void

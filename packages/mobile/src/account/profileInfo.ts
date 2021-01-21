@@ -7,6 +7,7 @@ import {
   OffchainErrors,
 } from '@celo/identity/lib/offchain-data-wrapper'
 import { PrivateNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
+import { PrivatePictureAccessor } from '@celo/identity/lib/offchain/accessors/pictures'
 import { buildEIP712TypedData, resolvePath } from '@celo/identity/lib/offchain/utils'
 import { privateKeyToAddress, toChecksumAddress } from '@celo/utils/lib/address'
 import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
@@ -15,9 +16,11 @@ import { SignedPostPolicyV4Output } from '@google-cloud/storage'
 // Use targetted import otherwise the RN FormData gets used which doesn't support Buffer related functionality
 import FormData from 'form-data/lib/form_data'
 import * as t from 'io-ts'
+import RNFS from 'react-native-fs'
 import { call, put, select } from 'redux-saga/effects'
 import { profileUploaded } from 'src/account/actions'
-import { isProfileUploadedSelector, nameSelector } from 'src/account/selectors'
+import { isProfileUploadedSelector, nameSelector, pictureSelector } from 'src/account/selectors'
+import { extensionToMimeType, getDataURL, saveRecipientPicture } from 'src/utils/image'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getWallet } from 'src/web3/contracts'
 import { currentAccountSelector, dataEncryptionKeySelector } from 'src/web3/selectors'
@@ -118,7 +121,12 @@ class UploadServiceDataWrapper implements OffchainDataWrapper {
           // See https://github.com/facebook/react-native/blob/b26a9549ce2dffd1d0073ae13502830459051c27/Libraries/Network/convertRequestBody.js#L34
           // and https://github.com/facebook/react-native/blob/b26a9549ce2dffd1d0073ae13502830459051c27/Libraries/Network/FormData.js
           body: formData.getBuffer(),
-        }).then((x) => x.text())
+        }).then((x) => {
+          if (!x.ok) {
+            Logger.error(TAG + '@writeDataTo', 'Error uploading ' + x.headers.get('location'))
+          }
+          return x.text()
+        })
       })
     )
   }
@@ -176,7 +184,7 @@ export function* uploadProfileInfo() {
   try {
     yield call(unlockDEK, true)
     // yield call(addMetadataClaim)
-    yield call(uploadName)
+    yield call(uploadNameAndPicture)
 
     yield put(profileUploaded())
   } catch (e) {
@@ -184,7 +192,7 @@ export function* uploadProfileInfo() {
   }
 }
 
-// TODO: make metadata claim when registering account info, and fetch metadata url when reading data
+// TODO: make metadata claim when registering account info, and use fetched metadata url when reading data
 
 // export function* addMetadataClaim() {
 //   try {
@@ -213,18 +221,28 @@ export function* uploadProfileInfo() {
 //   }
 // }
 
-export function* uploadName() {
+export function* uploadNameAndPicture() {
   const contractKit = yield call(getContractKit)
   const account = yield select(currentAccountSelector)
-  const name = yield select(nameSelector)
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
-  const nameAccessor = new PrivateNameAccessor(offchainWrapper)
 
-  const writeError = yield call([nameAccessor, 'write'], { name }, [])
-  Logger.info(TAG + '@uploadName', 'uploaded profile name')
+  const name = yield select(nameSelector)
+  const nameAccessor = new PrivateNameAccessor(offchainWrapper)
+  let writeError = yield call([nameAccessor, 'write'], { name }, [])
+  Logger.info(TAG + 'uploadNameAndPicture', 'uploaded profile name')
+
+  const pictureUri = yield select(pictureSelector)
+  if (pictureUri) {
+    const data = yield call(RNFS.readFile, pictureUri, 'base64')
+    const mimeType = extensionToMimeType[pictureUri.split('.').slice(-1)] || 'image/jpeg'
+    const dataURL = getDataURL(mimeType, data)
+    const pictureAccessor = new PrivatePictureAccessor(offchainWrapper)
+    writeError = yield call([pictureAccessor, 'write'], dataURL, [])
+    Logger.info(TAG + 'uploadNameAndPicture', 'uploaded profile picture')
+  }
 
   if (writeError) {
-    Logger.error(TAG + '@uploadName', writeError)
+    Logger.error(TAG + '@uploadNameAndPicture', writeError)
     throw Error('Unable to write data')
   }
 }
@@ -235,11 +253,17 @@ export function* uploadSymmetricKeys(recipientAddresses: string[]) {
   const account = yield select(currentAccountSelector)
   const contractKit = yield call(getContractKit)
   yield call(unlockDEK)
-
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
-  const nameAccessor = new PrivateNameAccessor(offchainWrapper)
 
-  const writeError = yield call([nameAccessor, 'writeKeys'], recipientAddresses)
+  const nameAccessor = new PrivateNameAccessor(offchainWrapper)
+  let writeError = yield call([nameAccessor, 'writeKeys'], recipientAddresses)
+
+  const pictureUri = yield select(pictureSelector)
+  if (pictureUri) {
+    const pictureAccessor = new PrivatePictureAccessor(offchainWrapper)
+    writeError = yield call([pictureAccessor, 'writeKeys'], recipientAddresses)
+  }
+
   Logger.info(TAG + '@uploadSymmetricKeys', 'uploaded symmetric keys for ' + recipientAddresses)
 
   if (writeError) {
@@ -253,16 +277,23 @@ export function* getProfileInfo(address: string) {
   const account = yield select(currentAccountSelector)
   const contractKit = yield call(getContractKit)
   yield call(unlockDEK)
-
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
-  const nameAccessor = new PrivateNameAccessor(offchainWrapper)
 
+  const nameAccessor = new PrivateNameAccessor(offchainWrapper)
   try {
-    const result = yield call([nameAccessor, 'read'], address)
-    console.log(result)
-    return result
+    const name = yield call([nameAccessor, 'read'], address)
+
+    const pictureAccessor = new PrivatePictureAccessor(offchainWrapper)
+    let picturePath
+    try {
+      const pictureObject = yield call([pictureAccessor, 'read'], address)
+      const pictureURL = pictureObject.toString()
+      picturePath = yield call(saveRecipientPicture, pictureURL, address)
+    } catch (error) {
+      Logger.warn("can't fetch picture for", address)
+    }
+    return { name: name.name, thumbnailPath: picturePath }
   } catch (error) {
-    console.log(error)
     Logger.warn("can't fetch name for", address)
   }
 }

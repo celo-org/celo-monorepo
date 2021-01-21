@@ -86,7 +86,7 @@ Make sure you are in the `ios` directory of the `mobile` package before running 
 # install cocopods and bundler if you don't already have it
 gem install cocoapods
 gem install bundler
-# download the project dependencies
+# download the project dependencies in mobile/
 bundle install
 # run inside mobile/ios
 bundle exec pod install

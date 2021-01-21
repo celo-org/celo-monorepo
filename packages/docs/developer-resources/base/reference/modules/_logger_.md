@@ -21,7 +21,7 @@
 
 Ƭ **Logger**: *function*
 
-*Defined in [packages/sdk/base/src/logger.ts:1](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L1)*
+*Defined in [packages/sdk/base/src/logger.ts:1](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L1)*
 
 #### Type declaration:
 
@@ -39,7 +39,7 @@ Name | Type |
 
 • **consoleLogger**: *[Logger](_logger_.md#logger)* = console.log
 
-*Defined in [packages/sdk/base/src/logger.ts:15](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L15)*
+*Defined in [packages/sdk/base/src/logger.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L15)*
 
 ## Functions
 
@@ -47,7 +47,7 @@ Name | Type |
 
 ▸ **noopLogger**(): *void*
 
-*Defined in [packages/sdk/base/src/logger.ts:3](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L3)*
+*Defined in [packages/sdk/base/src/logger.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L3)*
 
 **Returns:** *void*
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **prefixLogger**(`prefix`: string, `logger`: [Logger](_logger_.md#logger)): *[Logger](_logger_.md#logger)*
 
-*Defined in [packages/sdk/base/src/logger.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L7)*
+*Defined in [packages/sdk/base/src/logger.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/logger.ts#L7)*
 
 **Parameters:**
 

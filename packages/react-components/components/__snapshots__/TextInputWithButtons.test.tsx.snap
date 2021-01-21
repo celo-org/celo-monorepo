@@ -46,9 +46,12 @@ exports[`TextInputWithButtons renders correctly 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "opacity": 1,
-      }
+      Array [
+        undefined,
+        Object {
+          "opacity": 1,
+        },
+      ]
     }
     testID="Touchable"
   >

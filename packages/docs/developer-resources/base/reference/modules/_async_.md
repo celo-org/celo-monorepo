@@ -17,7 +17,7 @@
 
 ▸ **concurrentMap**<**A**, **B**>(`concurrency`: number, `xs`: A[], `mapFn`: function): *Promise‹B[]›*
 
-*Defined in [packages/sdk/base/src/async.ts:106](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L106)*
+*Defined in [packages/sdk/base/src/async.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L106)*
 
 Map an async function over a list xs with a given concurrency level
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **concurrentValuesMap**<**IN**, **OUT**>(`concurrency`: number, `x`: Record‹string, IN›, `mapFn`: function): *Promise‹Record‹string, OUT››*
 
-*Defined in [packages/sdk/base/src/async.ts:128](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L128)*
+*Defined in [packages/sdk/base/src/async.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L128)*
 
 Map an async function over the values in Object x with a given concurrency level
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **retryAsync**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delay`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
-*Defined in [packages/sdk/base/src/async.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L14)*
+*Defined in [packages/sdk/base/src/async.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L14)*
 
 **Type parameters:**
 
@@ -125,7 +125,7 @@ ___
 
 ▸ **retryAsyncWithBackOff**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
-*Defined in [packages/sdk/base/src/async.ts:40](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L40)*
+*Defined in [packages/sdk/base/src/async.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L40)*
 
 **Type parameters:**
 
@@ -152,7 +152,7 @@ ___
 
 ▸ **selectiveRetryAsyncWithBackOff**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `dontRetry`: string[], `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
-*Defined in [packages/sdk/base/src/async.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L68)*
+*Defined in [packages/sdk/base/src/async.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L68)*
 
 **Type parameters:**
 
@@ -180,7 +180,7 @@ ___
 
 ▸ **sleep**(`ms`: number): *Promise‹void›*
 
-*Defined in [packages/sdk/base/src/async.ts:6](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L6)*
+*Defined in [packages/sdk/base/src/async.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L6)*
 
 Sleep for a number of milliseconds
 

@@ -2,65 +2,26 @@ import SmallButton from '@celo/react-components/components/SmallButton'
 import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { Animated, FlexStyle, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-export enum AlertTypes {
-  MESSAGE = 'message',
-  ERROR = 'error',
-}
-
-interface AlertProps {
-  title?: string | null
-  text: string | null
-  onPress: () => void
-  type: AlertTypes
-  dismissAfter?: number | null
-  buttonMessage?: string | null
-}
-
-interface Props extends AlertProps {
-  isVisible: boolean
-  timestamp: number
+interface Props {
+  alert: {
+    type: 'message' | 'error'
+    title?: string | null
+    message: string
+    dismissAfter?: number | null
+    buttonMessage?: string | null
+    onPress: () => void
+  } | null
 }
 
 // This component needs to be always mounted for the hide animation to be visible
-function SmartTopAlert(props: Props) {
-  const [visibleAlertState, setVisibleAlertState] = useState<AlertProps | null>(null)
+function SmartTopAlert({ alert }: Props) {
+  const [visibleAlertState, setVisibleAlertState] = useState(alert)
   const insets = useSafeAreaInsets()
   const yOffset = useRef(new Animated.Value(-500))
   const containerRef = useRef<View>()
-  const animatedRef = useCallback((node) => {
-    containerRef.current = node && node.getNode()
-  }, [])
-
-  const alertState = useMemo(() => {
-    // tslint bug?
-    // tslint:disable-next-line: no-shadowed-variable
-    const { isVisible, type, title, text, buttonMessage, dismissAfter, onPress } = props
-    if (isVisible) {
-      return {
-        type,
-        title,
-        text,
-        buttonMessage,
-        dismissAfter,
-        onPress,
-      }
-    } else {
-      return null
-    }
-  }, [
-    props.timestamp,
-    props.isVisible,
-    props.type,
-    props.title,
-    props.text,
-    props.buttonMessage,
-    props.dismissAfter,
-    props.onPress,
-  ])
 
   function hide() {
     if (!containerRef.current) {
@@ -81,14 +42,14 @@ function SmartTopAlert(props: Props) {
   }
 
   useEffect(() => {
-    if (alertState) {
+    if (alert) {
       // show
-      setVisibleAlertState(alertState)
+      setVisibleAlertState(alert)
     } else {
       // hide
       hide()
     }
-  }, [alertState])
+  }, [alert])
 
   useEffect(() => {
     let rafHandle: number
@@ -132,8 +93,8 @@ function SmartTopAlert(props: Props) {
     return null
   }
 
-  const { type, title, text, buttonMessage, onPress } = visibleAlertState
-  const isError = type === AlertTypes.ERROR
+  const { type, title, message, buttonMessage, onPress } = visibleAlertState
+  const isError = type === 'error'
 
   const testID = isError ? 'errorBanner' : 'infoBanner'
 
@@ -141,11 +102,10 @@ function SmartTopAlert(props: Props) {
     <View style={styles.overflowContainer} testID={testID}>
       <TouchableWithoutFeedback onPress={onPress} testID="SmartTopAlertTouchable">
         <Animated.View
-          // @ts-ignore
-          ref={animatedRef}
+          ref={containerRef}
           style={[
             styles.container,
-            buttonMessage && styles.containerWithButton,
+            (buttonMessage && styles.containerWithButton) as FlexStyle,
             isError && styles.containerError,
             {
               // TODO(jeanregisser): Handle case where SmartTopAlert are stacked and only the first one would need the inset
@@ -157,7 +117,7 @@ function SmartTopAlert(props: Props) {
           {isError && <Error style={styles.errorIcon} />}
           <Text style={[fontStyles.small, isError && fontStyles.small500, styles.text]}>
             {!!title && <Text style={[fontStyles.small500, styles.text]}> {title} </Text>}
-            {text}
+            {message}
           </Text>
           {buttonMessage && (
             <SmallButton

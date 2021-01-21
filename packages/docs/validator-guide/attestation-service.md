@@ -282,7 +282,7 @@ If you are using a load balancer in front of Attestation Service with a URL base
 
 Attestation Service provides a test endpoint.
 
-You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
+You can run the following command ([reference]("../command-line-interface/identity.md#celocli identity:test-attestation-service")) to test an Attestation Service and send an SMS to yourself:
 
 ```bash
 celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE> [--provider <PROVIDER>]

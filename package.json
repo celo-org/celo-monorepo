@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
-    "lint": "yarn lerna run lint --concurrency 4 && yarn run --silent lint:do-not-merge",
+    "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
@@ -15,8 +15,8 @@
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
     "reset-rn": "watchman watch-del-all; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/haste-map-*; rm -rf $TMPDIR/metro-symbolicate*",
     "reset-yarn": "yarn cache clean",
-    "test": "yarn run lerna run test --concurrency 4",
-    "build": "yarn run lerna run build --concurrency 4",
+    "test": "yarn run lerna run test",
+    "build": "yarn run lerna run build",
     "build:wallet": "yarn build --scope @celo/mobile --include-filtered-dependencies && cd packages/mobile/ios && bundle exec pod install && cd ../../..",
     "docs": "yarn run lerna run docs",
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
@@ -44,18 +44,19 @@
     ],
     "nohoist": [
       "**/openzeppelin-solidity",
-      "**/solidity-bytes-utils"
+      "**/solidity-bytes-utils",
+      "**/@apollo/react-testing"
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.6.2",
-    "@babel/runtime": "^7.6.2",
+    "@babel/core": "^7.8.4",
+    "@babel/runtime": "^7.8.4",
     "@types/jest": "^25.1.4",
     "babel-jest": "^26.1.0",
     "codecov": "^3.6.5",
     "husky": "^3.0.0",
     "jest": "^26.1.0",
-    "jest-circus": "^26.1.0",
+    "jest-circus": "^26.6.3",
     "jest-junit": "^10.0.0",
     "jest-snapshot": "^26.1.0",
     "lerna": "^3.16.0",
@@ -98,7 +99,6 @@
     "randomatic": "^3.1.1",
     "logkitty": "^0.7.1",
     "minimist": "^1.2.5",
-    "yargs-parser": "^13.1.2",
     "npm": "^5.10.0",
     "npmi": "^4.0.0",
     "websocket-extensions": "^0.1.4",

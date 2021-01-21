@@ -21,7 +21,7 @@
 
 ▸ **getRandomId**(): *number*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:36](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L36)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L36)*
 
 **Returns:** *number*
 
@@ -31,7 +31,7 @@ ___
 
 ▸ **rpcCallHandler**(`payload`: [JsonRpcPayload](../interfaces/_types_.jsonrpcpayload.md), `handler`: function, `callback`: [Callback](_types_.md#callback)‹[JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)›): *void*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L8)*
+*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L8)*
 
 **Parameters:**
 
