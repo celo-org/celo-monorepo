@@ -559,3 +559,181 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
   })
 })
+
+contract('Integration: Exchange (EUR)', (accounts: string[]) => {
+  const transferAmount = 10
+  let exchange: ExchangeInstance
+  let multiSig: ReserveSpenderMultiSigInstance
+  let reserve: ReserveInstance
+  let goldToken: GoldTokenInstance
+  let stableToken: StableTokenInstance
+  let originalStable
+  let originalGold
+  let originalReserve
+  let finalStable: BigNumber
+  let finalGold: BigNumber
+  let finalReserve: BigNumber
+
+  const decimals = 18
+
+  before(async () => {
+    exchange = await getDeployedProxiedContract('Exchange', artifacts)
+    multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
+    reserve = await getDeployedProxiedContract('Reserve', artifacts)
+    goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
+    stableToken = await getDeployedProxiedContract('StableTokenEUR', artifacts)
+  })
+
+  describe('Selling', () => {
+    const sellAmount = new BigNumber('1000000000000000000')
+    const minBuyAmount = 1
+
+    describe('When selling gold', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await goldToken.approve(exchange.address, sellAmount)
+        await exchange.sell(sellAmount, minBuyAmount, true)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
+
+      it(`should increase user's stable`, async () => {
+        assert.isTrue(finalStable.gt(originalStable))
+      })
+
+      it(`should reduce user's gold`, async () => {
+        if (await addressMinedLatestBlock(accounts[0])) {
+          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+        } else {
+          assert.isTrue(finalGold.lt(originalGold))
+        }
+      })
+
+      it(`should increase Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.gt(originalReserve))
+      })
+    })
+
+    // Note that this test relies on having purchased cUSD in the previous test.
+    describe('When selling stable token', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await stableToken.approve(exchange.address, sellAmount)
+        // Cannot sell more than was purchased in the previous test.
+        await exchange.sell(sellAmount.div(20), minBuyAmount, false)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
+
+      it(`should reduce user's stable`, async () => {
+        assert.isTrue(finalStable.lt(originalStable))
+      })
+
+      it(`should increase user's gold`, async () => {
+        assert.isTrue(finalGold.gt(originalGold))
+      })
+
+      it(`should reduce Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.lt(originalReserve))
+      })
+    })
+  })
+
+  describe('Buying', () => {
+    const buyAmount = new BigNumber(1)
+    const maxSellAmount = new BigNumber('1000000000000000000')
+
+    describe('When buying stable token', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await goldToken.approve(exchange.address, maxSellAmount)
+        await exchange.buy(buyAmount, maxSellAmount, false)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
+
+      it(`should increase user's stable`, async () => {
+        assert.isTrue(finalStable.gt(originalStable))
+      })
+
+      it(`should reduce user's gold`, async () => {
+        if (await addressMinedLatestBlock(accounts[0])) {
+          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+        } else {
+          assert.isTrue(finalGold.lt(originalGold))
+        }
+      })
+
+      it(`should increase Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.gt(originalReserve))
+      })
+    })
+
+    // Note that this test relies on having purchased cUSD in a previous test
+    describe('When buying gold', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await stableToken.approve(exchange.address, maxSellAmount)
+        // Cannot sell more than was purchased in the previous test.
+        await exchange.buy(buyAmount, maxSellAmount, true)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
+
+      it(`should reduce user's stable`, async () => {
+        assert.isTrue(finalStable.lt(originalStable))
+      })
+
+      it(`should increase user's gold`, async () => {
+        assert.isTrue(finalGold.gt(originalGold))
+      })
+
+      it(`should reduce Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.lt(originalReserve))
+      })
+    })
+  })
+
+  describe('When transferring gold', () => {
+    const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
+    let originalOtherAccount
+    beforeEach(async () => {
+      originalReserve = await goldToken.balanceOf(reserve.address)
+      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
+    })
+
+    it(`should transfer gold`, async () => {
+      // @ts-ignore
+      const txData = reserve.contract.methods
+        .transferGold(otherReserveAddress, transferAmount)
+        .encodeABI()
+      await multiSig.submitTransaction(reserve.address, 0, txData, {
+        from: accounts[0],
+      })
+      assert.isTrue(
+        (await goldToken.balanceOf(reserve.address)).isEqualTo(
+          originalReserve.minus(transferAmount)
+        )
+      )
+      assert.isTrue(
+        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
+          originalOtherAccount.plus(transferAmount)
+        )
+      )
+    })
+  })
+})

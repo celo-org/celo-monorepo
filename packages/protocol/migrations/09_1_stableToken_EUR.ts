@@ -32,13 +32,13 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
+// TODO make this general
 module.exports = deploymentForCoreContract<StableTokenInstance>( // TODO add EUR
   web3,
   artifacts,
   CeloContractName.StableTokenEUR,
   initializeArgs,
   async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
-    console.info('make it here')
     if (config.stableTokenEUR.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
@@ -46,7 +46,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>( // TODO add EUR
       )
       await freezer.freeze(stableToken.address)
     }
-    console.info('make it here2')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<
       SortedOraclesInstance
     >('SortedOracles', artifacts)
