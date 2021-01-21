@@ -42,7 +42,7 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   const { content, loading, error } = useConsumerIncentivesContent()
   const dispatch = useDispatch()
 
-  if (!loading && !!error) {
+  if (!loading && error) {
     dispatch(showError(ErrorMessages.FIREBASE_FETCH_FAILED))
     navigateBack()
     return null
