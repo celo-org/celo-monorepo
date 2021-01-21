@@ -157,7 +157,7 @@ export function* handleDeepLink(action: OpenDeepLink) {
       // The isSecureOrigin is important. We don't want it to be possible to fire this deep link from outside
       // of our own notifications for security reasons.
       const params = convertQueryToScreenParams(rawParams.query)
-      navigate(params['screen'] as keyof StackParamList, params)
+      navigate(params.screen as keyof StackParamList, params)
     }
   }
 }

@@ -197,7 +197,11 @@ export const setSessionId = (sessionId: string) => ({
   sessionId,
 })
 
-export const openUrl = (url: string, openExternal = false, isSecureOrigin = false): OpenUrlAction => ({
+export const openUrl = (
+  url: string,
+  openExternal = false,
+  isSecureOrigin = false
+): OpenUrlAction => ({
   type: Actions.OPEN_URL,
   url,
   openExternal,

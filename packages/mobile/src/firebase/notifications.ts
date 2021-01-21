@@ -9,7 +9,7 @@ import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/i
 import {
   NotificationReceiveState,
   NotificationTypes,
-  TransferNotificationData
+  TransferNotificationData,
 } from 'src/notifications/types'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -17,7 +17,7 @@ import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   navigateToPaymentTransferReview,
-  navigateToRequestedPaymentReview
+  navigateToRequestedPaymentReview,
 } from 'src/transactions/actions'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
