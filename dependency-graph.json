@@ -312,8 +312,7 @@
   "@celo/wallet-hsm": {
     "location": "packages/sdk/wallets/wallet-hsm",
     "dependencies": [
-      "@celo/base",
-      "@celo/connect"
+      "@celo/base"
     ]
   },
   "@celo/wallet-ledger": {

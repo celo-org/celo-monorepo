@@ -18,6 +18,7 @@ import {
   appLock,
   minAppVersionDetermined,
   OpenDeepLink,
+  openDeepLink,
   OpenUrlAction,
   SetAppState,
   setAppState,
@@ -140,10 +141,15 @@ export function* watchDeepLinks() {
 export function* handleOpenUrl(action: OpenUrlAction) {
   const { url, openExternal } = action
   Logger.debug(TAG, 'Handling url', url)
-  if (openExternal || /^https?:\/\//.test(url) === false) {
-    yield call(navigateToURI, url)
-  } else {
+  if (url.startsWith('celo:')) {
+    // Handle celo links directly, this avoids showing the "Open with App" sheet on Android
+    yield call(handleDeepLink, openDeepLink(url))
+  } else if (/^https?:\/\//i.test(url) === true && !openExternal) {
+    // We display http or https links using our in app browser, unless openExternal is forced
     navigate(Screens.WebViewScreen, { uri: url })
+  } else {
+    // Fallback
+    yield call(navigateToURI, url)
   }
 }
 
