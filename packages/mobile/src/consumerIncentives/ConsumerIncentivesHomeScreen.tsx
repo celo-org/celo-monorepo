@@ -53,7 +53,7 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
 
   const onPressCTA = () => {
     if (userIsVerified) {
-      navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
+      navigate(Screens.FiatExchangeOptions, { isCashIn: true })
     } else {
       navigate(Screens.VerificationEducationScreen, { hideOnboardingStep: true })
     }

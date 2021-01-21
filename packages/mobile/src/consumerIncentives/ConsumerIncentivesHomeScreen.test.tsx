@@ -58,12 +58,7 @@ describe('ConsumerIncentivesHomeScreen', () => {
     await waitForElement(() => getByTestId('ConsumerIncentives/CTA'))
 
     fireEvent.press(getByTestId('ConsumerIncentives/CTA'))
-    expect(navigate).toHaveBeenCalledWith(
-      Screens.FiatExchangeOptions,
-      expect.objectContaining({
-        isAddFunds: true,
-      })
-    )
+    expect(navigate).toHaveBeenCalledWith(Screens.FiatExchangeOptions, { isCashIn: true })
   })
 
   it('navigates to Phone Confirmation screen if user is not verified and CTA is tapped', async () => {
@@ -76,12 +71,9 @@ describe('ConsumerIncentivesHomeScreen', () => {
 
     fireEvent.press(getByTestId('ConsumerIncentives/CTA'))
 
-    expect(navigate).toHaveBeenCalledWith(
-      Screens.VerificationEducationScreen,
-      expect.objectContaining({
-        hideOnboardingStep: true,
-      })
-    )
+    expect(navigate).toHaveBeenCalledWith(Screens.VerificationEducationScreen, {
+      hideOnboardingStep: true,
+    })
   })
 
   it('opens a WebView when Learn More is tapped', async () => {
@@ -94,11 +86,8 @@ describe('ConsumerIncentivesHomeScreen', () => {
 
     fireEvent.press(getByTestId('ConsumerIncentives/learnMore'))
 
-    expect(navigate).toHaveBeenCalledWith(
-      Screens.WebViewScreen,
-      expect.objectContaining({
-        uri: CELO_REWARDS_LINK,
-      })
-    )
+    expect(navigate).toHaveBeenCalledWith(Screens.WebViewScreen, {
+      uri: CELO_REWARDS_LINK,
+    })
   })
 })
