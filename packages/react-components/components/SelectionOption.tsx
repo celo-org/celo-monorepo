@@ -31,9 +31,7 @@ export default function SelectionOption({
       <View style={styles.contentContainer}>
         {!hideCheckboxes && (
           <View style={styles.iconContainer}>
-            {/* TODO: make proper checkbox */}
-            {!isSelected && <View style={styles.circle} />}
-            {isSelected && <RadioButton />}
+           <RadioButton selected={isSelected} />
           </View>
         )}
         <Text style={styles.text} numberOfLines={1}>
