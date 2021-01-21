@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.1--dev]**
+### **[1.0.2--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -17,7 +17,7 @@ Other Changes
 
 
 ## Published
-### **[1.0.0]** -- 2021-01-19
+### **[1.0.1]** -- 2021-01-20
 Features
 - Moved into SDK directory, and made compatible with SDK modularization changes - [#4790](https://github.com/celo-org/celo-monorepo/pull/4790)
 - Added ability to specify per token expiry in sorted oracles - [#6125](https://github.com/celo-org/celo-monorepo/pull/6125)
