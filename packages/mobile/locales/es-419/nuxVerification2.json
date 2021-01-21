@@ -61,7 +61,6 @@
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
-    "title": "Confirma el Teléfono",
     "body": "Recibe pagos directamente a tu número de teléfono",
     "cta": "Confirma Ahora"
   },
