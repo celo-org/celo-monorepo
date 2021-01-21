@@ -1,9 +1,8 @@
-import { ensureLeading0x } from '@celo/base'
+import { oracleCurrencyPairIdentifier } from '@celo/base'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
 import { Branded } from 'io-ts'
 import { CeloContract, CeloToken } from '../base'
 import { SortedOracles } from '../generated/SortedOracles'
@@ -53,17 +52,12 @@ export type CurrencyPairIdentifier = Branded<Address, 'PairIdentifier'>
 
 /**
  * Used to construct the pair identifier from a pair label (e.g. CELO/BTC)
- * The pair identifier needs to be a valid ethereum address, thus we
- * truncate a keccak of the pair label.
- * This function returns a branded type which can be fed into the wrapper.
+ * This function returns a branded type so we can have a safer interface
+ * for the wrapper which only accepts Addresses constructed by this function.
  * @param pair a string
  */
 export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
-  return ensureLeading0x(
-    keccak256(pair)
-      .slice(0, 20)
-      .toString('hex')
-  ) as CurrencyPairIdentifier
+  return oracleCurrencyPairIdentifier(pair) as CurrencyPairIdentifier
 }
 
 /**
@@ -195,6 +189,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * Updates an oracle value and the median.
    * @param target The ReportTarget, either CeloToken or currency pair
    * @param value The amount of `token` equal to one CELO.
+   * @param oracleAddress the oracle to report as
    */
   async report(
     target: ReportTarget,
@@ -220,6 +215,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Updates an oracle value and the median.
    * @param value The amount of US Dollars equal to one CELO.
+   * @param oracleAddress the oracle to report as
    */
   async reportStableToken(
     value: BigNumber.Value,

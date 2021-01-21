@@ -1,3 +1,6 @@
+import { sha3Raw } from 'web3-utils'
+import { Address, ensureLeading0x, trimLeading0x } from './address'
+
 export enum CURRENCY_ENUM {
   GOLD = 'Celo Gold',
   DOLLAR = 'Celo Dollar',
@@ -43,4 +46,15 @@ export enum SHORT_CURRENCIES {
 export const currencyToShortMap = {
   [CURRENCY_ENUM.DOLLAR]: SHORT_CURRENCIES.DOLLAR,
   [CURRENCY_ENUM.GOLD]: SHORT_CURRENCIES.GOLD,
+}
+
+/**
+ * Used to construct the pair identifier from a pair label (e.g. CELO/BTC)
+ * The pair identifier needs to be a valid ethereum address, thus we
+ * truncate the last 20 bytes (12-32) of the keccak of the pair label.
+ * @param pair a string
+ */
+export const oracleCurrencyPairIdentifier = (pair: string): Address => {
+  const hash = Buffer.from(trimLeading0x(sha3Raw(pair)), 'hex')
+  return ensureLeading0x(hash.slice(12, 32).toString('hex'))
 }
