@@ -1,6 +1,9 @@
+import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
-import { select } from 'redux-saga/effects'
+import * as matchers from 'redux-saga-test-plan/matchers'
+import { call, select } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
+import { SendOrigin } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import {
@@ -14,8 +17,14 @@ import { urlFromUriData } from 'src/qrcode/schema'
 import { BarcodeTypes } from 'src/qrcode/utils'
 import { RecipientKind } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
-import { Actions, HandleBarcodeDetectedAction, QrCode } from 'src/send/actions'
-import { watchQrCodeDetections } from 'src/send/saga'
+import {
+  Actions,
+  HandleBarcodeDetectedAction,
+  QrCode,
+  SendPaymentOrInviteAction,
+} from 'src/send/actions'
+import { sendPaymentOrInviteSaga, watchQrCodeDetections } from 'src/send/saga'
+import { getConnectedAccount, unlockAccount, UnlockResult } from 'src/web3/saga'
 import {
   mockAccount,
   mockAccount2Invite,
@@ -25,6 +34,7 @@ import {
   mockName,
   mockQrCodeData,
   mockQrCodeData2,
+  mockQRCodeRecipient,
   mockTransactionData,
 } from 'test/values'
 
@@ -57,6 +67,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -89,6 +100,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -121,6 +133,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -189,6 +202,7 @@ describe(watchQrCodeDetections, () => {
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })
@@ -236,5 +250,26 @@ describe(watchQrCodeDetections, () => {
       .put(showMessage(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
+  })
+})
+
+describe(sendPaymentOrInviteSaga, () => {
+  it('fails if user cancels PIN input', async () => {
+    const account = '0x000123'
+    const sendPaymentOrInviteAction: SendPaymentOrInviteAction = {
+      type: Actions.SEND_PAYMENT_OR_INVITE,
+      amount: new BigNumber(10),
+      comment: '',
+      recipient: mockQRCodeRecipient,
+      firebasePendingRequestUid: null,
+      fromModal: false,
+    }
+    await expectSaga(sendPaymentOrInviteSaga, sendPaymentOrInviteAction)
+      .provide([
+        [call(getConnectedAccount), account],
+        [matchers.call.fn(unlockAccount), UnlockResult.CANCELED],
+      ])
+      .put(showError(ErrorMessages.PIN_INPUT_CANCELED))
+      .run()
   })
 })

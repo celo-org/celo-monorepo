@@ -29,6 +29,7 @@ exports[`renders correctly when connected 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -98,6 +99,7 @@ exports[`renders correctly when disconnected 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }

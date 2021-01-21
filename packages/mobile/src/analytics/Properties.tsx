@@ -13,13 +13,14 @@ import {
   InviteEvents,
   NetworkEvents,
   OnboardingEvents,
+  PerformanceEvents,
   RequestEvents,
   SendEvents,
   SettingsEvents,
   TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
-import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
+import { BackQuizProgress, ScrollDirection, SendOrigin } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -54,6 +55,9 @@ interface AppEventsProperties {
   [AppEvents.fetch_balance_error]: {
     dollarBalance?: string
     goldBalance?: string
+  }
+  [AppEvents.redux_keychain_mismatch]: {
+    account: string
   }
 }
 
@@ -472,7 +476,6 @@ interface EscrowEventsProperties {
     error: string
   }
 }
-
 interface SendEventsProperties {
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
@@ -482,6 +485,7 @@ interface SendEventsProperties {
   [SendEvents.send_cancel]: undefined
   [SendEvents.send_amount_back]: undefined
   [SendEvents.send_amount_continue]: {
+    origin: SendOrigin
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
@@ -491,6 +495,7 @@ interface SendEventsProperties {
   }
   [SendEvents.send_confirm_back]: undefined
   [SendEvents.send_confirm_send]: {
+    origin: SendOrigin
     isScan: boolean
     isInvite: boolean
     isRequest: boolean
@@ -779,6 +784,12 @@ interface ContractKitEventsProperties {
   [ContractKitEvents.init_contractkit_finish]: undefined
 }
 
+interface PerformanceProperties {
+  [PerformanceEvents.redux_store_size]: {
+    size: number
+  }
+}
+
 export type AnalyticsPropertiesList = AppEventsProperties &
   HomeEventsProperties &
   SettingsEventsProperties &
@@ -796,4 +807,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FiatExchangeEventsProperties &
   GethEventsProperties &
   NetworkEventsProperties &
-  ContractKitEventsProperties
+  ContractKitEventsProperties &
+  PerformanceProperties

@@ -18,7 +18,7 @@
 
 • **refundedDeposits**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L135)*
+*Defined in [contractkit/src/wrappers/Governance.ts:132](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L132)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **upvote**: *[UpvoteRecord](_wrappers_governance_.upvoterecord.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L133)*
+*Defined in [contractkit/src/wrappers/Governance.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L130)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **votes**: *[VoteRecord](_wrappers_governance_.voterecord.md)[]*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L134)*
+*Defined in [contractkit/src/wrappers/Governance.ts:131](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L131)*

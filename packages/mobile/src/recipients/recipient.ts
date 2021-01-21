@@ -52,6 +52,7 @@ export interface RecipientWithQrCode extends IRecipient {
 export interface RecipientWithAddress extends IRecipient {
   kind: RecipientKind.Address
   address: string
+  thumbnailPath?: string
 }
 
 export interface NumberToRecipient {
@@ -132,7 +133,7 @@ export function getRecipientFromAddress(
 
 export function getDisplayName({ recipient, recipientAddress, t }: DisplayNameProps) {
   const { displayName, e164PhoneNumber } = recipient
-  if (displayName) {
+  if (displayName && displayName !== t('mobileNumber')) {
     return displayName
   }
   if (e164PhoneNumber) {
@@ -170,7 +171,12 @@ export function getRecipientVerificationStatus(
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {
-  return recipient && recipient.kind === RecipientKind.Contact ? recipient.thumbnailPath : undefined
+  switch (recipient?.kind) {
+    case RecipientKind.Contact:
+    case RecipientKind.Address:
+      return recipient.thumbnailPath
+  }
+  return undefined
 }
 
 type PreparedRecipient = Recipient & {
@@ -185,11 +191,13 @@ const SCORE_THRESHOLD = -6000
 const fuzzysortOptions = {
   keys: ['displayName', 'e164PhoneNumber', 'address'],
   threshold: SCORE_THRESHOLD,
+  allowTypo: false,
 }
 
 const fuzzysortPreparedOptions = {
   keys: ['displayPrepared', 'phonePrepared', 'addressPrepared'],
   threshold: SCORE_THRESHOLD,
+  allowTypo: false,
 }
 
 function fuzzysortToRecipients(

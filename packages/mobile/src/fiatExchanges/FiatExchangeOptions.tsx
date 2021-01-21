@@ -41,6 +41,7 @@ enum PaymentMethod {
   ADDRESS = 'ADDRESS',
   PONTO = 'PONTO',
   KOTANI = 'KOTANI',
+  GIFT_CARD = 'GIFT_CARD',
 }
 
 export const fiatExchangesOptionsScreenOptions = ({
@@ -150,6 +151,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.LocalProviderCashOut, { uri: PONTO_URI })
     } else if (selectedPaymentMethod === PaymentMethod.KOTANI) {
       navigate(Screens.LocalProviderCashOut, { uri: KOTANI_URI })
+    } else if (selectedPaymentMethod === PaymentMethod.GIFT_CARD) {
+      navigate(Screens.BidaliScreen, { currency: selectedCurrency })
     } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
       navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
     } else if (selectedCurrency === CURRENCY_ENUM.DOLLAR) {
@@ -203,7 +206,11 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderBottomLeftRadius: 8,
               borderBottomRightRadius: 8,
             }}
-            enabled={!MOONPAY_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT}
+            enabled={
+              !MOONPAY_DISABLED ||
+              (selectedPaymentMethod !== PaymentMethod.FIAT &&
+                selectedPaymentMethod !== PaymentMethod.GIFT_CARD)
+            }
           />
         </View>
       </ScrollView>
@@ -235,6 +242,12 @@ function FiatExchangeOptions({ route, navigation }: Props) {
                 selected={selectedPaymentMethod === PaymentMethod.ADDRESS}
                 onSelect={onSelectPaymentMethod(PaymentMethod.ADDRESS)}
                 enabled={selectedCurrency === CURRENCY_ENUM.GOLD}
+              />
+              <PaymentMethodRadioItem
+                text={t('receiveWithBidali')}
+                selected={selectedPaymentMethod === PaymentMethod.GIFT_CARD}
+                onSelect={onSelectPaymentMethod(PaymentMethod.GIFT_CARD)}
+                enabled={selectedCurrency === CURRENCY_ENUM.DOLLAR}
               />
               {showPonto && (
                 <PaymentMethodRadioItem

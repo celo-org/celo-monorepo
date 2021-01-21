@@ -177,6 +177,7 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -217,6 +218,7 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }

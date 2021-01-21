@@ -1,7 +1,7 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showErrorOrFallback } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -11,7 +11,7 @@ import { encryptComment } from 'src/identity/commentEncryption'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { completePaymentRequest } from 'src/paymentRequest/actions'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -54,7 +54,8 @@ export async function getSendTxGas(
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
   } catch (error) {
-    throw Error(ErrorMessages.CALCULATE_FEE_FAILED)
+    Logger.error(`${TAG}/getSendTxGas`, 'Error', error)
+    throw error
   }
 }
 
@@ -62,9 +63,14 @@ export async function getSendFee(
   account: string,
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer,
-  includeDekFee: boolean = false
+  includeDekFee: boolean = false,
+  dollarBalance?: string
 ) {
   try {
+    if (dollarBalance && new BigNumber(params.amount).isGreaterThan(new BigNumber(dollarBalance))) {
+      throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
+
     let gas = await getSendTxGas(account, currency, params)
     if (includeDekFee) {
       const dekGas = await getRegisterDekTxGas(account, currency)
@@ -179,13 +185,14 @@ function* sendPayment(
   }
 }
 
-function* sendPaymentOrInviteSaga({
+export function* sendPaymentOrInviteSaga({
   amount,
   comment,
   recipient,
   recipientAddress,
   inviteMethod,
   firebasePendingRequestUid,
+  fromModal,
 }: SendPaymentOrInviteAction) {
   try {
     yield call(getConnectedUnlockedAccount)
@@ -210,10 +217,15 @@ function* sendPaymentOrInviteSaga({
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
 
-    navigateHome()
+    if (fromModal) {
+      navigateBack()
+    } else {
+      navigateHome()
+    }
+
     yield put(sendPaymentOrInviteSuccess(amount))
   } catch (e) {
-    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
+    yield put(showErrorOrFallback(e, ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }
 }

@@ -1,9 +1,7 @@
 import { base64ToHex, hexToBuffer } from '@celo/base'
-import {
-  printAndIgnoreRequestErrors,
-  requestAttestationsFromIssuers,
-} from '@celo/celotool/lib/lib/attestation'
+import { printAndIgnoreRequestErrors } from '@celo/celotool/lib/lib/attestation'
 import { newKitFromWeb3 } from '@celo/contractkit'
+import { requestAttestationsFromIssuers } from '@celo/env-tests/lib/shared/attestation'
 import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import { compressedPubKey } from '@celo/utils/src/dataEncryptionKey'
 import { LocalWallet } from '@celo/wallet-local'
@@ -161,11 +159,6 @@ const run = async () => {
     return
   }
 
-  const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
-  console.log(approveRes)
-  if (!approveRes.ok) {
-    return
-  }
   const statsBefore = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('Before ===== ')
   console.log(statsBefore)

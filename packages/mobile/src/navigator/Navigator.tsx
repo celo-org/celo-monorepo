@@ -16,6 +16,7 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import { currentLanguageSelector } from 'src/app/reducers'
 import UpgradeScreen from 'src/app/UpgradeScreen'
+import WebViewScreen, { webViewScreenNavOptions } from 'src/app/WebViewScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupForceScreen from 'src/backup/BackupForceScreen'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
@@ -32,6 +33,7 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
 import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
 import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
+import BidaliScreen from 'src/fiatExchanges/BidaliScreen'
 import ExternalExchanges, {
   externalExchangesScreenOptions,
 } from 'src/fiatExchanges/ExternalExchanges'
@@ -95,11 +97,14 @@ import ValidateRecipientIntro, {
 } from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
+import Logger from 'src/utils/Logger'
 import { getDatetimeDisplayString } from 'src/utils/time'
 import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
+
+const TAG = 'Navigator'
 
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
@@ -112,8 +117,7 @@ export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
     ios: {
       gestureEnabled: true,
       cardOverlayEnabled: true,
-      headerStatusBarHeight:
-        navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
+      headerStatusBarHeight: 0,
       ...TransitionPresets.ModalPresentationIOS,
     },
   })
@@ -147,6 +151,11 @@ const commonScreens = (Navigator: typeof Stack) => {
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
         options={noHeaderGestureDisabled}
+      />
+      <Navigator.Screen
+        name={Screens.WebViewScreen}
+        component={WebViewScreen}
+        options={webViewScreenNavOptions}
       />
     </>
   )
@@ -434,6 +443,11 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={LocalProviderCashOut}
     />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
+    <Navigator.Screen
+      options={BidaliScreen.navigationOptions}
+      name={Screens.BidaliScreen}
+      component={BidaliScreen}
+    />
   </>
 )
 
@@ -512,6 +526,7 @@ export function MainStackScreen() {
     }
 
     setInitialRoute(initialRoute)
+    Logger.info(`${TAG}@MainStackScreen`, `Initial route: ${initialRoute}`)
 
     // Wait for next frame to avoid slight gap when hiding the splash
     requestAnimationFrame(() => SplashScreen.hide())
@@ -573,6 +588,11 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
       name={Screens.SelectCountry}
       component={SelectCountry}
       options={SelectCountry.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.SendConfirmationModal}
+      component={SendConfirmation}
+      options={sendConfirmationScreenNavOptions}
     />
   </>
 )

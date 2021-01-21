@@ -7,6 +7,7 @@ import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
 
 /*
@@ -70,9 +71,13 @@ const isCoreContract = (contractName: string) =>
 
 const deployImplementation = async (
   contractName: string,
-  Contract: Truffle.Contract<Truffle.ContractInstance>,
-  dryRun: boolean
+  Contract: TruffleContract<Truffle.ContractInstance>,
+  dryRun: boolean,
+  from: string
 ) => {
+  if (from) {
+    Contract.defaults({ from }) // override truffle with provided from address
+  }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new())
@@ -86,7 +91,12 @@ const deployImplementation = async (
   return contract
 }
 
-const deployProxy = async (contractName: string, addresses: ContractAddresses, dryRun: boolean) => {
+const deployProxy = async (
+  contractName: string,
+  addresses: ContractAddresses,
+  dryRun: boolean,
+  from: string
+) => {
   // Explicitly forbid upgrading to a new Governance proxy contract.
   // Upgrading to a new Governance proxy contract would require ownership of all
   // contracts to be moved to the new governance contract, possibly including contracts
@@ -99,6 +109,9 @@ const deployProxy = async (contractName: string, addresses: ContractAddresses, d
   }
   console.log(`Deploying ${contractName}Proxy`)
   const Proxy = await artifacts.require(`${contractName}Proxy`)
+  if (from) {
+    Proxy.defaults({ from }) // override truffle with provided from address
+  }
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(celoRegistryAddress) : Proxy.new())
 
@@ -118,9 +131,10 @@ const deployCoreContract = async (
   addresses: ContractAddresses,
   report: ASTDetailedVersionedReport,
   initializationData: any,
-  isDryRun: boolean
+  isDryRun: boolean,
+  from: string
 ) => {
-  const contract = await deployImplementation(contractName, instance, isDryRun)
+  const contract = await deployImplementation(contractName, instance, isDryRun, from)
   const setImplementationTx: ProposalTx = {
     contract: `${contractName}Proxy`,
     function: '_setImplementation',
@@ -133,7 +147,7 @@ const deployCoreContract = async (
   if (!shouldDeployProxy) {
     proposal.push(setImplementationTx)
   } else {
-    const proxy = await deployProxy(contractName, addresses, isDryRun)
+    const proxy = await deployProxy(contractName, addresses, isDryRun, from)
 
     // Update the contract's address to the new proxy in the proposal
     addresses.set(contractName, proxy.address)
@@ -166,8 +180,12 @@ const deployLibrary = async (
   contractName: string,
   contractArtifact: Truffle.Contract<Truffle.ContractInstance>,
   addresses: ContractAddresses,
-  isDryRun: boolean
+  isDryRun: boolean,
+  from: string
 ) => {
+  if (from) {
+    Contract.defaults({ from }) // override truffle with provided from address
+  }
   const contract = await deployImplementation(contractName, contractArtifact, isDryRun)
   addresses.set(contractName, contract.address)
   return
@@ -184,7 +202,7 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'network', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
+      string: ['report', 'from', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
@@ -225,10 +243,11 @@ module.exports = async (callback: (error?: any) => number) => {
           addresses,
           report,
           initializationData,
-          argv.dry_run
+          argv.dry_run,
+          argv.from
         )
       } else if (isLibrary) {
-        await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run)
+        await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
       }
       // Mark the contract as released
       released.add(contractName)
