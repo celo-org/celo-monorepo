@@ -1,6 +1,6 @@
 # Migrating to ContractKit v1.x.y
 
-cLabs recently released ContractKit version 1.0.0. In it, the original ContractKit package has been split into several separate packages that all make up the Celo SDK. This document explains the key differences and shows you how you can start using the updated SDK.
+cLabs recently released [ContractKit version 1.0.0](https://medium.com/celoorg/contractkit-1-0-0-9c0412462d45). In it, the original ContractKit package has been split into several separate packages that all make up the Celo SDK. This document explains the key differences and shows you how you can start using the updated SDK.
 
 If you are using a previous version of ContractKit (anything below 1.0.0), you can continue using that version and you will only need to make the following changes when you upgrade.
 
@@ -47,7 +47,7 @@ For example:
 // Previously this would work to import the block-explorer
 import { newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
 
-// With ContractKit v1.0+, import the block-explorer explicitly
+// With ContractKit v1.x.y, import the block-explorer explicitly
 import { newBlockExplorer } from '@celo/explorer/lib/block-explorer'
 ```
 
@@ -63,7 +63,7 @@ const ContractKit = require('@celo/contractkit')
 const kit = ContractKit.newKit('https://forno.celo.org')
 ```
 
-### Version 1.0.0+
+### Version 1.x.y
 
 ```javascript
 // Since ContractKit no longer instantiates web3, you'll need to explicitly require it 
@@ -82,7 +82,7 @@ You can access `web3` functions through the `connection` module.
 // version ^0.4.0 
 let amount = kit.web3.utils.fromWei("1000000", "ether")
  
-// version 1.0.0 
+// version 1.x.y
 let amount = kit.connection.web3.utils.fromWei("1000000", "ether")
 ```
 ## Backward Compatibility
