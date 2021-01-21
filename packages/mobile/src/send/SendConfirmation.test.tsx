@@ -3,6 +3,7 @@ import * as React from 'react'
 import { fireEvent, render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { ErrorDisplayType } from 'src/alert/reducer'
+import { SendOrigin } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
 import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
@@ -27,10 +28,12 @@ const mockedGetSendFee = getSendFee as jest.Mock
 
 const mockScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
   transactionData: mockTransactionData,
+  origin: SendOrigin.AppSendFlow,
 })
 
 const mockInviteScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
   transactionData: mockInviteTransactionData,
+  origin: SendOrigin.AppSendFlow,
 })
 
 describe('SendConfirmation', () => {
@@ -237,6 +240,7 @@ describe('SendConfirmation', () => {
 
     fireEvent.press(tree.getByTestId('accountEditButton'))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressValidationType: mockAddressValidationType,
     })
