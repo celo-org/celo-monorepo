@@ -46,13 +46,21 @@ describe(handleNotification, () => {
 
     it('shows the in-app message when the app is already in the foreground', async () => {
       await expectSaga(handleNotification, message, NotificationReceiveState.APP_ALREADY_OPEN)
-        .put(showMessage('My Body', undefined, null, openUrl('https://celo.org'), 'My title'))
+        .put(
+          showMessage(
+            'My Body',
+            undefined,
+            null,
+            openUrl('https://celo.org', false, true),
+            'My title'
+          )
+        )
         .run()
     })
 
     it('directly opens the url if the app is not already in the foreground', async () => {
       await expectSaga(handleNotification, message, NotificationReceiveState.APP_OPENED_FRESH)
-        .put(openUrl('https://celo.org'))
+        .put(openUrl('https://celo.org', false, true))
         .run()
     })
 
@@ -62,7 +70,20 @@ describe(handleNotification, () => {
         { ...message, data: { ou: message.data.ou, openExternal: 'true' } },
         NotificationReceiveState.APP_OPENED_FRESH
       )
-        .put(openUrl(message.data.ou, true))
+        .put(openUrl(message.data.ou, true, true))
+        .run()
+    })
+  })
+
+  describe("with a notification with an 'open url' semantic and a deep link", () => {
+    const message = {
+      notification: { title: 'My title', body: 'My Body' },
+      data: { ou: `celo://wallet/openScreen?screen=${Screens.WalletHome}` },
+    }
+
+    it('fires  an event to open the deep link', async () => {
+      await expectSaga(handleNotification, message, NotificationReceiveState.APP_OPENED_FRESH)
+        .put(openUrl(message.data.ou, false, true))
         .run()
     })
   })

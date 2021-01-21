@@ -62,13 +62,28 @@ describe('App saga', () => {
   it('Handles cash in deep link', async () => {
     const deepLink = 'celo://wallet/cashIn'
     await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
-    expect(navigate).toHaveBeenCalledWith(Screens.FiatExchangeOptions, { isAddFunds: true })
+    expect(navigate).toHaveBeenCalledWith(Screens.FiatExchangeOptions, { isCashIn: true })
   })
 
   it('Handles Bidali deep link', async () => {
     const deepLink = 'celo://wallet/bidali'
     await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
     expect(navigate).toHaveBeenCalledWith(Screens.BidaliScreen, { currency: CURRENCY_ENUM.DOLLAR })
+  })
+
+  it('Handles openScreen deep link with safe origin', async () => {
+    const deepLink = `celo://wallet/openScreen?screen=${Screens.FiatExchangeOptions}&isAddFunds=true`
+    await expectSaga(handleDeepLink, openDeepLink(deepLink, true)).run()
+    expect(navigate).toHaveBeenCalledWith(
+      Screens.FiatExchangeOptions,
+      expect.objectContaining({ isAddFunds: true })
+    )
+  })
+
+  it('Handles openScreen deep link without safe origin', async () => {
+    const deepLink = `celo://wallet/openScreen?screen=${Screens.FiatExchangeOptions}&isAddFunds=true`
+    await expectSaga(handleDeepLink, openDeepLink(deepLink, false)).run()
+    expect(navigate).not.toHaveBeenCalled()
   })
 
   describe(handleOpenUrl, () => {
