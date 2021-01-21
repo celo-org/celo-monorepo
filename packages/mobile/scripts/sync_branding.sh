@@ -39,7 +39,7 @@ fi
 
 echo "Using branding/$branding"
 
-rsync -avyz --exclude '.git' "$mobile_root/branding/$branding/" "$mobile_root"
+rsync -avyz --exclude '.git' --exclude '.gitignore' "$mobile_root/branding/$branding/" "$mobile_root"
 
 # Now clean up branded files which have been deleted
 # This is needed when switching branding, so we don't leave files

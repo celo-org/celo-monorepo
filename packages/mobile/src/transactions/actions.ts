@@ -1,3 +1,4 @@
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -191,5 +192,5 @@ export const navigateToExchangeReview = (
 }
 
 export const navigateToRequestedPaymentReview = (transactionData: TransactionDataInput) => {
-  navigate(Screens.SendConfirmation, { transactionData })
+  navigate(Screens.SendConfirmation, { transactionData, origin: SendOrigin.AppRequestFlow })
 }
