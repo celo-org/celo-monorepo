@@ -31,7 +31,7 @@ export default function SelectionOption({
       <View style={styles.contentContainer}>
         {!hideCheckboxes && (
           <View style={styles.iconContainer}>
-           <RadioButton selected={isSelected} />
+            <RadioButton selected={isSelected} />
           </View>
         )}
         <Text style={styles.text} numberOfLines={1}>
@@ -58,13 +58,5 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 16,
-  },
-  circle: {
-    paddingTop: 2,
-    height: 20,
-    width: 20,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.gray4,
   },
 })
