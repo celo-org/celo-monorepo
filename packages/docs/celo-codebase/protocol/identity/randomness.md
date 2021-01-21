@@ -7,3 +7,4 @@ Producing unpredictable pseudo-randomness without a trusted third party is not t
 In a proposed block, the proposer attaches two values related to the randomness scheme - randomness corresponding to their previous commitment, and a new commitment to freshly generated random bytes that will be revealed in the future. The revealed randomness is added to an entropy pool accessible on-chain from the Random smart contract.
 
 More formally, the $$n*{th}$$ block proposed by a given validator contains values $$(r_n, s_n)$$ such that $$\text{keccack256}(r_n) = s*{n-1}$$. The one exception to this is the validator’s first block, the case where $$n = 1$$, since they have not previously committed to randomness yet. Here, the protocol instead requires that $$r_1 = 1$$.
+
