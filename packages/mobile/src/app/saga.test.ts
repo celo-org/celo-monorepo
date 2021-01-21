@@ -62,7 +62,7 @@ describe('App saga', () => {
   it('Handles cash in deep link', async () => {
     const deepLink = 'celo://wallet/cashIn'
     await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
-    expect(navigate).toHaveBeenCalledWith(Screens.FiatExchangeOptions, { isAddFunds: true })
+    expect(navigate).toHaveBeenCalledWith(Screens.FiatExchangeOptions, { isCashIn: true })
   })
 
   it('Handles Bidali deep link', async () => {

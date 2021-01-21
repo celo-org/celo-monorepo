@@ -98,12 +98,13 @@ export type StackParamList = {
   }
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeOptions]: {
-    isAddFunds?: boolean
+    isCashIn?: boolean
     amount?: BigNumber
   }
   [Screens.MoonPay]: {
-    localAmount: BigNumber
+    localAmount: number
     currencyCode: LocalCurrencyCode
+    currencyToBuy: CURRENCY_ENUM
   }
   [Screens.GoldEducation]: undefined
   [Screens.ImportWallet]:
@@ -161,6 +162,9 @@ export type StackParamList = {
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
+  [Screens.ProviderOptionsScreen]: {
+    isCashIn?: boolean
+  }
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
