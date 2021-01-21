@@ -45,7 +45,7 @@ We will not go into the details of how to write Solidity in this exercise, but y
 The contract will just store a name for now:
 
 ```text
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.5.0;
 
 contract HelloWorld {
   string name = 'Celo';
@@ -92,7 +92,7 @@ You can [learn more about Truffle configuration options here.](https://www.truff
 
 When you deploy contracts to the Celo network with a remote node, you have to sign the contract deployment transaction locally before sending it to the remote node to be broadcast to the network. This presents some unique challenges when using Ethereum development tools \(like Truffle\) because Celo transaction objects are slightly different than Ethereum transaction objects.
 
-When you are ready to deploy your contract to Alfajores, you'll need a Celo client connected to the testnet. In this exercise we are going to connect to a remote node to read and write to the public testnet (Alfajores), but you could also run a testnet node locally to perform the same actions.
+When you are ready to deploy your contract to Alfajores, you'll need a Celo client connected to the testnet. In this exercise you will connect to a remote node to read and write to the public testnet (Alfajores), but you could also run a testnet node locally to perform the same actions.
 
 Here are the steps to go through to deploy the contract to the Alfajores testnet.
 
@@ -191,7 +191,7 @@ truffle migrate --network alfajores
 
 #### Custom Node.js Deployment
 
-In this section, you deploy a contract using a simple Node.js script to show how you can do it without using Truffle.
+In this section, you will deploy a contract using a simple Node.js script to show how you can do it without using Truffle.
 
 You need to compile the `HelloWorld.sol` contract using \(if it isn't already\):
 
