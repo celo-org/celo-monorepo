@@ -191,11 +191,15 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text
@@ -580,11 +584,15 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text

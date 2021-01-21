@@ -21,4 +21,32 @@ describe(SimpleMessagingCard, () => {
     fireEvent.press(getByName('TextButton'))
     expect(onPress).toHaveBeenCalled()
   })
+
+  it('renders remote icons', () => {
+    const onPress = jest.fn()
+    const { getByTestId } = render(
+      <SimpleMessagingCard
+        text="Test"
+        icon={{ uri: 'https://example.com/icon.png' }}
+        callToActions={[{ text: 'it goes boom', onPress }]}
+        testID="Card"
+      />
+    )
+
+    const icon = getByTestId('Card/Icon')
+    expect(icon.props.source).toEqual({ uri: 'https://example.com/icon.png' })
+  })
+
+  it('hides the icon when not set', () => {
+    const onPress = jest.fn()
+    const { queryByTestId } = render(
+      <SimpleMessagingCard
+        text="Test"
+        callToActions={[{ text: 'it goes boom', onPress }]}
+        testID="Card"
+      />
+    )
+
+    expect(queryByTestId('Card/Icon')).toBeNull()
+  })
 })

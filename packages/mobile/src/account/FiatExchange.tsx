@@ -23,12 +23,12 @@ import { navigateToURI } from 'src/utils/linking'
 function FiatExchange() {
   function goToAddFunds() {
     navigate(Screens.FiatExchangeOptions, {
-      isAddFunds: true,
+      isCashIn: true,
     })
   }
 
   function goToCashOut() {
-    navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
+    navigate(Screens.FiatExchangeOptions, { isCashIn: false })
   }
 
   function goToSpend() {
