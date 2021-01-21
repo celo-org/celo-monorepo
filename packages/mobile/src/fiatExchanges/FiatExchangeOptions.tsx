@@ -206,7 +206,11 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderBottomLeftRadius: 8,
               borderBottomRightRadius: 8,
             }}
-            enabled={!MOONPAY_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT}
+            enabled={
+              !MOONPAY_DISABLED ||
+              (selectedPaymentMethod !== PaymentMethod.FIAT &&
+                selectedPaymentMethod !== PaymentMethod.GIFT_CARD)
+            }
           />
         </View>
       </ScrollView>

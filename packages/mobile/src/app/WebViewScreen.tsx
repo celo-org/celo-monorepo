@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
-import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import React, { useState } from 'react'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes'
 import { useDispatch } from 'react-redux'
 import { openDeepLink } from 'src/app/actions'
@@ -35,6 +35,7 @@ export const webViewScreenNavOptions = ({ route }: RouteProps) => {
 function WebViewScreen({ route }: Props) {
   const { uri } = route.params
   const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true)
 
   const handleLoadRequest = (event: ShouldStartLoadRequest): boolean => {
     if (event.url.startsWith('celo://')) {
@@ -44,6 +45,10 @@ function WebViewScreen({ route }: Props) {
     return true
   }
 
+  const hideLoading = () => {
+    setLoading(false)
+  }
+
   return (
     <View style={styles.container}>
       <WebView
@@ -51,7 +56,9 @@ function WebViewScreen({ route }: Props) {
         onShouldStartLoadWithRequest={handleLoadRequest}
         setSupportMultipleWindows={false}
         source={{ uri }}
+        onLoad={hideLoading}
       />
+      {loading && <ActivityIndicator style={styles.loading} size="large" />}
     </View>
   )
 }
@@ -61,6 +68,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     justifyContent: 'center',
+  },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
   },
   close: {
     color: colors.dark,
