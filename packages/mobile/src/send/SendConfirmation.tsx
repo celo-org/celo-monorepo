@@ -89,7 +89,7 @@ function SendConfirmation(props: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const fromModal = props.route.name === Screens.SendConfirmationModal
-  const { transactionData, addressJustValidated, currencyInfo } = props.route.params
+  const { transactionData, addressJustValidated, currencyInfo, origin } = props.route.params
   const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const confirmationInput = getConfirmationInput(
@@ -166,6 +166,7 @@ function SendConfirmation(props: Props) {
     )
 
     ValoraAnalytics.track(SendEvents.send_confirm_send, {
+      origin,
       isScan: !!props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       isRequest: type === TokenTransactionType.PayRequest,
@@ -194,6 +195,7 @@ function SendConfirmation(props: Props) {
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,
+      origin: props.route.params.origin,
     })
   }
 

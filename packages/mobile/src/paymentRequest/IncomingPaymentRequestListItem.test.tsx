@@ -3,6 +3,7 @@ import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -95,6 +96,7 @@ describe('IncomingPaymentRequestListItem', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+      origin: SendOrigin.AppRequestFlow,
       transactionData: mockTransactionData,
     })
   })
@@ -139,6 +141,7 @@ describe('IncomingPaymentRequestListItem', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+      origin: SendOrigin.AppRequestFlow,
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.PARTIAL,
     })
