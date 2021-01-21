@@ -19,7 +19,10 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useTypedSelector from 'src/redux/useSelector'
+import Logger from 'src/utils/Logger'
 import { fetchI18nContent } from 'src/utils/translationsFetcher'
+
+const TAG = 'ConsumerIncentivesHomeScreen'
 
 const useConsumerIncentivesContent = () => {
   const contentResult = useAsync<ContentType>(fetchConsumerRewardsContent, [])
@@ -30,7 +33,7 @@ const useConsumerIncentivesContent = () => {
   return {
     content: texts,
     loading: contentResult.loading,
-    error: contentResult.loading,
+    error: contentResult.error,
   }
 }
 
@@ -43,6 +46,7 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   const dispatch = useDispatch()
 
   if (!loading && error) {
+    Logger.error(TAG, 'Error while loading remote texts from Firebase', error)
     dispatch(showError(ErrorMessages.FIREBASE_FETCH_FAILED))
     navigateBack()
     return null
