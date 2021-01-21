@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { openUrl } from 'src/app/actions'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getElementText } from 'test/utils'
 import { mockE164Number, mockE164NumberPepper, mockPaymentRequests } from 'test/values'
 
@@ -279,10 +278,9 @@ describe('NotificationBox', () => {
     expect(queryByText('Notification 2')).toBeTruthy()
     expect(queryByText('Notification 3')).toBeTruthy()
 
+    expect(store.getActions()).toEqual([])
+
     fireEvent.press(getByText('Press Remote'))
-    expect(navigate).toHaveBeenCalledWith(
-      Screens.WebViewScreen,
-      expect.objectContaining({ uri: testNotification.ctaUri })
-    )
+    expect(store.getActions()).toEqual([openUrl(testNotification.ctaUri, false, true)])
   })
 })
