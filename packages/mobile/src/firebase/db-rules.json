@@ -44,6 +44,10 @@
     "notifications": {
       ".read": true,
       ".write": false
+    },
+    "notificationsV2": {
+      ".read": true,
+      ".write": false
     }
   }
 }
