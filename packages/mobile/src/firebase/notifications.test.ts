@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
+import { SendOrigin } from 'src/analytics/types'
 import { openUrl } from 'src/app/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
@@ -163,6 +164,7 @@ describe(handleNotification, () => {
         .run()
 
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        origin: SendOrigin.AppRequestFlow,
         transactionData: {
           amount: new BigNumber('10'),
           firebasePendingRequestUid: 'abc',

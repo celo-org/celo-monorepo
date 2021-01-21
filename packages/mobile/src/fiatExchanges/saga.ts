@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { call, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { Actions as AppActions, ActionTypes as AppActionTypes } from 'src/app/actions'
 import { Actions, BidaliPaymentRequestedAction } from 'src/fiatExchanges/actions'
@@ -49,7 +50,7 @@ function* bidaliPaymentRequest({
   }
   navigate(Screens.SendConfirmationModal, {
     transactionData,
-    isFromScan: true,
+    origin: SendOrigin.Bidali,
   })
 
   while (true) {

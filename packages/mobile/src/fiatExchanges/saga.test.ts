@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { activeScreenChanged } from 'src/app/actions'
 import { bidaliPaymentRequested } from 'src/fiatExchanges/actions'
@@ -72,7 +73,7 @@ describe(watchBidaliPaymentRequests, () => {
       .run()
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmationModal, {
-      isFromScan: true,
+      origin: SendOrigin.Bidali,
       transactionData: {
         amount,
         reason: 'Some description (TEST_CHARGE_ID)',
@@ -117,7 +118,7 @@ describe(watchBidaliPaymentRequests, () => {
       .run()
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmationModal, {
-      isFromScan: true,
+      origin: SendOrigin.Bidali,
       transactionData: {
         amount,
         reason: 'Some description (TEST_CHARGE_ID)',
