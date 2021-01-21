@@ -91,7 +91,7 @@ WithdrawCeloReviewScreen.navigationOptions = ({
   const onCancel = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_cancel)
     if (isCashOut) {
-      navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
+      navigate(Screens.FiatExchangeOptions, { isCashIn: false })
     } else {
       navigateToExchangeHome()
     }

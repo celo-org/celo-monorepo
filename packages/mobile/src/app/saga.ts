@@ -150,7 +150,7 @@ export function* handleDeepLink(action: OpenDeepLink) {
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
     } else if (rawParams.path === '/cashIn') {
-      navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
+      navigate(Screens.FiatExchangeOptions, { isCashIn: true })
     } else if (rawParams.pathname === '/bidali') {
       navigate(Screens.BidaliScreen, { currency: CURRENCY_ENUM.DOLLAR })
     } else if (isSecureOrigin && rawParams.pathname === '/openScreen' && rawParams.query) {
