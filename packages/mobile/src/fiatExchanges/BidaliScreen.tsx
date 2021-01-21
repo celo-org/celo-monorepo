@@ -30,6 +30,11 @@ function useInitialJavaScript(
       return
     }
 
+    // This JavaScript code runs in the WebView
+    // Bidali reads the paymentCurrency, phoneNumber and balances to provide a more deeply integrated experience.
+    // When a payment request is needed, Bidali calls the provided `onPaymentRequest` method.
+    // When a new url needs to be open (currently for FAQ, Terms of Service), `openUrl` is called by Bidali.
+    // See also the comment in the `onMessage` handler
     setInitialJavaScript(`
       window.valora = {
         paymentCurrency: "${CURRENCIES[currency].code.toUpperCase()}",
@@ -54,12 +59,20 @@ function useInitialJavaScript(
 type RouteProps = StackScreenProps<StackParamList, Screens.BidaliScreen>
 type Props = RouteProps
 
-function BidaliScreen({ route }: Props) {
+function BidaliScreen({ route, navigation }: Props) {
+  const onLoadEnd = () => {
+    // Remove loading indicator
+    navigation.setOptions({
+      headerRight: undefined,
+    })
+  }
   const onMessage = (event: WebViewMessageEvent) => {
     const { method, data } = JSON.parse(event.nativeEvent.data)
     switch (method) {
       case 'onPaymentRequest':
         const { amount, address, currency, description, chargeId } = data
+        // These 2 callbacks needs to be called to notify Bidali of the status of the payment request
+        // so it can update the WebView accordingly.
         const onPaymentSent = () => {
           webViewRef.current?.injectJavaScript(`window.valora.paymentSent();`)
         }
@@ -114,15 +127,14 @@ function BidaliScreen({ route }: Props) {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      {initialJavaScript ? (
+      {initialJavaScript && (
         <WebView
           ref={webViewRef}
           source={{ uri: networkConfig.bidaliUrl }}
+          onLoadEnd={onLoadEnd}
           onMessage={onMessage}
           injectedJavaScriptBeforeContentLoaded={initialJavaScript}
         />
-      ) : (
-        <ActivityIndicator size="large" color={colors.greenBrand} />
       )}
     </SafeAreaView>
   )
@@ -132,8 +144,16 @@ BidaliScreen.navigationOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
   return {
     ...emptyHeader,
+    headerTitle: 'Bidali',
     headerLeft: () => (
       <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
+    ),
+    headerRight: () => (
+      <ActivityIndicator
+        style={styles.headerActivityIndicator}
+        size="small"
+        color={colors.greenBrand}
+      />
     ),
   }
 }
@@ -141,7 +161,9 @@ BidaliScreen.navigationOptions = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  headerActivityIndicator: {
+    marginRight: 16,
   },
 })
 
