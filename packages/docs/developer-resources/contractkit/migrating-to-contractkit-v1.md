@@ -99,7 +99,7 @@ kit.connection.addAccount
 
 ## `Connection` package
 
-The `connection` package update includes changes to some common functions.
+The `connection` package update includes implementations of some common web3 functions. Here are a few examples:
 
  - `kit.web3.eth.isSyncing` --> `kit.connection.isSyncing`
  - `kit.web3.eth.getBlock` --> `kit.connection.getBlock`
