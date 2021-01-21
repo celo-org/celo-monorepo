@@ -1,5 +1,7 @@
 import Pagination from '@celo/react-components/components/Pagination'
-import SimpleMessagingCard from '@celo/react-components/components/SimpleMessagingCard'
+import SimpleMessagingCard, {
+  Props as SimpleMessagingCardProps,
+} from '@celo/react-components/components/SimpleMessagingCard'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -18,13 +20,7 @@ import { pausedFeatures } from 'src/flags'
 import { dismissNotification } from 'src/home/actions'
 import { IdToNotification } from 'src/home/reducers'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import {
-  backupKey,
-  getVerified,
-  inviteFriends,
-  learnCelo,
-  remoteNotification,
-} from 'src/images/Images'
+import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { ensurePincode, navigate } from 'src/navigator/NavigationService'
@@ -166,11 +162,10 @@ export class NotificationBox extends React.Component<Props, State> {
       dismissedGoldEducation,
       openUrl,
     } = this.props
-    const actions = []
+    const actions: SimpleMessagingCardProps[] = []
 
     if (!backupCompleted) {
       actions.push({
-        title: t('backupKeyFlow6:yourAccountKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
         icon: backupKey,
         callToActions: [
@@ -198,7 +193,6 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!dismissedGetVerified && !numberVerified && verificationPossible) {
       actions.push({
-        title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
         icon: getVerified,
         callToActions: [
@@ -240,7 +234,7 @@ export class NotificationBox extends React.Component<Props, State> {
 
       actions.push({
         text: texts.body,
-        icon: remoteNotification,
+        icon: notification.iconUrl ? { uri: notification.iconUrl } : undefined,
         darkMode: notification.darkMode,
         callToActions: [
           {
@@ -270,7 +264,6 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!dismissedGoldEducation && !goldEducationCompleted) {
       actions.push({
-        title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
         icon: learnCelo,
         callToActions: [
@@ -300,7 +293,6 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!dismissedInviteFriends && !pausedFeatures.INVITE) {
       actions.push({
-        title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
         icon: inviteFriends,
         callToActions: [
