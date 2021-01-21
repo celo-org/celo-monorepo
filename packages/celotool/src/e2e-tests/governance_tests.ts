@@ -171,6 +171,10 @@ describe('governance tests', () => {
     migrateTo: 25,
     networkId: 1101,
     network: 'local',
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       // Validators 0 and 1 are swapped in and out of the group.
       {
