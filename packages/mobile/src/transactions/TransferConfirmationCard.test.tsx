@@ -4,7 +4,6 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
-import { CELO_REWARDS_LINK } from 'src/brandingConfig'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TransferConfirmationCard from 'src/transactions/TransferConfirmationCard'
@@ -103,10 +102,7 @@ describe('TransferConfirmationCard', () => {
     )
     expect(tree).toMatchSnapshot()
     fireEvent.press(tree.getByTestId('celoRewards/learnMore'))
-    expect(navigate).toHaveBeenCalledWith(
-      Screens.WebViewScreen,
-      expect.objectContaining({ uri: `${CELO_REWARDS_LINK}?origin=transaction-detail` })
-    )
+    expect(navigate).toHaveBeenCalledWith(Screens.ConsumerIncentivesHomeScreen)
   })
 
   it('renders correctly for received escrow transaction drilldown', () => {
