@@ -5,7 +5,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 
-interface Props {
+export interface Props {
   text: string
   icon?: ImageSourcePropType | React.ReactNode
   darkMode?: boolean
@@ -20,11 +20,22 @@ export default function SimpleMessagingCard({
   callToActions,
   testID,
 }: Props) {
-  const icon = React.isValidElement(iconProp) ? (
-    iconProp
+  const icon = iconProp ? (
+    React.isValidElement(iconProp) ? (
+      iconProp
+    ) : (
+      <Image
+        // @ts-ignore isValidElement check above ensures image is an image source type
+        source={iconProp}
+        resizeMode="contain"
+        style={
+          Object.prototype.hasOwnProperty.call(iconProp, 'uri') ? styles.remoteIcon : undefined
+        }
+        testID={`${testID}/Icon`}
+      />
+    )
   ) : (
-    // @ts-ignore isValidElement check above ensures image is an image source type
-    <Image source={iconProp} resizeMode="contain" />
+    undefined
   )
 
   return (
@@ -43,7 +54,7 @@ export default function SimpleMessagingCard({
             testID={`${testID}/CallToActions`}
           />
         </View>
-        <View style={styles.iconContainer}>{icon}</View>
+        {!!icon && <View style={styles.iconContainer}>{icon}</View>}
       </View>
     </MessagingCard>
   )
@@ -64,14 +75,18 @@ const styles = StyleSheet.create({
   },
   text: {
     ...fontStyles.large,
-    marginRight: 12,
   },
   darkModeText: {
     color: colors.light,
   },
   iconContainer: {
+    marginLeft: 12,
     width: 80,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  remoteIcon: {
+    width: '100%',
+    height: '100%',
   },
 })

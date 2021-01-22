@@ -2,7 +2,6 @@
 
 display autocomplete installation instructions
 
-- [`celocli autocomplete [SHELL]`](#celocli-autocomplete-shell)
 
 ## `celocli autocomplete [SHELL]`
 

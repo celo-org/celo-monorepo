@@ -72,4 +72,17 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
       intrinsicGasForAlternativeFeeCurrency: await this.getIntrinsicGasForAlternativeFeeCurrency(),
     }
   }
+
+  /**
+   * Getting the uptime lookback window.
+   */
+  getUptimeLookbackWindow = proxyCall(
+    this.contract.methods.getUptimeLookbackWindow,
+    undefined,
+    valueToInt
+  )
+  /**
+   * Setting the uptime lookback window.
+   */
+  setUptimeLookbackWindow = proxySend(this.kit, this.contract.methods.setUptimeLookbackWindow)
 }

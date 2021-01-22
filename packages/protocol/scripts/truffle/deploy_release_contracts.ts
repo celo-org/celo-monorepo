@@ -1,4 +1,5 @@
 import { retryTx } from '@celo/protocol/lib/proxy-utils'
+import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
@@ -86,7 +87,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     config.initialDistributionRatio,
     config.canValidate,
     config.canVote,
-    '0x000000000000000000000000000000000000ce10',
+    celoRegistryAddress,
   ]
 
   const bytecode = await web3.eth.getCode(config.beneficiary)
