@@ -93,7 +93,11 @@ export default function PhoneNumberInput({
           disabled={!editable}
         >
           <View style={styles.countryCodeContent}>
-            <Expandable isExpandable={editable} isExpanded={false}>
+            <Expandable
+              isExpandable={editable}
+              isExpanded={false}
+              containerStyle={styles.countryFlagContainer}
+            >
               <Text style={styles.flag} testID={'countryCodeFlag'}>
                 {flagEmoji}
               </Text>
@@ -130,6 +134,9 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     backgroundColor: colors.light,
     borderRadius: 8,
+  },
+  countryFlagContainer: {
+    justifyContent: 'center',
   },
   countryCodeContent: {
     flex: 1,

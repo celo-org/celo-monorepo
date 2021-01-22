@@ -256,7 +256,9 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                       "lineHeight": 22,
                       "marginLeft": 16,
                     },
-                    Object {},
+                    Object {
+                      "color": "#B4B9BD",
+                    },
                   ]
                 }
               >
@@ -330,7 +332,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                 cx="10"
                 cy="10"
                 r="9"
-                stroke="#B4B9BD"
+                stroke="#1AB775"
                 strokeWidth={2}
                 style={Object {}}
               />
@@ -390,15 +392,8 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                 cx="10"
                 cy="10"
                 r="9"
-                stroke="#1AB775"
+                stroke="#B4B9BD"
                 strokeWidth={2}
-                style={Object {}}
-              />
-              <circle
-                cx="10"
-                cy="10"
-                fill="#1AB775"
-                r="6"
                 style={Object {}}
               />
             </svg>

@@ -21,6 +21,10 @@ describe('Blockchain parameters tests', function(this: any) {
     keepData: false,
     networkId: 1101,
     network: 'local',
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator',

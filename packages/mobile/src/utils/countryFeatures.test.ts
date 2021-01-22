@@ -18,7 +18,6 @@ describe(getCountryFeaturesSelector, () => {
         "PONTO_SUPPORTED": false,
         "RESTRICTED_CP_DOTO": false,
         "SANCTIONED_COUNTRY": false,
-        "SIMPLEX_DISABLED": false,
       }
     `)
   })
@@ -38,7 +37,6 @@ describe(getCountryFeaturesSelector, () => {
         "PONTO_SUPPORTED": true,
         "RESTRICTED_CP_DOTO": true,
         "SANCTIONED_COUNTRY": false,
-        "SIMPLEX_DISABLED": true,
       }
     `)
   })
@@ -58,7 +56,6 @@ describe(getCountryFeaturesSelector, () => {
         "PONTO_SUPPORTED": false,
         "RESTRICTED_CP_DOTO": true,
         "SANCTIONED_COUNTRY": false,
-        "SIMPLEX_DISABLED": false,
       }
     `)
   })
@@ -78,7 +75,6 @@ describe(getCountryFeaturesSelector, () => {
         "PONTO_SUPPORTED": false,
         "RESTRICTED_CP_DOTO": false,
         "SANCTIONED_COUNTRY": true,
-        "SIMPLEX_DISABLED": true,
       }
     `)
   })

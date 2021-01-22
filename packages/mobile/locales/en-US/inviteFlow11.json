@@ -14,7 +14,6 @@
   "accountSetupFailed": "Failed to create your wallet",
   "emptyInviteCode": "Invite code has no funds",
   "transferDollarsToAccount": "Dollars transferred to your account!",
-  "inviteFriendsToCelo": "Invite Friends to {{appName}}",
   "inviteAnyone": "Send easily to your friends by adding your contacts",
   "inviteReceived": "Invite Received",
   "escrowPaymentNotificationTitle": "Invited {{mobile}}",

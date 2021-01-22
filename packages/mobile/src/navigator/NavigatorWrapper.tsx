@@ -17,7 +17,7 @@ import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import i18n from 'src/i18n'
 import InviteFriendModal from 'src/invite/InviteFriendModal'
 import { generateInviteLink } from 'src/invite/saga'
-import { navigate, navigationRef } from 'src/navigator/NavigationService'
+import { navigate, navigationRef, navigatorIsReadyRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
@@ -132,6 +132,12 @@ export const NavigatorWrapper = () => {
     }
   }, [appState])
 
+  React.useEffect(() => {
+    return () => {
+      navigatorIsReadyRef.current = false
+    }
+  }, [])
+
   if (!isReady) {
     return null
   }
@@ -172,9 +178,14 @@ export const NavigatorWrapper = () => {
     await Share.share({ message })
   }
 
+  const onReady = () => {
+    navigatorIsReadyRef.current = true
+  }
+
   return (
     <NavigationContainer
       ref={navigationRef}
+      onReady={onReady}
       onStateChange={handleStateChange}
       initialState={initialState}
       theme={AppTheme}
