@@ -103,7 +103,7 @@ spec:
             # Get the AWS key region (if it exists).
             # Even if we aren't deploying for AWS, this is OK to include.
             AWS_KEY_REGIONS={{- range $index, $identity := .Values.oracle.identities -}}{{- if (hasKey $identity "aws" ) -}}{{ $identity.aws.keyRegion | default "" }}{{- end }},{{- end }}
-            AWS_KEY_REGION=`echo -n $AWS_KEY_REGIONS | cut -d ',' -f $((RID + 1))`
+            export AWS_KEY_REGION=`echo -n $AWS_KEY_REGIONS | cut -d ',' -f $((RID + 1))`
 
             # Get the correct key vault name. If this oracle's identity is not
             # using Azure HSM signing, the key vault name will be empty and ignored
