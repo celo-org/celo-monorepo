@@ -202,7 +202,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -243,6 +243,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Object {
                       "color": undefined,
                       "fontSize": 24,
+                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -1223,7 +1224,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -1264,6 +1265,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Object {
                       "color": undefined,
                       "fontSize": 24,
+                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -2244,7 +2246,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -2285,6 +2287,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Object {
                       "color": undefined,
                       "fontSize": 24,
+                      "paddingVertical": 4,
                     },
                   ]
                 }

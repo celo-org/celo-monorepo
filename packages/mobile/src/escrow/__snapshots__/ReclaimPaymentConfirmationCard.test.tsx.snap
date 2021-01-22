@@ -136,7 +136,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
     style={
       Array [
         Object {
-          "alignItems": "flex-start",
+          "alignItems": "center",
           "alignSelf": "center",
           "flexDirection": "row",
           "marginTop": 5,
@@ -177,6 +177,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Object {
             "color": undefined,
             "fontSize": 24,
+            "paddingVertical": 4,
           },
         ]
       }
