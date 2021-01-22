@@ -107,7 +107,7 @@ function PaymentMethodRadioItem({
   return (
     <TouchableWithoutFeedback onPress={onSelect} disabled={!enabled}>
       <View style={styles.paymentMethodItemContainer}>
-        <RadioButton selected={selected} />
+        <RadioButton selected={selected} disabled={!enabled}/>
         <Text style={[styles.paymentMethodItemText, enabled ? {} : { color: colors.gray3 }]}>
           {text}
         </Text>
