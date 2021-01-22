@@ -1,17 +1,32 @@
-import { NumberToRecipient } from 'src/recipients/recipient'
+import { AddressToRecipient, NumberToRecipient } from 'src/recipients/recipient'
 
 export enum Actions {
-  SET_RECIPIENT_CACHE = 'SEND/SET_RECIPIENT_CACHE',
+  SET_PHONE_RECIPIENT_CACHE = 'RECIPIENTS/SET_PHONE_RECIPIENT_CACHE',
+  UPDATE_VALORA_RECIPIENT_CACHE = 'RECIPIENTS/SET_VALORA_RECIPIENT_CACHE',
 }
 
-export interface SetRecipientCacheAction {
-  type: Actions.SET_RECIPIENT_CACHE
+export interface SetPhoneRecipientCacheAction {
+  type: Actions.SET_PHONE_RECIPIENT_CACHE
   recipients: NumberToRecipient
 }
 
-export type ActionTypes = SetRecipientCacheAction
+export interface UpdateValoraRecipientCacheAction {
+  type: Actions.UPDATE_VALORA_RECIPIENT_CACHE
+  recipients: AddressToRecipient
+}
 
-export const setRecipientCache = (recipients: NumberToRecipient): SetRecipientCacheAction => ({
-  type: Actions.SET_RECIPIENT_CACHE,
+export type ActionTypes = SetPhoneRecipientCacheAction | UpdateValoraRecipientCacheAction
+
+export const setPhoneRecipientCache = (
+  recipients: NumberToRecipient
+): SetPhoneRecipientCacheAction => ({
+  type: Actions.SET_PHONE_RECIPIENT_CACHE,
+  recipients,
+})
+
+export const updateValoraRecipientCache = (
+  recipients: AddressToRecipient
+): UpdateValoraRecipientCacheAction => ({
+  type: Actions.UPDATE_VALORA_RECIPIENT_CACHE,
   recipients,
 })

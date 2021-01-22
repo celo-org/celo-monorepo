@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -14,6 +13,7 @@ import { RequestEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton'
 import CommentTextInput from 'src/components/CommentTextInput'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { currencyToShortMap } from 'src/geth/consts'
@@ -23,7 +23,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { writePaymentRequest } from 'src/paymentRequest/actions'
 import { PaymentRequestStatus } from 'src/paymentRequest/types'
-import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
+import { getDisplayName } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -98,8 +98,8 @@ class PaymentRequestConfirmation extends React.Component<Props> {
   onConfirm = async () => {
     const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
     const { t } = this.props
-    if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
-      throw new Error("Can't request from recipient without valid e164 number or a wallet address")
+    if (!recipient) {
+      throw new Error("Can't request without valid recipient")
     }
 
     const address = this.props.account
@@ -143,7 +143,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
   render() {
     const { t, confirmationInput } = this.props
-    const { recipient, recipientAddress: requesteeAddress } = confirmationInput
+    const { recipient } = confirmationInput
     const amount = {
       value: this.props.confirmationInput.amount,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code, // Only cUSD for now
@@ -162,16 +162,10 @@ class PaymentRequestConfirmation extends React.Component<Props> {
         >
           <View style={styles.transferContainer}>
             <View style={styles.headerContainer}>
-              <ContactCircle
-                name={this.props.confirmationInput.recipient.displayName}
-                thumbnailPath={getRecipientThumbnail(recipient)}
-                address={requesteeAddress || ''}
-              />
+              <ContactCircle recipient={recipient} />
               <View style={styles.recipientInfoContainer}>
                 <Text style={styles.headerText}>{t('requesting')}</Text>
-                <Text style={styles.displayName}>
-                  {getDisplayName({ recipient, recipientAddress: requesteeAddress, t })}
-                </Text>
+                <Text style={styles.displayName}>{getDisplayName(recipient, t)}</Text>
               </View>
             </View>
             <CurrencyDisplay type={DisplayType.Default} style={styles.amount} amount={amount} />

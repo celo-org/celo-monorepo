@@ -4,7 +4,7 @@ import Animated, {
   Clock,
   clockRunning,
   cond,
-  Easing,
+  EasingNode,
   not,
   set,
   startClock,
@@ -14,7 +14,7 @@ import Animated, {
 
 export interface LoopProps {
   clock?: Animated.Clock
-  easing?: Animated.EasingFunction
+  easing?: Animated.EasingNodeFunction
   duration?: number
   boomerang?: boolean
   autoStart?: boolean
@@ -25,7 +25,7 @@ export interface LoopProps {
 export const loop = (loopConfig: LoopProps) => {
   const { clock, easing, duration, boomerang, autoStart } = {
     clock: new Clock(),
-    easing: Easing.linear,
+    easing: EasingNode.linear,
     duration: 250,
     boomerang: false,
     autoStart: true,

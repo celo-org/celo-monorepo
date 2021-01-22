@@ -10,6 +10,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
+import { getDisplayName, recipientHasNumber } from 'src/recipients/recipient'
 
 type RouteProps = StackScreenProps<StackParamList, Screens.PaymentRequestUnavailable>
 type Props = RouteProps
@@ -25,17 +26,18 @@ export const paymentRequestUnavailableScreenNavOptions = () => ({
 const PaymentRequestUnavailable = (props: Props) => {
   const { t } = useTranslation(Namespaces.paymentRequestFlow)
   const { recipient } = props.route.params.transactionData
+  const displayName = getDisplayName(recipient, t)
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.requestHeader}>
-          {recipient.displayName === 'Mobile #'
+          {!recipient.name
             ? t('requestUnavailableNoDisplayNameHeader')
-            : t('requestUnavailableHeader', { displayName: recipient.displayName })}
+            : t('requestUnavailableHeader', { displayName })}
         </Text>
         <Text style={styles.body}>
-          {recipient.e164PhoneNumber
+          {recipientHasNumber(recipient)
             ? t('requestUnavailableBody', { e164PhoneNumber: recipient.e164PhoneNumber })
             : t('requestUnavailableNoNumberBody')}
         </Text>

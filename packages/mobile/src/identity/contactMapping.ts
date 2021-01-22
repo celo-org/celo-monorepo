@@ -38,7 +38,7 @@ import {
 } from 'src/identity/reducer'
 import { checkIfValidationRequired } from 'src/identity/secureSend'
 import { ImportContactsStatus } from 'src/identity/types'
-import { setRecipientCache } from 'src/recipients/actions'
+import { setPhoneRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
@@ -104,15 +104,15 @@ function* doImportContacts(doMatchmaking: boolean) {
   yield put(updateImportContactsProgress(ImportContactsStatus.Processing, 0, contacts.length))
 
   const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
-  const recipients = contactsToRecipients(contacts, defaultCountryCode)
-  if (!recipients) {
+  const e164NumberToRecipients = contactsToRecipients(contacts, defaultCountryCode)
+  if (!e164NumberToRecipients) {
     Logger.warn(TAG, 'No recipients found')
     return true
   }
-  const { e164NumberToRecipients, otherRecipients } = recipients
 
   yield call(updateUserContact, e164NumberToRecipients)
-  yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
+  Logger.debug(TAG, 'Updating recipients cache')
+  yield put(setPhoneRecipientCache(e164NumberToRecipients))
 
   ValoraAnalytics.track(IdentityEvents.contacts_processing_complete)
 
@@ -143,14 +143,6 @@ function* updateUserContact(e164NumberToRecipients: NumberToRecipient) {
   }
 
   yield put(setUserContactDetails(userRecipient.contactId, userRecipient.thumbnailPath || null))
-}
-
-function* updateRecipientsCache(
-  e164NumberToRecipients: NumberToRecipient,
-  otherRecipients: NumberToRecipient
-) {
-  Logger.debug(TAG, 'Updating recipients cache')
-  yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
 export function* fetchAddressesAndValidateSaga({

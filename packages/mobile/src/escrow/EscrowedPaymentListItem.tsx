@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -6,6 +5,7 @@ import { StyleSheet, View } from 'react-native'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -15,6 +15,7 @@ import { InviteDetails } from 'src/invite/actions'
 import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { Recipient } from 'src/recipients/recipient'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -73,12 +74,10 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   getCTA = () => {
     const { t } = this.props
     const ctas = []
-    if (this.getDisplayName()) {
-      ctas.push({
-        text: t('global:remind'),
-        onPress: this.onRemind,
-      })
-    }
+    ctas.push({
+      text: t('global:remind'),
+      onPress: this.onRemind,
+    })
     ctas.push({
       text: t('global:reclaim'),
       onPress: this.onReclaimPayment,
@@ -86,29 +85,26 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
     return ctas
   }
 
-  getDisplayName() {
-    const { payment } = this.props
-    // TODO(Rossy) Get contact number from recipient cache here
-    return payment.recipientPhone
-  }
-
   render() {
     const { t, payment } = this.props
-    const mobile = this.getDisplayName() || t('global:unknown').toLowerCase()
     const amount = {
       value: divideByWei(payment.amount),
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
+    const recipient: Recipient = {
+      e164PhoneNumber: payment.recipientPhone,
+    }
+    // TODO: get display number from recipient cache
 
     return (
       <View style={styles.container}>
         <RequestMessagingCard
-          title={t('escrowPaymentNotificationTitle', { mobile })}
+          title={t('escrowPaymentNotificationTitle', { mobile: payment.recipientPhone })}
           amount={<CurrencyDisplay amount={amount} />}
           details={payment.message}
           icon={
             <ContactCircle
-              name={mobile}
+              recipient={recipient}
               // TODO: Add thumbnailPath={}
             />
           }

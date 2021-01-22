@@ -64,6 +64,7 @@
   * [packages/sdk/utils/src/solidity](modules/_packages_sdk_utils_src_solidity_.md)
   * [packages/sdk/utils/src/string](modules/_packages_sdk_utils_src_string_.md)
   * [packages/sdk/utils/src/task](modules/_packages_sdk_utils_src_task_.md)
+  * [packages/sdk/utils/src/typed-data-constructors](modules/_packages_sdk_utils_src_typed_data_constructors_.md)
 * [Classes]()
   * [F](classes/_node_modules_bls12377js_src_f_.f.md)
   * [F2](classes/_node_modules_bls12377js_src_f2_.f2.md)

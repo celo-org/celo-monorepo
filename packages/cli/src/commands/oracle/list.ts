@@ -5,7 +5,7 @@ export default class List extends BaseCommand {
   static description = 'List oracle addresses for a given token'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   static args = [

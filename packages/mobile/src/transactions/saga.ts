@@ -1,15 +1,18 @@
 import { CeloTransactionObject } from '@celo/connect'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
-import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { all, call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { getProfileInfo } from 'src/account/profileInfo'
 import { showError } from 'src/alert/actions'
+import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { Actions as IdentityActions } from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
-import { NumberToRecipient } from 'src/recipients/recipient'
-import { recipientCacheSelector } from 'src/recipients/reducer'
+import { updateValoraRecipientCache } from 'src/recipients/actions'
+import { AddressToRecipient, NumberToRecipient } from 'src/recipients/recipient'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   Actions,
@@ -105,7 +108,7 @@ export function* sendAndMonitorTransaction<T>(
 
 function* refreshRecentTxRecipients() {
   const addressToE164Number = yield select(addressToE164NumberSelector)
-  const recipientCache = yield select(recipientCacheSelector)
+  const recipientCache = yield select(phoneRecipientCacheSelector)
   const knownFeedTransactions: KnownFeedTransactionsType = yield select(
     knownFeedTransactionsSelector
   )
@@ -149,8 +152,44 @@ function* refreshRecentTxRecipients() {
   yield put(updateRecentTxRecipientsCache(recentTxRecipientsCache))
 }
 
+function* addProfile(transaction: TransactionFeedFragment) {
+  const profiles = yield select(valoraRecipientCacheSelector)
+  // @ts-ignore transaction must have address because it is a TokenTransfer
+  const address = transaction.address
+  if (!profiles[address]) {
+    const newProfile: AddressToRecipient = {}
+    if (transaction.type === TokenTransactionType.Received) {
+      const info = yield call(getProfileInfo, address)
+      if (info) {
+        newProfile[address] = {
+          address,
+          name: info.name,
+          thumbnailPath: info.thumbnailPath,
+        }
+        yield put(updateValoraRecipientCache(newProfile))
+        return
+      }
+    }
+
+    newProfile[address] = {
+      address,
+    }
+    yield put(updateValoraRecipientCache(newProfile))
+    return
+  }
+}
+
+function* addRecipientProfiles({ transactions }: NewTransactionsInFeedAction) {
+  yield all(
+    transactions
+      .filter((trans) => trans.__typename === 'TokenTransfer')
+      .map((trans) => call(addProfile, trans))
+  )
+}
+
 function* watchNewFeedTransactions() {
   yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, cleanupStandbyTransactions)
+  yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, addRecipientProfiles)
   yield takeLatest(Actions.NEW_TRANSACTIONS_IN_FEED, refreshRecentTxRecipients)
 }
 

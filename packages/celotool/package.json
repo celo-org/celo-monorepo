@@ -9,6 +9,7 @@
     "@celo/base": "1.0.0-dev",
     "@celo/connect": "1.0.0-dev",
     "@celo/contractkit": "1.0.0-dev",
+    "@celo/env-tests": "1.0.0",
     "@celo/explorer": "1.0.0-dev",
     "@celo/identity": "1.0.0-dev",
     "@celo/governance": "1.0.0-dev",

@@ -5,87 +5,11 @@ import { call } from 'redux-saga/effects'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { features } from 'src/flags'
 import i18n from 'src/i18n'
-import { AddressToE164NumberType } from 'src/identity/reducer'
 import { PaymentRequest } from 'src/paymentRequest/types'
-import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 
 const TAG = 'paymentRequest/utils'
-
-// Returns a recipient for the SENDER of a payment request
-// i.e. this account when outgoing, another when incoming
-export function getRequesterFromPaymentRequest(
-  paymentRequest: PaymentRequest,
-  addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
-): Recipient {
-  return getRecipientObjectFromPaymentRequest(
-    paymentRequest,
-    addressToE164Number,
-    recipientCache,
-    false
-  )
-}
-
-// Returns a recipient for the TARGET of a payment request
-// i.e. this account when incoming, another when outgoing
-export function getRequesteeFromPaymentRequest(
-  paymentRequest: PaymentRequest,
-  addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
-): Recipient {
-  return getRecipientObjectFromPaymentRequest(
-    paymentRequest,
-    addressToE164Number,
-    recipientCache,
-    true
-  )
-}
-
-function getRecipientObjectFromPaymentRequest(
-  paymentRequest: PaymentRequest,
-  addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient,
-  isRequestee: boolean
-): Recipient {
-  let address: string
-  let e164PhoneNumber: string | undefined
-  if (isRequestee) {
-    address = paymentRequest.requesteeAddress
-    e164PhoneNumber = addressToE164Number[address] ?? undefined
-  } else {
-    address = paymentRequest.requesterAddress
-    // For now, priority is given the # in the request over the cached #
-    // from the on-chain mapping. This may be revisted later.
-    e164PhoneNumber =
-      paymentRequest.requesterE164Number ?? addressToE164Number[address] ?? undefined
-  }
-
-  if (!e164PhoneNumber) {
-    return {
-      kind: RecipientKind.Address,
-      address,
-      displayName: address,
-    }
-  }
-
-  const cachedRecipient = recipientCache[e164PhoneNumber]
-  if (cachedRecipient) {
-    return {
-      ...cachedRecipient,
-      kind: RecipientKind.Address,
-      address,
-    }
-  } else {
-    return {
-      kind: RecipientKind.MobileNumber,
-      address,
-      e164PhoneNumber,
-      displayName: e164PhoneNumber,
-    }
-  }
-}
 
 // Encrypt sensitive data in the payment request using the recipient and sender DEK
 export function* encryptPaymentRequest(paymentRequest: PaymentRequest) {

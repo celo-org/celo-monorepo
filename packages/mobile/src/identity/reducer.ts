@@ -21,6 +21,7 @@ import {
   ESTIMATED_COST_PER_ATTESTATION,
   NUM_ATTESTATIONS_REQUIRED,
 } from 'src/identity/verification'
+import { recipientHasAddress } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { Actions as SendActions, StoreLatestInRecentsAction } from 'src/send/actions'
@@ -49,6 +50,7 @@ export interface AddressToDataEncryptionKeyType {
 export interface AddressInfoToDisplay {
   name: string
   imageUrl: string | null
+  isCeloRewardSender?: boolean
 }
 
 export interface AddressToDisplayNameType {
@@ -251,6 +253,14 @@ export const reducer = (
         isFetchingAddresses: false,
       }
     }
+    case Actions.CANCEL_VERIFICATION:
+      return {
+        ...state,
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          isActive: false,
+        },
+      }
     case Actions.RESET_VERIFICATION:
       return {
         ...state,
@@ -314,7 +324,7 @@ export const reducer = (
         feelessVerificationStatus: action.status,
         feelessVerificationState: {
           ...state.feelessVerificationState,
-          isActive: action.status > 0 && action.status !== VerificationStatus.Done,
+          isActive: action.status !== VerificationStatus.Done,
           isLoading: action.status === VerificationStatus.GettingStatus,
         },
       }
@@ -394,14 +404,14 @@ export const reducer = (
         e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
       }
     case SendActions.STORE_LATEST_IN_RECENTS:
-      if (!action.recipient.address) {
+      if (!recipientHasAddress(action.recipient)) {
         return state
       }
       action = {
         type: Actions.UPDATE_KNOWN_ADDRESSES,
         knownAddresses: {
           [action.recipient.address]: {
-            name: action.recipient.displayName,
+            name: action.recipient.name!,
             imageUrl: null,
           },
         },

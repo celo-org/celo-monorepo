@@ -10,11 +10,11 @@ import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { RecipientWithContact } from 'src/recipients/recipient'
+import { MobileRecipient } from 'src/recipients/recipient'
 
 interface Props {
   recipientPhone: string
-  recipientContact?: RecipientWithContact
+  recipientContact: MobileRecipient
   amount: BigNumber
   fee?: BigNumber
   isLoadingFee?: boolean

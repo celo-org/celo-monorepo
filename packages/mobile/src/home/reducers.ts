@@ -1,34 +1,84 @@
-import dotProp from 'dot-prop-immutable'
-import { Actions } from 'src/home/actions'
+import { RehydrateAction } from 'redux-persist'
+import { Actions, ActionTypes } from 'src/home/actions'
+import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
+
+export interface NotificationTexts {
+  body: string
+  cta: string
+  dismiss: string
+}
+
+export interface Notification {
+  ctaUri: string
+  darkMode: boolean
+  content: { [lang: string]: NotificationTexts | undefined }
+  dismissed?: boolean
+}
+
+export interface IdToNotification {
+  [id: string]: Notification | undefined
+}
 
 export interface State {
   loading: boolean
-  notifications: any[]
+  notifications: IdToNotification
 }
 
 const initialState = {
   loading: false,
-  notifications: [],
+  notifications: {},
 }
 
-export const homeReducer = (state: State = initialState, action: any) => {
+export const homeReducer = (state: State = initialState, action: ActionTypes | RehydrateAction) => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      const rehydratedState = getRehydratePayload(action, 'home')
+      return {
+        ...state,
+        ...rehydratedState,
+        loading: false,
+      }
+    }
     case Actions.SET_LOADING:
       return {
         ...state,
         loading: action.loading,
       }
-    case Actions.ADD_NOTIFICATION:
-      return dotProp.set(state, 'notifications', (list: any) => [
-        action.payload.notification,
-        ...list,
-      ])
-    case Actions.SET_NOTIFICATION:
-      return dotProp.set(
-        state,
-        `notifications.${action.payload.index}`,
-        action.payload.notification
-      )
+    case Actions.UPDATE_NOTIFICATIONS:
+      // Doing it this way removes any notifications not received on the action.
+      let updatedNotifications = {}
+      for (const [id, updatedNotification] of Object.entries(action.notifications)) {
+        if (!updatedNotification) {
+          continue
+        }
+        updatedNotifications = {
+          ...updatedNotifications,
+          [id]: {
+            ...(state.notifications[id] || {}),
+            ...updatedNotification,
+          },
+        }
+      }
+      return {
+        ...state,
+        notifications: updatedNotifications,
+      }
+    case Actions.DISMISS_NOTIFICATION:
+      const notification = state.notifications[action.id]
+      if (!notification) {
+        return state
+      }
+      return {
+        ...state,
+        notifications: {
+          ...state.notifications,
+          [action.id]: {
+            ...notification,
+            dismissed: true,
+          },
+        },
+      }
     default:
       return state
   }

@@ -5,16 +5,15 @@ import { showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { openUrl } from 'src/app/actions'
 import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
 import {
   NotificationReceiveState,
   NotificationTypes,
   TransferNotificationData,
 } from 'src/notifications/types'
 import { PaymentRequest } from 'src/paymentRequest/types'
-import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
-import { getRecipientFromAddress } from 'src/recipients/recipient'
-import { recipientCacheSelector } from 'src/recipients/reducer'
+import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
@@ -37,13 +36,13 @@ function* handlePaymentRequested(
     return
   }
 
-  const addressToE164Number = yield select(addressToE164NumberSelector)
-  const recipientCache = yield select(recipientCacheSelector)
-  const targetRecipient = getRequesterFromPaymentRequest(
-    paymentRequest,
-    addressToE164Number,
-    recipientCache
-  )
+  const info: RecipientInfo = {
+    addressToE164Number: yield select(addressToE164NumberSelector),
+    phoneRecipientCache: yield select(phoneRecipientCacheSelector),
+    valoraRecipientCache: yield select(valoraRecipientCacheSelector),
+    addressToDisplayName: yield select(addressToDisplayNameSelector),
+  }
+  const targetRecipient = getRecipientFromAddress(paymentRequest.requesterAddress, info)
 
   navigateToRequestedPaymentReview({
     firebasePendingRequestUid: paymentRequest.uid,
@@ -59,8 +58,13 @@ function* handlePaymentReceived(
   notificationState: NotificationReceiveState
 ) {
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
-    const recipientCache = yield select(recipientCacheSelector)
-    const addressToE164Number = yield select(addressToE164NumberSelector)
+    const addressToDisplayName = yield select(addressToDisplayNameSelector)
+    const info: RecipientInfo = {
+      addressToE164Number: yield select(addressToE164NumberSelector),
+      phoneRecipientCache: yield select(phoneRecipientCacheSelector),
+      valoraRecipientCache: yield select(valoraRecipientCacheSelector),
+      addressToDisplayName,
+    }
     const address = transferNotification.sender.toLowerCase()
     const currency = resolveCurrency(transferNotification.currency)
 
@@ -74,9 +78,10 @@ function* handlePaymentReceived(
         },
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,
-        recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),
+        recipient: getRecipientFromAddress(address, info),
         type: TokenTransactionType.Received,
-      }
+      },
+      addressToDisplayName
     )
   }
 }
@@ -85,27 +90,21 @@ export function* handleNotification(
   message: FirebaseMessagingTypes.RemoteMessage,
   notificationState: NotificationReceiveState
 ) {
-  // See if this is a notification with an open url action (`ou` prop in the data)
+  // See if this is a notification with an open url or webview action (`ou` prop in the data)
   const urlToOpen = message.data?.ou
+  const openExternal = message.data?.openExternal === 'true'
+  const openUrlAction = urlToOpen ? openUrl(urlToOpen, openExternal) : null
 
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
     const { title, body } = message.notification ?? {}
     if (title) {
-      yield put(
-        showMessage(
-          body || title,
-          undefined,
-          null,
-          urlToOpen ? openUrl(urlToOpen) : null,
-          body ? title : null
-        )
-      )
+      yield put(showMessage(body || title, undefined, null, openUrlAction, body ? title : null))
     }
   } else {
     // Notification was received while app wasn't already open (i.e. tapped to act on it)
     // So directly handle the action if any
-    if (urlToOpen) {
-      yield put(openUrl(urlToOpen))
+    if (openUrlAction) {
+      yield put(openUrlAction)
       return
     }
   }

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { TextStyle } from 'react-native'
 import { e164NumberSelector, nameSelector, userContactDetailsSelector } from 'src/account/selectors'
 import Avatar from 'src/components/Avatar'
-import { Recipient, RecipientKind } from 'src/recipients/recipient'
+import { Recipient } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -19,22 +19,27 @@ export function AvatarSelf({ iconSize, displayNameStyle }: Props) {
   const account = useSelector(currentAccountSelector)
 
   // Recipient refering to the wallet user, used for the avatar
-  let recipient: Recipient | undefined
+  let recipient: Recipient
   if (displayName && e164PhoneNumber) {
     recipient = {
-      kind: RecipientKind.Contact,
       contactId: contactDetails.contactId || 'none',
       thumbnailPath: contactDetails.thumbnailPath || undefined,
-      displayName,
+      name: displayName,
       e164PhoneNumber,
+      address: account || undefined,
     }
   } else if (account) {
     recipient = {
-      kind: RecipientKind.Address,
       address: account,
-      displayName: account,
     }
   }
 
-  return <Avatar recipient={recipient} iconSize={iconSize} displayNameStyle={displayNameStyle} />
+  return (
+    <Avatar
+      // @ts-ignore
+      recipient={recipient}
+      iconSize={iconSize}
+      displayNameStyle={displayNameStyle}
+    />
+  )
 }

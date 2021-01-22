@@ -6,9 +6,13 @@ import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import { Namespaces } from 'src/i18n'
-import { addressToDisplayNameSelector, AddressToE164NumberType } from 'src/identity/reducer'
+import {
+  addressToDisplayNameSelector,
+  AddressToDisplayNameType,
+  AddressToE164NumberType,
+} from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
-import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
+import { getRecipientFromAddress, NumberToRecipient, RecipientInfo } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
@@ -22,10 +26,11 @@ type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
   addressToE164Number: AddressToE164NumberType
-  recipientCache: NumberToRecipient
+  phoneRecipientCache: NumberToRecipient
   recentTxRecipientsCache: NumberToRecipient
   invitees: InviteDetails[]
   commentKey: string | null
+  recipientInfo: RecipientInfo
 }
 
 function navigateToTransactionReview({
@@ -35,33 +40,37 @@ function navigateToTransactionReview({
   commentKey,
   timestamp,
   amount,
-  addressToE164Number,
-  recipientCache,
-}: Props) {
+  recipientInfo,
+  addressToDisplayName,
+}: Props & { addressToDisplayName: AddressToDisplayNameType }) {
   // TODO: remove this when verification reward drilldown is supported
   if (type === TokenTransactionType.VerificationReward) {
     return
   }
 
-  const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-  const e164PhoneNumber = addressToE164Number[address] || undefined
+  const recipient = getRecipientFromAddress(address, recipientInfo)
 
-  navigateToPaymentTransferReview(type, timestamp, {
-    address,
-    comment: getDecryptedTransferFeedComment(comment, commentKey, type),
-    amount,
-    recipient,
+  navigateToPaymentTransferReview(
     type,
-    e164PhoneNumber,
-    // fee TODO: add fee here.
-  })
+    timestamp,
+    {
+      address,
+      comment: getDecryptedTransferFeedComment(comment, commentKey, type),
+      amount,
+      recipient,
+      type,
+      // fee TODO: add fee here.
+    },
+    addressToDisplayName
+  )
 }
 
 export function TransferFeedItem(props: Props) {
   const { t } = useTranslation(Namespaces.walletFlow5)
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
 
   const onPress = () => {
-    navigateToTransactionReview(props)
+    navigateToTransactionReview({ ...props, addressToDisplayName })
     ValoraAnalytics.track(HomeEvents.transaction_feed_item_select)
   }
 
@@ -74,17 +83,16 @@ export function TransferFeedItem(props: Props) {
     commentKey,
     status,
     addressToE164Number,
-    recipientCache,
+    phoneRecipientCache,
     recentTxRecipientsCache,
     invitees,
+    recipientInfo,
   } = props
-
-  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
-    recipientCache,
+    phoneRecipientCache,
     recentTxRecipientsCache,
     address,
     addressToE164Number,
@@ -92,9 +100,9 @@ export function TransferFeedItem(props: Props) {
     comment,
     commentKey,
     timestamp,
-    invitees
+    invitees,
+    recipientInfo
   )
-  const imageUrl = addressToDisplayName[address]?.imageUrl ?? null
 
   return (
     <TransactionFeedItem
@@ -102,9 +110,7 @@ export function TransferFeedItem(props: Props) {
       amount={amount}
       title={title}
       info={info}
-      icon={
-        <TransferFeedIcon type={type} recipient={recipient} address={address} imageUrl={imageUrl} />
-      }
+      icon={<TransferFeedIcon type={type} recipient={recipient} />}
       timestamp={timestamp}
       status={status}
       onPress={onPress}

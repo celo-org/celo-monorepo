@@ -16,7 +16,7 @@
 
 • **sign**: *function*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L4)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L4)*
 
 #### Type declaration:
 

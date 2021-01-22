@@ -6,11 +6,17 @@ import {
   TransferItemFragment,
   UserTransactionsQuery,
 } from 'src/apollo/types'
+import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
-import { NumberToRecipient } from 'src/recipients/recipient'
+import {
+  getRecipientFromAddress,
+  NumberToRecipient,
+  Recipient,
+  RecipientInfo,
+} from 'src/recipients/recipient'
 import { KnownFeedTransactionsType } from 'src/transactions/reducer'
 import { isPresent } from 'src/utils/typescript'
 
@@ -50,28 +56,35 @@ function getRecipient(
   recipientCache: NumberToRecipient,
   recentTxRecipientsCache: NumberToRecipient,
   txTimestamp: number,
-  invitees: InviteDetails[]
+  invitees: InviteDetails[],
+  address: string,
+  recipientInfo: RecipientInfo
 ) {
   let phoneNumber = e164PhoneNumber
+  let recipient: Recipient
 
   if (type === TokenTransactionType.EscrowSent) {
     phoneNumber = getEscrowSentRecipientPhoneNumber(invitees, txTimestamp)
   }
 
-  if (!phoneNumber) {
-    return undefined
-  }
+  if (phoneNumber) {
+    // Use the recentTxRecipientCache until the full cache is populated
+    recipient = Object.keys(recipientCache).length
+      ? recipientCache[phoneNumber]
+      : recentTxRecipientsCache[phoneNumber]
 
-  // Use the recentTxRecipientCache until the full cache is populated
-  return Object.keys(recipientCache).length
-    ? recipientCache[phoneNumber]
-    : recentTxRecipientsCache[phoneNumber]
+    if (recipient) {
+      Object.assign(recipient, { address })
+      return recipient
+    }
+  }
+  return getRecipientFromAddress(address, recipientInfo)
 }
 
 export function getTransferFeedParams(
   type: TokenTransactionType,
   t: TFunction,
-  recipientCache: NumberToRecipient,
+  phoneRecipientCache: NumberToRecipient,
   recentTxRecipientsCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
@@ -79,19 +92,27 @@ export function getTransferFeedParams(
   rawComment: string | null,
   commentKey: string | null,
   timestamp: number,
-  invitees: InviteDetails[]
+  invitees: InviteDetails[],
+  recipientInfo: RecipientInfo
 ) {
   const e164PhoneNumber = addressToE164Number[address]
   const recipient = getRecipient(
     type,
     e164PhoneNumber,
-    recipientCache,
+    phoneRecipientCache,
     recentTxRecipientsCache,
     timestamp,
-    invitees
+    invitees,
+    address,
+    recipientInfo
   )
-  const nameOrNumber =
-    recipient?.displayName || addressToDisplayName[address]?.name || e164PhoneNumber
+  Object.assign(recipient, { address })
+  const nameOrNumber = recipient?.name || addressToDisplayName[address]?.name || e164PhoneNumber
+  const displayName =
+    nameOrNumber ||
+    t('feedItemAddress', {
+      address: formatShortenedAddress(address),
+    })
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info
@@ -134,18 +155,12 @@ export function getTransferFeedParams(
       break
     }
     case TokenTransactionType.Sent: {
-      title = t('feedItemSentTitle', {
-        context: !nameOrNumber ? 'noReceiverDetails' : null,
-        nameOrNumber,
-      })
+      title = t('feedItemSentTitle', { displayName })
       info = t('feedItemSentInfo', { context: !comment ? 'noComment' : null, comment })
       break
     }
     case TokenTransactionType.Received: {
-      title = t('feedItemReceivedTitle', {
-        context: !nameOrNumber ? 'noSenderDetails' : null,
-        nameOrNumber,
-      })
+      title = t('feedItemReceivedTitle', { displayName })
       info = t('feedItemReceivedInfo', { context: !comment ? 'noComment' : null, comment })
       break
     }

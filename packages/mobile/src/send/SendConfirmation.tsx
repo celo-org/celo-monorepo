@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
@@ -17,6 +16,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton'
 import CommentTextInput from 'src/components/CommentTextInput'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import FeeDrawer from 'src/components/FeeDrawer'
@@ -49,7 +49,7 @@ import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
+import { getDisplayName } from 'src/recipients/recipient'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
 import { isSendingSelector } from 'src/send/selectors'
@@ -229,8 +229,6 @@ function SendConfirmation(props: Props) {
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
 
-    const { displayName, e164PhoneNumber } = transactionData.recipient
-
     const subtotalAmount = {
       value: amount || inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
@@ -322,18 +320,12 @@ function SendConfirmation(props: Props) {
           <View style={styles.transferContainer}>
             {isInvite && <Text style={styles.inviteText}>{t('inviteMoneyEscrow')}</Text>}
             <View style={styles.headerContainer}>
-              <ContactCircle
-                name={transactionData.recipient.displayName}
-                thumbnailPath={getRecipientThumbnail(recipient)}
-                address={recipientAddress || ''}
-              />
+              <ContactCircle recipient={recipient} />
               <View style={styles.recipientInfoContainer}>
                 <Text style={styles.headerText} testID="HeaderText">
                   {t('sending')}
                 </Text>
-                <Text style={styles.displayName}>
-                  {getDisplayName({ recipient, recipientAddress, t })}
-                </Text>
+                <Text style={styles.displayName}>{getDisplayName(recipient, t)}</Text>
                 {validatedRecipientAddress && (
                   <View style={styles.editContainer}>
                     <ShortenedAddress style={styles.address} address={validatedRecipientAddress} />
@@ -372,7 +364,7 @@ function SendConfirmation(props: Props) {
             <InviteAndSendModal
               isVisible={modalVisible}
               // TODO: we should refactor name display, this is fragile, we shouldn't compare against the english string. Here and in other places!
-              name={!displayName || displayName === 'Mobile #' ? e164PhoneNumber! : displayName}
+              name={getDisplayName(transactionData.recipient, t)}
               onInvite={sendInvite}
               onCancel={cancelModal}
             />
@@ -407,9 +399,10 @@ function SendConfirmation(props: Props) {
         account,
         recipientAddress,
         amount: amount.valueOf(),
+        dollarBalance,
         includeDekFee: !isDekRegistered,
       }
-    : { feeType: FeeType.INVITE, account, amount }
+    : { feeType: FeeType.INVITE, account, amount, dollarBalance }
 
   return (
     // Note: intentionally passing a new child func here otherwise

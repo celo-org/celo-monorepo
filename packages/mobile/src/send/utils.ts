@@ -24,10 +24,10 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
 import {
+  AddressRecipient,
   Recipient,
-  RecipientKind,
-  RecipientWithContact,
-  RecipientWithQrCode,
+  recipientHasAddress,
+  recipientHasNumber,
 } from 'src/recipients/recipient'
 import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
@@ -56,14 +56,14 @@ export const getConfirmationInput = (
   const { recipient } = transactionData
   let recipientAddress: string | null | undefined
 
-  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+  if (recipientHasAddress(recipient)) {
     recipientAddress = recipient.address
-  } else if (recipient.e164PhoneNumber) {
+  } else if (recipientHasNumber(recipient)) {
     recipientAddress = getAddressFromPhoneNumber(
       recipient.e164PhoneNumber,
       e164NumberToAddress,
       secureSendPhoneNumberMapping,
-      recipient.address
+      undefined
     )
   }
 
@@ -172,16 +172,14 @@ export function showLimitReachedError(
 
 export function* handleSendPaymentData(
   data: UriData,
-  cachedRecipient?: RecipientWithContact,
+  cachedRecipient?: Recipient,
   isOutgoingPaymentRequest?: true
 ) {
-  const recipient: RecipientWithQrCode = {
-    kind: RecipientKind.QrCode,
+  const recipient: AddressRecipient = {
     address: data.address.toLowerCase(),
-    displayId: data.e164PhoneNumber,
-    displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
+    name: data.displayName || cachedRecipient?.name || 'anonymous',
     e164PhoneNumber: data.e164PhoneNumber,
-    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
+    displayNumber: cachedRecipient?.displayNumber,
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
   }

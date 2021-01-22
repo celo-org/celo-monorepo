@@ -12,7 +12,6 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import { verificationPossibleSelector } from 'src/app/selectors'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -31,7 +30,7 @@ import {
   sortRecipients,
 } from 'src/recipients/recipient'
 import RecipientPicker from 'src/recipients/RecipientPicker'
-import { recipientCacheSelector } from 'src/recipients/reducer'
+import { phoneRecipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
 import { SendCallToAction } from 'src/send/SendCallToAction'
@@ -86,7 +85,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   verificationPossible: verificationPossibleSelector(state),
   devModeActive: state.account.devModeActive,
   recentRecipients: state.send.recentRecipients,
-  allRecipients: recipientCacheSelector(state),
+  allRecipients: phoneRecipientCacheSelector(state),
   matchedContacts: state.identity.matchedContacts,
 })
 
@@ -228,11 +227,6 @@ class Send extends React.Component<Props, State> {
     this.props.hideAlert()
     const isOutgoingPaymentRequest = this.props.route.params?.isOutgoingPaymentRequest
 
-    if (!recipient.e164PhoneNumber && !recipient.address) {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
-      return
-    }
-
     this.props.storeLatestInRecents(recipient)
 
     ValoraAnalytics.track(
@@ -240,7 +234,6 @@ class Send extends React.Component<Props, State> {
         ? RequestEvents.request_select_recipient
         : SendEvents.send_select_recipient,
       {
-        recipientKind: recipient.kind,
         usedSearchBar: this.state.searchQuery.length > 0,
       }
     )

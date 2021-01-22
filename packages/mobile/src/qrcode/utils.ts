@@ -6,11 +6,15 @@ import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
-import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
+import {
+  getRecipientFromAddress,
+  recipientHasNumber,
+  RecipientInfo,
+} from 'src/recipients/recipient'
 import { QrCode, SVG } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { handleSendPaymentData } from 'src/send/utils'
@@ -54,8 +58,8 @@ function* handleSecureSend(
   secureSendTxData: TransactionDataInput,
   requesterAddress?: string
 ) {
-  if (!secureSendTxData.recipient.e164PhoneNumber) {
-    throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
+  if (!recipientHasNumber(secureSendTxData.recipient)) {
+    throw Error('Invalid recipient type for Secure Send, has no mobile number')
   }
 
   const userScannedAddress = address.toLowerCase()
@@ -92,9 +96,8 @@ function* handleSecureSend(
 
 export function* handleBarcode(
   barcode: QrCode,
-  addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
+  recipientInfo: RecipientInfo,
   secureSendTxData?: TransactionDataInput,
   isOutgoingPaymentRequest?: true,
   requesterAddress?: string
@@ -135,11 +138,7 @@ export function* handleBarcode(
     return
   }
 
-  const cachedRecipient = getRecipientFromAddress(
-    qrData.address,
-    addressToE164Number,
-    recipientCache
-  )
+  const cachedRecipient = getRecipientFromAddress(qrData.address, recipientInfo)
 
   yield call(handleSendPaymentData, qrData, cachedRecipient, isOutgoingPaymentRequest)
 }

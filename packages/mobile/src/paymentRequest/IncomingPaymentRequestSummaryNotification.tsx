@@ -6,7 +6,7 @@ import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { addressToE164NumberSelector, AddressToE164NumberType } from 'src/identity/reducer'
+import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
 import { notificationIncomingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -14,9 +14,8 @@ import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
 import { PaymentRequest } from 'src/paymentRequest/types'
-import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
-import { NumberToRecipient } from 'src/recipients/recipient'
-import { recipientCacheSelector } from 'src/recipients/reducer'
+import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
@@ -26,13 +25,16 @@ interface OwnProps {
 type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
-  addressToE164Number: AddressToE164NumberType
-  recipientCache: NumberToRecipient
+  recipientInfo: RecipientInfo
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  addressToE164Number: addressToE164NumberSelector(state),
-  recipientCache: recipientCacheSelector(state),
+  recipientInfo: {
+    addressToE164Number: addressToE164NumberSelector(state),
+    phoneRecipientCache: phoneRecipientCacheSelector(state),
+    valoraRecipientCache: valoraRecipientCacheSelector(state),
+    addressToDisplayName: addressToDisplayNameSelector(state),
+  },
 })
 
 // Payment Request notification for the notification center on home screen
@@ -50,22 +52,18 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        recipient={getRequesterFromPaymentRequest(
-          item,
-          this.props.addressToE164Number,
-          this.props.recipientCache
-        )}
+        recipient={getRecipientFromAddress(item.requesterAddress, this.props.recipientInfo)}
+        t={this.props.t}
       />
     )
   }
 
   render() {
-    const { addressToE164Number, recipientCache, requests, t } = this.props
+    const { recipientInfo, requests, t } = this.props
 
     return requests.length === 1 ? (
       listItemRenderer({
-        addressToE164Number,
-        recipientCache,
+        recipientInfo,
       })(requests[0])
     ) : (
       <SummaryNotification<PaymentRequest>

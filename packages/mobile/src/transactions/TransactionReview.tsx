@@ -5,9 +5,15 @@ import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard, {
   ExchangeConfirmationCardProps,
 } from 'src/exchange/ExchangeConfirmationCard'
-import { SecureSendPhoneNumberMapping } from 'src/identity/reducer'
+import {
+  addressToDisplayNameSelector,
+  addressToE164NumberSelector,
+  SecureSendPhoneNumberMapping,
+} from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import TransferConfirmationCard, {
   TransferConfirmationCardProps,
@@ -15,6 +21,7 @@ import TransferConfirmationCard, {
 
 interface StateProps {
   addressHasChanged: boolean
+  recipientInfo: RecipientInfo
 }
 export interface ReviewProps {
   type: TokenTransactionType
@@ -55,15 +62,25 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { confirmationProps } = ownProps.route.params
   const { secureSendPhoneNumberMapping } = state.identity
   const addressHasChanged = hasAddressChanged(confirmationProps, secureSendPhoneNumberMapping)
+  const recipientInfo = {
+    addressToE164Number: addressToE164NumberSelector(state),
+    phoneRecipientCache: phoneRecipientCacheSelector(state),
+    valoraRecipientCache: valoraRecipientCacheSelector(state),
+    addressToDisplayName: addressToDisplayNameSelector(state),
+  }
 
-  return { addressHasChanged }
+  return { addressHasChanged, recipientInfo }
 }
 
-function TransactionReview({ route, addressHasChanged }: Props) {
+function TransactionReview({ route, addressHasChanged, recipientInfo }: Props) {
   const { confirmationProps } = route.params
 
   if (isTransferConfirmationCardProps(confirmationProps)) {
-    const props = { ...confirmationProps, addressHasChanged }
+    // @ts-ignore, address should never be undefined
+    const recipient = getRecipientFromAddress(confirmationProps.address, recipientInfo)
+    Object.assign(recipient, { e164PhoneNumber: confirmationProps.e164PhoneNumber })
+
+    const props = { ...confirmationProps, addressHasChanged, recipient }
     return <TransferConfirmationCard {...props} />
   }
 

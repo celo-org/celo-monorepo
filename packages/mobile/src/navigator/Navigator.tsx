@@ -16,6 +16,7 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import { currentLanguageSelector } from 'src/app/reducers'
 import UpgradeScreen from 'src/app/UpgradeScreen'
+import WebViewScreen, { webViewScreenNavOptions } from 'src/app/WebViewScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupForceScreen from 'src/backup/BackupForceScreen'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
@@ -67,7 +68,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
-import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
+import NameAndPicture from 'src/onboarding/registration/NameAndPicture'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
@@ -95,11 +96,14 @@ import ValidateRecipientIntro, {
 } from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
+import Logger from 'src/utils/Logger'
 import { getDatetimeDisplayString } from 'src/utils/time'
 import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
+
+const TAG = 'Navigator'
 
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
@@ -147,6 +151,11 @@ const commonScreens = (Navigator: typeof Stack) => {
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
         options={noHeaderGestureDisabled}
+      />
+      <Navigator.Screen
+        name={Screens.WebViewScreen}
+        component={WebViewScreen}
+        options={webViewScreenNavOptions}
       />
     </>
   )
@@ -204,8 +213,8 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={Welcome.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.NameAndNumber}
-      component={NameAndNumber}
+      name={Screens.NameAndPicture}
+      component={NameAndPicture}
       options={{
         ...nuxNavigationOptions,
         headerTitle: () => (
@@ -396,7 +405,11 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
+    <Navigator.Screen
+      options={Profile.navigationOptions}
+      name={Screens.Profile}
+      component={Profile}
+    />
     <Navigator.Screen
       name={Screens.Language}
       component={Language}
@@ -468,7 +481,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     choseToRestoreAccount: state.account.choseToRestoreAccount,
     language: currentLanguageSelector(state),
-    e164Number: state.account.e164PhoneNumber,
+    name: state.account.name,
     acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
@@ -487,7 +500,7 @@ export function MainStackScreen() {
     const {
       choseToRestoreAccount,
       language,
-      e164Number,
+      name,
       acceptedTerms,
       pincodeType,
       redeemComplete,
@@ -498,7 +511,7 @@ export function MainStackScreen() {
 
     if (!language) {
       initialRoute = Screens.Language
-    } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
+    } else if (!name || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
     } else if (!redeemComplete) {
@@ -512,6 +525,7 @@ export function MainStackScreen() {
     }
 
     setInitialRoute(initialRoute)
+    Logger.info(`${TAG}@MainStackScreen`, `Initial route: ${initialRoute}`)
 
     // Wait for next frame to avoid slight gap when hiding the splash
     requestAnimationFrame(() => SplashScreen.hide())

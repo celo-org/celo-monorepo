@@ -46,7 +46,7 @@ aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
 
 \+ **new AwsHsmWallet**(`awsCredentials?`: KMS.ClientConfiguration): *[AwsHsmWallet](_aws_hsm_wallet_.awshsmwallet.md)*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-wallet.ts:31](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-wallet.ts#L31)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-wallet.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-wallet.ts#L31)*
 
 **Parameters:**
 
@@ -132,7 +132,7 @@ ___
 
 ▸ **getAddressFromKeyId**(`keyId`: string): *Promise‹Address›*
 
-*Defined in [wallet-hsm-aws/src/aws-hsm-wallet.ts:92](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-wallet.ts#L92)*
+*Defined in [wallet-hsm-aws/src/aws-hsm-wallet.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-aws/src/aws-hsm-wallet.ts#L92)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName

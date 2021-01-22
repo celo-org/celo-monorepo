@@ -50,7 +50,7 @@ ___
 
 Ƭ **Address**: *t.TypeOf‹typeof AddressType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:101](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L101)*
+*Defined in [packages/sdk/utils/src/io.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L101)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Ƭ **AttestationRequest**: *t.TypeOf‹typeof AttestationRequestType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:116](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L116)*
+*Defined in [packages/sdk/utils/src/io.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L116)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 Ƭ **AttestationResponse**: *t.TypeOf‹typeof AttestationResponseType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:162](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L162)*
+*Defined in [packages/sdk/utils/src/io.ts:162](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L162)*
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 Ƭ **AttestationServiceTestRequest**: *t.TypeOf‹typeof AttestationServiceTestRequestType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:98](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L98)*
+*Defined in [packages/sdk/utils/src/io.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L98)*
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 Ƭ **E164Number**: *t.TypeOf‹typeof E164PhoneNumberType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:102](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L102)*
+*Defined in [packages/sdk/utils/src/io.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L102)*
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 Ƭ **GetAttestationRequest**: *t.TypeOf‹typeof GetAttestationRequestType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:128](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L128)*
+*Defined in [packages/sdk/utils/src/io.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L128)*
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 Ƭ **Signature**: *t.TypeOf‹typeof SignatureType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:100](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L100)*
+*Defined in [packages/sdk/utils/src/io.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L100)*
 
 ## Variables
 
@@ -116,7 +116,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:51](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L51)*
+*Defined in [packages/sdk/utils/src/io.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L51)*
 
 ___
 
@@ -134,7 +134,7 @@ ___
   language: t.union([t.undefined, t.string]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:104](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L104)*
+*Defined in [packages/sdk/utils/src/io.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L104)*
 
 ___
 
@@ -172,7 +172,7 @@ ___
   attestationCode: t.union([t.undefined, t.string]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:130](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L130)*
+*Defined in [packages/sdk/utils/src/io.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L130)*
 
 ___
 
@@ -191,7 +191,7 @@ ___
   appSignature: t.string,
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:79](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L79)*
+*Defined in [packages/sdk/utils/src/io.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L79)*
 
 ___
 
@@ -204,7 +204,7 @@ ___
   provider: t.union([t.string, t.undefined]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:92](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L92)*
+*Defined in [packages/sdk/utils/src/io.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L92)*
 
 ___
 
@@ -222,7 +222,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L39)*
+*Defined in [packages/sdk/utils/src/io.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L39)*
 
 ___
 
@@ -238,7 +238,7 @@ ___
   securityCode: t.union([t.undefined, t.string]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:118](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L118)*
+*Defined in [packages/sdk/utils/src/io.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L118)*
 
 ___
 
@@ -259,7 +259,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L24)*
+*Defined in [packages/sdk/utils/src/io.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L24)*
 
 ___
 
@@ -277,7 +277,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L63)*
+*Defined in [packages/sdk/utils/src/io.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L63)*
 
 ___
 
@@ -285,7 +285,7 @@ ___
 
 • **SaltType**: *StringC‹›* = t.string
 
-*Defined in [packages/sdk/utils/src/io.ts:77](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L77)*
+*Defined in [packages/sdk/utils/src/io.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L77)*
 
 ___
 
@@ -293,7 +293,7 @@ ___
 
 • **SignatureType**: *StringC‹›* = t.string
 
-*Defined in [packages/sdk/utils/src/io.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L75)*
+*Defined in [packages/sdk/utils/src/io.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L75)*
 
 ___
 
@@ -311,4 +311,4 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L12)*
+*Defined in [packages/sdk/utils/src/io.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L12)*

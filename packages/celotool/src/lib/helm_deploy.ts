@@ -186,7 +186,7 @@ export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?
 
   // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n default`,
     `cert-manager-cluster-issuers`,
     `cert-manager-cluster-issuers exists, skipping install`
   )
@@ -194,7 +194,7 @@ export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?
     await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n default`,
     `nginx-ingress-release`,
     `nginx-ingress-release exists, skipping install`
   )
@@ -280,7 +280,7 @@ export async function installCertManager() {
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
   console.info('Installing cert-manager-cluster-issuers')
   await execCmdWithExitOnFailure(
-    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
+    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath} -n default`
   )
 }
 
@@ -289,13 +289,13 @@ export async function installAndEnableMetricsDeps(
   clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
-    `helm list -A`,
+    `helm list -n default`,
     `kube-state-metrics`,
     `kube-state-metrics exists, skipping install`
   )
   if (!kubeStateMetricsReleaseExists) {
     await execCmdWithExitOnFailure(
-      `helm install kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
+      `helm install kube-state-metrics stable/kube-state-metrics --set rbac.create=true -n default`
     )
   }
   if (installPrometheus) {
@@ -746,6 +746,8 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
     `--set geth.secondaries="${fetchEnvOrFallback('SECONDARIES', '0')}"`,
+    `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
+    `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
     `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
       'ISTANBUL_REQUEST_TIMEOUT_MS',
       '3000'

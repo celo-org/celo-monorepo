@@ -2,66 +2,83 @@ import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { TFunction } from 'i18next'
 import { MinimalContact } from 'react-native-contacts'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { formatShortenedAddress } from 'src/components/ShortenedAddress'
+import {
+  AddressToDisplayNameType,
+  AddressToE164NumberType,
+  E164NumberToAddressType,
+} from 'src/identity/reducer'
 import { ContactMatches, RecipientVerificationStatus } from 'src/identity/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
 
-export enum RecipientKind {
-  MobileNumber = 'MobileNumber',
-  Contact = 'Contact',
-  QrCode = 'QrCode',
-  Address = 'Address',
+export type Recipient = {
+  name?: string
+  contactId?: string // unique ID given by phone OS
+  thumbnailPath?: string
+  displayNumber?: string
+} & (
+  | {
+      e164PhoneNumber: string
+    }
+  | {
+      address: string
+    }
+)
+
+export type MobileRecipient = Recipient & {
+  e164PhoneNumber: string
 }
 
-export type Recipient =
-  | RecipientWithMobileNumber
-  | RecipientWithContact
-  | RecipientWithQrCode
-  | RecipientWithAddress
-
-interface IRecipient {
-  kind: RecipientKind
-  displayName: string
-  displayId?: string
-  e164PhoneNumber?: string
-  address?: string
-}
-
-export interface RecipientWithMobileNumber extends IRecipient {
-  kind: RecipientKind.MobileNumber
-  e164PhoneNumber: string // MobileNumber recipients always have a parsable number
-}
-
-export interface RecipientWithContact extends IRecipient {
-  kind: RecipientKind.Contact
+// contacts pulled from the phone
+export type ContactRecipient = MobileRecipient & {
+  name: string
   contactId: string
-  phoneNumberLabel?: string
-  thumbnailPath?: string
 }
 
-export interface RecipientWithQrCode extends IRecipient {
-  kind: RecipientKind.QrCode
+export type AddressRecipient = Recipient & {
   address: string
-  phoneNumberLabel?: string
-  contactId?: string
-  thumbnailPath?: string
 }
 
-export interface RecipientWithAddress extends IRecipient {
-  kind: RecipientKind.Address
-  address: string
+export function recipientHasNumber(recipient: Recipient): recipient is MobileRecipient {
+  return 'e164PhoneNumber' in recipient
+}
+
+export function recipientHasAddress(recipient: Recipient): recipient is AddressRecipient {
+  return 'address' in recipient
+}
+
+export function recipientHasContact(recipient: Recipient): recipient is ContactRecipient {
+  return 'contactId' in recipient && 'name' in recipient
+}
+
+export function getDisplayName(recipient: Recipient, t: TFunction) {
+  if (recipient.name) {
+    return recipient.name
+  } else if (recipient.displayNumber) {
+    return recipient.displayNumber
+  } else if (recipientHasNumber(recipient)) {
+    return recipient.e164PhoneNumber
+  } else {
+    return t('global:account') + ' ' + formatShortenedAddress(recipient.address)
+  }
+}
+
+export function getDisplayDetail(recipient: Recipient) {
+  if (recipientHasNumber(recipient)) {
+    return recipient.displayNumber
+  } else {
+    return recipient.address
+  }
 }
 
 export interface NumberToRecipient {
-  [number: string]: RecipientWithContact
+  [number: string]: ContactRecipient
 }
 
-interface DisplayNameProps {
-  recipient: Recipient
-  recipientAddress?: string | null
-  t: TFunction
+export interface AddressToRecipient {
+  [address: string]: AddressRecipient
 }
 
 /**
@@ -73,8 +90,6 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
     //  We need a map of e164Number to recipients so we can efficiently
     //    update them later as the latest contact mappings arrive from the contact calls.
     const e164NumberToRecipients: NumberToRecipient = {}
-    // Recipients without e164Numbers go here instead
-    const otherRecipients: NumberToRecipient = {}
 
     for (const contact of contacts) {
       if (!contact.phoneNumbers || !contact.phoneNumbers.length) {
@@ -91,69 +106,61 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
             continue
           }
           e164NumberToRecipients[parsedNumber.e164Number] = {
-            kind: RecipientKind.Contact,
-            displayName: contact.displayName,
-            displayId: parsedNumber.displayNumber,
+            name: contact.displayName,
+            displayNumber: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
-            phoneNumberLabel: phoneNumber.label,
             // @ts-ignore TODO Minimal contact type is incorrect, on android it returns id
             contactId: contact.recordID || contact.id,
             thumbnailPath: contact.thumbnailPath,
           }
         } else {
-          otherRecipients[phoneNumber.number] = {
-            kind: RecipientKind.Contact,
-            displayName: contact.displayName,
-            displayId: phoneNumber.number,
-            phoneNumberLabel: phoneNumber.label,
-            // @ts-ignore TODO Minimal contact type is incorrect, on android it returns id
-            contactId: contact.recordID || contact.id,
-            thumbnailPath: contact.thumbnailPath,
-          }
+          // don't do anything for contacts without e164PhoneNumber, as we can't interact with them anyways
         }
       }
     }
-
-    return { e164NumberToRecipients, otherRecipients }
+    return e164NumberToRecipients
   } catch (error) {
     Logger.error(TAG, 'Failed to build recipients cache', error)
     throw error
   }
 }
 
-export function getRecipientFromAddress(
-  address: string,
-  addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
-) {
-  const e164PhoneNumber = addressToE164Number[address]
-  return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
+export interface RecipientInfo {
+  addressToE164Number: AddressToE164NumberType
+  phoneRecipientCache: NumberToRecipient
+  valoraRecipientCache: AddressToRecipient
+  // this info comes from Firebase for known addresses (ex. Simplex, cUSD incentive programs)
+  // differentiated from valoraRecipients because they are not displayed in the RecipientPicker
+  addressToDisplayName: AddressToDisplayNameType
 }
 
-export function getDisplayName({ recipient, recipientAddress, t }: DisplayNameProps) {
-  const { displayName, e164PhoneNumber } = recipient
-  if (displayName) {
-    return displayName
+export function getRecipientFromAddress(address: string, info: RecipientInfo) {
+  const e164PhoneNumber = info.addressToE164Number[address]
+  const numberRecipient = e164PhoneNumber ? info.phoneRecipientCache[e164PhoneNumber] : undefined
+  const valoraRecipient = info.valoraRecipientCache[address]
+  const displayInfo = info.addressToDisplayName[address]
+
+  const recipient: Recipient = {
+    address,
+    name: valoraRecipient?.name || numberRecipient?.name || displayInfo?.name,
+    thumbnailPath: valoraRecipient?.thumbnailPath || displayInfo?.imageUrl || undefined,
+    contactId: valoraRecipient?.contactId || numberRecipient?.contactId,
+    e164PhoneNumber: e164PhoneNumber || undefined,
+    displayNumber: numberRecipient?.displayNumber,
   }
-  if (e164PhoneNumber) {
-    return e164PhoneNumber
-  }
-  if (recipientAddress) {
-    return recipientAddress
-  }
-  // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
-  return t('global:unknown')
+
+  return recipient
 }
 
 export function getRecipientVerificationStatus(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
 ): RecipientVerificationStatus {
-  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+  if (recipientHasAddress(recipient)) {
     return RecipientVerificationStatus.VERIFIED
   }
 
-  if (!recipient.e164PhoneNumber) {
+  if (!recipientHasNumber(recipient)) {
     return RecipientVerificationStatus.UNKNOWN
   }
 
@@ -167,10 +174,6 @@ export function getRecipientVerificationStatus(
   }
 
   return RecipientVerificationStatus.VERIFIED
-}
-
-export function getRecipientThumbnail(recipient?: Recipient) {
-  return recipient && recipient.kind === RecipientKind.Contact ? recipient.thumbnailPath : undefined
 }
 
 type PreparedRecipient = Recipient & {
@@ -205,8 +208,8 @@ function fuzzysortToRecipients(
 }
 
 function nameCompare(a: FuzzyRecipient, b: FuzzyRecipient) {
-  const nameA = a.displayName.toUpperCase()
-  const nameB = b.displayName.toUpperCase()
+  const nameA = a.name!.toUpperCase()
+  const nameB = b.name!.toUpperCase()
 
   if (nameA > nameB) {
     return 1
@@ -218,8 +221,8 @@ function nameCompare(a: FuzzyRecipient, b: FuzzyRecipient) {
 
 function nameCompareExceptPrioritized(prioritizedRecipients: ContactMatches) {
   return (a: FuzzyRecipient, b: FuzzyRecipient) => {
-    const e164A = a.e164PhoneNumber
-    const e164B = b.e164PhoneNumber
+    const e164A = recipientHasNumber(a) ? a.e164PhoneNumber : undefined
+    const e164B = recipientHasNumber(b) ? b.e164PhoneNumber : undefined
 
     if (e164A && prioritizedRecipients[e164A]) {
       if (e164B && prioritizedRecipients[e164B]) {
@@ -272,9 +275,9 @@ export function filterRecipientFactory(
 ) {
   const preparedRecipients = recipients.map((r) => ({
     ...r,
-    displayPrepared: fuzzysort.prepare(r.displayName),
-    phonePrepared: r.e164PhoneNumber ? fuzzysort.prepare(r.e164PhoneNumber) : undefined,
-    addressPrepared: r.address ? fuzzysort.prepare(r.address) : undefined,
+    displayPrepared: fuzzysort.prepare(r.name!),
+    phonePrepared: recipientHasNumber(r) ? fuzzysort.prepare(r.e164PhoneNumber) : undefined,
+    addressPrepared: recipientHasAddress(r) ? fuzzysort.prepare(r.address) : undefined,
   }))
 
   return (query: string) => {
@@ -297,14 +300,18 @@ export function areRecipientsEquivalent(recipient1: Recipient, recipient2: Recip
   }
 
   if (
-    recipient1.e164PhoneNumber &&
-    recipient2.e164PhoneNumber &&
+    recipientHasNumber(recipient1) &&
+    recipientHasNumber(recipient2) &&
     recipient1.e164PhoneNumber === recipient2.e164PhoneNumber
   ) {
     return true
   }
 
-  if (recipient1.address && recipient2.address && recipient1.address === recipient2.address) {
+  if (
+    recipientHasAddress(recipient1) &&
+    recipientHasAddress(recipient2) &&
+    recipient1.address === recipient2.address
+  ) {
     return true
   }
 

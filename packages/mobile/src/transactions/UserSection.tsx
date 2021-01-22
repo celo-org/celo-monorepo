@@ -2,82 +2,48 @@ import Expandable from '@celo/react-components/components/Expandable'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { getAddressChunks } from '@celo/utils/src/address'
 import { getDisplayNumberInternational } from '@celo/utils/src/phoneNumbers'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
-import { useSelector } from 'react-redux'
 import AccountNumber from 'src/components/AccountNumber'
 import { Namespaces } from 'src/i18n'
-import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
-import { Recipient } from 'src/recipients/recipient'
-
-function getDisplayName(
-  recipient?: Recipient,
-  cachedName?: string,
-  e164Number?: string,
-  address?: string
-) {
-  if (recipient && recipient.displayName) {
-    return recipient.displayName
-  }
-  if (cachedName) {
-    return cachedName
-  }
-  const number = getDisplayNumber(e164Number, recipient)
-  if (number) {
-    return number
-  }
-  if (address) {
-    // TODO: extract this into a reusable getShortAddressDisplay function
-    const addressChunks = getAddressChunks(address)
-    return `0x ${addressChunks[0]}…${addressChunks[addressChunks.length - 1]}`
-  }
-
-  return undefined
-}
-
-function getDisplayNumber(e164Number?: string, recipient?: Recipient) {
-  const number = e164Number || recipient?.e164PhoneNumber
-  if (!number) {
-    return undefined
-  }
-  return getDisplayNumberInternational(number)
-}
+import {
+  getDisplayName,
+  Recipient,
+  recipientHasAddress,
+  recipientHasNumber,
+} from 'src/recipients/recipient'
 
 interface Props {
   type: 'sent' | 'received' | 'withdrawn'
-  address?: string
   addressHasChanged?: boolean
-  e164PhoneNumber?: string
-  recipient?: Recipient
+  recipient: Recipient
   avatar: React.ReactNode
+  expandable?: boolean
 }
 
 export default function UserSection({
   type,
-  address,
   addressHasChanged = false,
   recipient,
-  e164PhoneNumber,
   avatar,
+  expandable = true,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const [expanded, setExpanded] = useState(addressHasChanged)
-
-  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
-  const userName = addressToDisplayName[address || '']?.name
+  const [expanded, setExpanded] = useState(expandable && addressHasChanged)
 
   const toggleExpanded = () => {
     LayoutAnimation.easeInEaseOut()
     setExpanded(!expanded)
   }
 
-  const displayName = getDisplayName(recipient, userName, e164PhoneNumber, address)
-  const displayNumber = getDisplayNumber(e164PhoneNumber, recipient)
-  const e164Number = displayName !== displayNumber ? displayNumber : undefined
+  const displayName = getDisplayName(recipient, t)
+  const displayNumber = recipientHasNumber(recipient)
+    ? getDisplayNumberInternational(recipient.e164PhoneNumber)
+    : undefined
+  const address = recipientHasAddress(recipient) ? recipient.address : ''
 
   const sectionLabel = {
     received: t('receivedFrom'),
@@ -90,14 +56,16 @@ export default function UserSection({
       <View style={styles.header}>
         <View style={styles.userContainer}>
           <Text style={styles.sectionLabel}>{sectionLabel}</Text>
-          <Touchable onPress={toggleExpanded}>
+          <Touchable onPress={toggleExpanded} disabled={!expandable}>
             <>
-              <Expandable isExpandable={!e164Number} isExpanded={expanded}>
+              <Expandable isExpandable={expandable && !displayNumber} isExpanded={expanded}>
                 <Text style={styles.username}>{displayName}</Text>
               </Expandable>
-              <Expandable isExpandable={!!e164Number} isExpanded={expanded}>
-                <Text style={styles.phoneNumber}>{e164Number}</Text>
-              </Expandable>
+              {displayNumber && (
+                <Expandable isExpandable={expandable && !!displayNumber} isExpanded={expanded}>
+                  <Text style={styles.phoneNumber}>{displayNumber}</Text>
+                </Expandable>
+              )}
             </>
           </Touchable>
         </View>

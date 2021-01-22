@@ -1,21 +1,27 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSelector } from 'react-redux'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
-import { FAQ_LINK } from 'src/config'
+import { CELO_REWARDS_LINK, FAQ_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { Recipient } from 'src/recipients/recipient'
 import BottomText from 'src/transactions/BottomText'
 import CommentSection from 'src/transactions/CommentSection'
 import TransferAvatars from 'src/transactions/TransferAvatars'
@@ -34,6 +40,7 @@ export interface TransferConfirmationCardProps {
 
 type Props = TransferConfirmationCardProps & {
   addressHasChanged: boolean
+  recipient: Recipient
 }
 
 const onPressGoToFaq = () => {
@@ -64,13 +71,7 @@ function VerificationContent({ amount }: Props) {
   )
 }
 
-function InviteSentContent({
-  address,
-  addressHasChanged,
-  recipient,
-  e164PhoneNumber,
-  amount,
-}: Props) {
+function InviteSentContent({ addressHasChanged, recipient, amount }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const totalAmount = amount
   const inviteFee = getInvitationVerificationFeeInDollars()
@@ -82,17 +83,9 @@ function InviteSentContent({
     <>
       <UserSection
         type="sent"
-        address={address}
         addressHasChanged={addressHasChanged}
         recipient={recipient}
-        e164PhoneNumber={e164PhoneNumber}
-        avatar={
-          <ContactCircle
-            name={recipient ? recipient.displayName : null}
-            address={address}
-            thumbnailPath={getRecipientThumbnail(recipient)}
-          />
-        }
+        avatar={<ContactCircle recipient={recipient} />}
       />
       <HorizontalLine />
       <FeeDrawer
@@ -108,13 +101,7 @@ function InviteSentContent({
   )
 }
 
-function InviteReceivedContent({
-  address,
-  addressHasChanged,
-  recipient,
-  e164PhoneNumber,
-  amount,
-}: Props) {
+function InviteReceivedContent({ addressHasChanged, recipient, amount }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const totalAmount = amount
 
@@ -122,17 +109,9 @@ function InviteReceivedContent({
     <>
       <UserSection
         type="received"
-        address={address}
         addressHasChanged={addressHasChanged}
         recipient={recipient}
-        e164PhoneNumber={e164PhoneNumber}
-        avatar={
-          <ContactCircle
-            name={recipient ? recipient.displayName : null}
-            address={address}
-            thumbnailPath={getRecipientThumbnail(recipient)}
-          />
-        }
+        avatar={<ContactCircle recipient={recipient} />}
       />
       <HorizontalLine />
       <TotalLineItem amount={totalAmount} />
@@ -156,14 +135,7 @@ function NetworkFeeContent({ amount }: Props) {
   )
 }
 
-function PaymentSentContent({
-  address,
-  addressHasChanged,
-  recipient,
-  e164PhoneNumber,
-  amount,
-  comment,
-}: Props) {
+function PaymentSentContent({ addressHasChanged, recipient, amount, comment }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const sentAmount = amount
   // TODO: Use real fee
@@ -177,11 +149,9 @@ function PaymentSentContent({
     <>
       <UserSection
         type={isCeloWithdrawal ? 'withdrawn' : 'sent'}
-        address={address}
         addressHasChanged={addressHasChanged}
         recipient={recipient}
-        e164PhoneNumber={e164PhoneNumber}
-        avatar={<TransferAvatars type="sent" address={address} recipient={recipient} />}
+        avatar={<TransferAvatars type="sent" recipient={recipient} />}
       />
       <CommentSection comment={comment} />
       <HorizontalLine />
@@ -199,17 +169,15 @@ function PaymentSentContent({
   )
 }
 
-function PaymentReceivedContent({ address, recipient, e164PhoneNumber, amount, comment }: Props) {
+function PaymentReceivedContent({ recipient, amount, comment }: Props) {
   const totalAmount = amount
 
   return (
     <>
       <UserSection
         type="received"
-        address={address}
         recipient={recipient}
-        e164PhoneNumber={e164PhoneNumber}
-        avatar={<TransferAvatars type="received" address={address} recipient={recipient} />}
+        avatar={<TransferAvatars type="received" recipient={recipient} />}
       />
       <CommentSection comment={comment} />
       <HorizontalLine />
@@ -218,8 +186,33 @@ function PaymentReceivedContent({ address, recipient, e164PhoneNumber, amount, c
   )
 }
 
+function CeloRewardContent({ amount, recipient }: Props) {
+  const { t } = useTranslation(Namespaces.sendFlow7)
+
+  const openLearnMore = () => {
+    navigate(Screens.WebViewScreen, { uri: `${CELO_REWARDS_LINK}?origin=transaction-detail` })
+  }
+
+  return (
+    <>
+      <UserSection
+        type="received"
+        expandable={false}
+        recipient={recipient}
+        avatar={<TransferAvatars type="received" recipient={recipient} />}
+      />
+      <TouchableOpacity onPress={openLearnMore}>
+        <Text style={styles.learnMore}>{t('learnMore')}</Text>
+      </TouchableOpacity>
+      <HorizontalLine />
+      <TotalLineItem amount={amount} />
+    </>
+  )
+}
+
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 export default function TransferConfirmationCard(props: Props) {
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
   let content
 
   switch (props.type) {
@@ -244,7 +237,11 @@ export default function TransferConfirmationCard(props: Props) {
       break
     case TokenTransactionType.EscrowReceived:
     case TokenTransactionType.Received:
-      content = <PaymentReceivedContent {...props} />
+      content = addressToDisplayName[props.address || '']?.isCeloRewardSender ? (
+        <CeloRewardContent {...props} />
+      ) : (
+        <PaymentReceivedContent {...props} />
+      )
       break
   }
 
@@ -262,5 +259,10 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: 16,
+  },
+  learnMore: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    textDecorationLine: 'underline',
   },
 })

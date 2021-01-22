@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import TextButton from '@celo/react-components/components/TextButton'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -9,12 +8,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton'
+import ContactCircle from 'src/components/ContactCircle'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecipientThumbnail } from 'src/recipients/recipient'
+import { getDisplayName, recipientHasNumber } from 'src/recipients/recipient'
 
 const AVATAR_SIZE = 64
 
@@ -62,25 +62,22 @@ class ValidateRecipientIntro extends React.Component<Props> {
   render() {
     const { t } = this.props
     const { recipient } = this.props.route.params.transactionData
-    const { displayName, e164PhoneNumber } = recipient
+    const displayName = getDisplayName(recipient, t)
+    const e164PhoneNumber = recipientHasNumber(recipient) ? recipient.e164PhoneNumber : '#'
 
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.iconContainer}>
-            <ContactCircle
-              size={AVATAR_SIZE}
-              name={recipient.displayName}
-              thumbnailPath={getRecipientThumbnail(recipient)}
-            />
+            <ContactCircle size={AVATAR_SIZE} recipient={recipient} />
           </View>
           <Text style={styles.validationHeader}>
-            {displayName === 'Mobile #'
+            {!recipient.name
               ? t('confirmAccount.headerNoDisplayName')
               : t('confirmAccount.header', { displayName })}
           </Text>
           <Text style={styles.body}>
-            {displayName === 'Mobile #' || !e164PhoneNumber
+            {!recipient.name
               ? t('secureSendExplanation.body1NoDisplayName')
               : t('secureSendExplanation.body1', { e164PhoneNumber, displayName })}
           </Text>
