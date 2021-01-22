@@ -20,17 +20,16 @@ import RNFS from 'react-native-fs'
 import { call, put, select } from 'redux-saga/effects'
 import { profileUploaded } from 'src/account/actions'
 import { isProfileUploadedSelector, nameSelector, pictureSelector } from 'src/account/selectors'
+import config from 'src/geth/networkConfig'
 import { extensionToMimeType, getDataURL, saveRecipientPicture } from 'src/utils/image'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getWallet } from 'src/web3/contracts'
 import { currentAccountSelector, dataEncryptionKeySelector } from 'src/web3/selectors'
+
 const TAG = 'account/profileInfo'
 
-const authorizerUrl = 'https://kel03d4ef0.execute-api.eu-west-1.amazonaws.com/dev/authorize'
-const valoraMetadataUrl = 'https://d2uaxwjh0f8rcm.cloudfront.net'
-
 async function makeCall(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
-  const response = await fetch(authorizerUrl, {
+  const response = await fetch(config.CIP8AuthorizerUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -139,7 +138,7 @@ class UploadServiceDataWrapper implements OffchainDataWrapper {
   ): Promise<Result<Buffer, OffchainErrors>> {
     let dataResponse, signatureResponse
 
-    const accountRoot = `${valoraMetadataUrl}/${toChecksumAddress(account)}`
+    const accountRoot = `${config.CIP8MetadataUrl}/${toChecksumAddress(account)}`
     try {
       ;[dataResponse, signatureResponse] = await Promise.all([
         fetch(resolvePath(accountRoot, dataPath)),
@@ -256,12 +255,12 @@ export function* uploadSymmetricKeys(recipientAddresses: string[]) {
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
 
   const nameAccessor = new PrivateNameAccessor(offchainWrapper)
-  let writeError = yield call([nameAccessor, 'writeKeys'], recipientAddresses)
+  let writeError = yield call([nameAccessor, 'allowAccess'], recipientAddresses)
 
   const pictureUri = yield select(pictureSelector)
   if (pictureUri) {
     const pictureAccessor = new PrivatePictureAccessor(offchainWrapper)
-    writeError = yield call([pictureAccessor, 'writeKeys'], recipientAddresses)
+    writeError = yield call([pictureAccessor, 'allowAccess'], recipientAddresses)
   }
 
   Logger.info(TAG + '@uploadSymmetricKeys', 'uploaded symmetric keys for ' + recipientAddresses)
