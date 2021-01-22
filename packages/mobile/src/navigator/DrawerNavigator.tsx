@@ -61,6 +61,7 @@ import InviteFriendModal from 'src/invite/InviteFriendModal'
 import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
 import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
+import RewardsPill from 'src/navigator/RewardsPill'
 import { Screens } from 'src/navigator/Screens'
 import { default as useSelector } from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -171,7 +172,10 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
-        <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
+        <View style={styles.drawerHeader}>
+          <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
+          <RewardsPill />
+        </View>
         <Text style={styles.nameLabel}>{displayName}</Text>
         {e164PhoneNumber && (
           <PhoneNumberWithFlag
@@ -310,6 +314,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'flex-start',
     marginRight: 16,
+  },
+  drawerHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   nameLabel: {
     ...fontStyles.displayName,

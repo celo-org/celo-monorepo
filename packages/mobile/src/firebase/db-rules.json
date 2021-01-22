@@ -48,6 +48,10 @@
     "notificationsV2": {
       ".read": true,
       ".write": false
+    },
+    "consumerIncentives": {
+      ".read": true,
+      ".write": false
     }
   }
 }
