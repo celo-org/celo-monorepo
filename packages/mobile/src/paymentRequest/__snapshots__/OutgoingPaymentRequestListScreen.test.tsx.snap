@@ -134,7 +134,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -392,7 +392,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -650,7 +650,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }

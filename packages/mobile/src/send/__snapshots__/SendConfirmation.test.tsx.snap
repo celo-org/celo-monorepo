@@ -883,7 +883,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -943,7 +943,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -978,7 +978,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -2034,7 +2034,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -2094,7 +2094,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -2129,7 +2129,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3107,7 +3107,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3167,7 +3167,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -3202,7 +3202,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
