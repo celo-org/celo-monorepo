@@ -19,8 +19,8 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useTypedSelector from 'src/redux/useSelector'
+import { getContentForCurrentLang } from 'src/utils/contentTranslations'
 import Logger from 'src/utils/Logger'
-import { fetchI18nContent } from 'src/utils/translationsFetcher'
 
 const TAG = 'ConsumerIncentivesHomeScreen'
 
@@ -28,7 +28,7 @@ const useConsumerIncentivesContent = () => {
   const contentResult = useAsync<ContentType>(fetchConsumerRewardsContent, [])
   let texts
   if (contentResult.result) {
-    texts = fetchI18nContent(contentResult.result)
+    texts = getContentForCurrentLang(contentResult.result)
   }
   return {
     content: texts,

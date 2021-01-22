@@ -34,8 +34,8 @@ import {
 } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
+import { getContentForCurrentLang } from 'src/utils/contentTranslations'
 import Logger from 'src/utils/Logger'
-import { fetchI18nContent } from 'src/utils/translationsFetcher'
 
 const TAG = 'NotificationBox'
 
@@ -228,7 +228,7 @@ export class NotificationBox extends React.Component<Props, State> {
       if (!notification) {
         continue
       }
-      const texts = fetchI18nContent(notification.content)
+      const texts = getContentForCurrentLang(notification.content)
       if (!texts) {
         continue
       }
