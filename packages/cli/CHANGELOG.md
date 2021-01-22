@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.1--dev]**
+### **[1.0.2--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -15,7 +15,7 @@ Bug Fixes
 Other Changes
 - [one-line summary] - [link PR]
 ## Published
-### **[1.0.0]** -- 2021-01-19
+### **[1.0.1]** -- 2021-01-20
 Features
 - Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
 - CIP 8 Encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
