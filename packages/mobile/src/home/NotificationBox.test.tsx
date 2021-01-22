@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { render } from 'react-native-testing-library'
+import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { openUrl } from 'src/app/actions'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
 import { createMockStore, getElementText } from 'test/utils'
@@ -9,6 +10,18 @@ import { mockE164Number, mockE164NumberPepper, mockPaymentRequests } from 'test/
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
 const RECENT_BACKUP_TIME = new Date().getTime() - TWO_DAYS_MS
 const EXPIRED_BACKUP_TIME = RECENT_BACKUP_TIME - DAYS_TO_BACKUP
+
+const testNotification = {
+  ctaUri: 'https://celo.org',
+  darkMode: true,
+  content: {
+    en: {
+      body: 'Body Text',
+      cta: 'Start',
+      dismiss: 'Dismiss',
+    },
+  },
+}
 
 const storeDataNotificationsEnabled = {
   goldToken: { educationCompleted: false },
@@ -20,6 +33,11 @@ const storeDataNotificationsEnabled = {
   },
   paymentRequest: {
     incomingPaymentRequests: mockPaymentRequests.slice(0, 2),
+  },
+  home: {
+    notifications: {
+      testNotification,
+    },
   },
 }
 
@@ -33,6 +51,14 @@ const storeDataNotificationsDisabled = {
   },
   paymentRequest: {
     incomingPaymentRequests: [],
+  },
+  home: {
+    notifications: {
+      testNotification: {
+        ...testNotification,
+        dismissed: true,
+      },
+    },
   },
 }
 
@@ -204,5 +230,57 @@ describe('NotificationBox', () => {
       </Provider>
     )
     expect(queryByText('nuxVerification2:notification.body')).toBeFalsy()
+  })
+
+  it('renders all remote notifications that were not dismissed', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      home: {
+        notifications: {
+          notification1: {
+            ...testNotification,
+            dismissed: true,
+            content: {
+              en: {
+                ...testNotification.content.en,
+                body: 'Notification 1',
+              },
+            },
+          },
+          notification2: {
+            ...testNotification,
+            content: {
+              en: {
+                ...testNotification.content.en,
+                body: 'Notification 2',
+              },
+            },
+          },
+          notification3: {
+            ...testNotification,
+            content: {
+              en: {
+                ...testNotification.content.en,
+                body: 'Notification 3',
+                cta: 'Press Remote',
+              },
+            },
+          },
+        },
+      },
+    })
+    const { queryByText, getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(queryByText('Notification 1')).toBeFalsy()
+    expect(queryByText('Notification 2')).toBeTruthy()
+    expect(queryByText('Notification 3')).toBeTruthy()
+
+    expect(store.getActions()).toEqual([])
+
+    fireEvent.press(getByText('Press Remote'))
+    expect(store.getActions()).toEqual([openUrl(testNotification.ctaUri, false, true)])
   })
 })

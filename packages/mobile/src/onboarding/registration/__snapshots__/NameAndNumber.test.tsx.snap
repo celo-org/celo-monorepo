@@ -176,7 +176,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -191,10 +191,15 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text
@@ -207,20 +212,6 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -298,7 +289,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View
@@ -578,7 +569,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                 "backgroundColor": "#FFFFFF",
                 "borderRadius": 8,
                 "paddingHorizontal": 12,
-                "width": 112,
+                "width": 80,
               }
             }
             testID="CountrySelectionButton"
@@ -593,10 +584,15 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text
@@ -609,20 +605,6 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                   testID="countryCodeFlag"
                 >
                   🇺🇸
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    }
-                  }
-                  testID="countryCodeText"
-                >
-                  +1
                 </Text>
                 <View
                   style={
@@ -700,7 +682,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
                 testID="PhoneNumberField"
                 underlineColorAndroid="transparent"
                 validator="phone"
-                value="(415) 555-6666"
+                value="+1 415-555-6666"
               />
             </View>
             <View

@@ -2,7 +2,7 @@
  * This is a reactnavigation SCREEN to which we navigate,
  * when we need to fetch a PIN from a user.
  */
-import { StackCardInterpolationProps, StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -11,6 +11,7 @@ import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
+import { modalScreenOptions } from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { checkPin } from 'src/pincode/authentication'
@@ -28,18 +29,15 @@ interface StateProps {
   currentAccount: string | null
 }
 
-type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
+type RouteProps = StackScreenProps<StackParamList, Screens.PincodeEnter>
+type Props = StateProps & WithTranslation & RouteProps
 
 class PincodeEnter extends React.Component<Props, State> {
-  static navigationOptions = {
+  static navigationOptions = (navOptions: RouteProps) => ({
+    ...modalScreenOptions(navOptions),
     ...headerWithBackButton,
     gestureEnabled: false,
-    cardStyleInterpolator: ({ current }: StackCardInterpolationProps) => ({
-      containerStyle: {
-        opacity: current.progress,
-      },
-    }),
-  }
+  })
 
   state = {
     pin: '',

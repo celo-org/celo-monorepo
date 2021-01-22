@@ -47,8 +47,11 @@ export function loadFromEnvFile() {
     return
   }
 
-  const envFile = getEnvFile(envName, '.mnemonic')
+  const envFile = getEnvFile(envName)
   dotenv.config({ path: envFile })
+
+  const envFileMnemonic = getEnvFile(envName, '.mnemonic')
+  dotenv.config({ path: envFileMnemonic })
 
   return envName
 }

@@ -1,6 +1,6 @@
 ---
 description: >-
-  In this guide we are going to learn how to connect to the Celo test network
+  In this guide we are going to learn how to connect to the Celo test network and tranfer tokens
   using ContractKit.
 ---
 
@@ -17,22 +17,22 @@ We assume you already have Node.js and NPM installed on your computer.
 At the end of this guide, you will be able to:
 
 * Connect to the Celo test network, called Alfajores
-* Get test CELO and cUSDs from the faucet
+* Get test CELO and Celo Dollars (cUSD) from the faucet
 * Read account and contract information from the test network
-* Send transactions to the network
+* Transferring CELO and cUSD on the test network
 
 ## Getting Started
 
 To start, [clone this GitHub repo](https://github.com/critesjosh/helloCelo). This is a Node.js application.
 
 ```
-$ git clone https://github.com/critesjosh/helloCelo.git
+git clone https://github.com/critesjosh/helloCelo.git
 ```
 
-We will be using the Celo ContractKit SDK to interact with the Celo test network. Let's install it. It is already defined in the package.json, so we can get it with
+We will be using the Celo ContractKit SDK to interact with the Celo test network (Alfajores). Let's install it. It is already defined in the package.json, so we can get it with
 
-```javascript
-$ npm install
+```
+npm install
 ```
 
 ## Importing ContractKit
@@ -42,15 +42,17 @@ We will be writing our Node.js app in the `helloCello.js` file.
 Import the contract kit into our script with
 
 ```javascript
-// 1. Import contractkit
+// 1. Import web3 and contractkit 
+const Web3 = require("web3")
 const ContractKit = require('@celo/contractkit')
 ```
 
-Now we can use the ContractKit to connect to the network.
+Now we can use the ContractKit to connect to the test network.
 
 ```javascript
 // 2. Init a new kit, connected to the alfajores testnet
-const kit = ContractKit.newKit('https://alfajores-forno.celo-testnet.org')
+const web3 = new Web3('https://alfajores-forno.celo-testnet.org')
+const kit = ContractKit.newKitFromWeb3(web3)
 ```
 
 {% hint style="info" %}
@@ -62,36 +64,45 @@ At any point in the file you can `console.log()` variables to print their output
 ContractKit contains a `contracts` property that we can use to access certain information about deployed Celo contracts.
 
 {% hint style="info" %}
-The Celo blockchain has two native assets, CELO \(CELO\) and the Celo Dollar \(cUSD\). Both of these assets implement the [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) from Ethereum. The CELO asset is managed by the CELO smart contract. We can access the gold contract with the SDK with `kit.contracts.getGoldToken()`. This function returns a promise, so we have to wait for it to resolve before we can interact with the gold token contract. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
+The Celo blockchain has two native assets, CELO \(CELO\) and the Celo Dollar \(cUSD\). Both of these assets implement the [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) from Ethereum. The CELO asset is managed by the CELO smart contract and Celo Dollars is managed by the cUSD contract. We can access the CELO contract via the SDK with `kit.contracts.getGoldToken()` and the cUSD contract with `kit.contracts.getStableToken()`. These functions return promises, so we have to wait for them to resolve before we can interact with the token contracts. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
 {% endhint %}
 
 Let's read some token balances from the blockchain. Add the following line in the `readAccount()` function. 
 
 ```javascript
-// 3. Get the Gold Token contract
+// 3. Get the token contract wrappers
 let goldtoken = await kit.contracts.getGoldToken()
+let stabletoken = await kit.contracts.getStableToken()
 ```
 
-We can get the CELO balance of an account using the gold token wrapper with `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`
+We can get the CELO balance of an account using the token wrappers like `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`.
 
 ```javascript
 // 4. Address to look up
 let anAddress = '0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'
 
-// 5. Get Gold Token balance
-let balance = await goldtoken.balanceOf(anAddress)
+// 5. Get token balances
+let celoBalance = await goldtoken.balanceOf(anAddress)
+let cUSDBalance = await stabletoken.balanceOf(anAddress)
 
-// Print balance
-console.log(`${anAddress} balance: ${balance.toString()}`)
+// Print balances
+console.log(`${anAddress} CELO balance: ${celoBalance.toString()}`)
+console.log(`${anAddress} cUSD balance: ${cUSDBalance.toString()}`)
 ```
 
 The `balanceOf(address)` function also returns a Promise, so we wait for the promise to resolve then we print the result.
+
+To view the balances, run the script from the termainal with 
+
+```
+node helloCelo.js
+```
 
 {% hint style="info" %}
 You may notice that we convert the balance to a string before we print it. This is because the `balanceOf()` function returns a [BigNumber](https://github.com/MikeMcl/bignumber.js/). Javascript does not have floating point numbers, so it is common to convert integers to large numbers before doing arithmetic. So 1 CELO = 10\*\*18 base units of CELO. The `balanceOf()` function returns the account balance in these base units. Converting the BigNumber to a string converts the BigNumber object into a more legible string.
 {% endhint %}
 
-Reading all account balances is a powerful feature of blockchains. Next, let's see how we can send value to each other on the test net.
+Reading all account balances is a powerful feature of blockchains. Next, let's see how we can send value to each other on the testnet.
 
 In order to do transfers (aka [transactions](https://docs.celo.org/getting-started/glossary#transaction)), we need to:
 
@@ -129,19 +140,22 @@ async function createAccount(){
     // 7. Get your account
     let account = await getAccount()
     
-    // 8. Get the Gold Token contract wrapper
+    // 8. Get the token contract wrappers
     let goldtoken = await kit.contracts.getGoldToken()
+    let stabletoken = await kit.contracts.getStableToken()
     
-    // 9. Get your CELO balance
-    let balance = await goldtoken.balanceOf(account.address)
+    // 9. Get your token balances
+    let celoBalance = await goldtoken.balanceOf(account.address)
+    let cUSDBalance = await stabletoken.balanceOf(account.address)
 
     // Print your account info
     console.log(`Your account address: ${account.address}`)
-    console.log(`Your account balance: ${balance.toString()}`)
+    console.log(`Your account CELO balance: ${celoBalance.toString()}`)
+    console.log(`Your account cUSD balance: ${cUSDBalance.toString()}`)
 }
 ```
 
-This will print `0`, as we have not funded the associated account yet.
+Run this script again with `node helloCelo.js`. This will print `0`, as we have not funded the associated account yet.
 
 ## Using the faucet
 
@@ -153,11 +167,13 @@ Once your account has been funded, run `$ node helloCelo.js` again to see your u
 
 ## Sending Value
 
-We have an account with CELO in it, now how do we send it to another account. Remember the Gold Token wrapper we used to read account balances earlier? We can use the same wrapper to send tokens, you just need to add the private key associated with your account to ContractKit \(see line 10\).
+We have an account with CELO and cUSD in it, now how do we send tokens to another account? Remember the token wrappers we used to read account balances earlier? We can use the same wrappers to send tokens, you just need to add the private key associated with your account to ContractKit \(see line 10\).
 
-The Gold Token wrapper has a method called `transfer(address, amount)` that allows you to send value to the specified address \(line 14\).
+The token wrappers have a method called `transfer(address, amount)` that allows you to send value to the specified address \(line 14\).
 
-You need to `send()` the transaction to the network after you construct it. The `send()` method returns a transaction object. We will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\) and print it when we get it. This receipt contains information about the transaction.
+You need to `send()` the transaction to the network after you construct it. The `send()` methods accepts an option that allows you to specify the `feeCurrency`, which allows the sender to pay transaction fees in CELO or cUSD. The default `feeCurrency` is CELO. In the following example, let's pay transaction fees in CELO when we transfer CELO and pay with cUSD when we transfer cUSD.  
+
+The `send()` method returns a transaction object. We will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\) and print it when we get it. This receipt contains information about the transaction.
 
 After we read the receipt, we check the balance of our account again, using the `balanceOf()` function. The logs print our updated balance!
 
@@ -171,7 +187,7 @@ async function send(){
     let account = await getAccount()
     
     // 11. Add your account to ContractKit to sign transactions
-    kit.addAccount(account.privateKey)
+    kit.connection.addAccount(account.privateKey)
     
     // 12. Specify recipient Address
     let anAddress = '0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'
@@ -179,27 +195,34 @@ async function send(){
     // 13. Specify an amount to send
     let amount = 100000
 
-    // 14. Get the Gold Token contract wrapper    
+    // 14. Get the token contract wrappers    
     let goldtoken = await kit.contracts.getGoldToken()
+    let stabletoken = await kit.contracts.getStableToken()
     
-    // 15. Transfer gold from your account to anAddress
-    let tx = await goldtoken.transfer(anAddress, amount).send({from: account.address})
+    // 15. Transfer CELO and cUSD from your account to anAddress
+    // Specify cUSD as the feeCurrency when sending cUSD
+    let celotx = await goldtoken.transfer(anAddress, amount).send({from: account.address})
+    let cUSDtx = await stabletoken.transfer(anAddress, amount).send({from: account.address, feeCurrency: stabletoken.address})
     
-    // 16. Wait for the transaction to be processed
-    let receipt = await tx.waitReceipt()
+    // 16. Wait for the transactions to be processed
+    let celoReceipt = await celotx.waitReceipt()
+    let cUSDReceipt = await cUSDtx.waitReceipt()
     
-    // 17. Print receipt
-    console.log('Transaction receipt: %o', receipt)
+    // 17. Print receipts
+    console.log('CELO Transaction receipt: %o', celoReceipt)
+    console.log('cUSD Transaction receipt: %o', cUSDReceipt)
     
-    // 18. Get your new balance
-    let balance = await goldtoken.balanceOf(account.address)
+    // 18. Get your new balances
+    let celoBalance = await goldtoken.balanceOf(account.address)
+    let cUSDBalance = await stabletoken.balanceOf(account.address)
     
     // 19. Print new balance
-    console.log(`Your new account balance: ${balance.toString()}`)
+    console.log(`Your new account CELO balance: ${celoBalance.toString()}`)
+    console.log(`Your new account cUSD balance: ${cUSDBalance.toString()}`)
 }
 ```
 
-Run `$ node helloCelo.js` again to send the transaction and see the printed output in the console.
+Run `$ node helloCelo.js` again to send the transactions and see the printed output in the console.
 
 ## Connecting to a Ledger Device from a Web Application
 

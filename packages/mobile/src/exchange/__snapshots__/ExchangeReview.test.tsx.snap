@@ -198,10 +198,13 @@ exports[`ExchangeReview renders correctly 1`] = `
               >
                 <View
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                    }
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
