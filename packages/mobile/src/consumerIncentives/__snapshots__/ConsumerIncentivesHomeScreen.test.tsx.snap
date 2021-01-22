@@ -43,7 +43,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
-            "marginTop": 8,
+            "marginTop": 16,
           }
         }
       >
@@ -54,9 +54,9 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
           Object {
             "color": "#2E3338",
             "fontFamily": "Inter-Medium",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "marginTop": 16,
+            "fontSize": 17,
+            "lineHeight": 16,
+            "marginTop": 24,
           }
         }
       >
@@ -69,7 +69,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
-            "marginTop": 8,
+            "marginTop": 16,
           }
         }
       >
@@ -80,9 +80,9 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
           Object {
             "color": "#2E3338",
             "fontFamily": "Inter-Medium",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "marginTop": 16,
+            "fontSize": 17,
+            "lineHeight": 16,
+            "marginTop": 24,
           }
         }
       >
@@ -95,7 +95,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
-            "marginTop": 8,
+            "marginTop": 16,
           }
         }
       >
@@ -108,7 +108,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
               "flexDirection": "column",
             },
             Object {
-              "marginTop": 20,
+              "marginTop": 24,
             },
           ]
         }
