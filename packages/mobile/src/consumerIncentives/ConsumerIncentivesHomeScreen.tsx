@@ -92,6 +92,12 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
                 <Text style={styles.body}>{content[`body${section}`]}</Text>
               </Fragment>
             ))}
+            {!userIsVerified && (
+              <>
+                <Text style={styles.subtitle}>{content.unverifiedSubtitle}</Text>
+                <Text style={styles.body}>{content.unverifiedBody}</Text>
+              </>
+            )}
             <Button
               style={styles.button}
               size={BtnSizes.FULL}
@@ -134,15 +140,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    ...fontStyles.regular500,
-    marginTop: 16,
+    ...fontStyles.sectionHeader,
+    fontSize: 17,
+    marginTop: 24,
   },
   body: {
     ...fontStyles.small,
-    marginTop: 8,
+    marginTop: 16,
   },
   button: {
-    marginTop: 20,
+    marginTop: 24,
   },
   learnMore: {
     alignSelf: 'center',
