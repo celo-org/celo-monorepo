@@ -62,6 +62,7 @@ export type StackParamList = {
         navigatedFromSettings: boolean
       }
   [Screens.BidaliScreen]: { currency: CURRENCY_ENUM }
+  [Screens.ConsumerIncentivesHomeScreen]: undefined
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }

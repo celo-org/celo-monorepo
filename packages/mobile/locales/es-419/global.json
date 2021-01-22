@@ -25,6 +25,7 @@
   "learnMore": "Saber más",
   "activity": "Actividad",
   "history": "Historial",
+  "earnRewards": "Ganhe recompensas",
   "notEnoughDollarsError": "No hay suficientes Celo Dólares para cambiarlos",
   "notEnoughGoldError": "No hay suficiente CELO para cambiarlo",
   "exchangeFailed": "Intercambio fallido, por favor vuelva a intentarlo",
@@ -185,5 +186,6 @@
   "commentUnavailable": "Comentario no disponible",
   "accountClearFailed": "Hubo un error al borrar tu Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",
   "withdraw": "Retirar",
-  "countryNotAvailable": "{{appName}} no está disponible en tu país"
+  "countryNotAvailable": "{{appName}} no está disponible en tu país",
+  "firebaseFetchFailed": "Falló la conexión con el servidor"
 }
