@@ -31,7 +31,6 @@ export default class RadioButton extends React.PureComponent<Props> {
     }
     const fill = (this.props.selected && !this.props.disabled) ? this.props.color : undefined;
     return (
-
       <Svg
         xmlns="http://www.w3.org/2000/svg"
         height={this.props.height}
