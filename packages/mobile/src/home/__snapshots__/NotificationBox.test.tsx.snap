@@ -230,7 +230,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       "fontFamily": "Inter-Regular",
                       "fontSize": 18,
                       "lineHeight": 24,
-                      "marginRight": 12,
                     },
                     Object {},
                   ]
@@ -295,6 +294,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                 Object {
                   "alignItems": "center",
                   "justifyContent": "center",
+                  "marginLeft": 12,
                   "width": 80,
                 }
               }
@@ -306,6 +306,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                     "testUri": "../../../packages/mobile/src/images/backup-key.png",
                   }
                 }
+                testID="undefined/Icon"
               />
             </View>
           </View>
@@ -373,7 +374,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       "fontFamily": "Inter-Regular",
                       "fontSize": 18,
                       "lineHeight": 24,
-                      "marginRight": 12,
                     },
                     Object {},
                   ]
@@ -479,6 +479,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                 Object {
                   "alignItems": "center",
                   "justifyContent": "center",
+                  "marginLeft": 12,
                   "width": 80,
                 }
               }
@@ -490,6 +491,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                     "testUri": "../../../packages/mobile/src/images/get-verified.png",
                   }
                 }
+                testID="undefined/Icon"
               />
             </View>
           </View>
@@ -559,7 +561,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       "fontFamily": "Inter-Regular",
                       "fontSize": 18,
                       "lineHeight": 24,
-                      "marginRight": 12,
                     },
                     Object {
                       "color": "#FFFFFF",
@@ -665,24 +666,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                 </View>
               </View>
             </View>
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                  "width": 80,
-                }
-              }
-            >
-              <Image
-                resizeMode="contain"
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/remote-notification.png",
-                  }
-                }
-              />
-            </View>
           </View>
         </View>
       </View>
@@ -748,7 +731,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       "fontFamily": "Inter-Regular",
                       "fontSize": 18,
                       "lineHeight": 24,
-                      "marginRight": 12,
                     },
                     Object {},
                   ]
@@ -854,6 +836,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                 Object {
                   "alignItems": "center",
                   "justifyContent": "center",
+                  "marginLeft": 12,
                   "width": 80,
                 }
               }
@@ -865,6 +848,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                     "testUri": "../../../packages/mobile/src/images/learn-celo.png",
                   }
                 }
+                testID="undefined/Icon"
               />
             </View>
           </View>

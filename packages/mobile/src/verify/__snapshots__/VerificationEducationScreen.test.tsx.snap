@@ -384,11 +384,15 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text
@@ -1401,11 +1405,15 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text
@@ -2418,11 +2426,15 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text
@@ -3435,11 +3447,15 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    Object {
+                      "justifyContent": "center",
+                    },
+                  ]
                 }
               >
                 <Text

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { HomeEvents } from 'src/analytics/Events'
+import { SendOrigin } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -80,13 +81,15 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
     const addressValidationType =
       secureSendDetails?.addressValidationType || AddressValidationType.NONE
 
+    const origin = SendOrigin.AppRequestFlow
     if (addressValidationType === AddressValidationType.NONE) {
-      navigate(Screens.SendConfirmation, { transactionData })
+      navigate(Screens.SendConfirmation, { transactionData, origin })
     } else {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
         requesterAddress,
+        origin,
       })
     }
   }

@@ -96,6 +96,13 @@ contract('Validators', (accounts: string[]) => {
     exponent: new BigNumber(5),
     adjustmentSpeed: toFixed(0.25),
   }
+
+  const grace = new BigNumber(0.00625)
+  const one = new BigNumber(1)
+  const max1 = (num: BigNumber) => (num.gt(one) ? one : num)
+  const calculateScore = (uptime: BigNumber) =>
+    max1(uptime.plus(grace)).pow(validatorScoreParameters.exponent)
+
   const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
@@ -1878,18 +1885,20 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#calculateEpochScore', () => {
     describe('when uptime is in the interval [0, 1.0]', () => {
-      const uptime = new BigNumber(0.99)
-      // @ts-ignore
-      const expected = uptime.pow(validatorScoreParameters.exponent)
-
       it('should calculate the score correctly', async () => {
         // Compare expected and actual to 8 decimal places.
+        const uptime = new BigNumber(0.99)
         assertEqualDpBN(
           fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
-          expected,
+          calculateScore(uptime),
           8
         )
-        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(new BigNumber(0))), 0, 8)
+        assertEqualDpBN(
+          fromFixed(await validators.calculateEpochScore(new BigNumber(0))),
+          calculateScore(new BigNumber(0)),
+          8
+        )
+
         assertEqualDpBN(fromFixed(await validators.calculateEpochScore(fixed1)), 1, 8)
       })
     })
@@ -1907,7 +1916,7 @@ contract('Validators', (accounts: string[]) => {
       const testGroupUptimeCalculation = (_uptimes) => {
         const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
-          .map((uptime) => uptime.pow(validatorScoreParameters.exponent.toNumber()))
+          .map((uptime) => calculateScore(uptime))
           .reduce((sum, n) => sum.plus(n))
           .div(_uptimes.length)
         it('should calculate the group score correctly', async () => {
@@ -1966,14 +1975,14 @@ contract('Validators', (accounts: string[]) => {
     describe('when 0 <= uptime <= 1.0', () => {
       const uptime = new BigNumber(0.99)
       // @ts-ignore
-      const epochScore = uptime.pow(validatorScoreParameters.exponent)
+      const epochScore = calculateScore(uptime)
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       beforeEach(async () => {
         await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
       })
 
       it('should update the validator score', async () => {
-        const expectedScore = adjustmentSpeed.times(epochScore)
+        const expectedScore = adjustmentSpeed.times(epochScore).decimalPlaces(12)
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assertEqualBN(parsedValidator.score, toFixed(expectedScore))
       })
@@ -1984,7 +1993,7 @@ contract('Validators', (accounts: string[]) => {
         })
 
         it('should update the validator score', async () => {
-          let expectedScore = adjustmentSpeed.times(epochScore)
+          let expectedScore = adjustmentSpeed.times(epochScore).decimalPlaces(12)
           expectedScore = new BigNumber(1)
             .minus(adjustmentSpeed)
             .times(expectedScore)
@@ -2199,7 +2208,7 @@ contract('Validators', (accounts: string[]) => {
       const uptime = new BigNumber(0.99)
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       // @ts-ignore
-      const expectedScore = adjustmentSpeed.times(uptime.pow(validatorScoreParameters.exponent))
+      const expectedScore = adjustmentSpeed.times(calculateScore(uptime))
       const expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
       const expectedGroupPayment = expectedTotalPayment
         .times(fromFixed(commission))
