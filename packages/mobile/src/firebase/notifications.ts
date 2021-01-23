@@ -90,7 +90,7 @@ export function* handleNotification(
   // See if this is a notification with an open url or webview action (`ou` prop in the data)
   const urlToOpen = message.data?.ou
   const openExternal = message.data?.openExternal === 'true'
-  const openUrlAction = urlToOpen ? openUrl(urlToOpen, openExternal) : null
+  const openUrlAction = urlToOpen ? openUrl(urlToOpen, openExternal, true) : null
 
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
     const { title, body } = message.notification ?? {}

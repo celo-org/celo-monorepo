@@ -61,7 +61,6 @@
   },
   "congratsVerified": "Congratulations you are now verified!",
   "notification": {
-    "title": "Confirm Your Phone",
     "body": "Receive payments directly to your phone number",
     "cta": "Confirm Now"
   },

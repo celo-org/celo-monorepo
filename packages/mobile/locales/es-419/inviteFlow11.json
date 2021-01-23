@@ -14,7 +14,6 @@
   "accountSetupFailed": "No se pudo crear tu monedero",
   "emptyInviteCode": "El código de invitación no tiene fondos",
   "transferDollarsToAccount": "Dólares transferidos a tu cuenta!",
-  "inviteFriendsToCelo": "Invitar amigos a {{appName}}",
   "inviteAnyone": "Envía fácilmente a tus amigos agregando tus contactos",
   "inviteReceived": "Invitación recibida",
   "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)",

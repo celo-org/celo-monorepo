@@ -3,6 +3,7 @@ import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -27,6 +28,10 @@ const mockTransactionData = {
 }
 
 describe('IncomingPaymentRequestListItem', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders correctly', () => {
     const store = createMockStore()
 
@@ -51,13 +56,14 @@ describe('IncomingPaymentRequestListItem', () => {
     expect(tree.queryByTestId('loading/paymentRequest')).not.toBeNull()
   })
 
-  it('navigates to send confirmation if there is no validation needed ', () => {
+  it('navigates to send confirmation if there is no validation needed', () => {
     const store = createMockStore({
       identity: {
         secureSendPhoneNumberMapping: {
           [mockE164Number]: {
             addressValidationType: AddressValidationType.NONE,
             isFetchingAddresses: true,
+            lastFetchSuccessful: true,
           },
         },
       },
@@ -77,6 +83,7 @@ describe('IncomingPaymentRequestListItem', () => {
           [mockE164Number]: {
             addressValidationType: AddressValidationType.NONE,
             isFetchingAddresses: false,
+            lastFetchSuccessful: true,
           },
         },
       },
@@ -89,17 +96,19 @@ describe('IncomingPaymentRequestListItem', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+      origin: SendOrigin.AppRequestFlow,
       transactionData: mockTransactionData,
     })
   })
 
-  it('navigates to secure send if there is validation needed ', () => {
+  it('navigates to secure send if there is validation needed', () => {
     const store = createMockStore({
       identity: {
         secureSendPhoneNumberMapping: {
           [mockE164Number]: {
             addressValidationType: AddressValidationType.NONE,
             isFetchingAddresses: true,
+            lastFetchSuccessful: true,
           },
         },
       },
@@ -119,6 +128,7 @@ describe('IncomingPaymentRequestListItem', () => {
           [mockE164Number]: {
             addressValidationType: AddressValidationType.PARTIAL,
             isFetchingAddresses: false,
+            lastFetchSuccessful: true,
           },
         },
       },
@@ -131,8 +141,51 @@ describe('IncomingPaymentRequestListItem', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+      origin: SendOrigin.AppRequestFlow,
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.PARTIAL,
     })
+  })
+
+  it('does not navigate when address fetch is unsuccessful', () => {
+    const store = createMockStore({
+      identity: {
+        secureSendPhoneNumberMapping: {
+          [mockE164Number]: {
+            addressValidationType: AddressValidationType.NONE,
+            isFetchingAddresses: true,
+            lastFetchSuccessful: false,
+          },
+        },
+      },
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <IncomingPaymentRequestListItem {...props} />
+      </Provider>
+    )
+
+    fireEvent.press(tree.getByText('global:send'))
+
+    const updatedStore = createMockStore({
+      identity: {
+        secureSendPhoneNumberMapping: {
+          [mockE164Number]: {
+            addressValidationType: AddressValidationType.PARTIAL,
+            isFetchingAddresses: false,
+            lastFetchSuccessful: false,
+          },
+        },
+      },
+    })
+
+    tree.rerender(
+      <Provider store={updatedStore}>
+        <IncomingPaymentRequestListItem {...props} />
+      </Provider>
+    )
+
+    expect(navigate).toBeCalledTimes(0)
   })
 })

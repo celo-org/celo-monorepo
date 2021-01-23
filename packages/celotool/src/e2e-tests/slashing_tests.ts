@@ -97,6 +97,10 @@ describe('slashing tests', function(this: any) {
     networkId: 1101,
     runPath: TMP_PATH,
     migrate: true,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator0',
