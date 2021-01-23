@@ -1,12 +1,11 @@
 import { Result } from '@celo/base/lib/result'
-import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
+import { CeloTxReceipt } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import {
   CheckSessionResp,
@@ -970,38 +969,16 @@ export function* feelessRequestAttestations(
       `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    const mtwWrapper: MetaTransactionWalletWrapper = yield call(
-      [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
-      mtwAddress
-    )
-
-    const approveTx: CeloTransactionObject<boolean> = yield call(
-      [attestationsWrapper, attestationsWrapper.approveAttestationFee],
-      numAttestationsRequestsNeeded
-    )
-
-    const requestTx: CeloTransactionObject<void> = yield call(
-      [attestationsWrapper, attestationsWrapper.request],
+    const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+      [komenciKit, komenciKit.requestAttestations],
+      mtwAddress,
       phoneHash,
       numAttestationsRequestsNeeded
     )
 
-    const approveAndRequestTx = mtwWrapper.executeTransactions([approveTx.txo, requestTx.txo])
-
-    const signedApproveAndRequestTx: CeloTransactionObject<string> = yield call(
-      [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
-      approveAndRequestTx.txo
-    )
-
-    const approveAndRequestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
-      [komenciKit, komenciKit.submitMetaTransaction],
-      mtwAddress,
-      signedApproveAndRequestTx
-    )
-
-    if (!approveAndRequestTxResult.ok) {
-      Logger.debug(TAG, '@feelessRequestAttestations', 'Failed approve tx')
-      throw approveAndRequestTxResult.error
+    if (!requestTxResult.ok) {
+      Logger.debug(TAG, '@feelessRequestAttestations', 'Failed request tx')
+      throw requestTxResult.error
     }
 
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
