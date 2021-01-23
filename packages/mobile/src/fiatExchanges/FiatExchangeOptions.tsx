@@ -30,7 +30,6 @@ import { StackParamList } from 'src/navigator/types'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
 import Logger from 'src/utils/Logger'
 
-
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
 type RouteProps = StackScreenProps<StackParamList, Screens.FiatExchangeOptions>
@@ -104,11 +103,11 @@ function PaymentMethodRadioItem({
   onSelect: () => void
   text: string
   enabled?: boolean
-}) {
+}): JSX.Element {
   return (
     <TouchableWithoutFeedback onPress={onSelect} disabled={!enabled}>
       <View style={styles.paymentMethodItemContainer}>
-        <RadioButton selected={selected} disabled={!enabled}/>
+        <RadioButton selected={selected} disabled={!enabled} />
         <Text style={[styles.paymentMethodItemText, enabled ? {} : { color: colors.gray3 }]}>
           {text}
         </Text>
