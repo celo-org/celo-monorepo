@@ -103,19 +103,19 @@ You should see `Good signature from ...` with your real name and email.
 
 ## Key Publishing
 
-Keys are published to [celo.org](https://celo.org) using [OpenPGP WKD](https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html), which is essentially just a hosted folder of public keys. Published keys are managed by submitting a pull request to the `master` branch of `celo-monorepo` on [GitHub](https://github.com/celo-org/celo-monorepo).
+Keys are published to [celo.org](https://celo.org) using [OpenPGP WKD](https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html), which is essentially just a hosted folder of public keys. Published keys are managed by submitting a pull request to the [https://github.com/celo-org/website](https://github.com/celo-org/website) repo on Github.
 
 #### Adding your key to the repository
 
-Adding your key to the `@celo/web` package of `celo-monorepo` will allow them to be available on [celo.org](https://celo.org) with the next website deployment.
+Adding your key to [https://github.com/celo-org/website](https://github.com/celo-org/website) repo will allow it to be available on [celo.org](https://celo.org) with the next website deployment.
 
-Running the following command from the root of `celo-monorepo` will add your key to the `packages/web/openpgpkey` directory:
+After cloning the repo, running the following command from the root of `website` will add your key to the `openpgpkey` directory:
 
 ```bash
-gpg --list-options show-only-fpr-mbox -k ${USER_NAME}@clabs.co | $(gpgconf --list-dirs libexecdir)/gpg-wks-client -v --install-key -C packages/web/openpgpkey
+gpg --list-options show-only-fpr-mbox -k ${USER_NAME}@clabs.co | $(gpgconf --list-dirs libexecdir)/gpg-wks-client -v --install-key -C openpgpkey
 ```
 
-You should confirm that new key files were added to the `packages/web/openpgpkey/` directory and open a pull request with the changes. You should see new files in the `packages/web/openpgpkey/clabs.co/hu` folder, if you followed the directions above.
+You should confirm that a new key file was added to the `openpgpkey/` directory and open a pull request with the change. You should see the new file in the `openpgpkey/clabs.co/hu` folder, if you followed the directions above.
 
 #### Verifying the published key
 

@@ -56,6 +56,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -107,14 +108,6 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
           onGestureHandlerStateChange={[Function]}
           onHandlerStateChange={[Function]}
           rippleColor={0}
-          style={
-            Array [
-              Object {
-                "overflow": "hidden",
-              },
-              undefined,
-            ]
-          }
         >
           <View
             accessible={true}
@@ -208,14 +201,6 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
           onGestureHandlerStateChange={[Function]}
           onHandlerStateChange={[Function]}
           rippleColor={0}
-          style={
-            Array [
-              Object {
-                "overflow": "hidden",
-              },
-              undefined,
-            ]
-          }
         >
           <View
             accessible={true}
@@ -265,7 +250,9 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                       "lineHeight": 22,
                       "marginLeft": 16,
                     },
-                    Object {},
+                    Object {
+                      "color": "#B4B9BD",
+                    },
                   ]
                 }
               >
@@ -316,76 +303,6 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
         onGestureHandlerStateChange={[Function]}
         onHandlerStateChange={[Function]}
         rippleColor={0}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          accessible={true}
-        >
-          <View
-            style={
-              Object {
-                "flexDirection": "row",
-                "padding": 8,
-              }
-            }
-          >
-            <svg
-              fill="none"
-              height="20"
-              style={Object {}}
-              viewBox="0 0 20 20"
-              width="20"
-            >
-              <circle
-                cx="10"
-                cy="10"
-                r="9"
-                stroke="#B4B9BD"
-                strokeWidth={2}
-                style={Object {}}
-              />
-            </svg>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                    "marginLeft": 8,
-                  },
-                  Object {},
-                ]
-              }
-            >
-              payWithFiat
-            </Text>
-          </View>
-        </View>
-      </RNGestureHandlerButton>
-      <RNGestureHandlerButton
-        collapsable={false}
-        onGestureEvent={[Function]}
-        onGestureHandlerEvent={[Function]}
-        onGestureHandlerStateChange={[Function]}
-        onHandlerStateChange={[Function]}
-        rippleColor={0}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
-        }
       >
         <View
           accessible={true}
@@ -418,6 +335,60 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                 cy="10"
                 fill="#1AB775"
                 r="6"
+                style={Object {}}
+              />
+            </svg>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "marginLeft": 8,
+                  },
+                  Object {},
+                ]
+              }
+            >
+              payWithFiat
+            </Text>
+          </View>
+        </View>
+      </RNGestureHandlerButton>
+      <RNGestureHandlerButton
+        collapsable={false}
+        onGestureEvent={[Function]}
+        onGestureHandlerEvent={[Function]}
+        onGestureHandlerStateChange={[Function]}
+        onHandlerStateChange={[Function]}
+        rippleColor={0}
+      >
+        <View
+          accessible={true}
+        >
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "padding": 8,
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height="20"
+              style={Object {}}
+              viewBox="0 0 20 20"
+              width="20"
+            >
+              <circle
+                cx="10"
+                cy="10"
+                r="9"
+                stroke="#B4B9BD"
+                strokeWidth={2}
                 style={Object {}}
               />
             </svg>
@@ -474,6 +445,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -687,6 +659,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }

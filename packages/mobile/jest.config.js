@@ -20,7 +20,6 @@ module.exports = {
     defaultPlatform: 'android',
   },
   moduleNameMapper: {
-    '@celo/mobile': '<rootDir>',
     '^crypto-js$': '<rootDir>/../../node_modules/crypto-js',
     // Jest isn't able to use the react-native field of package.json and tries to use the main field
     // which then causes other import errors

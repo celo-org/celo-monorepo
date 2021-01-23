@@ -27,7 +27,7 @@ export default class KeyboardAwareScrollView extends React.Component<Props> {
       // Wait for next frame so that the layout is updated first if there's a KeyboardSpacer
       // in the hierarchy, otherwise the scroll into view has no effect
       requestAnimationFrame(() => {
-        const currentlyFocusedField = TextInput.State.currentlyFocusedField()
+        const currentlyFocusedField = TextInput.State.currentlyFocusedInput()
         this.scrollInputIntoView(currentlyFocusedField, this.scrollViewRef.current)
       })
     })
@@ -69,23 +69,24 @@ export default class KeyboardAwareScrollView extends React.Component<Props> {
       return
     }
 
+    const innerViewNode = scrollView.getInnerViewNode()
+    if (!innerViewNode) {
+      return
+    }
+
     // When multiple screens are in a stack navigator we need to be sure
     // the provided input is a child of the scrollview
     // otherwise we get an exception
     // @ts-ignore, react-native type defs are missing this one!
-    UIManager.viewIsDescendantOf(
-      inputHandle,
-      scrollView.getInnerViewNode(),
-      (isAncestor: boolean) => {
-        if (isAncestor && scrollView) {
-          scrollView.scrollResponderScrollNativeHandleToKeyboard(
-            inputHandle,
-            hasNavBar ? customKeyboardHeight + 0 : customKeyboardHeight + 120,
-            true
-          )
-        }
+    UIManager.viewIsDescendantOf(inputHandle, innerViewNode, (isAncestor: boolean) => {
+      if (isAncestor && scrollView) {
+        scrollView.scrollResponderScrollNativeHandleToKeyboard(
+          inputHandle,
+          hasNavBar ? customKeyboardHeight + 0 : customKeyboardHeight + 120,
+          true
+        )
       }
-    )
+    })
   }
 
   render() {

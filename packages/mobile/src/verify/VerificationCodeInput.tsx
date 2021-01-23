@@ -1,11 +1,13 @@
 import { hexToBuffer } from '@celo/utils/src/address'
-import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import {
+  extractAttestationCodeFromMessage,
+  extractSecurityCodeWithPrefix,
+} from '@celo/utils/src/attestations'
 import * as React from 'react'
 import { StyleProp, ViewStyle } from 'react-native'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import { features } from 'src/flags'
 import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
-import { extractSecurityCodeWithPrefix } from 'src/identity/securityCode'
 import { AttestationCode } from 'src/identity/verification'
 import Logger from 'src/utils/Logger'
 

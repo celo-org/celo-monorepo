@@ -73,35 +73,60 @@ The instructions below are for the first phase of the Plumo setup, Powers of Tau
 
 The first step to participating is generating your Celo address in a secure location.
 
-* Download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
+* Obtain the `generate` binary:
+  * Option one - compile the `generate` binary:
+    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/. If you're using an Apple M1 machine, install the beta version of Rust using `rustup install beta`.
+    * `git clone https://github.com/celo-org/snark-setup-operator`
+    * `cd snark-setup-operator`
+    * `git checkout ac3d5603256fc250500e00bae21ba646dd316d6f`
+    * `cargo build --release --bin generate`
+    * Now you can use `./target/release/generate`
+  * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.1).
+* Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
     * Make sure to save your passphrase - you will need it later.
+    * If you are using a USB thumbdrive, you can use the flag `--keys-file KEYS_FILE`, passing in the respective file path to save the key on the drive itself.
 * Send the address generated to plumo@celo.org.
 * Keep the resulting `plumo.keys` file. Ideally, it will be stored in a location that's easy to destroy afterwards, such as a USB thumbdrive.
 
 ### Run the Contributor software
 
-Next you'll download the `contribute` binary and begin contributing to the Plumo setup. 
+Next you'll obtain the `contribute` binary and begin contributing to the Plumo setup.
 
 cLabs is running the coordinator server, which has a list of approved participant addresses. Additionally, cLabs is running a few verifiers that verify contributions on-demand, allowing the setup to make progress.
 
-* After receiving confirmation from cLabs, download the `contribute` binary from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0).
-* Run it as follows, assuming your keys reside in KEYS_PATH:
-    * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
-    * macOS users: `./contribute-macos --keys-path KEYS_PATH`
-    * Linux users: `./contribute-linux --keys-path KEYS_PATH`
+* After receiving confirmation from cLabs, obtain the `contribute` binary:
+  * Option one - compile the `contribute` binary:
+    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/. If you're using an Apple M1 machine, install the beta version of Rust using `rustup install beta`.
+    * `git clone https://github.com/celo-org/snark-setup-operator`
+    * `cd snark-setup-operator`
+    * `git checkout ac3d5603256fc250500e00bae21ba646dd316d6f`
+    * `cargo build --release --bin contribute`
+    * Now you can use `./target/release/contribute`
+  * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.1).
+* Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
+* Run it as follows, assuming your keys reside in KEYS_FILE:
+    * Windows users: `./contribute-windows.exe --keys-file KEYS_FILE`
+    * macOS users: `./contribute-macos --keys-file KEYS_FILE`
+    * Linux users: `./contribute-linux --keys-file KEYS_FILE`
   
-  For example, assuming you're using Linux and your keys reside in `/mnt/plumo/plumo.keys`, you'd run: `./contribute-linux --keys-path /mnt/plumo/plumo.keys`.
+  For example, assuming you're using Linux and your keys reside in `/mnt/plumo/plumo.keys`, you'd run: `./contribute-linux --keys-file /mnt/plumo/plumo.keys`.
 * You will be asked for your passphrase - enter the same one from earlier. 
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
 
 Once this is running, you can leave the machine running -- no direct action is needed. This will run for about ~36 hours, after which the software will terminate running and you will have finished contributing to the Plumo setup!
 
+### Publish your attestation
+
+The `contribute` binary produces a `plumo.attestation` file that contains a signature with your address. After your participation finishes (and not before!), please post it (here)[https://github.com/celo-org/plumo-ceremony-attestations] by creating a new issue! If you use precompiled binaries, be sure to mention you've verified the binary hashes posted on the releases page match the downloaded files.
+
+If you don't have access to the `plumo.attestation` anymore, that's still OK, you can fill in the other details in the issue.
+
 ### Troubleshooting
 
-This section contains some common issues contributors may run into while running the setup software.
+This section contains some common issues contributors may run into while running the setup software. If you have any questions, please reach out on the #plumo channel in the [Celo Discord server](https://discord.gg/6yWMkgM). It is recommended that you have another device to be able to reach out in case of persistent issues.
 
 **Permissions:**
 - You may need to change the permissions on both the `generate` and `contribute` files to be able to run them. For example, on macOS, you can run `chmod u+x generate-macos contribute-macos`.
@@ -111,6 +136,7 @@ This section contains some common issues contributors may run into while running
 **Hardware:**
 - Disable sleep - if your machine is automatically set to sleep or turn hard disks off, it's best to switch these options off.
 - Battery - it's best to connect the machine to an outlet, as the setup is computationally intensive and would drain a battery fast.
+- Frozen machine - if your computer freezes, don't worry -- the Plumo setup software is using all the threads on the CPU, and it should resolve itself.
 
 If either of these happen, don't worry - stop and restart the contribution program and re-enter the passphrase to continue.
 

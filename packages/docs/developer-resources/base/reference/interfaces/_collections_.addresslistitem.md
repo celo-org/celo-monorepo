@@ -21,7 +21,7 @@
 
 • **address**: *string*
 
-*Defined in [packages/sdk/base/src/collections.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L54)*
+*Defined in [packages/sdk/base/src/collections.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L54)*
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 • **value**: *T*
 
-*Defined in [packages/sdk/base/src/collections.ts:55](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L55)*
+*Defined in [packages/sdk/base/src/collections.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L55)*

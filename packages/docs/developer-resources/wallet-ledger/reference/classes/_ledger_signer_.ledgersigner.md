@@ -31,7 +31,7 @@ Signs the EVM transaction with a Ledger device
 
 \+ **new LedgerSigner**(`ledger`: any, `derivationPath`: string, `ledgerAddressValidation`: [AddressValidation](../enums/_ledger_wallet_.addressvalidation.md), `appConfiguration`: object): *[LedgerSigner](_ledger_signer_.ledgersigner.md)*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L22)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L22)*
 
 **Parameters:**
 
@@ -59,7 +59,7 @@ Name | Type |
 
 ▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:196](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L196)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:196](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L196)*
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:190](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L190)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:190](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L190)*
 
 **Parameters:**
 
@@ -91,7 +91,7 @@ ___
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:39](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L39)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L39)*
 
 **Returns:** *string*
 
@@ -101,7 +101,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:82](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L82)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L82)*
 
 **Parameters:**
 
@@ -117,7 +117,7 @@ ___
 
 ▸ **signTransaction**(`addToV`: number, `encodedTx`: RLPEncodedTx): *Promise‹object›*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:43](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L43)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L43)*
 
 **Parameters:**
 
@@ -134,7 +134,7 @@ ___
 
 ▸ **signTypedData**(`typedData`: EIP712TypedData): *Promise‹object›*
 
-*Defined in [wallet-ledger/src/ledger-signer.ts:103](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L103)*
+*Defined in [wallet-ledger/src/ledger-signer.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-signer.ts#L103)*
 
 **Parameters:**
 

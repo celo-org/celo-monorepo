@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { SendOrigin } from 'src/analytics/types'
 import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -16,6 +17,7 @@ const mockRoute = {
   params: {
     transactionData: mockTransactionData,
     addressValidationType: AddressValidationType.FULL,
+    origin: SendOrigin.AppSendFlow,
   },
 }
 
@@ -37,6 +39,7 @@ describe('ValidateRecipientIntro', () => {
     )
     fireEvent.press(tree.getByTestId('confirmAccountButton'))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientAccount, {
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.FULL,
     })

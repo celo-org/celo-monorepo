@@ -14,7 +14,7 @@
 
 ▸ **QrFromUri**(`uri`: string, `type`: "svg" | "terminal" | "utf8"): *Promise‹string›*
 
-*Defined in [tx-uri.ts:114](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L114)*
+*Defined in [tx-uri.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L114)*
 
 **Parameters:**
 
@@ -31,7 +31,7 @@ ___
 
 ▸ **buildUri**(`tx`: CeloTx, `functionName?`: undefined | string, `abiTypes`: string[]): *string*
 
-*Defined in [tx-uri.ts:65](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L65)*
+*Defined in [tx-uri.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L65)*
 
 **Parameters:**
 
@@ -49,7 +49,7 @@ ___
 
 ▸ **parseUri**(`uri`: string): *CeloTx*
 
-*Defined in [tx-uri.ts:26](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L26)*
+*Defined in [tx-uri.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L26)*
 
 **Parameters:**
 

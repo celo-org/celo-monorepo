@@ -9,6 +9,7 @@ export enum AppEvents {
   user_restart = 'user_restart',
   fetch_balance = 'fetch_balance',
   fetch_balance_error = 'fetch_balance_error',
+  redux_keychain_mismatch = 'redux_keychain_mismatch',
 }
 
 export enum HomeEvents {
@@ -299,6 +300,9 @@ export enum CeloExchangeEvents {
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
   spend_merchant_link = 'spend_merchant_link',
+
+  cico_option_chosen = 'cico_option_chosen',
+  provider_chosen = 'provider_chosen',
 }
 
 export enum GethEvents {
@@ -343,6 +347,10 @@ export enum ContractKitEvents {
   init_contractkit_finish = 'init_contractkit_finish',
 }
 
+export enum PerformanceEvents {
+  redux_store_size = 'redux_store_size',
+}
+
 export type AnalyticsEventType =
   | AppEvents
   | HomeEvents
@@ -360,3 +368,4 @@ export type AnalyticsEventType =
   | CeloExchangeEvents
   | GethEvents
   | NetworkEvents
+  | PerformanceEvents

@@ -1,4 +1,3 @@
-import interpolateColors from '@celo/react-components/components/interpolateColors'
 import SegmentedControl from '@celo/react-components/components/SegmentedControl'
 import Share from '@celo/react-components/icons/Share'
 import Times from '@celo/react-components/icons/Times'
@@ -29,12 +28,12 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
     [state, descriptors]
   )
 
-  const shareOpacity = Animated.interpolate(position, {
+  const shareOpacity = Animated.interpolateNode(position, {
     inputRange: [0, 0.1],
     outputRange: [1, 0],
   })
 
-  const color = interpolateColors(position, {
+  const color = Animated.interpolateColors(position, {
     inputRange: [0.9, 1],
     outputColorRange: [colors.dark, colors.light],
   })

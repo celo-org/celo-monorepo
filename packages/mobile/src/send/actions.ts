@@ -47,6 +47,7 @@ export interface SendPaymentOrInviteAction {
   recipientAddress?: string | null
   inviteMethod?: InviteBy
   firebasePendingRequestUid: string | null | undefined
+  fromModal: boolean
 }
 
 export interface SendPaymentOrInviteSuccessAction {
@@ -97,7 +98,8 @@ export const sendPaymentOrInvite = (
   recipient: Recipient,
   recipientAddress: string | null | undefined,
   inviteMethod: InviteBy | undefined,
-  firebasePendingRequestUid: string | null | undefined
+  firebasePendingRequestUid: string | null | undefined,
+  fromModal: boolean
 ): SendPaymentOrInviteAction => ({
   type: Actions.SEND_PAYMENT_OR_INVITE,
   amount,
@@ -106,6 +108,7 @@ export const sendPaymentOrInvite = (
   recipientAddress,
   inviteMethod,
   firebasePendingRequestUid,
+  fromModal,
 })
 
 export const sendPaymentOrInviteSuccess = (

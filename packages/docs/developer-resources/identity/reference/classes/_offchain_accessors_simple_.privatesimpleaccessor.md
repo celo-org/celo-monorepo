@@ -41,7 +41,7 @@ in a type parameter is supported for runtime type safety.
 
 \+ **new PrivateSimpleAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹DataType›, `dataPath`: string): *[PrivateSimpleAccessor](_offchain_accessors_simple_.privatesimpleaccessor.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:68](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L68)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L68)*
 
 **Parameters:**
 
@@ -59,7 +59,7 @@ Name | Type |
 
 • **dataPath**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:72](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L72)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L72)*
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 *Implementation of [PrivateAccessor](../interfaces/_offchain_accessors_interfaces_.privateaccessor.md).[read](../interfaces/_offchain_accessors_interfaces_.privateaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:93](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L93)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L93)*
 
 #### Type declaration:
 
@@ -87,7 +87,7 @@ ___
 
 • **type**: *Type‹DataType›*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:71](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L71)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L71)*
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L70)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L70)*
 
 ## Methods
 
@@ -103,7 +103,7 @@ ___
 
 ▸ **readAsResult**(`account`: Address): *Promise‹Result‹DataType, [SchemaErrors](../modules/_offchain_accessors_errors_.md#schemaerrors)››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:83](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L83)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L83)*
 
 **Parameters:**
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **write**(`data`: DataType, `toAddresses`: Address[], `symmetricKey?`: Buffer): *Promise‹void | [InvalidDataError](_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_offchain_accessors_errors_.invalidkey.md)‹››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L75)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L75)*
 
 **Parameters:**
 

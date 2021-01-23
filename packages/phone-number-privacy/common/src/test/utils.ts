@@ -79,7 +79,7 @@ function uint8ArrayToBase64(bytes: Uint8Array) {
 export async function replenishQuota(account: string, contractKit: any) {
   const goldToken = await contractKit.contracts.getGoldToken()
   const selfTransferTx = goldToken.transfer(account, 1)
-  await selfTransferTx.sendAndWaitForReceipt()
+  await selfTransferTx.sendAndWaitForReceipt({ from: account })
 }
 
 export async function registerWalletAddress(

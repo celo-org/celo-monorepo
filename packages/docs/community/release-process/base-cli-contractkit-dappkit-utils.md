@@ -1,4 +1,4 @@
-# Release Process for Base, Celocli, ContractKit, DAppKit, and Utils
+# Release Process for Celocli and ContractKit
 
 ## Versioning
 
@@ -16,15 +16,12 @@ Development builds will be identified as such: `x.y.z-dev`, and will be publishe
 ### NPM
 
 You can find the npm packages in the following places:
-  * [@celo/base](https://www.npmjs.com/package/@celo/base)
   * [@celo/celocli](https://www.npmjs.com/package/@celo/celocli)
   * [@celo/contractkit](https://www.npmjs.com/package/@celo/contractkit)
-  * [@celo/dappkit](https://www.npmjs.com/package/@celo/dappkit)
-  * [@celo/utils](https://www.npmjs.com/package/@celo/utils)
 
 ### Github tags
 
-To identify the commits included in a specific release and see which new features were added or bugs fixed, please refer to the [release notes](https://github.com/celo-org/celo-monorepo/releases) in the monorepo. Also to keep track of continual updates to the stable and dev versions of the packages, each package has a `CHANGELOG.md` file: [Base](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/CHANGELOG.md), [Celocli](https://github.com/celo-org/celo-monorepo/blob/master/packages/cli/CHANGELOG.md), [Contractkit](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/CHANGELOG.md), [Dappkit](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/dappkit/CHANGELOG.md), [Utils](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/CHANGELOG.md).
+To identify the commits included in a specific release and see which new features were added or bugs fixed, please refer to the [release notes](https://github.com/celo-org/celo-monorepo/releases) in the monorepo. Also to keep track of continual updates to the stable and dev versions of the packages, each package has a `CHANGELOG.md` file: [Celocli](https://github.com/celo-org/celo-monorepo/blob/master/packages/cli/CHANGELOG.md) and [Contractkit](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/CHANGELOG.md).
 All releases should be tagged with the version number, e.g. `contractkit-vX.Y.Z`. Each release should include a summary of the release contents, including links to pull requests and issues with detailed description of any notable changes. 
 
 ### Communication
@@ -72,10 +69,12 @@ Vulnerabilities in any of these releases should be disclosed according to the [s
 ## Dependencies
 
   * @celo/mobile - Dappkit relies on this 
-  * Base/Celocli/ContractKit/Utils - These all rely on each other quite bit, so triple check that these packages weren’t affected by a change in another.
+  * Celocli
+  * All the packages under the ["SDK" folder](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk) -- These all rely on each other quite bit, so triple check that these packages weren’t affected by a change in another.
 
 ## Dependents
 
-  * Base/Celocli/ContractKit/Utils
+  * Celocli
+  * All the packages under the ["SDK" folder](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk)
 
 

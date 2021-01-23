@@ -31,7 +31,7 @@
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [wallet-local/src/local-wallet.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-local/src/local-wallet.ts#L10)*
+*Defined in [wallet-local/src/local-wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-local/src/local-wallet.ts#L10)*
 
 Register the private key as signer account
 
@@ -125,7 +125,7 @@ ___
 
 *Overrides void*
 
-*Defined in [wallet-local/src/local-wallet.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/wallets/wallet-local/src/local-wallet.ts#L24)*
+*Defined in [wallet-local/src/local-wallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-local/src/local-wallet.ts#L24)*
 
 Remove the account
 

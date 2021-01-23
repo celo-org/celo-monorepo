@@ -36,7 +36,7 @@
 
 Ƭ **Result**: *[OkResult](../interfaces/_result_.okresult.md)‹TResult› | [ErrorResult](../interfaces/_result_.errorresult.md)‹TError›*
 
-*Defined in [packages/sdk/base/src/result.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L10)*
+*Defined in [packages/sdk/base/src/result.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L10)*
 
 ## Variables
 
@@ -44,7 +44,7 @@
 
 • **JSONParseErrorType**: *"JsonParseError"* = "JsonParseError"
 
-*Defined in [packages/sdk/base/src/result.ts:77](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L77)*
+*Defined in [packages/sdk/base/src/result.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L77)*
 
 ## Functions
 
@@ -52,7 +52,7 @@
 
 ▸ **Err**<**TError**>(`error`: TError): *[ErrorResult](../interfaces/_result_.errorresult.md)‹TError›*
 
-*Defined in [packages/sdk/base/src/result.ts:16](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L16)*
+*Defined in [packages/sdk/base/src/result.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L16)*
 
 **Type parameters:**
 
@@ -72,7 +72,7 @@ ___
 
 ▸ **Ok**<**TResult**>(`result`: TResult): *[OkResult](../interfaces/_result_.okresult.md)‹TResult›*
 
-*Defined in [packages/sdk/base/src/result.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L12)*
+*Defined in [packages/sdk/base/src/result.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L12)*
 
 **Type parameters:**
 
@@ -92,7 +92,7 @@ ___
 
 ▸ **makeAsyncThrowable**<**TArgs**, **TResult**, **TError**, **TModifiedError**>(`f`: function, `errorModifier?`: undefined | function): *(Anonymous function)*
 
-*Defined in [packages/sdk/base/src/result.ts:47](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L47)*
+*Defined in [packages/sdk/base/src/result.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L47)*
 
 **Type parameters:**
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **makeThrowable**<**TArgs**, **TResult**, **TError**, **TModifiedError**>(`f`: function, `errorModifier?`: undefined | function): *(Anonymous function)*
 
-*Defined in [packages/sdk/base/src/result.ts:35](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L35)*
+*Defined in [packages/sdk/base/src/result.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L35)*
 
 **Type parameters:**
 
@@ -160,7 +160,7 @@ ___
 
 ▸ **parseJsonAsResult**(`data`: string): *[OkResult](../interfaces/_result_.okresult.md)‹any› | [ErrorResult](../interfaces/_result_.errorresult.md)‹[JSONParseError](../classes/_result_.jsonparseerror.md)‹››*
 
-*Defined in [packages/sdk/base/src/result.ts:84](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L84)*
+*Defined in [packages/sdk/base/src/result.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L84)*
 
 **Parameters:**
 
@@ -176,7 +176,7 @@ ___
 
 ▸ **throwIfError**<**TResult**, **TError**, **TModifiedError**>(`result`: [Result](_result_.md#result)‹TResult, TError›, `errorModifier?`: undefined | function): *TResult*
 
-*Defined in [packages/sdk/base/src/result.ts:21](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L21)*
+*Defined in [packages/sdk/base/src/result.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L21)*
 
 **Type parameters:**
 
