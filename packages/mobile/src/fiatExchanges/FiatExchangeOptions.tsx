@@ -83,7 +83,7 @@ function CurrencyRadioItem({
           { borderColor: currencyBorderColor(selected) },
         ]}
       >
-        <RadioButton selected={selected} />
+        <RadioButton selected={selected} disabled={!enabled} />
         <Text style={[styles.currencyItemTitle, enabled ? {} : { color: colors.gray3 }]}>
           {title}
         </Text>
