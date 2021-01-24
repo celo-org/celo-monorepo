@@ -8,7 +8,7 @@ import { WebViewMessageEvent } from 'react-native-webview'
 import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { openUrl } from 'src/app/actions'
-import WebView from 'src/components/WebView'
+import WebView, { WebViewRef } from 'src/components/WebView'
 import { bidaliPaymentRequested } from 'src/fiatExchanges/actions'
 import networkConfig from 'src/geth/networkConfig'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
@@ -99,7 +99,7 @@ function BidaliScreen({ route, navigation }: Props) {
     }
   }
 
-  const webViewRef = useRef<WebView>(null)
+  const webViewRef = useRef<WebViewRef>(null)
   const cusdBalance = useSelector(stableTokenBalanceSelector)
   const celoBalance = useSelector(celoTokenBalanceSelector)
   const jsonBalances = useMemo(
