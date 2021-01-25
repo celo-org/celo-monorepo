@@ -39,6 +39,7 @@
 - [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
 - [Monitoring](validator-guide/monitoring.md)
 - [Upgrading a Node](validator-guide/node-upgrades.md)
+- [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
 
@@ -48,7 +49,7 @@
 - [Code Examples](developer-resources/start.md)
   - [Sending CELO & cUSD](developer-resources/walkthroughs/hellocelo.md)
   - [Deploy a Contract (local node)](developer-resources/walkthroughs/hellocontracts.md)
-  - [Deploy a Contract (Forno)](developer-resources/walkthroughs/hello-contract-remote-node.md)
+  - [Deploy and Interact with Contracts (Remotely)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
@@ -937,7 +938,7 @@
 - [Release Process](community/release-process/README.md)
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
-  - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
+  - [Celocli and ContractKit](community/release-process/base-cli-contractkit-dappkit-utils.md)
   - [Attestation Service](community/release-process/attestation-service.md)
 
 ## Important Information

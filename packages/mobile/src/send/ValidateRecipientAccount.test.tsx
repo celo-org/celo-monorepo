@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { SendOrigin } from 'src/analytics/types'
 import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -17,6 +18,7 @@ describe('ValidateRecipientAccount', () => {
           {...getMockStackScreenProps(Screens.ValidateRecipientAccount, {
             transactionData: mockTransactionData,
             addressValidationType: AddressValidationType.FULL,
+            origin: SendOrigin.AppSendFlow,
           })}
         />
       </Provider>
@@ -32,6 +34,7 @@ describe('ValidateRecipientAccount', () => {
           {...getMockStackScreenProps(Screens.ValidateRecipientAccount, {
             transactionData: mockTransactionData,
             addressValidationType: AddressValidationType.PARTIAL,
+            origin: SendOrigin.AppSendFlow,
           })}
         />
       </Provider>
@@ -54,6 +57,7 @@ describe('ValidateRecipientAccount', () => {
     const props = getMockStackScreenProps(Screens.ValidateRecipientAccount, {
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.PARTIAL,
+      origin: SendOrigin.AppSendFlow,
     })
 
     const tree = render(
@@ -80,6 +84,7 @@ describe('ValidateRecipientAccount', () => {
     )
 
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })
@@ -102,6 +107,7 @@ it('navigates to payment request confirmation when validation successful for req
     transactionData: mockTransactionData,
     addressValidationType: AddressValidationType.PARTIAL,
     isOutgoingPaymentRequest: true,
+    origin: SendOrigin.AppRequestFlow,
   })
 
   const tree = render(
