@@ -969,6 +969,8 @@ export function* feelessRequestAttestations(
       `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
+    // KomenciKit `requestAttestations` method now bundles in the approve tx
+    // so there is no need to approve separately
     const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.requestAttestations],
       mtwAddress,
