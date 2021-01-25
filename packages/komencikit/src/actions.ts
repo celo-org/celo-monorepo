@@ -174,7 +174,6 @@ export interface RequestSubsidisedAttestationsPayload {
   attestationsRequested: number
   walletAddress: string
   requestTx: RawTransaction
-  approveTx: RawTransaction
 }
 
 export const requestSubsidisedAttestations = action<
