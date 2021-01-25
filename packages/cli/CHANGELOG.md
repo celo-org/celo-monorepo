@@ -15,9 +15,16 @@ Bug Fixes
 Other Changes
 - [one-line summary] - [link PR]
 ## Published
+### **[1.0.3]** -- 2021-01-25
+Bug Fixes
+- Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [ToBeAddedAfterCreatingPR]
+
 ### **[1.0.2]** -- 2021-01-22
 Bug Fixes
 - Fixed Global Flag Parsing in CLI - [#6619](https://github.com/celo-org/celo-monorepo/pull/6619)
+
+Other Changes
+- Fix libraries versions (`shrinkwrap`) to avoid supply chain attacks - [#6575](https://github.com/celo-org/celo-monorepo/pull/6575)
 
 ### **[1.0.1]** -- 2021-01-20
 Features
