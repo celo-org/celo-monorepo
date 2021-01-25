@@ -344,18 +344,13 @@ function* withdrawFromEscrowWithoutCode(komenciActive: boolean = false) {
             token: feelessVerificationState.komenci.sessionToken,
           })
 
-          const signedWithdrawAndTransferTx: CeloTransactionObject<string> = yield call(
-            [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
-            withdrawAndTransferTx.txo
-          )
-
           const withdrawAndTransferTxResult: Result<
             CeloTxReceipt,
             FetchError | TxError
           > = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
-            signedWithdrawAndTransferTx
+            withdrawAndTransferTx
           )
 
           if (!withdrawAndTransferTxResult.ok) {
