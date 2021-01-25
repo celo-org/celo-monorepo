@@ -1,7 +1,6 @@
-import colors from '@celo/react-components/styles/colors';
-import * as React from 'react';
-import { Circle, Svg } from 'svgs';
-
+import colors from '@celo/react-components/styles/colors'
+import * as React from 'react'
+import { Circle, Svg } from 'svgs'
 
 interface Props {
   height?: number
@@ -9,7 +8,6 @@ interface Props {
   selected?: boolean
   disabled?: boolean
 }
-
 
 export default class RadioButton extends React.PureComponent<Props> {
   static defaultProps = {
@@ -21,7 +19,7 @@ export default class RadioButton extends React.PureComponent<Props> {
   }
 
   render() {
-    let stroke = undefined;
+    let stroke
     if (this.props.disabled) {
       stroke = colors.gray2
     } else if (this.props.selected) {
@@ -29,7 +27,7 @@ export default class RadioButton extends React.PureComponent<Props> {
     } else if (!this.props.selected) {
       stroke = colors.gray3
     }
-    const fill = (this.props.selected && !this.props.disabled) ? this.props.color : undefined;
+    const fill = this.props.selected && !this.props.disabled ? this.props.color : undefined
     return (
       <Svg
         xmlns="http://www.w3.org/2000/svg"
