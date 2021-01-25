@@ -59,6 +59,52 @@ exports[`ProviderOptionsScreen renders correctly 1`] = `
               },
             ]
           }
+          testID="Provider/Moonpay"
+        >
+          <Image
+            resizeMode="contain"
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/moonpay.png",
+              }
+            }
+            style={
+              Object {
+                "height": 30,
+              }
+            }
+          />
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#EDEEEF",
+              "height": 1,
+              "width": "100%",
+            }
+          }
+        />
+        <View
+          accessible={true}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "marginVertical": 24,
+              },
+              Object {
+                "opacity": 1,
+              },
+            ]
+          }
+          testID="Provider/Simplex"
         >
           <Image
             resizeMode="contain"
