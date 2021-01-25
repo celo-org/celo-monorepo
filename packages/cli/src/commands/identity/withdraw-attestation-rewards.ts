@@ -19,7 +19,7 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
   }
 
   async run() {
-    let {
+    const {
       flags: { from, tokenAddress },
     } = this.parse(AttestationRewardsWithdraw)
     const [accounts, attestations] = await Promise.all([
@@ -32,7 +32,10 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
     }
 
     const accountAddress = await accounts.signerToAccount(from)
-    const pendingWithdrawals = await attestations.getPendingWithdrawals(tokenAddress, accountAddress)
+    const pendingWithdrawals = await attestations.getPendingWithdrawals(
+      tokenAddress,
+      accountAddress
+    )
     if (!pendingWithdrawals.gt(0)) {
       console.info('No pending rewards for this token address')
       return
