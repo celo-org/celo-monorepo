@@ -235,7 +235,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                   cx="10"
                   cy="10"
                   r="9"
-                  stroke="#B4B9BD"
+                  stroke="#EDEEEF"
                   strokeWidth={2}
                   style={Object {}}
                 />
@@ -339,6 +339,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
               <circle
                 cx="10"
                 cy="10"
+                fill="#1AB775"
                 r="6"
                 style={Object {}}
               />
@@ -394,6 +395,12 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                 r="9"
                 stroke="#B4B9BD"
                 strokeWidth={2}
+                style={Object {}}
+              />
+              <circle
+                cx="10"
+                cy="10"
+                r="6"
                 style={Object {}}
               />
             </svg>
