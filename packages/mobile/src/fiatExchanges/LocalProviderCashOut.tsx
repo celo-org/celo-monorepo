@@ -1,7 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { WebView } from 'react-native-webview'
+import WebView from 'src/components/WebView'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -27,7 +27,7 @@ function LocalProviderCashOut({ route }: Props) {
 
   return (
     <View style={styles.container}>
-      <WebView style={styles.exchangeWebView} source={{ uri }} />
+      <WebView source={{ uri }} />
     </View>
   )
 }
@@ -37,9 +37,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     justifyContent: 'center',
-  },
-  exchangeWebView: {
-    opacity: 0.99,
   },
 })
 

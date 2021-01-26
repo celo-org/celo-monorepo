@@ -11,6 +11,7 @@ import { StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { RequestEvents, SendEvents } from 'src/analytics/Events'
+import { SendOrigin } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { verificationPossibleSelector } from 'src/app/selectors'
@@ -245,7 +246,11 @@ class Send extends React.Component<Props, State> {
       }
     )
 
-    navigate(Screens.SendAmount, { recipient, isOutgoingPaymentRequest })
+    navigate(Screens.SendAmount, {
+      recipient,
+      isOutgoingPaymentRequest,
+      origin: SendOrigin.AppSendFlow,
+    })
   }
 
   onPressStartVerification = () => {

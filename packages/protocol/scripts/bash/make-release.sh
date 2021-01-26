@@ -41,7 +41,7 @@ done
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags
+git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*'
 git checkout $BRANCH
 rm -rf build/contracts
 yarn build
@@ -50,7 +50,7 @@ mv build/contracts $BUILD_DIR
 cp migrationsConfig.js $BUILD_DIR/
 git checkout -
 cp $BUILD_DIR/migrationsConfig.js ./
-yarn build:ts
+yarn build
 
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \

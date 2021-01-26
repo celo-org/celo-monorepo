@@ -8,6 +8,7 @@ import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
 import { feesSaga } from 'src/fees/saga'
+import { fiatExchangesSaga } from 'src/fiatExchanges/saga'
 import { firebaseSaga } from 'src/firebase/saga'
 import { gethSaga } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
@@ -107,6 +108,7 @@ export function* rootSaga() {
   yield spawn(importSaga)
   yield spawn(dappKitSaga)
   yield spawn(checkAccountExistenceSaga)
+  yield spawn(fiatExchangesSaga)
 
   sagasFinishedLoading = true
 }

@@ -4267,7 +4267,7 @@
     "@ledgerhq/errors" "^4.64.0"
     "@ledgerhq/hw-transport" "^4.64.0"
 
-"@ledgerhq/hw-app-eth@^5.11.0":
+"@ledgerhq/hw-app-eth@~5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-app-eth/-/hw-app-eth-5.11.0.tgz#5db6abe0ddf5b5266ed09868de12021f59c1a33e"
   integrity sha512-qgpPwZzM8UMHYMC5+9xYV2O+8kgkDAl9+38w9JiBksaGmUFqcS4najsB1nj6AWf2rGEuXdKMb2WEYRskVypJrA==
@@ -4311,7 +4311,7 @@
     node-hid "^0.7.9"
     usb "^1.6.0"
 
-"@ledgerhq/hw-transport-node-hid@^5.11.0":
+"@ledgerhq/hw-transport-node-hid@~5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-5.11.0.tgz#f2d3e0edc25840de4f452cf427a0482c65be8e86"
   integrity sha512-J/hP3IqcgZn/sTGblELkwZcH68Gbv3ZeaRWdhei6K2dAuxae4dxoVUf6PoOcupEOcXT5XzJBNMc5800AwFeOgg==
@@ -4342,7 +4342,7 @@
     "@ledgerhq/errors" "^4.64.0"
     events "^3.0.0"
 
-"@ledgerhq/hw-transport@^5.11.0":
+"@ledgerhq/hw-transport@^5.11.0", "@ledgerhq/hw-transport@~5.11.0":
   version "5.11.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-5.11.0.tgz#f5c45a34d9b68d81fd2f6641b49815527720364b"
   integrity sha512-z56iwv0DZZu20T5q9sNMHFQNVuRKYqzCuNFhY9woWSpmOQkyVHCRiEgOQbN5h6kVri6fkfPkDzqqcsYjJlnT9g==
@@ -5742,11 +5742,6 @@
   version "6.7.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/dynamic-links/-/dynamic-links-6.7.1.tgz#1de460a2014818a9b1ed8706eb635d8fea59556d"
   integrity sha512-y4xh1zznBLcBy7Gl1rlyPDhTyXcOss8jT1/2fa/e9cmlhCC13WJ3qz/oh61q5K6L61bFtR25DIZggW1MfMjThA==
-
-"@react-native-firebase/functions@^6.7.1":
-  version "6.8.1"
-  resolved "https://registry.yarnpkg.com/@react-native-firebase/functions/-/functions-6.8.1.tgz#0098f1609418f76556e903fc7c96ae9ae9338558"
-  integrity sha512-F775T2Ef05UcophtCBpBm8o0U+76Zcv9x3jsqaQiG5gl3K7+0MhDp3CUUwWDI3+ldP9SKi3SMY6qogWpE7k40g==
 
 "@react-native-firebase/messaging@^6.7.1":
   version "6.7.1"
@@ -7409,6 +7404,10 @@
 "@umpirsky/country-list@git://github.com/umpirsky/country-list#05fda51":
   version "1.0.0"
   resolved "git://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
+
+"@umpirsky/country-list@https://github.com/umpirsky/country-list#05fda51":
+  version "1.0.0"
+  resolved "https://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
 
 "@ungap/url-search-params@^0.1.2":
   version "0.1.2"
