@@ -89,6 +89,13 @@ export abstract class BaseFullNodeDeployer {
         )
     }
 
+    let gethFlags = ''
+    if (this.celoEnv === 'baklava') {
+      gethFlags = '--baklava'
+    } else if (this.celoEnv === 'alfajores') {
+      gethFlags = '--alfajores'
+    }
+
     const rpcApis = 'eth,net,rpc,web3'
     return [
       `--set namespace=${this.kubeNamespace}`,
@@ -101,7 +108,7 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
-      `--set geth.flags=${this.celoEnv === 'baklava' ? '--baklava' : ''}`,
+      `--set geth.flags=${gethFlags}`,
       `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
       ...(await this.additionalHelmParameters()),
