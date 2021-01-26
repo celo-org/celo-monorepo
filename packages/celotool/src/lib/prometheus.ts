@@ -1,4 +1,5 @@
 import fs from 'fs'
+import yaml from 'js-yaml'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
@@ -9,12 +10,11 @@ import {
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import {
-  createServiceAccountIfNotExists,
+  createServiceAccountWithRole,
   getServiceAccountEmail,
-  getServiceAccountKey
+  getGcloudServiceAccountWithRoleKeyBase64
 } from './service-account-utils'
-import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
-const yaml = require('js-yaml')
+import { outputIncludes } from './utils'
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
@@ -143,37 +143,25 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
 }
 
 async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string) {
-  await switchToGCPProjectFromEnv()
   const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
 
-  await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
-
-  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
-  await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
-  return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+  return getGcloudServiceAccountWithRoleKeyBase64(
+    gcloudProjectName,
+    serviceAccountName,
+    'roles/monitoring.metricWriter'
+  )
 }
 
-// createPrometheusGcloudServiceAccount creates a gcloud service account with a given
-// name and the proper permissions for writing metrics to stackdriver
-async function createPrometheusGcloudServiceAccount(serviceAccountName: string, gcloudProjectName: string) {
-  await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
-  const accountCreated = await createServiceAccountIfNotExists(serviceAccountName)
-  if (accountCreated) {
-    let serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-    while (!serviceAccountEmail) {
-      serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-    }
-    await execCmdWithExitOnFailure(
-      `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
-    )
-    // Setup workload identity IAM permissions
-    await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
-  }
+async function createPrometheusGcloudServiceAccount(gcloudProjectName: string, serviceAccountName: string) {
+  return createServiceAccountWithRole(
+    gcloudProjectName,
+    serviceAccountName,
+    'roles/monitoring.metricWriter'
+  )
 }
 
-function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
+export function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
   const prefixByCloudProvider: { [key in CloudProvider]: string } = {
     [CloudProvider.AWS]: 'aws',
     [CloudProvider.AZURE]: 'aks',

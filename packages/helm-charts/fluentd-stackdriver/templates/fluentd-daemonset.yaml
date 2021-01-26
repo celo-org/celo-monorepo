@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  namespace: kube-system
+spec:
+ selector:
+   matchLabels:
+     name: fluentd
+ template:
+   metadata:
+     annotations:
+       checksum/config: {{ include (print $.Template.BasePath "/fluentd-configmap.yaml") . | sha256sum }}
+     labels:
+       name: fluentd
+   spec:
+     serviceAccountName: default
+     tolerations:
+       - key: node-role.kubernetes.io/master
+         effect: NoSchedule
+     containers:
+# Pulled from https://github.com/GoogleCloudPlatform/kubernetes-engine-customize-fluentd/blob/master/kubernetes/fluentd-daemonset.yaml#L35
+       - image: gcr.io/stackdriver-agents/stackdriver-logging-agent:1.8.5
+         imagePullPolicy: Always
+         name: fluentd
+         resources:
+           limits:
+             memory: "250Mi"
+             cpu: 250m
+           requests:
+             memory: "250Mi"
+             cpu: 100m
+         volumeMounts:
+           - mountPath: /var/log
+             name: varlog
+           - mountPath: /var/lib/docker/containers
+             name: varlibdockercontainers
+             readOnly: true
+           - mountPath: /opt/credentials.json
+             name: credentials-json
+             subPath: credentials-json-path
+             readOnly: true
+           - mountPath: /etc/google-fluentd/google-fluentd.conf
+             name: google-fluentd-conf
+             subPath: google-fluentd-conf-path
+             readOnly: true
+           - mountPath: /etc/google-fluentd/config.d/app.conf
+             name: app-conf
+             subPath: app-conf-path
+             readOnly: true
+         env:
+           - name: GOOGLE_APPLICATION_CREDENTIALS
+             value: /opt/credentials.json
+     restartPolicy: Always
+     terminationGracePeriodSeconds: 30
+     volumes:
+       - hostPath:
+           path: /var/log
+         name: varlog
+       - hostPath:
+           path: /var/lib/docker/containers
+         name: varlibdockercontainers
+       - name: credentials-json
+         configMap:
+           name: fluentd-config
+           items:
+           -  key: credentials-json
+              path: credentials-json-path
+       - name: app-conf
+         configMap:
+           name: fluentd-config
+           items:
+           -  key: app-conf
+              path: app-conf-path
+       - name: google-fluentd-conf
+         configMap:
+           name: fluentd-config
+           items:
+           -  key: google-fluentd-conf
+              path: google-fluentd-conf-path

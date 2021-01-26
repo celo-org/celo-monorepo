@@ -46,8 +46,8 @@ export async function switchToGCPProject(projectName: string) {
   }
 }
 
-export async function switchToProjectFromEnv() {
-  const expectedProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+export async function switchToProjectFromEnv(projectName?: string) {
+  const expectedProject = projectName || fetchEnv(envVar.TESTNET_PROJECT_NAME)
   await switchToGCPProject(expectedProject)
 }
 

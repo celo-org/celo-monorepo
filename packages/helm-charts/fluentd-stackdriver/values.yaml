@@ -1,0 +1,5 @@
+cluster:
+  name: "test-oracles-us-west-2"
+  location: "us-west-2"
+
+serviceAccountCredentials: eyJmb28iOiJiYXIifQ==

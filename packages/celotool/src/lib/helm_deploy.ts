@@ -6,9 +6,11 @@ import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
+import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
-import { installPrometheusIfNotExists } from './prometheus'
+import { getCloudProviderPrefix, installPrometheusIfNotExists } from './prometheus'
+import { getGcloudServiceAccountWithRoleKeyBase64 } from './service-account-utils'
 import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
@@ -301,6 +303,36 @@ export async function installAndEnableMetricsDeps(
   if (installPrometheus) {
     await installPrometheusIfNotExists(clusterConfig)
   }
+}
+
+export async function installFluentdStackdriver(
+  clusterConfig: AwsClusterConfig
+) {
+  const kubeStateMetricsReleaseExists = await outputIncludes(
+    `helm list -n default`,
+    `fluentd-stackdriver`,
+    `fluentd-stackdriver exists, skipping install`
+  )
+
+  if (!kubeStateMetricsReleaseExists) {
+    const credentials = await getGcloudServiceAccountWithRoleKeyBase64(
+      fetchEnv(envVar.TESTNET_PROJECT_NAME),
+      getFluentdServiceAccountName(
+        clusterConfig.clusterName,
+        getCloudProviderPrefix(clusterConfig)
+      ),
+      'roles/logging.logWriter'
+    )
+    await execCmdWithExitOnFailure(
+      `helm install fluentd-stackdriver ../helm-charts/fluentd-stackdriver --set cluster.name=${clusterConfig.clusterName} --set cluster.location=${clusterConfig.clusterRegion} --set serviceAccountCredentials='${credentials}' -n default`
+    )
+  }
+}
+
+function getFluentdServiceAccountName(clusterName: string, cloudProvider: string) {
+  // Ensure the service account name is within the length restriction
+  // and ends with an alphanumeric character
+  return `fluentd-${cloudProvider}-${clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
 export async function grantRoles(serviceAccountName: string, role: string) {

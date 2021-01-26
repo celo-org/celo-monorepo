@@ -100,7 +100,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     const replicas = this.deploymentConfig.replicas
     return Promise.all(
       range(replicas).map(async (i: number) =>
-        getService(`${this.celoEnv}-fullnodes-${i}`, this.kubeNamespace)
+        getService(`${this.celoEnv}-fullnodes-${i}-tcp-and-udp`, this.kubeNamespace)
       )
     )
   }
