@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.3--dev]**
+### **[1.0.4--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -17,7 +17,7 @@ Other Changes
 ## Published
 ### **[1.0.3]** -- 2021-01-25
 Bug Fixes
-- Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [ToBeAddedAfterCreatingPR]
+- Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [#6671](https://github.com/celo-org/celo-monorepo/pull/6671)
 
 ### **[1.0.2]** -- 2021-01-22
 Bug Fixes
