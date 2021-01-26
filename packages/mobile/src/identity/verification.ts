@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/base'
 import { CeloTransactionObject } from '@celo/connect'
-import { Address } from '@celo/contractkit'
+import { Address, ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -457,6 +457,7 @@ export function* requestAndRetrieveAttestations(
   currentActionableAttestations: ActionableAttestation[],
   attestationsNeeded: number,
   isFeelessVerification: boolean = false,
+  contractKit?: ContractKit,
   komenciKit?: KomenciKit
 ) {
   let attestations = currentActionableAttestations
@@ -474,9 +475,10 @@ export function* requestAndRetrieveAttestations(
       feeless: isFeelessVerification,
     })
     // Request any additional attestations beyond the original set
-    if (isFeelessVerification && komenciKit) {
+    if (isFeelessVerification && contractKit && komenciKit) {
       yield call(
         feelessRequestAttestations,
+        contractKit,
         komenciKit,
         attestationsWrapper,
         attestationsNeeded - attestations.length,

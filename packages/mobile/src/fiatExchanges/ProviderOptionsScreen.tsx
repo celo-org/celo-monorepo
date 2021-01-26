@@ -106,6 +106,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       isCashIn,
       provider: provider.name,
     })
+    provider.onSelected()
   }
 
   return (
@@ -122,6 +123,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
                     key={provider.name}
                     onPress={providerOnPress(provider)}
                     style={styles.provider}
+                    testID={`Provider/${provider.name}`}
                   >
                     {provider.image}
                   </TouchableOpacity>
