@@ -1,5 +1,4 @@
 import fs from 'fs'
-import yaml from 'js-yaml'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
@@ -15,6 +14,7 @@ import {
   getGcloudServiceAccountWithRoleKeyBase64
 } from './service-account-utils'
 import { outputIncludes } from './utils'
+const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
@@ -127,6 +127,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     const cloudProvider = 'gcp'
     const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
     await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
+    await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
     console.info(serviceAccountName)
     const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     params.push(
@@ -285,13 +286,9 @@ export async function removeGrafanaHelmRelease() {
   }
 }
 
+// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+// Only grant access to GCE API to Prometheus SA deployed in GKE
 async function setupWorkloadIdentities(serviceAccountName: string, gcloudProjectName: string) {
-  // https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-  // Only grant access to GCE API to Prometheus SA deployed in GKE
-  if (!serviceAccountName.includes('gcp')) {
-    return
-  }
-
   // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
   const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
   await execCmdWithExitOnFailure(
