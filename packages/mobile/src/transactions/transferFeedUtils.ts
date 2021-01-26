@@ -6,12 +6,12 @@ import {
   TransferItemFragment,
   UserTransactionsQuery,
 } from 'src/apollo/types'
-import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import {
+  getDisplayName,
   getRecipientFromAddress,
   NumberToRecipient,
   Recipient,
@@ -107,12 +107,8 @@ export function getTransferFeedParams(
     recipientInfo
   )
   Object.assign(recipient, { address })
-  const nameOrNumber = recipient?.name || addressToDisplayName[address]?.name || e164PhoneNumber
-  const displayName =
-    nameOrNumber ||
-    t('feedItemAddress', {
-      address: formatShortenedAddress(address),
-    })
+  const nameOrNumber = recipient?.name || e164PhoneNumber
+  const displayName = getDisplayName(recipient, t)
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info
