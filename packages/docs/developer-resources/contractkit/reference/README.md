@@ -20,19 +20,20 @@ ContractKit supports the following functionality:
 To install:
 
 ```bash
-npm install @celo/contractkit@baklava
+npm install @celo/contractkit
 // or
-yarn add @celo/contractkit@baklava
+yarn add @celo/contractkit
 ```
 
-You will need node version `8.13.0` or higher.
+You will need node version `8.13.0` or higher. Node version 10 is recommended.
 
 To start working with contractkit you need a `kit` instance:
 
 ```ts
 import { newKit } from '@celo/contractkit'
 
-const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
+// Remotely connect to the Alfajores testnet
+const kit = newKit('https://alfajores-forno.celo-testnet.org')
 ```
 
 To access web3:
@@ -48,13 +49,18 @@ await kit.web3.eth.getBalance(someAddress)
 ```ts
 import { newKit, CeloContract } from '@celo/contractkit'
 
-async function getKit(myAddress: string) {
-  const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
+async function getKit(myAddress: string, privateKey: string) {
+  const kit = newKit('https://alfajores-forno.celo-testnet.org')
 
-  // default from
+  // default from account 
   kit.defaultAccount = myAddress
+  
+  // add the account private key for tx signing when connecting to a remote node
+  kit.connection.addAccount(privateKey)
+  
   // paid gas in celo dollars
   await kit.setFeeCurrency(CeloContract.StableToken)
+  
   return kit
 }
 ```
@@ -65,27 +71,26 @@ celo-blockchain has two initial coins: CELO and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
-const goldtoken = await kit.contracts.getGoldToken()
+// get the CELO contract
+const celoToken = await kit.contracts.getGoldToken()
 
-const balance = await goldtoken.balanceOf(someAddress)
+// get the cUSD contract
+const stableToken = await kit.contracts.getStableToken()
+
+const celoBalance = await goldToken.balanceOf(someAddress)
+const cusdBalance = await stableToken.balanceOf(someAddress)
 ```
 
 To send funds:
 
 ```ts
-const oneGold = kit.web3.utils.toWei('1', 'ether')
-const tx = await goldtoken.transfer(someAddress, oneGold).send({
-  from: myAddress,
+const oneGold = kit.connection.web3.utils.toWei('1', 'ether')
+const tx = await goldToken.transfer(someAddress, oneGold).send({
+  from: myAddress
 })
 
 const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
-```
-
-To interact with cUSD, is the same but with a different contract:
-
-```ts
-const stabletoken = await kit.contracts.getStableToken()
 ```
 
 If you would like to pay fees in cUSD, set the gas price manually:
@@ -191,13 +196,17 @@ When interacting with a web3 contract object:
 
 ```ts
 const goldtoken = await kit._web3Contracts.getGoldToken()
-const oneGold = kit.web3.utils.toWei('1', 'ether')
+const oneGold = kit.connection.web3.utils.toWei('1', 'ether')
 
 const txo = await goldtoken.methods.transfer(someAddress, oneGold)
 const tx = await kit.sendTransactionObject(txo, { from: myAddress })
 const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
+
+### More Information
+
+You can find more information about the ContractKit in the Celo docs at [https://docs.celo.org/developer-guide/contractkit](https://docs.celo.org/developer-guide/contractkit).
 
 ### Debugging
 
