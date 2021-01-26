@@ -918,7 +918,7 @@ export async function startGeth(
   ]
 
   if (minerValidator) {
-    gethArgs.push(
+    instance.args.push(
       '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
       minerValidator
     )
