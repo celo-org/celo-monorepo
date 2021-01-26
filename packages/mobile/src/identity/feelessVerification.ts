@@ -356,6 +356,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             attestations,
             attestations.length + attestationsToRequest,
             true,
+            contractKit,
             komenciKit
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
@@ -931,6 +932,7 @@ export function* feelessRequiredAttestationsCompleted() {
 }
 
 export function* feelessRequestAttestations(
+  contractKit: ContractKit,
   komenciKit: KomenciKit,
   attestationsWrapper: AttestationsWrapper,
   numAttestationsRequestsNeeded: number,
@@ -964,39 +966,26 @@ export function* feelessRequestAttestations(
   } else {
     Logger.debug(
       `${TAG}@feelessRequestAttestations`,
-      `Approving ${numAttestationsRequestsNeeded} new attestations`
+      `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    const approveTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
-      [komenciKit, komenciKit.approveAttestations],
-      mtwAddress,
-      numAttestationsRequestsNeeded
-    )
-
-    if (!approveTxResult.ok) {
-      Logger.debug(TAG, '@feelessRequestAttestations', 'Failed approve tx')
-      throw approveTxResult.error
-    }
-
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
-      feeless: true,
-    })
-
-    Logger.debug(
-      `${TAG}@feelessRequestAttestations`,
-      `Requesting ${numAttestationsRequestsNeeded} new attestations`
-    )
-
+    // KomenciKit `requestAttestations` method now bundles in the approve tx
+    // so there is no need to approve separately
     const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.requestAttestations],
       mtwAddress,
       phoneHash,
       numAttestationsRequestsNeeded
     )
+
     if (!requestTxResult.ok) {
       Logger.debug(TAG, '@feelessRequestAttestations', 'Failed request tx')
       throw requestTxResult.error
     }
+
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
+      feeless: true,
+    })
 
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent, {
       feeless: true,
