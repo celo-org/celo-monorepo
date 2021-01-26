@@ -48,9 +48,9 @@ This command will return you with:
 
 ***Note***
 
-If the address was generated with another derivationPath or address index (the ethereum's default is `"m/44'/60'/0'/0/0"` which will cover almost every case) you can specify both using the flags `addressIndex` and `derivationPath`.
+If the address was generated with another derivationPath or address index (the ethereum's default is `"m/44'/60'/0'/0/0"` which will cover almost every case) you can specify both using the flags `addressIndex`, `changeIndex` and `derivationPath`.
 
-Example for `m/44'/78'/1'/1/23` derivationPath: `celocli account:new --mnemonicPath recovery.txt --derivationPath "m/44'/78'/1'/1" --addressIndex 23 --node https://forno.celo.org`.
+Example for `m/44'/78'/1'/4/23` derivationPath: `celocli account:new --mnemonicPath recovery.txt --derivationPath "m/44'/78'/1'" --changeIndex 4 --addressIndex 23 --node https://forno.celo.org`.
 
 ### Check your CELO balanace
 
