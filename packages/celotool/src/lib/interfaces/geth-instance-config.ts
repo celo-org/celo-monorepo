@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 
 export interface GethInstanceConfig {
   name: string
@@ -13,7 +13,8 @@ export interface GethInstanceConfig {
   lightserv?: boolean
   gatewayFee?: BigNumber
   privateKey?: string
-  etherbase?: string
+  minerValidator?: string
+  txFeeRecipient?: string
   proxies?: Array<string[2]>
   isProxied?: boolean
   isProxy?: boolean

@@ -66,11 +66,13 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -418,11 +420,13 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -978,11 +982,13 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1177,6 +1183,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
             },
           ]
         }
+        testID="celoRewards/learnMore"
       >
         <Text
           style={
@@ -1446,11 +1453,13 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1904,11 +1913,13 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -2362,11 +2373,13 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -2714,11 +2727,13 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -3067,11 +3082,13 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -3419,11 +3436,13 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text

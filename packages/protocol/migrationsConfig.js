@@ -42,6 +42,7 @@ const DefaultConfig = {
     },
     deploymentBlockGasLimit: 20000000,
     blockGasLimit: 13000000,
+    uptimeLookbackWindow: 12,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD

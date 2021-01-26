@@ -333,36 +333,28 @@ function* withdrawFromEscrowWithoutCode(komenciActive: boolean = false) {
         value
       )
 
+      const withdrawAndTransferTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
+
       try {
         if (!komenciActive) {
-          const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
-          yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context)
+          yield call(sendTransaction, withdrawAndTransferTx.txo, walletAddress, context)
         } else {
           const komenciKit: KomenciKit = new KomenciKit(contractKit, walletAddress, {
             url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
             token: feelessVerificationState.komenci.sessionToken,
           })
-          // TODO: When Komenci supports batched subsidized transactions, batch these two txs
-          // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
-          // there will be a service in place to transfer funds from MTW to EOA for users
-          const withdrawTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+
+          const withdrawAndTransferTxResult: Result<
+            CeloTxReceipt,
+            FetchError | TxError
+          > = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
-            withdrawTx
+            withdrawAndTransferTx
           )
 
-          if (!withdrawTxResult.ok) {
-            throw withdrawTxResult.error
-          }
-
-          const transferTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
-            [komenciKit, komenciKit.submitMetaTransaction],
-            mtwAddress,
-            transferTx
-          )
-
-          if (!transferTxResult.ok) {
-            throw transferTxResult.error
+          if (!withdrawAndTransferTxResult.ok) {
+            throw withdrawAndTransferTxResult.error
           }
         }
         withdrawTxSuccess.push(true)
