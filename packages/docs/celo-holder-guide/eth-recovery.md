@@ -28,7 +28,7 @@ Write your recovery phrase to a file using the following commands:
 
 1. `nano recovery.txt`
 2. Paste `<word1> <word2> … <word24>`
-3. Replace the `<word>`s in brackets with the words from your recovery phrase (usually 24 words, but works for another mnemonic sizes)
+3. Replace the `<word>`s in brackets with the words from your recovery phrase (usually 24 words, but can be 12, 15, 18, 21 or 24 words, as specified in the [BIP 39 standard](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki))
 4. Press ctrl-o to save
 5. Press ctrl-x to exit
 
