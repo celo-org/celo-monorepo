@@ -64,7 +64,7 @@ export function attestToIdentifier(
 }
 
 export function extractSecurityCodeWithPrefix(message: string) {
-  const matches = message.match('\\s(\\d{8})')
+  const matches = message.match('(\\d{8})')
   if (matches && matches.length === 2) {
     return matches[1]
   }

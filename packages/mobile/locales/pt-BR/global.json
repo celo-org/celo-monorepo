@@ -94,7 +94,7 @@
     "1": "alguns recursos desabilitados"
   },
   "networkConnectionFailed": "Não foi possível conectar-se à rede, verifique sua conexão de dados",
-  "firebaseFailed": "Não foi possível conectar-se ao Firebase",
+  "firebaseFailed": "A conexão com a Internet está fraca. As informações da conta não podem ser atualizadas até que a conexão seja restaurada.",
   "gasPriceUpdateFailed": "Não foi possível atualizar a taxa",
   "appUpdateAvailable": "Atualização de aplicativo disponível",
   "appIsOutdated": "Sua versão atual está desatualizada, atualize para a versão mais recente",
@@ -187,5 +187,6 @@
   "accountClearFailed": "Ocorreu um erro ao remover a chave da sua conta. Pode ser necessário reinstalar o aplicativo para restaurar todas as funcionalidades.",
   "withdraw": "Sacar",
   "countryNotAvailable": "{{appName}} não está disponível no seu país",
+  "firebaseFetchFailed": "Falha na conexão do servidor",
   "pictureLoadFailed": "Ocorreu um erro ao carregar sua imagem"
 }

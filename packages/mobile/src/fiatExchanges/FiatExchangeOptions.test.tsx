@@ -6,9 +6,9 @@ import FiatExchangeOptions from 'src/fiatExchanges/FiatExchangeOptions'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
-const mockScreenProps = (isAddFunds: boolean) =>
+const mockScreenProps = (isCashIn: boolean) =>
   getMockStackScreenProps(Screens.FiatExchangeOptions, {
-    isAddFunds,
+    isCashIn,
     amount: new BigNumber('1'),
   })
 

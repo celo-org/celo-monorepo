@@ -197,6 +197,15 @@ export const getFaucetedAccounts = (mnemonic: string) => {
   return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts, ...votingBotAccounts]
 }
 
+const hardForkActivationBlock = (key: string) => {
+  const value = fetchEnvOrFallback(key, '')
+  if (value === '') {
+    return undefined
+  } else {
+    return parseInt(value, 10)
+  }
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
@@ -243,6 +252,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     })
   )
 
+  // Celo hard fork activation blocks.  Default is undefined, which means not activated.
+  const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
+  const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
+
   // network start timestamp
   const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
 
@@ -257,6 +270,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     requestTimeout,
     enablePetersburg,
     timestamp,
+    churritoBlock,
+    donutBlock,
   })
 }
 
@@ -313,11 +328,20 @@ export const generateGenesis = ({
   requestTimeout,
   enablePetersburg = true,
   timestamp = 0,
+  churritoBlock,
+  donutBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
     genesis.config = GETH_CONFIG_OLD
+  }
+
+  if (typeof churritoBlock === 'number') {
+    genesis.config.churritoBlock = churritoBlock;
+  }
+  if (typeof donutBlock === 'number') {
+    genesis.config.donutBlock = donutBlock;
   }
 
   genesis.config.chainId = chainId
