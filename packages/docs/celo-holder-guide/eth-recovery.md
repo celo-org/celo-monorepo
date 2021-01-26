@@ -28,7 +28,7 @@ Write your recovery phrase to a file using the following commands:
 
 1. `nano recovery.txt`
 2. Paste `<word1> <word2> … <word24>`
-3. Replace the `<word>`s in brackets with the 24 words from your recovery phrase
+3. Replace the `<word>`s in brackets with the words from your recovery phrase (usually 24 words, but works for another mnemonic sizes)
 4. Press ctrl-o to save
 5. Press ctrl-x to exit
 
@@ -37,7 +37,7 @@ Write your recovery phrase to a file using the following commands:
 Recover your Ethereum address on the Celo network:
 
 ```
-celocli account:new --indexAddress 0 --mnemonicPath recovery.txt --derivationPath "m/44'/60'/0'/0" --node https://forno.celo.org
+celocli account:new --mnemonicPath recovery.txt --derivationPath "eth" --node https://forno.celo.org
 ```
 
 This command will return you with:
@@ -45,6 +45,12 @@ This command will return you with:
 - `accountAddress`: the same address as your Ethereum address
 - `privateKey`: the private key associated with your address -- please record this private key on paper and not share with anyone else
 - `publicKey`: the public key associated with your address
+
+***Note***
+
+If the address was generated with another derivationPath or address index (the ethereum's default is `"m/44'/60'/0'/0/0"` which will cover almost every case) you can specify both using the flags `addressIndex` and `derivationPath`.
+
+Example for `m/44'/78'/1'/1/23` derivationPath: `celocli account:new --mnemonicPath recovery.txt --derivationPath "m/44'/78'/1'/1" --addressIndex 23 --node https://forno.celo.org`.
 
 ### Check your CELO balanace
 
