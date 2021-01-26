@@ -41,7 +41,7 @@ export default class AttestationRewardsWithdraw extends BaseCommand {
     }
 
     cli.action.start(`Withdrawing ${pendingWithdrawals.toString()} rewards to ${accountAddress}`)
-    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from })
+    await displaySendTx('withdraw', attestations.withdraw(tokenAddress), { from: flags.from })
     cli.action.stop()
   }
 }
