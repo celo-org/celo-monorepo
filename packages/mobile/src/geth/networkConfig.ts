@@ -31,6 +31,8 @@ interface NetworkConfig {
   allowedMtwImplementations: string[]
   currentMtwImplementationAddress: string
   recaptchaSiteKey: string
+  CIP8AuthorizerUrl: string
+  CIP8MetadataUrl: string
 }
 
 const signMoonpayUrlStaging =
@@ -54,6 +56,13 @@ const CURRENT_MTW_IMPLEMENTATION_ADDRESS_MAINNET: Address =
 const CURRENT_MTW_IMPLEMENTATION_ADDRESS_STAGING: Address =
   '0x5C9a6E3c3E862eD306E2E3348EBC8b8310A99e5A'
 
+const CIP8_AUTHORIZER_URL_STAGING =
+  'https://kc0pg67dfa.execute-api.eu-west-1.amazonaws.com/alfajores/authorize'
+const CIP8_METADATA_URL_STAGING = 'https://d2dmse0lp0z44h.cloudfront.net'
+const CIP8_AUTHORIZER_URL_PROD =
+  'https://4za9j6ke6i.execute-api.eu-west-1.amazonaws.com/mainnet/authorize'
+const CIP8_METADATA_URL_PROD = 'https://d24lgi26ne6o8w.cloudfront.net'
+
 const networkConfigs: { [testnet: string]: NetworkConfig } = {
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
@@ -69,6 +78,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     allowedMtwImplementations: ALLOWED_MTW_IMPLEMENTATIONS_STAGING,
     currentMtwImplementationAddress: CURRENT_MTW_IMPLEMENTATION_ADDRESS_STAGING,
     recaptchaSiteKey: RECAPTCHA_SITE_KEY_ALFAJORES,
+    CIP8AuthorizerUrl: CIP8_AUTHORIZER_URL_STAGING,
+    CIP8MetadataUrl: CIP8_METADATA_URL_STAGING,
   },
   [Testnets.mainnet]: {
     nodeDir: `.${Testnets.mainnet}`,
@@ -84,6 +95,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     allowedMtwImplementations: ALLOWED_MTW_IMPLEMENTATIONS_MAINNET,
     currentMtwImplementationAddress: CURRENT_MTW_IMPLEMENTATION_ADDRESS_MAINNET,
     recaptchaSiteKey: RECAPTCHA_SITE_KEY_MAINNET,
+    CIP8AuthorizerUrl: CIP8_AUTHORIZER_URL_PROD,
+    CIP8MetadataUrl: CIP8_METADATA_URL_PROD,
   },
 }
 
