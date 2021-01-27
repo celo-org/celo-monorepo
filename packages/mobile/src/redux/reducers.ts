@@ -102,4 +102,5 @@ export interface PersistedRootState {
   invite: InviteState
   escrow: EscrowState
   localCurrency: LocalCurrencyState
+  recipients: RecipientsState
 }

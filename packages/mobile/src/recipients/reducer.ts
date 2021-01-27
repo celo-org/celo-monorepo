@@ -1,6 +1,6 @@
 import { Actions, ActionTypes } from 'src/recipients/actions'
 import { AddressToRecipient, NumberToRecipient } from 'src/recipients/recipient'
-import { RehydrateAction } from 'src/redux/persist-helper'
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
@@ -24,6 +24,13 @@ export const recipientsReducer = (
   action: ActionTypes | RehydrateAction
 ) => {
   switch (action.type) {
+    case REHYDRATE: {
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'recipients'),
+        phoneRecipientCache: initialState.phoneRecipientCache,
+      }
+    }
     case Actions.SET_PHONE_RECIPIENT_CACHE:
       return {
         ...state,
