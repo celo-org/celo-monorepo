@@ -48,7 +48,8 @@ contract('StableToken', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK,
       [],
-      []
+      [],
+      'Exchange' // USD
     )
     initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
@@ -102,7 +103,8 @@ contract('StableToken', (accounts: string[]) => {
           fixed1,
           SECONDS_IN_A_WEEK,
           [],
-          []
+          [],
+          'Exchange' // USD
         )
       )
     })

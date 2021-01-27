@@ -29,6 +29,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.stableTokenEUR.inflationPeriod,
     config.stableTokenEUR.initialBalances.addresses,
     config.stableTokenEUR.initialBalances.values,
+    'ExchangeEUR',
   ]
 }
 
