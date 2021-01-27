@@ -11,8 +11,4 @@ contract StableTokenEUR is StableToken {
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
   }
-
-  function getExchangeAddress() private view returns (address) {
-    return registry.getAddressFor(EXCHANGEEUR_REGISTRY_ID);
-  }
 }

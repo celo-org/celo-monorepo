@@ -14,5 +14,4 @@ interface IStableToken {
 
   // NOTE: duplicated with IERC20.sol, remove once interface inheritance is supported.
   function balanceOf(address) external view returns (uint256);
-  // function getExchangeAddress() external view returns (address);
 }
