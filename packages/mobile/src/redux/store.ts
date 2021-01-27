@@ -67,7 +67,45 @@ export const configureStore = (initialState = {}) => {
   const sagaMiddleware = createSagaMiddleware()
   const middlewares = [sagaMiddleware]
 
+  if (__DEV__) {
+    const createDebugger = require('redux-flipper').default
+    // Sending the whole state makes the redux debugger in flipper super slow!!
+    // I suspect it's the exchange rates causing this!
+    // For now exclude the `exchange` reducer.
+    middlewares.push(
+      createDebugger({
+        stateWhitelist: [
+          'app',
+          'networkInfo',
+          'alert',
+          'goldToken',
+          'stableToken',
+          'send',
+          'home',
+          // "exchange",
+          'transactions',
+          'web3',
+          'identity',
+          'account',
+          'invite',
+          'geth',
+          'escrow',
+          'fees',
+          'recipients',
+          'localCurrency',
+          'imports',
+          'paymentRequest',
+        ],
+      })
+    )
+  }
+
   const enhancers = [applyMiddleware(...middlewares)]
+
+  if (__DEV__) {
+    const Reactotron = require('src/reactotronConfig').default
+    enhancers.push(Reactotron.createEnhancer())
+  }
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   // @ts-ignore

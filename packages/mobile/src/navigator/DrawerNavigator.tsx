@@ -44,7 +44,7 @@ import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { AccountKey } from 'src/icons/navigator/AccountKey'
 import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
 import { Gold } from 'src/icons/navigator/Gold'
@@ -215,7 +215,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       </View>
       <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
-        <Text style={fontStyles.label}>Account No.</Text>
+        <Text style={fontStyles.label}>{i18n.t('dappkit:address')}</Text>
         <View style={styles.accountOuterContainer}>
           <View style={styles.accountInnerContainer}>
             <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />

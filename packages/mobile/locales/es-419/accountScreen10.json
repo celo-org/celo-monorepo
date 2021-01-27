@@ -20,7 +20,7 @@
     "body": "Para encender y apagar Ahorro de Datos repetidamente, deberás reiniciar la aplicación y volver a esta pantalla.",
     "restart": "Reiniciar"
   },
-  "addFunds": "Añadir Fondos",
+  "addFunds": "Agregar Fondos",
   "promptFornoModal": {
     "header": "Cambiar modo de conexión?",
     "body": "Hemos notado que tienes problemas para conectarte. Recomendamos habilitar el modo de ahorro de datos para que pueda seguir usando {{appName}} con una conexión intermitente.",
