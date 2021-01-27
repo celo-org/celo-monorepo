@@ -662,6 +662,8 @@ contract('Integration: Exchange (EUR)', (accounts: string[]) => {
         finalStable = await stableToken.balanceOf(accounts[0])
         finalGold = await goldToken.balanceOf(accounts[0])
         finalReserve = await goldToken.balanceOf(reserve.address)
+        console.log('finalGold', finalGold)
+        console.log('originalGold', originalGold)
       })
 
       it(`should increase user's stable`, async () => {
@@ -669,6 +671,7 @@ contract('Integration: Exchange (EUR)', (accounts: string[]) => {
       })
 
       it(`should reduce user's gold`, async () => {
+        // Fails
         if (await addressMinedLatestBlock(accounts[0])) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
@@ -678,6 +681,7 @@ contract('Integration: Exchange (EUR)', (accounts: string[]) => {
       })
 
       it(`should increase Reserve's gold`, async () => {
+        // fails
         assert.isTrue(finalReserve.gt(originalReserve))
       })
     })

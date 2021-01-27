@@ -15,13 +15,13 @@ import {
 } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const stableToken: StableTokenEURInstance = await getDeployedProxiedContract<
+  const stableTokenEUR: StableTokenEURInstance = await getDeployedProxiedContract<
     StableTokenEURInstance
   >('StableTokenEUR', artifacts)
   return [
     // TODO replace this with specific
     config.registry.predeployedProxyAddress,
-    stableToken.address,
+    stableTokenEUR.address,
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
