@@ -187,7 +187,6 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}
               key: TWILIO_AUTH_TOKEN
-        
         volumeMounts:
         - name: data
           mountPath: /root/.celo
