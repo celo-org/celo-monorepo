@@ -244,7 +244,7 @@ export async function knownAddressesChannel() {
 }
 
 export async function notificationsChannel() {
-  return simpleReadChannel('notifications')
+  return simpleReadChannel('notificationsV2')
 }
 
 function simpleReadChannel(key: string) {

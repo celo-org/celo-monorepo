@@ -15,7 +15,7 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
-import { CELO_REWARDS_LINK, FAQ_LINK } from 'src/config'
+import { FAQ_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
@@ -228,7 +228,7 @@ function CeloRewardContent({ address, amount, recipient }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const openLearnMore = () => {
-    navigate(Screens.WebViewScreen, { uri: `${CELO_REWARDS_LINK}?origin=transaction-detail` })
+    navigate(Screens.ConsumerIncentivesHomeScreen)
   }
 
   return (

@@ -30,7 +30,7 @@ export class ContractVersion {
   }
 
   /**
-   * @param version A 256 byte buffer containing the 32 byte storage, major, minor, and patch
+   * @param version A 128 byte buffer containing the 32 byte storage, major, minor, and patch
    * version numbers.
    */
   static fromGetVersionNumberReturnValue = (version: Buffer): ContractVersion => {
@@ -38,12 +38,12 @@ export class ContractVersion {
       throw new Error(`Invalid version buffer: ${version.toString('hex')}`)
     }
     const versions = [
-      version.slice(0, 32),  // Storage
-      version.slice(32, 64), // Major
-      version.slice(64, 96), // Minor
-      version.slice(96, 128) // Patch
+      version.toString('hex', 0, 32),  // Storage
+      version.toString('hex', 32, 64), // Major
+      version.toString('hex', 64, 96), // Minor
+      version.toString('hex', 96, 128) // Patch
     ]
-    return ContractVersion.fromString(versions.map((x) => x.toString('hex')).join('.'))
+    return ContractVersion.fromString(versions.map((x) => parseInt(x, 16)).join('.'))
   }
 
   constructor(

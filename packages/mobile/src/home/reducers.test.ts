@@ -36,12 +36,14 @@ describe('home reducer', () => {
         notification2,
       },
     })
+
     updatedState = reducer(updatedState, {
       type: Actions.UPDATE_NOTIFICATIONS,
       notifications: {
         notification1: {
           ...notification1,
           ctaUri: 'https://valoraapp.com',
+          minVersion: '1.8.0',
         },
       },
     })
@@ -52,6 +54,56 @@ describe('home reducer', () => {
         notification1: {
           ...notification1,
           ctaUri: 'https://valoraapp.com',
+          minVersion: '1.8.0',
+        },
+      },
+    })
+
+    // Now we remove one of the optional fields
+    updatedState = reducer(updatedState, {
+      type: Actions.UPDATE_NOTIFICATIONS,
+      notifications: {
+        notification1,
+      },
+    })
+    // The optional field is now removed
+    expect(updatedState).toEqual({
+      ...initialState,
+      notifications: {
+        notification1,
+      },
+    })
+
+    // Now we update an already dismissed notification
+    updatedState = reducer(
+      {
+        ...updatedState,
+        notifications: {
+          ...updatedState.notifications,
+          notification1: {
+            ...updatedState.notifications.notification1,
+            dismissed: true,
+          },
+        },
+      },
+      {
+        type: Actions.UPDATE_NOTIFICATIONS,
+        notifications: {
+          notification1: {
+            ...notification1,
+            iconUrl: 'http://example.com/icon.png',
+          },
+        },
+      }
+    )
+    // The notification remains dismissed
+    expect(updatedState).toEqual({
+      ...initialState,
+      notifications: {
+        notification1: {
+          ...notification1,
+          iconUrl: 'http://example.com/icon.png',
+          dismissed: true,
         },
       },
     })

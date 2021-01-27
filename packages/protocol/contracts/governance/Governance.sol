@@ -187,7 +187,7 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 1);
+    return (1, 2, 0, 2);
   }
 
   /**
@@ -640,7 +640,7 @@ contract Governance is
     );
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
     voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
-    if (proposal.timestamp > voter.mostRecentReferendumProposal) {
+    if (proposal.timestamp > proposals[voter.mostRecentReferendumProposal].timestamp) {
       voter.mostRecentReferendumProposal = proposalId;
     }
     emit ProposalVoted(proposalId, account, uint256(value), weight);

@@ -331,7 +331,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
         const nameClaim = metadata.findClaim(ClaimTypes.NAME)
 
-        const resp = await fetch(`${attestationServiceURLClaim.url}status`)
+        const resp = await fetch(
+          `${attestationServiceURLClaim.url}${
+            attestationServiceURLClaim.url.substr(-1) === '/' ? '' : '/'
+          }status`
+        )
         if (!resp.ok) {
           throw new Error(`Request failed with status ${resp.status}`)
         }
