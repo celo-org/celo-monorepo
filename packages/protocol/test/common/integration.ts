@@ -15,6 +15,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
+  ExchangeEURInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceApproverMultiSigInstance,
@@ -24,6 +25,7 @@ import {
   RegistryInstance,
   ReserveInstance,
   ReserveSpenderMultiSigInstance,
+  StableTokenEURInstance,
   StableTokenInstance,
 } from 'types'
 
@@ -562,11 +564,11 @@ contract('Integration: Exchange', (accounts: string[]) => {
 
 contract('Integration: Exchange (EUR)', (accounts: string[]) => {
   const transferAmount = 10
-  let exchange: ExchangeInstance
+  let exchange: ExchangeEURInstance
   let multiSig: ReserveSpenderMultiSigInstance
   let reserve: ReserveInstance
   let goldToken: GoldTokenInstance
-  let stableToken: StableTokenInstance
+  let stableToken: StableTokenEURInstance
   let originalStable
   let originalGold
   let originalReserve

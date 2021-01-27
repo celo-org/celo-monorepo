@@ -12,7 +12,7 @@ import {
   FreezerInstance,
   ReserveInstance,
   SortedOraclesInstance,
-  StableTokenInstance,
+  StableTokenEURInstance,
 } from 'types'
 import Web3 from 'web3'
 
@@ -33,12 +33,12 @@ const initializeArgs = async (): Promise<any[]> => {
 }
 
 // TODO make this general
-module.exports = deploymentForCoreContract<StableTokenInstance>( // TODO add EUR
+module.exports = deploymentForCoreContract<StableTokenEURInstance>( // TODO add EUR
   web3,
   artifacts,
   CeloContractName.StableTokenEUR,
   initializeArgs,
-  async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
+  async (stableToken: StableTokenEURInstance, _web3: Web3, networkName: string) => {
     if (config.stableTokenEUR.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
@@ -85,7 +85,5 @@ module.exports = deploymentForCoreContract<StableTokenInstance>( // TODO add EUR
       FeeCurrencyWhitelistInstance
     >('FeeCurrencyWhitelist', artifacts)
     await feeCurrencyWhitelist.addToken(stableToken.address)
-    const a = 1 / 0
-    console.log(a)
   }
 )
