@@ -156,6 +156,7 @@ if [ $PLATFORM = "android" ]; then
       -no-snapshot \
       -netdelay $NET_DELAY \
       ${CI:+-gpu swiftshader_indirect -no-window} \
+      -memory 1024 \
       &
 
     echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
