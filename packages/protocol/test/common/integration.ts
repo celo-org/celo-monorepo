@@ -95,7 +95,7 @@ contract('Integration: Running elections', (_accounts: string[]) => {
     election = await getDeployedProxiedContract('Election', artifacts)
   })
 
-  describe('When getting the elected validators', () => {
+  describe.skip('When getting the elected validators', () => {
     it('should elect all 30 validators', async () => {
       const elected = await election.electValidatorSigners()
       assert.equal(elected.length, 30)
@@ -147,7 +147,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     ]
   })
 
-  describe('When making a governance proposal', () => {
+  describe.skip('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
         proposalTransactions.map((x: any) => x.value),
@@ -166,7 +166,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe('When upvoting that proposal', () => {
+  describe.skip('When upvoting that proposal', () => {
     before(async () => {
       await governance.upvote(proposalId, 0, 0)
     })
@@ -176,7 +176,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe('When approving that proposal', () => {
+  describe.skip('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
@@ -191,7 +191,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe('When voting on that proposal', () => {
+  describe.skip('When voting on that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.approvalStageDuration, web3)
       await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
@@ -203,7 +203,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe('When executing that proposal', () => {
+  describe.skip('When executing that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
@@ -214,7 +214,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe('When performing slashing', () => {
+  describe.skip('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
@@ -284,7 +284,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     ]
   })
 
-  describe('Checking governance thresholds', () => {
+  describe.skip('Checking governance thresholds', () => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
         const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
@@ -313,7 +313,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     }
   })
 
-  describe('When making a governance proposal', () => {
+  describe.skip('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
         proposalTransactions.map((x: any) => x.value),
@@ -332,7 +332,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When upvoting that proposal', () => {
+  describe.skip('When upvoting that proposal', () => {
     before(async () => {
       await governance.upvote(proposalId, 0, 0)
     })
@@ -342,7 +342,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When approving that proposal', () => {
+  describe.skip('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
@@ -357,7 +357,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When voting on that proposal', () => {
+  describe.skip('When voting on that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.approvalStageDuration, web3)
       await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
@@ -369,7 +369,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When executing that proposal', () => {
+  describe.skip('When executing that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
@@ -406,11 +406,11 @@ contract('Integration: Exchange', (accounts: string[]) => {
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
   })
 
-  describe('Selling', () => {
+  describe.skip('Selling', () => {
     const sellAmount = new BigNumber('1000000000000000000')
     const minBuyAmount = 1
 
-    describe('When selling gold', () => {
+    describe.skip('When selling gold', () => {
       before(async () => {
         originalStable = await stableToken.balanceOf(accounts[0])
         originalGold = await goldToken.balanceOf(accounts[0])
@@ -441,7 +441,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
 
     // Note that this test relies on having purchased cUSD in the previous test.
-    describe('When selling stable token', () => {
+    describe.skip('When selling stable token', () => {
       before(async () => {
         originalStable = await stableToken.balanceOf(accounts[0])
         originalGold = await goldToken.balanceOf(accounts[0])
@@ -468,11 +468,11 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('Buying', () => {
+  describe.skip('Buying', () => {
     const buyAmount = new BigNumber(1)
     const maxSellAmount = new BigNumber('1000000000000000000')
 
-    describe('When buying stable token', () => {
+    describe.skip('When buying stable token', () => {
       before(async () => {
         originalStable = await stableToken.balanceOf(accounts[0])
         originalGold = await goldToken.balanceOf(accounts[0])
@@ -503,7 +503,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
 
     // Note that this test relies on having purchased cUSD in a previous test
-    describe('When buying gold', () => {
+    describe.skip('When buying gold', () => {
       before(async () => {
         originalStable = await stableToken.balanceOf(accounts[0])
         originalGold = await goldToken.balanceOf(accounts[0])
@@ -530,7 +530,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('When transferring gold', () => {
+  describe.skip('When transferring gold', () => {
     const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
     let originalOtherAccount
     beforeEach(async () => {
@@ -577,7 +577,7 @@ contract('Integration: Exchange (EUR)', (accounts: string[]) => {
   const decimals = 18
 
   before(async () => {
-    exchange = await getDeployedProxiedContract('Exchange', artifacts)
+    exchange = await getDeployedProxiedContract('ExchangeEUR', artifacts)
     multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)

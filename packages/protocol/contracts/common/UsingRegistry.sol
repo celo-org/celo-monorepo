@@ -33,6 +33,7 @@ contract UsingRegistry is Ownable {
   );
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
+  bytes32 constant EXCHANGEEUR_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeEUR"));
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );

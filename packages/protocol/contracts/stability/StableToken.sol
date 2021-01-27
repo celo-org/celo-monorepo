@@ -90,7 +90,7 @@ contract StableToken is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -159,6 +159,10 @@ contract StableToken is
     );
   }
 
+  function getExchangeAddress() private view returns (address) {
+    return registry.getAddressFor(EXCHANGE_REGISTRY_ID);
+  }
+
   /**
    * @notice Increase the allowance of another user.
    * @param spender The address which is being approved to spend StableToken.
@@ -216,7 +220,7 @@ contract StableToken is
    */
   function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
     require(
-      msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
+      msg.sender == getExchangeAddress() ||
         msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID),
       "Only the Exchange and Validators contracts are authorized to mint"
     );
@@ -265,10 +269,11 @@ contract StableToken is
    */
   function burn(uint256 value)
     external
-    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    //onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
     updateInflationFactor
     returns (bool)
   {
+    require(msg.sender == getExchangeAddress(), "Only the Exchange can burn");
     uint256 units = _valueToUnits(inflationState.factor, value);
     require(units <= balances[msg.sender], "value exceeded balance of sender");
     totalSupply_ = totalSupply_.sub(units);
