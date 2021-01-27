@@ -32,9 +32,9 @@ interface Props {
   label: string
   style?: StyleProp<ViewStyle>
   country: LocalizedCountry | undefined
-  nationalPhoneNumber: string
+  internationalPhoneNumber: string
   onPressCountry?: () => void
-  onChange?: (nationalPhoneNumber: string, countryCallingCode: string) => void
+  onChange?: (internationalPhoneNumber: string, countryCallingCode: string) => void
   editable?: boolean
 }
 
@@ -42,12 +42,12 @@ export default function PhoneNumberInput({
   label,
   style,
   country,
-  nationalPhoneNumber,
+  internationalPhoneNumber,
   onPressCountry,
   onChange,
   editable = true,
 }: Props) {
-  const shouldRequestPhoneNumberRef = useRef(nationalPhoneNumber.length === 0)
+  const shouldRequestPhoneNumberRef = useRef(internationalPhoneNumber.length === 0)
   const flagEmoji = country?.emoji
   const countryCallingCode = country?.countryCallingCode ?? ''
   const numberPlaceholder = country?.countryPhonePlaceholder.national ?? ''
@@ -77,9 +77,9 @@ export default function PhoneNumberInput({
     return true
   }
 
-  function onChangePhoneNumber(newNationalPhoneNumber: string) {
+  function onChangePhoneNumber(newInternationalPhoneNumber: string) {
     if (onChange) {
-      onChange(newNationalPhoneNumber, countryCallingCode)
+      onChange(newInternationalPhoneNumber, countryCallingCode)
     }
   }
 
@@ -93,12 +93,13 @@ export default function PhoneNumberInput({
           disabled={!editable}
         >
           <View style={styles.countryCodeContent}>
-            <Expandable isExpandable={editable} isExpanded={false}>
+            <Expandable
+              isExpandable={editable}
+              isExpanded={false}
+              containerStyle={styles.countryFlagContainer}
+            >
               <Text style={styles.flag} testID={'countryCodeFlag'}>
                 {flagEmoji}
-              </Text>
-              <Text style={styles.phoneCountryCode} testID={'countryCodeText'}>
-                {countryCallingCode}
               </Text>
             </Expandable>
           </View>
@@ -106,7 +107,7 @@ export default function PhoneNumberInput({
         <ValidatedTextInput
           InputComponent={FormTextInput}
           style={styles.phoneNumberInput}
-          value={nationalPhoneNumber}
+          value={internationalPhoneNumber}
           placeholder={numberPlaceholder}
           keyboardType="phone-pad"
           testID="PhoneNumberField"
@@ -128,11 +129,14 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   countryCodeContainer: {
-    width: 112,
+    width: 80,
     paddingHorizontal: 12,
     alignItems: 'stretch',
     backgroundColor: colors.light,
     borderRadius: 8,
+  },
+  countryFlagContainer: {
+    justifyContent: 'center',
   },
   countryCodeContent: {
     flex: 1,

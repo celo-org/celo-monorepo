@@ -41,14 +41,18 @@ exports[`FiatExchange renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "left": 0,
-          "marginBottom": 0,
-          "marginLeft": 16,
-          "opacity": 1,
-          "padding": 0,
-          "position": "absolute",
-        }
+        Array [
+          Object {
+            "left": 0,
+            "marginBottom": 0,
+            "marginLeft": 16,
+            "padding": 0,
+            "position": "absolute",
+          },
+          Object {
+            "opacity": 1,
+          },
+        ]
       }
       testID="Hamburguer"
     >
@@ -174,6 +178,7 @@ exports[`FiatExchange renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -236,6 +241,7 @@ exports[`FiatExchange renders correctly 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }

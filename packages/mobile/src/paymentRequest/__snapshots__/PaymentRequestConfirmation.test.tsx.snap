@@ -408,6 +408,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

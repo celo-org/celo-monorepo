@@ -7,14 +7,24 @@ import { getDisplayNumberInternational } from '@celo/utils/src/phoneNumbers'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import AccountNumber from 'src/components/AccountNumber'
 import { Namespaces } from 'src/i18n'
+import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 
-function getDisplayName(recipient?: Recipient, e164Number?: string, address?: string) {
+function getDisplayName(
+  recipient?: Recipient,
+  cachedName?: string,
+  e164Number?: string,
+  address?: string
+) {
   if (recipient && recipient.displayName) {
     return recipient.displayName
+  }
+  if (cachedName) {
+    return cachedName
   }
   const number = getDisplayNumber(e164Number, recipient)
   if (number) {
@@ -44,6 +54,7 @@ interface Props {
   e164PhoneNumber?: string
   recipient?: Recipient
   avatar: React.ReactNode
+  expandable?: boolean
 }
 
 export default function UserSection({
@@ -53,16 +64,20 @@ export default function UserSection({
   recipient,
   e164PhoneNumber,
   avatar,
+  expandable = true,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const [expanded, setExpanded] = useState(addressHasChanged)
+  const [expanded, setExpanded] = useState(expandable && addressHasChanged)
+
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
+  const userName = addressToDisplayName[address || '']?.name
 
   const toggleExpanded = () => {
     LayoutAnimation.easeInEaseOut()
     setExpanded(!expanded)
   }
 
-  const displayName = getDisplayName(recipient, e164PhoneNumber, address)
+  const displayName = getDisplayName(recipient, userName, e164PhoneNumber, address)
   const displayNumber = getDisplayNumber(e164PhoneNumber, recipient)
   const e164Number = displayName !== displayNumber ? displayNumber : undefined
 
@@ -77,14 +92,16 @@ export default function UserSection({
       <View style={styles.header}>
         <View style={styles.userContainer}>
           <Text style={styles.sectionLabel}>{sectionLabel}</Text>
-          <Touchable onPress={toggleExpanded}>
+          <Touchable onPress={toggleExpanded} disabled={!expandable}>
             <>
-              <Expandable isExpandable={!e164Number} isExpanded={expanded}>
+              <Expandable isExpandable={expandable && !e164Number} isExpanded={expanded}>
                 <Text style={styles.username}>{displayName}</Text>
               </Expandable>
-              <Expandable isExpandable={!!e164Number} isExpanded={expanded}>
-                <Text style={styles.phoneNumber}>{e164Number}</Text>
-              </Expandable>
+              {e164Number && (
+                <Expandable isExpandable={expandable && !!e164Number} isExpanded={expanded}>
+                  <Text style={styles.phoneNumber}>{e164Number}</Text>
+                </Expandable>
+              )}
             </>
           </Touchable>
         </View>

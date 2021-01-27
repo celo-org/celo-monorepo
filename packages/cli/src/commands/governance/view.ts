@@ -1,4 +1,4 @@
-import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
+import { proposalToJSON } from '@celo/governance'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -8,7 +8,7 @@ export default class View extends BaseCommand {
   static description = 'View governance proposal information from ID'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     proposalID: flags.string({ required: true, description: 'UUID of proposal to view' }),
     raw: flags.boolean({ required: false, description: 'Display proposal in raw bytes format' }),
   }

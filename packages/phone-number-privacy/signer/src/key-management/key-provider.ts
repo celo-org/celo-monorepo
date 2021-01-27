@@ -1,4 +1,4 @@
-import { logger } from '@celo/phone-number-privacy-common'
+import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import config, { SupportedKeystore } from '../config'
 import { AWSKeyProvider } from './aws-key-provider'
 import { AzureKeyProvider } from './azure-key-provider'

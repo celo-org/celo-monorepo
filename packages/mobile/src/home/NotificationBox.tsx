@@ -1,5 +1,7 @@
 import Pagination from '@celo/react-components/components/Pagination'
-import SimpleMessagingCard from '@celo/react-components/components/SimpleMessagingCard'
+import SimpleMessagingCard, {
+  Props as SimpleMessagingCardProps,
+} from '@celo/react-components/components/SimpleMessagingCard'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -9,16 +11,20 @@ import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from '
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { openUrl as openUrlAction } from 'src/app/actions'
 import { verificationPossibleSelector } from 'src/app/selectors'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
+import { dismissNotification } from 'src/home/actions'
+import { IdToNotification } from 'src/home/reducers'
+import { getExtraNotifications } from 'src/home/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
-import { navigate } from 'src/navigator/NavigationService'
+import { ensurePincode, navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/IncomingPaymentRequestSummaryNotification'
 import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/OutgoingPaymentRequestSummaryNotification'
@@ -28,7 +34,10 @@ import {
 } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
-import { isBackupTooLate } from 'src/redux/selectors'
+import { getContentForCurrentLang } from 'src/utils/contentTranslations'
+import Logger from 'src/utils/Logger'
+
+const TAG = 'NotificationBox'
 
 export enum NotificationBannerTypes {
   incoming_tx_request = 'incoming_tx_request',
@@ -39,6 +48,7 @@ export enum NotificationBannerTypes {
   invite_prompt = 'invite_prompt',
   verification_prompt = 'verification_prompt',
   backup_prompt = 'backup_prompt',
+  remote_notification = 'remote_notification',
 }
 
 export enum NotificationBannerCTATypes {
@@ -48,6 +58,7 @@ export enum NotificationBannerCTATypes {
   reclaim = 'reclaim',
   remind = 'remind',
   pay = 'pay',
+  remote_notification_cta = 'remote_notification_cta',
 }
 
 interface StateProps {
@@ -60,15 +71,17 @@ interface StateProps {
   dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
-  backupTooLate: boolean
+  extraNotifications: IdToNotification
   reclaimableEscrowPayments: EscrowedPayment[]
   invitees: InviteDetails[]
 }
 
 interface DispatchProps {
+  dismissNotification: typeof dismissNotification
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
   dismissGoldEducation: typeof dismissGoldEducation
+  openUrl: typeof openUrlAction
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -79,19 +92,21 @@ const mapStateToProps = (state: RootState): StateProps => ({
   goldEducationCompleted: state.goldToken.educationCompleted,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
+  extraNotifications: getExtraNotifications(state),
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   verificationPossible: verificationPossibleSelector(state),
   dismissedGoldEducation: state.account.dismissedGoldEducation,
-  backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
   invitees: inviteesSelector(state),
 })
 
 const mapDispatchToProps = {
+  dismissNotification,
   dismissInviteFriends,
   dismissGetVerified,
   dismissGoldEducation,
+  openUrl: openUrlAction,
 }
 
 interface State {
@@ -147,12 +162,12 @@ export class NotificationBox extends React.Component<Props, State> {
       dismissedGetVerified,
       verificationPossible,
       dismissedGoldEducation,
+      openUrl,
     } = this.props
-    const actions = []
+    const actions: SimpleMessagingCardProps[] = []
 
     if (!backupCompleted) {
       actions.push({
-        title: t('backupKeyFlow6:yourAccountKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
         icon: backupKey,
         callToActions: [
@@ -163,7 +178,15 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.backup_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.BackupIntroduction)
+              ensurePincode()
+                .then((pinIsCorrect) => {
+                  if (pinIsCorrect) {
+                    navigate(Screens.BackupIntroduction)
+                  }
+                })
+                .catch((error) => {
+                  Logger.error(`${TAG}@backupNotification`, 'PIN ensure error', error)
+                })
             },
           },
         ],
@@ -172,7 +195,6 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!dismissedGetVerified && !numberVerified && verificationPossible) {
       actions.push({
-        title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
         icon: getVerified,
         callToActions: [
@@ -202,9 +224,47 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
+    for (const [id, notification] of Object.entries(this.props.extraNotifications)) {
+      if (!notification) {
+        continue
+      }
+      const texts = getContentForCurrentLang(notification.content)
+      if (!texts) {
+        continue
+      }
+
+      actions.push({
+        text: texts.body,
+        icon: notification.iconUrl ? { uri: notification.iconUrl } : undefined,
+        darkMode: notification.darkMode,
+        callToActions: [
+          {
+            text: texts.cta,
+            onPress: () => {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.remote_notification,
+                selectedAction: NotificationBannerCTATypes.remote_notification_cta,
+              })
+              openUrl(notification.ctaUri, false, true)
+            },
+          },
+          {
+            text: texts.dismiss,
+            dim: notification.darkMode,
+            onPress: () => {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.remote_notification,
+                selectedAction: NotificationBannerCTATypes.decline,
+              })
+              this.props.dismissNotification(id)
+            },
+          },
+        ],
+      })
+    }
+
     if (!dismissedGoldEducation && !goldEducationCompleted) {
       actions.push({
-        title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
         icon: learnCelo,
         callToActions: [
@@ -234,7 +294,6 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!dismissedInviteFriends && !pausedFeatures.INVITE) {
       actions.push({
-        title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
         icon: inviteFriends,
         callToActions: [

@@ -14,7 +14,7 @@ export function runOracleTest(context: EnvTestContext) {
     // TODO: Check if oracle account is authorized
     test('report a rate', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.Oracle)
-      context.kit.addAccount(from.privateKey)
+      context.kit.connection.addAccount(from.privateKey)
       context.kit.defaultAccount = from.address
       const stableToken = await context.kit.contracts.getStableToken()
       context.kit.defaultFeeCurrency = stableToken.address
@@ -44,7 +44,7 @@ export function runOracleTest(context: EnvTestContext) {
       }
 
       // Move the rate in one direction or another
-      rateToReport = rateToReport.times(0.95 + Math.random() * 0.1)
+      rateToReport = rateToReport.times(0.95 + Math.random() * 0.1).decimalPlaces(10)
 
       const reportTx = await oracles.report(CeloContract.StableToken, rateToReport, from.address)
       const reportTxReceipt = await reportTx.sendAndWaitForReceipt({ from: from.address })

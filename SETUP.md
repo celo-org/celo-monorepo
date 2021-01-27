@@ -157,7 +157,6 @@ Then install the packages:
 
 ```bash
 cd celo-monorepo
-npm install lerna
 # install dependencies and run post-install script
 yarn
 # build all packages

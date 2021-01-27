@@ -1,5 +1,4 @@
 import locales from '@celo/mobile/locales'
-import { currencyTranslations } from '@celo/utils/src/currencies'
 import hoistStatics from 'hoist-non-react-statics'
 import i18n, { LanguageDetectorModule } from 'i18next'
 import {
@@ -23,7 +22,6 @@ export enum Namespaces {
   inviteFlow11 = 'inviteFlow11',
   goldEducation = 'goldEducation',
   nuxNamePin1 = 'nuxNamePin1',
-  nuxRestoreWallet3 = 'nuxRestoreWallet3',
   nuxVerification2 = 'nuxVerification2',
   receiveFlow8 = 'receiveFlow8',
   sendFlow7 = 'sendFlow7',
@@ -34,14 +32,18 @@ export enum Namespaces {
   fiatExchangeFlow = 'fiatExchangeFlow',
 }
 
-const availableResources = {
-  'en-US': {
-    ...locales.enUS,
-  },
-  'es-419': {
-    ...locales.es_419,
-  },
+function getAvailableResources() {
+  const resources = {}
+  for (const [key, value] of Object.entries(locales)) {
+    Object.defineProperty(resources, key, {
+      get: () => value!.strings,
+      enumerable: true,
+    })
+  }
+  return resources
 }
+
+const availableResources = getAvailableResources()
 
 function getLanguage() {
   // We fallback to `undefined` to know we couldn't find the best language
@@ -63,21 +65,6 @@ const languageDetector: LanguageDetectorModule = {
   },
 }
 
-const currencyInterpolator = (text: string, value: any) => {
-  const key = value[1]
-  const translations = currencyTranslations[i18n.language]
-
-  if (translations && key in translations) {
-    return translations[key]
-  } else {
-    Logger.warn(
-      '@currencyInterpolator',
-      `Unexpected currency interpolation: ${text} in ${i18n.language}`
-    )
-    return ''
-  }
-}
-
 i18n
   .use(languageDetector)
   .use(initReactI18next)
@@ -89,12 +76,13 @@ i18n
     resources: availableResources,
     ns: ['common', ...Object.keys(Namespaces)],
     defaultNS: 'common',
-    debug: true,
+    // Only enable for debugging as it forces evaluation of all our lazy loaded locales
+    // and prints out all strings when initializing
+    debug: false,
     interpolation: {
       escapeValue: false,
       defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK_DISPLAY },
     },
-    missingInterpolationHandler: currencyInterpolator,
   })
   .catch((reason: any) => Logger.error(TAG, 'Failed init i18n', reason))
 

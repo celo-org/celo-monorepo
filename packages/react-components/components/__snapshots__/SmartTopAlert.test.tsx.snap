@@ -12,7 +12,6 @@ exports[`SmartTopAlert renders correctly 1`] = `
   <View
     accessible={true}
     focusable={true}
-    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -21,20 +20,26 @@ exports[`SmartTopAlert renders correctly 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#0768AE",
-        "flexDirection": "row",
-        "justifyContent": "center",
-        "paddingBottom": 10,
-        "paddingHorizontal": 25,
-        "paddingTop": 10,
-        "transform": Array [
-          Object {
-            "translateY": -500,
-          },
-        ],
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#0768AE",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 10,
+          "paddingHorizontal": 25,
+        },
+        undefined,
+        false,
+        Object {
+          "paddingTop": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
+        },
+      ]
     }
     testID="SmartTopAlertTouchable"
   >
