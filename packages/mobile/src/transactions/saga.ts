@@ -160,22 +160,15 @@ function* addProfile(transaction: TransactionFeedFragment) {
     const newProfile: AddressToRecipient = {}
     if (transaction.type === TokenTransactionType.Received) {
       const info = yield call(getProfileInfo, address)
-      if (info) {
-        newProfile[address] = {
-          address,
-          name: info.name,
-          thumbnailPath: info.thumbnailPath,
-        }
-        yield put(updateValoraRecipientCache(newProfile))
-        return
+      newProfile[address] = {
+        address,
+        name: info?.name,
+        thumbnailPath: info?.thumbnailPath,
       }
-    }
 
-    newProfile[address] = {
-      address,
+      yield put(updateValoraRecipientCache(newProfile))
+      Logger.info(TAG, `added ${newProfile} to valoraRecipientCache`)
     }
-    yield put(updateValoraRecipientCache(newProfile))
-    return
   }
 }
 
