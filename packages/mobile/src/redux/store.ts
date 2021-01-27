@@ -21,7 +21,7 @@ const persistConfig: any = {
   version: 7, // default is -1, increment as we make migrations
   keyPrefix: `reduxStore-`, // the redux-persist default is `persist:` which doesn't work with some file systems.
   storage: FSStorage(),
-  blacklist: ['home', 'geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
+  blacklist: ['geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
   stateReconciler: autoMergeLevel2,
   migrate: createMigrate(migrations, { debug: true }),
   serialize: (data: any) => {
@@ -67,7 +67,45 @@ export const configureStore = (initialState = {}) => {
   const sagaMiddleware = createSagaMiddleware()
   const middlewares = [sagaMiddleware]
 
+  if (__DEV__) {
+    const createDebugger = require('redux-flipper').default
+    // Sending the whole state makes the redux debugger in flipper super slow!!
+    // I suspect it's the exchange rates causing this!
+    // For now exclude the `exchange` reducer.
+    middlewares.push(
+      createDebugger({
+        stateWhitelist: [
+          'app',
+          'networkInfo',
+          'alert',
+          'goldToken',
+          'stableToken',
+          'send',
+          'home',
+          // "exchange",
+          'transactions',
+          'web3',
+          'identity',
+          'account',
+          'invite',
+          'geth',
+          'escrow',
+          'fees',
+          'recipients',
+          'localCurrency',
+          'imports',
+          'paymentRequest',
+        ],
+      })
+    )
+  }
+
   const enhancers = [applyMiddleware(...middlewares)]
+
+  if (__DEV__) {
+    const Reactotron = require('src/reactotronConfig').default
+    enhancers.push(Reactotron.createEnhancer())
+  }
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   // @ts-ignore

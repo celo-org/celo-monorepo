@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { fetchExchangeRate } from 'src/localCurrency/saga'
@@ -152,8 +153,8 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), mockUriData[3].currencyCode]])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+          origin: SendOrigin.AppSendFlow,
           recipient: mockQRCodeRecipient,
-          isFromScan: true,
           isOutgoingPaymentRequest: undefined,
         })
       })
@@ -170,8 +171,8 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), '2']])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+          origin: SendOrigin.AppSendFlow,
           transactionData: mockTransactionData,
-          isFromScan: true,
           currencyInfo: { localCurrencyCode: mockUriData[4].currencyCode, localExchangeRate: '2' },
         })
       })
@@ -188,8 +189,8 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), '2']])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+          origin: SendOrigin.AppSendFlow,
           transactionData: mockTransactionData,
-          isFromScan: true,
           currencyInfo: { localCurrencyCode: mockUriData[5].currencyCode, localExchangeRate: '2' },
         })
       })

@@ -1,8 +1,11 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import TransferConfirmationCard from 'src/transactions/TransferConfirmationCard'
 import { createMockStore } from 'test/utils'
 import {
@@ -13,9 +16,19 @@ import {
   mockE164Number,
 } from 'test/values'
 
+const celoRewardSenderAddress = '0x123456'
+
 const store = createMockStore({
   account: {
     defaultCountryCode: mockCountryCode,
+  },
+  identity: {
+    addressToDisplayName: {
+      [celoRewardSenderAddress]: {
+        name: 'CELO Rewards',
+        isCeloRewardSender: true,
+      },
+    },
   },
 })
 
@@ -71,6 +84,25 @@ describe('TransferConfirmationCard', () => {
       </Provider>
     )
     expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly for received CELO reward', () => {
+    const props = {
+      type: TokenTransactionType.Received,
+      addressHasChanged: false,
+      address: celoRewardSenderAddress,
+      comment: '',
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
+    }
+
+    const tree = render(
+      <Provider store={store}>
+        <TransferConfirmationCard {...props} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+    fireEvent.press(tree.getByTestId('celoRewards/learnMore'))
+    expect(navigate).toHaveBeenCalledWith(Screens.ConsumerIncentivesHomeScreen)
   })
 
   it('renders correctly for received escrow transaction drilldown', () => {

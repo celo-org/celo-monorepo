@@ -193,10 +193,13 @@ exports[`renders correctly with giant numbers 1`] = `
               >
                 <View
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                    }
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -688,10 +691,13 @@ exports[`renders correctly with no exchange rate 1`] = `
               >
                 <View
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                    }
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text

@@ -714,10 +714,13 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -1863,10 +1866,13 @@ exports[`SendConfirmation renders correctly when there are multiple user address
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -2934,10 +2940,13 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text

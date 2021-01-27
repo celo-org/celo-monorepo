@@ -1,4 +1,5 @@
 import {
+  formatNonAccentedCharacters,
   generateKeys,
   generateMnemonic,
   MnemonicLanguages,
@@ -53,7 +54,7 @@ export default class NewAccount extends BaseCommand {
     }),
     derivationPath: flags.string({
       description:
-        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'/0\"). Use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'/0/\"). Recreating the same account requires knowledge of the mnemonic, passphrase (if any), and the derivation path",
+        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'\"). Use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'\"). Recreating the same account requires knowledge of the mnemonic, passphrase (if any), and the derivation path",
     }),
   }
 
@@ -100,7 +101,8 @@ export default class NewAccount extends BaseCommand {
     const res = this.parse(NewAccount)
     let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
     if (mnemonic) {
-      if (!validateMnemonic(mnemonic, NewAccount.languageOptions(res.flags.language!))) {
+      mnemonic = formatNonAccentedCharacters(mnemonic)
+      if (!validateMnemonic(mnemonic)) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }
     } else {
