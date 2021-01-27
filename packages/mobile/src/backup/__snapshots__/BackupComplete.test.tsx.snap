@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BackupComplete renders correctly when social backup is complete 1`] = `
-<SafeAreaView
+exports[`BackupComplete renders correctly 1`] = `
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -18,123 +17,33 @@ exports[`BackupComplete renders correctly when social backup is complete 1`] = `
       }
     }
   >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "marginBottom": 20,
-          },
-          Object {},
-        ]
-      }
+    <svg
+      fill="none"
+      height={32}
+      style={Object {}}
+      viewBox="0 0 32 32"
+      width={32}
     >
-      <Image
-        resizeMode="contain"
-        source={
-          Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
-          }
-        }
-        style={
-          Object {
-            "height": 70,
-            "width": 70,
-          }
-        }
+      <path
+        d="M8.414 15.086a2 2 0 10-2.828 2.828l2.828-2.828zM12.5 22l-1.414 1.414a2 2 0 002.8.029L12.5 22zm13.885-10.557a2 2 0 00-2.77-2.886l2.77 2.886zm-20.8 6.471l5.5 5.5 2.83-2.828-5.5-5.5-2.83 2.828zm8.3 5.529l12.5-12-2.77-2.886-12.5 12 2.77 2.886z"
+        fill="#42D689"
+        style={Object {}}
       />
-    </View>
+    </svg>
     <Text
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
+          "fontFamily": "Jost-Book",
+          "fontSize": 26,
+          "lineHeight": 32,
           "marginTop": 20,
-          "paddingBottom": 20,
           "paddingHorizontal": 40,
-          "textAlign": "center",
         }
       }
     >
       backupComplete.2
     </Text>
   </View>
-</SafeAreaView>
-`;
-
-exports[`BackupComplete renders correctly when social backup is not complete 1`] = `
-<SafeAreaView
-  style={
-    Object {
-      "backgroundColor": "#FFFFFF",
-      "flex": 1,
-    }
-  }
->
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flex": 1,
-        "justifyContent": "center",
-      }
-    }
-  >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "marginBottom": 20,
-          },
-          Object {},
-        ]
-      }
-    >
-      <Image
-        resizeMode="contain"
-        source={
-          Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
-          }
-        }
-        style={
-          Object {
-            "height": 70,
-            "width": 70,
-          }
-        }
-      />
-    </View>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "marginTop": 20,
-          "paddingBottom": 20,
-          "paddingHorizontal": 40,
-          "textAlign": "center",
-        }
-      }
-    >
-      backupComplete.0
-    </Text>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 18,
-          "paddingHorizontal": 40,
-          "textAlign": "center",
-        }
-      }
-    >
-      backupComplete.1
-    </Text>
-  </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

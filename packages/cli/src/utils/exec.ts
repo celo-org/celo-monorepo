@@ -1,4 +1,5 @@
 import { spawn, SpawnOptions } from 'child_process'
+import cmdExists from 'command-exists'
 
 export function execCmd(
   cmd: string,
@@ -48,5 +49,5 @@ export async function execCmdWithError(
 }
 
 export async function commandExists(command: string) {
-  return execWith0Exit('command', ['-v', command], { silent: true })
+  return cmdExists(command)
 }

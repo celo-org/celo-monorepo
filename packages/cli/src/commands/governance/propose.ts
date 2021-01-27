@@ -1,8 +1,4 @@
-import {
-  ProposalBuilder,
-  proposalToJSON,
-  ProposalTransactionJSON,
-} from '@celo/contractkit/lib/governance/proposals'
+import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/governance'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'
@@ -10,13 +6,15 @@ import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
 
   static flags = {
     ...BaseCommand.flags,
-    jsonTransactions: flags.string({ required: true, description: 'Path to json transactions' }),
+    jsonTransactions: flags.string({
+      required: true,
+      description: 'Path to json transactions',
+    }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
     descriptionURL: flags.string({
@@ -36,7 +34,7 @@ export default class Propose extends BaseCommand {
     this.kit.defaultAccount = account
 
     await newCheckBuilder(this, account)
-      .hasEnoughGold(account, deposit)
+      .hasEnoughCelo(account, deposit)
       .exceedsProposalMinDeposit(deposit)
       .runChecks()
 
@@ -61,7 +59,7 @@ export default class Propose extends BaseCommand {
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),
-      { value: res.flags.deposit },
+      { value: deposit.toString() },
       'ProposalQueued'
     )
   }

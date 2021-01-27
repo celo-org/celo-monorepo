@@ -1,4 +1,4 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
@@ -11,7 +11,7 @@ process.env.NO_SYNCCHECK = 'true'
 
 testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   let contractAddress: any
-  let kit: any
+  let kit: ContractKit
 
   beforeEach(async () => {
     const contractCanValidate = false
@@ -30,7 +30,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
     const balanceBefore = await kit.getTotalBalance(refundAddress)
     await RefundAndFinalize.run(['--contract', contractAddress])
     const balanceAfter = await kit.getTotalBalance(refundAddress)
-    expect(balanceBefore.gold.toNumber()).toBeLessThan(balanceAfter.gold.toNumber())
+    expect(balanceBefore.CELO.toNumber()).toBeLessThan(balanceAfter.CELO.toNumber())
   })
 
   test('can finalize the contract', async () => {

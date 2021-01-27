@@ -2,7 +2,7 @@ FROM circleci/node:10
 MAINTAINER Gaston Ponti <ponti@c-labs.co>
 
 RUN sudo apt-get update -y
-RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 rsync -y
 
 # Install Kubernetes, as per https://kubernetes.io/docs/tasks/tools/install-kubectl/
 RUN sudo apt-get install -y apt-transport-https && \

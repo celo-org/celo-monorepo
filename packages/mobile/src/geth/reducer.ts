@@ -1,4 +1,4 @@
-import { Actions, ActionTypes } from 'src/geth/actions'
+import { Actions, ActionTypes, ChainHead } from 'src/geth/actions'
 
 export enum InitializationState {
   NOT_YET_INITIALIZED = 'NOT_YET_INITIALIZED',
@@ -11,6 +11,7 @@ export enum InitializationState {
 export interface State {
   initialized: InitializationState
   connected: boolean
+  chainHead: ChainHead | null
   gethStartedThisSession: boolean
 }
 
@@ -18,6 +19,7 @@ const initialState: State = {
   initialized: InitializationState.NOT_YET_INITIALIZED,
   connected: false,
   gethStartedThisSession: false,
+  chainHead: null,
 }
 
 export function gethReducer(state: State = initialState, action: ActionTypes) {
@@ -33,6 +35,11 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
       return {
         ...state,
         connected: action.connected,
+      }
+    case Actions.SET_CHAIN_HEAD:
+      return {
+        ...state,
+        chainHead: action.head,
       }
     default:
       return state

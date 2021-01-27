@@ -16,7 +16,7 @@ import {
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
-  TEMPLATE,
+  TEMPLATE
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
@@ -34,6 +34,7 @@ export enum AccountType {
   PROXY = 7,
   ATTESTATION_BOT = 8,
   VOTING_BOT = 9,
+  TX_NODE_PRIVATE = 10,
 }
 
 export enum ConsensusType {
@@ -63,6 +64,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'proxy',
   'attestation_bot',
   'voting_bot',
+  'tx_node_private',
 ]
 
 export const add0x = (str: string) => {
@@ -78,10 +80,15 @@ export const coerceMnemonicAccountType = (raw: string): AccountType => {
 }
 
 export const generatePrivateKey = (mnemonic: string, accountType: AccountType, index: number) => {
+  return generatePrivateKeyWithDerivations(mnemonic, [accountType, index])
+}
+
+export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
-  const newNode = node.derive(accountType).derive(index)
-
+  const newNode = derivations.reduce((n: bip32.BIP32Interface, derivation: number) => {
+    return n.derive(derivation)
+  }, node)
   return newNode.privateKey!.toString('hex')
 }
 
@@ -190,6 +197,15 @@ export const getFaucetedAccounts = (mnemonic: string) => {
   return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts, ...votingBotAccounts]
 }
 
+const hardForkActivationBlock = (key: string) => {
+  const value = fetchEnvOrFallback(key, '')
+  if (value === '') {
+    return undefined
+  } else {
+    return parseInt(value, 10)
+  }
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
@@ -236,6 +252,13 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     })
   )
 
+  // Celo hard fork activation blocks.  Default is undefined, which means not activated.
+  const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
+  const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
+
+  // network start timestamp
+  const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
+
   return generateGenesis({
     validators,
     consensusType,
@@ -246,6 +269,9 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     chainId,
     requestTimeout,
     enablePetersburg,
+    timestamp,
+    churritoBlock,
+    donutBlock,
   })
 }
 
@@ -301,11 +327,21 @@ export const generateGenesis = ({
   chainId,
   requestTimeout,
   enablePetersburg = true,
+  timestamp = 0,
+  churritoBlock,
+  donutBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
     genesis.config = GETH_CONFIG_OLD
+  }
+
+  if (typeof churritoBlock === 'number') {
+    genesis.config.churritoBlock = churritoBlock;
+  }
+  if (typeof donutBlock === 'number') {
+    genesis.config.donutBlock = donutBlock;
   }
 
   genesis.config.chainId = chainId
@@ -362,6 +398,10 @@ export const generateGenesis = ({
         balance: '0',
       }
     }
+  }
+
+  if (timestamp > 0) {
+    genesis.timestamp = timestamp.toString()
   }
 
   return JSON.stringify(genesis, null, 2)

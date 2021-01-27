@@ -4,7 +4,7 @@ import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
-const VALIDATORS = 10
+const VALIDATORS = 5
 const EPOCH = 20
 const EPOCHS_TO_WAIT = 3
 const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
@@ -26,6 +26,8 @@ describe('governance tests', () => {
     })),
     genesisConfig: {
       epoch: EPOCH,
+      churritoBlock: 0,
+      donutBlock: 0,
     },
   }
 
@@ -50,7 +52,7 @@ describe('governance tests', () => {
     })
 
     it('properly orders validators randomly', async function(this: any) {
-      this.timeout(160000 /* 160 seconds */)
+      this.timeout(320000 /* 320 seconds */)
       // If a consensus round fails during this test, the results are inconclusive.
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
       this.retries(2)

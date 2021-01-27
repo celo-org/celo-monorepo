@@ -1,74 +1,85 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, "9.0"
+# Allow using RNFirebase as static frameworks
+# https://rnfirebase.io/#allow-ios-static-frameworks
+# Otherwise we get the following error:
+# `The 'Pods-celo' target has transitive dependencies that include statically linked binaries [...]`
+$RNFirebaseAsStaticFramework = true
+
+# Workaround OpenSSL-Universal react-native-fast-crypto conflict
+$static_framework = ['react-native-flipper', 'react-native-fast-crypto', 'FlipperKit', 'Flipper', 'Flipper-Folly',
+  'CocoaAsyncSocket', 'ComponentKit', 'Flipper-DoubleConversion',
+  'Flipper-Glog', 'Flipper-PeerTalk', 'Flipper-RSocket',
+  'CocoaLibEvent', 'OpenSSL-Universal']
+
+require_relative "../../../node_modules/react-native/scripts/react_native_pods"
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
+
+platform :ios, '12.4'
 
 target "celo" do
   use_frameworks!
 
-  # React Native Core pods
-  pod "FBLazyVector", :path => "../../../node_modules/react-native/Libraries/FBLazyVector"
-  pod "FBReactNativeSpec", :path => "../../../node_modules/react-native/Libraries/FBReactNativeSpec"
-  pod "RCTRequired", :path => "../../../node_modules/react-native/Libraries/RCTRequired"
-  pod "RCTTypeSafety", :path => "../../../node_modules/react-native/Libraries/TypeSafety"
-  pod "React", :path => "../../../node_modules/react-native/"
-  pod "React-Core", :path => "../../../node_modules/react-native/"
-  pod "React-CoreModules", :path => "../../../node_modules/react-native/React/CoreModules"
-  pod "React-Core/DevSupport", :path => "../../../node_modules/react-native/"
-  pod "React-RCTActionSheet", :path => "../../../node_modules/react-native/Libraries/ActionSheetIOS"
-  pod "React-RCTAnimation", :path => "../../../node_modules/react-native/Libraries/NativeAnimation"
-  pod "React-RCTBlob", :path => "../../../node_modules/react-native/Libraries/Blob"
-  pod "React-RCTImage", :path => "../../../node_modules/react-native/Libraries/Image"
-  pod "React-RCTLinking", :path => "../../../node_modules/react-native/Libraries/LinkingIOS"
-  pod "React-RCTNetwork", :path => "../../../node_modules/react-native/Libraries/Network"
-  pod "React-RCTSettings", :path => "../../../node_modules/react-native/Libraries/Settings"
-  pod "React-RCTText", :path => "../../../node_modules/react-native/Libraries/Text"
-  pod "React-RCTVibration", :path => "../../../node_modules/react-native/Libraries/Vibration"
-  pod "React-Core/RCTWebSocket", :path => "../../../node_modules/react-native/"
-  pod "React-cxxreact", :path => "../../../node_modules/react-native/ReactCommon/cxxreact"
-  pod "React-jsi", :path => "../../../node_modules/react-native/ReactCommon/jsi"
-  pod "React-jsiexecutor", :path => "../../../node_modules/react-native/ReactCommon/jsiexecutor"
-  pod "React-jsinspector", :path => "../../../node_modules/react-native/ReactCommon/jsinspector"
-  pod "ReactCommon/jscallinvoker", :path => "../../../node_modules/react-native/ReactCommon"
-  pod "ReactCommon/turbomodule/core", :path => "../../../node_modules/react-native/ReactCommon"
-  pod "Yoga", :path => "../../../node_modules/react-native/ReactCommon/yoga"
-  pod "DoubleConversion", :podspec => "../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
-  pod "glog", :podspec => "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
-  pod "Folly", :podspec => "../../../node_modules/react-native/third-party-podspecs/Folly.podspec"
-
+  # Headers only version of OpenSSL-Universal to workaround libcrypto / libssl conflict between Flipper and react-native-fast-crypto
+  pod 'OpenSSL-Universal', :git => "https://github.com/celo-org/OpenSSL-headers.git"
+  
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
-  pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec"
+  pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
 
-  pod "Firebase/Core", "~> 5.20.2"
-  pod "Firebase/Auth"
-  pod "Firebase/Storage"
-  pod "Firebase/Messaging"
-  pod "Firebase/Database"
-  pod "Firebase/DynamicLinks"
-  pod "GoogleUtilities", "~> 5.3.7"
+  pod 'Segment-Firebase', '~> 2.7.0'
 
-  # Using a custom fork so we can have a specific bug fix (crash when firebase already initialized)
-  # without upgrading to firebase 6
-  # TODO: remove this once we upgrade to Firebase >= 6
-  pod "Segment-Firebase", :git => "https://github.com/celo-org/analytics-ios-integration-firebase.git", :commit => "e849d040239a7e56e02df96aabc0851e56a4cb19"
+  # RNPermissions
+  permissions_path = '../../../node_modules/react-native-permissions/ios'
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera.podspec"
+
+  pod 'RNSecureRandom', :path => '../../../node_modules/react-native-securerandom'
 
   target "celoTests" do
     inherit! :search_paths
   end
 
-  use_native_modules!
+  config = use_native_modules!
+  use_react_native!(:path => config[:reactNativePath])
+
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable these next few lines.
+  use_flipper!({ 'Flipper' => '~> 0.69.0' })
+end
+
+# Convert all permission pods into static libraries
+# See https://github.com/react-native-community/react-native-permissions#workaround-for-use_frameworks-issues
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if $static_framework.include?(pod.name) || pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+      def pod.build_type;
+        Pod::BuildType.static_library
+      end
+    end
+  end
 end
 
 post_install do |installer|
+  flipper_post_install(installer)
+
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings["ENABLE_BITCODE"] = "NO"
+      if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] == '8.0'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+      end
     end
   end
 
-  rnfirebase = installer.pods_project.targets.find { |target| target.name == "RNFirebase" }
-  rnfirebase.build_configurations.each do |config|
-    config.build_settings["HEADER_SEARCH_PATHS"] = "$(inherited) ${PODS_ROOT}/Headers/Public/**"
+  installer.pods_project.build_configurations.each do |config|
+    # Needed for now as Xcode 12 now tries to build/link both arm64 and x86_64 slices for the simulator
+    # but some of our prebuilt deps don't support this
+    # See:
+    # - https://stackoverflow.com/a/63955114/158525
+    # - https://github.com/facebook/react-native/issues/29984
+    # - https://apontious.com/2020/08/23/arm-wrestling-your-ios-simulator-builds/
+    config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
   end
 
   # Include env xccconfig generated by React Native Config

@@ -1,19 +1,15 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
+import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
-import * as chai from 'chai'
-import * as chaiSubset from 'chai-subset'
+import chai from 'chai'
+import chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import {
-  ProxyInstance,
-  RegistryInstance,
-  UsingRegistryInstance,
-} from 'types'
-const soliditySha3 = new (require('web3'))().utils.soliditySha3
+import { ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
+import Web3 from 'web3'
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
-import Web3 from 'web3'
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -24,7 +20,6 @@ const assert = chai.assert
 
 // hard coded in ganache
 export const EPOCH = 100
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function stripHexEncoding(hexString: string) {
   return hexString.substr(0, 2) === '0x' ? hexString.substr(2) : hexString
@@ -45,7 +40,7 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
           params,
           // salt id generation, milliseconds might not be
           // enough to generate unique ids
-          id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
+          id: new Date().getTime() + Math.floor(Math.random() * (1 + 100 - 1)),
         },
         // @ts-ignore
         (err: any, result: any) => {
@@ -72,11 +67,16 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   }
 }
 
-export async function currentEpochNumber(web3) {
+export async function currentEpochNumber(web3: Web3, epochSize: number = EPOCH) {
   const blockNumber = await web3.eth.getBlockNumber()
+
+  return getEpochNumberOfBlock(blockNumber, epochSize)
+}
+
+export function getEpochNumberOfBlock(blockNumber: number, epochSize: number = EPOCH) {
   // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-  const epochNumber = Math.floor(blockNumber / EPOCH)
-  if (blockNumber % EPOCH === 0) {
+  const epochNumber = Math.floor(blockNumber / epochSize)
+  if (blockNumber % epochSize === 0) {
     return epochNumber
   } else {
     return epochNumber + 1
@@ -84,18 +84,18 @@ export async function currentEpochNumber(web3) {
 }
 
 // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-export function getFirstBlockNumberForEpoch(epochNumber: number) {
+export function getFirstBlockNumberForEpoch(epochNumber: number, epochSize: number = EPOCH) {
   if (epochNumber === 0) {
     // No first block for epoch 0
     return 0
   }
-  return (epochNumber - 1) * EPOCH + 1
+  return (epochNumber - 1) * epochSize + 1
 }
 
-export async function mineToNextEpoch(web3) {
+export async function mineToNextEpoch(web3: Web3, epochSize: number = EPOCH) {
   const blockNumber = await web3.eth.getBlockNumber()
-  const epochNumber = await currentEpochNumber(web3)
-  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
+  const epochNumber = await currentEpochNumber(web3, epochSize)
+  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1, epochSize) - blockNumber
   await mineBlocks(blocksUntilNextEpoch, web3)
 }
 
@@ -110,13 +110,25 @@ export async function assertBalance(address: string, balance: BigNumber) {
   }
 }
 
+export const assertThrowsAsync = async (promise: any, errorMessage: string = '') => {
+  let failed = false
+  try {
+    await promise
+  } catch (_) {
+    failed = true
+  }
+
+  assert.isTrue(failed, errorMessage)
+}
+
 // TODO: Use assertRevert directly from openzeppelin-solidity
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound = error.message.search('VM Exception while processing transaction: revert') >= 0
+    const revertFound =
+      error.message.search('VM Exception while processing transaction: revert') >= 0
     const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
@@ -140,11 +152,7 @@ export async function exec(command: string, args: string[]) {
   })
 }
 
-function execCmd(
-  cmd: string,
-  args: string[],
-  options?: SpawnOptions & { silent?: boolean }
-) {
+function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?: boolean }) {
   return new Promise<number>(async (resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
     if (!silent) {
@@ -287,10 +295,15 @@ export function assertAlmostEqualBN(
   margin: number | BN | BigNumber,
   msg?: string
 ) {
-  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
+  const diff = web3.utils
+    .toBN(actual)
+    .sub(web3.utils.toBN(expected))
+    .abs()
   assert(
     web3.utils.toBN(margin).gte(diff),
-    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(10)}. ${msg || ''}`
+    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(
+      10
+    )}. ${msg || ''}`
   )
 }
 
@@ -308,8 +321,11 @@ export function assertEqualDpBN(
   )
 }
 
-
-export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
+export function assertEqualBNArray(
+  value: number[] | BN[] | BigNumber[],
+  expected: number[] | BN[] | BigNumber[],
+  msg?: string
+) {
   assert.equal(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }
@@ -396,4 +412,9 @@ export default {
   assertRevert,
   timeTravel,
   isSameAddress,
+}
+
+export async function addressMinedLatestBlock(address: string) {
+  const block = await web3.eth.getBlock('latest')
+  return isSameAddress(block.miner, address)
 }

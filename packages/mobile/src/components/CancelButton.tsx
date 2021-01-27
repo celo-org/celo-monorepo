@@ -1,50 +1,42 @@
-import Touchable from '@celo/react-components/components/Touchable'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { useTranslation } from 'react-i18next'
+import { StyleProp, StyleSheet, TextStyle } from 'react-native'
+import { AnalyticsEventType } from 'src/analytics/Events'
+import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 
-type Props = {
-  eventName?: CustomEventNames
+interface Props {
   onCancel?: () => void
-} & WithTranslation
+  style?: StyleProp<TextStyle>
+  eventName?: AnalyticsEventType
+}
 
-class CancelButton extends React.PureComponent<Props> {
-  cancel = () => {
-    if (this.props.eventName) {
-      CeloAnalytics.track(this.props.eventName)
-    }
-
-    if (this.props.onCancel) {
-      this.props.onCancel()
+export default function CancelButton({ eventName, onCancel, style }: Props) {
+  function onPressCancel() {
+    if (onCancel) {
+      onCancel()
     } else {
       navigateBack()
     }
   }
 
-  render() {
-    return (
-      <Touchable
-        borderless={true}
-        style={styles.container}
-        onPress={this.cancel}
-        testID="CancelButton"
-      >
-        <Text style={fontStyles.headerButton}>{this.props.t('cancel')}</Text>
-      </Touchable>
-    )
-  }
+  const { t } = useTranslation(Namespaces.global)
+
+  return (
+    <TopBarTextButton
+      testID="CancelButton"
+      onPress={onPressCancel}
+      titleStyle={style ? [styles.title, style] : styles.title}
+      title={t('cancel')}
+      eventName={eventName}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  title: {
+    color: colors.dark,
   },
 })
-
-export default withTranslation(Namespaces.global)(CancelButton)

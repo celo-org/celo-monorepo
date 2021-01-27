@@ -25,7 +25,6 @@ export default class ValidatorGroupRegister extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupRegister)
 
-    this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
     const commission = new BigNumber(res.flags.commission)
 
@@ -33,7 +32,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
       const requirements = await validators.getGroupLockedGoldRequirements()
       const duration = requirements.duration.toNumber() * 1000
       const check = await binaryPrompt(
-        `This will lock ${requirements.value.shiftedBy(-18)} cGLD for ${humanizeDuration(
+        `This will lock ${requirements.value.shiftedBy(-18)} CELO for ${humanizeDuration(
           duration
         )}. Are you sure you want to continue?`,
         true

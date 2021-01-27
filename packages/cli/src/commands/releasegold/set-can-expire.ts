@@ -2,15 +2,15 @@ import { flags } from '@oclif/command'
 import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { ReleaseGoldCommand } from './release-gold'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
-export default class SetCanExpire extends ReleaseGoldCommand {
+export default class SetCanExpire extends ReleaseGoldBaseCommand {
   static description = 'Set the canExpire flag for the given ReleaseGold contract'
 
   static expireOptions = ['true', 'false', 'True', 'False']
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     value: flags.enum({
       options: SetCanExpire.expireOptions,
       required: true,

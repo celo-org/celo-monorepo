@@ -1,13 +1,11 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-
-import "../interfaces/IValidators.sol";
 
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockValidators is IValidators {
+contract MockValidators {
   using SafeMath for uint256;
 
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;

@@ -16,14 +16,31 @@
 -keep class io.invertase.firebase.** { *; }
 -dontwarn io.invertase.firebase.**
 
--dontwarn com.segment.analytics.android.integrations.**
+# Segment https://segment.com/docs/connections/sources/catalog/libraries/mobile/android/android-faqs/#sts=How%20should%20I%20configure%20Proguard?
+-keep class com.segment.analytics.** { *; }
+-keep class androidx.lifecycle.DefaultLifecycleObserver
+
 -keep class org.ethereum.geth.** { *; }
 -keep class org.celo.mobile.BuildConfig { *; }
 -keep public class com.horcrux.svg.** {*;}
 -keep class com.rt2zz.reactnativecontacts.** {*;}
 -keepclassmembers class com.rt2zz.reactnativecontacts.** {*;}
-# NDK crash handler
--keep class ru.ivanarh.jndcrash.** { *; }
 
 # Instabug
 -dontwarn com.instabug.**
+
+# React-native-bls-threshold (for its JNA dependency)
+-dontwarn java.awt.*
+-keep class com.sun.jna.* { *; }
+-keepclassmembers class * extends com.sun.jna.* { public *; }
+
+# Hermes
+-keep class com.facebook.jni.** { *; }
+
+# Keychain
+-keep class com.facebook.crypto.** {
+   *;
+}
+
+# react-native-reanimated
+-keep class com.facebook.react.turbomodule.** { *; }

@@ -1,28 +1,32 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import Switch from '@celo/react-components/components/Switch'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
-import { getStoredMnemonic } from 'src/backup/utils'
+import CancelConfirm from 'src/backup/CancelConfirm'
+import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import CancelButton from 'src/components/CancelButton'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
+
+const TAG = 'backup/BackupPhrase'
 
 interface State {
   mnemonic: string
@@ -30,6 +34,7 @@ interface State {
 }
 
 interface StateProps {
+  account: string | null
   backupCompleted: boolean
 }
 
@@ -38,20 +43,35 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.BackupPhrase>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    account: currentAccountSelector(state),
     backupCompleted: state.account.backupCompleted,
   }
 }
 
-class BackupPhrase extends React.Component<Props, State> {
-  // TODO(Rossy): Show modal when cancelling if backup flow incomplete
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-  })
+export const navOptionsForBackupPhrase = ({
+  route,
+}: StackScreenProps<StackParamList, Screens.BackupPhrase>) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  return {
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerRight: () => <HeaderRight />,
+  }
+}
 
+class BackupPhrase extends React.Component<Props, State> {
   state = {
     mnemonic: '',
     isConfirmChecked: false,
@@ -69,16 +89,12 @@ class BackupPhrase extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
+    const mnemonic = await getStoredMnemonic(this.props.account)
 
-    try {
-      const mnemonic = await getStoredMnemonic()
-      if (!mnemonic) {
-        throw new Error('Mnemonic not found in key store')
-      }
+    if (mnemonic) {
       this.setState({ mnemonic })
-    } catch (e) {
-      Logger.error('BackupPhrase/retrieveMnemonic', 'Failed to retrieve mnemonic', e)
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    } else {
+      onGetMnemonicFail(this.props.showError, 'BackupPhrase')
     }
   }
 
@@ -88,89 +104,99 @@ class BackupPhrase extends React.Component<Props, State> {
     })
   }
 
+  onPressConfirmArea = () => {
+    this.onPressConfirmSwitch(!this.state.isConfirmChecked)
+  }
+
   onPressContinue = () => {
-    const { mnemonic } = this.state
-    CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz, { mnemonic })
+    ValoraAnalytics.track(OnboardingEvents.backup_continue)
+    navigate(Screens.BackupQuiz, { navigatedFromSettings: this.navigatedFromSettings() })
+  }
+
+  navigatedFromSettings = () => {
+    return this.props.route.params?.navigatedFromSettings ?? false
   }
 
   render() {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
+    const navigatedFromSettings = this.navigatedFromSettings()
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View>
-            <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
-            <Text style={styles.body}>{t('backupKeySummary')}</Text>
-            <BackupPhraseContainer
-              value={mnemonic}
-              showCopy={true}
-              mode={BackupPhraseContainerMode.READONLY}
-              type={BackupPhraseType.BACKUP_KEY}
-            />
-            <Text style={styles.tipText}>
-              <Text style={[styles.tipText, fontStyles.bold]}>{t('global:warning')}</Text>
-              {t('securityTip')}
-            </Text>
-          </View>
+          <BackupPhraseContainer
+            value={mnemonic}
+            mode={BackupPhraseContainerMode.READONLY}
+            type={BackupPhraseType.BACKUP_KEY}
+          />
+          <Text style={styles.body}>{t('backupKeySummary')}</Text>
         </ScrollView>
-        {!backupCompleted && (
-          <View>
+        {(!backupCompleted || navigatedFromSettings) && (
+          <>
             <View style={styles.confirmationSwitchContainer}>
-              <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
-              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
+              <Switch
+                value={isConfirmChecked}
+                onValueChange={this.onPressConfirmSwitch}
+                testID="backupKeySavedSwitch"
+              />
+              <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
+                {t('savedConfirmation')}
+              </Text>
             </View>
             <Button
               disabled={!isConfirmChecked}
               onPress={this.onPressContinue}
               text={t('global:continue')}
-              standard={false}
-              type={BtnTypes.PRIMARY}
+              size={BtnSizes.FULL}
+              type={BtnTypes.SECONDARY}
+              testID="backupKeyContinue"
             />
-          </View>
+          </>
         )}
       </SafeAreaView>
     )
   }
 }
 
+function HeaderRight() {
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
+  const onMoreInfoPressed = () => {
+    ValoraAnalytics.track(OnboardingEvents.backup_more_info)
+    pushToStack(Screens.AccountKeyEducation)
+  }
+  return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
+    padding: 16,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   body: {
-    ...fontStyles.body,
-    marginBottom: 20,
-  },
-  tipText: {
-    ...fontStyles.bodySmall,
-    color: colors.darkSecondary,
-    marginTop: 25,
-    marginHorizontal: 3,
+    ...fontStyles.regular,
+    marginTop: 16,
   },
   confirmationSwitchContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    marginVertical: 16,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   confirmationSwitchLabel: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    paddingTop: 3,
-    paddingLeft: 10,
+    flex: 1,
+    ...fontStyles.regular,
+    paddingLeft: 8,
+  },
+  cancelButton: {
+    color: colors.gray4,
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, { showError, hideAlert })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase)
-  )
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  showError,
+  hideAlert,
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhrase))

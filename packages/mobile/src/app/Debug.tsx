@@ -1,10 +1,12 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Clipboard from '@react-native-community/clipboard'
 import * as React from 'react'
-import { Clipboard, StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import LogView from 'src/app/LogView'
+import { noHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -19,7 +21,7 @@ interface State {
 }
 
 export class Debug extends React.Component<RootState, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = noHeader
 
   state = {
     reactNativeLogs: '',
@@ -47,7 +49,7 @@ export class Debug extends React.Component<RootState, State> {
     })
   }
 
-  onClickText = (...text: string[]) => {
+  onClickText = (...text: Array<string | null>) => {
     return () => {
       Logger.showMessage('Copied to Clipboard')
       Clipboard.setString(text.join(', '))
@@ -61,7 +63,7 @@ export class Debug extends React.Component<RootState, State> {
   render() {
     const { reactNativeLogs, gethLogs, latestBlockNumber } = this.state
     const pincodeType = this.props.account.pincodeType
-    const address = currentAccountSelector(this.props) || ''
+    const address = currentAccountSelector(this.props)
     const phoneNumber = this.props.account.e164PhoneNumber
     const version = DeviceInfo.getVersion()
     const buildNumber = DeviceInfo.getBuildNumber()
@@ -69,52 +71,50 @@ export class Debug extends React.Component<RootState, State> {
     const deviceId = DeviceInfo.getDeviceId()
 
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <Text
           onPress={this.onClickText(deviceId, phoneNumber)}
-          style={style.singleLine}
+          style={styles.singleLine}
         >{`Device Id: ${deviceId} | Phone Number: ${phoneNumber}`}</Text>
         <Text
           onPress={this.onClickText(version, buildNumber, String(apiLevel))}
-          style={style.singleLine}
+          style={styles.singleLine}
         >{`Version: ${version} | Build Number: ${buildNumber} | Api Level: ${apiLevel}`}</Text>
-        <Text style={style.singleLine}>{`Pin Type: ${pincodeType}`}</Text>
+        <Text style={styles.singleLine}>{`Pin Type: ${pincodeType}`}</Text>
         <Text
           onPress={this.onClickText(address)}
-          style={style.singleLine}
+          style={styles.singleLine}
         >{`Address: ${address}`}</Text>
-        <Text style={style.singleLine}>{`Latest Block: ${latestBlockNumber}`}</Text>
+        <Text style={styles.singleLine}>{`Latest Block: ${latestBlockNumber}`}</Text>
         <LogView
           title={'React-Native Logs'}
           logs={reactNativeLogs}
-          style={style.logView}
+          style={styles.logView}
           onPress={this.onClickText(reactNativeLogs)}
         />
         <LogView
           title={'Geth Logs'}
           logs={gethLogs}
-          style={style.logView}
+          style={styles.logView}
           onPress={this.onClickText(gethLogs)}
         />
         <Button
           onPress={this.onClickEmailLogs}
           text={'Email logs to support'}
-          standard={true}
           type={BtnTypes.PRIMARY}
-          style={style.button}
+          style={styles.button}
         />
       </SafeAreaView>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 5,
     paddingHorizontal: 10,
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
   },
   singleLine: {
     marginTop: 5,

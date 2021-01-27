@@ -1,8 +1,9 @@
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 
 export interface GethInstanceConfig {
   name: string
   validating?: boolean
+  replica?: boolean
   validatingGasPrice?: number
   syncmode: string
   port: number
@@ -11,7 +12,8 @@ export interface GethInstanceConfig {
   wsport?: number
   lightserv?: boolean
   privateKey?: string
-  etherbase?: string
+  minerValidator?: string
+  txFeeRecipient?: string
   proxies?: Array<string[2]>
   pid?: number
   isProxied?: boolean

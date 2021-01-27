@@ -1,4 +1,4 @@
-import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
+import SmartTopAlert from '@celo/react-components/components/SmartTopAlert'
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 
@@ -10,12 +10,13 @@ describe('SmartTopAlert', () => {
   it('renders correctly', async () => {
     const { toJSON } = render(
       <SmartTopAlert
-        timestamp={Date.now()}
-        dismissAfter={5}
-        title={'Smart Top Alert'}
-        text="dont get funny"
-        onPress={jest.fn()}
-        type={NotificationTypes.MESSAGE}
+        alert={{
+          dismissAfter: 5,
+          title: 'Smart Top Alert',
+          message: 'dont get funny',
+          onPress: jest.fn(),
+          type: 'message',
+        }}
       />
     )
 

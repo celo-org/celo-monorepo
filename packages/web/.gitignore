@@ -1,7 +1,0 @@
-.next/
-node_modules/
-dist/
-
-# keys
-env-config.js
-server-env-config.js

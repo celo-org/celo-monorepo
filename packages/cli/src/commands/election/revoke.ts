@@ -24,7 +24,6 @@ export default class ElectionRevoke extends BaseCommand {
   async run() {
     const res = this.parse(ElectionRevoke)
 
-    this.kit.defaultAccount = res.flags.from
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .isValidatorGroup(res.flags.for)

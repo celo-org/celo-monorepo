@@ -23,7 +23,7 @@ export default class Register extends BaseCommand {
 
   async run() {
     const res = this.parse(Register)
-    this.kit.defaultAccount = res.flags.from
+
     const accounts = await this.kit.contracts.getAccounts()
 
     await newCheckBuilder(this)

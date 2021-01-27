@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.13;
 
 /**
  * @title FixidityLib
@@ -11,6 +11,8 @@ pragma solidity ^0.5.0;
  * in the internal representation of a fraction.
  * When using this library be sure to use maxNewFixed() as the upper limit for
  * creation of fixed point numbers.
+ * @dev All contained functions are pure and thus marked internal to be inlined
+ * on consuming contracts at compile time for gas efficiency.
  */
 library FixidityLib {
   struct Fraction {

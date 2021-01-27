@@ -2,13 +2,13 @@ import { flags } from '@oclif/command'
 import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { ReleaseGoldCommand } from './release-gold'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
-export default class SetMaxDistribution extends ReleaseGoldCommand {
+export default class SetMaxDistribution extends ReleaseGoldBaseCommand {
   static description = 'Set the maximum distribution of gold for the given contract'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     distributionRatio: flags.string({
       required: true,
       description:

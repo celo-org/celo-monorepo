@@ -8,7 +8,7 @@ To start experimenting with the Alfajores Testnet, you will first need to get a 
 Alfajores Testnet accounts hold no real world economic value. The testnet's data may be reset on a regular basis. This will erase your accounts, their balance and your transaction history.
 {% endhint %}
 
-Getting an account is really being given or generating a public-private keypair. This gives you control of balances accessible with the address corresponding to that key. For Celo Gold, this is a native balance stored at the account whose address matches your key. For Celo Dollars, an ERC-20 token, the StableCoin smart contract maintains in its storage a mapping of the balance of each address.
+Getting an account is really being given or generating a public-private keypair. This gives you control of balances accessible with the address corresponding to that key. For CELO, this is a native balance stored at the account whose address matches your key. For Celo Dollars, an ERC-20 token, the StableCoin smart contract maintains in its storage a mapping of the balance of each address.
 
 ### Get an Invitation Code
 
@@ -37,7 +37,7 @@ mkdir celo-data-dir $ cd celo-data-dir
 Create an account by running this command:
 
 ```bash
-docker run -v `pwd`:/root/.celo --rm -it us.gcr.io/celo-testnet/celo-node:alfajores account new
+docker run -v `pwd`:/root/.celo --rm -it us.gcr.io/celo-org/geth:alfajores account new
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address:
@@ -56,6 +56,6 @@ The Alfajores Testnet Faucet is an easy way to get more funds deposited to an ac
 
 Visit [celo.org/build/faucet](https://celo.org/build/faucet), and enter your account address. If you are using the Celo Wallet, you can find your account address in the Settings page. Complete the Captcha, and click 'Add Funds'.
 
-Each time you complete a faucet request, your account is funded with an additional 10 Celo Dollars and 5 Celo Gold.
+Each time you complete a faucet request, your account is funded with an additional 10 Celo Dollars and 5 CELO.
 
 You may do this multiple times if you require more funds.

@@ -1,6 +1,7 @@
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import BigNumber from 'bignumber.js'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
+import { TransactionContext } from 'src/transactions/types'
 
 export interface EscrowedPayment {
   senderAddress: string
@@ -21,14 +22,15 @@ export enum Actions {
   RESEND_PAYMENT = 'ESCROW/RESEND_PAYMENT',
   RECLAIM_PAYMENT_SUCCESS = 'ESCROW/RECLAIM_PAYMENT_SUCCESS',
   RECLAIM_PAYMENT_FAILURE = 'ESCROW/RECLAIM_PAYMENT_FAILURE',
+  RECLAIM_PAYMENT_CANCEL = 'RECLAIM_PAYMENT_CANCEL',
 }
 
 export interface EscrowTransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
-  phoneHash: string
+  phoneHashDetails: PhoneNumberHashDetails
   amount: BigNumber
-  tempWalletAddress: string
-  txId: string
+  context: TransactionContext
+  tempWalletAddress?: string
 }
 export interface EscrowReclaimPaymentAction {
   type: Actions.RECLAIM_PAYMENT
@@ -55,7 +57,10 @@ export interface EscrowReclaimPaymentSuccessAction {
 
 export interface EscrowReclaimFailureAction {
   type: Actions.RECLAIM_PAYMENT_FAILURE
-  error: ErrorMessages
+}
+
+export interface EscrowReclaimCancelAction {
+  type: Actions.RECLAIM_PAYMENT_CANCEL
 }
 
 export type ActionTypes =
@@ -66,18 +71,19 @@ export type ActionTypes =
   | EscrowResendPaymentAction
   | EscrowReclaimPaymentSuccessAction
   | EscrowReclaimFailureAction
+  | EscrowReclaimCancelAction
 
 export const transferEscrowedPayment = (
-  phoneHash: string,
+  phoneHashDetails: PhoneNumberHashDetails,
   amount: BigNumber,
-  tempWalletAddress: string,
-  txId: string
+  context: TransactionContext,
+  tempWalletAddress?: string
 ): EscrowTransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
-  phoneHash,
+  phoneHashDetails,
   amount,
+  context,
   tempWalletAddress,
-  txId,
 })
 
 export const reclaimEscrowPayment = (paymentID: string): EscrowReclaimPaymentAction => ({
@@ -105,7 +111,10 @@ export const reclaimEscrowPaymentSuccess = (): EscrowReclaimPaymentSuccessAction
   type: Actions.RECLAIM_PAYMENT_SUCCESS,
 })
 
-export const reclaimEscrowPaymentFailure = (error: ErrorMessages): EscrowReclaimFailureAction => ({
+export const reclaimEscrowPaymentFailure = (): EscrowReclaimFailureAction => ({
   type: Actions.RECLAIM_PAYMENT_FAILURE,
-  error,
+})
+
+export const reclaimEscrowPaymentCancel = (): EscrowReclaimCancelAction => ({
+  type: Actions.RECLAIM_PAYMENT_CANCEL,
 })

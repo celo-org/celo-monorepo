@@ -1,66 +1,87 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import Education from 'src/account/Education'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
+import { BtnTypes } from '@celo/react-components/components/Button'
+import { TransitionPresets } from '@react-navigation/stack'
+import React, { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
-import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Namespaces } from 'src/i18n'
+import { celoEducation1, celoEducation2, celoEducation3, celoEducation4 } from 'src/images/Images'
+import { noHeader } from 'src/navigator/Headers'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import useSelector from 'src/redux/useSelector'
 
-interface DispatchProps {
-  setEducationCompleted: typeof setEducationCompleted
-}
-type Props = DispatchProps
-export class GoldEducation extends React.Component<Props> {
-  static navigationOptions = { header: null }
+export default function GoldEducation() {
+  const { t } = useTranslation(Namespaces.global)
 
-  goToExchange = () => {
-    this.props.setEducationCompleted()
-    CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
-    navigate(Screens.ExchangeHomeScreen)
+  const dispatch = useDispatch()
+
+  const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
+
+  const onFinish = () => {
+    ValoraAnalytics.track(OnboardingEvents.celo_education_complete)
+
+    if (isCeloEducationComplete) {
+      navigateBack()
+    } else {
+      navigate(Screens.ExchangeHomeScreen)
+      dispatch(setEducationCompleted())
+    }
   }
 
-  goToWalletHome = () => {
-    this.props.setEducationCompleted()
-    CeloAnalytics.track(CustomEventNames.wallet_gold_nux)
-    navigateHome()
-  }
+  const stepInfo = useStep()
 
-  render() {
-    const stepInfo = [
-      {
-        image: shinyGold,
-        text: 'celoLikeGold',
-        cancelEvent: CustomEventNames.gold_cancel1,
-        screenName: 'Gold_Nux_1',
-      },
-      {
-        image: goldValue,
-        text: 'goldFluctuates',
-        cancelEvent: CustomEventNames.gold_cancel2,
-        screenName: 'Gold_Nux_2',
-      },
-      {
-        image: exchangeIcon,
-        text: 'exchange',
-        cancelEvent: CustomEventNames.gold_cancel3,
-        screenName: 'Gold_Nux_3',
-      },
-    ]
-    return (
-      <Education
-        stepInfo={stepInfo}
-        onFinish={this.goToExchange}
-        onFinishAlternate={this.goToWalletHome}
-        buttonText={'exchangeGold'}
-        linkText={'backToWallet'}
-      />
-    )
-  }
+  useEffect(() => {
+    ValoraAnalytics.track(OnboardingEvents.celo_education_start)
+  }, [])
+
+  return (
+    <Education
+      embeddedNavBar={isCeloEducationComplete ? EmbeddedNavBar.Close : EmbeddedNavBar.Drawer}
+      stepInfo={stepInfo}
+      onFinish={onFinish}
+      finalButtonType={BtnTypes.TERTIARY}
+      finalButtonText={t('global:done')}
+      buttonText={t('global:next')}
+    />
+  )
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(null, { setEducationCompleted })(GoldEducation)
-)
+GoldEducation.navigationOptions = {
+  ...noHeader,
+  ...TransitionPresets.ModalTransition,
+}
+
+function useStep() {
+  const { t } = useTranslation(Namespaces.goldEducation)
+
+  return React.useMemo(() => {
+    return [
+      {
+        image: celoEducation1,
+        topic: EducationTopic.celo,
+      },
+      {
+        image: celoEducation2,
+        topic: EducationTopic.celo,
+      },
+      {
+        image: celoEducation3,
+        topic: EducationTopic.celo,
+      },
+      {
+        image: celoEducation4, // Placeholder Image
+        topic: EducationTopic.celo,
+      },
+    ].map((step, index) => {
+      return {
+        ...step,
+        title: t(`steps.${index}.title`),
+        text: t(`steps.${index}.text`),
+      }
+    })
+  }, [])
+}

@@ -1,4 +1,5 @@
-import { execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { execCmdWithExitOnFailure } from './cmd-utils'
+import { outputIncludes, switchToProjectFromEnv } from './utils'
 
 // createServiceAccountIfNotExists creates a service account with the given name
 // if it does not exist. Returns if the account was created.

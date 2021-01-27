@@ -1,3 +1,4 @@
+import { unknownUserIcon } from '@celo/react-components/images/Images'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { getContactNameHash } from '@celo/utils/src/contacts'
@@ -8,13 +9,13 @@ import { MinimalContact } from 'react-native-contacts'
 interface Props {
   style?: ViewStyle
   contact?: MinimalContact
-  name?: string
+  name: string | null // Requiring a value so we need to be explicit if we dont have it
   address?: string
-  size: number
-  preferNameInitial?: boolean
+  size?: number
   thumbnailPath?: string | null
 }
 
+const DEFAULT_ICON_SIZE = 40
 export const contactIconColors = [colors.teal, colors.orange, colors.purple]
 
 const getAddressColor = (address: string) =>
@@ -25,64 +26,76 @@ const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
 export default class ContactCircle extends React.PureComponent<Props> {
   getInitials = (): string => {
-    const { preferNameInitial, name, contact } = this.props
-    return (
-      (preferNameInitial && name && getNameInitial(name)) ||
-      (contact && getContactInitial(contact)) ||
-      (name && getNameInitial(name)) ||
-      '#'
-    )
+    const { name, contact } = this.props
+    return (contact && getContactInitial(contact)) || (name && getNameInitial(name)) || '#'
   }
 
-  getContactCircleInner = () => {
-    const { contact, size, thumbnailPath, children } = this.props
+  renderThumbnail = () => {
+    const { contact, size, thumbnailPath, name } = this.props
     const resolvedThumbnail = thumbnailPath || (contact && contact.thumbnailPath)
+    const iconSize = size || DEFAULT_ICON_SIZE
 
     if (resolvedThumbnail) {
       return (
         <Image
           source={{ uri: resolvedThumbnail }}
-          style={[style.image, { height: size, width: size, borderRadius: size / 2.0 }]}
+          style={[
+            styles.image,
+            { height: iconSize, width: iconSize, borderRadius: iconSize / 2.0 },
+          ]}
           resizeMode={'cover'}
         />
       )
     }
 
-    // If children components (i.e. a default image) has been provided, use that
-    if (children) {
-      return children
+    // Mobile # is what default display name when contact isn't saved
+    if (name && name !== 'Mobile #') {
+      const initials = this.getInitials()
+      return (
+        <Text style={[fontStyles.iconText, { fontSize: iconSize / 2.0 }]}>
+          {initials.toLocaleUpperCase()}
+        </Text>
+      )
     }
 
-    const fontSize = size / 2.0
-    const textStyle = [fontStyles.iconText, { fontSize }]
-    const initials = this.getInitials()
-    return <Text style={textStyle}>{initials.toLocaleUpperCase()}</Text>
+    return (
+      <Image
+        source={unknownUserIcon}
+        style={[styles.image, { height: iconSize, width: iconSize }]}
+      />
+    )
   }
 
   render() {
     const { address, contact, size } = this.props
+    const iconSize = size || DEFAULT_ICON_SIZE
     const iconColor =
       (contact && getContactColor(contact)) ||
       (address && getAddressColor(address)) ||
       contactIconColors[0]
 
     return (
-      <View style={[style.row, this.props.style]}>
+      <View style={[styles.container, this.props.style]}>
         <View
           style={[
-            style.icon,
-            { backgroundColor: iconColor, height: size, width: size, borderRadius: size / 2 },
+            styles.icon,
+            {
+              backgroundColor: iconColor,
+              height: iconSize,
+              width: iconSize,
+              borderRadius: iconSize / 2,
+            },
           ]}
         >
-          {this.getContactCircleInner()}
+          {this.renderThumbnail()}
         </View>
       </View>
     )
   }
 }
 
-const style = StyleSheet.create({
-  row: {
+const styles = StyleSheet.create({
+  container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -92,7 +105,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
   },
   image: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    margin: 'auto',
+    alignSelf: 'center',
   },
 })

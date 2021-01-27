@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const chalk = require('chalk')
 
-const FirebaseOrGAEProjects = ['faucet', 'web', 'verification-pool-api', 'notification-service']
+const FirebaseOrGAEProjects = ['faucet', 'web', 'notification-service']
 
 // Set CWD to monorepo root
 process.cwd(path.join(__dirname, '..'))

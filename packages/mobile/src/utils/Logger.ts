@@ -16,8 +16,8 @@ class Logger extends ReactNativeLogger {
    * @override
    */
   getLogs = async (): Promise<any> => {
-    // TODO(Rossy) Does this technique of passing logs back as a string
-    // fail when the logs get o big?
+    // TODO(Rossy) This approach of passing logs back as a string
+    // fails when the logs get too big
     try {
       const rnLogsSrc = this.getReactNativeLogsFilePath()
       const gethLogsSrc = this.getGethLogFilePath()

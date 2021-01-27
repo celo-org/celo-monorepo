@@ -1,5 +1,6 @@
 import NetInfo from '@react-native-community/netinfo'
-import firebase from 'react-native-firebase'
+import auth from '@react-native-firebase/auth'
+import storage from '@react-native-firebase/storage'
 import * as RNFS from 'react-native-fs'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
@@ -46,9 +47,7 @@ export default class FirebaseLogUploader {
   ): Promise<void> {
     const tmpFilePath = logFilePath + '.tmp'
     await RNFS.moveFile(logFilePath, tmpFilePath)
-    // Don't "await" here. While everything else in this async method is relatively fast, data upload can be slow
-    // and we don't want to block the user from using the app.
-    return FirebaseLogUploader.uploadLogsToFirebaseStorage(tmpFilePath, uploadPath, uploadFileName)
+    FirebaseLogUploader.uploadLogsToFirebaseStorage(tmpFilePath, uploadPath, uploadFileName).catch()
   }
 
   // Uploaded logs can be seen at
@@ -59,7 +58,7 @@ export default class FirebaseLogUploader {
     uploadFileName: string
   ) {
     try {
-      await firebase.auth().signInAnonymously()
+      await auth().signInAnonymously()
 
       const currentDayUTC = new Date().toISOString().slice(0, 10) // example: 2019-05-10
 
@@ -68,8 +67,7 @@ export default class FirebaseLogUploader {
 
       // Note: when this "await" finishes upload might still be pending, so, if the file gets deleted,
       // the upload will fail.
-      await firebase
-        .storage()
+      await storage()
         .ref(fullUploadPath)
         .putFile(localFilePath)
 

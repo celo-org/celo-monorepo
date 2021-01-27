@@ -1,5 +1,6 @@
 const reactNativeJestPreset = require('react-native/jest-preset')
 const { defaults: tsjPreset } = require('ts-jest/presets')
+const { nodeFlakeTracking } = require('@celo/flake-tracker/src/jest/config.js')
 
 module.exports = {
   ...tsjPreset,
@@ -20,7 +21,8 @@ module.exports = {
   },
   modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],
   preset: 'react-native',
-  setupFilesAfterEnv: ['<rootDir>/jest_setup'],
+  ...nodeFlakeTracking,
+  setupFilesAfterEnv: ['<rootDir>/jest_setup', ...nodeFlakeTracking.setupFilesAfterEnv],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e'],
   transform: {
     ...tsjPreset.transform,

@@ -1,0 +1,77 @@
+# Provide the next vars with a vars-file or modifying the default value
+google = {
+  project = "celo-rc1"
+  region  = "asia-southeast1"
+  zone    = "asia-southeast1-c"
+}
+
+validator_name = "Acme-RC1-Validator"
+
+proxy_name = "Acme-RC1-Proxy"
+
+validator_signer_accounts = {
+    account_addresses = [
+      "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    ]
+    private_keys = [
+      "cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    ]
+    #define your own strong password here
+    account_passwords = [
+      "Iez5lodohzaShap7ohH6ro5ohm9aecaezied4Esii3xeeBo1uxooP6aeluithu0u",
+    ]
+    release_gold_addresses = [
+      "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+}
+
+proxy_accounts = {
+  
+    account_addresses = [
+      "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    ]
+    private_keys = [
+      "10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    ]
+    
+    #note that complete enode is not revealed from celocli account:new. FIXME  
+    enodes = [
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+    #define your own strong password here
+    account_passwords = [
+      "oi0ahsas8ahghaaxeenoh0fo7ar2EoFa2aloj2chaveelu6Veegh4ahNgeikaegh",
+    ]
+}
+
+attestation_signer_accounts = {
+    account_addresses = [
+      "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxf7",
+    ]
+    private_keys = [
+      "46xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx58",
+    ]
+    #define your own strong password here
+    account_passwords = [
+      "el5Lai2ohvex4ohv1ree9Noo2iethoolae6be0aijeishaemiexohtae3meika2u"
+    ]
+}
+
+attestation_service_db = {
+    username = "celo"
+    #define your own strong password here
+    password = "Yeu4Chaotoh0eiG4xij2oob5phaekaeGeexel5thoo0xahsha2meihahLohk9wai"
+}
+
+attestation_service_credentials = {
+    sms_providers                = "twilio"
+    nexmo_key                    = ""
+    nexmo_secret                 = ""
+    nexmo_blacklist              = ""
+    twilio_account_sid           = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    twilio_messaging_service_sid = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    twilio_auth_token            = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    twilio_blacklist             = ""
+}
+
+public_www_fqdn = "www.mysite.org"

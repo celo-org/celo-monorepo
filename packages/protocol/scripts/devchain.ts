@@ -1,11 +1,11 @@
-import * as ganache from '@celo/ganache-cli'
+import ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
-import * as fs from 'fs-extra'
-import * as path from 'path'
-import * as targz from 'targz'
-import * as tmp from 'tmp'
-import * as yargs from 'yargs'
+import fs from 'fs-extra'
+import path from 'path'
+import targz from 'targz'
+import tmp from 'tmp'
+import yargs from 'yargs'
 
 tmp.setGracefulCleanup()
 
@@ -197,7 +197,7 @@ function createDirIfMissing(dir: string) {
 }
 
 function runMigrations(opts: { upto?: number; migrationOverride?: string } = {}) {
-  const cmdArgs = ['truffle', 'migrate', '--reset']
+  const cmdArgs = ['truffle', 'migrate', '--reset', '--network', 'development']
 
   if (opts.upto) {
     cmdArgs.push('--to')
@@ -221,10 +221,12 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push('--grants')
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
-  cmdArgs.push('10')
+  cmdArgs.push('1')
   cmdArgs.push('--deployed_grants')
   // Random file name to prevent rewriting to it
   cmdArgs.push('/tmp/deployedGrants' + Math.floor(1000 * Math.random()) + '.json')
+  cmdArgs.push('--output_file')
+  cmdArgs.push('/tmp/releaseGoldOutput.txt')
   // --yesreally command to bypass prompts
   cmdArgs.push('--yesreally')
   cmdArgs.push('--build_directory')

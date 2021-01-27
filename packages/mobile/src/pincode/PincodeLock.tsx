@@ -3,43 +3,44 @@
  * to lock the app with a PIN code.
  */
 import colors from '@celo/react-components/styles/colors'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { showError } from 'src/alert/actions'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
+import { checkPin } from 'src/pincode/authentication'
 import Pincode from 'src/pincode/Pincode'
-import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
   const [pin, setPin] = useState('')
+  const [errorText, setErrorText] = useState<string | undefined>(undefined)
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxNamePin1)
-  const fornoMode = useSelector(fornoSelector)
-  const currentAccount = useSelector(currentAccountSelector)
+  const account = useSelector(currentAccountSelector)
 
-  const onWrongPin = useCallback(() => {
-    dispatch(showError(ErrorMessages.INCORRECT_PIN))
+  const onWrongPin = () => {
     setPin('')
-  }, [dispatch, showError, setPin])
+    setErrorText(t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`))
+  }
 
-  const onCorrectPin = useCallback(() => {
+  const onCorrectPin = () => {
     dispatch(appUnlock())
-  }, [dispatch, appUnlock])
+  }
 
-  const onPress = () => {
-    if (currentAccount) {
-      return isPinCorrect(pin, fornoMode, currentAccount)
-        .then(onCorrectPin)
-        .catch(onWrongPin)
-    } else {
+  const onCompletePin = async (enteredPin: string) => {
+    if (!account) {
+      throw new Error('Attempting to unlock pin before account initialized')
+    }
+
+    if (await checkPin(enteredPin, account)) {
       onCorrectPin()
+    } else {
+      onWrongPin()
     }
   }
 
@@ -55,26 +56,23 @@ function PincodeLock() {
   }, [])
 
   return (
-    <SafeAreaView style={style.container}>
+    <SafeAreaView style={styles.container}>
       <Pincode
         title={t('confirmPin.title')}
-        placeholder={t('createPin.yourPin')}
-        buttonText={t('global:submit')}
-        isPinValid={isPinValid}
-        onPress={onPress}
+        errorText={errorText}
         pin={pin}
         onChangePin={setPin}
-        maxLength={PIN_LENGTH}
+        onCompletePin={onCompletePin}
       />
     </SafeAreaView>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 })
 

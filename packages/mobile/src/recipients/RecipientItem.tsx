@@ -1,10 +1,11 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { unknownUserIcon } from 'src/images/Images'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
+import { StyleSheet, Text, View } from 'react-native'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 interface Props {
   recipient: Recipient
@@ -16,78 +17,50 @@ class RecipientItem extends React.PureComponent<Props> {
     this.props.onSelectRecipient(this.props.recipient)
   }
 
-  isUnknown = (recipientKind: RecipientKind) => {
-    return recipientKind === RecipientKind.Address || recipientKind === RecipientKind.MobileNumber
-  }
-
   render() {
     const { recipient } = this.props
 
     return (
-      <TouchableHighlight onPress={this.onPress} underlayColor={colors.altDarkBg}>
-        <View style={style.row}>
+      <Touchable onPress={this.onPress} testID="RecipientItem">
+        <View style={styles.row}>
           <ContactCircle
-            style={style.avatar}
+            style={styles.avatar}
             name={recipient.displayName}
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
             size={40}
-          >
-            <Image source={unknownUserIcon} style={style.image} />
-          </ContactCircle>
-          <View style={style.nameContainer}>
-            <Text
-              numberOfLines={1}
-              ellipsizeMode={'tail'}
-              style={[fontStyles.bodySmallSemiBold, style.name]}
-            >
+          />
+          <View style={styles.contentContainer}>
+            <Text numberOfLines={1} ellipsizeMode={'tail'} style={styles.name}>
               {recipient.displayName}
             </Text>
+            <Text style={styles.phone}>{recipient.displayId}</Text>
           </View>
-          <Text style={[fontStyles.bodySmallSemiBold, fontStyles.light, style.phone]}>
-            {recipient.displayId}
-          </Text>
         </View>
-      </TouchableHighlight>
+      </Touchable>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 50,
-    paddingHorizontal: 10,
+    height: 64,
+    paddingHorizontal: variables.contentPadding,
     flex: 1,
   },
   avatar: {
-    marginRight: 10,
+    marginRight: 12,
   },
-  nameContainer: {
+  contentContainer: {
     flex: 1,
-    flexDirection: 'row',
-    paddingRight: 5,
   },
-  name: {
-    lineHeight: 41,
-  },
-  invite: {
-    color: colors.celoGreen,
-    lineHeight: 41,
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-  },
-  image: {
-    height: 40,
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  name: { ...fontStyles.regular500, color: colors.dark },
   phone: {
-    textAlign: 'right',
-    lineHeight: 41,
+    ...fontStyles.small,
+    color: colors.gray4,
   },
 })
 

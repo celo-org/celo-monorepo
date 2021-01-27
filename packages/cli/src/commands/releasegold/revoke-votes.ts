@@ -3,14 +3,14 @@ import BigNumber from 'bignumber.js'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
-export default class RevokeVotes extends ReleaseGoldCommand {
+export default class RevokeVotes extends ReleaseGoldBaseCommand {
   static description =
     "Revokes `votes` for the given contract's account from the given group's account"
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     group: Flags.address({
       required: true,
       description: 'Address of the group to revoke votes from',

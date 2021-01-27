@@ -1,8 +1,9 @@
-import _QRCode from 'qrcode'
-import React, { PureComponent } from 'react'
+import _QRCode, { QRCodeErrorCorrectionLevel } from 'qrcode'
+import React, { useMemo } from 'react'
 import Svg, { Path, Rect } from 'react-native-svg'
+import { SVG } from 'src/send/actions'
 
-export function genMatrix(value: any, errorCorrectionLevel: string) {
+export function genMatrix(value: string, errorCorrectionLevel: QRCodeErrorCorrectionLevel) {
   const arr = Array.prototype.slice.call(
     _QRCode.create(value, { errorCorrectionLevel }).modules.data,
     0
@@ -16,8 +17,12 @@ export function genMatrix(value: any, errorCorrectionLevel: string) {
 }
 
 /* calculate the size of the cell and draw the path */
-export function calculateMatrix(props: any) {
-  const { value, size, ecl, onError } = props
+export function calculateMatrix(
+  value: string,
+  size: number,
+  ecl: QRCodeErrorCorrectionLevel,
+  onError: any
+) {
   try {
     const reducedSize = size - 20
     const matrix = genMatrix(value, ecl)
@@ -65,53 +70,39 @@ export function transformMatrixIntoPath(cellSize: number, matrix: any) {
 
 interface QRProps {
   value: string
-  size: number
-  color: string
-  backgroundColor: string
-  getRef: any
-  ecl: string
-  onError: any
-}
-
-interface QRState {
-  cellSize?: number | undefined
-  path?: string | undefined
+  size?: number
+  color?: string
+  backgroundColor?: string
+  svgRef: React.MutableRefObject<SVG>
+  ecl?: QRCodeErrorCorrectionLevel
+  onError?: any
 }
 
 /**
  * A simple component for displaying QR Code using svg
  */
-export default class QRCode extends PureComponent<QRProps, QRState> {
-  static defaultProps = {
-    value: 'This is a QR Code.',
-    size: 100,
-    color: 'black',
-    backgroundColor: 'white',
-    ecl: 'M',
-    onError: undefined,
-  }
+function QRCode({
+  value,
+  size = 100,
+  color = 'black',
+  backgroundColor = 'white',
+  svgRef,
+  ecl = 'M',
+  onError,
+}: QRProps) {
+  const { cellSize, path } = useMemo(() => calculateMatrix(value, size, ecl, onError), [
+    value,
+    size,
+    ecl,
+    onError,
+  ])
 
-  static getDerivedStateFromProps(props: any, state: any) {
-    // if value has changed, re-calculateMatrix
-    if (props.value !== state.value || props.size !== state.size) {
-      return calculateMatrix(props)
-    }
-    return null
-  }
-
-  constructor(props: any) {
-    super(props)
-    this.state = calculateMatrix(props)
-  }
-
-  render() {
-    const { getRef, size, color, backgroundColor } = this.props
-    const { cellSize, path } = this.state
-    return (
-      <Svg ref={getRef} width={size} height={size}>
-        <Rect width={size} height={size} fill={backgroundColor} />
-        {path && cellSize && <Path d={path} stroke={color} strokeWidth={cellSize} />}
-      </Svg>
-    )
-  }
+  return (
+    <Svg ref={svgRef} width={size} height={size}>
+      <Rect width={size} height={size} fill={backgroundColor} />
+      {path && cellSize && <Path d={path} stroke={color} strokeWidth={cellSize} />}
+    </Svg>
+  )
 }
+
+export default React.memo(QRCode)

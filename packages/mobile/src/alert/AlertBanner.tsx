@@ -1,49 +1,37 @@
-import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import SmartTopAlert from '@celo/react-components/components/SmartTopAlert'
+import React, { memo, useMemo } from 'react'
+import { useDispatch } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import { State as AlertState } from 'src/alert/reducer'
-import { RootState } from 'src/redux/reducers'
+import { ErrorDisplayType } from 'src/alert/reducer'
+import useSelector from 'src/redux/useSelector'
 
-interface StateProps {
-  alert: AlertState
+function AlertBanner() {
+  const alert = useSelector((state) => state.alert)
+  const dispatch = useDispatch()
+
+  const displayAlert = useMemo(() => {
+    if (alert?.displayMethod === ErrorDisplayType.BANNER && (alert.title || alert.message)) {
+      const onPress = () => {
+        const action = alert?.action ?? hideAlert()
+        dispatch(action)
+      }
+
+      const { type, title, message, buttonMessage, dismissAfter } = alert
+
+      return {
+        type,
+        title,
+        message,
+        buttonMessage,
+        dismissAfter,
+        onPress,
+      }
+    } else {
+      return null
+    }
+  }, [alert])
+
+  return <SmartTopAlert alert={displayAlert} />
 }
 
-interface DispatchProps {
-  hideAlert: typeof hideAlert
-}
-
-type Props = StateProps & DispatchProps
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    alert: state.alert,
-  }
-}
-
-const mapDispatchToProps = {
-  hideAlert,
-}
-
-export class AlertBanner extends React.Component<Props> {
-  render() {
-    const { alert, hideAlert: hideAlertAction } = this.props
-
-    return (
-      <SmartTopAlert
-        timestamp={Date.now()}
-        text={alert && alert.message}
-        onPress={hideAlertAction}
-        type={alert && alert.type === 'error' ? NotificationTypes.ERROR : NotificationTypes.MESSAGE}
-        dismissAfter={alert && alert.dismissAfter}
-        buttonMessage={alert && alert.buttonMessage}
-        title={alert && alert.title}
-      />
-    )
-  }
-}
-
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  mapDispatchToProps
-)(AlertBanner)
+export default memo(AlertBanner)

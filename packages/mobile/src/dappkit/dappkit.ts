@@ -13,7 +13,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { getWeb3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -58,10 +58,10 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   Logger.debug(TAG, 'Producing tx signature')
 
   yield call(getConnectedUnlockedAccount)
+  const web3 = yield call(getWeb3)
 
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
-      const contractKit = getContractKit()
       // TODO offload this logic to walletkit or contractkit, otherwise they
       // could diverge again and create another bug
       // See https://github.com/celo-org/celo-monorepo/issues/3045
@@ -87,7 +87,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         params.to = tx.to
       }
       Logger.debug(TAG, 'Signing tx with params', JSON.stringify(params))
-      const signedTx = await contractKit.web3.eth.signTransaction(params)
+      const signedTx = await web3.eth.signTransaction(params)
       return signedTx.raw
     })
   )
@@ -112,9 +112,11 @@ export function handleDappkitDeepLink(deepLink: string) {
         navigate(Screens.DappKitSignTxScreen, { dappKitRequest })
         break
       default:
+        navigate(Screens.ErrorScreen, { errorMessage: 'Unsupported dapp request type' })
         Logger.warn(TAG, 'Unsupported dapp request type')
     }
   } catch (error) {
+    navigate(Screens.ErrorScreen, { errorMessage: `Deep link not valid for dappkit: ${error}` })
     Logger.debug(TAG, `Deep link not valid for dappkit: ${error}`)
   }
 }

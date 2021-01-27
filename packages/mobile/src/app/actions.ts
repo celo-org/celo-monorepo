@@ -1,5 +1,4 @@
 import i18n from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
@@ -19,13 +18,18 @@ export enum Actions {
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
   OPEN_DEEP_LINK = 'APP/OPEN_DEEP_LINK',
   RESET_APP_OPENED_STATE = 'APP/RESET_APP_OPENED_STATE',
-  ENTER_BACKUP_FLOW = 'APP/ENTER_BACKUP_FLOW',
-  EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
+  SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
+  MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+  SET_PONTO_FEATURE_FLAG = 'APP/SET_PONTO_FEATURE_FLAG',
+  SET_KOTANI_FEATURE_FLAG = 'APP/SET_KOTANI_FEATURE_FLAG',
+  TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
+  ACTIVE_SCREEN_CHANGED = 'APP/ACTIVE_SCREEN_CHANGED',
 }
 
 export interface SetAppState {
@@ -51,18 +55,11 @@ export interface SetLanguage {
 export interface OpenDeepLink {
   type: Actions.OPEN_DEEP_LINK
   deepLink: string
+  isSecureOrigin: boolean
 }
 
 interface ResetAppOpenedState {
   type: Actions.RESET_APP_OPENED_STATE
-}
-
-interface EnterBackupFlow {
-  type: Actions.ENTER_BACKUP_FLOW
-}
-
-interface ExitBackupFlow {
-  type: Actions.EXIT_BACKUP_FLOW
 }
 
 interface SetAnalyticsEnabled {
@@ -70,9 +67,19 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-interface SetLockWithPinEnabled {
+interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
+}
+
+interface InviteModalAction {
+  type: Actions.TOGGLE_INVITE_MODAL
+  inviteModalVisible: boolean
+}
+
+interface ActiveScreenChangedAction {
+  type: Actions.ACTIVE_SCREEN_CHANGED
+  activeScreen: Screens
 }
 
 export interface Lock {
@@ -83,6 +90,33 @@ export interface Unlock {
   type: Actions.UNLOCK
 }
 
+export interface SetSessionId {
+  type: Actions.SET_SESSION_ID
+  sessionId: string
+}
+
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+  openExternal: boolean
+  isSecureOrigin: boolean
+}
+
+interface MinAppVersionDeterminedAction {
+  type: Actions.MIN_APP_VERSION_DETERMINED
+  minVersion: string | null
+}
+
+interface PontoFeatureFlagSetAction {
+  type: Actions.SET_PONTO_FEATURE_FLAG
+  enabled: boolean
+}
+
+interface KotaniFeatureFlagSetAction {
+  type: Actions.SET_KOTANI_FEATURE_FLAG
+  enabled: boolean
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -90,12 +124,17 @@ export type ActionTypes =
   | ResetAppOpenedState
   | SetLanguage
   | OpenDeepLink
-  | EnterBackupFlow
-  | ExitBackupFlow
   | SetAnalyticsEnabled
-  | SetLockWithPinEnabled
+  | SetRequirePinOnAppOpen
   | Lock
   | Unlock
+  | SetSessionId
+  | OpenUrlAction
+  | MinAppVersionDeterminedAction
+  | PontoFeatureFlagSetAction
+  | KotaniFeatureFlagSetAction
+  | InviteModalAction
+  | ActiveScreenChangedAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -112,24 +151,22 @@ export const setNumberVerified = (numberVerified: boolean) => ({
   numberVerified,
 })
 
-export const setLanguage = (language: string, nextScreen?: Screens) => {
+export const setLanguage = (language: string) => {
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 
-  if (nextScreen) {
-    navigate(nextScreen)
-  }
   return {
     type: Actions.SET_LANGUAGE,
     language,
   }
 }
 
-export const openDeepLink = (deepLink: string) => {
+export const openDeepLink = (deepLink: string, isSecureOrigin: boolean = false): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
+    isSecureOrigin,
   }
 }
 
@@ -137,20 +174,12 @@ export const resetAppOpenedState = () => ({
   type: Actions.RESET_APP_OPENED_STATE,
 })
 
-export const enterBackupFlow = () => ({
-  type: Actions.ENTER_BACKUP_FLOW,
-})
-
-export const exitBackupFlow = () => ({
-  type: Actions.EXIT_BACKUP_FLOW,
-})
-
 export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   type: Actions.SET_ANALYTICS_ENABLED,
   enabled,
 })
 
-export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })
@@ -161,4 +190,47 @@ export const appLock = (): Lock => ({
 
 export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
+})
+
+export const setSessionId = (sessionId: string) => ({
+  type: Actions.SET_SESSION_ID,
+  sessionId,
+})
+
+export const openUrl = (
+  url: string,
+  openExternal = false,
+  isSecureOrigin = false
+): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
+  openExternal,
+  isSecureOrigin,
+})
+
+export const minAppVersionDetermined = (
+  minVersion: string | null
+): MinAppVersionDeterminedAction => ({
+  type: Actions.MIN_APP_VERSION_DETERMINED,
+  minVersion,
+})
+
+export const setPontoFeatureFlag = (enabled: boolean) => ({
+  type: Actions.SET_PONTO_FEATURE_FLAG,
+  enabled,
+})
+
+export const setKotaniFeatureFlag = (enabled: boolean) => ({
+  type: Actions.SET_KOTANI_FEATURE_FLAG,
+  enabled,
+})
+
+export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
+  type: Actions.TOGGLE_INVITE_MODAL,
+  inviteModalVisible,
+})
+
+export const activeScreenChanged = (activeScreen: Screens): ActiveScreenChangedAction => ({
+  type: Actions.ACTIVE_SCREEN_CHANGED,
+  activeScreen,
 })

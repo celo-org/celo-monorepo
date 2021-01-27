@@ -1,10 +1,12 @@
 import hoistStatics from 'hoist-non-react-statics'
 import { withTranslation as withTranslationI18Next } from 'react-i18next'
 
+const t = (key: string) => key
+
 export default {
   language: 'EN',
-  t: (key: string) => key,
-  changeLanguage: () => {},
+  t,
+  changeLanguage: jest.fn().mockResolvedValue(t),
 }
 
 export enum Namespaces {}

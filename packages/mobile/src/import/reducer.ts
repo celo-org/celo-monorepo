@@ -22,12 +22,6 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         isImportingWallet: false,
       }
 
-    case Actions.BACKUP_PHRASE_EMPTY:
-      return {
-        ...state,
-        isImportingWallet: false,
-      }
-
     default:
       return state
   }

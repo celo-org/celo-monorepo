@@ -6,8 +6,8 @@ Rewards to Locked Gold are totally independent from validator and validator grou
 
 ![](https://storage.googleapis.com/celo-website/docs/locked-gold-rewards.jpg)
 
-First, an on-target reward rate is determined. The protocol has a target for the proportion of circulating Celo Gold that is locked and used for voting, and adjusts the reward rate to increase or reduce the attractiveness of locking up additional supply. This aims to balance having sufficient liquidity for Celo Gold, while making it more challenging to buy enough Celo Gold to meaningfully influence the outcome of a validator election.
+First, an on-target reward rate is determined. The protocol has a target for the proportion of circulating CELO that is locked and used for voting, and adjusts the reward rate to increase or reduce the attractiveness of locking up additional supply. This aims to balance having sufficient liquidity for CELO, while making it more challenging to buy enough CELO to meaningfully influence the outcome of a validator election.
 
-Adjusting the on-target reward rate to account for under- or over-spending against the target schedule gives a baseline reward, essentially the percentage increase for a unit of Locked Gold voting for a group eligible for rewards.
+Adjusting the on-target reward rate to account for under- or over-spending against the target schedule gives a baseline reward, essentially the percentage increase for a unit of Locked CELO voting for a group eligible for rewards.
 
 The reward for activated Locked Gold voting for a given group is determined as follows. First, if the group elected no validators in the current epoch, rewards are zero. Otherwise, the baseline reward rate factors in two deductions. It is multiplied by the slashing penalty for the group, and by the average epoch uptime score for validators in the group elected in the current epoch. Finally, the group's activated pool of Locked Gold is increased by this rate.

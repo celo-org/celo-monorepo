@@ -22,4 +22,11 @@ describe(convertDollarsToMaxSupportedPrecision, () => {
     const dollarsResult = convertDollarsToMaxSupportedPrecision(new BigNumber('2.99'))
     expect(dollarsResult.toString()).toEqual('2.99')
   })
+
+  it('should round amounts with more than 18 decimals to 18 decimals (the max precision)', () => {
+    const dollarsResult = convertDollarsToMaxSupportedPrecision(
+      new BigNumber('0.01183102924038876762')
+    )
+    expect(dollarsResult.toString()).toEqual('0.011831029240388768')
+  })
 })

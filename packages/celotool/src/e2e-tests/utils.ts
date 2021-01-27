@@ -2,10 +2,10 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
-import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import readLastLines from 'read-last-lines'
 import Web3 from 'web3'
+import { spawnCmd } from '../lib/cmd-utils'
 import {
   AccountType,
   getPrivateKeysFor,
@@ -31,7 +31,6 @@ import {
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { spawnCmd } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
@@ -270,6 +269,10 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       } else if (instance.isProxy) {
         instance.privateKey = instance.privateKey || proxyPrivateKeys[proxyIndex]
         proxyIndex++
+      }
+
+      if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
+        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
       }
     }
 

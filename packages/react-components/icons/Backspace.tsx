@@ -11,7 +11,7 @@ interface Props {
 export default class Backspace extends React.PureComponent<Props> {
   static defaultProps = {
     height: 30,
-    width: 60,
+    width: 30,
     color: colors.dark,
   }
 
@@ -20,7 +20,7 @@ export default class Backspace extends React.PureComponent<Props> {
       <Svg
         xmlns="http://www.w3.org/2000/svg"
         height={this.props.height}
-        width={this.props.height}
+        width={this.props.width}
         viewBox="0 0 35 18"
         fill="none"
       >

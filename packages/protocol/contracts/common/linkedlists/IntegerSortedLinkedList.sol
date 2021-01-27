@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -10,6 +10,14 @@ import "./SortedLinkedList.sol";
 library IntegerSortedLinkedList {
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Inserts an element into a doubly linked list.

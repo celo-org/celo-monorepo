@@ -6,7 +6,8 @@ export default class Reports extends BaseCommand {
   static description = 'List oracle reports for a given token'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
+    ...(cli.table.flags() as object),
   }
 
   static args = [
@@ -33,7 +34,7 @@ export default class Reports extends BaseCommand {
         rate: { get: (r) => r.rate.toNumber() },
         timestamp: { get: (r) => r.timestamp.toNumber() },
       },
-      { 'no-truncate': !res.flags.truncate }
+      res.flags
     )
   }
 }

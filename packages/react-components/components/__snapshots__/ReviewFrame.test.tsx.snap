@@ -7,7 +7,6 @@ exports[`ReviewFrame renders correctly 1`] = `
       Object {
         "backgroundColor": "#FFFFFF",
         "flex": 1,
-        "justifyContent": "space-between",
       },
       undefined,
     ]
@@ -16,17 +15,16 @@ exports[`ReviewFrame renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "justifyContent": "flex-start",
         "paddingVertical": 10,
       }
     }
+    keyboardShouldPersistTaps="handled"
   >
     <View>
       <View
         style={
           Object {
             "marginHorizontal": 16,
-            "marginVertical": 20,
           }
         }
       />
@@ -62,7 +60,6 @@ exports[`ReviewFrame renders correctly 1`] = `
             "top": 10,
           }
         }
-        isTVSelectable={true}
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -71,17 +68,29 @@ exports[`ReviewFrame renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 25,
-            "borderWidth": 0,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-            "width": 50,
-          }
+          Array [
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#42D689",
+              },
+              Object {
+                "borderWidth": 0,
+              },
+              Object {
+                "borderColor": "#42D689",
+                "borderRadius": 25,
+                "height": 50,
+                "width": 50,
+              },
+            ],
+            Object {
+              "opacity": 1,
+            },
+          ]
         }
       >
         <svg
@@ -105,5 +114,21 @@ exports[`ReviewFrame renders correctly 1`] = `
       </View>
     </View>
   </View>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;

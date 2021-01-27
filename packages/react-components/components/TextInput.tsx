@@ -8,21 +8,27 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import {
   NativeSyntheticEvent,
+  Platform,
+  StyleProp,
   StyleSheet,
   TextInput as RNTextInput,
   TextInputFocusEventData,
   TextInputProps as RNTextInputProps,
   View,
+  ViewStyle,
 } from 'react-native'
 
-interface OwnProps {
+type Props = Omit<RNTextInputProps, 'style'> & {
+  style?: StyleProp<ViewStyle>
+  inputStyle?: RNTextInputProps['style']
   onChangeText: (value: string) => void
   testID?: string
   showClearButton?: boolean
-  forwardedRef?: React.RefObject<RNTextInput>
+  forwardedRef?:
+    | ((instance: RNTextInput | null) => void)
+    | React.MutableRefObject<RNTextInput | null>
+    | null
 }
-
-type Props = OwnProps & RNTextInputProps
 
 interface State {
   isFocused: boolean
@@ -38,16 +44,12 @@ export class CTextInput extends React.Component<Props, State> {
 
   handleInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     this.setState({ isFocused: true })
-    if (this.props.onFocus) {
-      this.props.onFocus(e)
-    }
+    this.props.onFocus?.(e)
   }
 
   handleInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     this.setState({ isFocused: false })
-    if (this.props.onBlur) {
-      this.props.onBlur(e)
-    }
+    this.props.onBlur?.(e)
   }
 
   onClear = () => {
@@ -56,7 +58,8 @@ export class CTextInput extends React.Component<Props, State> {
 
   render() {
     const {
-      style: propsStyle,
+      style,
+      inputStyle,
       value = '',
       showClearButton = true,
       forwardedRef,
@@ -66,26 +69,27 @@ export class CTextInput extends React.Component<Props, State> {
     const { isFocused = false } = this.state
 
     return (
-      <View style={[style.container, propsStyle]}>
+      <View style={[styles.container, style]}>
         <RNTextInput
           ref={forwardedRef}
-          style={{
-            ...style.borderedText,
-            ...(passThroughProps.multiline && { textAlignVertical: 'top' }),
-          }}
+          style={[
+            styles.input,
+            passThroughProps.multiline && { textAlignVertical: 'top' },
+            inputStyle,
+          ]}
           value={value}
           {...passThroughProps}
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
         />
-        {isFocused && !!value && showClearButton && (
+        {!passThroughProps.multiline && isFocused && !!value && showClearButton && (
           <CircleButton
-            style={style.iconStyle}
+            style={styles.icon}
             onPress={this.onClear}
             solid={true}
             size={20}
-            activeColor={colors.gray}
-            inactiveColor={colors.darkLightest}
+            activeColor={colors.gray5}
+            inactiveColor={colors.gray1}
           />
         )}
       </View>
@@ -93,31 +97,29 @@ export class CTextInput extends React.Component<Props, State> {
   }
 }
 
-// @ts-ignore TODO(cmcewen): Figure out how to type this properly
-const TextInput = React.forwardRef((props: Props, ref: React.RefObject<RNTextInput>) => {
+const TextInput = React.forwardRef<RNTextInput, Props>((props, ref) => {
   return <CTextInput {...props} forwardedRef={ref} />
 })
 
 export default TextInput
 export type TextInputProps = Props
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  borderedText: {
+  input: {
     ...fontStyles.regular,
     flex: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-    padding: 8,
-    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
+    paddingHorizontal: 0,
+    lineHeight: Platform.select({ android: 22, ios: 20 }), // vertical align = center
   },
-  iconStyle: {
-    marginRight: 8,
+  icon: {
+    marginLeft: 8,
     zIndex: 100,
   },
 })

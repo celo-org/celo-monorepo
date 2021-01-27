@@ -2,7 +2,7 @@
 
 ### **Parameters Governing the Stability Fee**
 
-`inflationPeriod` how long we wait between rounds of applying inflation
+`inflationPeriod` how long to wait between rounds of applying inflation
 
 `inflationRate` the multiplier by which the inflation factor is adjusted per `inflationPeriod` 
 

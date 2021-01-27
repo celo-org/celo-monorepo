@@ -1,8 +1,7 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { ensureLeading0x, NULL_ADDRESS } from '@celo/utils/lib/address'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
@@ -14,6 +13,8 @@ const headerHex =
   '0xf901a6a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001825208845c47775c80'
 
 const TMP_PATH = '/tmp/e2e'
+
+const safeMarginBlocks = 4
 
 function headerArray(block: any) {
   return [
@@ -60,12 +61,46 @@ async function findDoubleSignerIndex(
   return signerIdx
 }
 
+async function generateValidIntervalArrays(
+  startBlock: number,
+  endBlock: number,
+  startEpoch: number,
+  slotSize: number,
+  kit: ContractKit
+): Promise<{
+  startBlocks: number[]
+  endBlocks: number[]
+}> {
+  const startBlocks: number[] = []
+  const endBlocks: number[] = []
+
+  const nextEpochStart = await kit.getFirstBlockNumberForEpoch(startEpoch + 1)
+  for (let currentSlotStart = startBlock; currentSlotStart <= endBlock; ) {
+    let currentSlotEnd = currentSlotStart + slotSize - 1
+    currentSlotEnd = currentSlotEnd > endBlock ? endBlock : currentSlotEnd
+    // avoids crossing the epoch
+    currentSlotEnd =
+      currentSlotEnd >= nextEpochStart && currentSlotStart < nextEpochStart
+        ? nextEpochStart - 1
+        : currentSlotEnd
+    startBlocks.push(currentSlotStart)
+    endBlocks.push(currentSlotEnd)
+    currentSlotStart = currentSlotEnd + 1
+  }
+
+  return { startBlocks, endBlocks }
+}
+
 describe('slashing tests', function(this: any) {
   const gethConfigDown: GethRunConfig = {
     network: 'local',
     networkId: 1101,
     runPath: TMP_PATH,
     migrate: true,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator0',
@@ -154,16 +189,14 @@ describe('slashing tests', function(this: any) {
     it('should parse blockNumber from test header', async () => {
       this.timeout(0)
       const contract = await kit._web3Contracts.getElection()
-      const header = kit.web3.utils.hexToBytes(headerHex)
-
-      const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
+      const blockNumber = await contract.methods.getBlockNumberFromHeader(headerHex).call()
       assert.equal(blockNumber, '1')
     })
 
     it('should parse blockNumber from current header', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const current = await kit.web3.eth.getBlockNumber()
-      const block = await kit.web3.eth.getBlock(current)
+      const current = await kit.connection.getBlockNumber()
+      const block = await kit.connection.getBlock(current)
       const header = headerFromBlock(block)
       const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
       assert.equal(blockNumber, current.toString())
@@ -171,15 +204,14 @@ describe('slashing tests', function(this: any) {
 
     it('should hash test header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const header = kit.web3.utils.hexToBytes(headerHex)
-      const hash = await contract.methods.hashHeader(header).call()
+      const hash = await contract.methods.hashHeader(headerHex).call()
       assert.equal(hash, '0x2e14ef428293e41c5f81a108b5d36f892b2bee3e34aec4223474c4a31618ea69')
     })
 
     it('should hash current header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const current = await kit.web3.eth.getBlockNumber()
-      const block = await kit.web3.eth.getBlock(current)
+      const current = await kit.connection.getBlockNumber()
+      const block = await kit.connection.getBlock(current)
       const header = headerFromBlock(block)
       const blockHash = await contract.methods.hashHeader(header).call()
       assert.equal(blockHash, block.hash)
@@ -197,27 +229,48 @@ describe('slashing tests', function(this: any) {
     it('slash for downtime', async function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDowntimeSlasher()
-      const blockNumber = await web3.eth.getBlockNumber()
-      await waitForBlock(web3, blockNumber + 20)
+      const slashableDowntime = new BigNumber(await slasher.methods.slashableDowntime().call())
+      const blockNumber = await kit.connection.getBlockNumber()
+      await waitForBlock(web3, blockNumber + slashableDowntime.toNumber() + 2 * safeMarginBlocks)
 
       // Store this block for testing double signing
-      doubleSigningBlock = await web3.eth.getBlock(blockNumber + 15)
+      doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
 
-      const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber + 12).call()
+      const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber).call()
 
-      const validator = (await kit.web3.eth.getAccounts())[0]
-      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
       const lockedGold = await kit.contracts.getLockedGold()
 
       const validatorsContract = await kit._web3Contracts.getValidators()
       const history = await validatorsContract.methods.getMembershipHistory(signer).call()
       const historyIndex = history[0].length - 1
 
+      const slotSize = slashableDowntime.dividedToIntegerBy(3).toNumber()
+
+      const startBlock = blockNumber + safeMarginBlocks
+      const endBlock = startBlock + slashableDowntime.toNumber() - 1
+      const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
+
+      const intervalArrays = await generateValidIntervalArrays(
+        startBlock,
+        endBlock,
+        startEpoch,
+        slotSize,
+        kit
+      )
+
+      for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {
+        await slasher.methods
+          .setBitmapForInterval(intervalArrays.startBlocks[i], intervalArrays.endBlocks[i])
+          .send({ from: validator, gas: 5000000 })
+      }
+
       await slasher.methods
         .slash(
-          blockNumber + 12,
-          4,
-          4,
+          intervalArrays.startBlocks,
+          intervalArrays.endBlocks,
+          [4, 4],
           historyIndex,
           [],
           [],
@@ -243,19 +296,29 @@ describe('slashing tests', function(this: any) {
     it('slash for downtime with contractkit', async function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDowntimeSlasher()
-      const blockNumber = await web3.eth.getBlockNumber()
-      await waitForBlock(web3, blockNumber + 20)
+      const blockNumber = await kit.connection.getBlockNumber()
+      const slashableDowntime = await slasher.slashableDowntime()
 
-      const validator = (await kit.web3.eth.getAccounts())[0]
-      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      await waitForBlock(web3, blockNumber + slashableDowntime + 2 * safeMarginBlocks)
 
-      const tx = await slasher.slashEndSignerIndex(blockNumber + 12, 4)
-      const txResult = await tx.send({ from: validator, gas: 5000000 })
+      const user = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(user, '', 1000000)
+
+      const endBlock = blockNumber + safeMarginBlocks + slashableDowntime - 1
+      const intervals = await slasher.slashableDowntimeIntervalsBefore(endBlock)
+
+      for (const interval of intervals) {
+        await slasher.setBitmapForInterval(interval).send({ from: user, gas: 5000000 })
+      }
+
+      const election = await kit.contracts.getElection()
+      const signer = await election.validatorSignerAddressFromSet(4, intervals[0].start)
+
+      const tx = await slasher.slashValidator(signer, intervals)
+      const txResult = await tx.send({ from: user, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)
 
-      const election = await kit.contracts.getElection()
-      const signer = await election.validatorSignerAddressFromSet(4, blockNumber + 12)
       const lockedGold = await kit.contracts.getLockedGold()
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
       // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator
@@ -279,12 +342,12 @@ describe('slashing tests', function(this: any) {
 
       const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
-      const header = headerFromBlock(await web3.eth.getBlock(num))
+      const header = headerFromBlock(await kit.connection.getBlock(num))
 
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
-      const validator = (await kit.web3.eth.getAccounts())[0]
-      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
       const lockedGold = await kit.contracts.getLockedGold()
       const validatorsContract = await kit._web3Contracts.getValidators()
@@ -327,12 +390,12 @@ describe('slashing tests', function(this: any) {
 
       const other = headerFromBlock(doubleSigningBlock)
       const num = await slasher.getBlockNumberFromHeader(other)
-      const header = headerFromBlock(await web3.eth.getBlock(num))
+      const header = headerFromBlock(await kit.connection.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
 
-      const validator = (await kit.web3.eth.getAccounts())[0]
-      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
       const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })

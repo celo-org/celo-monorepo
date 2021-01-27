@@ -7,16 +7,16 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
-import { TestRandomContract, TestRandomInstance } from 'types'
+import { RandomTestContract, RandomTestInstance } from 'types'
 
-const Random: TestRandomContract = artifacts.require('TestRandom')
+const Random: RandomTestContract = artifacts.require('RandomTest')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
 Random.numberFormat = 'BigNumber'
 
 contract('Random', (accounts: string[]) => {
-  let random: TestRandomInstance
+  let random: RandomTestInstance
 
   beforeEach(async () => {
     random = await Random.new()

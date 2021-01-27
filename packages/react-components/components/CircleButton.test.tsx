@@ -1,6 +1,6 @@
 import CircleButton from '@celo/react-components/components/CircleButton'
-import { shallow } from 'enzyme'
 import * as React from 'react'
+import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 describe('CircleButton', () => {
@@ -28,16 +28,9 @@ describe('CircleButton', () => {
   describe('when pressed', () => {
     it('calls the onPress prop', () => {
       const onPress = jest.fn()
-      const circleButton = shallow(<CircleButton onPress={onPress} solid={true} />)
-      circleButton.find({ onPress }).simulate('press')
+      const { getByName } = render(<CircleButton onPress={onPress} solid={true} />)
+      fireEvent.press(getByName('CircleButton'))
       expect(onPress).toHaveBeenCalled()
-    })
-  })
-  describe('when disabled', () => {
-    it('sets disabled on the same Touchable onPress is set on', () => {
-      const onPress = jest.fn()
-      const circleButton = shallow(<CircleButton onPress={onPress} solid={true} disabled={true} />)
-      expect(circleButton.find({ onPress }).prop('disabled')).toBe(true)
     })
   })
 })

@@ -1,46 +1,35 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 interface Props {
   text: string
-  bubbleText?: string | null
+  style?: StyleProp<ViewStyle>
 }
 
-export default class SectionHead extends React.PureComponent<Props> {
-  render() {
-    return (
-      <View style={style.sectionHead}>
-        <Text style={fontStyles.sectionLabel}>{this.props.text}</Text>
-        {this.props.bubbleText && (
-          <Text style={[fontStyles.notification, style.bubble]}>{this.props.bubbleText}</Text>
-        )}
-      </View>
-    )
-  }
+export default function SectionheadNew({ text, style }: Props) {
+  return (
+    <View style={[styles.container, style]}>
+      <Text style={styles.text}>{text}</Text>
+    </View>
+  )
 }
 
-const style = StyleSheet.create({
-  sectionHead: {
-    backgroundColor: colors.altDarkBg,
-    paddingHorizontal: 10,
-    height: 36,
-    display: 'flex',
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.light,
+    paddingHorizontal: variables.contentPadding,
+    paddingVertical: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  bubble: {
-    textAlign: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: colors.messageBlue,
-    borderRadius: 10,
-    padding: 1,
-    margin: 5,
-    height: 20,
-    width: 20,
+  text: {
+    ...fontStyles.sectionHeader,
+    fontSize: 13,
+    lineHeight: 16,
+    color: colors.gray4,
   },
 })

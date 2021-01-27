@@ -1,7 +1,7 @@
 {
   "__comment": "On macOS the first 8 items listed in ignore_dirs can be accelerated at the OS level. See https://facebook.github.io/watchman/docs/config.html#ignore_dirs", 
   "ignore_dirs": [
-    "packages/mobile/android/build",
+    "packages/mobile/android/app/build",
     "packages/mobile/ios/build",
     "packages/mobile/e2e/artifacts"
   ]

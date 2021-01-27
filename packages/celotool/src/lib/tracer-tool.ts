@@ -1,5 +1,5 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesAddresses } from 'src/lib/geth'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv } from './env-utils'
 
 export async function installHelmChart(celoEnv: string) {
@@ -8,7 +8,7 @@ export async function installHelmChart(celoEnv: string) {
   const params = await helmParameters(celoEnv)
 
   await execCmdWithExitOnFailure(
-    `helm install ../helm-charts/tracer-tool/ --name ${celoEnv}-tracer-tool ${params}`
+    `helm install ${celoEnv}-tracer-tool ../helm-charts/tracer-tool/ ${params}`
   )
 }
 
@@ -24,7 +24,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 
 export async function removeHelmRelease(celoEnv: string) {
   console.info(`Deleting helm chart ${celoEnv}-tracer-tool`)
-  await execCmdWithExitOnFailure(`helm del --purge ${celoEnv}-tracer-tool`)
+  await execCmdWithExitOnFailure(`helm uninstall --namespace ${celoEnv} ${celoEnv}-tracer-tool`)
 }
 
 async function helmParameters(celoEnv: string) {

@@ -25,6 +25,15 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
         isReclaiming: true,
       }
     case Actions.RECLAIM_PAYMENT_FAILURE:
+      return {
+        ...state,
+        isReclaiming: false,
+      }
+    case Actions.RECLAIM_PAYMENT_CANCEL:
+      return {
+        ...state,
+        isReclaiming: false,
+      }
     case Actions.RECLAIM_PAYMENT_SUCCESS:
       return {
         ...state,
@@ -35,10 +44,10 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
   }
 }
 
-export const getSentEscrowPayments = (state: RootState) => state.escrow.sentEscrowedPayments
+export const sentEscrowedPaymentsSelector = (state: RootState) => state.escrow.sentEscrowedPayments
 
 export const getReclaimableEscrowPayments = createSelector(
-  getSentEscrowPayments,
+  sentEscrowedPaymentsSelector,
   (sentPayments) => {
     const currUnixTime = Date.now() / 1000
     return sentPayments.filter((payment) => {

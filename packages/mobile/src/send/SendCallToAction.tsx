@@ -1,5 +1,4 @@
 import TextButton from '@celo/react-components/components/TextButton'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -18,7 +17,7 @@ export function SendCallToAction(props: SendCTAProps) {
     <View style={styles.container}>
       {props.icon}
       <View style={styles.textContainer}>
-        <Text style={fontStyles.bodySmallSemiBold}>{props.header}</Text>
+        <Text style={fontStyles.small500}>{props.header}</Text>
         <Text style={styles.bodyText}>{props.body}</Text>
         <TextButton onPress={props.onPressCta}>{props.cta}</TextButton>
       </View>
@@ -29,8 +28,6 @@ export function SendCallToAction(props: SendCTAProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderBottomColor: colors.listBorder,
-    borderBottomWidth: 1,
     paddingVertical: 15,
     paddingHorizontal: 20,
   },
@@ -39,7 +36,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   bodyText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     marginVertical: 10,
   },
 })

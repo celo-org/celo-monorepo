@@ -2,6 +2,7 @@ import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
 import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
+import { POP_SIZE } from '@celo/utils/lib/signatureUtils'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
@@ -34,6 +35,9 @@ const parseBlsPublicKey: ParseFn<string> = (input) => {
 const parseBlsProofOfPossession: ParseFn<string> = (input) => {
   return parseBytes(input, BLS_POP_SIZE, `${input} is not a BLS proof-of-possession`)
 }
+const parseProofOfPossession: ParseFn<string> = (input) => {
+  return parseBytes(input, POP_SIZE, `${input} is not a proof-of-possession`)
+}
 const parseAddress: ParseFn<string> = (input) => {
   if (Web3.utils.isAddress(input)) {
     return input
@@ -50,7 +54,7 @@ const parseWei: ParseFn<BigNumber> = (input) => {
   }
 }
 
-const parsePath: ParseFn<string> = (input) => {
+export const parsePath: ParseFn<string> = (input) => {
   if (pathExistsSync(input)) {
     return input
   } else {
@@ -74,6 +78,48 @@ const parseUrl: ParseFn<string> = (input) => {
   }
 }
 
+function parseArray<T>(parseElement: ParseFn<T>): ParseFn<T[]> {
+  return (input) => {
+    const array = JSON.parse(input)
+    if (Array.isArray(array)) {
+      return array.map(parseElement)
+    } else {
+      throw new CLIError(`"${input}" is not a valid array`)
+    }
+  }
+}
+
+export const parseAddressArray = parseArray(parseAddress)
+export const parseIntRange = (input: string) => {
+  const range = input
+    .slice(1, input.length - 1)
+    .split(':')
+    .map((s) => parseInt(s, 10))
+  if (range.length !== 2) {
+    throw new Error('range input must be two integers separated by a ":"')
+  }
+
+  let start: number
+  if (input.startsWith('[')) {
+    start = range[0]
+  } else if (input.startsWith('(')) {
+    start = range[0] + 1
+  } else {
+    throw new Error('range input must begin with "[" (inclusive) or "(" (exclusive)')
+  }
+
+  let end: number
+  if (input.endsWith(']')) {
+    end = range[1]
+  } else if (input.startsWith(')')) {
+    end = range[1] - 1
+  } else {
+    throw new Error('range input must end with "[" (inclusive) or "(" (exclusive)')
+  }
+
+  return { start, end }
+}
+
 type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>
 type ArgBuilder<T> = (name: string, args?: Partial<Omit<IArg<T>, 'name' | 'parse'>>) => IArg<T>
 export function argBuilder<T>(parser: ParseFn<T>): ArgBuilder<T> {
@@ -86,6 +132,15 @@ export function argBuilder<T>(parser: ParseFn<T>): ArgBuilder<T> {
 }
 
 export const Flags = {
+  intRangeArray: flags.build({
+    parse: (s) => s.split(',').map((r) => parseIntRange(r.trim())),
+    helpValue: "'[0:1], [1:2]'",
+  }),
+  addressArray: flags.build({
+    parse: parseAddressArray,
+    helpValue:
+      '\'["0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD", "0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95"]\'',
+  }),
   address: flags.build({
     parse: parseAddress,
     description: 'Account Address',
@@ -110,6 +165,11 @@ export const Flags = {
     parse: parsePhoneNumber,
     description: 'Phone Number in E164 Format',
     helpValue: '+14152223333',
+  }),
+  proofOfPossession: flags.build({
+    parse: parseProofOfPossession,
+    description: 'Proof-of-Possession',
+    helpValue: '0x',
   }),
   url: flags.build({
     parse: parseUrl,

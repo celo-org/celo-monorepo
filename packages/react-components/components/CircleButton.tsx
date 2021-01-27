@@ -19,23 +19,23 @@ export default class CircleButton extends React.PureComponent<ButtonProps> {
   static defaultProps = {
     size: 50,
     disable: false,
-    activeColor: colors.celoGreen,
-    inactiveColor: colors.celoGreenInactive,
+    activeColor: colors.greenBrand,
+    inactiveColor: colors.greenFaint,
   }
 
   render() {
     const { onPress, solid, borderWidth, disabled, size, activeColor, inactiveColor } = this.props
     const color = disabled ? inactiveColor : activeColor
     const buttonStyle = [
-      style.button,
+      styles.button,
       solid ? { backgroundColor: color } : { backgroundColor: 'transparent' },
       borderWidth !== undefined ? { borderWidth } : { borderWidth: 0 },
       { borderColor: color, width: size, height: size, borderRadius: Math.floor(size! / 2) },
     ]
-    const xColor = solid ? colors.white : color
+    const xColor = solid ? colors.light : color
 
     return (
-      <View style={[style.row, this.props.style]}>
+      <View style={[styles.row, this.props.style]}>
         <TouchableOpacity
           onPress={onPress}
           disabled={disabled}
@@ -49,7 +49,7 @@ export default class CircleButton extends React.PureComponent<ButtonProps> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',

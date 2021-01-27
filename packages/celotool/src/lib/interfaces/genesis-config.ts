@@ -10,4 +10,8 @@ export interface GenesisConfig {
   chainId?: number
   requestTimeout?: number
   enablePetersburg?: boolean
+  timestamp?: number
+  // Activation block numbers for Celo hard forks
+  churritoBlock?: number
+  donutBlock?: number
 }

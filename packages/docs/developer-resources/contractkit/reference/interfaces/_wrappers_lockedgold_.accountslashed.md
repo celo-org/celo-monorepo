@@ -20,7 +20,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L37)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L50)*
 
 ___
 
@@ -28,15 +28,15 @@ ___
 
 • **penalty**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L34)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L47)*
 
 ___
 
 ###  reporter
 
-• **reporter**: *[Address](../modules/_base_.md#address)*
+• **reporter**: *Address*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L35)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L48)*
 
 ___
 
@@ -44,12 +44,12 @@ ___
 
 • **reward**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L36)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L49)*
 
 ___
 
 ###  slashed
 
-• **slashed**: *[Address](../modules/_base_.md#address)*
+• **slashed**: *Address*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L33)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L46)*

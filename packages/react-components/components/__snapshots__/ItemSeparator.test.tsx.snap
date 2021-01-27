@@ -4,7 +4,7 @@ exports[`renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "rgba(134, 138, 141, 0.15)",
+      "backgroundColor": "#EDEEEF",
       "height": 1,
       "marginHorizontal": 16,
     }

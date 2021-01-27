@@ -1,6 +1,7 @@
 import {
   call,
   cancel,
+  cancelled,
   delay,
   fork,
   put,
@@ -10,13 +11,16 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { fetchSentEscrowPayments } from 'src/escrow/actions'
+import { notificationsChannel } from 'src/firebase/firebase'
 import { fetchGoldBalance } from 'src/goldToken/actions'
-import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
+import { Actions, refreshAllBalances, setLoading, updateNotifications } from 'src/home/actions'
+import { IdToNotification } from 'src/home/reducers'
 import { fetchCurrentRate } from 'src/localCurrency/actions'
 import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { withTimeout } from 'src/redux/sagas-helpers'
 import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -41,13 +45,6 @@ export function* refreshBalances() {
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
   yield put(fetchSentEscrowPayments())
-}
-
-export function* refreshBalancesWithLoadingSaga() {
-  yield takeLeading(
-    Actions.REFRESH_BALANCES,
-    withLoading(withTimeout(REFRESH_TIMEOUT, refreshBalances))
-  )
 }
 
 export function* autoRefreshSaga() {
@@ -76,13 +73,33 @@ export function* watchRefreshBalances() {
     Actions.REFRESH_BALANCES,
     withLoading(withTimeout(REFRESH_TIMEOUT, refreshBalances))
   )
+  yield takeLeading(
+    TransactionActions.NEW_TRANSACTIONS_IN_FEED,
+    withTimeout(REFRESH_TIMEOUT, refreshBalances)
+  )
+}
+
+function* fetchNotifications() {
+  const channel = yield call(notificationsChannel)
+  if (!channel) {
+    return
+  }
+  try {
+    while (true) {
+      const notifications: IdToNotification = yield take(channel)
+      yield put(updateNotifications(notifications))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@fetchNotifications`, error)
+  } finally {
+    if (yield cancelled()) {
+      channel.close()
+    }
+  }
 }
 
 export function* homeSaga() {
   yield spawn(watchRefreshBalances)
   yield spawn(autoRefreshWatcher)
-  // This has been disabled due to the saga interference bug
-  // depending on timing, it can block the sync progress updates and
-  // keep us stuck on sync screen
-  // yield spawn(refreshBalancesWithLoadingSaga)
+  yield spawn(fetchNotifications)
 }

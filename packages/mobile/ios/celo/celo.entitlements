@@ -7,6 +7,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:l.celo.org</string>
+		<string>applinks:vlra.app</string>
 	</array>
 </dict>
 </plist>

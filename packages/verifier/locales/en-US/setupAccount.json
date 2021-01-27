@@ -1,9 +1,0 @@
-{
-  "setupAccount": "Setup Account",
-  "specifyPhoneNumber":
-    "Specify the phone number that’s linked to your Celo account where you would like to deposit your SMS reward.",
-  "mustBeVerified": "Please note you must have a verified Celo account to use the Celo Rewards.",
-  "fullName": "Full Name",
-  "depositToNumber": "Deposit to <0>{{number}}</0>",
-  "version": "Version:"
-}

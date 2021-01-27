@@ -68,14 +68,9 @@ variable geth_bootnode_docker_image_tag {
   description = "Tag of the bootnode docker image"
 }
 
-variable geth_exporter_docker_image_repository {
+variable geth_metrics {
   type        = string
-  description = "Repository of the geth exporter docker image"
-}
-
-variable geth_exporter_docker_image_tag {
-  type        = string
-  description = "Tag of the geth exporter docker image"
+  description = "Enable Geth metrics (prometheus format) on port 6060"
 }
 
 variable geth_node_docker_image_repository {
@@ -118,15 +113,20 @@ variable network_name {
   description = "The name of the network to use"
 }
 
+variable node_disk_size_gb {
+  type        = number
+  description = "The size in GB of disks for all types of nodes"
+}
+
 variable private_tx_node_count {
   type        = number
   description = "Number of private tx-nodes that are created with RPC ports only internally exposed"
   default     = 0
 }
 
-variable proxied_validator_count {
-  type        = number
-  description = "Number of validator_count validators that are hidden behind proxies"
+variable proxies_per_validator {
+  type        = list(number)
+  description = "Number of proxies for each validator that is proxied. Does not include validators that aren't proxied. indices correspond to validator indices."
 }
 
 variable tx_node_count {

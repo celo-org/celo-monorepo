@@ -1,14 +1,14 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {
   FreezerContract,
   FreezerInstance,
@@ -144,6 +144,14 @@ contract('StableToken', (accounts: string[]) => {
       assert.equal(balance, amountToMint)
       const supply = (await stableToken.totalSupply()).toNumber()
       assert.equal(supply, amountToMint)
+    })
+
+    it('should allow minting 0 value', async () => {
+      await stableToken.mint(validators, 0, { from: validators })
+      const balance = (await stableToken.balanceOf(validators)).toNumber()
+      assert.equal(balance, 0)
+      const supply = (await stableToken.totalSupply()).toNumber()
+      assert.equal(supply, 0)
     })
 
     it('should not allow anyone else to mint', async () => {

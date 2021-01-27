@@ -1,84 +1,113 @@
-import TextButton from '@celo/react-components/components/TextButton'
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import Modal from 'react-native-modal'
+import { useDispatch } from 'react-redux'
+import { setRetryVerificationWithForno } from 'src/account/actions'
+import Dialog from 'src/components/Dialog'
 import { Namespaces } from 'src/i18n'
 import { cancelVerification } from 'src/identity/actions'
-import { VerificationStatus } from 'src/identity/verification'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { VerificationStatus } from 'src/identity/types'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { toggleFornoMode } from 'src/web3/actions'
 
 interface Props {
   verificationStatus: VerificationStatus
-  cancelVerification: typeof cancelVerification
+  retryWithForno: boolean
+  fornoMode: boolean
 }
 
-export function VerificationFailedModal(props: Props) {
+export function VerificationFailedModal({ verificationStatus, retryWithForno, fornoMode }: Props) {
+  const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxVerification2)
-  const [isDismissed, setIsDismissed] = React.useState(false)
+  const [isDismissed, setIsDismissed] = useState(true)
 
-  const onDismiss = React.useCallback(() => {
-    setIsDismissed(true)
-  }, [setIsDismissed])
+  useEffect(() => {
+    setIsDismissed(false) // Prevents a ghost modal from showing up briefly
+  }, []) // after opening Verification Loading when it is already dismissed
 
-  const onSkip = React.useCallback(() => {
-    props.cancelVerification()
+  const onSkip = () => {
+    dispatch(cancelVerification())
     navigateHome()
-  }, [props.cancelVerification])
+  }
+
+  const onRetry = () => {
+    dispatch(toggleFornoMode(true)) // Note that forno remains toggled on after verification retry
+    dispatch(setRetryVerificationWithForno(false)) // Only prompt retry with forno once
+    setIsDismissed(true)
+    navigate(Screens.VerificationEducationScreen)
+  }
+
+  const userBalanceInsufficient = verificationStatus === VerificationStatus.InsufficientBalance
+  const saltQuotaExceeded = verificationStatus === VerificationStatus.SaltQuotaExceeded
 
   const isVisible =
-    props.verificationStatus === VerificationStatus.Failed ||
-    (props.verificationStatus === VerificationStatus.RevealAttemptFailed && !isDismissed)
+    (verificationStatus === VerificationStatus.Failed ||
+      userBalanceInsufficient ||
+      saltQuotaExceeded) &&
+    !isDismissed
 
-  const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
+  // Only prompt forno switch if not already in forno mode and failure
+  // wasn't due to insuffuicient balance or exceeded quota for lookups
+  const promptRetryWithForno =
+    retryWithForno && !fornoMode && !userBalanceInsufficient && !saltQuotaExceeded
 
-  return (
-    <Modal isVisible={isVisible}>
-      <View style={styles.modalContainer}>
-        <Text style={styles.modalHeader}>{t('failModal.header')}</Text>
-        <Text style={fontStyles.body}>{t('failModal.body1')}</Text>
-        <Text style={[fontStyles.body, componentStyles.marginTop10]}>
-          {t('failModal.body2') + (allowEnterCodes ? t('failModal.enterCodesBody') : '')}
-        </Text>
-        <View style={styles.modalButtonsContainer}>
-          {allowEnterCodes && (
-            <TextButton onPress={onDismiss} style={styles.modalSkipText}>
-              {t('failModal.enterCodesButton')}
-            </TextButton>
-          )}
-          <TextButton onPress={onSkip} style={styles.modalSkipText}>
-            {t('missingCodesModal.skip')}
-          </TextButton>
-        </View>
-      </View>
-    </Modal>
-  )
+  if (promptRetryWithForno) {
+    // Retry verification with forno with option to skip verificaion
+    return (
+      <Dialog
+        isVisible={isVisible}
+        title={t('retryWithFornoModal.header')}
+        actionText={t('retryWithFornoModal.retryButton')}
+        actionPress={onRetry}
+        secondaryActionText={t('education.skip')}
+        secondaryActionPress={onSkip}
+      >
+        {t('retryWithFornoModal.body1')}
+        {'\n\n'}
+        {t('retryWithFornoModal.body2')}
+      </Dialog>
+    )
+  } else if (userBalanceInsufficient) {
+    // Show userBalanceInsufficient message and skip verification
+    return (
+      <Dialog
+        isVisible={isVisible}
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+      >
+        {t('failModal.body1InsufficientBalance')}
+        {'\n\n'}
+        {t('failModal.body2InsufficientBalance')}
+      </Dialog>
+    )
+  } else if (saltQuotaExceeded) {
+    // Show saltQuotaExceeded message and skip verification
+    return (
+      <Dialog
+        isVisible={isVisible}
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+      >
+        {t('failModal.body1SaltQuotaExceeded')}
+        {'\n\n'}
+        {t('failModal.body2SaltQuotaExceeded')}
+      </Dialog>
+    )
+  } else {
+    return (
+      // Show general error and skip verification
+      <Dialog
+        isVisible={isVisible}
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+      >
+        {t('failModal.body1')}
+        {'\n\n'}
+        {t('failModal.body2')}
+      </Dialog>
+    )
+  }
 }
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    backgroundColor: colors.background,
-    padding: 20,
-    marginHorizontal: 10,
-    borderRadius: 4,
-  },
-  modalHeader: {
-    ...fontStyles.h2,
-    ...fontStyles.bold,
-    marginVertical: 15,
-    color: colors.errorRed,
-  },
-  modalButtonsContainer: {
-    marginTop: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  modalSkipText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-  },
-})

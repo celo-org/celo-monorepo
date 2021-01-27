@@ -1,9 +1,8 @@
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import React from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
@@ -28,7 +27,7 @@ export function NotificationList<T>(props: Props<T>) {
           <View style={styles.scrollArea}>{props.items.map(props.listItemRenderer)}</View>
         </ScrollView>
       ) : (
-        <Text style={[fontStyles.bodySecondary, styles.empty]}>{i18n.t('global:emptyList')}</Text>
+        <Text style={[fontStyles.regular, styles.empty]}>{i18n.t('global:emptyList')}</Text>
       )}
     </SafeAreaView>
   )
@@ -43,7 +42,6 @@ export function titleWithBalanceNavigationOptions(title: string) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
     flex: 1,
   },
   scrollArea: {

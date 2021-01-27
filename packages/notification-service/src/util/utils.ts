@@ -35,7 +35,7 @@ export async function getTokenAddresses() {
 
 let contractKit: ContractKit
 export async function getContractKit(): Promise<ContractKit> {
-  if (contractKit && (await contractKit.isListening())) {
+  if (contractKit && (await contractKit.connection.isListening())) {
     // Already connected
     return contractKit
   } else {
@@ -44,4 +44,10 @@ export async function getContractKit(): Promise<ContractKit> {
     contractKit = newKitFromWeb3(web3)
     return contractKit
   }
+}
+
+// Flat single level array
+// TODO: remove this once we upgrade to node >= 11 which natively supports Array.prototype.flat
+export function flat<T>(arr: T[][]): T[] {
+  return ([] as T[]).concat(...arr)
 }

@@ -1,6 +1,7 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
+  assertLogMatches2,
   assertRevert,
   assertSameAddress,
   timeTravel,
@@ -35,6 +36,7 @@ contract('Reserve', (accounts: string[]) => {
   const nonOwner: string = accounts[1]
   const spender: string = accounts[2]
   const exchangeAddress: string = accounts[3]
+  const exchangeSpenderAddress: string = accounts[4]
   const aTobinTaxStalenessThreshold: number = 600
   const aTobinTax = toFixed(0.005)
   const aTobinTaxReserveRatio = toFixed(2)
@@ -48,6 +50,7 @@ contract('Reserve', (accounts: string[]) => {
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
+
     await reserve.initialize(
       registry.address,
       aTobinTaxStalenessThreshold,
@@ -283,6 +286,115 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
+  describe('#addExchangeSpender(exchangeAddress)', () => {
+    it('only allows owner', async () => {
+      await assertRevert(reserve.addExchangeSpender(nonOwner, { from: nonOwner }))
+    })
+
+    it('should emit addExchangeSpender event on add', async () => {
+      const resp = await reserve.addExchangeSpender(exchangeSpenderAddress)
+      const log = resp.logs[0]
+      assert.equal(resp.logs.length, 1)
+      assertLogMatches2(log, {
+        event: 'ExchangeSpenderAdded',
+        args: {
+          exchangeSpender: exchangeSpenderAddress,
+        },
+      })
+    })
+
+    it('has the right list of exchange spenders after addition', async () => {
+      await reserve.addExchangeSpender(exchangeAddress)
+      await reserve.addExchangeSpender(accounts[1])
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 2)
+      assert.equal(spenders[0], exchangeAddress)
+      assert.equal(spenders[1], accounts[1])
+    })
+  })
+
+  describe('#removeExchangeSpender(exchangeAddress)', () => {
+    beforeEach(async () => {
+      await reserve.addExchangeSpender(exchangeSpenderAddress)
+    })
+
+    it('only allows owner', async () => {
+      await assertRevert(reserve.removeExchangeSpender(nonOwner, 0, { from: nonOwner }))
+    })
+
+    it('should emit removeExchangeSpender event on remove', async () => {
+      const resp = await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
+      const log = resp.logs[0]
+      assert.equal(resp.logs.length, 1)
+      assertLogMatches2(log, {
+        event: 'ExchangeSpenderRemoved',
+        args: {
+          exchangeSpender: exchangeSpenderAddress,
+        },
+      })
+    })
+
+    it('has the right list of exchange spenders', async () => {
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 1)
+      assert.equal(spenders[0], exchangeSpenderAddress)
+    })
+
+    it('has the right list of exchange after removing one', async () => {
+      await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 0)
+    })
+
+    it("can't be removed twice", async () => {
+      await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
+      await assertRevert(reserve.removeExchangeSpender(exchangeSpenderAddress, 0))
+    })
+
+    it("can't delete an index out of range", async () => {
+      await assertRevert(reserve.removeExchangeSpender(exchangeSpenderAddress, 1))
+    })
+
+    it('removes from a big array', async () => {
+      await reserve.addExchangeSpender(accounts[1])
+      await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
+      const spenders = await reserve.getExchangeSpenders()
+      assert.equal(spenders.length, 1)
+      assert.equal(spenders[0], accounts[1])
+    })
+
+    it("doesn't remove an address with the wrong index", async () => {
+      await reserve.addExchangeSpender(accounts[1])
+      await assertRevert(reserve.removeExchangeSpender(exchangeSpenderAddress, 1))
+    })
+  })
+
+  describe('#addSpender(spender)', () => {
+    it('emits on add', async () => {
+      const addSpenderTx = await reserve.addSpender(spender)
+
+      const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderAdded')
+      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+
+    it('only allows owner', async () => {
+      await assertRevert(reserve.addSpender(nonOwner, { from: nonOwner }))
+    })
+  })
+
+  describe('#removeSpender(spender)', () => {
+    it('emits on remove', async () => {
+      const addSpenderTx = await reserve.removeSpender(spender)
+
+      const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderRemoved')
+      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+    })
+
+    it('only allows owner', async () => {
+      await assertRevert(reserve.removeSpender(nonOwner, { from: nonOwner }))
+    })
+  })
+
   describe('#transferExchangeGold()', () => {
     const aValue = 10000
     let otherReserveAddress: string = ''
@@ -293,7 +405,7 @@ contract('Reserve', (accounts: string[]) => {
       await reserve.addOtherReserveAddress(otherReserveAddress)
     })
 
-    it('should allow a exchange to call transferExchangeGold', async () => {
+    it('should allow an exchange to call transferExchangeGold', async () => {
       await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
     })
 
@@ -303,6 +415,14 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not allow other addresses to call transferExchangeGold', async () => {
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
+    })
+
+    it('should not allow removed exchange spender addresses to call transferExchangeGold', async () => {
+      await reserve.addExchangeSpender(exchangeSpenderAddress)
+      await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
+      await assertRevert(
+        reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeSpenderAddress })
+      )
     })
 
     it('should not allow freezing more gold than is available', async () => {

@@ -1,7 +1,6 @@
-import { Address } from '@celo/contractkit'
+import { Address, BlockHeader } from '@celo/connect'
 import { eqAddress } from '@celo/utils/lib/address'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
-import { Block } from 'web3-eth'
 
 /**
  * Cache to efficiently retreive the elected validators for many blocks within an epoch.
@@ -22,7 +21,7 @@ export class ElectionResultsCache {
       return cached
     }
     // For the first epoch, the contract might be unavailable
-    const electedSigners = await this.election.getCurrentValidatorSigners(
+    const electedSigners = await this.election.getValidatorSigners(
       epoch === 1 ? blockNumber : this.firstBlockOfEpoch(epoch)
     )
     this.cache.set(epoch, electedSigners)
@@ -44,7 +43,7 @@ export class ElectionResultsCache {
    * @param signer Validator signer address to check if present in the block.
    * @param block The block to check for a signature on.
    */
-  async signedParent(signer: Address, block: Block): Promise<boolean> {
+  async signedParent(signer: Address, block: BlockHeader): Promise<boolean> {
     const electedSigners = await this.electedSigners(block.number)
     const signerIndex = electedSigners.map(eqAddress.bind(null, signer)).indexOf(true)
     if (signerIndex < 0) {

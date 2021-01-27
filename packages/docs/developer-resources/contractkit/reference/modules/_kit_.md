@@ -1,4 +1,4 @@
-# External module: "kit"
+# Module: "kit"
 
 ## Index
 
@@ -8,7 +8,6 @@
 
 ### Interfaces
 
-* [KitOptions](../interfaces/_kit_.kitoptions.md)
 * [NetworkConfig](../interfaces/_kit_.networkconfig.md)
 
 ### Functions
@@ -20,9 +19,9 @@
 
 ###  newKit
 
-▸ **newKit**(`url`: string, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
+▸ **newKit**(`url`: string, `wallet?`: ReadOnlyWallet): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [contractkit/src/kit.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L32)*
+*Defined in [contractkit/src/kit.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L37)*
 
 Creates a new instance of `ContractKit` give a nodeUrl
 
@@ -33,7 +32,7 @@ Creates a new instance of `ContractKit` give a nodeUrl
 Name | Type | Description |
 ------ | ------ | ------ |
 `url` | string | CeloBlockchain node url |
-`wallet?` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | - |
+`wallet?` | ReadOnlyWallet | - |
 
 **Returns:** *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
@@ -41,19 +40,17 @@ ___
 
 ###  newKitFromWeb3
 
-▸ **newKitFromWeb3**(`web3`: Web3, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
+▸ **newKitFromWeb3**(`web3`: Web3, `wallet`: ReadOnlyWallet): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [contractkit/src/kit.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L41)*
+*Defined in [contractkit/src/kit.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L48)*
 
-Creates a new instance of `ContractKit` give a web3 instance
-
-**`optional`** wallet to reuse or add a wallet different that the default (example ledger-wallet)
+Creates a new instance of the `ContractKit` with a web3 instance
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`web3` | Web3 | Web3 instance |
-`wallet?` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | - |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`web3` | Web3 | - | Web3 instance  |
+`wallet` | ReadOnlyWallet | new LocalWallet() | - |
 
 **Returns:** *[ContractKit](../classes/_kit_.contractkit.md)‹›*
