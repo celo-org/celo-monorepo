@@ -125,7 +125,8 @@ contract('Exchange', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK,
       [],
-      []
+      [],
+      'Exchange' // USD
     )
 
     mockSortedOracles = await MockSortedOracles.new()
