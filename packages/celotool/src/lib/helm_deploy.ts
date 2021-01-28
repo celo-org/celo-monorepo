@@ -3,7 +3,7 @@ import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
-import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
@@ -400,7 +400,7 @@ export async function deleteIPAddress(name: string, zone?: string) {
 
 export async function retrieveIPAddress(name: string, zone?: string) {
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses describe ${name}  --region ${getKubernetesClusterRegion(zone)} --format="value(address)"`
+    `gcloud compute addresses describe ${name} --region ${getKubernetesClusterRegion(zone)} --format="value(address)"`
   )
   return address.replace(/\n*$/, '')
 }
@@ -704,13 +704,6 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
-  const productionTagOverrides = isProduction()
-    ? [
-        `--set gethexporter.image.repository=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')}`,
-        `--set gethexporter.image.tag=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_TAG')}`,
-      ]
-    : []
-
   const gethMetricsOverrides = fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === "true"
     ? [
         `--set metrics="true"`,
@@ -766,7 +759,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     )}`,
     `--set geth.diskSizeGB=${fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')}`,
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
-    ...productionTagOverrides,
     ...gethMetricsOverrides,
     ...(await helmIPParameters(celoEnv)),
   ]
