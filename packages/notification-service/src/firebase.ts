@@ -47,8 +47,14 @@ interface ExchangeRateObject {
   timestamp: number // timestamp in milliseconds
 }
 
+export type BlockNotificationsData = { [key in Currencies]: number }
+
 let registrations: Registrations = {}
-let lastBlockNotified: number = -1
+let lastBlockNotified: BlockNotificationsData = {
+  [Currencies.DOLLAR]: -1,
+  [Currencies.GOLD]: -1,
+}
+
 let pendingRequests: PendingRequests = {}
 
 export function _setTestRegistrations(testRegistrations: Registrations) {
@@ -91,8 +97,19 @@ export function initializeDb() {
   lastBlockRef.on(
     'value',
     (snapshot) => {
-      console.debug('Latest block data updated: ', snapshot && snapshot.val())
-      lastBlockNotified = (snapshot && snapshot.val()) || 0
+      const blockData = (snapshot && snapshot.val()) || {
+        [Currencies.DOLLAR]: 0,
+        [Currencies.GOLD]: 0,
+      }
+      console.debug('Latest block data updated: ', blockData)
+      if (typeof blockData === 'number') {
+        lastBlockNotified = {
+          [Currencies.DOLLAR]: blockData,
+          [Currencies.GOLD]: blockData,
+        }
+      } else {
+        lastBlockNotified = blockData
+      }
     },
     (errorObject: any) => {
       console.error('Latest block data read failed:', errorObject.code)
@@ -134,6 +151,10 @@ export function getTranslatorForAddress(address: string) {
 }
 
 export function getLastBlockNotified() {
+  return Math.max(lastBlockNotified.dollar, lastBlockNotified.gold)
+}
+
+export function getLastBlocksNotified() {
   return lastBlockNotified
 }
 
@@ -160,18 +181,24 @@ export function writeExchangeRatePair(
   console.debug(`Recorded exchange rate for ${pair}`, exchangeRateRecord)
 }
 
-export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {
-  if (newBlock <= lastBlockNotified) {
+export function setLastBlockNotified(
+  dollarBlock: number,
+  celoBlock: number
+): Promise<void> | undefined {
+  if (dollarBlock <= lastBlockNotified.dollar && celoBlock <= lastBlockNotified.gold) {
     console.debug('Block number less than latest, skipping latestBlock update.')
     return
   }
 
-  console.debug('Updating last block notified to:', newBlock)
   // Although firebase will keep our local lastBlockNotified in sync with the DB,
   // we set it here ourselves to avoid race condition where we check for notifications
   // again before it syncs
-  lastBlockNotified = newBlock
-  return lastBlockRef.set(newBlock)
+  lastBlockNotified = {
+    [Currencies.DOLLAR]: dollarBlock,
+    [Currencies.GOLD]: celoBlock,
+  }
+  console.debug('Updating last block notified to:', lastBlockNotified)
+  return lastBlockRef.set(lastBlockNotified)
 }
 
 export async function sendPaymentNotification(

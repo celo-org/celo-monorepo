@@ -1,7 +1,12 @@
 import BigNumber from 'bignumber.js'
 import fetch from 'node-fetch'
 import { BLOCKSCOUT_API } from '../config'
-import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
+import {
+  BlockNotificationsData,
+  getLastBlocksNotified,
+  sendPaymentNotification,
+  setLastBlockNotified,
+} from '../firebase'
 import { flat, getTokenAddresses, removeEmptyValuesFromObject } from '../util/utils'
 import { Log, Response, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
@@ -81,13 +86,16 @@ export function filterAndJoinTransfers(
 
 export function notifyForNewTransfers(
   transfers: Transfer[],
-  lastBlockNotified: number
+  lastBlocksNotified: BlockNotificationsData
 ): Promise<void[]> {
   const results = new Array<Promise<void>>(transfers.length)
   for (let i = 0; i < transfers.length; i++) {
     const t = transfers[i]
+
     // Skip transactions for which we've already sent notifications
-    if (!t || t.blockNumber <= lastBlockNotified) {
+    const currency: Currencies =
+      [Currencies.DOLLAR, Currencies.GOLD].indexOf(t.currency) >= 0 ? t.currency : Currencies.DOLLAR
+    if (!t || t.blockNumber <= lastBlocksNotified[currency]) {
       continue
     }
 
@@ -119,8 +127,8 @@ export function convertWeiValue(value: string) {
 }
 
 export async function handleTransferNotifications(): Promise<void> {
-  const lastBlockNotified = getLastBlockNotified()
-  if (lastBlockNotified < 0) {
+  const lastBlocksNotified = getLastBlocksNotified()
+  if (lastBlocksNotified.dollar < 0 || lastBlocksNotified.gold < 0) {
     // Firebase not yet ready
     return
   }
@@ -129,15 +137,19 @@ export async function handleTransferNotifications(): Promise<void> {
   const {
     transfers: goldTransfers,
     latestBlock: goldTransfersLatestBlock,
-  } = await getLatestTokenTransfers(goldTokenAddress, lastBlockNotified, Currencies.GOLD)
+  } = await getLatestTokenTransfers(goldTokenAddress, lastBlocksNotified.gold, Currencies.GOLD)
 
   const {
     transfers: stableTransfers,
     latestBlock: stableTransfersLatestBlock,
-  } = await getLatestTokenTransfers(stableTokenAddress, lastBlockNotified, Currencies.DOLLAR)
+  } = await getLatestTokenTransfers(
+    stableTokenAddress,
+    lastBlocksNotified.dollar,
+    Currencies.DOLLAR
+  )
 
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
-  await notifyForNewTransfers(allTransfers, lastBlockNotified)
-  return setLastBlockNotified(Math.max(goldTransfersLatestBlock, stableTransfersLatestBlock))
+  await notifyForNewTransfers(allTransfers, lastBlocksNotified)
+  return setLastBlockNotified(stableTransfersLatestBlock, goldTransfersLatestBlock)
 }
