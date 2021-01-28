@@ -76,8 +76,9 @@ export enum OnboardingEvents {
   celo_education_complete = 'celo_education_complete',
   celo_education_cancel = 'celo_education_cancel',
 
+  name_and_picture_set = 'name_and_picture_set',
+
   phone_number_set = 'phone_number_set',
-  phone_number_invalid = 'phone_number_invalid',
 
   pin_set = 'pin_set',
   pin_invalid = 'pin_invalid',
