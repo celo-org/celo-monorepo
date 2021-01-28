@@ -28,6 +28,7 @@
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
+- [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
 
 ## Validator Guide
 
