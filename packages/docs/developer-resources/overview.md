@@ -22,6 +22,8 @@ View the [Developer Code Examples page](start.md) to get started using the Celo 
   - Easily connect to the [Valora](http://valoraapp.com/) wallet
   - Valora manages user account, private keys and transaction signing, so you can focus on building your dapp
   - Learn more and see the code with the [Dappkit truffle box](https://github.com/critesjosh/celo-dappkit)
+- [Python SDK](https://github.com/blaize-tech/celo-sdk-py)
+- [Java SDK](https://github.com/blaize-tech/celo-sdk-java)
 
 ### Infrastructure
 
@@ -57,8 +59,7 @@ View the [Developer Code Examples page](start.md) to get started using the Celo 
 
 - [Community projects](celo-dapp-gallery.md)
 - [Grant recipients](https://celo.org/experience/grants/directory)
-- Python & Java SDKs
-- Web wallet (like Metamask)
+- Web wallets (like Metamask)
 
 ## Community
 
