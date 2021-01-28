@@ -52,7 +52,7 @@ function Profile({ navigation, route }: Props) {
         <TopBarTextButton title={i18n.t('global:save')} testID="SaveButton" onPress={onSave} />
       ),
     })
-  }, [navigation, newName, newPictureUri])
+  }, [navigation, newName, newPictureUri, picturePath])
 
   const onPictureChosen = async (pictureDataUrl: string | null) => {
     if (!pictureDataUrl) {
