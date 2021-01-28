@@ -390,7 +390,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }

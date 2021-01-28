@@ -55,6 +55,7 @@ export interface SetLanguage {
 export interface OpenDeepLink {
   type: Actions.OPEN_DEEP_LINK
   deepLink: string
+  isSecureOrigin: boolean
 }
 
 interface ResetAppOpenedState {
@@ -98,6 +99,7 @@ export interface OpenUrlAction {
   type: Actions.OPEN_URL
   url: string
   openExternal: boolean
+  isSecureOrigin: boolean
 }
 
 interface MinAppVersionDeterminedAction {
@@ -160,10 +162,11 @@ export const setLanguage = (language: string) => {
   }
 }
 
-export const openDeepLink = (deepLink: string): OpenDeepLink => {
+export const openDeepLink = (deepLink: string, isSecureOrigin: boolean = false): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
+    isSecureOrigin,
   }
 }
 
@@ -194,10 +197,15 @@ export const setSessionId = (sessionId: string) => ({
   sessionId,
 })
 
-export const openUrl = (url: string, openExternal: boolean = false): OpenUrlAction => ({
+export const openUrl = (
+  url: string,
+  openExternal = false,
+  isSecureOrigin = false
+): OpenUrlAction => ({
   type: Actions.OPEN_URL,
   url,
   openExternal,
+  isSecureOrigin,
 })
 
 export const minAppVersionDetermined = (

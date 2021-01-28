@@ -29,9 +29,8 @@ export default function SelectCountry({ navigation, route }: Props) {
   ])
 
   function onSelect(country: LocalizedCountry) {
-    navigation.navigate(Screens.NameAndNumber, {
+    navigation.navigate(Screens.VerificationEducationScreen, {
       selectedCountryCodeAlpha2: country.alpha2,
-      country: country.displayNameNoDiacritics,
     })
   }
 

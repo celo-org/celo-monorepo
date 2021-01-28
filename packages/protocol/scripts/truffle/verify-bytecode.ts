@@ -6,7 +6,7 @@ import { ProxyInstance, RegistryInstance } from 'types'
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds
- * to a Celo system deployed to a given network. It uses the Registry constract
+ * to a Celo system deployed to a given network. It uses the Registry contract
  * as its source of truth, potentially modified by an optional contract upgrade
  * proposal description.
  *

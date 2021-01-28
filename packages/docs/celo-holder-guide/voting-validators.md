@@ -4,6 +4,12 @@ Validators play a critical role in the Celo protocol, determining which transact
 
 The Celo community makes these decisions by locking CELO and voting for [Validator Groups](../celo-codebase/protocol/proof-of-stake/validator-groups.md), intermediaries that sit between voters and Validators. Every Validator Group has an ordered list of up to 5 candidate Validators. Some organizations may operate a group with their own Validators in it; some may operate a group to which they have added Validators run by others.
 
+{% hint style="info" %}
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+
+You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
+{% endhint %}
+
 ## Validator Elections
 
 [Validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md) are held every epoch (approximately once per day). The protocol elects a maximum of 100 Validators. At each epoch, every elected Validator must be re-elected to continue. Validators are selected [in proportion](../celo-codebase/protocol/proof-of-stake/validator-elections.md#Running-the-Election) to votes received for each Validator Group.

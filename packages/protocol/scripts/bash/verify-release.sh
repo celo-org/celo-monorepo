@@ -38,21 +38,21 @@ done
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal via the -p flag" && exit 1;
 
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags >> $LOG_FILE
+git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' >> $LOG_FILE
 echo " - Checkout source code at $BRANCH"
-git checkout $BRANCH 2>$LOG_FILE > $LOG_FILE
+git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 rm -rf build/contracts
 # TODO: Move to yarn build:sol after the next contract release.
 echo " - Build contract artifacts ..."
-yarn build > $LOG_FILE
+yarn build >> $LOG_FILE
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 
 echo " - Return to original git ref"
 # Move back to branch from which we started
-git checkout - > $LOG_FILE
+git checkout - >> $LOG_FILE
 
 echo " - Build verification script ..."
-yarn build > $LOG_FILE
+yarn build >> $LOG_FILE
 echo " - Run verification script ..."
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal $PROPOSAL $FORNO $INITIALIZE_DATA

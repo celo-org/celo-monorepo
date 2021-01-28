@@ -178,10 +178,8 @@ const styles = StyleSheet.create({
   input: {
     justifyContent: 'flex-end',
     paddingLeft: 16,
-    flex: 0,
   },
   innerInput: {
-    flex: 0,
     minWidth: 160,
     textAlign: 'right',
     paddingVertical: 0,
