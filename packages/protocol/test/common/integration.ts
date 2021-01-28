@@ -15,7 +15,6 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
-  ExchangeEURInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceApproverMultiSigInstance,
@@ -25,7 +24,6 @@ import {
   RegistryInstance,
   ReserveInstance,
   ReserveSpenderMultiSigInstance,
-  StableTokenEURInstance,
   StableTokenInstance,
 } from 'types'
 
@@ -97,7 +95,7 @@ contract('Integration: Running elections', (_accounts: string[]) => {
     election = await getDeployedProxiedContract('Election', artifacts)
   })
 
-  describe.skip('When getting the elected validators', () => {
+  describe('When getting the elected validators', () => {
     it('should elect all 30 validators', async () => {
       const elected = await election.electValidatorSigners()
       assert.equal(elected.length, 30)
@@ -149,7 +147,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     ]
   })
 
-  describe.skip('When making a governance proposal', () => {
+  describe('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
         proposalTransactions.map((x: any) => x.value),
@@ -168,7 +166,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When upvoting that proposal', () => {
+  describe('When upvoting that proposal', () => {
     before(async () => {
       await governance.upvote(proposalId, 0, 0)
     })
@@ -178,7 +176,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When approving that proposal', () => {
+  describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
@@ -193,7 +191,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When voting on that proposal', () => {
+  describe('When voting on that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.approvalStageDuration, web3)
       await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
@@ -205,7 +203,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When executing that proposal', () => {
+  describe('When executing that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
@@ -216,7 +214,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When performing slashing', () => {
+  describe('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
@@ -286,7 +284,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     ]
   })
 
-  describe.skip('Checking governance thresholds', () => {
+  describe('Checking governance thresholds', () => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
         const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
@@ -315,7 +313,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     }
   })
 
-  describe.skip('When making a governance proposal', () => {
+  describe('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
         proposalTransactions.map((x: any) => x.value),
@@ -334,7 +332,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When upvoting that proposal', () => {
+  describe('When upvoting that proposal', () => {
     before(async () => {
       await governance.upvote(proposalId, 0, 0)
     })
@@ -344,7 +342,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When approving that proposal', () => {
+  describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
@@ -359,7 +357,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When voting on that proposal', () => {
+  describe('When voting on that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.approvalStageDuration, web3)
       await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
@@ -371,7 +369,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('When executing that proposal', () => {
+  describe('When executing that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
@@ -384,362 +382,185 @@ contract('Integration: Governance', (accounts: string[]) => {
   })
 })
 
-contract('Integration: Exchange', (accounts: string[]) => {
-  const transferAmount = 10
-  let exchange: ExchangeInstance
-  let multiSig: ReserveSpenderMultiSigInstance
-  let reserve: ReserveInstance
-  let goldToken: GoldTokenInstance
-  let stableToken: StableTokenInstance
-  let originalStable
-  let originalGold
-  let originalReserve
-  let finalStable: BigNumber
-  let finalGold: BigNumber
-  let finalReserve: BigNumber
+Array.from([
+  ['Exchange', 'StableToken'], // USD
+  ['ExchangeEUR', 'StableTokenEUR'], // EUR
+]).forEach(([exchangeId, stableTokenId]) =>
+  contract(`Integration: ${exchangeId} ${stableTokenId}`, (accounts: string[]) => {
+    const transferAmount = 10
+    let exchange: ExchangeInstance
+    let multiSig: ReserveSpenderMultiSigInstance
+    let reserve: ReserveInstance
+    let goldToken: GoldTokenInstance
+    let stableToken: StableTokenInstance
+    let originalStable
+    let originalGold
+    let originalReserve
+    let finalStable: BigNumber
+    let finalGold: BigNumber
+    let finalReserve: BigNumber
 
-  const decimals = 18
+    const decimals = 18
 
-  before(async () => {
-    exchange = await getDeployedProxiedContract('Exchange', artifacts)
-    multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
-    reserve = await getDeployedProxiedContract('Reserve', artifacts)
-    goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
-    stableToken = await getDeployedProxiedContract('StableToken', artifacts)
-  })
+    before(async () => {
+      exchange = await getDeployedProxiedContract(exchangeId, artifacts)
+      stableToken = await getDeployedProxiedContract(stableTokenId, artifacts)
+      multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
+      reserve = await getDeployedProxiedContract('Reserve', artifacts)
+      goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
+    })
 
-  describe.skip('Selling', () => {
-    const sellAmount = new BigNumber('1000000000000000000')
-    const minBuyAmount = 1
+    describe('Selling', () => {
+      const sellAmount = new BigNumber('1000000000000000000')
+      const minBuyAmount = 1
 
-    describe.skip('When selling gold', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
+      describe('When selling gold', () => {
+        before(async () => {
+          originalStable = await stableToken.balanceOf(accounts[0])
+          originalGold = await goldToken.balanceOf(accounts[0])
+          originalReserve = await goldToken.balanceOf(reserve.address)
+          await goldToken.approve(exchange.address, sellAmount)
+          await exchange.sell(sellAmount, minBuyAmount, true)
+          finalStable = await stableToken.balanceOf(accounts[0])
+          finalGold = await goldToken.balanceOf(accounts[0])
+          finalReserve = await goldToken.balanceOf(reserve.address)
+        })
+
+        it(`should increase user's stable`, async () => {
+          assert.isTrue(finalStable.gt(originalStable))
+        })
+
+        it(`should reduce user's gold`, async () => {
+          if (await addressMinedLatestBlock(accounts[0])) {
+            const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+            assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+          } else {
+            assert.isTrue(finalGold.lt(originalGold))
+          }
+        })
+
+        it(`should increase Reserve's gold`, async () => {
+          assert.isTrue(finalReserve.gt(originalReserve))
+        })
+      })
+
+      // Note that this test relies on having purchased stable token in the previous test.
+      describe('When selling stable token', () => {
+        before(async () => {
+          originalStable = await stableToken.balanceOf(accounts[0])
+          originalGold = await goldToken.balanceOf(accounts[0])
+          originalReserve = await goldToken.balanceOf(reserve.address)
+          await stableToken.approve(exchange.address, sellAmount)
+          // Cannot sell more than was purchased in the previous test.
+          await exchange.sell(sellAmount.div(20), minBuyAmount, false)
+          finalStable = await stableToken.balanceOf(accounts[0])
+          finalGold = await goldToken.balanceOf(accounts[0])
+          finalReserve = await goldToken.balanceOf(reserve.address)
+        })
+
+        it(`should reduce user's stable`, async () => {
+          assert.isTrue(finalStable.lt(originalStable))
+        })
+
+        it(`should increase user's gold`, async () => {
+          assert.isTrue(finalGold.gt(originalGold))
+        })
+
+        it(`should reduce Reserve's gold`, async () => {
+          assert.isTrue(finalReserve.lt(originalReserve))
+        })
+      })
+    })
+
+    describe('Buying', () => {
+      const buyAmount = new BigNumber(100)
+      const maxSellAmount = new BigNumber('1000000000000000000')
+
+      describe('When buying stable token', () => {
+        before(async () => {
+          originalStable = await stableToken.balanceOf(accounts[0])
+          originalGold = await goldToken.balanceOf(accounts[0])
+          originalReserve = await goldToken.balanceOf(reserve.address)
+          await goldToken.approve(exchange.address, maxSellAmount)
+          await exchange.buy(buyAmount, maxSellAmount, false)
+          finalStable = await stableToken.balanceOf(accounts[0])
+          finalGold = await goldToken.balanceOf(accounts[0])
+          finalReserve = await goldToken.balanceOf(reserve.address)
+        })
+
+        it(`should increase user's stable`, async () => {
+          assert.isTrue(finalStable.gt(originalStable))
+        })
+
+        it(`should reduce user's gold`, async () => {
+          if (await addressMinedLatestBlock(accounts[0])) {
+            const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+            assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+          } else {
+            assert.isTrue(finalGold.lt(originalGold))
+          }
+        })
+
+        it(`should increase Reserve's gold`, async () => {
+          assert.isTrue(finalReserve.gt(originalReserve))
+        })
+      })
+
+      // Note that this test relies on having purchased cUSD in a previous test
+      describe('When buying gold', () => {
+        before(async () => {
+          originalStable = await stableToken.balanceOf(accounts[0])
+          originalGold = await goldToken.balanceOf(accounts[0])
+          originalReserve = await goldToken.balanceOf(reserve.address)
+          await stableToken.approve(exchange.address, maxSellAmount)
+          // Cannot sell more than was purchased in the previous test.
+          await exchange.buy(buyAmount, maxSellAmount, true)
+          finalStable = await stableToken.balanceOf(accounts[0])
+          finalGold = await goldToken.balanceOf(accounts[0])
+          finalReserve = await goldToken.balanceOf(reserve.address)
+        })
+
+        it(`should reduce user's stable`, async () => {
+          assert.isTrue(finalStable.lt(originalStable))
+        })
+
+        it(`should increase user's gold`, async () => {
+          assert.isTrue(finalGold.gt(originalGold))
+        })
+
+        it(`should reduce Reserve's gold`, async () => {
+          assert.isTrue(finalReserve.lt(originalReserve))
+        })
+      })
+    })
+
+    describe('When transferring gold', () => {
+      const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
+      let originalOtherAccount
+      beforeEach(async () => {
         originalReserve = await goldToken.balanceOf(reserve.address)
-        await goldToken.approve(exchange.address, sellAmount)
-        await exchange.sell(sellAmount, minBuyAmount, true)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
+        originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
       })
 
-      it(`should increase user's stable`, async () => {
-        assert.isTrue(finalStable.gt(originalStable))
-      })
-
-      it(`should reduce user's gold`, async () => {
-        if (await addressMinedLatestBlock(accounts[0])) {
-          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
-        } else {
-          assert.isTrue(finalGold.lt(originalGold))
-        }
-      })
-
-      it(`should increase Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.gt(originalReserve))
-      })
-    })
-
-    // Note that this test relies on having purchased cUSD in the previous test.
-    describe.skip('When selling stable token', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await stableToken.approve(exchange.address, sellAmount)
-        // Cannot sell more than was purchased in the previous test.
-        await exchange.sell(sellAmount.div(20), minBuyAmount, false)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-      })
-
-      it(`should reduce user's stable`, async () => {
-        assert.isTrue(finalStable.lt(originalStable))
-      })
-
-      it(`should increase user's gold`, async () => {
-        assert.isTrue(finalGold.gt(originalGold))
-      })
-
-      it(`should reduce Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.lt(originalReserve))
-      })
-    })
-  })
-
-  describe.skip('Buying', () => {
-    const buyAmount = new BigNumber(1)
-    const maxSellAmount = new BigNumber('1000000000000000000')
-
-    describe.skip('When buying stable token', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await goldToken.approve(exchange.address, maxSellAmount)
-        await exchange.buy(buyAmount, maxSellAmount, false)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-      })
-
-      it(`should increase user's stable`, async () => {
-        assert.isTrue(finalStable.gt(originalStable))
-      })
-
-      it(`should reduce user's gold`, async () => {
-        if (await addressMinedLatestBlock(accounts[0])) {
-          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
-        } else {
-          assert.isTrue(finalGold.lt(originalGold))
-        }
-      })
-
-      it(`should increase Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.gt(originalReserve))
-      })
-    })
-
-    // Note that this test relies on having purchased cUSD in a previous test
-    describe.skip('When buying gold', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await stableToken.approve(exchange.address, maxSellAmount)
-        // Cannot sell more than was purchased in the previous test.
-        await exchange.buy(buyAmount, maxSellAmount, true)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-      })
-
-      it(`should reduce user's stable`, async () => {
-        assert.isTrue(finalStable.lt(originalStable))
-      })
-
-      it(`should increase user's gold`, async () => {
-        assert.isTrue(finalGold.gt(originalGold))
-      })
-
-      it(`should reduce Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.lt(originalReserve))
-      })
-    })
-  })
-
-  describe.skip('When transferring gold', () => {
-    const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
-    let originalOtherAccount
-    beforeEach(async () => {
-      originalReserve = await goldToken.balanceOf(reserve.address)
-      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
-    })
-
-    it(`should transfer gold`, async () => {
-      // @ts-ignore
-      const txData = reserve.contract.methods
-        .transferGold(otherReserveAddress, transferAmount)
-        .encodeABI()
-      await multiSig.submitTransaction(reserve.address, 0, txData, {
-        from: accounts[0],
-      })
-      assert.isTrue(
-        (await goldToken.balanceOf(reserve.address)).isEqualTo(
-          originalReserve.minus(transferAmount)
+      it(`should transfer gold`, async () => {
+        // @ts-ignore
+        const txData = reserve.contract.methods
+          .transferGold(otherReserveAddress, transferAmount)
+          .encodeABI()
+        await multiSig.submitTransaction(reserve.address, 0, txData, {
+          from: accounts[0],
+        })
+        assert.isTrue(
+          (await goldToken.balanceOf(reserve.address)).isEqualTo(
+            originalReserve.minus(transferAmount)
+          )
         )
-      )
-      assert.isTrue(
-        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
-          originalOtherAccount.plus(transferAmount)
+        assert.isTrue(
+          (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
+            originalOtherAccount.plus(transferAmount)
+          )
         )
-      )
-    })
-  })
-})
-
-contract('Integration: Exchange (EUR)', (accounts: string[]) => {
-  const transferAmount = 10
-  let exchange: ExchangeEURInstance
-  let multiSig: ReserveSpenderMultiSigInstance
-  let reserve: ReserveInstance
-  let goldToken: GoldTokenInstance
-  let stableToken: StableTokenEURInstance
-  let originalStable
-  let originalGold
-  let originalReserve
-  let finalStable: BigNumber
-  let finalGold: BigNumber
-  let finalReserve: BigNumber
-
-  const decimals = 18
-
-  before(async () => {
-    exchange = await getDeployedProxiedContract('ExchangeEUR', artifacts)
-    multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
-    reserve = await getDeployedProxiedContract('Reserve', artifacts)
-    goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
-    stableToken = await getDeployedProxiedContract('StableTokenEUR', artifacts)
-  })
-
-  describe('Selling', () => {
-    const sellAmount = new BigNumber('1000000000000000000')
-    const minBuyAmount = 1
-
-    describe('When selling gold', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await goldToken.approve(exchange.address, sellAmount)
-        await exchange.sell(sellAmount, minBuyAmount, true)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-      })
-
-      it(`should increase user's stable`, async () => {
-        assert.isTrue(finalStable.gt(originalStable))
-      })
-
-      it(`should reduce user's gold`, async () => {
-        if (await addressMinedLatestBlock(accounts[0])) {
-          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
-        } else {
-          assert.isTrue(finalGold.lt(originalGold))
-        }
-      })
-
-      it(`should increase Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.gt(originalReserve))
-      })
-    })
-
-    // Note that this test relies on having purchased cUSD in the previous test.
-    describe('When selling stable token', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await stableToken.approve(exchange.address, sellAmount)
-        // Cannot sell more than was purchased in the previous test.
-        await exchange.sell(sellAmount.div(20), minBuyAmount, false)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-      })
-
-      it(`should reduce user's stable`, async () => {
-        assert.isTrue(finalStable.lt(originalStable))
-      })
-
-      it(`should increase user's gold`, async () => {
-        assert.isTrue(finalGold.gt(originalGold))
-      })
-
-      it(`should reduce Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.lt(originalReserve))
       })
     })
   })
-
-  describe('Buying', () => {
-    const buyAmount = new BigNumber(1)
-    const maxSellAmount = new BigNumber('1000000000000000000')
-
-    describe('When buying stable token', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await goldToken.approve(exchange.address, maxSellAmount)
-        await exchange.buy(buyAmount, maxSellAmount, false)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-        console.log('finalGold', finalGold)
-        console.log('originalGold', originalGold)
-      })
-
-      it(`should increase user's stable`, async () => {
-        assert.isTrue(finalStable.gt(originalStable))
-      })
-
-      it(`should reduce user's gold`, async () => {
-        // Fails
-        if (await addressMinedLatestBlock(accounts[0])) {
-          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
-        } else {
-          assert.isTrue(finalGold.lt(originalGold))
-        }
-      })
-
-      it(`should increase Reserve's gold`, async () => {
-        // fails
-        assert.isTrue(finalReserve.gt(originalReserve))
-      })
-    })
-
-    // Note that this test relies on having purchased cUSD in a previous test
-    describe('When buying gold', () => {
-      before(async () => {
-        originalStable = await stableToken.balanceOf(accounts[0])
-        originalGold = await goldToken.balanceOf(accounts[0])
-        originalReserve = await goldToken.balanceOf(reserve.address)
-        await stableToken.approve(exchange.address, maxSellAmount)
-        // Cannot sell more than was purchased in the previous test.
-        await exchange.buy(buyAmount, maxSellAmount, true)
-        finalStable = await stableToken.balanceOf(accounts[0])
-        finalGold = await goldToken.balanceOf(accounts[0])
-        finalReserve = await goldToken.balanceOf(reserve.address)
-      })
-
-      it(`should reduce user's stable`, async () => {
-        assert.isTrue(finalStable.lt(originalStable))
-      })
-
-      it(`should increase user's gold`, async () => {
-        assert.isTrue(finalGold.gt(originalGold))
-      })
-
-      it(`should reduce Reserve's gold`, async () => {
-        assert.isTrue(finalReserve.lt(originalReserve))
-      })
-    })
-  })
-
-  describe('When transferring gold', () => {
-    const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
-    let originalOtherAccount
-    beforeEach(async () => {
-      originalReserve = await goldToken.balanceOf(reserve.address)
-      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
-    })
-
-    it(`should transfer gold`, async () => {
-      // @ts-ignore
-      const txData = reserve.contract.methods
-        .transferGold(otherReserveAddress, transferAmount)
-        .encodeABI()
-      await multiSig.submitTransaction(reserve.address, 0, txData, {
-        from: accounts[0],
-      })
-      assert.isTrue(
-        (await goldToken.balanceOf(reserve.address)).isEqualTo(
-          originalReserve.minus(transferAmount)
-        )
-      )
-      assert.isTrue(
-        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
-          originalOtherAccount.plus(transferAmount)
-        )
-      )
-    })
-  })
-})
+)
