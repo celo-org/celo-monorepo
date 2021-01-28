@@ -102,6 +102,7 @@ export function initializeDb() {
         [Currencies.GOLD]: 0,
       }
       console.debug('Latest block data updated: ', blockData)
+      // This check is for backwards-compatibility and can be removed once this update is deployed on Alfajores and Mainnet.
       if (typeof blockData === 'number') {
         lastBlockNotified = {
           [Currencies.DOLLAR]: blockData,
