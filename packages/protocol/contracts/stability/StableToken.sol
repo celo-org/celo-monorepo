@@ -222,7 +222,7 @@ contract StableToken is
    */
   function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
     require(
-      msg.sender == registry.getAddressForOrDie(exchangeRegistryId) ||
+      msg.sender == registry.getAddressForOrDie(getExchangeRegistryId()) ||
         msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID),
       "Only the Exchange and Validators contracts are authorized to mint"
     );
@@ -271,7 +271,7 @@ contract StableToken is
    */
   function burn(uint256 value)
     external
-    onlyRegisteredContract(exchangeRegistryId)
+    onlyRegisteredContract(getExchangeRegistryId())
     updateInflationFactor
     returns (bool)
   {
@@ -387,6 +387,19 @@ contract StableToken is
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
     return _valueToUnits(updatedInflationFactor, value);
+  }
+
+  /**
+   * @notice Returns the exchange id in the registry of the corresponding fiat pair exchange.
+   * @dev When this storage is uninitialized, it falls back to the default EXCHANGE_REGISTRY_ID.
+   * @return Registry id for the corresponding exchange.
+   */
+  function getExchangeRegistryId() public view returns (bytes32) {
+    if (exchangeRegistryId == bytes32(0)) {
+      return EXCHANGE_REGISTRY_ID;
+    } else {
+      return exchangeRegistryId;
+    }
   }
 
   /**
