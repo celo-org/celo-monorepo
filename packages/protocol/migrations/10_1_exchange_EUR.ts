@@ -19,7 +19,6 @@ const initializeArgs = async (): Promise<any[]> => {
     StableTokenEURInstance
   >('StableTokenEUR', artifacts)
   return [
-    // TODO replace this with specific
     config.registry.predeployedProxyAddress,
     stableTokenEUR.address,
     toFixed(config.exchange.spread).toString(),
@@ -42,10 +41,6 @@ module.exports = deploymentForCoreContract<ExchangeEURInstance>(
       )
       await freezer.freeze(exchange.address)
     }
-    // const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    //   'Registry',
-    //   artifacts
-    // )
 
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
