@@ -13,10 +13,12 @@ import { NotificationTypes } from 'src/notifications/types'
 import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
 import { UriData } from 'src/qrcode/schema'
 import {
-  RecipientKind,
-  RecipientWithContact,
-  RecipientWithMobileNumber,
-  RecipientWithQrCode,
+  AddressRecipient,
+  AddressToRecipient,
+  ContactRecipient,
+  MobileRecipient,
+  NumberToRecipient,
+  RecipientInfo,
 } from 'src/recipients/recipient'
 
 export const nullAddress = '0x0'
@@ -109,22 +111,18 @@ export const mockInviteDetails3 = {
   inviteLink: 'http://celo.page.link/PARAMS',
 }
 
-export const mockInvitableRecipient: RecipientWithContact = {
-  kind: RecipientKind.Contact,
-  displayName: mockName,
-  displayId: '14155550000',
+export const mockInvitableRecipient: ContactRecipient = {
+  name: mockName,
+  displayNumber: '14155550000',
   e164PhoneNumber: mockE164Number,
   contactId: 'contactId',
-  phoneNumberLabel: 'phoneNumLabel',
 }
 
-export const mockInvitableRecipient2: RecipientWithContact = {
-  kind: RecipientKind.Contact,
-  displayName: mockNameInvite,
-  displayId: mockDisplayNumberInvite,
+export const mockInvitableRecipient2: ContactRecipient = {
+  name: mockNameInvite,
+  displayNumber: mockDisplayNumberInvite,
   e164PhoneNumber: mockE164NumberInvite,
   contactId: 'contactId',
-  phoneNumberLabel: 'phoneNumLabel',
 }
 
 export const mockTransactionData = {
@@ -139,34 +137,26 @@ export const mockInviteTransactionData = {
   type: TokenTransactionType.InviteSent,
 }
 
-export const mockInvitableRecipient3: RecipientWithContact = {
-  kind: RecipientKind.Contact,
-  displayName: mockName2Invite,
-  displayId: mockDisplayNumber2Invite,
+export const mockInvitableRecipient3: ContactRecipient = {
+  name: mockName2Invite,
+  displayNumber: mockDisplayNumber2Invite,
   e164PhoneNumber: mockE164Number2Invite,
   contactId: 'contactId',
-  phoneNumberLabel: 'phoneNumLabel',
 }
 
-export const mockRecipient: RecipientWithContact = {
+export const mockRecipient: ContactRecipient = {
   ...mockInvitableRecipient,
   address: mockAccount,
 }
 
-export const mockRecipient2: RecipientWithContact = {
+export const mockRecipient2: ContactRecipient = {
   ...mockInvitableRecipient2,
   address: mockAccountInvite,
 }
 
-export const mockRecipient3: RecipientWithContact = {
+export const mockRecipient3: ContactRecipient = {
   ...mockInvitableRecipient3,
   address: mockAccount2Invite,
-}
-
-export const mockRecipient4: RecipientWithContact = {
-  kind: RecipientKind.Contact,
-  displayName: 'Zebra Zone',
-  contactId: 'contactId4',
 }
 
 export const mockE164NumberToInvitableRecipient = {
@@ -175,17 +165,22 @@ export const mockE164NumberToInvitableRecipient = {
   [mockE164Number2Invite]: mockInvitableRecipient3,
 }
 
-export const mockRecipientCache = {
+export const mockPhoneRecipientCache: NumberToRecipient = {
   [mockE164Number]: mockRecipient,
   [mockE164NumberInvite]: mockInvitableRecipient2,
   [mockE164Number2Invite]: mockInvitableRecipient3,
 }
 
-export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
-  kind: RecipientKind.MobileNumber,
+export const mockValoraRecipientCache: AddressToRecipient = {
+  [mockAccount]: mockRecipient,
+  [mockAccountInvite]: mockRecipient2,
+  [mockAccount2Invite]: mockRecipient3,
+}
+
+export const mockRecipientWithPhoneNumber: MobileRecipient = {
   address: mockAccount,
-  displayName: mockName,
-  displayId: '14155550000',
+  name: mockName,
+  displayNumber: '14155550000',
   e164PhoneNumber: mockE164Number,
 }
 
@@ -354,13 +349,18 @@ export const mockUriData: UriData[] = [
   },
 ]
 
-export const mockQRCodeRecipient: RecipientWithQrCode = {
-  kind: RecipientKind.QrCode,
+export const mockQRCodeRecipient: AddressRecipient = {
   address: mockUriData[3].address.toLowerCase(),
-  displayId: mockUriData[3].e164PhoneNumber,
-  displayName: mockUriData[3].displayName || 'anonymous',
+  displayNumber: mockUriData[3].e164PhoneNumber,
+  name: mockUriData[3].displayName || 'anonymous',
   e164PhoneNumber: mockUriData[3].e164PhoneNumber,
-  phoneNumberLabel: undefined,
   thumbnailPath: undefined,
   contactId: undefined,
+}
+
+export const mockRecipientInfo: RecipientInfo = {
+  phoneRecipientCache: mockPhoneRecipientCache,
+  valoraRecipientCache: mockValoraRecipientCache,
+  addressToE164Number: mockAddressToE164Number,
+  addressToDisplayName: {},
 }

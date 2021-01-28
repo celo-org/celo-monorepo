@@ -15,18 +15,10 @@ const store = createMockStore({
 })
 
 describe(Avatar, () => {
-  it('renders correctly without contact and number', () => {
-    const tree = renderer.create(
-      <Provider store={store}>
-        <Avatar name={mockName} iconSize={40} />
-      </Provider>
-    )
-    expect(tree).toMatchSnapshot()
-  })
   it('renders correctly with number but without contact', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <Avatar name={mockName} iconSize={40} e164Number={mockNumber} />
+        <Avatar recipient={{ name: mockName, e164Number: mockNumber }} iconSize={40} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -34,7 +26,7 @@ describe(Avatar, () => {
   it('renders correctly with address but without contact', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <Avatar name={mockName} iconSize={40} address={mockAccount} />
+        <Avatar recipient={{ name: mockName, address: mockAccount }} iconSize={40} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

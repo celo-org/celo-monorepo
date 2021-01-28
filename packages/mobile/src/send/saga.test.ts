@@ -14,8 +14,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { urlFromUriData } from 'src/qrcode/schema'
 import { BarcodeTypes } from 'src/qrcode/utils'
-import { RecipientKind } from 'src/recipients/recipient'
-import { recipientCacheSelector } from 'src/recipients/reducer'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
   HandleBarcodeDetectedAction,
@@ -60,7 +59,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -69,12 +69,10 @@ describe(watchQrCodeDetections, () => {
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
-        displayName: mockName,
-        displayId: mockE164Number,
+        name: mockName,
+        displayNumber: mockE164Number,
         e164PhoneNumber: mockE164Number,
-        kind: RecipientKind.QrCode,
         contactId: undefined,
-        phoneNumberLabel: undefined,
         thumbnailPath: undefined,
       },
     })
@@ -92,7 +90,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -101,12 +100,10 @@ describe(watchQrCodeDetections, () => {
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
-        displayName: 'anonymous',
-        displayId: mockE164Number,
+        name: 'anonymous',
+        displayNumber: mockE164Number,
         e164PhoneNumber: mockE164Number,
-        kind: RecipientKind.QrCode,
         contactId: undefined,
-        phoneNumberLabel: undefined,
         thumbnailPath: undefined,
       },
     })
@@ -117,14 +114,14 @@ describe(watchQrCodeDetections, () => {
       type: BarcodeTypes.QR_CODE,
       data: urlFromUriData({
         address: mockQrCodeData.address,
-        displayName: mockQrCodeData.displayName,
+        name: mockQrCodeData.displayName,
       }),
     }
 
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -133,13 +130,11 @@ describe(watchQrCodeDetections, () => {
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
-        displayName: mockName,
-        displayId: undefined,
+        name: mockName,
+        displayNumber: undefined,
         e164PhoneNumber: undefined,
         contactId: undefined,
-        phoneNumberLabel: undefined,
         thumbnailPath: undefined,
-        kind: RecipientKind.QrCode,
       },
     })
   })
@@ -151,7 +146,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -171,7 +167,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -191,7 +188,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(qrAction)
@@ -215,7 +213,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(qrAction)
@@ -238,7 +237,8 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([
         [select(addressToE164NumberSelector), {}],
-        [select(recipientCacheSelector), {}],
+        [select(phoneRecipientCacheSelector), {}],
+        [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(qrAction)

@@ -13,6 +13,8 @@ import {
   mockContractAddress,
   mockE164NumberToAddress,
   mockNavigation,
+  mockPhoneRecipientCache,
+  mockValoraRecipientCache,
 } from 'test/values'
 
 // Sleep for a number of ms
@@ -93,7 +95,18 @@ export function getMockStoreData(overrides: RecursivePartial<RootState> = {}): R
       e164NumberToAddress: mockE164NumberToAddress,
     },
   }
-  const mockStoreData: any = { ...defaultSchema, ...appConnectedData, ...contactMappingData }
+  const recipientData = {
+    recipients: {
+      phoneRecipientCache: mockPhoneRecipientCache,
+      valoraRecipientCache: mockValoraRecipientCache,
+    },
+  }
+  const mockStoreData: any = {
+    ...defaultSchema,
+    ...appConnectedData,
+    ...contactMappingData,
+    ...recipientData,
+  }
 
   // Apply overrides. Note: only merges one level deep
   for (const key of Object.keys(overrides)) {

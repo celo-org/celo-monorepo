@@ -8,7 +8,7 @@ import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/i
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { NotificationReceiveState, NotificationTypes } from 'src/notifications/types'
-import { recipientCacheSelector } from 'src/recipients/reducer'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 
 describe(handleNotification, () => {
   beforeEach(() => {
@@ -80,7 +80,8 @@ describe(handleNotification, () => {
       await expectSaga(handleNotification, message, NotificationReceiveState.APP_OPENED_FRESH)
         .provide([
           [select(addressToE164NumberSelector), {}],
-          [select(recipientCacheSelector), {}],
+          [select(phoneRecipientCacheSelector), {}],
+          [select(valoraRecipientCacheSelector), {}],
           [select(addressToDisplayNameSelector), {}],
         ])
         .run()
@@ -127,7 +128,8 @@ describe(handleNotification, () => {
       await expectSaga(handleNotification, message, NotificationReceiveState.APP_OPENED_FRESH)
         .provide([
           [select(addressToE164NumberSelector), {}],
-          [select(recipientCacheSelector), {}],
+          [select(phoneRecipientCacheSelector), {}],
+          [select(valoraRecipientCacheSelector), {}],
         ])
         .run()
 

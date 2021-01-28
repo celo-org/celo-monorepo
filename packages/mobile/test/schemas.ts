@@ -481,6 +481,10 @@ export const v7Schema = {
     loading: false,
     notifications: {},
   },
+  recipients: {
+    phoneRecipientCache: {},
+    valoraRecipientCache: {},
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

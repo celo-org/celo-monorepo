@@ -24,7 +24,6 @@ import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { RecipientKind } from 'src/recipients/recipient'
 
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
@@ -480,7 +479,7 @@ interface EscrowEventsProperties {
 interface SendEventsProperties {
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
-    recipientKind: RecipientKind
+    // TODO: decide what recipient info to collect, now that RecipientKind doesn't exist
     usedSearchBar: boolean
   }
   [SendEvents.send_cancel]: undefined

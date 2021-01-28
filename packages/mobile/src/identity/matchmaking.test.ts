@@ -8,7 +8,7 @@ import { PincodeType } from 'src/account/reducer'
 import { addContactsMatches } from 'src/identity/actions'
 import { fetchContactMatches } from 'src/identity/matchmaking'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
-import { NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { isAccountUpToDate } from 'src/web3/dataEncryptionKey'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { createMockStore } from 'test/utils'
@@ -46,21 +46,18 @@ describe('Fetch contact matches', () => {
 
     const e164NumberToRecipients: NumberToRecipient = {
       [mockE164Number]: {
-        kind: RecipientKind.Contact,
         contactId: 'contactId1',
-        displayName: 'contact1',
+        name: 'contact1',
         e164PhoneNumber: mockE164Number,
       },
       [mockE164Number2]: {
-        kind: RecipientKind.Contact,
         contactId: 'contactId2',
-        displayName: 'contact2',
+        name: 'contact2',
         e164PhoneNumber: mockE164Number2,
       },
       '+491515555555': {
-        kind: RecipientKind.Contact,
         contactId: 'contactId3',
-        displayName: 'contact3',
+        name: 'contact3',
         e164PhoneNumber: '+491515555555',
       },
     }
