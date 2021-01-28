@@ -6,17 +6,9 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
-import {
-  EscrowInstance,
-  GoldTokenInstance,
-  MultiSigInstance,
-  OwnableInstance,
-  ProxyContract,
-  ProxyInstance,
-  RegistryInstance,
-  StableTokenInstance,
-} from 'types'
+import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
+
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
@@ -155,14 +147,7 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  await _setInitialProxyImplementation(
-    web3,
-    implementation,
-    proxy,
-    contractName,
-    { from: null, value: null },
-    ...args
-  )
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
   return Contract.at(proxy.address) as ContractInstance
 }
 
@@ -174,8 +159,8 @@ export async function _setInitialProxyImplementation<
   proxy: ProxyInstance,
   contractName: string,
   txOptions: {
-    from: Address
-    value: string
+    from: Address,
+    value: string,
   },
   ...args: any[]
 ) {
@@ -188,28 +173,16 @@ export async function _setInitialProxyImplementation<
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
     console.log(`  Setting initial ${contractName} implementation on proxy`)
-    receipt = await setAndInitializeImplementation(
-      web3,
-      proxy,
-      implementation.address,
-      initializerAbi,
-      txOptions,
-      ...args
-    )
+    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
     if (txOptions.from != null) {
-      receipt = await retryTx(proxy._setImplementation, [
-        implementation.address,
-        { from: txOptions.from },
-      ])
+      receipt = await retryTx(proxy._setImplementation, [implementation.address, { from: txOptions.from }])
       if (txOptions.value != null) {
-        await retryTx(web3.eth.sendTransaction, [
-          {
-            from: txOptions.from,
-            to: proxy.address,
-            value: txOptions.value,
-          },
-        ])
+        await retryTx(web3.eth.sendTransaction, [{
+          from: txOptions.from,
+          to: proxy.address,
+          value: txOptions.value,
+        }])
       }
     } else {
       receipt = await retryTx(proxy._setImplementation, [implementation.address])
@@ -254,7 +227,7 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
-  return deploymentForContract(web3, artifacts, name, args, true, then)
+  return deploymentForContract(web3, artifacts, name, args, true, then);
 }
 
 export function deploymentForProxiedContract<ContractInstance extends Truffle.ContractInstance>(
@@ -264,7 +237,8 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
-  return deploymentForContract(web3, artifacts, name, args, false, then)
+  return deploymentForContract(web3, artifacts, name, args, false, then);
+
 }
 
 export function deploymentForContract<ContractInstance extends Truffle.ContractInstance>(
@@ -390,14 +364,10 @@ export async function sendEscrowedPayment(
 }
 
 /*
- * Builds and returns mapping of function names to selectors.
- * Each function name maps to an array of selectors to account for overloading.
- */
-export function getFunctionSelectorsForContract(
-  contract: any,
-  contractName: string,
-  artifacts: Truffle.Artifacts
-) {
+* Builds and returns mapping of function names to selectors.
+* Each function name maps to an array of selectors to account for overloading.
+*/
+export function getFunctionSelectorsForContract(contract: any, contractName: string, artifacts: Truffle.Artifacts) {
   const selectors: { [index: string]: string[] } = {}
   const proxy: any = artifacts.require(contractName + 'Proxy')
   proxy.abi

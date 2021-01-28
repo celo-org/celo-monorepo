@@ -1,7 +1,6 @@
 pragma solidity ^0.5.13;
 
 import "./StableToken.sol";
-import "../common/UsingRegistry.sol";
 
 contract StableTokenEUR is StableToken {
   /**
