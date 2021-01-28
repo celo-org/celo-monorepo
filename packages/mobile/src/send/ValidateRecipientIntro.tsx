@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import TextButton from '@celo/react-components/components/TextButton'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -9,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton'
+import ContactCircle from 'src/components/ContactCircle'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -48,12 +48,14 @@ class ValidateRecipientIntro extends React.Component<Props> {
       transactionData,
       isOutgoingPaymentRequest,
       requesterAddress,
+      origin,
     } = this.props.route.params
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,
       isOutgoingPaymentRequest,
       requesterAddress,
+      origin,
     })
 
     ValoraAnalytics.track(SendEvents.send_secure_start, { confirmByScan: false })

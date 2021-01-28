@@ -72,6 +72,8 @@
 	<string>Adding your contacts makes it easy to send and request payments with your friends.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Connecting your photo library allows you to save your code to your photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This is required for you to choose a profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>

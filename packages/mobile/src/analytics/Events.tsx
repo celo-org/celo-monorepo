@@ -76,8 +76,9 @@ export enum OnboardingEvents {
   celo_education_complete = 'celo_education_complete',
   celo_education_cancel = 'celo_education_cancel',
 
+  name_and_picture_set = 'name_and_picture_set',
+
   phone_number_set = 'phone_number_set',
-  phone_number_invalid = 'phone_number_invalid',
 
   pin_set = 'pin_set',
   pin_invalid = 'pin_invalid',
@@ -300,6 +301,9 @@ export enum CeloExchangeEvents {
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
   spend_merchant_link = 'spend_merchant_link',
+
+  cico_option_chosen = 'cico_option_chosen',
+  provider_chosen = 'provider_chosen',
 }
 
 export enum GethEvents {

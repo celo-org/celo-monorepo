@@ -357,10 +357,10 @@ OPTIONS
       Choose the change index for the derivation path
 
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use
-      "eth" as an alias of the Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating
-      the same account requires knowledge of the mnemonic, passphrase (if any), and the
-      derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'"). Use "eth"
+      as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
+      account requires knowledge of the mnemonic, passphrase (if any), and the derivation
+      path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish
@@ -488,10 +488,10 @@ OPTIONS
       Choose the change index for the derivation path
 
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use
-      "eth" as an alias of the Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating
-      the same account requires knowledge of the mnemonic, passphrase (if any), and the
-      derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'"). Use "eth"
+      as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
+      account requires knowledge of the mnemonic, passphrase (if any), and the derivation
+      path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish

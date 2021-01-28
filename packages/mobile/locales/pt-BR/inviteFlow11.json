@@ -14,7 +14,6 @@
   "accountSetupFailed": "Falha ao criar sua conta",
   "emptyInviteCode": "O código do convite não tem fundos",
   "transferDollarsToAccount": "Dólares transferidos para sua conta!",
-  "inviteFriendsToCelo": "Convide amigos para {{appName}} ",
   "inviteAnyone": "Envie facilmente para seus amigos adicionando seus contatos",
   "inviteReceived": "Convite recebido",
   "escrowPaymentNotificationTitle": "{{mobile}} foi convidado",

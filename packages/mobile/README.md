@@ -267,18 +267,37 @@ To debug network requests in forno mode, we use Charles, a proxy for monitoring 
 
 ### Debugging
 
-_To avoid debugging errors, ensure your device and laptop are connected to the same WiFi network even if they are connected via USB._
+Since we integrated dependencies making use of TurboModules, debugging via Chrome DevTools or React Native Debugger doesn't work anymore.
+As an alternative, Flipper can be used instead.
 
-1. Either shake the device or run `yarn run dev:show-menu` (only for Android) to open up the developer menu.
+#### Install Flipper
 
-2. Select `Debug` (iOS) or `Start Remote JS Debugging` (Android). This should open a new tab in your browser with React Native logger in the console. In order to get a full picture, the console's filter should be set to
-   `All levels`.
+[Flipper][flipper] is a platform for debugging iOS, Android and React Native apps. Visualize, inspect, and control your apps from a simple desktop interface.
 
-3. For the fastest development experience, you likely want to open the developer menu again and ensure `Fast Reloading` (iOS) or `Live Reloading` and `Hot Reloading` (Android) is enabled.
+```sh
+brew install flipper
+```
 
-#### Optional: Install React Native Debugger
+As of Jan 2021, Flipper is not notarized and triggers a MacOS Gatekeeper popup when trying to run it for the first time.
+Follow [these steps to successfully launch it](https://github.com/facebook/flipper/issues/1308#issuecomment-652951556) (only needed the very first time it's run)
 
-The [React Native Debugger][rn debugger] bundles together the Redux and Chrome dev tools nicely and provides a clean debugging environment.
+The application currently makes use of 2 additional Flipper plugins to enable more detailed debugging:
+
+- Reactotron (Flipper -> Manage Plugins -> Install Plugins -> flipper-plugin-reactotron)
+- Redux Debugger (Flipper -> Manage Plugins > Install Plugins > search redux-debugger)
+
+Once installed, you should be able to see them and interact with them when the wallet is running (only in dev builds).
+
+This allows viewing / debugging the following:
+
+- React DevTools (Components and Profiling)
+- Network connections
+- View hierarchy
+- Redux State / Actions
+- AsyncStorage
+- App preferences
+- Hermes
+- and more ;)
 
 ### App Profiling
 
@@ -448,7 +467,7 @@ $ adb kill-server && adb start-server
 [light node]: https://docs.celo.org/overview#ultralight-synchronization
 [protocol readme]: ../protocol/README.md
 [react native]: https://facebook.github.io/react-native/
-[rn debugger]: https://github.com/jhen0409/react-native-debugger
+[flipper]: https://fbflipper.com
 [rn optimize example]: https://reactjs.org/docs/optimizing-performance.html#examples
 [rn profiler]: https://reactjs.org/blog/2018/09/10/introducing-the-react-profiler.html
 [rn running on device]: https://facebook.github.io/react-native/docs/running-on-device
