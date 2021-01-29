@@ -14,7 +14,7 @@ interface Props {
 // An avatar for the wallet user themselves
 export function AvatarSelf({ iconSize, displayNameStyle }: Props) {
   const displayName = useSelector(nameSelector)
-  const e164PhoneNumber = useSelector(e164NumberSelector)
+  const e164PhoneNumber = useSelector(e164NumberSelector) ?? undefined
   const contactDetails = useSelector(userContactDetailsSelector)
   const account = useSelector(currentAccountSelector)
 

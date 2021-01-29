@@ -3,6 +3,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
+import { SendOrigin } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import {
@@ -68,6 +69,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -99,6 +101,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -130,6 +133,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+      origin: SendOrigin.AppSendFlow,
       isFromScan: true,
       recipient: {
         address: mockAccount.toLowerCase(),
@@ -202,6 +206,7 @@ describe(watchQrCodeDetections, () => {
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+      origin: SendOrigin.AppSendFlow,
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })
@@ -265,6 +270,7 @@ describe(sendPaymentOrInviteSaga, () => {
       comment: '',
       recipient: mockQRCodeRecipient,
       firebasePendingRequestUid: null,
+      fromModal: false,
     }
     await expectSaga(sendPaymentOrInviteSaga, sendPaymentOrInviteAction)
       .provide([

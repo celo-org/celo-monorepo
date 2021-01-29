@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
@@ -173,7 +174,8 @@ export function showLimitReachedError(
 export function* handleSendPaymentData(
   data: UriData,
   cachedRecipient?: Recipient,
-  isOutgoingPaymentRequest?: true
+  isOutgoingPaymentRequest?: true,
+  isFromScan?: true
 ) {
   const recipient: AddressRecipient = {
     address: data.address.toLowerCase(),
@@ -211,8 +213,9 @@ export function* handleSendPaymentData(
       }
       navigate(Screens.SendConfirmation, {
         transactionData,
-        isFromScan: true,
+        isFromScan,
         currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
+        origin: SendOrigin.AppSendFlow,
       })
     }
   } else {
@@ -220,7 +223,12 @@ export function* handleSendPaymentData(
       Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
       return
     } else if (data.token === 'cUSD' || !data.token) {
-      navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+      navigate(Screens.SendAmount, {
+        recipient,
+        isFromScan,
+        isOutgoingPaymentRequest,
+        origin: SendOrigin.AppSendFlow,
+      })
     }
   }
 }

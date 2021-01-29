@@ -16,7 +16,7 @@ import {
 } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { completePaymentRequest } from 'src/paymentRequest/actions'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientHasNumber, RecipientInfo } from 'src/recipients/recipient'
@@ -203,6 +203,7 @@ export function* sendPaymentOrInviteSaga({
   recipientAddress,
   inviteMethod,
   firebasePendingRequestUid,
+  fromModal,
 }: SendPaymentOrInviteAction) {
   try {
     yield call(getConnectedUnlockedAccount)
@@ -223,7 +224,12 @@ export function* sendPaymentOrInviteSaga({
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
 
-    navigateHome()
+    if (fromModal) {
+      navigateBack()
+    } else {
+      navigateHome()
+    }
+
     yield put(sendPaymentOrInviteSuccess(amount))
   } catch (e) {
     yield put(showErrorOrFallback(e, ErrorMessages.SEND_PAYMENT_FAILED))

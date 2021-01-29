@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[` renders correctly with address but without contact 1`] = `
+exports[` renders correctly with address and name but no number 1`] = `
 <View
   style={
     Object {
@@ -98,12 +98,221 @@ exports[` renders correctly with address but without contact 1`] = `
       ]
     }
   >
-    0x0000000000000000000000000000000000007E57
+    0x0000...7E57
   </Text>
 </View>
 `;
 
-exports[` renders correctly with number but without contact 1`] = `
+exports[` renders correctly with address but no name nor number 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "marginBottom": 10,
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "hsl(0, 53%, 93%)",
+            "borderRadius": 20,
+            "height": 40,
+            "width": 40,
+          },
+        ]
+      }
+    >
+      <svg
+        fill="hsl(0, 53%, 93%)"
+        height="40"
+        style={Object {}}
+        viewBox="0 0 40 40"
+        width="40"
+      />
+    </View>
+  </View>
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    style={
+      Array [
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Inter-Medium",
+          "fontSize": 14,
+          "lineHeight": 18,
+        },
+        Object {
+          "marginHorizontal": 20,
+          "paddingTop": 6,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    global:account 0x0000...7E57
+  </Text>
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    style={
+      Array [
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+        },
+        Object {
+          "marginHorizontal": 20,
+          "paddingTop": 6,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    0x0000...7E57
+  </Text>
+</View>
+`;
+
+exports[` renders correctly with just number 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "marginBottom": 10,
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "hsl(0, 53%, 93%)",
+            "borderRadius": 20,
+            "height": 40,
+            "width": 40,
+          },
+        ]
+      }
+    >
+      <svg
+        fill="hsl(0, 53%, 93%)"
+        height="40"
+        style={Object {}}
+        viewBox="0 0 40 40"
+        width="40"
+      />
+    </View>
+  </View>
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    style={
+      Array [
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Inter-Medium",
+          "fontSize": 14,
+          "lineHeight": 18,
+        },
+        Object {
+          "marginHorizontal": 20,
+          "paddingTop": 6,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    +14155556666
+  </Text>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "alignItems": "center",
+            "justifyContent": "center",
+            "marginRight": 4,
+          },
+        ]
+      }
+    >
+      🇺🇸
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#9CA4A9",
+          },
+        ]
+      }
+    >
+      +1 415-555-6666
+    </Text>
+  </View>
+</View>
+`;
+
+exports[` renders correctly with number and name 1`] = `
 <View
   style={
     Object {
@@ -182,5 +391,49 @@ exports[` renders correctly with number but without contact 1`] = `
   >
     mockName
   </Text>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "alignItems": "center",
+            "justifyContent": "center",
+            "marginRight": 4,
+          },
+        ]
+      }
+    >
+      🇺🇸
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#9CA4A9",
+          },
+        ]
+      }
+    >
+      +1 415-555-6666
+    </Text>
+  </View>
 </View>
 `;

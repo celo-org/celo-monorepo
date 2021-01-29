@@ -1,5 +1,5 @@
 import firebase from '@react-native-firebase/app'
-import { call, put, spawn, take, takeLeading } from 'redux-saga/effects'
+import { call, put, spawn, take, takeEvery, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
   ClearStoredAccountAction,
@@ -9,6 +9,7 @@ import {
   setPincodeFailure,
   setPincodeSuccess,
 } from 'src/account/actions'
+import { uploadNameAndPicture } from 'src/account/profileInfo'
 import { showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -95,8 +96,13 @@ export function* watchInitializeAccount() {
   yield takeLeading(Actions.INITIALIZE_ACCOUNT, initializeAccount)
 }
 
+export function* watchSaveNameAndPicture() {
+  yield takeEvery(Actions.SAVE_NAME_AND_PICTURE, uploadNameAndPicture)
+}
+
 export function* accountSaga() {
   yield spawn(watchSetPincode)
   yield spawn(watchClearStoredAccount)
   yield spawn(watchInitializeAccount)
+  yield spawn(watchSaveNameAndPicture)
 }

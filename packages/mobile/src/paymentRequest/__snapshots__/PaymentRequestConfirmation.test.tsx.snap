@@ -265,7 +265,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -325,7 +325,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -360,7 +360,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }

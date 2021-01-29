@@ -234,7 +234,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }

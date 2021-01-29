@@ -102,7 +102,7 @@ function SendAmount(props: Props) {
   const [amount, setAmount] = useState('')
   const [reviewButtonPressed, setReviewButtonPressed] = useState(false)
 
-  const { isOutgoingPaymentRequest, recipient } = props.route.params
+  const { isOutgoingPaymentRequest, recipient, origin } = props.route.params
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -230,8 +230,9 @@ function SendAmount(props: Props) {
       localCurrencyAmount: localCurrencyAmount
         ? localCurrencyAmount.toString()
         : localCurrencyAmount,
+      origin,
     }
-  }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
+  }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount, origin])
 
   const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
     dollarAmount,
@@ -262,15 +263,17 @@ function SendAmount(props: Props) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
+        origin,
       })
     } else {
       ValoraAnalytics.track(SendEvents.send_amount_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: props.route.params?.isFromScan,
+        origin,
       })
     }
-  }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData])
+  }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData, origin])
 
   const onRequest = React.useCallback(() => {
     if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
@@ -289,6 +292,7 @@ function SendAmount(props: Props) {
         transactionData,
         addressValidationType,
         isOutgoingPaymentRequest: true,
+        origin,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
       ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)

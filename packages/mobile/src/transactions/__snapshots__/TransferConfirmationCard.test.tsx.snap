@@ -66,11 +66,13 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -89,11 +91,13 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               </View>
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -401,7 +405,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -440,11 +444,13 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -539,7 +545,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -619,7 +625,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -678,7 +684,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -713,7 +719,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -810,7 +816,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -870,7 +876,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -905,7 +911,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -1000,11 +1006,13 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1023,11 +1031,13 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               </View>
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1221,6 +1231,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
             },
           ]
         }
+        testID="celoRewards/learnMore"
       >
         <Text
           style={
@@ -1314,7 +1325,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -1374,7 +1385,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -1409,7 +1420,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -1490,11 +1501,13 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1513,11 +1526,13 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               </View>
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1794,7 +1809,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -1854,7 +1869,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -1889,7 +1904,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -1970,11 +1985,13 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -1993,11 +2010,13 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               </View>
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -2274,7 +2293,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -2334,7 +2353,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -2369,7 +2388,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -2450,11 +2469,13 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -2473,11 +2494,13 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               </View>
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -2785,7 +2808,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -2824,11 +2847,13 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -2923,7 +2948,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -3003,7 +3028,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3062,7 +3087,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -3097,7 +3122,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3177,11 +3202,13 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -3200,11 +3227,13 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               </View>
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <Text
@@ -3512,7 +3541,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3551,11 +3580,13 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -3650,7 +3681,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -3730,7 +3761,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3789,7 +3820,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -3824,7 +3855,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3921,7 +3952,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -3980,7 +4011,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -4015,7 +4046,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }

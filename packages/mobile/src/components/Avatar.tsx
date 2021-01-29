@@ -6,6 +6,7 @@ import { StyleSheet, Text, TextStyle, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import ContactCircle from 'src/components/ContactCircle'
+import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
   getDisplayName,
@@ -47,18 +48,17 @@ export function Avatar(props: Props) {
       >
         {name}
       </Text>
-      {e164NumberToShow ? (
+      {e164NumberToShow && (
         <PhoneNumberWithFlag
           e164PhoneNumber={e164NumberToShow}
           defaultCountryCode={defaultCountryCode}
         />
-      ) : null}
-
-      {!e164NumberToShow && address ? (
+      )}
+      {!e164NumberToShow && address && (
         <Text style={[fontStyles.small, styles.contactName]} numberOfLines={1} ellipsizeMode="tail">
-          {address}
+          {formatShortenedAddress(address)}
         </Text>
-      ) : null}
+      )}
     </View>
   )
 }

@@ -1,6 +1,8 @@
 import { Address } from '@celo/base'
 import { OdisUtils } from '@celo/identity'
 import {
+  BIDALI_URL_ALFAJORES,
+  BIDALI_URL_MAINNET,
   DEFAULT_SYNC_MODE,
   DEFAULT_TESTNET,
   FORNO_ENABLED_INITIALLY,
@@ -31,6 +33,7 @@ interface NetworkConfig {
   allowedMtwImplementations: string[]
   currentMtwImplementationAddress: string
   recaptchaSiteKey: string
+  bidaliUrl: string
   CIP8AuthorizerUrl: string
   CIP8MetadataUrl: string
 }
@@ -78,6 +81,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     allowedMtwImplementations: ALLOWED_MTW_IMPLEMENTATIONS_STAGING,
     currentMtwImplementationAddress: CURRENT_MTW_IMPLEMENTATION_ADDRESS_STAGING,
     recaptchaSiteKey: RECAPTCHA_SITE_KEY_ALFAJORES,
+    bidaliUrl: BIDALI_URL_ALFAJORES,
     CIP8AuthorizerUrl: CIP8_AUTHORIZER_URL_STAGING,
     CIP8MetadataUrl: CIP8_METADATA_URL_STAGING,
   },
@@ -95,6 +99,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     allowedMtwImplementations: ALLOWED_MTW_IMPLEMENTATIONS_MAINNET,
     currentMtwImplementationAddress: CURRENT_MTW_IMPLEMENTATION_ADDRESS_MAINNET,
     recaptchaSiteKey: RECAPTCHA_SITE_KEY_MAINNET,
+    bidaliUrl: BIDALI_URL_MAINNET,
     CIP8AuthorizerUrl: CIP8_AUTHORIZER_URL_PROD,
     CIP8MetadataUrl: CIP8_METADATA_URL_PROD,
   },
