@@ -75,18 +75,18 @@ The first step to participating is generating your Celo address in a secure loca
 
 * Obtain the `generate` binary:
   * Option one - compile the `generate` binary:
-    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/.
+    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/. If you're using an Apple M1 machine, install the beta version of Rust using `rustup install beta`.
     * `git clone https://github.com/celo-org/snark-setup-operator`
     * `cd snark-setup-operator`
-    * `git checkout 9851cc0f56c8209c8e9cc1808264a0beb4d125ba`
+    * `git checkout ac3d5603256fc250500e00bae21ba646dd316d6f`
     * `cargo build --release --bin generate`
     * Now you can use `./target/release/generate`
-  * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.0).
+  * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.3).
 * Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
     * Make sure to save your passphrase - you will need it later.
-    * If you are using a USB thumbdrive, you can use the flag `--keys-path KEYS_PATH`, passing in the respective path to save the key on the drive itself.
+    * If you are using a USB thumbdrive, you can use the flag `--keys-file KEYS_FILE`, passing in the respective file path to save the key on the drive itself.
 * Send the address generated to plumo@celo.org.
 * Keep the resulting `plumo.keys` file. Ideally, it will be stored in a location that's easy to destroy afterwards, such as a USB thumbdrive.
 
@@ -98,20 +98,20 @@ cLabs is running the coordinator server, which has a list of approved participan
 
 * After receiving confirmation from cLabs, obtain the `contribute` binary:
   * Option one - compile the `contribute` binary:
-    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/.
+    * Install Rust 1.49 using `rustup install 1.49.0`. If you don't have `rustup` installed, follow the instructions in https://rustup.rs/. If you're using an Apple M1 machine, install the beta version of Rust using `rustup install beta`.
     * `git clone https://github.com/celo-org/snark-setup-operator`
     * `cd snark-setup-operator`
-    * `git checkout 9851cc0f56c8209c8e9cc1808264a0beb4d125ba`
+    * `git checkout ac3d5603256fc250500e00bae21ba646dd316d6f`
     * `cargo build --release --bin contribute`
     * Now you can use `./target/release/contribute`
-  * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.0).
+  * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.3).
 * Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
-* Run it as follows, assuming your keys reside in KEYS_PATH:
-    * Windows users: `./contribute-windows.exe --keys-path KEYS_PATH`
-    * macOS users: `./contribute-macos --keys-path KEYS_PATH`
-    * Linux users: `./contribute-linux --keys-path KEYS_PATH`
+* Run it as follows, assuming your keys reside in KEYS_FILE:
+    * Windows users: `./contribute-windows.exe --keys-file KEYS_FILE`
+    * macOS users: `./contribute-macos --keys-file KEYS_FILE`
+    * Linux users: `./contribute-linux --keys-file KEYS_FILE`
   
-  For example, assuming you're using Linux and your keys reside in `/mnt/plumo/plumo.keys`, you'd run: `./contribute-linux --keys-path /mnt/plumo/plumo.keys`.
+  For example, assuming you're using Linux and your keys reside in `/mnt/plumo/plumo.keys`, you'd run: `./contribute-linux --keys-file /mnt/plumo/plumo.keys`.
 * You will be asked for your passphrase - enter the same one from earlier. 
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.

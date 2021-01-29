@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/src/async'
 import firebase from '@react-native-firebase/app'
 import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
 import { eventChannel } from 'redux-saga'
@@ -18,6 +19,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'firebase/saga'
 const EXCHANGE_RATES = 'exchangeRates'
 const VALUE_CHANGE_HOOK = 'value'
+const FIREBASE_CONNECT_RETRIES = 3
 
 let firebaseAlreadyAuthorized = false
 export function* waitForFirebaseAuth() {
@@ -39,17 +41,25 @@ function* initializeFirebase() {
 
   Logger.info(TAG, 'Firebase enabled')
   try {
-    const app = firebase.app()
-    Logger.info(
-      TAG,
-      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${app.options.databaseURL}`
-    )
-    yield call(initializeAuth, firebase, address)
-    yield put(firebaseAuthorized())
-    yield call(initializeCloudMessaging, firebase, address)
-    Logger.info(TAG, `Firebase initialized`)
+    for (let i = 0; i < FIREBASE_CONNECT_RETRIES; i += 1) {
+      try {
+        const app = firebase.app()
+        Logger.info(TAG, `Attempt ${i + 1} to initialize db ${app.options.databaseURL}`)
 
-    return
+        yield call(initializeAuth, firebase, address)
+        yield put(firebaseAuthorized())
+        yield call(initializeCloudMessaging, firebase, address)
+        Logger.info(TAG, `Firebase initialized`)
+
+        return
+      } catch (error) {
+        if (i + 1 === FIREBASE_CONNECT_RETRIES) {
+          throw error
+        }
+
+        yield sleep(2 ** i * 5000)
+      }
+    }
   } catch (error) {
     Logger.error(TAG, 'Error while initializing firebase', error)
     yield put(showError(ErrorMessages.FIREBASE_FAILED))

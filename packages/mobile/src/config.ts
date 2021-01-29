@@ -108,12 +108,42 @@ export const RECAPTCHA_SITE_KEY_MAINNET = keyOrUndefined(
 )
 export const SAFETYNET_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SAFETYNET_KEY')
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
+export const BIDALI_URL_ALFAJORES = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'BIDALI_URL_ALFAJORES'
+)
+export const BIDALI_URL_MAINNET = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'BIDALI_URL_MAINNET'
+)
 
 export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
+    name: 'Binance',
+    link: 'https://www.binance.com/en/trade/CELO_USDT',
+    currencies: [CURRENCY_ENUM.GOLD],
+  },
+  {
     name: 'Bittrex',
     link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
+    currencies: [CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR],
+  },
+  {
+    name: 'Coinbase (CELO as CGLD)',
+    link: 'https://www.coinbase.com',
     currencies: [CURRENCY_ENUM.GOLD],
+  },
+  {
+    name: 'Coinbase Pro (CELO as CGLD)',
+    link: 'https://pro.coinbase.com/trade/CGLD-USD',
+    currencies: [CURRENCY_ENUM.GOLD],
+  },
+  {
+    name: 'CoinList Pro',
+    link: 'https://coinlist.co/asset/celo',
+    currencies: [CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR],
   },
   {
     name: 'OKCoin',
@@ -123,21 +153,6 @@ export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
     name: 'OKEx',
     link: 'https://www.okex.com/spot/trade/CELO-USDT',
-    currencies: [CURRENCY_ENUM.GOLD],
-  },
-  {
-    name: 'CoinList Pro',
-    link: 'https://coinlist.co/asset/celo',
-    currencies: [CURRENCY_ENUM.GOLD],
-  },
-  {
-    name: 'Coinbase Pro (CELO as CGLD)',
-    link: 'https://pro.coinbase.com/trade/CGLD-USD',
-    currencies: [CURRENCY_ENUM.GOLD],
-  },
-  {
-    name: 'Coinbase (CELO as CGLD)',
-    link: 'https://www.coinbase.com',
     currencies: [CURRENCY_ENUM.GOLD],
   },
 ]
@@ -160,3 +175,4 @@ export const KOTANI_URI = 'https://kotanipay.com/partners/valora'
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN
+export const DYNAMIC_DOWNLOAD_LINK = Config.DYNAMIC_DOWNLOAD_LINK

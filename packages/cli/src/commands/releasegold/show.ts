@@ -31,6 +31,7 @@ export default class Show extends ReleaseGoldBaseCommand {
       beneficiary: await this.releaseGoldWrapper.getBeneficiary(),
       authorizedSigners,
       releaseOwner: await this.releaseGoldWrapper.getReleaseOwner(),
+      owner: await this.releaseGoldWrapper.getOwner(),
       refundAddress: await this.releaseGoldWrapper.getRefundAddress(),
       liquidityProvisionMet: await this.releaseGoldWrapper.getLiquidityProvisionMet(),
       canValidate: await this.releaseGoldWrapper.getCanValidate(),

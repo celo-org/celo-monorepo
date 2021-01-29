@@ -135,14 +135,32 @@ export function recoverEIP712TypedDataSigner(
   signature: string
 ): string {
   const dataBuff = generateTypedDataHash(typedData)
-  const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
-  const publicKey = ethjsutil.ecrecover(
-    ethjsutil.toBuffer(dataBuff),
-    v,
-    ethjsutil.toBuffer(r),
-    ethjsutil.toBuffer(s)
-  )
-  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+
+  for (const parse of [parseSignatureAsRsv, parseSignatureAsVrs]) {
+    try {
+      const { r, s, v } = parse(signature.slice(2))
+      const publicKey = ethjsutil.ecrecover(
+        ethjsutil.toBuffer(dataBuff),
+        v,
+        ethjsutil.toBuffer(r),
+        ethjsutil.toBuffer(s)
+      )
+      return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+    } catch (e) {
+      // try both serialization formats before throwing
+    }
+  }
+
+  throw new Error('Unable to recover signature')
+}
+
+export function verifyEIP712TypedDataSigner(
+  typedData: EIP712TypedData,
+  signature: string,
+  signer: string
+) {
+  const recoveredSigner = recoverEIP712TypedDataSigner(typedData, signature)
+  return eqAddress(signer, recoveredSigner)
 }
 
 export function guessSigner(message: string, signature: string): string {
@@ -200,4 +218,6 @@ export const SignatureUtils = {
   parseSignature,
   parseSignatureWithoutPrefix,
   serializeSignature,
+  recoverEIP712TypedDataSigner,
+  verifyEIP712TypedDataSigner,
 }

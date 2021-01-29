@@ -37,7 +37,7 @@ describe('RegulatoryTermsScreen', () => {
       fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
       expect(acceptTerms).toHaveBeenCalled()
     })
-    it('navigates to NameAndNumber', () => {
+    it('navigates to NameAndPicture', () => {
       const store = createMockStore({})
       const acceptTerms = jest.fn()
       const wrapper = render(
@@ -46,7 +46,7 @@ describe('RegulatoryTermsScreen', () => {
         </Provider>
       )
       fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
-      expect(navigate).toHaveBeenCalledWith(Screens.NameAndNumber)
+      expect(navigate).toHaveBeenCalledWith(Screens.NameAndPicture)
     })
   })
 })
