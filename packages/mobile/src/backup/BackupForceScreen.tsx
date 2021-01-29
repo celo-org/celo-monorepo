@@ -47,11 +47,6 @@ function BackupForceScreen({ navigation }: Props) {
     navigate(Screens.WalletHome)
   }
 
-  const skipBackup = () => {
-    dispatch(setBackupCompleted())
-    navigate(Screens.WalletHome)
-  }
-
   // Prevent back button on Android
   useEffect(() => {
     const backPressListener = () => true

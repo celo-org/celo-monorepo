@@ -221,6 +221,9 @@ export function* uploadProfileInfo() {
 // }
 
 export function* uploadNameAndPicture() {
+  console.log('uploading name and picture')
+  yield call(unlockDEK)
+
   const contractKit = yield call(getContractKit)
   const account = yield select(currentAccountSelector)
   const offchainWrapper = new UploadServiceDataWrapper(contractKit, account)
@@ -228,6 +231,10 @@ export function* uploadNameAndPicture() {
   const name = yield select(nameSelector)
   const nameAccessor = new PrivateNameAccessor(offchainWrapper)
   let writeError = yield call([nameAccessor, 'write'], { name }, [])
+  if (writeError) {
+    Logger.error(TAG + '@uploadNameAndPicture', writeError)
+    throw Error('Unable to write name')
+  }
   Logger.info(TAG + 'uploadNameAndPicture', 'uploaded profile name')
 
   const pictureUri = yield select(pictureSelector)
@@ -237,12 +244,11 @@ export function* uploadNameAndPicture() {
     const dataURL = getDataURL(mimeType, data)
     const pictureAccessor = new PrivatePictureAccessor(offchainWrapper)
     writeError = yield call([pictureAccessor, 'write'], dataURL, [])
+    if (writeError) {
+      Logger.error(TAG + '@uploadNameAndPicture', writeError)
+      throw Error('Unable to write data')
+    }
     Logger.info(TAG + 'uploadNameAndPicture', 'uploaded profile picture')
-  }
-
-  if (writeError) {
-    Logger.error(TAG + '@uploadNameAndPicture', writeError)
-    throw Error('Unable to write data')
   }
 }
 
