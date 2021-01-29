@@ -105,7 +105,8 @@
       "@oclif/plugin-autocomplete",
       "@oclif/plugin-not-found",
       "@oclif/plugin-commands",
-      "@oclif/plugin-warn-if-update-available"
+      "@oclif/plugin-warn-if-update-available",
+      "@oclif/plugin-plugins"
     ],
     "topics": {
       "account": {
@@ -151,13 +152,6 @@
         "description": "View and manage Validator Groups"
       }
     },
-    "bin": "celocli",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-autocomplete",
-      "@oclif/plugin-warn-if-update-available",
-      "@oclif/plugin-plugins"
-    ],
     "warn-if-update-available": {
       "timeoutInDays": 1,
       "message": "<%= config.name %> update available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>."
