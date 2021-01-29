@@ -23,6 +23,7 @@
 * [signMessage](_packages_sdk_utils_src_signatureutils_.md#signmessage)
 * [signMessageWithoutPrefix](_packages_sdk_utils_src_signatureutils_.md#signmessagewithoutprefix)
 * [signedMessageToPublicKey](_packages_sdk_utils_src_signatureutils_.md#signedmessagetopublickey)
+* [verifyEIP712TypedDataSigner](_packages_sdk_utils_src_signatureutils_.md#verifyeip712typeddatasigner)
 * [verifySignature](_packages_sdk_utils_src_signatureutils_.md#verifysignature)
 
 ### Object literals
@@ -106,7 +107,7 @@ ___
 
 ▸ **guessSigner**(`message`: string, `signature`: string): *string*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L148)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L166)*
 
 **Parameters:**
 
@@ -283,6 +284,24 @@ Name | Type |
 
 ___
 
+###  verifyEIP712TypedDataSigner
+
+▸ **verifyEIP712TypedDataSigner**(`typedData`: [EIP712TypedData](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712typeddata.md), `signature`: string, `signer`: string): *boolean*
+
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L157)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`typedData` | [EIP712TypedData](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712typeddata.md) |
+`signature` | string |
+`signer` | string |
+
+**Returns:** *boolean*
+
+___
+
 ###  verifySignature
 
 ▸ **verifySignature**(`message`: string, `signature`: string, `signer`: string): *boolean*
@@ -305,46 +324,58 @@ Name | Type |
 
 ### ▪ **SignatureUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:195](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L195)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:213](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L213)*
 
 ###  LocalSigner
 
 • **LocalSigner**: *[LocalSigner](_packages_sdk_utils_src_signatureutils_.md#localsigner)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L197)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L215)*
 
 ###  NativeSigner
 
 • **NativeSigner**: *NativeSigner*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:196](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L196)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:214](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L214)*
 
 ###  parseSignature
 
 • **parseSignature**: *[parseSignature](_packages_sdk_utils_src_signatureutils_.md#parsesignature)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:200](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L200)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:218](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L218)*
 
 ###  parseSignatureWithoutPrefix
 
 • **parseSignatureWithoutPrefix**: *[parseSignatureWithoutPrefix](_packages_sdk_utils_src_signatureutils_.md#parsesignaturewithoutprefix)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L201)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:219](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L219)*
+
+###  recoverEIP712TypedDataSigner
+
+• **recoverEIP712TypedDataSigner**: *[recoverEIP712TypedDataSigner](_packages_sdk_utils_src_signatureutils_.md#recovereip712typeddatasigner)*
+
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:221](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L221)*
 
 ###  serializeSignature
 
 • **serializeSignature**: *serializeSignature*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L202)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:220](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L220)*
 
 ###  signMessage
 
 • **signMessage**: *[signMessage](_packages_sdk_utils_src_signatureutils_.md#signmessage)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:198](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L198)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:216](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L216)*
 
 ###  signMessageWithoutPrefix
 
 • **signMessageWithoutPrefix**: *[signMessageWithoutPrefix](_packages_sdk_utils_src_signatureutils_.md#signmessagewithoutprefix)*
 
-*Defined in [packages/sdk/utils/src/signatureUtils.ts:199](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L199)*
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:217](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L217)*
+
+###  verifyEIP712TypedDataSigner
+
+• **verifyEIP712TypedDataSigner**: *[verifyEIP712TypedDataSigner](_packages_sdk_utils_src_signatureutils_.md#verifyeip712typeddatasigner)*
+
+*Defined in [packages/sdk/utils/src/signatureUtils.ts:222](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L222)*

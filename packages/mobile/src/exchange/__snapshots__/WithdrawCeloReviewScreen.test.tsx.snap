@@ -176,7 +176,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -217,10 +217,13 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
           >
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -315,7 +318,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -395,7 +398,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -455,7 +458,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -490,7 +493,7 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }

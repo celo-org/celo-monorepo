@@ -14,5 +14,7 @@ filter='paths | join(".") | [(input_filename | gsub(".*/|\\.json$";"")), .] | jo
 # TODO: add pt-BR check
 en_keys=$(jq -r "$filter" ../locales/en-US/*.json | sort)
 es_keys=$(jq -r "$filter" ../locales/es-419/*.json | sort)
+pt_keys=$(jq -r "$filter" ../locales/pt-BR/*.json | sort)
 
 diff -u <(echo "$en_keys") <(echo "$es_keys")
+diff -u <(echo "$en_keys") <(echo "$pt_keys")

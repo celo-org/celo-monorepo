@@ -388,7 +388,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for CP-DOTO restricted
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -415,7 +415,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for CP-DOTO restricted
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -931,7 +931,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for non CP-DOTO restri
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
@@ -958,7 +958,7 @@ exports[`ExchangeHomeScreen renders and behaves correctly for non CP-DOTO restri
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }

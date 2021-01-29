@@ -190,6 +190,7 @@ export interface FetchAddressesAndValidateAction {
 export interface EndFetchingAddressesAction {
   type: Actions.END_FETCHING_ADDRESSES
   e164Number: string
+  lastFetchSuccessful: boolean
 }
 
 export interface ImportContactsAction {
@@ -471,9 +472,13 @@ export const fetchAddressesAndValidate = (
   requesterAddress,
 })
 
-export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
+export const endFetchingAddresses = (
+  e164Number: string,
+  lastFetchSuccessful: boolean
+): EndFetchingAddressesAction => ({
   type: Actions.END_FETCHING_ADDRESSES,
   e164Number,
+  lastFetchSuccessful,
 })
 
 export const updateE164PhoneNumberAddresses = (

@@ -273,9 +273,14 @@ export class KomenciKit {
   ): Promise<Result<CeloTxReceipt, FetchError | TxError>> {
     const attestations = await this.contractKit.contracts.getAttestations()
     const wallet = await this.getWallet(metaTxWalletAddress)
+    const nonce = await wallet.nonce()
+
+    const approveTx = await attestations.approveAttestationFee(attestationsRequested)
+    const approveTxSig = await wallet.signMetaTransaction(approveTx.txo, nonce)
+    const approveMetaTx = wallet.executeMetaTransaction(approveTx.txo, approveTxSig)
 
     const requestTx = await attestations.request(identifier, attestationsRequested)
-    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo)
+    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo, nonce + 1)
     const requestMetaTx = wallet.executeMetaTransaction(requestTx.txo, requestTxSig)
 
     const resp = await this.client.exec(
@@ -284,6 +289,7 @@ export class KomenciKit {
         attestationsRequested,
         walletAddress: metaTxWalletAddress,
         requestTx: toRawTransaction(requestMetaTx.txo),
+        approveTx: toRawTransaction(approveMetaTx.txo),
       })
     )
 
@@ -296,7 +302,9 @@ export class KomenciKit {
   }
 
   /**
-   * selectIssuers: wraps the `submitMetaTransaction` action in order
+   * @deprecated This call is now bundled in the requestAttestations call
+   *
+   * approveAttestations: wraps the `submitMetaTransaction` action in order
    * to execute cUSD.approve(attestations, fee)
    *
    * @param metaTxWalletAddress - The MetaTxWallet selecting issuers

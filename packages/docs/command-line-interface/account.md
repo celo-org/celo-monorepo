@@ -2,32 +2,6 @@
 
 Manage your account, keys, and metadata
 
-- [`celocli account:authorize`](#celocli-accountauthorize)
-- [`celocli account:balance ADDRESS`](#celocli-accountbalance-address)
-- [`celocli account:claim-account FILE`](#celocli-accountclaim-account-file)
-- [`celocli account:claim-attestation-service-url FILE`](#celocli-accountclaim-attestation-service-url-file)
-- [`celocli account:claim-domain FILE`](#celocli-accountclaim-domain-file)
-- [`celocli account:claim-keybase FILE`](#celocli-accountclaim-keybase-file)
-- [`celocli account:claim-name FILE`](#celocli-accountclaim-name-file)
-- [`celocli account:claim-storage FILE`](#celocli-accountclaim-storage-file)
-- [`celocli account:create-metadata FILE`](#celocli-accountcreate-metadata-file)
-- [`celocli account:get-metadata ADDRESS`](#celocli-accountget-metadata-address)
-- [`celocli account:list`](#celocli-accountlist)
-- [`celocli account:lock ACCOUNT`](#celocli-accountlock-account)
-- [`celocli account:new`](#celocli-accountnew)
-- [`celocli account:offchain-read`](#celocli-accountoffchain-read)
-- [`celocli account:offchain-write`](#celocli-accountoffchain-write)
-- [`celocli account:proof-of-possession`](#celocli-accountproof-of-possession)
-- [`celocli account:recover-old`](#celocli-accountrecover-old)
-- [`celocli account:register`](#celocli-accountregister)
-- [`celocli account:register-data-encryption-key`](#celocli-accountregister-data-encryption-key)
-- [`celocli account:register-metadata`](#celocli-accountregister-metadata)
-- [`celocli account:set-name`](#celocli-accountset-name)
-- [`celocli account:show ADDRESS`](#celocli-accountshow-address)
-- [`celocli account:show-claimed-accounts ADDRESS`](#celocli-accountshow-claimed-accounts-address)
-- [`celocli account:show-metadata FILE`](#celocli-accountshow-metadata-file)
-- [`celocli account:unlock ACCOUNT`](#celocli-accountunlock-account)
-- [`celocli account:verify-proof-of-possession`](#celocli-accountverify-proof-of-possession)
 
 ## `celocli account:authorize`
 
@@ -383,10 +357,10 @@ OPTIONS
       Choose the change index for the derivation path
 
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use
-      "eth" as an alias of the Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating
-      the same account requires knowledge of the mnemonic, passphrase (if any), and the
-      derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'"). Use "eth"
+      as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
+      account requires knowledge of the mnemonic, passphrase (if any), and the derivation
+      path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish
@@ -514,10 +488,10 @@ OPTIONS
       Choose the change index for the derivation path
 
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use
-      "eth" as an alias of the Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating
-      the same account requires knowledge of the mnemonic, passphrase (if any), and the
-      derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'"). Use "eth"
+      as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
+      account requires knowledge of the mnemonic, passphrase (if any), and the derivation
+      path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish
