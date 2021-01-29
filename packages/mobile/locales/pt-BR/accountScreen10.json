@@ -5,7 +5,7 @@
   "localCurrencySetting": "Moeda",
   "licenses": "Licenças",
   "removeAccountTitle": "Redefinir o Valora",
-  "removeAccountDetails": "A redefinição removerá sua conta deste dispositivo. Seus fundos permanecerão na conta, mas só estarão acessíveis com a Chave da Conta",
+  "removeAccountDetails": "A redefinição removerá sua conta deste dispositivo. Seus fundos permanecerão na conta, mas só estarão acessíveis com a Chave de Conta",
   "legal": "Jurídico",
   "securityAndData": "Segurança e Dados",
   "requirePinOnAppOpen": "Exigir PIN ao abrir o aplicativo",
@@ -27,13 +27,13 @@
     "switchToDataSaver": "Alterar para o modo de Economia de Dados"
   },
   "accountKeyModal": {
-    "header": "Sem a sua Chave da Conta, você perderá o acesso aos seus fundos para sempre",
-    "body1": "Para redefinir o Valora, você precisará confirmar o que escreveu na sua Chave da Conta.",
+    "header": "Sem a sua Chave de Conta, você perderá o acesso aos seus fundos para sempre",
+    "body1": "Para redefinir o Valora, você precisará confirmar o que escreveu na sua Chave de Conta.",
     "body2": "Ninguém, nem mesmo o Valora, pode recuperar sua conta sem sua chave."
   },
   "promptConfirmRemovalModal": {
     "header": "Tem certeza de que deseja redefinir o Valora?",
-    "body": "Você não poderá mais acessar seus fundos ou sua Chave da Conta a partir deste dispositivo. Não há como recuperar sua Chave da Conta se você não a anotou.",
+    "body": "Você não poderá mais acessar seus fundos ou sua Chave de Conta a partir deste dispositivo. Não há como recuperar sua Chave de Conta se você não a anotou.",
     "resetNow": "Redefinir agora"
   },
   "promptConfirmRevokeModal": {
@@ -64,5 +64,10 @@
   "contactMessagePlaceholder": "Digite sua mensagem aqui...",
   "attachLogs": "Anexar registros",
   "supportLegalCheckbox": "Ao enviar, concordo em compartilhar as informações acima e todos os dados de registro do aplicativo anexados com o serviço de suporte do {{appName}}.",
-  "contactSuccess": "Seu problema foi relatado com sucesso! Aguarde uma resposta por e-mail em breve!"
+  "contactSuccess": "Seu problema foi relatado com sucesso! Aguarde uma resposta por e-mail em breve!",
+  "namePictureSaved": "Seu nome e foto foram salvos com sucesso.",
+  "addPhoto": "Carregar foto",
+  "chooseFromLibrary": "Escolha na galeria",
+  "takePhoto": "Tirar Foto",
+  "removePhoto": "Deletar Foto"
 }
