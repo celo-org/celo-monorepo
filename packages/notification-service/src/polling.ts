@@ -1,8 +1,8 @@
 import AsyncPolling from 'async-polling'
-import { handlePaymentRequests } from 'src/handlers'
 import { handleTransferNotifications } from './blockscout/transfers'
 import { EXCHANGE_POLLING_INTERVAL, POLLING_INTERVAL } from './config'
 import { handleExchangeQuery } from './exchange/exchangeQuery'
+import { handlePaymentRequests } from './handlers'
 
 export const notificationPolling = AsyncPolling(async (end) => {
   try {

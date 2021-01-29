@@ -14,12 +14,7 @@ export enum Currencies {
   DOLLAR = 'dollar',
 }
 
-interface ProcessedTx {
-  txHash: string
-  blockNumber: number
-}
-
-let processedTxs: ProcessedTx[] = []
+let processedBlocks: number[] = []
 
 export async function query(path: string) {
   try {
@@ -93,10 +88,9 @@ export function notifyForNewTransfers(transfers: Transfer[]): Promise<void[]> {
     const t = transfers[i]
 
     // Skip transactions for which we've already sent notifications
-    if (!t || !!processedTxs.find((tx) => tx.txHash === t.txHash)) {
+    if (!t || processedBlocks.find((blockNumber) => blockNumber === t.blockNumber)) {
       continue
     }
-    processedTxs.push({ blockNumber: t.blockNumber, txHash: t.txHash })
 
     // notification data must be only string type
     const notificationData = {
@@ -125,8 +119,15 @@ export function convertWeiValue(value: string) {
     .valueOf()
 }
 
-function cleanOldProcessedTx(lastBlock: number) {
-  processedTxs = processedTxs.filter((tx) => tx.blockNumber >= lastBlock - MAX_BLOCKS_TO_WAIT)
+function updateProcessedBlocks(transfers: Transfer[], lastBlock: number) {
+  transfers.forEach((transfer) => {
+    if (transfer && processedBlocks.indexOf(transfer.blockNumber) < 0) {
+      processedBlocks.push(transfer?.blockNumber)
+    }
+  })
+  processedBlocks = processedBlocks.filter(
+    (blockNumber) => blockNumber >= lastBlock - MAX_BLOCKS_TO_WAIT
+  )
 }
 
 export async function handleTransferNotifications(): Promise<void> {
@@ -151,6 +152,6 @@ export async function handleTransferNotifications(): Promise<void> {
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
   await notifyForNewTransfers(allTransfers)
-  cleanOldProcessedTx(lastBlock)
+  updateProcessedBlocks(allTransfers, lastBlock)
   return setLastBlockNotified(lastBlock)
 }
