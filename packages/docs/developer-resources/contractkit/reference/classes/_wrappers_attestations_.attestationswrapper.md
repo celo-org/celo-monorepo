@@ -772,7 +772,7 @@ ___
 
 ▸ **revoke**(`identifer`: string, `account`: Address): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:757](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L757)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:763](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L763)*
 
 **Parameters:**
 
