@@ -48,7 +48,7 @@ interface ExchangeRateObject {
 }
 
 let registrations: Registrations = {}
-let lastBlockNotified = -1
+let lastBlockNotified: number = -1
 
 let pendingRequests: PendingRequests = {}
 
@@ -174,12 +174,12 @@ export function setLastBlockNotified(newBlock: number): Promise<void> | undefine
     return
   }
 
+  console.debug('Updating last block notified to:', newBlock)
   // Although firebase will keep our local lastBlockNotified in sync with the DB,
   // we set it here ourselves to avoid race condition where we check for notifications
   // again before it syncs
   lastBlockNotified = newBlock
-  console.debug('Updating last block notified to:', lastBlockNotified)
-  return lastBlockRef.set(lastBlockNotified)
+  return lastBlockRef.set(newBlock)
 }
 
 export async function sendPaymentNotification(
