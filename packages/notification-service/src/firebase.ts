@@ -1,7 +1,7 @@
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
-import { Currencies } from './blockscout/transfers'
+import { Currencies, MAX_BLOCKS_TO_WAIT } from './blockscout/transfers'
 import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
 let database: admin.database.Database
@@ -47,13 +47,8 @@ interface ExchangeRateObject {
   timestamp: number // timestamp in milliseconds
 }
 
-export type BlockNotificationsData = { [key in Currencies]: number }
-
 let registrations: Registrations = {}
-let lastBlockNotified: BlockNotificationsData = {
-  [Currencies.DOLLAR]: -1,
-  [Currencies.GOLD]: -1,
-}
+let lastBlockNotified = -1
 
 let pendingRequests: PendingRequests = {}
 
@@ -97,19 +92,14 @@ export function initializeDb() {
   lastBlockRef.on(
     'value',
     (snapshot) => {
-      const blockData = (snapshot && snapshot.val()) || {
-        [Currencies.DOLLAR]: 0,
-        [Currencies.GOLD]: 0,
-      }
-      console.debug('Latest block data updated: ', blockData)
-      // This check is for backwards-compatibility and can be removed once this update is deployed on Alfajores and Mainnet.
-      if (typeof blockData === 'number') {
-        lastBlockNotified = {
-          [Currencies.DOLLAR]: blockData,
-          [Currencies.GOLD]: blockData,
-        }
-      } else {
-        lastBlockNotified = blockData
+      const lastBlock = (snapshot && snapshot.val()) || 0
+      console.debug('Latest block data updated: ', lastBlock)
+      if (lastBlockNotified < 0) {
+        // This is to prevent sending again notifications for transfers that happened in the previous |MAX_BLOCKS_TO_WAIT|
+        // blocks when deploying this service. We might miss some notifications when deploying.
+        lastBlockNotified = lastBlock + MAX_BLOCKS_TO_WAIT
+      } else if (lastBlock > lastBlockNotified) {
+        lastBlockNotified = lastBlock
       }
     },
     (errorObject: any) => {
@@ -152,10 +142,6 @@ export function getTranslatorForAddress(address: string) {
 }
 
 export function getLastBlockNotified() {
-  return Math.max(lastBlockNotified.dollar, lastBlockNotified.gold)
-}
-
-export function getLastBlocksNotified() {
   return lastBlockNotified
 }
 
@@ -182,11 +168,8 @@ export function writeExchangeRatePair(
   console.debug(`Recorded exchange rate for ${pair}`, exchangeRateRecord)
 }
 
-export function setLastBlockNotified(
-  dollarBlock: number,
-  celoBlock: number
-): Promise<void> | undefined {
-  if (dollarBlock <= lastBlockNotified.dollar && celoBlock <= lastBlockNotified.gold) {
+export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {
+  if (newBlock <= lastBlockNotified) {
     console.debug('Block number less than latest, skipping latestBlock update.')
     return
   }
@@ -194,10 +177,7 @@ export function setLastBlockNotified(
   // Although firebase will keep our local lastBlockNotified in sync with the DB,
   // we set it here ourselves to avoid race condition where we check for notifications
   // again before it syncs
-  lastBlockNotified = {
-    [Currencies.DOLLAR]: dollarBlock,
-    [Currencies.GOLD]: celoBlock,
-  }
+  lastBlockNotified = newBlock
   console.debug('Updating last block notified to:', lastBlockNotified)
   return lastBlockRef.set(lastBlockNotified)
 }

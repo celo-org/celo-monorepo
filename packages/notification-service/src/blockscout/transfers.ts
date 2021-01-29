@@ -1,22 +1,25 @@
 import BigNumber from 'bignumber.js'
 import fetch from 'node-fetch'
 import { BLOCKSCOUT_API } from '../config'
-import {
-  BlockNotificationsData,
-  getLastBlocksNotified,
-  sendPaymentNotification,
-  setLastBlockNotified,
-} from '../firebase'
+import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
 import { flat, getTokenAddresses, removeEmptyValuesFromObject } from '../util/utils'
 import { Log, Response, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
+export const MAX_BLOCKS_TO_WAIT = 120
 
 export enum Currencies {
   GOLD = 'gold',
   DOLLAR = 'dollar',
 }
+
+interface ProcessedTx {
+  txHash: string
+  blockNumber: number
+}
+
+let processedTxs: ProcessedTx[] = []
 
 export async function query(path: string) {
   try {
@@ -84,20 +87,16 @@ export function filterAndJoinTransfers(
   return filteredGold.concat(filterdStable)
 }
 
-export function notifyForNewTransfers(
-  transfers: Transfer[],
-  lastBlocksNotified: BlockNotificationsData
-): Promise<void[]> {
+export function notifyForNewTransfers(transfers: Transfer[]): Promise<void[]> {
   const results = new Array<Promise<void>>(transfers.length)
   for (let i = 0; i < transfers.length; i++) {
     const t = transfers[i]
 
     // Skip transactions for which we've already sent notifications
-    const currency: Currencies =
-      [Currencies.DOLLAR, Currencies.GOLD].indexOf(t.currency) >= 0 ? t.currency : Currencies.DOLLAR
-    if (!t || t.blockNumber <= lastBlocksNotified[currency]) {
+    if (!t || !!processedTxs.find((tx) => tx.txHash === t.txHash)) {
       continue
     }
+    processedTxs.push({ blockNumber: t.blockNumber, txHash: t.txHash })
 
     // notification data must be only string type
     const notificationData = {
@@ -126,30 +125,32 @@ export function convertWeiValue(value: string) {
     .valueOf()
 }
 
+function cleanOldProcessedTx(lastBlock: number) {
+  processedTxs = processedTxs.filter((tx) => tx.blockNumber >= lastBlock - MAX_BLOCKS_TO_WAIT)
+}
+
 export async function handleTransferNotifications(): Promise<void> {
-  const lastBlocksNotified = getLastBlocksNotified()
-  if (lastBlocksNotified.dollar < 0 || lastBlocksNotified.gold < 0) {
+  const lastBlockNotified = getLastBlockNotified()
+  if (lastBlockNotified < 0) {
     // Firebase not yet ready
     return
   }
+  const blockToQuery = lastBlockNotified - MAX_BLOCKS_TO_WAIT
 
   const { goldTokenAddress, stableTokenAddress } = await getTokenAddresses()
   const {
     transfers: goldTransfers,
     latestBlock: goldTransfersLatestBlock,
-  } = await getLatestTokenTransfers(goldTokenAddress, lastBlocksNotified.gold, Currencies.GOLD)
+  } = await getLatestTokenTransfers(goldTokenAddress, blockToQuery, Currencies.GOLD)
 
   const {
     transfers: stableTransfers,
     latestBlock: stableTransfersLatestBlock,
-  } = await getLatestTokenTransfers(
-    stableTokenAddress,
-    lastBlocksNotified.dollar,
-    Currencies.DOLLAR
-  )
-
+  } = await getLatestTokenTransfers(stableTokenAddress, blockToQuery, Currencies.DOLLAR)
+  const lastBlock = Math.max(stableTransfersLatestBlock, goldTransfersLatestBlock)
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
-  await notifyForNewTransfers(allTransfers, lastBlocksNotified)
-  return setLastBlockNotified(stableTransfersLatestBlock, goldTransfersLatestBlock)
+  await notifyForNewTransfers(allTransfers)
+  cleanOldProcessedTx(lastBlock)
+  return setLastBlockNotified(lastBlock)
 }
