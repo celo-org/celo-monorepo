@@ -38,7 +38,7 @@ Celo uses a [proof-of-stake](../celo-codebase/protocol/proof-of-stake) consensus
 
 Participating in the Baklava testnet requires testnet units of CELO, which can only be used in the Baklava testnet. You can request a distribution of testnet CELO by filling out [the faucet request form](https://forms.gle/JTYkMAJWTAUQp1sv9). If you need any help getting started, please join the discussion on [Discord](https://chat.celo.org) or email community@celo.org.
 
-Fauceted funds come two different ways, depending on whether you're using ReleaseGold smart contract or you are validating the regular way. For every new validator, we encourage going the non-ReleaseGold route.
+Faucetted funds come two different ways, depending on whether you're using a ReleaseGold smart contract or you are validating the non-ReleaseGold way. For every new validator, we encourage going the non-ReleaseGold route.
 
 #### ReleaseGold
 
@@ -49,7 +49,7 @@ Faucetted funds will come as two `ReleaseGold` contracts. At a high level, `Rele
 If you are new to validating on Celo, please follow the Non-ReleaseGold instructions for validating.
 {% endhint %}
 
-Fauceted funds will come as 2 transactions, one for your validator address and another for your validator group address. 
+Faucetted funds will come as 2 transactions, one for your validator address and another for your validator group address. 
 
 ### Hardware requirements
 
@@ -208,7 +208,7 @@ Running a Celo Validator node requires the management of several different keys,
 | Vote signer key        | This key can be used to vote in Validator elections and on-chain governance.                                                                                                                                                                                          |
 | Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |
 
-Note that account and signer keys must be unique and may not be reused.
+Note that Account and all the signer keys must be unique and may not be reused.
 
 ##### Generating Validator and Validator Group Keys
 
@@ -216,7 +216,7 @@ First, you'll need to generate account keys for your Validator and Validator Gro
 
 {% hint style="danger" %}
 These keys will control your locked CELO, and thus should be handled with care.
-Store and back these keys up in a secure manner, as there will be no way to recover if them if lost or stolen.
+Store and back these keys up in a secure manner, as there will be no way to recover them if lost or stolen.
 {% endhint %}
 
 ```bash
@@ -228,7 +228,12 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 ```
 
 This will create a new keystore in the current directory with two new accounts.
-Copy the addresses from the terminal and set the following environment variables:`
+Copy the addresses from the terminal and set the following environment variables:
+```bash
+# On your local machine
+export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
+export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
+```
 
 ### Start your Accounts node
 
@@ -722,7 +727,7 @@ If you are new to validating on Baklava, then you most likely need to be followi
 
 ### Register the Accounts
 
-You've now done all the infrastructure setup to get a validator and proxy running. The cLabs team will review your submission to receive funds and send you 12,000 testnet CELO to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via celocli and put up a stake to register as a validator and validator group.
+You've now done all the infrastructure setup to get a validator and proxy running. The cLabs team will review your submission to receive funds and send you 12,000 Baklava testnet CELO to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](https://docs.celo.org/command-line-interface/introduction) and put up a stake to register as a validator and validator group.
 
 You can view your CELO balances by running the following commands:
 
@@ -756,7 +761,7 @@ celocli account:show $CELO_VALIDATOR_ADDRESS`
 
 ### Lock up CELO
 
-Lock up testnet CELO for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10k CELO to register a validator, and 10,000 CELO _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
+Lock up testnet CELO for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10,000 CELO to register a validator, and 10,000 CELO _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
 
 ```bash
 # On your local machine
@@ -806,7 +811,7 @@ You can view information about your Validator Group by running the following com
 celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
 ```
 
-Next, register your Validator by running the following command. Note that because we have authorized a Validator signer, this step could also be performed on the Validator machine. Running it on the local machine allows us to avoid needing to install the celocli on the Validator machine.
+Next, register your Validator by running the following command. Note that because we have authorized a Validator signer, this step could also be performed on the Validator machine. Running it on the local machine allows us to avoid needing to install the [`celocli`](https://docs.celo.org/command-line-interface/introduction) on the Validator machine.
 
 ```bash
 # On your local machine
