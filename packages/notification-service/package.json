@@ -1,7 +1,7 @@
 {
   "name": "@celo/notification-service",
   "description": "A cloud service that dispatches notifications to mobile clients",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": true,
   "author": "Celo",
   "license": "Apache-2.0",

@@ -119,7 +119,7 @@ export function convertWeiValue(value: string) {
     .valueOf()
 }
 
-function updateProcessedBlocks(transfers: Transfer[], lastBlock: number) {
+export function updateProcessedBlocks(transfers: Transfer[], lastBlock: number) {
   transfers.forEach((transfer) => {
     if (transfer && processedBlocks.indexOf(transfer.blockNumber) < 0) {
       processedBlocks.push(transfer?.blockNumber)
