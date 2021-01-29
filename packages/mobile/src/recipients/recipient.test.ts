@@ -6,7 +6,6 @@ import {
   mockRecipient,
   mockRecipient2,
   mockRecipient3,
-  mockRecipient4,
 } from 'test/values'
 
 describe('contactsToRecipients', () => {
@@ -37,13 +36,12 @@ describe('contactsToRecipients', () => {
 })
 
 describe('Recipient sorting', () => {
-  const recipients = [mockRecipient2, mockRecipient, mockRecipient4, mockRecipient3]
+  const recipients = [mockRecipient2, mockRecipient, mockRecipient3]
   it('Sorts recipients without any prioritized', () => {
     expect(sortRecipients(recipients)).toStrictEqual([
       mockRecipient3,
       mockRecipient2,
       mockRecipient,
-      mockRecipient4,
     ])
   })
   it('Sorts recipients with some prioritized', () => {
@@ -52,7 +50,6 @@ describe('Recipient sorting', () => {
       mockRecipient,
       mockRecipient3,
       mockRecipient2,
-      mockRecipient4,
     ])
   })
 })

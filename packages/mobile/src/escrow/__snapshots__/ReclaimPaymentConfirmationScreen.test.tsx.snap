@@ -113,23 +113,13 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Inter-Medium",
-                          "fontSize": 16,
-                        },
-                        Object {
-                          "color": "hsl(0, 67%, 24%)",
-                          "fontSize": 20,
-                        },
-                      ]
-                    }
-                  >
-                    M
-                  </Text>
+                  <svg
+                    fill="hsl(0, 53%, 93%)"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
+                  />
                 </View>
               </View>
               <Text
@@ -151,7 +141,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   ]
                 }
               >
-                mobileNumber
+                +14155550000
               </Text>
               <View
                 style={
@@ -1134,23 +1124,13 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Inter-Medium",
-                          "fontSize": 16,
-                        },
-                        Object {
-                          "color": "hsl(0, 67%, 24%)",
-                          "fontSize": 20,
-                        },
-                      ]
-                    }
-                  >
-                    M
-                  </Text>
+                  <svg
+                    fill="hsl(0, 53%, 93%)"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
+                  />
                 </View>
               </View>
               <Text
@@ -1172,7 +1152,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   ]
                 }
               >
-                mobileNumber
+                +14155550000
               </Text>
               <View
                 style={
@@ -2155,23 +2135,13 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Inter-Medium",
-                          "fontSize": 16,
-                        },
-                        Object {
-                          "color": "hsl(0, 67%, 24%)",
-                          "fontSize": 20,
-                        },
-                      ]
-                    }
-                  >
-                    M
-                  </Text>
+                  <svg
+                    fill="hsl(0, 53%, 93%)"
+                    height="40"
+                    style={Object {}}
+                    viewBox="0 0 40 40"
+                    width="40"
+                  />
                 </View>
               </View>
               <Text
@@ -2193,7 +2163,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   ]
                 }
               >
-                mobileNumber
+                +14155550000
               </Text>
               <View
                 style={

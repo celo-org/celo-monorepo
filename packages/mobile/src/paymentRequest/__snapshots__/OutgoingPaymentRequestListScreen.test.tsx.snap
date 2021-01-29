@@ -189,23 +189,13 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         ]
                       }
                     >
-                      <Text
-                        style={
-                          Array [
-                            Object {
-                              "color": "#FFFFFF",
-                              "fontFamily": "Inter-Medium",
-                              "fontSize": 16,
-                            },
-                            Object {
-                              "color": "hsl(338, 67%, 24%)",
-                              "fontSize": 20,
-                            },
-                          ]
-                        }
-                      >
-                        0
-                      </Text>
+                      <svg
+                        fill="hsl(338, 53%, 93%)"
+                        height="40"
+                        style={Object {}}
+                        viewBox="0 0 40 40"
+                        width="40"
+                      />
                     </View>
                   </View>
                 </View>
@@ -447,23 +437,13 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         ]
                       }
                     >
-                      <Text
-                        style={
-                          Array [
-                            Object {
-                              "color": "#FFFFFF",
-                              "fontFamily": "Inter-Medium",
-                              "fontSize": 16,
-                            },
-                            Object {
-                              "color": "hsl(338, 67%, 24%)",
-                              "fontSize": 20,
-                            },
-                          ]
-                        }
-                      >
-                        0
-                      </Text>
+                      <svg
+                        fill="hsl(338, 53%, 93%)"
+                        height="40"
+                        style={Object {}}
+                        viewBox="0 0 40 40"
+                        width="40"
+                      />
                     </View>
                   </View>
                 </View>
@@ -705,23 +685,13 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         ]
                       }
                     >
-                      <Text
-                        style={
-                          Array [
-                            Object {
-                              "color": "#FFFFFF",
-                              "fontFamily": "Inter-Medium",
-                              "fontSize": 16,
-                            },
-                            Object {
-                              "color": "hsl(338, 67%, 24%)",
-                              "fontSize": 20,
-                            },
-                          ]
-                        }
-                      >
-                        0
-                      </Text>
+                      <svg
+                        fill="hsl(338, 53%, 93%)"
+                        height="40"
+                        style={Object {}}
+                        viewBox="0 0 40 40"
+                        width="40"
+                      />
                     </View>
                   </View>
                 </View>

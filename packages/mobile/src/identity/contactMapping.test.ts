@@ -19,7 +19,7 @@ import {
   e164NumberToAddressSelector,
   secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
-import { setRecipientCache } from 'src/recipients/actions'
+import { setPhoneRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
 import { getContractKitAsync } from 'src/web3/contracts'
@@ -37,9 +37,6 @@ import {
 } from 'test/values'
 
 const recipients = contactsToRecipients(mockContactList, '+1')
-const e164NumberRecipients = recipients!.e164NumberToRecipients
-const otherRecipients = recipients!.otherRecipients
-const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
@@ -56,7 +53,7 @@ describe('Import Contacts Saga', () => {
           mockContactWithPhone2.thumbnailPath || null
         )
       )
-      .put(setRecipientCache(allRecipients))
+      .put(setPhoneRecipientCache(recipients))
       .run()
   })
 

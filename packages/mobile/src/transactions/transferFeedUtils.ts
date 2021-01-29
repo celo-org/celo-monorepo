@@ -8,7 +8,7 @@ import {
 } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
-import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import {
   getDisplayName,
@@ -88,7 +88,6 @@ export function getTransferFeedParams(
   recentTxRecipientsCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
-  addressToDisplayName: AddressToDisplayNameType,
   rawComment: string | null,
   commentKey: string | null,
   timestamp: number,

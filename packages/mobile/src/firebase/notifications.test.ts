@@ -91,7 +91,7 @@ describe(handleNotification, () => {
           address: '0xtest',
           amount: { currencyCode: 'cUSD', value: new BigNumber('1e-17') },
           comment: undefined,
-          recipient: undefined,
+          recipient: { address: '0xtest' },
           type: 'RECEIVED',
         },
         reviewProps: {
@@ -130,6 +130,7 @@ describe(handleNotification, () => {
           [select(addressToE164NumberSelector), {}],
           [select(phoneRecipientCacheSelector), {}],
           [select(valoraRecipientCacheSelector), {}],
+          [select(addressToDisplayNameSelector), {}],
         ])
         .run()
 
@@ -138,7 +139,7 @@ describe(handleNotification, () => {
           amount: new BigNumber('10'),
           firebasePendingRequestUid: 'abc',
           reason: 'Pizza',
-          recipient: { address: '0xTEST', displayName: '0xTEST', kind: 'Address' },
+          recipient: { address: '0xTEST' },
           type: 'PAY_REQUEST',
         },
       })

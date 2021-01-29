@@ -77,7 +77,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(195, 53%, 93%)",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -94,7 +94,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(195, 67%, 24%)",
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]

@@ -23,8 +23,6 @@ function ContactCircle({ size, recipient, style }: Props) {
   const iconSize = size || DEFAULT_ICON_SIZE
   const iconBackgroundColor = getAddressBackgroundColor(address || '0x0')
 
-  const getInitials = () => (recipient.name && getNameInitial(recipient.name)) || '#'
-
   const renderThumbnail = () => {
     if (recipient.thumbnailPath) {
       return (
@@ -41,7 +39,7 @@ function ContactCircle({ size, recipient, style }: Props) {
 
     const fontColor = getAddressForegroundColor(address || '0x0')
     if (recipient.name) {
-      const initials = getInitials()
+      const initials = getNameInitial(recipient.name)
       return (
         <Text style={[fontStyles.iconText, { fontSize: iconSize / 2.0, color: fontColor }]}>
           {initials.toLocaleUpperCase()}

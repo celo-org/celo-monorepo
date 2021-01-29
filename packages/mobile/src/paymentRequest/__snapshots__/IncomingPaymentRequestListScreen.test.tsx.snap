@@ -204,7 +204,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           ]
                         }
                       >
-                        +
+                        J
                       </Text>
                     </View>
                   </View>
@@ -462,7 +462,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           ]
                         }
                       >
-                        +
+                        J
                       </Text>
                     </View>
                   </View>
@@ -720,7 +720,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           ]
                         }
                       >
-                        +
+                        J
                       </Text>
                     </View>
                   </View>

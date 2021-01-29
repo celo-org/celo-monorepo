@@ -258,7 +258,7 @@ function SendAmount(props: Props) {
 
     dispatch(hideAlert())
 
-    if (addressValidationType !== AddressValidationType.NONE && recipientHasAddress(recipient)) {
+    if (addressValidationType !== AddressValidationType.NONE && !recipientHasAddress(recipient)) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
@@ -284,7 +284,7 @@ function SendAmount(props: Props) {
 
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationType !== AddressValidationType.NONE && recipientHasAddress(recipient)) {
+    if (addressValidationType !== AddressValidationType.NONE && !recipientHasAddress(recipient)) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,

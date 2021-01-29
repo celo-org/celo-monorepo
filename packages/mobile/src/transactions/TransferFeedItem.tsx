@@ -96,7 +96,6 @@ export function TransferFeedItem(props: Props) {
     recentTxRecipientsCache,
     address,
     addressToE164Number,
-    addressToDisplayName,
     comment,
     commentKey,
     timestamp,

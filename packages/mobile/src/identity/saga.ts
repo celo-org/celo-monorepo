@@ -39,6 +39,7 @@ import {
   reportRevealStatusSaga,
   startVerification,
 } from 'src/identity/verification'
+import { recipientHasNumber } from 'src/recipients/recipient'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
@@ -54,8 +55,8 @@ export function* validateRecipientAddressSaga({
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
   try {
-    if (!recipient.e164PhoneNumber) {
-      throw Error(`Invalid recipient type for Secure Send: ${recipient.kind}`)
+    if (!recipientHasNumber(recipient)) {
+      throw Error(`Invalid recipient type for Secure Send, does not have e164Number`)
     }
 
     const userAddress = yield select(currentAccountSelector)

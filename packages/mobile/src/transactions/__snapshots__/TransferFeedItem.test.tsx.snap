@@ -1043,13 +1043,23 @@ exports[`transfer feed item renders correctly for received 1`] = `
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
-          />
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "hsl(0, 67%, 24%)",
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            J
+          </Text>
         </View>
       </View>
     </View>
@@ -1321,13 +1331,23 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
-          />
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "hsl(0, 67%, 24%)",
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            J
+          </Text>
         </View>
       </View>
     </View>
@@ -1471,13 +1491,23 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
-          />
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "hsl(0, 67%, 24%)",
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            J
+          </Text>
         </View>
       </View>
     </View>
@@ -1507,7 +1537,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             }
           }
         >
-          0x0000...7E57
+          John Doe
         </Text>
         <Text
           numberOfLines={1}
@@ -1743,13 +1773,23 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
-          />
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "hsl(0, 67%, 24%)",
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            J
+          </Text>
         </View>
       </View>
     </View>
@@ -1779,7 +1819,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             }
           }
         >
-          0x0000...7E57
+          John Doe
         </Text>
         <Text
           numberOfLines={1}
@@ -1926,7 +1966,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             }
           }
         >
-          0x1Ff4...Bc42
+          global:account 0x1Ff4...Bc42
         </Text>
         <Text
           numberOfLines={1}

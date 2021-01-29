@@ -144,23 +144,13 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 ]
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#FFFFFF",
-                      "fontFamily": "Inter-Medium",
-                      "fontSize": 16,
-                    },
-                    Object {
-                      "color": "hsl(151, 67%, 24%)",
-                      "fontSize": 20,
-                    },
-                  ]
-                }
-              >
-                +
-              </Text>
+              <svg
+                fill="hsl(151, 53%, 93%)"
+                height="40"
+                style={Object {}}
+                viewBox="0 0 40 40"
+                width="40"
+              />
             </View>
           </View>
         </View>
@@ -405,23 +395,13 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 ]
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#FFFFFF",
-                      "fontFamily": "Inter-Medium",
-                      "fontSize": 16,
-                    },
-                    Object {
-                      "color": "hsl(151, 67%, 24%)",
-                      "fontSize": 20,
-                    },
-                  ]
-                }
-              >
-                +
-              </Text>
+              <svg
+                fill="hsl(151, 53%, 93%)"
+                height="40"
+                style={Object {}}
+                viewBox="0 0 40 40"
+                width="40"
+              />
             </View>
           </View>
         </View>

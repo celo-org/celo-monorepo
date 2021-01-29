@@ -6,6 +6,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import {
+  addressToDisplayNameSelector,
   addressToE164NumberSelector,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
@@ -62,6 +63,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
@@ -70,7 +72,6 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount.toLowerCase(),
         name: mockName,
-        displayNumber: mockE164Number,
         e164PhoneNumber: mockE164Number,
         contactId: undefined,
         thumbnailPath: undefined,
@@ -93,6 +94,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
@@ -101,7 +103,6 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount.toLowerCase(),
         name: 'anonymous',
-        displayNumber: mockE164Number,
         e164PhoneNumber: mockE164Number,
         contactId: undefined,
         thumbnailPath: undefined,
@@ -123,6 +124,8 @@ describe(watchQrCodeDetections, () => {
         [select(addressToE164NumberSelector), {}],
         [select(phoneRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
+        [select(addressToDisplayNameSelector), {}],
+        [select(valoraRecipientCacheSelector)],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
@@ -149,6 +152,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
@@ -170,6 +174,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), {}],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
@@ -191,6 +196,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch(qrAction)
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
@@ -216,6 +222,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch(qrAction)
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
@@ -240,6 +247,7 @@ describe(watchQrCodeDetections, () => {
         [select(phoneRecipientCacheSelector), {}],
         [select(valoraRecipientCacheSelector), {}],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
+        [select(addressToDisplayNameSelector), {}],
       ])
       .dispatch(qrAction)
       .put(showMessage(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
