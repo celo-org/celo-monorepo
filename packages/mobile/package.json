@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-  "@celo/client": "0.0.322",
+    "@celo/client": "0.0.322",
     "@celo/connect": "1.0.1-dev",
     "@celo/contractkit": "1.0.1-dev",
     "@celo/identity": "1.0.1-dev",
