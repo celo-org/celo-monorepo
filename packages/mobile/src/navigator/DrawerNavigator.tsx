@@ -44,7 +44,7 @@ import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { AccountKey } from 'src/icons/navigator/AccountKey'
 import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
 import { Gold } from 'src/icons/navigator/Gold'
@@ -56,6 +56,7 @@ import InviteFriendModal from 'src/invite/InviteFriendModal'
 import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
 import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
+import RewardsPill from 'src/navigator/RewardsPill'
 import { Screens } from 'src/navigator/Screens'
 import { default as useSelector } from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -165,7 +166,10 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
-        <ContactCircleSelf size={64} />
+        <View style={styles.drawerHeader}>
+          <ContactCircleSelf size={64} />
+          <RewardsPill />
+        </View>
         <Text style={styles.nameLabel}>{displayName}</Text>
         {e164PhoneNumber && (
           <PhoneNumberWithFlag
@@ -211,7 +215,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       </View>
       <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
-        <Text style={fontStyles.label}>Account No.</Text>
+        <Text style={fontStyles.label}>{i18n.t('dappkit:address')}</Text>
         <View style={styles.accountOuterContainer}>
           <View style={styles.accountInnerContainer}>
             <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />
@@ -304,6 +308,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'flex-start',
     marginRight: 16,
+  },
+  drawerHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   nameLabel: {
     ...fontStyles.displayName,

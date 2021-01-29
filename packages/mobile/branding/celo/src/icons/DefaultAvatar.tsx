@@ -7,5 +7,5 @@ interface Props {
 }
 
 export default function DefaultAvatar({ foregroundColor, backgroundColor }: Props) {
-  return <Svg width="40" height="40" viewBox="0 0 40 40" fill={backgroundColor}></Svg>
+  return <Svg width="40" height="40" viewBox="0 0 40 40" fill={backgroundColor} />
 }

@@ -16,9 +16,12 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import { emptyHeader } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { ensurePincode, navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import Logger from 'src/utils/Logger'
+
+const TAG = 'BackupForceScreen'
 
 type Props = StackScreenProps<StackParamList, Screens.BackupForceScreen>
 
@@ -28,7 +31,20 @@ function BackupForceScreen({ navigation }: Props) {
 
   const startBackup = () => {
     ValoraAnalytics.track(OnboardingEvents.backup_start)
-    navigate(Screens.AccountKeyEducation)
+    ensurePincode()
+      .then((pinIsCorrect) => {
+        if (pinIsCorrect) {
+          navigate(Screens.AccountKeyEducation)
+        }
+      })
+      .catch((error) => {
+        Logger.error(`${TAG}@onPress`, 'PIN ensure error', error)
+      })
+  }
+
+  const skipBackup = () => {
+    dispatch(setBackupCompleted())
+    navigate(Screens.WalletHome)
   }
 
   const skipBackup = () => {

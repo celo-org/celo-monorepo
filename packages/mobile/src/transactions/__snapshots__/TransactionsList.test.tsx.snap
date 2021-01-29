@@ -404,7 +404,7 @@ exports[`ignores failed standby transactions 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -829,7 +829,7 @@ exports[`ignores pending standby transactions that are completed in the response
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -1345,7 +1345,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }

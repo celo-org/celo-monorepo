@@ -207,12 +207,12 @@ export function* fetchAddressesAndValidateSaga({
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
-    yield put(endFetchingAddresses(e164Number))
+    yield put(endFetchingAddresses(e164Number, true))
     ValoraAnalytics.track(IdentityEvents.phone_number_lookup_complete)
   } catch (error) {
-    Logger.error(TAG + '@fetchAddressesAndValidateSaga', `Error fetching addresses`, error)
+    Logger.error(TAG + '@fetchAddressesAndValidate', `Error fetching addresses`, error)
     yield put(showErrorOrFallback(error, ErrorMessages.ADDRESS_LOOKUP_FAILURE))
-    yield put(endFetchingAddresses(e164Number))
+    yield put(endFetchingAddresses(e164Number, false))
     ValoraAnalytics.track(IdentityEvents.phone_number_lookup_error, {
       error: error.message,
     })
