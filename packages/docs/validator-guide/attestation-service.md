@@ -34,7 +34,7 @@ Attestation Service needs to expose a HTTP or HTTPS endpoint to the public Inter
 
 The `PORT` environment variable sets the listening port for the service on the local instance. Note that depending on your setup, this may be different from the port exposed to the public Internet.
 
-Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`, and (from version 1.2.0) POST `/delivery_status_messagebird`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
+Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`, and (from version 1.2.0) GET (not POST) `/delivery_status_messagebird`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
 
 An Attestation Service is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
 
@@ -81,8 +81,6 @@ Note that Attestation Service from version 1.2.0 no longer requires callback URL
 ### MessageBird
 
 MessageBird support is introduced in version 1.2.0 and later. After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and approval to send SMS to certain countries that validators must support including the USA, Canada and others. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
-
-Unlike Twilio and Nexmo, you will need to enter the callback URL for [delivery receipts](#delivery-receipts) in the MessageBird dashboard. As such, it is not currently possible to share MessageBird accounts between validators while receiving delivery receipts.
 
 ## Installation
 
@@ -352,7 +350,7 @@ Metrics for attestation requests:
 
 - `attestation_requests_unexpected_errors`: Counter for the number of unexpected errors.
 
-The following metrics track each delivery attempt. Each client request for an attestation may result in several delivery attempts, at most `MAX_PROVIDER_RETRIES` times the number of providers configured for that country:
+The following metrics track each delivery attempt. Each client request for an attestation may result in several delivery attempts, at most `MAX_DELIVERY_ATTEMPTS` configured for that country:
 
 - `attestation_attempts_delivery_status`: Counter for delivery attempts made. Label `country` breaks down the count by country code. Label `provider` identifies the provider. Label `status` identifies the outcome:
 
