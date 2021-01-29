@@ -34,7 +34,7 @@ Attestation Service needs to expose a HTTP or HTTPS endpoint to the public Inter
 
 The `PORT` environment variable sets the listening port for the service on the local instance. Note that depending on your setup, this may be different from the port exposed to the public Internet.
 
-Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
+Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`, and (from version 1.2.0) GET (not POST) `/delivery_status_messagebird`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
 
 An Attestation Service is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
 
@@ -81,8 +81,6 @@ Note that Attestation Service from version 1.2.0 no longer requires callback URL
 ### MessageBird
 
 MessageBird support is introduced in version 1.2.0 and later. After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and approval to send SMS to certain countries that validators must support including the USA, Canada and others. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
-
-Unlike Twilio and Nexmo, you will need to enter the callback URL for [delivery receipts](#delivery-receipts) in the MessageBird dashboard. As such, it is not currently possible to share MessageBird accounts between validators while receiving delivery receipts.
 
 ## Installation
 
@@ -211,28 +209,7 @@ MessageBird configuration options (v1.2.0+):
 | `MESSAGEBIRD_API_KEY`       | The API key to the MessageBird API                              |
 | `MESSAGEBIRD_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 
-## Running the Attestation Service
-
-Before running the attestation service, ensure that your local node is fully synced.
-
-```bash
-# On the Attestation machine
-sudo celocli node:synced --node geth.ipc
-```
-
-The following command for running the Attestation Service uses `--network host` to access a local database (only works on Linux), and listens for connections on port 80.
-
-It assumes all of the configuration options needed have been added to the config file located under `$CONFIG` which Docker will process. Alternatively, you can pass the config file for the service to read on startup using `-e CONFIG=<docker-path-to-config-file>`, and other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
-
-Set the `TAG` environment variable to determine which image to install. Use `attestation-service-mainnet` for the latest image suitable for mainnet (as below), `attestation-service-baklava` for the latest image suitable for baklava, or specify a specific build as given in the release notes linked above.
-
-```bash
-# On the Attestation machine
-export TAG=attestation-service-mainnet
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:$TAG -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
-```
-
-### Registering Metadata
+## Registering Metadata
 
 Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the registered Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. Note that metadata needs recreating if the key signing it is changed; it is recommended not to use the validator signer address since that key is typically rotated more regularly.
 
@@ -250,7 +227,7 @@ The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attesta
 celocli account:claim-attestation-service-url ./metadata.json --url $CELO_ATTESTATION_SERVICE_URL --from $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
-You should now host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` button to receive the permalink to the machine-readable file.
+You should now host your metadata somewhere reachable via HTTPS. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` button to receive the permalink to the machine-readable file.
 
 Now we can register this url for others to see. To do this, we must have the `beneficiary` address of the `ReleaseGold` contract (`CELO_VALIDATOR_ADDRESS`) unlocked.
 
@@ -266,6 +243,27 @@ If everything goes well users should be able to see your claims by running:
 ```bash
 # On your local machine
 celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
+```
+
+## Running the Attestation Service
+
+Before running the attestation service, ensure that your local node is fully synced and that the metadata has been registered.
+
+```bash
+# On the Attestation machine
+sudo celocli node:synced --node geth.ipc
+```
+
+The following command for running the Attestation Service uses `--network host` to access a local database (only works on Linux), and listens for connections on port 80.
+
+It assumes all of the configuration options needed have been added to the config file located under `$CONFIG` which Docker will process. Alternatively, you can pass the config file for the service to read on startup using `-e CONFIG=<docker-path-to-config-file>`, and other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
+
+Set the `TAG` environment variable to determine which image to install. Use `attestation-service-mainnet` for the latest image suitable for mainnet (as below), `attestation-service-baklava` for the latest image suitable for baklava, or specify a specific build as given in the release notes linked above.
+
+```bash
+# On the Attestation machine
+export TAG=attestation-service-mainnet
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:$TAG -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ### Delivery Receipts
@@ -352,7 +350,7 @@ Metrics for attestation requests:
 
 - `attestation_requests_unexpected_errors`: Counter for the number of unexpected errors.
 
-The following metrics track each delivery attempt. Each client request for an attestation may result in several delivery attempts, at most `MAX_PROVIDER_RETRIES` times the number of providers configured for that country:
+The following metrics track each delivery attempt. Each client request for an attestation may result in several delivery attempts, at most `MAX_DELIVERY_ATTEMPTS` configured for that country:
 
 - `attestation_attempts_delivery_status`: Counter for delivery attempts made. Label `country` breaks down the count by country code. Label `provider` identifies the provider. Label `status` identifies the outcome:
 
@@ -375,3 +373,7 @@ Administrative metrics:
 The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen at [Celo Explorer](https://explorer.celo.org): enter the Validator's address and click the 'Celo Info' tab.  
 
 [TheCelo](https://thecelo.com/?tab=attestations) tracks global attestation counts and success rates, and shows detailed information about recent attestation attempts.
+
+### Attestation Service Dashboard
+
+After your service is up and running, you can monitor its performance using the public [Attestation Service Dashboard](https://metabase.celo-networks-dev.org/public/dashboard/b0a27650-1d62-4645-81d7-26ff7546ff0d?date_filter=past2weeks~). Enter your validator address in the top right search bar to view your service's stats. This dashboard can also be useful for troubleshooting various issues that will arise with certain geographic regions or providers.

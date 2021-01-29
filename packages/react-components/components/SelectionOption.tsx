@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import CheckCircle from '@celo/react-components/icons/CheckCircle'
+import RadioButton from '@celo/react-components/icons/RadioButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
@@ -31,9 +31,7 @@ export default function SelectionOption({
       <View style={styles.contentContainer}>
         {!hideCheckboxes && (
           <View style={styles.iconContainer}>
-            {/* TODO: make proper checkbox */}
-            {!isSelected && <View style={styles.circle} />}
-            {isSelected && <CheckCircle />}
+            <RadioButton selected={isSelected} />
           </View>
         )}
         <Text style={styles.text} numberOfLines={1}>
@@ -60,13 +58,5 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 16,
-  },
-  circle: {
-    paddingTop: 2,
-    height: 24,
-    width: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.gray4,
   },
 })

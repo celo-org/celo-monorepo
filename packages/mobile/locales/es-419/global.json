@@ -25,6 +25,7 @@
   "learnMore": "Saber más",
   "activity": "Actividad",
   "history": "Historial",
+  "earnRewards": "Gana recompensas",
   "notEnoughDollarsError": "No hay suficientes Celo Dólares para cambiarlos",
   "notEnoughGoldError": "No hay suficiente CELO para cambiarlo",
   "exchangeFailed": "Intercambio fallido, por favor vuelva a intentarlo",
@@ -32,6 +33,7 @@
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
   "paste": "Pegar",
+  "choose": "Elige",
   "receivedPayment": "Pago recibido",
   "getStarted": "Primeros pasos",
   "manageCeloDollars": "Administrar Celo Dólares",
@@ -93,7 +95,7 @@
     "1": "algunas funciones no disponible"
   },
   "networkConnectionFailed": "No se pudo conectar a la red, por favor verifica tu conexión",
-  "firebaseFailed": "La conexión a Internet es débil. La información de la cuenta no se puede actualizar hasta que se restablezca la conexión.",
+  "firebaseFailed": "La conexión con el servidor falló. La información de tu cuenta no se puede actualizar hasta que se restablezca la conexión.",
   "gasPriceUpdateFailed": "No se pudo actualizar la comisión",
   "appUpdateAvailable": "Actualización de la aplicación disponible",
   "appIsOutdated": "Su versión actual está desactualizada, actualice a la última versión",
@@ -177,7 +179,7 @@
   "settings": "Configuración",
   "help": "Ayuda",
   "dismiss": "Ocultar",
-  "review": "Revisar",
+  "review": "Continuar",
   "insufficientBalance": "Tu saldo es demasiado bajo para realizar esta transacción.",
   "amount": "Monto",
   "currentBalance": "Tu Saldo actual (cUSD)",
@@ -185,5 +187,7 @@
   "commentUnavailable": "Comentario no disponible",
   "accountClearFailed": "Hubo un error al borrar tu Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",
   "withdraw": "Retirar",
-  "countryNotAvailable": "{{appName}} no está disponible en tu país"
+  "countryNotAvailable": "{{appName}} no está disponible en tu país",
+  "firebaseFetchFailed": "La conexión con el servidor falló",
+  "pictureLoadFailed": "Hubo un error al cargar la imagen"
 }

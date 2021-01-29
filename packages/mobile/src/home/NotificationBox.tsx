@@ -20,7 +20,7 @@ import { pausedFeatures } from 'src/flags'
 import { dismissNotification } from 'src/home/actions'
 import { IdToNotification } from 'src/home/reducers'
 import { getExtraNotifications } from 'src/home/selectors'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
@@ -34,6 +34,7 @@ import {
 } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
+import { getContentForCurrentLang } from 'src/utils/contentTranslations'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'NotificationBox'
@@ -227,8 +228,7 @@ export class NotificationBox extends React.Component<Props, State> {
       if (!notification) {
         continue
       }
-      const language = i18n.language.toLowerCase()
-      const texts = notification.content[language] || notification.content[language.slice(0, 2)]
+      const texts = getContentForCurrentLang(notification.content)
       if (!texts) {
         continue
       }

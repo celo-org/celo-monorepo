@@ -90,7 +90,7 @@ Array [
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -137,7 +137,7 @@ Array [
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "#7AD6FE",
+                    "backgroundColor": "hsl(166, 53%, 93%)",
                     "borderRadius": 20,
                     "height": 40,
                     "width": 40,
@@ -154,6 +154,7 @@ Array [
                       "fontSize": 16,
                     },
                     Object {
+                      "color": "hsl(166, 67%, 24%)",
                       "fontSize": 20,
                     },
                   ]

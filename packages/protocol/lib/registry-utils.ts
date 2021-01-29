@@ -10,6 +10,7 @@ export enum CeloContractName {
   EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
+  ExchangeEUR = 'ExchangeEUR',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -23,18 +24,17 @@ export enum CeloContractName {
   ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
+  StableTokenEUR = 'StableTokenEUR',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 
-// TODO(amy): Pull this list from the build artifacts instead
 export const usesRegistry = [
   CeloContractName.Escrow,
   CeloContractName.Reserve,
   CeloContractName.StableToken,
 ]
 
-// TODO(amy): Find another way to create this list
 export const hasEntryInRegistry: string[] = [
   CeloContractName.Accounts,
   CeloContractName.Attestations,

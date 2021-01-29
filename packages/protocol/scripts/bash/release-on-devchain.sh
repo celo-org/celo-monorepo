@@ -10,13 +10,11 @@ source ./scripts/bash/utils.sh
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
-NETWORK=""
-FORNO=""
 BUILD_DIR=""
 RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
-while getopts ':b:rl:d:' flag; do
+while getopts 'b:l:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
@@ -32,7 +30,6 @@ if [ -z "$BUILD_DIR" ]
 then
     RE_BUILD_REPO="yes"
     BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-    # yarn test:generate-old-devchain-and-build -b $BRANCH -d $BUILD_DIR -l $LOG_FILE
 fi
 
 echo "- Run local network"
@@ -53,7 +50,11 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
+git checkout $BRANCH >> $LOG_FILE
+yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts
+git checkout - >> $LOG_FILE
+yarn build >> $LOG_FILE
 
 echo "- Check versions of current branch"
 # From check-versions.sh
