@@ -716,6 +716,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     if (!metadataURL) {
       ret.state = AttestationServiceStatusState.NoMetadataURL
+      return ret
+    }
+
+    if (metadataURL.startsWith('http://')) {
+      ret.state = AttestationServiceStatusState.InvalidAttestationServiceURL
+      return ret
     }
 
     try {
@@ -809,6 +815,7 @@ export enum AttestationServiceStatusState {
   NoMetadataURL = 'NoMetadataURL',
   InvalidMetadata = 'InvalidMetadata',
   NoAttestationServiceURL = 'NoAttestationServiceURL',
+  InvalidAttestationServiceURL = 'InvalidAttestationServiceURL',
   UnreachableAttestationService = 'UnreachableAttestationService',
   Valid = 'Valid',
   UnreachableHealthz = 'UnreachableHealthz',
