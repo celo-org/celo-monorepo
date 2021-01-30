@@ -719,7 +719,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       return ret
     }
 
-    if (metadataURL.includes('http://')) {
+    if (metadataURL.startsWith('http://')) {
       ret.state = AttestationServiceStatusState.InvalidAttestationServiceURL
       return ret
     }
