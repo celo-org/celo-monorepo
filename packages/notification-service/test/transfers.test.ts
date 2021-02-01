@@ -5,6 +5,7 @@ import {
   filterAndJoinTransfers,
   handleTransferNotifications,
   notifyForNewTransfers,
+  updateProcessedBlocks,
 } from '../src/blockscout/transfers'
 
 export let TRANSFER1: Transfer
@@ -13,6 +14,7 @@ export let sendPaymentNotificationMock: any
 export let getLastBlockNotifiedMock: any
 export let setLastBlockNotifiedMock: any
 export let decodeLogsMock: any
+const lastNotifiedBlock = 150
 
 jest.mock('node-fetch')
 const fetchMock: jest.Mock = require('node-fetch')
@@ -24,7 +26,7 @@ jest.mock('../src/firebase', () => {
   sendPaymentNotificationMock = jest.fn(() => {
     return new Promise<void>((resolve) => setTimeout(resolve, 1000))
   })
-  getLastBlockNotifiedMock = jest.fn(() => 120)
+  getLastBlockNotifiedMock = jest.fn(() => lastNotifiedBlock)
   setLastBlockNotifiedMock = jest.fn((newblock) => newblock)
   return {
     sendPaymentNotification: sendPaymentNotificationMock,
@@ -38,7 +40,7 @@ jest.mock('../src/blockscout/decode', () => {
     recipient: 'recipient',
     sender: 'sender',
     value: '1',
-    blockNumber: 123,
+    blockNumber: 153,
     txHash: 'txhash',
     timestamp: 1,
   }
@@ -46,7 +48,7 @@ jest.mock('../src/blockscout/decode', () => {
     recipient: 'recipient',
     sender: 'sender',
     value: '1',
-    blockNumber: 124,
+    blockNumber: 154,
     txHash: 'txhash2',
     timestamp: 1,
   }
@@ -58,8 +60,8 @@ jest.mock('../src/blockscout/decode', () => {
 
   decodeLogsMock = jest
     .fn()
-    .mockReturnValueOnce({ transfers: goldTransfers, latestBlock: 123 })
-    .mockReturnValueOnce({ transfers: stableTransfers, latestBlock: 124 })
+    .mockReturnValueOnce({ transfers: goldTransfers, latestBlock: 153 })
+    .mockReturnValueOnce({ transfers: stableTransfers, latestBlock: 154 })
 
   return {
     ...jest.requireActual('../src/blockscout/decode'),
@@ -122,8 +124,7 @@ describe('Transfers', () => {
 
   it('should notify for new transfers since last block notified', async () => {
     const transfers = [TRANSFER1, TRANSFER2]
-    const lastBlockNotified = 122
-    const returned = await notifyForNewTransfers(transfers, lastBlockNotified)
+    const returned = await notifyForNewTransfers(transfers)
 
     expect(sendPaymentNotificationMock).toHaveBeenCalledWith(
       TRANSFER1.recipient,
@@ -149,11 +150,10 @@ describe('Transfers', () => {
     expect(returned.length).toEqual(transfers.length)
   })
 
-  it('should skip for transfers older than last block notified', async () => {
-    const transfers = [TRANSFER1, TRANSFER2]
-    const lastBlockNotified = 130
-    const returned = await notifyForNewTransfers(transfers, lastBlockNotified)
-
+  it('should only notify once for each transfer', async () => {
+    const transfers = [TRANSFER1]
+    updateProcessedBlocks(transfers, TRANSFER1.blockNumber)
+    const returned = await notifyForNewTransfers(transfers)
     expect(sendPaymentNotificationMock).not.toHaveBeenCalled()
     expect(returned.length).toEqual(0)
   })
