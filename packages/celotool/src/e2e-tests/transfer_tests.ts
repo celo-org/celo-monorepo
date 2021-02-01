@@ -210,6 +210,10 @@ describe('Transfer tests', function(this: any) {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator',

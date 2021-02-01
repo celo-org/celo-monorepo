@@ -41,8 +41,8 @@ import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 const TAG = 'VerificationLoadingScreen'
 
 const mapStateToProps = (state: RootState) => {
-  const feelessIsActive = state.identity.feelessVerificationState.isActive
-  const verificationStatus = feelessIsActive
+  const feelessAvailable = state.identity.feelessVerificationState.komenci.serviceAvailable
+  const verificationStatus = feelessAvailable
     ? state.identity.feelessVerificationStatus
     : state.identity.verificationStatus
 
