@@ -8,7 +8,6 @@ import {
   toChecksumAddress,
 } from 'ethereumjs-util'
 import * as Web3Utils from 'web3-utils'
-import { isCompressed } from './ecdh'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
@@ -38,9 +37,7 @@ export const privateKeyToPublicKey = (privateKey: string) =>
 
 export const publicKeyToAddress = (publicKey: string) =>
   toChecksumAddress(
-    ensureLeading0x(
-      pubToAddress(toBuffer(ensureLeading0x(publicKey)), isCompressed(publicKey)).toString('hex')
-    )
+    ensureLeading0x(pubToAddress(toBuffer(ensureLeading0x(publicKey)), true).toString('hex'))
   )
 
 export const isValidPrivateKey = (privateKey: string) =>
