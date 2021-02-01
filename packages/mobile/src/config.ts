@@ -169,7 +169,11 @@ export const SPEND_MERCHANT_LINKS: SpendMerchant[] = [
   },
 ]
 
+export const VALORA_LOGO_URL =
+  'https://valoraapp.com/_next/static/images/icon-62b90ddabe4910b9c5d55ecabf817aa8.png'
+
 export const SIMPLEX_URI = 'https://valoraapp.com/simplex'
+export const RAMP_URI = 'https://buy.ramp.network'
 export const PONTO_URI = 'https://withponto.com/partners/celo/valora'
 export const KOTANI_URI = 'https://kotanipay.com/partners/valora'
 
