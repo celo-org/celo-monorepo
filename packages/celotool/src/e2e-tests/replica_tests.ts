@@ -1,11 +1,9 @@
-// tslint:disable: no-console
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-import { DefaultRpcCaller, RpcCaller } from '@celo/contractkit/lib/utils/rpc-caller'
+import { BlockHeader } from '@celo/connect'
+import { DefaultRpcCaller, RpcCaller } from '@celo/connect/lib/utils/rpc-caller'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { BlockHeader } from 'web3-eth'
 import { privateKeyToPublicKey } from '../lib/generate_utils'
 import { getEnodeAddress, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
@@ -44,6 +42,8 @@ describe('replica swap tests', () => {
     network: 'local',
     genesisConfig: {
       blockTime: 1,
+      churritoBlock: 0,
+      donutBlock: 0,
     },
     instances: [
       {
@@ -141,6 +141,7 @@ describe('replica swap tests', () => {
         port: 30315,
         rpcport: 8555,
         privateKey: gethConfig.instances[0].privateKey,
+        minerValidator: privateKeyToAddress(gethConfig.instances[0].privateKey!),
         proxy: 'validator0-proxy0',
         isProxied: true,
         proxyport: 30304,

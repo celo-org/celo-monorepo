@@ -12,7 +12,6 @@ exports[`AlertBanner when an action is provided it dispatches the action when pr
   <View
     accessible={true}
     focusable={true}
-    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -21,20 +20,26 @@ exports[`AlertBanner when an action is provided it dispatches the action when pr
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#0768AE",
-        "flexDirection": "row",
-        "justifyContent": "center",
-        "paddingBottom": 10,
-        "paddingHorizontal": 25,
-        "paddingTop": 10,
-        "transform": Array [
-          Object {
-            "translateY": -500,
-          },
-        ],
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#0768AE",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 10,
+          "paddingHorizontal": 25,
+        },
+        undefined,
+        false,
+        Object {
+          "paddingTop": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
+        },
+      ]
     }
     testID="SmartTopAlertTouchable"
   >
@@ -74,7 +79,6 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
   <View
     accessible={true}
     focusable={true}
-    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -83,20 +87,28 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#EA6042",
-        "flexDirection": "row",
-        "justifyContent": "center",
-        "paddingBottom": 10,
-        "paddingHorizontal": 25,
-        "paddingTop": 10,
-        "transform": Array [
-          Object {
-            "translateY": -500,
-          },
-        ],
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#0768AE",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 10,
+          "paddingHorizontal": 25,
+        },
+        undefined,
+        Object {
+          "backgroundColor": "#EA6042",
+        },
+        Object {
+          "paddingTop": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
+        },
+      ]
     }
     testID="SmartTopAlertTouchable"
   >
@@ -174,7 +186,6 @@ exports[`AlertBanner when message and title passed in renders title with message
   <View
     accessible={true}
     focusable={true}
-    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -183,20 +194,26 @@ exports[`AlertBanner when message and title passed in renders title with message
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#0768AE",
-        "flexDirection": "row",
-        "justifyContent": "center",
-        "paddingBottom": 10,
-        "paddingHorizontal": 25,
-        "paddingTop": 10,
-        "transform": Array [
-          Object {
-            "translateY": -500,
-          },
-        ],
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#0768AE",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 10,
+          "paddingHorizontal": 25,
+        },
+        undefined,
+        false,
+        Object {
+          "paddingTop": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
+        },
+      ]
     }
     testID="SmartTopAlertTouchable"
   >
@@ -257,7 +274,6 @@ exports[`AlertBanner when message passed in renders message 1`] = `
   <View
     accessible={true}
     focusable={true}
-    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -266,20 +282,26 @@ exports[`AlertBanner when message passed in renders message 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#0768AE",
-        "flexDirection": "row",
-        "justifyContent": "center",
-        "paddingBottom": 10,
-        "paddingHorizontal": 25,
-        "paddingTop": 10,
-        "transform": Array [
-          Object {
-            "translateY": -500,
-          },
-        ],
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#0768AE",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 10,
+          "paddingHorizontal": 25,
+        },
+        undefined,
+        false,
+        Object {
+          "paddingTop": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
+        },
+      ]
     }
     testID="SmartTopAlertTouchable"
   >

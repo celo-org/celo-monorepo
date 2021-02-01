@@ -28,7 +28,7 @@ The service currently supports Postgres, MSSQL, and MySQL.
 ### Blockchain provider
 
 The service needs a connection to a full node in order to access chain state. The `BLOCKCHAIN_PROVIDER` config should be a url to a node with its JSON RPC enabled.
-This could be a node with RPC set up. Preferably this would be an node dedicated to this service. Alternatively, the public Forno endpoints can be used but their uptime guarantees are not as strong. For development with Alfajores, the forno url is `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://rc1-forno.celo-testnet.org`
+This could be a node with RPC set up. Preferably this would be an node dedicated to this service. Alternatively, the public Forno endpoints can be used but their uptime guarantees are not as strong. For development with Alfajores, the forno url is `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://forno.celo.org`
 
 - `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. `
 
@@ -95,4 +95,4 @@ Then check on the service to make sure its running:
 
 ### Logs
 
-Error logs will be prefixed with `CELO_PNP_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
+Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).

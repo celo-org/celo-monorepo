@@ -1,5 +1,6 @@
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { describe } from '@jest/globals'
+import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot } from './scaffold'
@@ -16,11 +17,12 @@ function runTests() {
   if (!process.env.MNEMONIC) {
     throw new Error('No MNEMONIC was set, envName was parsed as ' + envName)
   }
-  const kit = newKit(process.env.CELO_PROVIDER || 'http://localhost:8545')
+  const kit = newKitFromWeb3(new Web3(process.env.CELO_PROVIDER || 'http://localhost:8545'))
   const mnemonic = process.env.MNEMONIC!
+  const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
 
   describe('Run tests in context of monorepo', () => {
-    const context = { kit, mnemonic, logger: rootLogger }
+    const context = { kit, mnemonic, logger: rootLogger, reserveSpenderMultiSigAddress }
     // TODO: Assert maximum loss after test
     runTransfercUSDTest(context)
     runExchangeTest(context)
@@ -32,7 +34,7 @@ function runTests() {
     // TODO: Validator election + Slashing
 
     afterAll(async () => {
-      await clearAllFundsToRoot({ kit, mnemonic, logger: rootLogger })
+      await clearAllFundsToRoot(context)
     })
   })
 }

@@ -105,7 +105,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -122,6 +122,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -193,7 +194,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  +1 (415) 555-0000
+                  +1 415-555-0000
                 </Text>
               </View>
             </View>
@@ -201,7 +202,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -221,7 +222,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 34,
                     },
                   ]
@@ -240,8 +241,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 24,
+                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -260,7 +262,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -338,7 +340,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -399,6 +401,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -607,6 +610,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                             nativeBackgroundAndroid={
                               Object {
                                 "attribute": "selectableItemBackgroundBorderless",
+                                "rippleRadius": undefined,
                                 "type": "ThemeAttrAndroid",
                               }
                             }
@@ -739,7 +743,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -799,7 +803,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Array [
                         undefined,
                         Object {
-                          "color": undefined,
+                          "color": "#2E3338",
                         },
                       ]
                     }
@@ -834,7 +838,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -886,6 +890,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -956,6 +961,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -1121,7 +1127,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1138,6 +1144,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -1209,7 +1216,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  +1 (415) 555-0000
+                  +1 415-555-0000
                 </Text>
               </View>
             </View>
@@ -1217,7 +1224,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -1237,7 +1244,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 34,
                     },
                   ]
@@ -1256,8 +1263,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 24,
+                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -1276,7 +1284,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -1354,7 +1362,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -1415,6 +1423,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -1623,6 +1632,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                             nativeBackgroundAndroid={
                               Object {
                                 "attribute": "selectableItemBackgroundBorderless",
+                                "rippleRadius": undefined,
                                 "type": "ThemeAttrAndroid",
                               }
                             }
@@ -1755,7 +1765,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -1815,7 +1825,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Array [
                         undefined,
                         Object {
-                          "color": undefined,
+                          "color": "#2E3338",
                         },
                       ]
                     }
@@ -1850,7 +1860,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -1902,6 +1912,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -1972,6 +1983,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2137,7 +2149,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
+                        "backgroundColor": "hsl(0, 53%, 93%)",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2154,6 +2166,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                           "fontSize": 16,
                         },
                         Object {
+                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -2225,7 +2238,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  +1 (415) 555-0000
+                  +1 415-555-0000
                 </Text>
               </View>
             </View>
@@ -2233,7 +2246,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -2253,7 +2266,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 34,
                     },
                   ]
@@ -2272,8 +2285,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 24,
+                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -2292,7 +2306,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -2370,7 +2384,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -2431,6 +2445,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
+                      "rippleRadius": undefined,
                       "type": "ThemeAttrAndroid",
                     }
                   }
@@ -2639,6 +2654,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                             nativeBackgroundAndroid={
                               Object {
                                 "attribute": "selectableItemBackgroundBorderless",
+                                "rippleRadius": undefined,
                                 "type": "ThemeAttrAndroid",
                               }
                             }
@@ -2768,7 +2784,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -2828,7 +2844,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Array [
                         undefined,
                         Object {
-                          "color": undefined,
+                          "color": "#2E3338",
                         },
                       ]
                     }
@@ -2863,7 +2879,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -2915,6 +2931,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }
@@ -2985,6 +3002,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
+                "rippleRadius": undefined,
                 "type": "ThemeAttrAndroid",
               }
             }

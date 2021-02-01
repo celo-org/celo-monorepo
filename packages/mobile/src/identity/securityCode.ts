@@ -1,21 +1,14 @@
+import { Address } from '@celo/connect'
 import {
   ActionableAttestation,
   AttestationsWrapper,
   getSecurityCodePrefix,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { PhoneNumberHashDetails } from '@celo/contractkit/src/identity/odis/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/securityCode'
-
-export function extractSecurityCodeWithPrefix(message: string) {
-  const matches = message.match('\\s(\\d{8})\\s')
-  if (matches && matches.length === 2) {
-    return matches[1]
-  }
-  return null
-}
 
 // We look for the case, where all the promises fail or the first one to succeed.
 // Promise.all looks for all the values or the first error, so we can switch roles
@@ -40,7 +33,8 @@ export async function getAttestationCodeForSecurityCode(
   phoneHashDetails: PhoneNumberHashDetails,
   account: string,
   attestations: ActionableAttestation[],
-  securityCodeWithPrefix: string
+  securityCodeWithPrefix: string,
+  signer: Address
 ) {
   const securityCodePrefix = securityCodeWithPrefix[0]
   const lookupAttestations = attestations.filter(
@@ -55,7 +49,8 @@ export async function getAttestationCodeForSecurityCode(
         account,
         phoneHashDetails,
         attestation,
-        securityCodeWithPrefix.substr(1) // remove prefix
+        securityCodeWithPrefix.substr(1), // remove prefix
+        signer
       )
     )
   )
@@ -66,7 +61,8 @@ async function requestValidator(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
-  securityCode: string
+  securityCode: string,
+  signer: Address
 ): Promise<string> {
   const issuer = attestation.issuer
   Logger.debug(
@@ -82,18 +78,11 @@ async function requestValidator(
       securityCode,
     }
 
-    const response = await attestationsWrapper.getAttestationForSecurityCode(
+    return attestationsWrapper.getAttestationForSecurityCode(
       attestation.attestationServiceURL,
-      requestBody
+      requestBody,
+      signer
     )
-    const { ok, status } = response
-    if (ok) {
-      const body = await response.json()
-      if (body.attestationCode) {
-        return body.attestationCode
-      }
-    }
-    throw new Error(`Error getting security code for ${issuer}. Status code: ${status}`)
   } catch (error) {
     Logger.error(
       TAG + '@getAttestationCodeFromSecurityCode',

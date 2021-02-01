@@ -1,14 +1,14 @@
 import { ContractKit } from '@celo/contractkit'
-import { AuthenticationMethod } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
 import { RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
-import { logger } from './logger'
 
 const ec = new EC('secp256k1')
 
@@ -18,7 +18,8 @@ const ec = new EC('secp256k1')
  */
 export async function authenticateUser(
   request: Request,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  logger: Logger
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -80,7 +81,8 @@ export async function getDataEncryptionKey(
 export async function isVerified(
   account: string,
   hashedPhoneNumber: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  logger: Logger
 ): Promise<boolean> {
   return retryAsyncWithBackOff(
     async () => {

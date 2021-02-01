@@ -23,17 +23,17 @@
 
 ###  address
 
-• **address**: *[Address](../modules/_base_.md#address)*
+• **address**: *Address*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L37)*
+*Defined in [contractkit/src/wrappers/Validators.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L33)*
 
 ___
 
 ###  affiliates
 
-• **affiliates**: *[Address](../modules/_base_.md#address)[]*
+• **affiliates**: *Address[]*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L40)*
+*Defined in [contractkit/src/wrappers/Validators.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L36)*
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **commission**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L41)*
+*Defined in [contractkit/src/wrappers/Validators.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L37)*
 
 ___
 
@@ -49,15 +49,15 @@ ___
 
 • **lastSlashed**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L44)*
+*Defined in [contractkit/src/wrappers/Validators.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L40)*
 
 ___
 
 ###  members
 
-• **members**: *[Address](../modules/_base_.md#address)[]*
+• **members**: *Address[]*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L38)*
+*Defined in [contractkit/src/wrappers/Validators.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L34)*
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 • **membersUpdated**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L39)*
+*Defined in [contractkit/src/wrappers/Validators.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L35)*
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L36)*
+*Defined in [contractkit/src/wrappers/Validators.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L32)*
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 • **nextCommission**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L42)*
+*Defined in [contractkit/src/wrappers/Validators.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L38)*
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 • **nextCommissionBlock**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L43)*
+*Defined in [contractkit/src/wrappers/Validators.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L39)*
 
 ___
 
@@ -97,4 +97,4 @@ ___
 
 • **slashingMultiplier**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L45)*
+*Defined in [contractkit/src/wrappers/Validators.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L41)*

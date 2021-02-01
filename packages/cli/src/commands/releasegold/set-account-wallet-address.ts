@@ -1,8 +1,8 @@
 import { flags } from '@oclif/command'
-import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class SetAccountWalletAddress extends ReleaseGoldBaseCommand {
   static description = "Set the ReleaseGold contract account's wallet address"

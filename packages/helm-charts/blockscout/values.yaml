@@ -8,7 +8,7 @@ blockscout:
         minReplicas: 2
         target:
           cpu: 70
-    pool_size: 40
+    pool_size: 10
   web:
     autoscaling:
       maxReplicas: 5

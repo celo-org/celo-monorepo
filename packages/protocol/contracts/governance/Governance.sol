@@ -187,7 +187,7 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 0, 2);
   }
 
   /**
@@ -464,15 +464,15 @@ contract Governance is
   /**
    * @notice Removes a proposal if it is queued and expired.
    * @param proposalId The ID of the proposal to remove.
-   * @return Whether the proposal was expired.
+   * @return Whether the proposal was removed.
    */
   function removeIfQueuedAndExpired(uint256 proposalId) private returns (bool) {
-    bool expired = queue.contains(proposalId) && isQueuedProposalExpired(proposalId);
-    if (expired) {
+    if (isQueued(proposalId) && isQueuedProposalExpired(proposalId)) {
       queue.remove(proposalId);
       emit ProposalExpired(proposalId);
+      return true;
     }
-    return expired;
+    return false;
   }
 
   /**
@@ -541,7 +541,8 @@ contract Governance is
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
     } else if (isQueued(proposalId)) {
-      return Proposals.Stage.Queued;
+      return
+        isQueuedProposalExpired(proposalId) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
       return proposals[proposalId].getDequeuedStage(stageDurations);
     }
@@ -639,7 +640,7 @@ contract Governance is
     );
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
     voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
-    if (proposal.timestamp > voter.mostRecentReferendumProposal) {
+    if (proposal.timestamp > proposals[voter.mostRecentReferendumProposal].timestamp) {
       voter.mostRecentReferendumProposal = proposalId;
     }
     emit ProposalVoted(proposalId, account, uint256(value), weight);
@@ -762,7 +763,9 @@ contract Governance is
   function isVoting(address account) external view returns (bool) {
     Voter storage voter = voters[account];
     uint256 upvotedProposal = voter.upvote.proposalId;
-    bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
+    bool isVotingQueue = upvotedProposal != 0 &&
+      isQueued(upvotedProposal) &&
+      !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
     bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
       Proposals.Stage.Referendum);
@@ -1010,11 +1013,12 @@ contract Governance is
 
   /**
    * @notice Returns whether or not a proposal is in the queue.
+   * @dev NOTE: proposal may be expired
    * @param proposalId The ID of the proposal.
    * @return Whether or not the proposal is in the queue.
    */
   function isQueued(uint256 proposalId) public view returns (bool) {
-    return queue.contains(proposalId) && !isQueuedProposalExpired(proposalId);
+    return queue.contains(proposalId);
   }
 
   /**

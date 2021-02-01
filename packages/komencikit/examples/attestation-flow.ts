@@ -1,12 +1,10 @@
 import { base64ToHex, hexToBuffer } from '@celo/base'
-import {
-  printAndIgnoreRequestErrors,
-  requestAttestationsFromIssuers,
-} from '@celo/celotool/lib/lib/attestation'
-import { ContractKit } from '@celo/contractkit'
-import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
-import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
+import { printAndIgnoreRequestErrors } from '@celo/celotool/lib/lib/attestation'
+import { newKitFromWeb3 } from '@celo/contractkit'
+import { requestAttestationsFromIssuers } from '@celo/env-tests/lib/shared/attestation'
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import { compressedPubKey } from '@celo/utils/src/dataEncryptionKey'
+import { LocalWallet } from '@celo/wallet-local'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
@@ -85,7 +83,7 @@ const fornoURL: Record<Network, string> = {
 
 const provider = new Web3.providers.HttpProvider(fornoURL[network])
 const web3 = new Web3(provider)
-const contractKit = new ContractKit(web3, wallet)
+const contractKit = newKitFromWeb3(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
 
@@ -129,10 +127,11 @@ const run = async () => {
   console.log('DeployWallet: ', deployWallet)
   if (!deployWallet.ok) {
     return
+    ;-b
   }
   const walletAddress = deployWallet.result
   // cached:
-  const phoneNumber = '+40723301264'
+  const phoneNumber = '+105551234'
   // const identifier = '0x59c637d9c774d242dc36bdb0445e29fa79c69b74ef70b6d1a5c407c1db6b4110'
 
   const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
@@ -161,11 +160,6 @@ const run = async () => {
     return
   }
 
-  const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
-  console.log(approveRes)
-  if (!approveRes.ok) {
-    return
-  }
   const statsBefore = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('Before ===== ')
   console.log(statsBefore)

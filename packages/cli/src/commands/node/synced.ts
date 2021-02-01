@@ -6,7 +6,7 @@ export default class NodeSynced extends BaseCommand {
   static description = 'Check if the node is synced'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     verbose: flags.boolean({
       description: 'output the full status if syncing',
     }),

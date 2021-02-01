@@ -1,16 +1,17 @@
 import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
-import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
-import { BlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
-import {
-  getBlindedPhoneNumber,
-  getPhoneNumberIdentifierFromSignature,
-} from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
+import { ContractEventLog } from '@celo/contractkit/lib/generated/types'
 import {
   MetaTransactionWalletWrapper,
   toRawTransaction,
 } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
-import { TransactionReceipt } from 'web3-core'
+import { BlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
+import {
+  getBlindedPhoneNumber,
+  getPhoneNumberIdentifierFromSignature,
+} from '@celo/identity/lib/odis/phone-number-identifier'
 import {
   checkService,
   checkSession,
@@ -251,7 +252,7 @@ export class KomenciKit {
    * @param identifier - phone number identifier
    * @param metaTxWalletAddress - MetaTransactionWallet address requesting attestations
    * @param attestationsRequested - the number of attestations
-   * @return TransactionReceipt of the batch transaction
+   * @return CeloTxReceipt of the batch transaction
    */
   @retry({
     tries: 3,
@@ -269,12 +270,17 @@ export class KomenciKit {
     metaTxWalletAddress: string,
     identifier: string,
     attestationsRequested: number
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<CeloTxReceipt, FetchError | TxError>> {
     const attestations = await this.contractKit.contracts.getAttestations()
     const wallet = await this.getWallet(metaTxWalletAddress)
+    const nonce = await wallet.nonce()
+
+    const approveTx = await attestations.approveAttestationFee(attestationsRequested)
+    const approveTxSig = await wallet.signMetaTransaction(approveTx.txo, nonce)
+    const approveMetaTx = wallet.executeMetaTransaction(approveTx.txo, approveTxSig)
 
     const requestTx = await attestations.request(identifier, attestationsRequested)
-    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo)
+    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo, nonce + 1)
     const requestMetaTx = wallet.executeMetaTransaction(requestTx.txo, requestTxSig)
 
     const resp = await this.client.exec(
@@ -283,6 +289,7 @@ export class KomenciKit {
         attestationsRequested,
         walletAddress: metaTxWalletAddress,
         requestTx: toRawTransaction(requestMetaTx.txo),
+        approveTx: toRawTransaction(approveMetaTx.txo),
       })
     )
 
@@ -295,7 +302,9 @@ export class KomenciKit {
   }
 
   /**
-   * selectIssuers: wraps the `submitMetaTransaction` action in order
+   * @deprecated This call is now bundled in the requestAttestations call
+   *
+   * approveAttestations: wraps the `submitMetaTransaction` action in order
    * to execute cUSD.approve(attestations, fee)
    *
    * @param metaTxWalletAddress - The MetaTxWallet selecting issuers
@@ -304,7 +313,7 @@ export class KomenciKit {
   public approveAttestations = async (
     metaTxWalletAddress: string,
     attestationsRequested: number
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
+  ): Promise<Result<CeloTxReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     const approveTx = await attestations.approveAttestationFee(attestationsRequested)
     return this.submitMetaTransaction(metaTxWalletAddress, approveTx)
@@ -320,7 +329,7 @@ export class KomenciKit {
   public selectIssuers = async (
     metaTxWalletAddress: string,
     identifier: string
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
+  ): Promise<Result<CeloTxReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     await attestations.waitForSelectingIssuers(identifier, metaTxWalletAddress)
     return this.submitMetaTransaction(metaTxWalletAddress, attestations.selectIssuers(identifier))
@@ -340,7 +349,7 @@ export class KomenciKit {
     identifier: string,
     issuer: Address,
     code: string
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
+  ): Promise<Result<CeloTxReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     return this.submitMetaTransaction(
       metaTxWalletAddress,
@@ -363,7 +372,7 @@ export class KomenciKit {
     name: string,
     dataEncryptionKey: string,
     walletAddress: Address
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
+  ): Promise<Result<CeloTxReceipt, FetchError | TxError>> => {
     const accounts = await this.contractKit.contracts.getAccounts()
     const proofOfPossession = await accounts.generateProofOfKeyPossession(
       metaTxWalletAddress,
@@ -401,7 +410,7 @@ export class KomenciKit {
     metaTxWalletAddress: string,
     tx: CeloTransactionObject<any>,
     nonce?: number
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<CeloTxReceipt, FetchError | TxError>> {
     const wallet = await this.getWallet(metaTxWalletAddress)
     const signature = await wallet.signMetaTransaction(tx.txo, nonce)
     const rawMetaTx = toRawTransaction(wallet.executeMetaTransaction(tx.txo, signature).txo)
@@ -422,11 +431,11 @@ export class KomenciKit {
    * @param txHash - the hash of the transaction to watch
    * @private
    */
-  private async waitForReceipt(txHash: string): Promise<Result<TransactionReceipt, TxError>> {
-    let receipt: TransactionReceipt | null = null
+  private async waitForReceipt(txHash: string): Promise<Result<CeloTxReceipt, TxError>> {
+    let receipt: CeloTxReceipt | null = null
     let waited = 0
     while (receipt == null && waited < this.options.txRetryTimeoutMs) {
-      receipt = await this.contractKit.web3.eth.getTransactionReceipt(txHash)
+      receipt = await this.contractKit.connection.getTransactionReceipt(txHash)
       if (receipt == null) {
         await sleep(this.options.txPollingIntervalMs)
         waited += this.options.txPollingIntervalMs
@@ -473,7 +482,10 @@ export class KomenciKit {
   ): Promise<Result<string, LoginSignatureError>> {
     try {
       const loginStruct = buildLoginTypedData(this.externalAccount, captchaToken)
-      const signature = await this.contractKit.signTypedData(this.externalAccount, loginStruct)
+      const signature = await this.contractKit.connection.signTypedData(
+        this.externalAccount,
+        loginStruct
+      )
 
       return Ok(serializeSignature(signature))
     } catch (e) {
@@ -501,7 +513,16 @@ export class KomenciKit {
     })
 
     const deployWalletLog = events.find(
-      (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
+      (
+        event: ContractEventLog<{
+          owner: string
+          wallet: string
+          implementation: string
+          0: string
+          1: string
+          2: string
+        }>
+      ) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
     )
 
     if (deployWalletLog === undefined) {

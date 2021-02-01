@@ -21,7 +21,7 @@
 
 Ƭ **AttestationServiceURLClaim**: *t.TypeOf‹typeof AttestationServiceURLClaimType›*
 
-*Defined in [packages/contractkit/src/identity/claims/attestation-service-url.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/attestation-service-url.ts#L19)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L20)*
 
 ## Variables
 
@@ -33,7 +33,7 @@
   url: UrlType,
 })
 
-*Defined in [packages/contractkit/src/identity/claims/attestation-service-url.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/attestation-service-url.ts#L13)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L14)*
 
 ## Functions
 
@@ -41,7 +41,7 @@
 
 ▸ **createAttestationServiceURLClaim**(`url`: string): *[AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim)*
 
-*Defined in [packages/contractkit/src/identity/claims/attestation-service-url.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/attestation-service-url.ts#L21)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L22)*
 
 **Parameters:**
 
@@ -55,9 +55,9 @@ ___
 
 ###  validateAttestationServiceUrl
 
-▸ **validateAttestationServiceUrl**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim), `address`: [Address](_base_.md#address)): *Promise‹string | undefined›*
+▸ **validateAttestationServiceUrl**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim), `address`: Address): *Promise‹string | undefined›*
 
-*Defined in [packages/contractkit/src/identity/claims/attestation-service-url.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/attestation-service-url.ts#L27)*
+*Defined in [contractkit/src/identity/claims/attestation-service-url.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/attestation-service-url.ts#L28)*
 
 **Parameters:**
 
@@ -65,6 +65,6 @@ Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 `claim` | [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim) |
-`address` | [Address](_base_.md#address) |
+`address` | Address |
 
 **Returns:** *Promise‹string | undefined›*

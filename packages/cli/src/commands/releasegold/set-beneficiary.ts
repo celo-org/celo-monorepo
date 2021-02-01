@@ -1,9 +1,9 @@
 import { flags } from '@oclif/command'
 import prompts from 'prompts'
-import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class SetBeneficiary extends ReleaseGoldBaseCommand {
   static description =
