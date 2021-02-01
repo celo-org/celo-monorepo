@@ -156,6 +156,9 @@
       "timeoutInDays": 1,
       "message": "<%= config.name %> update available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>."
     },
-    "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>"
+    "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>",
+    "hooks": {
+      "prerun": "./lib/hooks/prerun/plugin-warning"
+    }
   }
 }
