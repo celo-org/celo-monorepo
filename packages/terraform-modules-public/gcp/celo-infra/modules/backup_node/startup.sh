@@ -166,11 +166,13 @@ cat <<'EOF' > /root/backup.sh
 # This takes quit some time, and takes quite a bit of local disk.
 # The rsync variant (below) is more efficient, but tarballs are more portable.
 set -x
+echo "Starting chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
 tar -C /root/.celo/celo -zcvf /root/chaindata.tgz chaindata
 gsutil cp /root/chaindata.tgz gs://${gcloud_project}-chaindata
 rm -f /root/chaindata.tgz
+echo "Chaindata backup completed" | logger
 sleep 3
 systemctl start geth.service
 EOF
@@ -182,9 +184,11 @@ cat <<'EOF' > /root/backup_rsync.sh
 #!/bin/bash
 # This script stops geth, and uses rsync to copy chaindata to GCS.
 set -x
+echo "Starting rsync chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
 gsutil -m rsync -d -r /root/.celo/celo gs://${gcloud_project}-chaindata-rsync
+echo "rsync chaindata backup completed" | logger
 sleep 3
 systemctl start geth.service
 EOF

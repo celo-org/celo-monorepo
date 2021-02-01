@@ -68,7 +68,7 @@ variable geth_node_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-org/geth"
-    tag        = "1.1.1"
+    tag        = "1.2.2"
   }
 }
 
@@ -171,7 +171,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-1-1-0"
+    tag        = "attestation-service-v1.2.0"
   }
 }
 

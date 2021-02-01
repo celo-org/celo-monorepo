@@ -425,8 +425,9 @@ ExecStart=/usr/bin/docker run \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
       --nodiscover \\
       --proxy.proxied \\
-      --proxy.proxyenodeurlpair=\\"$PROXY_URL\\" \\
+      --proxy.proxyenodeurlpairs=\\"$PROXY_URL\\" \\
       --light.serve 0 \\
+      --istanbul.replica \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
 

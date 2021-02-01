@@ -161,13 +161,18 @@ systemctl restart rsyslog
 echo "Creating chaindata backup script" | logger
 cat <<'EOF' > /root/backup.sh
 #!/bin/bash
+# This script stops geth, tars up the chaindata (with gzip compression), and copies it to GCS.
+# The 'chaindata' GCS bucket has versioning enabled, so if a corrupted tarball is uploaded, an older version can be selected for restore.
+# This takes quit some time, and takes quite a bit of local disk.
+# The rsync variant (below) is more efficient, but tarballs are more portable.
 set -x
+echo "Starting chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
-#note this will likely need to be upgraded to rsync, as the tar operation is slow on the persistent disk storage
 tar -C /root/.celo/celo -zcvf /root/chaindata.tgz chaindata
 gsutil cp /root/chaindata.tgz gs://${gcloud_project}-chaindata
 rm -f /root/chaindata.tgz
+echo "Chaindata backup completed" | logger
 sleep 3
 systemctl start geth.service
 EOF
@@ -177,10 +182,13 @@ chmod u+x /root/backup.sh
 echo "Creating rsync chaindata backup script" | logger
 cat <<'EOF' > /root/backup_rsync.sh
 #!/bin/bash
+# This script stops geth, and uses rsync to copy chaindata to GCS.
 set -x
+echo "Starting rsync chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
 gsutil -m rsync -d -r /root/.celo/celo gs://${gcloud_project}-chaindata-rsync
+echo "rsync chaindata backup completed" | logger
 sleep 3
 systemctl start geth.service
 EOF

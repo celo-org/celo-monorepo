@@ -24,11 +24,6 @@ variable ethstats_host {
   description = "Ethstats url or IP address"
 }
 
-#variable genesis_content_base64 {
-#  type        = string
-#  description = "Content of the genesis file encoded in base64"
-#}
-
 variable geth_exporter_docker_image_repository {
   type        = string
   description = "Repository of the geth exporter docker image"
@@ -94,11 +89,6 @@ variable validator_signer_account_addresses {
   description = "Array with the Validator etherbase account addresses"
 }
 
-#variable bootnodes_base64 {
-#  type        = string
-#  description = "Bootnodes ethereum address encoded as base64"
-#}
-
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
@@ -107,12 +97,12 @@ variable reset_geth_data {
 
 variable proxy_name {
   type        = string
-  description = "The proxy Name for ethstats"
+  description = "The proxy Name for celostats"
 }
 
 variable proxy_addresses {
   type        = list(string)
-  description = "The proxy address for ethstats"
+  description = "The proxy address for celostats"
 }
 
 variable proxy_max_peers {

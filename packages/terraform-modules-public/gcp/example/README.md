@@ -297,6 +297,12 @@
 
 16. Wait for new epoch
 
+    ***Note that as of Celo blockchain v1.2.2, the validator node will now come up in *replica* mode, meaning that it will not
+    validate blocks until instructed to do so by running 'istanbul.start()' from the geth js console.***
+
+    See the [Hotswap docs](https://docs.celo.org/validator-guide/node-upgrades#hotswapping-validator-nodes) for info on how to 
+    shift validating responsibility from one active (or failed) validator to another **without doing a key rotation**.
+
     Now sit back, pull up [TheCelo](http://www.thecelo.com/) and wait for the new epoch to roll around.  You can track your validator on the [PRL Block Map Site](https://cauldron.pretoriaresearchlab.io/rc1-block-map), and get a visual indication of when your new signer has taken over.
 
 17. Troubleshooting
@@ -383,6 +389,7 @@
       * POST /test_attestations
       * GET /get_attestations
       * POST /delivery_status_twilio
+      * GET /delivery_status_nexmo
       * GET /status
       * GET /healthz
       * GET /metrics
@@ -468,6 +475,13 @@
     celocli account:get-metadata $CELO_VALIDATOR_GROUP_RG_ADDRESS
     celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
     ```
+
+22. Verify validator and attestation performance
+    You can see how well your validator group is performing visually by looking at the [Mainnet Block Map](https://cauldron.pretoriaresearchlab.io/block-map) from [Pretoria Research Lab](https://cauldron.pretoriaresearchlab.io/).
+
+    Pretoria has also created an [Attestation Map](https://cauldron.pretoriaresearchlab.io/attestations).
+
+    The cLabs team also has a [firebase dashboard](https://metabase.celo-networks-dev.org/public/dashboard/b0a27650-1d62-4645-81d7-26ff7546ff0d?date_filter=past2weeks~&validator_address=0x474df04481f778b46Fc71204C72B6A8BE396F0FF) that allows you to visualize attestation performance, and also seeks to identify situations in which an attestation failed due to operator (rather than user) error.
 
 # Areas for improvement
 * move sshd to non standard port to reduce brute force noise

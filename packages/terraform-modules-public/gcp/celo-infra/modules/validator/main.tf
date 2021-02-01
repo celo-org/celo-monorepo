@@ -16,7 +16,6 @@ resource "google_compute_instance" "validator" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
 
-  #deletion_protection = true
   deletion_protection = false
 
   count = var.validator_count
@@ -27,7 +26,6 @@ resource "google_compute_instance" "validator" {
 
   boot_disk {
     initialize_params {
-      #image = "debian-cloud/debian-9"
       image = "debian-cloud/debian-10"
     }
   }

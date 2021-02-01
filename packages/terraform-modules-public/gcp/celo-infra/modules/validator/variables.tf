@@ -5,7 +5,7 @@ variable block_time {
 
 variable celo_env {
   type        = string
-  description = "Name of the testnet Celo environment"
+  description = "Name of the Celo environment"
 }
 
 variable gcloud_project {
@@ -21,13 +21,8 @@ variable instance_type {
 
 variable ethstats_host {
   type        = string
-  description = "Ethstats url or IP address"
+  description = "Celostats url or IP address"
 }
-
-#variable genesis_content_base64 {
-#  type        = string
-#  description = "Content of the genesis file encoded in base64"
-#}
 
 variable geth_exporter_docker_image_repository {
   type        = string

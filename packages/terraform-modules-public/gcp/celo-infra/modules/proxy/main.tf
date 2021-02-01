@@ -23,8 +23,7 @@ resource "google_compute_instance" "proxy" {
   machine_type = var.instance_type
 
   deletion_protection = false
-  #deletion_protection = true
-
+  
   count = var.validator_count
 
   tags = ["${var.celo_env}-proxy"]
