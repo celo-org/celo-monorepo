@@ -49,7 +49,7 @@ spec:
 {{- end }}
     spec:
       initContainers:
-{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: Always
@@ -182,7 +182,9 @@ spec:
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
           if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
-            BOOTNODE_FLAG="--${network_name}"
+            BOOTNODE_FLAG="--{{ .Release.Name }}"
+          elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
+            BOOTNODE_FLAG=""
           else
             BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
           fi
@@ -196,6 +198,7 @@ spec:
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
+            --ipcpath=geth.ipc \
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \

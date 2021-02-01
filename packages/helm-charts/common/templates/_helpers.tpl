@@ -39,6 +39,13 @@ app: {{ template "common.name" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "common.conditional-init-genesis-container" -}}
+{{- $production_envs := list "rc1" "baklava" "alfajores" -}}
+{{- if not (has .Release.Name $production_envs) -}}
+{{ include "common.init-genesis-container" . }}
+{{- end -}}
+{{- end -}}
+
 {{- define "common.init-genesis-container" -}}
 - name: init-genesis
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -48,7 +55,7 @@ release: {{ .Release.Name }}
   - -c
   args:
   - |
-      mkdir -p /var/geth /root/celo
+      mkdir -p /var/geth /root/.celo
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
@@ -161,11 +168,17 @@ release: {{ .Release.Name }}
     PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
     {{- end }}
 
+    if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
+      BOOTNODE_FLAG="--{{ .Release.Name }}"
+    elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
+      BOOTNODE_FLAG=""
+    else
+      BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode)"
+    fi
 {{ .extra_setup }}
-
     exec geth \
       --port $PORT  \
-      --bootnodes=$(cat /root/.celo/bootnodeEnode) \
+      "$BOOTNODE_FLAG" \
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
       --maxpeers {{ .maxpeers | default 1100 }} \

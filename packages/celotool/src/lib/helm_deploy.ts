@@ -721,6 +721,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
 
+  const defaultDiskSize = fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')
+  const privateTxNodeDiskSize = fetchEnvOrFallback(envVar.PRIVATE_NODE_DISK_SIZE_GB, defaultDiskSize)
+
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
@@ -758,7 +761,8 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
-    `--set geth.diskSizeGB=${fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')}`,
+    `--set geth.diskSizeGB=${defaultDiskSize}`,
+    `--set geth.privateTxNodediskSizeGB=${privateTxNodeDiskSize}`,
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...gethMetricsOverrides,
     ...(await helmIPParameters(celoEnv)),
