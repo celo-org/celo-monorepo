@@ -41,7 +41,7 @@ exports[`renders correctly when not ready 1`] = `
         Array [
           undefined,
           Object {
-            "color": undefined,
+            "color": "#2E3338",
           },
         ]
       }
@@ -68,7 +68,7 @@ exports[`renders correctly when not ready 1`] = `
         Array [
           undefined,
           Object {
-            "color": undefined,
+            "color": "#2E3338",
           },
         ]
       }
@@ -121,7 +121,7 @@ exports[`renders correctly when ready 1`] = `
         Array [
           undefined,
           Object {
-            "color": undefined,
+            "color": "#2E3338",
           },
         ]
       }
@@ -148,7 +148,7 @@ exports[`renders correctly when ready 1`] = `
         Array [
           undefined,
           Object {
-            "color": undefined,
+            "color": "#2E3338",
           },
         ]
       }
