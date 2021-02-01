@@ -48,8 +48,6 @@ const keyVaultAddresses: Map<string, { address: string; privateKey: string }> = 
   ],
 ])
 
-console.log(keyVaultAddresses)
-
 // Sample data from the official EIP-712 example:
 // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
 const TYPED_DATA = {
