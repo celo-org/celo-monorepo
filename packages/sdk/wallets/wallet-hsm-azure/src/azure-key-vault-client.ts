@@ -23,7 +23,7 @@ const SIGNING_ALGORITHM_FOR: Record<SupportedCurve, SigningAlgorithm> = {
 }
 
 const isSupportedCurve = (curveName: string): curveName is SupportedCurve => {
-  return curveName in SUPPORTED_CURVES
+  return (SUPPORTED_CURVES as string[]).indexOf(curveName) > -1
 }
 
 /**
