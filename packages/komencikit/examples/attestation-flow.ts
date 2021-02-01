@@ -127,10 +127,11 @@ const run = async () => {
   console.log('DeployWallet: ', deployWallet)
   if (!deployWallet.ok) {
     return
+    ;-b
   }
   const walletAddress = deployWallet.result
   // cached:
-  const phoneNumber = '+40723301264'
+  const phoneNumber = '+105551234'
   // const identifier = '0x59c637d9c774d242dc36bdb0445e29fa79c69b74ef70b6d1a5c407c1db6b4110'
 
   const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
