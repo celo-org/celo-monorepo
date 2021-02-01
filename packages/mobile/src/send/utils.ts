@@ -2,11 +2,12 @@ import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { call, put, select } from 'redux-saga/effects'
+import { dailyLimitSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { FeeType } from 'src/fees/actions'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -85,8 +86,12 @@ export const getFeeType = (
 }
 
 // exported for tests
-export function dailyAmountRemaining(now: number, recentPayments: PaymentInfo[]) {
-  return DAILY_PAYMENT_LIMIT_CUSD - dailySpent(now, recentPayments)
+export function dailyAmountRemaining(
+  now: number,
+  recentPayments: PaymentInfo[],
+  dailyLimit: number
+) {
+  return dailyLimit - dailySpent(now, recentPayments)
 }
 
 function dailySpent(now: number, recentPayments: PaymentInfo[]) {
@@ -123,13 +128,25 @@ export function useDailyTransferLimitValidator(
   const recentPayments = useSelector(getRecentPayments)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
+  const dailyLimit = useSelector(dailyLimitSelector)
 
   const now = Date.now()
 
-  const isLimitReached = _isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
+  const isLimitReached = _isPaymentLimitReached(
+    now,
+    recentPayments,
+    dollarAmount.toNumber(),
+    dailyLimit
+  )
   const showLimitReachedBanner = () => {
     dispatch(
-      showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
+      showLimitReachedError(
+        now,
+        recentPayments,
+        localCurrencyExchangeRate,
+        localCurrencySymbol,
+        dailyLimit
+      )
     )
   }
   return [isLimitReached, showLimitReachedBanner]
@@ -138,25 +155,27 @@ export function useDailyTransferLimitValidator(
 export function _isPaymentLimitReached(
   now: number,
   recentPayments: PaymentInfo[],
-  initial: number
+  initial: number,
+  dailyLimit: number
 ): boolean {
   const amount = dailySpent(now, recentPayments) + initial
-  return amount > DAILY_PAYMENT_LIMIT_CUSD
+  return amount > dailyLimit
 }
 
 export function showLimitReachedError(
   now: number,
   recentPayments: PaymentInfo[],
   localCurrencyExchangeRate: string | null | undefined,
-  localCurrencySymbol: LocalCurrencySymbol | null
+  localCurrencySymbol: LocalCurrencySymbol | null,
+  dollarDailyLimit: number
 ) {
-  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments).toFixed(2)
+  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments, dollarDailyLimit).toFixed(2)
   const dailyRemaining = convertDollarsToLocalAmount(
     dailyRemainingcUSD,
     localCurrencyExchangeRate
   )?.decimalPlaces(2)
   const dailyLimit = convertDollarsToLocalAmount(
-    DAILY_PAYMENT_LIMIT_CUSD,
+    dollarDailyLimit,
     localCurrencyExchangeRate
   )?.decimalPlaces(2)
 
@@ -165,7 +184,7 @@ export function showLimitReachedError(
     dailyRemaining,
     dailyLimit,
     dailyRemainingcUSD,
-    dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
+    dailyLimitcUSD: dollarDailyLimit,
   }
 
   return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)

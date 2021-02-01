@@ -28,6 +28,7 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   CLEAR_STORED_ACCOUNT = 'ACCOUNT/CLEAR_STORED_ACCOUNT',
+  UPDATE_DAILY_LIMIT = 'ACCOUNT/UPDATE_DAILY_LIMIT',
 }
 
 export interface ChooseCreateAccountAction {
@@ -150,6 +151,11 @@ export interface ClearStoredAccountAction {
   account: string
 }
 
+export interface UpdateDailyLimitAction {
+  type: Actions.UPDATE_DAILY_LIMIT
+  newLimit: number
+}
+
 export type ActionTypes =
   | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
@@ -178,6 +184,7 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | ClearStoredAccountAction
+  | UpdateDailyLimitAction
 
 export function chooseCreateAccount(): ChooseCreateAccountAction {
   return {
@@ -322,4 +329,9 @@ export const setUserContactDetails = (
 export const clearStoredAccount = (account: string): ClearStoredAccountAction => ({
   type: Actions.CLEAR_STORED_ACCOUNT,
   account,
+})
+
+export const updateDailyLimit = (newLimit: number): UpdateDailyLimitAction => ({
+  type: Actions.UPDATE_DAILY_LIMIT,
+  newLimit,
 })

@@ -1,5 +1,6 @@
 import firebase from '@react-native-firebase/app'
-import { call, put, spawn, take, takeLeading } from 'redux-saga/effects'
+import _ from 'lodash'
+import { call, cancelled, put, spawn, take, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
   ClearStoredAccountAction,
@@ -8,6 +9,7 @@ import {
   SetPincodeAction,
   setPincodeFailure,
   setPincodeSuccess,
+  updateDailyLimit,
 } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
@@ -15,14 +17,14 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { clearStoredMnemonic } from 'src/backup/utils'
 import { FIREBASE_ENABLED } from 'src/config'
-import { firebaseSignOut } from 'src/firebase/firebase'
+import { dailyLimitChannel, firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
 import { refreshAllBalances } from 'src/home/actions'
 import { removeAccountLocally } from 'src/pincode/authentication'
 import { persistor } from 'src/redux/store'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { getOrCreateAccount } from 'src/web3/saga'
+import { getConnectedAccount, getOrCreateAccount } from 'src/web3/saga'
 
 const TAG = 'account/saga'
 
@@ -82,6 +84,28 @@ function* initializeAccount() {
   }
 }
 
+export function* watchDailyLimit() {
+  const account = yield call(getConnectedAccount)
+  const channel = yield call(dailyLimitChannel, account)
+  if (!channel) {
+    return
+  }
+  try {
+    while (true) {
+      const dailyLimit = yield take(channel)
+      if (_.isNumber(dailyLimit)) {
+        yield put(updateDailyLimit(dailyLimit))
+      }
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@watchDailyLimit`, error)
+  } finally {
+    if (yield cancelled()) {
+      channel.close()
+    }
+  }
+}
+
 export function* watchSetPincode() {
   yield takeLeading(Actions.SET_PINCODE, setPincode)
 }
@@ -99,4 +123,5 @@ export function* accountSaga() {
   yield spawn(watchSetPincode)
   yield spawn(watchClearStoredAccount)
   yield spawn(watchInitializeAccount)
+  yield spawn(watchDailyLimit)
 }

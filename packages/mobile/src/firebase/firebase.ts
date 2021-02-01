@@ -247,6 +247,10 @@ export async function notificationsChannel() {
   return simpleReadChannel('notificationsV2')
 }
 
+export async function dailyLimitChannel(address: string) {
+  return simpleReadChannel(`registrations/${address}/dailyLimit`)
+}
+
 function simpleReadChannel(key: string) {
   if (!FIREBASE_ENABLED) {
     return null
