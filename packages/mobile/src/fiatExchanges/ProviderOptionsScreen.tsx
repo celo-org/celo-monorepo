@@ -18,11 +18,11 @@ import { FiatExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
-import { openMoonpay, openSimplex } from 'src/fiatExchanges/utils'
+import { openMoonpay, openRamp, openSimplex } from 'src/fiatExchanges/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import QuestionIcon from 'src/icons/QuestionIcon'
-import { moonpayLogo, simplexLogo } from 'src/images/Images'
+import { moonpayLogo, rampLogo, simplexLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -97,6 +97,12 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         enabled: true,
         image: <Image source={simplexLogo} style={styles.logo} resizeMode={'contain'} />,
         onSelected: () => openSimplex(account),
+      },
+      {
+        name: 'Ramp',
+        enabled: true,
+        image: <Image source={rampLogo} style={styles.logo} resizeMode={'contain'} />,
+        onSelected: () => openRamp(account, CURRENCY_ENUM.DOLLAR),
       },
     ],
   }
