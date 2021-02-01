@@ -15,7 +15,10 @@ export function isCompressed(publicKey: string) {
   if (noLeading0x.length === 64) {
     return true
   }
-  return noLeading0x.length === 66 && (noLeading0x.startsWith('02') || noLeading0x.startsWith('03'))
+  return (
+    noLeading0x.length === 66 &&
+    (noLeading0x.startsWith('02') || noLeading0x.startsWith('03') || noLeading0x.startsWith('04'))
+  )
 }
 
 export function ensureCompressed(publicKey: string): string {
