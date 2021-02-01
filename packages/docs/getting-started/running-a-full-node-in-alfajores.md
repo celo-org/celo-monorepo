@@ -2,6 +2,12 @@
 
 This section explains how to get a full node running on the [Alfajores Network](alfajores-testnet.md), using a Docker image that was built for this purpose.
 
+{% hint style="info" %}
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+
+You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
+{% endhint %}
+
 Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes [full node incentives](../celo-codebase/protocol/transactions/full-node-incentives.md).
 
 When a light client sends transactions, they may include a gateway fee to be paid to the node that gossips transactions to the other full nodes and validators.

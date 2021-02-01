@@ -1,102 +1,28 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, "12.4"
-
 # Allow using RNFirebase as static frameworks
 # https://rnfirebase.io/#allow-ios-static-frameworks
 # Otherwise we get the following error:
 # `The 'Pods-celo' target has transitive dependencies that include statically linked binaries [...]`
 $RNFirebaseAsStaticFramework = true
 
+# Workaround OpenSSL-Universal react-native-fast-crypto conflict
+$static_framework = ['react-native-flipper', 'react-native-fast-crypto', 'FlipperKit', 'Flipper', 'Flipper-Folly',
+  'CocoaAsyncSocket', 'ComponentKit', 'Flipper-DoubleConversion',
+  'Flipper-Glog', 'Flipper-PeerTalk', 'Flipper-RSocket',
+  'CocoaLibEvent', 'OpenSSL-Universal']
+
+require_relative "../../../node_modules/react-native/scripts/react_native_pods"
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
-def add_flipper_pods!(versions = {})
-  versions['Flipper'] ||= '~> 0.33.1'
-  versions['DoubleConversion'] ||= '1.1.7'
-  versions['Flipper-Folly'] ||= '~> 2.1'
-  versions['Flipper-Glog'] ||= '0.3.6'
-  versions['Flipper-PeerTalk'] ||= '~> 0.0.4'
-  versions['Flipper-RSocket'] ||= '~> 1.0'
-  pod 'FlipperKit', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FlipperKitLayoutPlugin', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/SKIOSNetworkPlugin', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FlipperKitUserDefaultsPlugin', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FlipperKitReactPlugin', versions['Flipper'], :configuration => 'Debug'
-  # List all transitive dependencies for FlipperKit pods
-  # to avoid them being linked in Release builds
-  pod 'Flipper', versions['Flipper'], :configuration => 'Debug'
-  pod 'Flipper-DoubleConversion', versions['DoubleConversion'], :configuration => 'Debug'
-  pod 'Flipper-Folly', versions['Flipper-Folly'], :configuration => 'Debug'
-  pod 'Flipper-Glog', versions['Flipper-Glog'], :configuration => 'Debug'
-  pod 'Flipper-PeerTalk', versions['Flipper-PeerTalk'], :configuration => 'Debug'
-  pod 'Flipper-RSocket', versions['Flipper-RSocket'], :configuration => 'Debug'
-  pod 'FlipperKit/Core', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/CppBridge', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FBCxxFollyDynamicConvert', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FBDefines', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FKPortForwarding', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FlipperKitHighlightOverlay', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FlipperKitLayoutTextSearchable', versions['Flipper'], :configuration => 'Debug'
-  pod 'FlipperKit/FlipperKitNetworkPlugin', versions['Flipper'], :configuration => 'Debug'
-end
-# Post Install processing for Flipper
-def flipper_post_install(installer)
-  installer.pods_project.targets.each do |target|
-    if target.name == 'YogaKit'
-      target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '4.1'
-      end
-    end
-  end
-  file_name = Dir.glob("*.xcodeproj")[0]
-  app_project = Xcodeproj::Project.open(file_name)
-  app_project.native_targets.each do |target|
-    target.build_configurations.each do |config|
-      cflags = config.build_settings['OTHER_CFLAGS'] || '$(inherited) '
-      unless cflags.include? '-DFB_SONARKIT_ENABLED=1'
-        puts 'Adding -DFB_SONARKIT_ENABLED=1 in OTHER_CFLAGS...'
-        cflags << '-DFB_SONARKIT_ENABLED=1'
-      end
-      config.build_settings['OTHER_CFLAGS'] = cflags
-    end
-    app_project.save
-  end
-  installer.pods_project.save
-end
+platform :ios, '12.4'
 
 target "celo" do
   use_frameworks!
 
-  # React Native Core pods
-  pod "FBLazyVector", :path => "../../../node_modules/react-native/Libraries/FBLazyVector"
-  pod "FBReactNativeSpec", :path => "../../../node_modules/react-native/Libraries/FBReactNativeSpec"
-  pod "RCTRequired", :path => "../../../node_modules/react-native/Libraries/RCTRequired"
-  pod "RCTTypeSafety", :path => "../../../node_modules/react-native/Libraries/TypeSafety"
-  pod "React", :path => "../../../node_modules/react-native/"
-  pod "React-Core", :path => "../../../node_modules/react-native/"
-  pod "React-CoreModules", :path => "../../../node_modules/react-native/React/CoreModules"
-  pod "React-Core/DevSupport", :path => "../../../node_modules/react-native/"
-  pod "React-RCTActionSheet", :path => "../../../node_modules/react-native/Libraries/ActionSheetIOS"
-  pod "React-RCTAnimation", :path => "../../../node_modules/react-native/Libraries/NativeAnimation"
-  pod "React-RCTBlob", :path => "../../../node_modules/react-native/Libraries/Blob"
-  pod "React-RCTImage", :path => "../../../node_modules/react-native/Libraries/Image"
-  pod "React-RCTLinking", :path => "../../../node_modules/react-native/Libraries/LinkingIOS"
-  pod "React-RCTNetwork", :path => "../../../node_modules/react-native/Libraries/Network"
-  pod "React-RCTSettings", :path => "../../../node_modules/react-native/Libraries/Settings"
-  pod "React-RCTText", :path => "../../../node_modules/react-native/Libraries/Text"
-  pod "React-RCTVibration", :path => "../../../node_modules/react-native/Libraries/Vibration"
-  pod "React-Core/RCTWebSocket", :path => "../../../node_modules/react-native/"
-  pod "React-cxxreact", :path => "../../../node_modules/react-native/ReactCommon/cxxreact"
-  pod "React-jsi", :path => "../../../node_modules/react-native/ReactCommon/jsi"
-  pod "React-jsiexecutor", :path => "../../../node_modules/react-native/ReactCommon/jsiexecutor"
-  pod "React-jsinspector", :path => "../../../node_modules/react-native/ReactCommon/jsinspector"
-  pod 'ReactCommon/callinvoker', :path => "../../../node_modules/react-native/ReactCommon"
-  pod "ReactCommon/turbomodule/core", :path => "../../../node_modules/react-native/ReactCommon"
-  pod 'Yoga', :path => '../../../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
-  pod "DoubleConversion", :podspec => "../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
-  pod "glog", :podspec => "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
-  pod "Folly", :podspec => "../../../node_modules/react-native/third-party-podspecs/Folly.podspec"
-
+  # Headers only version of OpenSSL-Universal to workaround libcrypto / libssl conflict between Flipper and react-native-fast-crypto
+  pod 'OpenSSL-Universal', :git => "https://github.com/celo-org/OpenSSL-headers.git"
+  
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
   pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
 
@@ -112,20 +38,21 @@ target "celo" do
     inherit! :search_paths
   end
 
-  use_native_modules!
+  config = use_native_modules!
+  use_react_native!(:path => config[:reactNativePath])
 
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  # add_flipper_pods!
+  use_flipper!({ 'Flipper' => '~> 0.69.0' })
 end
 
 # Convert all permission pods into static libraries
 # See https://github.com/react-native-community/react-native-permissions#workaround-for-use_frameworks-issues
 pre_install do |installer|
   installer.pod_targets.each do |pod|
-    if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+    if $static_framework.include?(pod.name) || pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
       def pod.build_type;
         Pod::BuildType.static_library
       end
@@ -134,7 +61,7 @@ pre_install do |installer|
 end
 
 post_install do |installer|
-  # flipper_post_install(installer)
+  flipper_post_install(installer)
 
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|

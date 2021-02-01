@@ -1,15 +1,21 @@
-import { newKit, OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { newKitFromWeb3 } from '@celo/contractkit'
+import { OdisUtils } from '@celo/identity'
+import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { fetchEnv } from '@celo/phone-number-privacy-common'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { LocalWallet } from '@celo/wallet-local'
 import * as functions from 'firebase-functions'
+import Web3 from 'web3'
 
 const privateKey = fetchEnv('PRIVATE_KEY')
 const phoneNumber = fetchEnv('PHONE_NUMBER')
 const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
 
-const contractKit = newKit(functions.config().blockchain.provider)
-contractKit.addAccount(privateKey)
+const contractKit = newKitFromWeb3(
+  new Web3(functions.config().blockchain.provider),
+  new LocalWallet()
+)
+contractKit.connection.addAccount(privateKey)
 contractKit.defaultAccount = accountAddress
 
 export const queryOdisForSalt = () => {

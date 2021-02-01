@@ -32,9 +32,9 @@
 
 ###  address
 
-• **address**: *[Address](../modules/_base_.md#address)*
+• **address**: *Address*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:756](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L756)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:828](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L828)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **affiliation**: *string | null*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:759](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L759)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:831](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L831)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **ageOfLatestBlock**: *number | null*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:773](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L773)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:845](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L845)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **attestationServiceURL**: *string | null*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:763](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L763)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:835](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L835)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **attestationSigner**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:762](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L762)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:834](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L834)*
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 • **blacklistedRegionCodes**: *string[] | null*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:768](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L768)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:840](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L840)*
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 • **blsPublicKey**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:758](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L758)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:830](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L830)*
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 • **ecdsaPublicKey**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:757](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L757)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:829](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L829)*
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 • **error**: *null | Error*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:766](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L766)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:838](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L838)*
 
 ___
 
@@ -106,7 +106,7 @@ ___
 
 • **hasAttestationSigner**: *boolean*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:761](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L761)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:833](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L833)*
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 • **metadataURL**: *string | null*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:764](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L764)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:836](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L836)*
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:755](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L755)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:827](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L827)*
 
 ___
 
@@ -130,7 +130,7 @@ ___
 
 • **okStatus**: *boolean*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:765](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L765)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:837](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L837)*
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 • **rightAccount**: *boolean*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:769](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L769)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:841](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L841)*
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 • **score**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:760](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L760)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:832](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L832)*
 
 ___
 
@@ -154,7 +154,7 @@ ___
 
 • **signer**: *string*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:770](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L770)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:842](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L842)*
 
 ___
 
@@ -162,7 +162,7 @@ ___
 
 • **smsProviders**: *string[]*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:767](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L767)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:839](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L839)*
 
 ___
 
@@ -170,7 +170,7 @@ ___
 
 • **state**: *[AttestationServiceStatusState](../enums/_wrappers_attestations_.attestationservicestatusstate.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:771](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L771)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:843](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L843)*
 
 ___
 
@@ -178,4 +178,4 @@ ___
 
 • **version**: *string | null*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:772](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L772)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:844](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L844)*

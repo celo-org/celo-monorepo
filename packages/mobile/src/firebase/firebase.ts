@@ -170,23 +170,6 @@ export const registerTokenToDb = async (
   }
 }
 
-export function isVersionBelowMinimum(version: string, minVersion: string): boolean {
-  const minVersionArray = minVersion.split('.')
-  const versionArray = version.split('.')
-  const minVersionLength = Math.min(minVersionArray.length, version.length)
-  for (let i = 0; i < minVersionLength; i++) {
-    if (minVersionArray[i] > versionArray[i]) {
-      return true
-    } else if (minVersionArray[i] < versionArray[i]) {
-      return false
-    }
-  }
-  if (minVersionArray.length > versionArray.length) {
-    return true
-  }
-  return false
-}
-
 const VALUE_CHANGE_HOOK = 'value'
 
 /*
@@ -252,6 +235,45 @@ export function appRemoteFeatureFlagChannel() {
       .database()
       .ref('versions/flags')
       .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+    return cancel
+  })
+}
+
+export async function knownAddressesChannel() {
+  return simpleReadChannel('addressesExtraInfo')
+}
+
+export async function notificationsChannel() {
+  return simpleReadChannel('notificationsV2')
+}
+
+function simpleReadChannel(key: string) {
+  if (!FIREBASE_ENABLED) {
+    return null
+  }
+
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const value = snapshot.val()
+      Logger.debug(`Got value from Firebase for key ${key}: ${JSON.stringify(value)}`)
+      emit(value || {})
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref(key)
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
+      .database()
+      .ref(key)
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+
     return cancel
   })
 }

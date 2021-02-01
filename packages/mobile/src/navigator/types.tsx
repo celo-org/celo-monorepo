@@ -6,6 +6,7 @@ import {
   TxToSignParam,
 } from '@celo/utils'
 import BigNumber from 'bignumber.js'
+import { SendOrigin } from 'src/analytics/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { AddressValidationType } from 'src/identity/reducer'
@@ -23,6 +24,14 @@ type NestedNavigatorParams<ParamList> = {
     ? { screen: K; params?: ParamList[K] }
     : { screen: K; params: ParamList[K] }
 }[keyof ParamList]
+
+interface SendConfirmationParams {
+  origin: SendOrigin
+  transactionData: TransactionDataInput
+  addressJustValidated?: boolean
+  isFromScan?: boolean
+  currencyInfo?: CurrencyInfo
+}
 
 // tslint:disable-next-line: interface-over-type-literal
 export type StackParamList = {
@@ -46,11 +55,14 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
+  [Screens.BackupForceScreen]: undefined
   [Screens.BackupQuiz]:
     | undefined
     | {
         navigatedFromSettings: boolean
       }
+  [Screens.BidaliScreen]: { currency: CURRENCY_ENUM }
+  [Screens.ConsumerIncentivesHomeScreen]: undefined
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -87,12 +99,13 @@ export type StackParamList = {
   }
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeOptions]: {
-    isAddFunds?: boolean
+    isCashIn?: boolean
     amount?: BigNumber
   }
   [Screens.MoonPay]: {
-    localAmount: BigNumber
+    localAmount: number
     currencyCode: LocalCurrencyCode
+    currencyToBuy: CURRENCY_ENUM
   }
   [Screens.GoldEducation]: undefined
   [Screens.ImportWallet]:
@@ -108,12 +121,7 @@ export type StackParamList = {
         onPressSkip?: () => void
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.NameAndNumber]:
-    | {
-        selectedCountryCodeAlpha2: string
-        country: string
-      }
-    | undefined
+  [Screens.NameAndPicture]: undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList
@@ -150,9 +158,13 @@ export type StackParamList = {
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
+  [Screens.ProviderOptionsScreen]: {
+    isCashIn?: boolean
+  }
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
+    onCancel?: () => void
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.SelectCountry]: {
@@ -169,13 +181,10 @@ export type StackParamList = {
     recipient: Recipient
     isOutgoingPaymentRequest?: true
     isFromScan?: boolean
+    origin: SendOrigin
   }
-  [Screens.SendConfirmation]: {
-    transactionData: TransactionDataInput
-    addressJustValidated?: boolean
-    isFromScan?: boolean
-    currencyInfo?: CurrencyInfo
-  }
+  [Screens.SendConfirmation]: SendConfirmationParams
+  [Screens.SendConfirmationModal]: SendConfirmationParams
   [Screens.SetClock]: undefined
   [Screens.Settings]:
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
@@ -194,21 +203,24 @@ export type StackParamList = {
     addressValidationType: AddressValidationType
     isOutgoingPaymentRequest?: true
     requesterAddress?: string
+    origin: SendOrigin
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isOutgoingPaymentRequest?: true
     requesterAddress?: string
+    origin: SendOrigin
   }
   [Screens.VerificationEducationScreen]:
-    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
+    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean; selectedCountryCodeAlpha2?: string }
     | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+  [Screens.WebViewScreen]: { uri: string }
   [Screens.Welcome]: undefined
   [Screens.WithdrawCeloQrScannerScreen]: {
     onAddressScanned: (address: string) => void

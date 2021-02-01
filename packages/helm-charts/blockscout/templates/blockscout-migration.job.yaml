@@ -3,13 +3,13 @@ kind: Job
 metadata:
   name: {{ .Release.Name }}-migration
   labels:
-    app: blockscout
-    chart: blockscout
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-migration
 spec:
   template:
+    metadata:
+      labels:
+        {{- include "celo.blockscout.labels" . | nindent 8 }}
     spec:
       containers:
       - name: blockscout-migration
@@ -20,16 +20,20 @@ spec:
         - -c
         args:
         - |
+           trap "touch /tmp/pod/main-terminated" EXIT
            [ ${DROP_DB} == "true" ] && mix do ecto.drop, ecto.create
            mix do ecto.migrate
         resources:
           requests:
             memory: 250M
             cpu: 200m
+        volumeMounts:
+          - mountPath: /tmp/pod
+            name: tmp-pod
         env:
         - name: DROP_DB
           value: "{{ default "false" .Values.blockscout.db.drop }}"
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
+{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 6 }}
       restartPolicy: Never
   backoffLimit: 0

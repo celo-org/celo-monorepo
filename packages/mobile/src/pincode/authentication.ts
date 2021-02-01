@@ -46,6 +46,7 @@ export const PIN_LENGTH = 6
 // Pepper and pin not currently generalized to be per account
 // Using this value in the caches
 export const DEFAULT_CACHE_ACCOUNT = 'default'
+export const CANCELLED_PIN_INPUT = 'CANCELLED_PIN_INPUT'
 
 const PIN_BLACKLIST = [
   '000000',
@@ -126,6 +127,8 @@ async function retrievePasswordHash(account: string) {
 }
 
 let passwordLock = false
+let lastPassword: string | null = null
+let lastError: any = null
 
 export async function getPassword(
   account: string,
@@ -134,25 +137,42 @@ export async function getPassword(
 ) {
   while (passwordLock) {
     await sleep(100)
+    if (lastPassword) {
+      return lastPassword
+    }
+    if (lastError) {
+      throw lastError
+    }
   }
   passwordLock = true
-  let password = getCachedPassword(account)
-  if (password) {
-    passwordLock = false
+  try {
+    let password = getCachedPassword(account)
+    if (password) {
+      passwordLock = false
+      return password
+    }
+
+    const pin = await getPincode(withVerification)
+    password = await getPasswordForPin(pin)
+
+    if (storeHash) {
+      const hash = getPasswordHash(password)
+      await storePasswordHash(hash, account)
+    }
+
+    setCachedPassword(account, password)
+    lastPassword = password
     return password
+  } catch (error) {
+    lastError = error
+    throw error
+  } finally {
+    setTimeout(() => {
+      passwordLock = false
+      lastPassword = null
+      lastError = null
+    }, 500)
   }
-
-  const pin = await getPincode(withVerification)
-  password = await getPasswordForPin(pin)
-
-  if (storeHash) {
-    const hash = getPasswordHash(password)
-    await storePasswordHash(hash, account)
-  }
-
-  setCachedPassword(account, password)
-  passwordLock = false
-  return password
 }
 
 export function* getPasswordSaga(account: string, withVerification?: boolean, storeHash?: boolean) {
@@ -187,10 +207,10 @@ export async function getPincode(withVerification = true) {
 
 // Navigate to the pincode enter screen and check pin
 export async function requestPincodeInput(withVerification = true, shouldNavigateBack = true) {
-  const pin = await new Promise((resolve: PinCallback, reject: () => void) => {
+  const pin = await new Promise((resolve: PinCallback, reject: (error: string) => void) => {
     navigate(Screens.PincodeEnter, {
       onSuccess: resolve,
-      onCancel: reject,
+      onCancel: () => reject(CANCELLED_PIN_INPUT),
       withVerification,
     })
   })

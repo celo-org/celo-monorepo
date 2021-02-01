@@ -54,7 +54,9 @@ export function useBackToWelcomeScreen({ backAnalyticsEvents }: Props) {
     // See https://reactnavigation.org/docs/preventing-going-back
     const cancelBeforeRemove = navigation.addListener('beforeRemove', (event) => {
       const resetScreenName = (event?.data?.action?.payload as any)?.routes?.[0]?.name
-      if (resetScreenName !== Screens.DrawerNavigator) {
+      const processCanceled =
+        [Screens.VerificationEducationScreen, Screens.DrawerNavigator].indexOf(resetScreenName) < 0
+      if (processCanceled) {
         backAnalyticsEvents.forEach((analyticsEvent) => {
           ValoraAnalytics.track(analyticsEvent)
         })

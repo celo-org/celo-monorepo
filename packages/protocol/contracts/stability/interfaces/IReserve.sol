@@ -11,4 +11,8 @@ interface IReserve {
   function getOrComputeTobinTax() external returns (uint256, uint256);
   function getTokens() external view returns (address[] memory);
   function getReserveRatio() external view returns (uint256);
+  function addExchangeSpender(address) external;
+  function removeExchangeSpender(address, uint256) external;
+  function addSpender(address) external;
+  function removeSpender(address) external;
 }

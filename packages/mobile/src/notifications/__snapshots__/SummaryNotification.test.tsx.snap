@@ -97,6 +97,7 @@ exports[`SummaryNotification renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }

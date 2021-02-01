@@ -1,4 +1,5 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -6,6 +7,7 @@ import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableT
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/types'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore } from 'test/utils'
 import { mockAccount } from 'test/values'
@@ -43,6 +45,17 @@ describe('stableToken saga', () => {
       .withState(state)
       .dispatch(fetchDollarBalance())
       .put(setBalance(BALANCE_IN_WEI))
+      .run()
+  })
+
+  it('should not update the balance if it is too large', async () => {
+    const stableToken = await (await getContractKitAsync()).contracts.getStableToken()
+    // @ts-ignore Jest Mock
+    stableToken.balanceOf.mockResolvedValueOnce(new BigNumber(10000001))
+    await expectSaga(stableTokenFetch)
+      .provide([[call(waitWeb3LastBlock), true]])
+      .withState(state)
+      .dispatch(fetchDollarBalance())
       .run()
   })
 

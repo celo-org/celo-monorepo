@@ -3,8 +3,8 @@ const momentTimezone = require('moment-timezone')
 import differenceInYears from 'date-fns/esm/differenceInYears'
 import format from 'date-fns/esm/format'
 import getYear from 'date-fns/esm/getYear'
-import { enUS, es } from 'date-fns/locale'
 import { i18n as i18nType } from 'i18next'
+import locales from 'locales'
 import _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
 import i18n from 'src/i18n'
@@ -312,7 +312,7 @@ export const getLocalTimezone = () => {
 const ONE_SECOND_IN_MILLIS = 1000
 const ONE_MINUTE_IN_MILLIS = 60 * ONE_SECOND_IN_MILLIS
 const ONE_HOUR_IN_MILLIS = 60 * ONE_MINUTE_IN_MILLIS
-const ONE_DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS
+export const ONE_DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS
 
 export const timeDeltaInDays = (currTime: number, prevTime: number) => {
   return timeDifference(currTime, prevTime) / ONE_DAY_IN_MILLIS
@@ -338,6 +338,6 @@ function millisecondsSinceEpoch(timestamp: number) {
 
 function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
   return format(millisecondsSinceEpoch(timestamp), formatRule, {
-    locale: i18next?.language?.includes('es') ? es : enUS,
+    locale: locales[i18next?.language]?.dateFns ?? locales['en-US']?.dateFns,
   })
 }
