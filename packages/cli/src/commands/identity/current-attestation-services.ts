@@ -53,6 +53,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
               case AttestationServiceStatusState.UnreachableAttestationService:
               case AttestationServiceStatusState.WrongAccount:
               case AttestationServiceStatusState.Unhealthy:
+              case AttestationServiceStatusState.InvalidAttestationServiceURL:
                 return chalk.red(r.state)
               case AttestationServiceStatusState.Valid:
                 return chalk.green(r.state)
