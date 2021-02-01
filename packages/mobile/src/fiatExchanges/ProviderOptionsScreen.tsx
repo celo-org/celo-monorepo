@@ -22,7 +22,7 @@ import { openMoonpay, openRamp, openSimplex } from 'src/fiatExchanges/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import QuestionIcon from 'src/icons/QuestionIcon'
-import { moonpayLogo, rampLogo, simplexLogo } from 'src/images/Images'
+import { moonpayLogo, simplexLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -50,7 +50,7 @@ ProviderOptionsScreen.navigationOptions = ({
 interface Provider {
   name: string
   enabled: boolean
-  image: React.ReactNode
+  image?: React.ReactNode
   onSelected: () => void
 }
 
@@ -101,7 +101,6 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       {
         name: 'Ramp',
         enabled: true,
-        image: <Image source={rampLogo} style={styles.logo} resizeMode={'contain'} />,
         onSelected: () => openRamp(account, CURRENCY_ENUM.DOLLAR),
       },
     ],
@@ -131,7 +130,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
                     style={styles.provider}
                     testID={`Provider/${provider.name}`}
                   >
-                    {provider.image}
+                    {provider.image || <Text>{provider.name}</Text>}
                   </TouchableOpacity>
                   <View style={styles.separator} />
                 </>
