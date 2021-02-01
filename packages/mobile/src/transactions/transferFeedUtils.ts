@@ -15,6 +15,7 @@ import {
   getRecipientFromAddress,
   NumberToRecipient,
   Recipient,
+  recipientHasNumber,
   RecipientInfo,
 } from 'src/recipients/recipient'
 import { KnownFeedTransactionsType } from 'src/transactions/reducer'
@@ -59,7 +60,7 @@ function getRecipient(
   invitees: InviteDetails[],
   address: string,
   recipientInfo: RecipientInfo
-) {
+): Recipient {
   let phoneNumber = e164PhoneNumber
   let recipient: Recipient
 
@@ -74,8 +75,9 @@ function getRecipient(
       : recentTxRecipientsCache[phoneNumber]
 
     if (recipient) {
-      Object.assign(recipient, { address })
       return recipient
+    } else {
+      return { e164PhoneNumber: phoneNumber }
     }
   }
   return getRecipientFromAddress(address, recipientInfo)
@@ -106,7 +108,8 @@ export function getTransferFeedParams(
     recipientInfo
   )
   Object.assign(recipient, { address })
-  const nameOrNumber = recipient?.name || e164PhoneNumber
+  const nameOrNumber =
+    recipient?.name || (recipientHasNumber(recipient) ? recipient.e164PhoneNumber : e164PhoneNumber)
   const displayName = getDisplayName(recipient, t)
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
