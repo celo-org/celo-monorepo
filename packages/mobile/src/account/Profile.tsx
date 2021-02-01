@@ -1,63 +1,110 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import { SettingsItemInput } from '@celo/react-components/components/SettingsItem'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { StackScreenProps } from '@react-navigation/stack'
+import React, { useLayoutEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ScrollView, StyleSheet, View } from 'react-native'
+import * as RNFS from 'react-native-fs'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { connect } from 'react-redux'
-import { setName } from 'src/account/actions'
-import { UserContactDetails } from 'src/account/reducer'
-import { userContactDetailsSelector } from 'src/account/selectors'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { RootState } from 'src/redux/reducers'
+import { useDispatch, useSelector } from 'react-redux'
+import { saveNameAndPicture } from 'src/account/actions'
+import { nameSelector, pictureSelector } from 'src/account/selectors'
+import { showError, showMessage } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import CancelButton from 'src/components/CancelButton'
+import i18n, { Namespaces } from 'src/i18n'
+import { emptyHeader } from 'src/navigator/Headers'
+import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
+import { StackParamList } from 'src/navigator/types'
+import PictureInput from 'src/onboarding/registration/PictureInput'
+import { saveProfilePicture } from 'src/utils/image'
+import Logger from 'src/utils/Logger'
 
-interface StateProps {
-  name: string | null
-  userContact: UserContactDetails
-}
+type Props = StackScreenProps<StackParamList, Screens.Profile>
 
-interface DispatchProps {
-  setName: typeof setName
-}
+function Profile({ navigation, route }: Props) {
+  const { t } = useTranslation(Namespaces.accountScreen10)
+  const [newName, setNewName] = useState(useSelector(nameSelector) ?? '')
+  const picturePath = useSelector(pictureSelector)
+  const [newPictureUri, setNewPictureUri] = useState(picturePath || null)
 
-// tslint:disable-next-line: no-empty-interface
-interface OwnProps {}
+  const dispatch = useDispatch()
 
-type Props = OwnProps & StateProps & DispatchProps & WithTranslation
-const mapStateToProps = (state: RootState) => {
-  return {
-    name: state.account.name,
-    userContact: userContactDetailsSelector(state),
+  useLayoutEffect(() => {
+    const onSave = () => {
+      dispatch(saveNameAndPicture(newName, newPictureUri))
+      // TODO: Save name and picture on CIP-8.
+      dispatch(showMessage(t('namePictureSaved')))
+      navigation.goBack()
+
+      // Delete old profile pictures if necessary.
+      if (picturePath && picturePath !== newPictureUri) {
+        RNFS.unlink(picturePath).catch((e) => {
+          Logger.error('Error deleting old profile picture:', e)
+        })
+      }
+    }
+
+    navigation.setOptions({
+      headerRight: () => (
+        <TopBarTextButton title={i18n.t('global:save')} testID="SaveButton" onPress={onSave} />
+      ),
+    })
+  }, [navigation, newName, newPictureUri, picturePath])
+
+  const onPictureChosen = async (pictureDataUrl: string | null) => {
+    if (!pictureDataUrl) {
+      setNewPictureUri(null)
+    } else {
+      try {
+        const newPicturePath = await saveProfilePicture(pictureDataUrl)
+        setNewPictureUri(newPicturePath)
+      } catch (error) {
+        dispatch(showError(ErrorMessages.PICTURE_LOAD_FAILED))
+      }
+    }
   }
-}
 
-const mapDispatchToProps = {
-  setName,
-}
+  const updateName = (updatedName: string) => {
+    setNewName(updatedName)
+  }
 
-export class Profile extends React.Component<Props> {
-  render() {
-    const { t, userContact, name } = this.props
-    return (
-      <ScrollView style={styles.container}>
-        <SafeAreaView edges={['bottom']}>
-          <Text style={styles.title}>{t('editProfile')}</Text>
-          <View style={styles.accountProfile}>
-            <ContactCircle thumbnailPath={userContact.thumbnailPath} name={name} size={80} />
-          </View>
-          <SettingsItemInput
-            value={this.props.name ?? t('global:unknown')}
-            testID="ProfileEditName"
-            title={t('name')}
-            placeholder={t('yourName')}
-            onValueChange={this.props.setName}
+  return (
+    <ScrollView style={styles.container}>
+      <SafeAreaView edges={['bottom']}>
+        <View style={styles.accountProfile}>
+          <PictureInput
+            picture={newPictureUri}
+            onPhotoChosen={onPictureChosen}
+            backgroundColor={colors.gray3}
           />
-        </SafeAreaView>
-      </ScrollView>
-    )
+        </View>
+        <SettingsItemInput
+          value={newName ?? t('global:unknown')}
+          testID="ProfileEditName"
+          title={t('name')}
+          placeholder={t('yourName')}
+          onValueChange={updateName}
+        />
+      </SafeAreaView>
+    </ScrollView>
+  )
+}
+
+Profile.navigationOptions = ({ navigation, route }: Props) => {
+  const onCancel = () => {
+    navigation.goBack()
+  }
+  return {
+    ...emptyHeader,
+    headerTitle: i18n.t('accountScreen10:editProfile'),
+    headerLeft: () => <CancelButton onCancel={onCancel} />,
   }
 }
+
+export default Profile
 
 const styles = StyleSheet.create({
   container: {
@@ -76,8 +123,3 @@ const styles = StyleSheet.create({
     margin: 16,
   },
 })
-
-export default connect<StateProps, {}, OwnProps, RootState>(
-  mapStateToProps,
-  mapDispatchToProps
-)(withTranslation<Props>(Namespaces.accountScreen10)(Profile))

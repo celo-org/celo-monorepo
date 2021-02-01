@@ -127,7 +127,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -157,7 +157,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -299,7 +299,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -391,7 +391,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -451,7 +451,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -486,7 +486,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -572,7 +572,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": undefined,
+                  "color": "#2E3338",
                 },
               ]
             }
