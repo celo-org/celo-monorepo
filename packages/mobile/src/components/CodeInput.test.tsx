@@ -27,7 +27,7 @@ describe('CodeInput', () => {
   })
 
   it('disables auto correct / suggestion when in input mode', () => {
-    const { toJSON, getByType } = render(
+    const { getByType } = render(
       <CodeInput
         label="label"
         status={CodeInputStatus.INPUTTING}
