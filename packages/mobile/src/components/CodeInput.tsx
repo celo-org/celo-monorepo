@@ -109,12 +109,13 @@ export default function CodeInput({
                 // numberOfLines is currently Android only on TextInput
                 // workaround is to set the minHeight on iOS :/
                 numberOfLines={Platform.OS === 'ios' ? undefined : numberOfLines}
-                inputStyle={{
-                  minHeight:
-                    Platform.OS === 'ios' && numberOfLines
-                      ? LINE_HEIGHT * numberOfLines
-                      : undefined,
-                }}
+                inputStyle={
+                  Platform.OS === 'ios' && numberOfLines
+                    ? {
+                        minHeight: LINE_HEIGHT * numberOfLines,
+                      }
+                    : undefined
+                }
                 autoCapitalize="none"
                 testID={testID}
               />
