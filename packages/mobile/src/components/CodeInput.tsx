@@ -1,5 +1,5 @@
 import Card from '@celo/react-components/components/Card'
-import TextInput from '@celo/react-components/components/TextInput'
+import TextInput, { LINE_HEIGHT } from '@celo/react-components/components/TextInput'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -106,12 +106,14 @@ export default function CodeInput({
                 // and has the unfortunate drawback of breaking multiline autosize.
                 // We use numberOfLines to workaround this last problem.
                 keyboardType={Platform.OS === 'android' ? 'visible-password' : undefined}
-                // numberOfLines doesn't work for multiline TextInput on iOS
+                // numberOfLines is currently Android only on TextInput
                 // workaround is to set the minHeight on iOS :/
                 numberOfLines={Platform.OS === 'ios' ? undefined : numberOfLines}
                 inputStyle={{
                   minHeight:
-                    Platform.OS === 'ios' && numberOfLines ? 20 * numberOfLines : undefined,
+                    Platform.OS === 'ios' && numberOfLines
+                      ? LINE_HEIGHT * numberOfLines
+                      : undefined,
                 }}
                 autoCapitalize="none"
                 testID={testID}
