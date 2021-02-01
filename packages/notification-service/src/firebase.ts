@@ -95,8 +95,12 @@ export function initializeDb() {
       const lastBlock = (snapshot && snapshot.val()) || 0
       console.debug('Latest block data updated: ', lastBlock)
       if (lastBlockNotified < 0) {
-        // This is to prevent sending again notifications for transfers that happened in the previous |MAX_BLOCKS_TO_WAIT|
-        // blocks when deploying this service. We might miss some notifications when deploying.
+        // On the transfers file, we query using |lastBlockNotified - MAX_BLOCKS_TO_WAIT|, which would resolve to the current time.
+        // This means that any block previous to |lastBlock| which hasn't been notified never will be.
+        // If we just set |lastBlockNotified| to |lastBlock| we would risk sending duplicate notifications to all transfers made in
+        // the last |MAX_BLOCKS_TO_WAIT| blocks.
+        // To make sure all notifications are always sent, we'd have to store processed blocks on Firebase to persist the cache
+        // between deploys.
         lastBlockNotified = lastBlock + MAX_BLOCKS_TO_WAIT
       } else if (lastBlock > lastBlockNotified) {
         lastBlockNotified = lastBlock

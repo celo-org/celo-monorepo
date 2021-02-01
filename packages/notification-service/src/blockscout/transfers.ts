@@ -7,6 +7,9 @@ import { Log, Response, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
+// Blockscout is eventually consistent, it doesn't resolve all blocks in order.
+// This variable is used to save a cache of all blocks already handled in the last |MAX_BLOCKS_TO_WAIT| blocks, so a transaction
+// has that number of blocks to show up on Blockscout before we miss sending the notification for it.
 export const MAX_BLOCKS_TO_WAIT = 120
 
 export enum Currencies {
