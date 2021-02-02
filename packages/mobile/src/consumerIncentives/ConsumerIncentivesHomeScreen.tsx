@@ -51,6 +51,7 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   const { t } = useTranslation(Namespaces.consumerIncentives)
   const userIsVerified = useTypedSelector((state) => state.app.numberVerified)
   const { content, tiers, loading, error } = useConsumerIncentivesContent()
+  const insets = useSafeAreaInsets()
   const dispatch = useDispatch()
 
   if (!loading && error) {
@@ -69,8 +70,6 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   }
 
   const onLearnMore = () => navigate(Screens.WebViewScreen, { uri: CELO_REWARDS_LINK })
-
-  const insets = useSafeAreaInsets()
 
   return (
     <ScrollView
