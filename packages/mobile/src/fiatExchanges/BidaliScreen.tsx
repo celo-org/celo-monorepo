@@ -27,7 +27,7 @@ function useInitialJavaScript(
 ) {
   const [initialJavaScript, setInitialJavaScript] = useState<string | null>()
   useEffect(() => {
-    if (initialJavaScript || !e164PhoneNumber) {
+    if (initialJavaScript) {
       return
     }
 
@@ -39,7 +39,7 @@ function useInitialJavaScript(
     setInitialJavaScript(`
       window.valora = {
         paymentCurrency: "${CURRENCIES[currency].code.toUpperCase()}",
-        phoneNumber: "${e164PhoneNumber}",
+        phoneNumber: ${JSON.stringify(e164PhoneNumber)},
         balances: ${jsonBalances},
         onPaymentRequest: function (paymentRequest) {
           var payload = { method: 'onPaymentRequest', data: paymentRequest };
