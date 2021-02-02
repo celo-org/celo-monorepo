@@ -95,6 +95,8 @@ export function* watchDailyLimit() {
       const dailyLimit = yield take(channel)
       if (_.isNumber(dailyLimit)) {
         yield put(updateCusdDailyLimit(dailyLimit))
+      } else {
+        Logger.error(`${TAG}@watchDailyLimit`, 'Daily limit must be a number', dailyLimit)
       }
     }
   } catch (error) {
