@@ -1,3 +1,11 @@
+/**
+ * Be careful when adding to this file or relying on this file.
+ * The verification tooling uses the CeloContractName enum as a
+ * source of truth for what contracts are considered "core" and
+ * need to be checked for backwards compatability and bytecode on
+ * an environment.
+ */
+
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
 export enum CeloContractName {
