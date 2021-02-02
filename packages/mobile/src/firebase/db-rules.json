@@ -27,7 +27,8 @@
           ".write": "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()"
         },
         "dailyLimitCusd": {
-          ".write": false
+          ".write": false,
+          ".validate": "newData.isNumber() && newData.val() >= 500"
         }
       }
     },
