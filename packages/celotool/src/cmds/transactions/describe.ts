@@ -1,6 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
-import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
+import { newBlockExplorer } from '@celo/explorer/lib/block-explorer'
+import { newLogExplorer } from '@celo/explorer/lib/log-explorer'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getFornoUrl } from 'src/lib/endpoints'
 import Web3 from 'web3'
@@ -38,7 +38,7 @@ export const handler = async (argv: DescribeArgv) => {
     console.info(receipt)
   }
 
-  const parsedTransaction = blockExplorer.tryParseTx(transaction)
+  const parsedTransaction = await blockExplorer.tryParseTx(transaction)
 
   if (parsedTransaction === null) {
     return

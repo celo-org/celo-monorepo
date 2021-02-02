@@ -4,7 +4,10 @@ import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { Spacing } from '@celo/react-components/styles/styles'
-import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import {
+  extractAttestationCodeFromMessage,
+  extractSecurityCodeWithPrefix,
+} from '@celo/utils/src/attestations'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import dotProp from 'dot-prop-immutable'
 import * as React from 'react'
@@ -18,6 +21,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ALERT_BANNER_DURATION, ATTESTATION_REVEAL_TIMEOUT_SECONDS } from 'src/config'
+import { features } from 'src/flags'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   cancelVerification,
@@ -208,7 +212,10 @@ class VerificationInputScreen extends React.Component<Props, State> {
     return (value: string) => {
       // TODO(Rossy) Add test this of typing codes gradually
       this.setState((state) => dotProp.set(state, `codeInputValues.${index}`, value))
-      if (extractAttestationCodeFromMessage(value)) {
+      if (
+        (features.SHORT_VERIFICATION_CODES && extractSecurityCodeWithPrefix(value)) ||
+        extractAttestationCodeFromMessage(value)
+      ) {
         this.setState((state) => dotProp.set(state, `codeSubmittingStatuses.${index}`, true))
         this.props.receiveAttestationMessage(value, CodeInputType.MANUAL)
       }

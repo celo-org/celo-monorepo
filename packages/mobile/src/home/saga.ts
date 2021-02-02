@@ -1,6 +1,7 @@
 import {
   call,
   cancel,
+  cancelled,
   delay,
   fork,
   put,
@@ -10,8 +11,10 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { fetchSentEscrowPayments } from 'src/escrow/actions'
+import { notificationsChannel } from 'src/firebase/firebase'
 import { fetchGoldBalance } from 'src/goldToken/actions'
-import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
+import { Actions, refreshAllBalances, setLoading, updateNotifications } from 'src/home/actions'
+import { IdToNotification } from 'src/home/reducers'
 import { fetchCurrentRate } from 'src/localCurrency/actions'
 import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { withTimeout } from 'src/redux/sagas-helpers'
@@ -76,7 +79,27 @@ export function* watchRefreshBalances() {
   )
 }
 
+function* fetchNotifications() {
+  const channel = yield call(notificationsChannel)
+  if (!channel) {
+    return
+  }
+  try {
+    while (true) {
+      const notifications: IdToNotification = yield take(channel)
+      yield put(updateNotifications(notifications))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@fetchNotifications`, error)
+  } finally {
+    if (yield cancelled()) {
+      channel.close()
+    }
+  }
+}
+
 export function* homeSaga() {
   yield spawn(watchRefreshBalances)
   yield spawn(autoRefreshWatcher)
+  yield spawn(fetchNotifications)
 }

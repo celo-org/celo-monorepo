@@ -37,6 +37,7 @@ exports[`AccountKeyEducation renders correctly 1`] = `
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackgroundBorderless",
+          "rippleRadius": undefined,
           "type": "ThemeAttrAndroid",
         }
       }
@@ -379,6 +380,7 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }

@@ -4,8 +4,8 @@
  * Leaving the name for recognizability to current devs
  */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { sleep } from '@celo/utils/src/async'
+import { UnlockableWallet } from '@celo/wallet-base'
 import GethBridge from 'react-native-geth'
 import { call, delay, select } from 'redux-saga/effects'
 import { ContractKitEvents } from 'src/analytics/Events'
@@ -80,6 +80,7 @@ export function* initContractKit() {
         `${TAG}@initContractKit`,
         `Initialized wallet with accounts: ${wallet?.getAccounts()}`
       )
+
       contractKit = newKitFromWeb3(web3, wallet)
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
       ValoraAnalytics.track(ContractKitEvents.init_contractkit_finish)
@@ -198,11 +199,11 @@ export async function getWalletAsync() {
 // Convinience util for getting the kit's web3 instance
 export function* getWeb3(waitForSync: boolean = true) {
   const kit: ContractKit = yield call(getContractKit, waitForSync)
-  return kit.web3
+  return kit.connection.web3
 }
 
 // Used for cases where the kit's web3 must be accessed outside a saga
 export async function getWeb3Async(waitForSync: boolean = true): Promise<Web3> {
   const kit = await getContractKitAsync(waitForSync)
-  return kit.web3
+  return kit.connection.web3
 }

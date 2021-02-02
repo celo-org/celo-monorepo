@@ -68,7 +68,9 @@ exports[`renders correctly with backup completed 1`] = `
             Object {
               "alignContent": "center",
               "backgroundColor": "#F1F0EB",
+              "borderColor": "#2E3338",
               "borderRadius": 4,
+              "borderWidth": 1,
               "justifyContent": "center",
               "marginTop": 8,
               "padding": 16,
@@ -162,7 +164,9 @@ exports[`renders correctly with backup not completed 1`] = `
             Object {
               "alignContent": "center",
               "backgroundColor": "#F1F0EB",
+              "borderColor": "#2E3338",
               "borderRadius": 4,
+              "borderWidth": 1,
               "justifyContent": "center",
               "marginTop": 8,
               "padding": 16,
@@ -251,6 +255,7 @@ exports[`renders correctly with backup not completed 1`] = `
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
+            "rippleRadius": undefined,
             "type": "ThemeAttrAndroid",
           }
         }
@@ -361,7 +366,9 @@ exports[`still renders when mnemonic doesnt show up 1`] = `
             Object {
               "alignContent": "center",
               "backgroundColor": "#F1F0EB",
+              "borderColor": "#2E3338",
               "borderRadius": 4,
+              "borderWidth": 1,
               "justifyContent": "center",
               "marginTop": 8,
               "padding": 16,

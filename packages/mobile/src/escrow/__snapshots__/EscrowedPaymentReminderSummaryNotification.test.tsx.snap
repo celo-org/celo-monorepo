@@ -104,6 +104,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -233,7 +234,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -280,7 +281,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "#7AD6FE",
+                    "backgroundColor": "hsl(0, 53%, 93%)",
                     "borderRadius": 20,
                     "height": 40,
                     "width": 40,
@@ -297,6 +298,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                       "fontSize": 16,
                     },
                     Object {
+                      "color": "hsl(0, 67%, 24%)",
                       "fontSize": 20,
                     },
                   ]
@@ -322,6 +324,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -362,6 +365,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }
@@ -506,6 +510,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
+              "rippleRadius": undefined,
               "type": "ThemeAttrAndroid",
             }
           }

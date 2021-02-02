@@ -7,6 +7,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -122,7 +123,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             Array [
               undefined,
               Object {
-                "color": undefined,
+                "color": "#2E3338",
               },
             ]
           }

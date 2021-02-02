@@ -6,7 +6,7 @@ export default class Balance extends BaseCommand {
   static description = 'View Celo Dollar and Gold balances for an address'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   static args = [Args.address('address')]

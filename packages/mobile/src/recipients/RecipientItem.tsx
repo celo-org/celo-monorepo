@@ -1,10 +1,10 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import ContactCircle from 'src/components/ContactCircle'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 interface Props {
@@ -28,7 +28,6 @@ class RecipientItem extends React.PureComponent<Props> {
             name={recipient.displayName}
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
-            size={40}
           />
           <View style={styles.contentContainer}>
             <Text numberOfLines={1} ellipsizeMode={'tail'} style={styles.name}>

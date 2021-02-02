@@ -20,7 +20,7 @@
     "body": "Para encender y apagar Ahorro de Datos repetidamente, deberás reiniciar la aplicación y volver a esta pantalla.",
     "restart": "Reiniciar"
   },
-  "addFunds": "Añadir Fondos",
+  "addFunds": "Agregar Fondos",
   "promptFornoModal": {
     "header": "Cambiar modo de conexión?",
     "body": "Hemos notado que tienes problemas para conectarte. Recomendamos habilitar el modo de ahorro de datos para que pueda seguir usando {{appName}} con una conexión intermitente.",
@@ -35,6 +35,11 @@
     "header": "¿Estás seguro que quieres reinicializar Valora?",
     "body": "Ya no podrás acceder a tu dinero ni a tu Clave de Cuenta desde este dispositivo. No hay forma de recuperar tu Clave de Cuenta si no la has guardado.",
     "resetNow": "Reinicializar Ahora"
+  },
+  "promptConfirmRevokeModal": {
+    "header": "¿Estás seguro de que quieres revocar tu cuenta de Valora?",
+    "body": "Una vez revocada, esta cuenta no podrá volver a verificar. Revoque solo si está seguro de que nunca volverá a necesitar esta cuenta.",
+    "revoke": "Revocar"
   },
   "testFaqLink": "Las Preguntas Frecuentes del {{appName}}",
   "termsOfServiceLink": "Condiciones de Servicio",
@@ -59,5 +64,10 @@
   "contactMessagePlaceholder": "Por favor escribe tu mensaje aquí...",
   "attachLogs": "Adjuntar registros",
   "supportLegalCheckbox": "Al enviar, acepto compartir la información anterior y cualquier dato de registro de la aplicación adjunta con {{appName}} Support.",
-  "contactSuccess": "Tu problema ha sido reportado con éxito! ¡Espera una respuesta por correo electrónico pronto!"
+  "contactSuccess": "Tu problema ha sido reportado con éxito! ¡Espera una respuesta por correo electrónico pronto!",
+  "namePictureSaved": "Tu nombre y foto fueron guardados con éxito.",
+  "addPhoto": "Subir Foto",
+  "chooseFromLibrary": "Elegir en la Galería",
+  "takePhoto": "Tomar Foto",
+  "removePhoto": "Borrar Foto"
 }

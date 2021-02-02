@@ -47,7 +47,7 @@ A helm chart that deploys [blockscout](https://github.com/poanetwork/blockscout)
 
 ## pumba
 
-A helm chart that deploys [pumba](https://github.com/alexei-led/pumba), that we use for network emulation on a cluster. It will read the parameters from the .env file to add network delay, rate limiting and packet loss to all network communication. Note that if you degrade performance by too much, it can actually impact the operations of the Kubernetes cluster itself. Can be deployed with `celotooljs deploy intial pumba -e ENV`
+A helm chart that deploys [pumba](https://github.com/alexei-led/pumba), that we use for network emulation on a cluster. It will read the parameters from the .env file to add network delay, rate limiting and packet loss to all network connection. Note that if you degrade performance by too much, it can actually impact the operations of the Kubernetes cluster itself. Can be deployed with `celotooljs deploy intial pumba -e ENV`
 
 **WARNING**: Pumba applies to the whole Kubernetes cluster. Only use it on dedicated clusters.
 

@@ -69,7 +69,7 @@ export abstract class BaseClusterManager {
 
     console.info('Performing any cluster setup that needs to be done...')
 
-    await installCertManagerAndNginx()
+    await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
     await installAndEnableMetricsDeps(true, this.clusterConfig)
   }
 

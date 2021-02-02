@@ -7,6 +7,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -131,6 +132,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -258,6 +260,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -308,7 +311,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -325,6 +328,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
                   "fontSize": 16,
                 },
                 Object {
+                  "color": "hsl(0, 67%, 24%)",
                   "fontSize": 20,
                 },
               ]
@@ -416,6 +420,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -466,7 +471,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -483,6 +488,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
                   "fontSize": 16,
                 },
                 Object {
+                  "color": "hsl(0, 67%, 24%)",
                   "fontSize": 20,
                 },
               ]
@@ -571,6 +577,7 @@ exports[`transfer feed item renders correctly for known sent invite 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -695,6 +702,7 @@ exports[`transfer feed item renders correctly for known sent without recipient c
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -745,7 +753,7 @@ exports[`transfer feed item renders correctly for known sent without recipient c
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -762,6 +770,7 @@ exports[`transfer feed item renders correctly for known sent without recipient c
                   "fontSize": 16,
                 },
                 Object {
+                  "color": "hsl(0, 67%, 24%)",
                   "fontSize": 20,
                 },
               ]
@@ -850,6 +859,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -974,6 +984,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1024,7 +1035,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1032,24 +1043,12 @@ exports[`transfer feed item renders correctly for received 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="hsl(0, 53%, 93%)"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1135,6 +1134,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1262,6 +1262,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1312,7 +1313,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1320,24 +1321,12 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="hsl(0, 53%, 93%)"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1423,6 +1412,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1473,7 +1463,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1481,24 +1471,12 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="hsl(0, 53%, 93%)"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1529,7 +1507,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             }
           }
         >
-          feedItemSentTitle
+          0x0000...7E57
         </Text>
         <Text
           numberOfLines={1}
@@ -1581,6 +1559,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1705,6 +1684,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1755,7 +1735,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#7AD6FE",
+                "backgroundColor": "hsl(0, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1763,24 +1743,12 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="hsl(0, 53%, 93%)"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1811,7 +1779,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             }
           }
         >
-          feedItemSentTitle
+          0x0000...7E57
         </Text>
         <Text
           numberOfLines={1}
@@ -1863,6 +1831,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -1913,7 +1882,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "#FEB45E",
+                "backgroundColor": "hsl(151, 53%, 93%)",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1921,24 +1890,12 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-              }
-            }
-            style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-                Object {
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
+          <svg
+            fill="hsl(151, 53%, 93%)"
+            height="40"
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width="40"
           />
         </View>
       </View>
@@ -1969,7 +1926,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             }
           }
         >
-          feedItemSentTitle
+          0x1Ff4...Bc42
         </Text>
         <Text
           numberOfLines={1}
@@ -2021,6 +1978,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }
@@ -2145,6 +2103,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
+      "rippleRadius": undefined,
       "type": "ThemeAttrAndroid",
     }
   }

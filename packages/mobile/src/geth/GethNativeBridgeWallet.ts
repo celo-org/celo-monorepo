@@ -1,15 +1,15 @@
-import { RemoteWallet } from '@celo/contractkit/lib/wallets/remote-wallet'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { CeloTx } from '@celo/connect'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
+import { UnlockableWallet } from '@celo/wallet-base'
+import { RemoteWallet } from '@celo/wallet-remote'
 import { GethNativeModule } from 'react-native-geth'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { GethNativeBridgeSigner } from 'src/geth/GethNativeBridgeSigner'
 import Logger from 'src/utils/Logger'
-import { Tx } from 'web3-core'
 
 const TAG = 'geth/GethNativeBridgeWallet'
 
@@ -80,7 +80,7 @@ export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
    * @param txParams Transaction to sign
    * @dev overrides WalletBase.signTransaction
    */
-  async signTransaction(txParams: Tx) {
+  async signTransaction(txParams: CeloTx) {
     Logger.info(`${TAG}@signTransaction`, `Signing transaction: ${JSON.stringify(txParams)}`)
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()

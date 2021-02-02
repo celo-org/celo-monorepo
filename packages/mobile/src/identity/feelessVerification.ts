@@ -1,11 +1,12 @@
 import { Result } from '@celo/base/lib/result'
+import { CeloTxReceipt } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import {
   CheckSessionResp,
   GetDistributedBlindedPepperResp,
@@ -89,7 +90,6 @@ import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
@@ -313,7 +313,13 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       // Start listening for manual and/or auto message inputs
       receiveMessageTask = yield takeEvery(
         Actions.RECEIVE_ATTESTATION_MESSAGE,
-        attestationCodeReceiver(attestationsWrapper, phoneHash, unverifiedMtwAddress, issuers, true)
+        attestationCodeReceiver(
+          attestationsWrapper,
+          phoneHashDetails,
+          unverifiedMtwAddress,
+          attestations,
+          true
+        )
       )
 
       if (!withoutRevealing) {
@@ -350,6 +356,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             attestations,
             attestations.length + attestationsToRequest,
             true,
+            contractKit,
             komenciKit
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
@@ -364,9 +371,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             Actions.RECEIVE_ATTESTATION_MESSAGE,
             attestationCodeReceiver(
               attestationsWrapper,
-              phoneHash,
+              phoneHashDetails,
               unverifiedMtwAddress,
-              issuers,
+              attestations,
               true
             )
           )
@@ -610,8 +617,8 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     (account, i) => accountAttestationStatuses[i].isVerified
   )
 
-  if (!possibleMtwAddresses) {
-    Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
+  if (!possibleMtwAddresses.length) {
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'No possible MTWs found')
     return null
   }
 
@@ -925,6 +932,7 @@ export function* feelessRequiredAttestationsCompleted() {
 }
 
 export function* feelessRequestAttestations(
+  contractKit: ContractKit,
   komenciKit: KomenciKit,
   attestationsWrapper: AttestationsWrapper,
   numAttestationsRequestsNeeded: number,
@@ -958,39 +966,26 @@ export function* feelessRequestAttestations(
   } else {
     Logger.debug(
       `${TAG}@feelessRequestAttestations`,
-      `Approving ${numAttestationsRequestsNeeded} new attestations`
+      `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    const approveTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-      [komenciKit, komenciKit.approveAttestations],
-      mtwAddress,
-      numAttestationsRequestsNeeded
-    )
-
-    if (!approveTxResult.ok) {
-      Logger.debug(TAG, '@feelessRequestAttestations', 'Failed approve tx')
-      throw approveTxResult.error
-    }
-
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
-      feeless: true,
-    })
-
-    Logger.debug(
-      `${TAG}@feelessRequestAttestations`,
-      `Requesting ${numAttestationsRequestsNeeded} new attestations`
-    )
-
-    const requestTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+    // KomenciKit `requestAttestations` method now bundles in the approve tx
+    // so there is no need to approve separately
+    const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.requestAttestations],
       mtwAddress,
       phoneHash,
       numAttestationsRequestsNeeded
     )
+
     if (!requestTxResult.ok) {
       Logger.debug(TAG, '@feelessRequestAttestations', 'Failed request tx')
       throw requestTxResult.error
     }
+
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
+      feeless: true,
+    })
 
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent, {
       feeless: true,
@@ -1014,7 +1009,7 @@ export function* feelessRequestAttestations(
     feeless: true,
   })
 
-  const selectIssuersTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+  const selectIssuersTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.selectIssuers],
     mtwAddress,
     phoneHash
@@ -1044,7 +1039,7 @@ function* submitCompleteTxAndRetryOnRevert(
   code: AttestationCode
 ) {
   const numOfRetries = 3
-  let completeTxResult: Result<TransactionReceipt, FetchError | TxError>
+  let completeTxResult: Result<CeloTxReceipt, FetchError | TxError>
   for (let i = 0; i < numOfRetries; i += 1) {
     completeTxResult = yield call(
       [komenciKit, komenciKit.completeAttestation],
@@ -1100,7 +1095,7 @@ export function* feelessCompleteAttestation(
   }
 
   yield put(feelessProcessingInputCode(true))
-  const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+  const completeTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
     submitCompleteTxAndRetryOnRevert,
     komenciKit,
     mtwAddress,

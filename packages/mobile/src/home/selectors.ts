@@ -1,11 +1,15 @@
+import { getRegionCodeFromCountryCode } from '@celo/utils/src/phoneNumbers'
+import _ from 'lodash'
+import DeviceInfo from 'react-native-device-info'
 import { createSelector } from 'reselect'
+import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import {
   getIncomingPaymentRequests,
   getOutgoingPaymentRequests,
 } from 'src/paymentRequest/selectors'
 import { RootState } from 'src/redux/reducers'
-import { isBackupTooLate } from 'src/redux/selectors'
+import { isVersionInRange } from 'src/utils/versionCheck'
 
 // TODO: De-dupe this with NotificationBox
 // It's not great that we must edit this and NotificationBox whenever introducing new notifications
@@ -14,14 +18,14 @@ export const getActiveNotificationCount = createSelector(
     getIncomingPaymentRequests,
     getOutgoingPaymentRequests,
     getReclaimableEscrowPayments,
-    isBackupTooLate,
+    (state) => state.account.backupCompleted,
   ],
-  (incomingPaymentReqs, outgoingPaymentRequests, reclaimableEscrowPayments, backupTooLate) => {
+  (incomingPaymentReqs, outgoingPaymentRequests, reclaimableEscrowPayments, backupCompleted) => {
     return (
       incomingPaymentReqs.length +
       outgoingPaymentRequests.length +
       reclaimableEscrowPayments.length +
-      (backupTooLate ? 1 : 0)
+      (backupCompleted ? 0 : 1)
     )
   }
 )
@@ -34,3 +38,25 @@ export const callToActNotificationSelector = (state: RootState) => {
     (!state.app.numberVerified && !state.account.dismissedGetVerified)
   )
 }
+
+const homeNotificationsSelector = (state: RootState) => state.home.notifications
+
+export const getExtraNotifications = createSelector(
+  [homeNotificationsSelector, defaultCountryCodeSelector],
+  (notifications, countryCallingCode) => {
+    const version = DeviceInfo.getVersion()
+    const countryCodeAlpha2 = countryCallingCode
+      ? getRegionCodeFromCountryCode(countryCallingCode)
+      : null
+    return _.pickBy(notifications, (notification) => {
+      return (
+        !!notification &&
+        !notification.dismissed &&
+        isVersionInRange(version, notification.minVersion, notification.maxVersion) &&
+        (notification.countries?.length
+          ? !!countryCodeAlpha2 && notification.countries.includes(countryCodeAlpha2)
+          : true)
+      )
+    })
+  }
+)

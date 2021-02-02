@@ -1,12 +1,10 @@
 import { base64ToHex, hexToBuffer } from '@celo/base'
-import {
-  printAndIgnoreRequestErrors,
-  requestAttestationsFromIssuers,
-} from '@celo/celotool/lib/lib/attestation'
-import { ContractKit } from '@celo/contractkit'
-import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
-import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
+import { printAndIgnoreRequestErrors } from '@celo/celotool/lib/lib/attestation'
+import { newKitFromWeb3 } from '@celo/contractkit'
+import { requestAttestationsFromIssuers } from '@celo/env-tests/lib/shared/attestation'
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import { compressedPubKey } from '@celo/utils/src/dataEncryptionKey'
+import { LocalWallet } from '@celo/wallet-local'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
@@ -23,20 +21,18 @@ enum Network {
   rc1 = 'rc1',
 }
 
-let env = process.argv[2] as Env
+const captchaToken = process.argv[3] || 'special-captcha-bypass-token'
+const env = (process.argv[2] as Env) || Env.local
+
 let network: Network
-if (Env[env] === undefined) {
-  env = Env.alfajores_eus
+if (env === Env.alfajores_weu || env === Env.alfajores_eus || env === Env.local) {
   network = Network.alfajores
+} else if (env === Env.rc1_br || env === Env.rc1_sea) {
+  network = Network.rc1
 } else {
-  if (env === Env.alfajores_weu || env === Env.alfajores_eus || env === Env.local) {
-    network = Network.alfajores
-  } else if (env === Env.rc1_br || env === Env.rc1_sea) {
-    network = Network.rc1
-  } else {
-    throw new Error('Could not determine network')
-  }
+  throw new Error('Could not determine network')
 }
+
 console.log('Using env: ' + network)
 
 const WALLET_IMPLEMENTATIONS: Record<Network, Record<string, string>> = {
@@ -50,7 +46,7 @@ const WALLET_IMPLEMENTATIONS: Record<Network, Record<string, string>> = {
   },
 }
 
-let contractVersion = process.argv[3]
+let contractVersion = process.argv[4]
 if (contractVersion === undefined) {
   const versions = Object.keys(WALLET_IMPLEMENTATIONS[network])
   contractVersion = versions[versions.length - 1]
@@ -87,7 +83,7 @@ const fornoURL: Record<Network, string> = {
 
 const provider = new Web3.providers.HttpProvider(fornoURL[network])
 const web3 = new Web3(provider)
-const contractKit = new ContractKit(web3, wallet)
+const contractKit = newKitFromWeb3(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
 
@@ -116,7 +112,7 @@ const run = async () => {
   const attestations = await contractKit.contracts.getAttestations()
   console.log('Attestations: ', attestations.address)
   console.log('Starting')
-  const startSession = await komenciKit.startSession('special-captcha-bypass-token')
+  const startSession = await komenciKit.startSession(captchaToken)
 
   console.log('StartSession: ', startSession)
   if (!startSession.ok) {
@@ -131,10 +127,11 @@ const run = async () => {
   console.log('DeployWallet: ', deployWallet)
   if (!deployWallet.ok) {
     return
+    ;-b
   }
   const walletAddress = deployWallet.result
   // cached:
-  const phoneNumber = '+40723301264'
+  const phoneNumber = '+105551234'
   // const identifier = '0x59c637d9c774d242dc36bdb0445e29fa79c69b74ef70b6d1a5c407c1db6b4110'
 
   const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
@@ -163,11 +160,6 @@ const run = async () => {
     return
   }
 
-  const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
-  console.log(approveRes)
-  if (!approveRes.ok) {
-    return
-  }
   const statsBefore = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('Before ===== ')
   console.log(statsBefore)

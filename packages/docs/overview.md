@@ -114,10 +114,6 @@ The Celo protocol ensures that there is sufficient CELO collateral to redeem the
 
 In addition, a back-up reserve of cryptocurrencies is held off-chain. This off-chain reserve is managed to preserve value and minimize volatility by maintaining a diversified portfolio of cryptocurrencies through algorithmic rebalancing trading and periodically "topping-up" the CELO collateral available to ensure it exceeds the amount required to redeem Celo Dollars in circulation. The approved cryptocurrencies, distribution ratios, and rebalancing period are all subject to on-chain governance.
 
-This scheme relies on a series of Oracles, external to the network, reporting the value of the CELO to US Dollar market rate. To minimize depletion of the reserve when these reported values are inaccurate or out-of-date, Celo uses a constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. As arbitrage occurs, the on-chain price dynamically adjusts until the offered rate meets the external rate.
-
-Celo maintains the size of its reserve through several sources, including a stability fee levied on Celo Dollar balances and a transfer from epoch rewards.
-
 {% hint style="success" %}
 **Roadmap**: Celo envisages a number of stable currencies pegged to different fiat currencies as well as natural resources such as forests.  In addition, once bridges between other chains and the Celo blockchain are fully developed, and liquid trading on decentralized exchanges occurs, the rebalancing can be handled transparently on-chain.
 {% endhint %}
