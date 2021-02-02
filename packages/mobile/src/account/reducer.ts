@@ -83,7 +83,7 @@ export const reducer = (
         ...state,
         ...rehydratedPayload,
         dismissedGetVerified: false,
-        dailyLimit: rehydratedPayload.dailyLimit || state.dailyLimit,
+        dailyLimitCusd: rehydratedPayload.dailyLimitCusd || state.dailyLimitCusd,
       }
     }
     case Actions.CHOOSE_CREATE_ACCOUNT:
