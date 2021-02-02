@@ -41,11 +41,7 @@ export class AzureKeyVaultClient {
   >()
   private readonly secretClient: SecretClient
 
-  constructor(
-    vaultName: string,
-    credential?: TokenCredential,
-    signingAlgorithm?: AzureKeyVaultSigningAlgorithm
-  ) {
+  constructor(vaultName: string, credential?: TokenCredential) {
     this.vaultName = vaultName
     this.vaultUri = `https://${this.vaultName}.vault.azure.net`
     // DefaultAzureCredential supports service principal or managed identity
@@ -53,7 +49,6 @@ export class AzureKeyVaultClient {
     this.credential = credential || new DefaultAzureCredential()
     this.keyClient = new KeyClient(this.vaultUri, this.credential)
     this.secretClient = new SecretClient(this.vaultUri, this.credential)
-    this.SIGNING_ALGORITHM = signingAlgorithm || DEFAULT_SIGNING_ALGORITHM
   }
 
   public async getKeys(): Promise<string[]> {
