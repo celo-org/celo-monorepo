@@ -17,8 +17,8 @@ import { soliditySha3 } from 'web3-utils'
 export { anonymizedPhone, isE164Number, ParsedPhoneNumber } from '@celo/base/lib/phoneNumbers'
 
 const sha3 = (v: string): string | null => soliditySha3({ type: 'string', value: v })
-export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
-  return baseGetPhoneHash(sha3, phoneNumber, salt)
+export const getPhoneHash = (phoneNumber: string, pepper?: string): string => {
+  return baseGetPhoneHash(sha3, phoneNumber, pepper)
 }
 
 const phoneUtil = PhoneNumberUtil.getInstance()

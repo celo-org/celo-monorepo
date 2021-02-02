@@ -130,11 +130,6 @@ export interface FeelessSetCompletedCodesAction {
   numComplete: number
 }
 
-export interface SetCaptchaTokenAction {
-  type: Actions.SET_CAPTCHA_TOKEN
-  token: string
-}
-
 export interface InputAttestationCodeAction {
   type: Actions.INPUT_ATTESTATION_CODE
   code: AttestationCode
@@ -316,7 +311,6 @@ export type ActionTypes =
   | SetHasSeenVerificationNux
   | SetCompletedCodesAction
   | FeelessSetCompletedCodesAction
-  | SetCaptchaTokenAction
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | FeelessInputAttestationCodeAction
@@ -427,11 +421,6 @@ export const setCompletedCodes = (numComplete: number): SetCompletedCodesAction 
 export const feelessSetCompletedCodes = (numComplete: number): FeelessSetCompletedCodesAction => ({
   type: Actions.FEELESS_SET_COMPLETED_CODES,
   numComplete,
-})
-
-export const setCaptchaToken = (token: string): SetCaptchaTokenAction => ({
-  type: Actions.SET_CAPTCHA_TOKEN,
-  token,
 })
 
 export const inputAttestationCode = (code: AttestationCode): InputAttestationCodeAction => ({

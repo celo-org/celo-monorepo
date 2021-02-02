@@ -29,7 +29,6 @@ import {
   feelessFetchVerificationState,
   feelessStartVerification,
   fetchVerificationState,
-  setCaptchaToken,
   setHasSeenVerificationNux,
   startVerification,
 } from 'src/identity/actions'
@@ -48,7 +47,19 @@ import { getPhoneNumberState } from 'src/verify/utils'
 import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
 import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
 import { currentAccountSelector } from 'src/web3/selectors'
-import { prepare, komenciContextSelector } from './reducer'
+import {
+  stop,
+  prepareKomenci,
+  komenciContextSelector,
+  ensureRealHumanUser,
+  currentStateSelector,
+  StateType,
+  startKomenciSession,
+  fetchPhoneNumberDetails,
+  setKomenciContext,
+  useKomenciSelector,
+  start,
+} from './reducer'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.VerificationEducationScreen>
 
@@ -58,7 +69,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const showSkipDialog = route.params?.showSkipDialog || false
   const account = useTypedSelector(currentAccountSelector)
   const [showLearnMoreDialog, setShowLearnMoreDialog] = useState(false)
-  const [isCaptchaVisible, setIsCaptchaVisible] = useState(false)
+  // const [isCaptchaVisible, setIsCaptchaVisible] = useState(false)
   // const [, setSafetyNetAttestation] = useState()
   const { t } = useTranslation(Namespaces.onboarding)
   const dispatch = useDispatch()
@@ -96,8 +107,9 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   }, [route.params?.selectedCountryCodeAlpha2])
 
   // const verificationState = useSelector(verificationStateSelector)
+  const currentState = useSelector(currentStateSelector)
   const komenciContext = useSelector(komenciContextSelector)
-  const komenciAvailable = komenciContext.serviceAvailable
+  const useKomenci = useSelector(useKomenciSelector)
   // const relevantVerificationState = tryFeeless ? feelessVerificationState : verificationState
   // const { actionableAttestations, status } = relevantVerificationState
   // const { numAttestationsRemaining } = status
@@ -116,17 +128,17 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   useFocusEffect(
     // useCallback is needed here: https://bit.ly/2G0WKTJ
     useCallback(() => {
-      if (!account) {
-        return
-      }
-      dispatch(fetchVerificationState(!partOfOnboarding))
-      dispatch(feelessFetchVerificationState())
+      // if (!account) {
+      // return
+      // }
+      // dispatch(fetchVerificationState(!partOfOnboarding))
+      // dispatch(feelessFetchVerificationState())
     }, [account])
   )
 
   const onStartVerification = () => {
     dispatch(setHasSeenVerificationNux(true))
-    console.log('komenciAvailable: ', komenciAvailable)
+    // console.log('komenciAvailable: ', komenciAvailable)
     // if (tryFeeless) {
     // dispatch(feelessStartVerification(withoutRevealing))
     // } else {
@@ -162,12 +174,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
       return
     }
 
-    const { sessionActive } = komenciContext
-    if (komenciAvailable && !sessionActive) {
-      showCaptcha()
-    } else {
-      onStartVerification()
-    }
+    dispatch(start(phoneNumberInfo.e164Number))
   }
 
   const onPressSkipCancel = () => {
@@ -196,17 +203,20 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     setShowLearnMoreDialog(false)
   }
 
-  const showCaptcha = () => setIsCaptchaVisible(true)
-  const hideCaptcha = () => setIsCaptchaVisible(false)
+  const cancelCaptcha = () => {
+    dispatch(stop())
+  }
 
   const handleCaptchaResolved = (res: any) => {
-    hideCaptcha()
     const captchaToken = res?.nativeEvent?.data
     if (captchaToken !== 'cancel' && captchaToken !== 'error') {
       Logger.info('Captcha token received: ', captchaToken)
-      dispatch(setCaptchaToken(captchaToken))
+      dispatch(setKomenciContext({ captchaToken }))
+      // dispatch(setCaptchaToken(captchaToken))
       // TODO: Before calling this, make sure |safetyNetAttestation| has finished loading on Android.
-      onStartVerification()
+      dispatch(startKomenciSession())
+    } else {
+      cancelCaptcha()
     }
   }
 
@@ -230,9 +240,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     )
   }
 
-  useEffect(() => {
-    dispatch(prepare())
-  }, [])
+  useEffect(() => {}, [])
 
   // TODO: Remove true from here
   // if (feelessVerificationState.isLoading || verificationState.isLoading || !account) {
@@ -267,9 +275,9 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         testID="VerificationEducationSkip"
       />
     )
-  } else if (komenciAvailable /* || verificationState.isBalanceSufficient*/) {
+  } else if (useKomenci /* || verificationState.isBalanceSufficient*/) {
     // Sufficient balance
-    bodyText = t(`verificationEducation.${komenciAvailable ? 'feelessBody' : 'body'}`)
+    bodyText = t(`verificationEducation.${useKomenci ? 'feelessBody' : 'body'}`)
     firstButton = (
       <Button
         text={
@@ -322,9 +330,12 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           {t('verificationEducation.doINeedToConfirm')}
         </TextButton>
       </ScrollView>
-      <Modal isVisible={isCaptchaVisible} style={styles.recaptchaModal}>
+      <Modal
+        isVisible={currentState.type === StateType.EnsuringRealHumanUser}
+        style={styles.recaptchaModal}
+      >
         <TopBarTextButton
-          onPress={hideCaptcha}
+          onPress={cancelCaptcha}
           titleStyle={[
             {
               marginTop: insets.top,
