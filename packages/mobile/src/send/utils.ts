@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { call, put, select } from 'redux-saga/effects'
-import { dailyLimitSelector } from 'src/account/selectors'
+import { cUsdDailyLimitSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -128,7 +128,7 @@ export function useDailyTransferLimitValidator(
   const recentPayments = useSelector(getRecentPayments)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
-  const dailyLimit = useSelector(dailyLimitSelector)
+  const dailyLimitCusd = useSelector(cUsdDailyLimitSelector)
 
   const now = Date.now()
 
@@ -136,7 +136,7 @@ export function useDailyTransferLimitValidator(
     now,
     recentPayments,
     dollarAmount.toNumber(),
-    dailyLimit
+    dailyLimitCusd
   )
   const showLimitReachedBanner = () => {
     dispatch(
@@ -145,7 +145,7 @@ export function useDailyTransferLimitValidator(
         recentPayments,
         localCurrencyExchangeRate,
         localCurrencySymbol,
-        dailyLimit
+        dailyLimitCusd
       )
     )
   }
@@ -156,10 +156,10 @@ export function _isPaymentLimitReached(
   now: number,
   recentPayments: PaymentInfo[],
   initial: number,
-  dailyLimit: number
+  dailyLimitCusd: number
 ): boolean {
   const amount = dailySpent(now, recentPayments) + initial
-  return amount > dailyLimit
+  return amount > dailyLimitCusd
 }
 
 export function showLimitReachedError(
@@ -167,15 +167,15 @@ export function showLimitReachedError(
   recentPayments: PaymentInfo[],
   localCurrencyExchangeRate: string | null | undefined,
   localCurrencySymbol: LocalCurrencySymbol | null,
-  dollarDailyLimit: number
+  dailyLimitCusd: number
 ) {
-  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments, dollarDailyLimit).toFixed(2)
+  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments, dailyLimitCusd).toFixed(2)
   const dailyRemaining = convertDollarsToLocalAmount(
     dailyRemainingcUSD,
     localCurrencyExchangeRate
   )?.decimalPlaces(2)
   const dailyLimit = convertDollarsToLocalAmount(
-    dollarDailyLimit,
+    dailyLimitCusd,
     localCurrencyExchangeRate
   )?.decimalPlaces(2)
 
@@ -184,7 +184,7 @@ export function showLimitReachedError(
     dailyRemaining,
     dailyLimit,
     dailyRemainingcUSD,
-    dailyLimitcUSD: dollarDailyLimit,
+    dailyLimitcUSD: dailyLimitCusd,
   }
 
   return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)

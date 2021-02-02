@@ -30,7 +30,7 @@ export interface State {
   acceptedTerms: boolean
   hasMigratedToNewBip39: boolean
   choseToRestoreAccount: boolean | undefined
-  dailyLimit: number
+  dailyLimitCusd: number
 }
 
 export enum PincodeType {
@@ -68,7 +68,7 @@ export const initialState = {
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
   hasMigratedToNewBip39: false,
   choseToRestoreAccount: false,
-  dailyLimit: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
+  dailyLimitCusd: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
 }
 
 export const reducer = (
@@ -223,7 +223,7 @@ export const reducer = (
       return {
         ...state,
         // We don't allow minimum daily limits lower than the default to avoid human error when setting them.
-        dailyLimit: Math.max(action.newLimit, DEFAULT_DAILY_PAYMENT_LIMIT_CUSD),
+        dailyLimitCusd: Math.max(action.newLimit, DEFAULT_DAILY_PAYMENT_LIMIT_CUSD),
       }
     case Web3Actions.SET_ACCOUNT: {
       return {

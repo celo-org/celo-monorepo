@@ -331,7 +331,7 @@ export const clearStoredAccount = (account: string): ClearStoredAccountAction =>
   account,
 })
 
-export const updateDailyLimit = (newLimit: number): UpdateDailyLimitAction => ({
+export const updateCusdDailyLimit = (newLimit: number): UpdateDailyLimitAction => ({
   type: Actions.UPDATE_DAILY_LIMIT,
   newLimit,
 })

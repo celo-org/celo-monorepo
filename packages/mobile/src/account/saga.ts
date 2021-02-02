@@ -9,7 +9,7 @@ import {
   SetPincodeAction,
   setPincodeFailure,
   setPincodeSuccess,
-  updateDailyLimit,
+  updateCusdDailyLimit,
 } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
@@ -17,7 +17,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { clearStoredMnemonic } from 'src/backup/utils'
 import { FIREBASE_ENABLED } from 'src/config'
-import { dailyLimitChannel, firebaseSignOut } from 'src/firebase/firebase'
+import { cUsdDailyLimitChannel, firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
 import { refreshAllBalances } from 'src/home/actions'
 import { removeAccountLocally } from 'src/pincode/authentication'
@@ -86,7 +86,7 @@ function* initializeAccount() {
 
 export function* watchDailyLimit() {
   const account = yield call(getConnectedAccount)
-  const channel = yield call(dailyLimitChannel, account)
+  const channel = yield call(cUsdDailyLimitChannel, account)
   if (!channel) {
     return
   }
@@ -94,7 +94,7 @@ export function* watchDailyLimit() {
     while (true) {
       const dailyLimit = yield take(channel)
       if (_.isNumber(dailyLimit)) {
-        yield put(updateDailyLimit(dailyLimit))
+        yield put(updateCusdDailyLimit(dailyLimit))
       }
     }
   } catch (error) {

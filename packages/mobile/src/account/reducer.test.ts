@@ -15,7 +15,7 @@ describe('account reducer', () => {
       })
     ).toEqual({
       ...initialState,
-      dailyLimit: 600,
+      dailyLimitCusd: 600,
     })
   })
 
@@ -27,7 +27,7 @@ describe('account reducer', () => {
       })
     ).toEqual({
       ...initialState,
-      dailyLimit: 500,
+      dailyLimitCusd: 500,
     })
   })
 })
