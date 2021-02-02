@@ -1,5 +1,5 @@
-import OffchainDataWrapper from '@celo/identity/src/offchain-data-wrapper'
-import { PrivateNameAccessor, PublicNameAccessor } from '@celo/identity/src/offchain/accessors/name'
+import OffchainDataWrapper from '@celo/identity/lib/offchain-data-wrapper'
+import { PrivateNameAccessor, PublicNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { Args, Flags } from '../../utils/command'
