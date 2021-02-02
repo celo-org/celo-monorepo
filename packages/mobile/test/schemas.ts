@@ -477,7 +477,7 @@ export const v7Schema = {
     ...v6Schema.account,
     backupRequiredTime: null,
     pictureUri: null,
-    dailyLimit: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
+    dailyLimitCusd: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
   },
   home: {
     loading: false,
