@@ -8,7 +8,7 @@ import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
-import { Keyboard, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, Keyboard, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
@@ -32,6 +32,11 @@ import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboardin
 import UseBackToWelcomeScreen from 'src/onboarding/UseBackToWelcomeScreen'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
+
+const AVERAGE_WORD_WIDTH = 80
+const AVERAGE_SEED_WIDTH = AVERAGE_WORD_WIDTH * 24
+// Estimated number of lines needed to enter the account key
+const NUMBER_OF_LINES = Math.ceil(AVERAGE_SEED_WIDTH / Dimensions.get('window').width)
 
 interface State {
   keyboardVisible: boolean
@@ -172,6 +177,7 @@ export class ImportWallet extends React.Component<Props, State> {
                     inputValue={backupPhrase}
                     inputPlaceholder={t('importExistingKey.keyPlaceholder')}
                     multiline={true}
+                    numberOfLines={NUMBER_OF_LINES}
                     onInputChange={this.setBackupPhrase}
                     shouldShowClipboard={this.shouldShowClipboard}
                     testID="ImportWalletBackupKeyInputField"
