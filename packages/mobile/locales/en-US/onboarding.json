@@ -67,7 +67,7 @@
     "dismiss": "Dismiss"
   },
   "importExistingKey": {
-    "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.\n\nNote that your language preference must match the language used when you created your account.",
+    "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.",
     "keyPlaceholder": "horse leopard dog monkey ..."
   },
   "verificationInput": {
