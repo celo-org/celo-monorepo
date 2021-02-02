@@ -17,7 +17,7 @@
 
 • **authenticationMethod**: *[CUSTOM_SIGNER](../enums/_odis_query_.authenticationmethod.md#custom_signer)*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:24](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L24)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L24)*
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **customSigner**: *function*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:25](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L25)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L25)*
 
 #### Type declaration:
 

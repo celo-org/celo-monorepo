@@ -2,7 +2,6 @@
  * This is a reactnavigation SCREEN, which we use to set a PIN.
  */
 import colors from '@celo/react-components/styles/colors'
-import { CommonActions } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -16,6 +15,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
+import { navigate, navigateClearingStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { DEFAULT_CACHE_ACCOUNT, isPinValid } from 'src/pincode/authentication'
@@ -60,12 +60,12 @@ export class PincodeSet extends React.Component<Props, State> {
     errorText: undefined,
   }
 
-  getNextScreen = () => {
+  navigateToNextScreen = () => {
     if (this.props.choseToRestoreAccount) {
-      return Screens.ImportWallet
+      navigate(Screens.ImportWallet)
+    } else {
+      navigateClearingStack(Screens.VerificationEducationScreen)
     }
-
-    return Screens.VerificationEducationScreen
   }
 
   onChangePin1 = (pin1: string) => {
@@ -103,13 +103,7 @@ export class PincodeSet extends React.Component<Props, State> {
       setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
       this.props.setPincode(PincodeType.CustomPin)
       ValoraAnalytics.track(OnboardingEvents.pin_set)
-
-      this.props.navigation.dispatch(() => {
-        return CommonActions.reset({
-          index: 0,
-          routes: [{ name: this.getNextScreen() }],
-        })
-      })
+      this.navigateToNextScreen()
     } else {
       this.props.navigation.setParams({ isVerifying: false })
       ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pins do not match' })
@@ -128,7 +122,7 @@ export class PincodeSet extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={this.getNextScreen()} />
+        <DevSkipButton onSkip={this.navigateToNextScreen} />
         {isVerifying ? (
           // Verify
           <Pincode

@@ -475,6 +475,11 @@ export const v7Schema = {
   account: {
     ...v6Schema.account,
     backupRequiredTime: null,
+    pictureUri: null,
+  },
+  home: {
+    loading: false,
+    notifications: {},
   },
 }
 

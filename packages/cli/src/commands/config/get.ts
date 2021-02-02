@@ -6,7 +6,7 @@ export default class Get extends BaseCommand {
   static description = 'Output network node configuration'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   requireSynced = false

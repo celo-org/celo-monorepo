@@ -67,11 +67,13 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Celo Wallet needs camera access to scan QR codes.</string>
+	<string>Connecting your camera allows you to scans codes for payments.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Celo Wallet can import your contacts so you can transact with them.</string>
+	<string>Adding your contacts makes it easy to send and request payments with your friends.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Celo Wallet needs access to save your QR code to your photos.</string>
+	<string>Connecting your photo library allows you to save your code to your photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This is required for you to choose a profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>

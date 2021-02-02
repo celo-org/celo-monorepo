@@ -24,4 +24,4 @@
 
 Ƭ **SchemaErrors**: *[InvalidDataError](../classes/_offchain_accessors_errors_.invaliddataerror.md) | [OffchainError](../classes/_offchain_accessors_errors_.offchainerror.md) | [UnknownCiphertext](../classes/_offchain_accessors_errors_.unknownciphertext.md) | [UnavailableKey](../classes/_offchain_accessors_errors_.unavailablekey.md) | [InvalidKey](../classes/_offchain_accessors_errors_.invalidkey.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:44](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L44)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/errors.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/errors.ts#L44)*

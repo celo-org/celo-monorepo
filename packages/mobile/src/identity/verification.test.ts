@@ -125,18 +125,21 @@ const mockActionableAttestations: ActionableAttestation[] = [
     blockNumber: 100,
     attestationServiceURL: 'https://fake.celo.org/0',
     name: '',
+    version: '1.1.0',
   },
   {
     issuer: attestationCode1.issuer,
     blockNumber: 110,
     attestationServiceURL: 'https://fake.celo.org/1',
     name: '',
+    version: '1.1.0',
   },
   {
     issuer: attestationCode2.issuer,
     blockNumber: 120,
     attestationServiceURL: 'https://fake.celo.org/2',
     name: '',
+    version: '1.1.0',
   },
 ]
 
@@ -673,7 +676,7 @@ describe(doVerificationFlow, () => {
         [select(verificationStateSelector), mockVerificationStateUnverified],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [
@@ -730,7 +733,7 @@ describe(doVerificationFlow, () => {
         [select(verificationStateSelector), mockVerificationStatePartlyVerified],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [
@@ -834,7 +837,7 @@ describe(doVerificationFlow, () => {
         ],
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
-        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // https://github.com/celo-org/celo-monorepo/issues/6262 is resolved
         [delay(5000), true],
         [delay(10000), true],
         [

@@ -28,8 +28,8 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 echo "- Checkout source code at $BRANCH"
-git fetch --all --tags 2>$LOG_FILE >> $LOG_FILE
-git checkout $BRANCH 2>$LOG_FILE >> $LOG_FILE
+git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' 2>>$LOG_FILE >> $LOG_FILE
+git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
 rm -rf build/contracts

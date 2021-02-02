@@ -21,6 +21,8 @@ interface StartArgv extends GethArgv {
   syncMode: string
   mining: boolean
   blockTime: number
+  churritoBlock: number
+  donutBlock: number
   port: number
   rpcport: number
   wsport: number
@@ -36,6 +38,22 @@ interface StartArgv extends GethArgv {
   ethstats: string
   mnemonic: string
   initialAccounts: string
+}
+
+// hardForkBlockCoercer parses a hard fork activation block as follows:
+// "null" => no activation
+// "42" => activate at block 42 (and likewise for other numbers >= 0)
+const hardForkBlockCoercer = (arg: string) => {
+  if (arg === 'null') {
+    return undefined
+  } else {
+    const value = parseInt(arg, 10)
+    if (typeof value === 'number' && value >= 0) {
+      return value
+    } else {
+      throw new Error(`Invalid value for hard fork activation block: '${arg}'`)
+    }
+  }
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -109,6 +127,18 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Block Time',
       default: 1,
     })
+    .option('churritoBlock', {
+      type: 'string',
+      coerce: hardForkBlockCoercer,
+      description: 'Churrito hard fork activation block number (use "null" for no activation)',
+      default: '0',
+    })
+    .option('donutBlock', {
+      type: 'string',
+      coerce: hardForkBlockCoercer,
+      description: 'Donut hard fork activation block number (use "null" for no activation)',
+      default: '0',
+    })
     .option('migrate', {
       type: 'boolean',
       description: 'Migrate contracts',
@@ -145,6 +175,8 @@ export const handler = async (argv: StartArgv) => {
   const networkId = parseInt(argv.networkId, 10)
   const syncMode = argv.syncMode
   const blockTime = argv.blockTime
+  const churritoBlock = argv.churritoBlock
+  const donutBlock = argv.donutBlock
 
   const port = argv.port
   const rpcport = argv.rpcport
@@ -184,6 +216,8 @@ export const handler = async (argv: StartArgv) => {
       blockTime,
       epoch: 17280,
       initialAccounts,
+      churritoBlock,
+      donutBlock,
     },
   }
 

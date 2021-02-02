@@ -89,219 +89,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
-                  "type": "ThemeAttrAndroid",
-                }
-              }
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-            >
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "borderBottomWidth": 1,
-                    "borderColor": "#EDEEEF",
-                    "flexDirection": "row",
-                    "marginLeft": 16,
-                    "paddingVertical": 14,
-                  }
-                }
-              >
-                <View
-                  style={
-                    Object {
-                      "marginRight": 16,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
-                </View>
-                <Text
-                  numberOfLines={1}
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                      "marginRight": 16,
-                    }
-                  }
-                >
-                  USD
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View
-            onLayout={[Function]}
-            style={null}
-          >
-            <View
-              accessible={true}
-              focusable={true}
-              nativeBackgroundAndroid={
-                Object {
-                  "attribute": "selectableItemBackground",
-                  "type": "ThemeAttrAndroid",
-                }
-              }
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-            >
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "borderBottomWidth": 1,
-                    "borderColor": "#EDEEEF",
-                    "flexDirection": "row",
-                    "marginLeft": 16,
-                    "paddingVertical": 14,
-                  }
-                }
-              >
-                <View
-                  style={
-                    Object {
-                      "marginRight": 16,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
-                </View>
-                <Text
-                  numberOfLines={1}
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                      "marginRight": 16,
-                    }
-                  }
-                >
-                  CAD
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View
-            onLayout={[Function]}
-            style={null}
-          >
-            <View
-              accessible={true}
-              focusable={true}
-              nativeBackgroundAndroid={
-                Object {
-                  "attribute": "selectableItemBackground",
-                  "type": "ThemeAttrAndroid",
-                }
-              }
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-            >
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "borderBottomWidth": 1,
-                    "borderColor": "#EDEEEF",
-                    "flexDirection": "row",
-                    "marginLeft": 16,
-                    "paddingVertical": 14,
-                  }
-                }
-              >
-                <View
-                  style={
-                    Object {
-                      "marginRight": 16,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
-                </View>
-                <Text
-                  numberOfLines={1}
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "flex": 1,
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                      "marginRight": 16,
-                    }
-                  }
-                >
-                  EUR
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View
-            onLayout={[Function]}
-            style={null}
-          >
-            <View
-              accessible={true}
-              focusable={true}
-              nativeBackgroundAndroid={
-                Object {
-                  "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -333,24 +121,271 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                   }
                 >
                   <svg
-                    height={24}
+                    height={20}
                     style={Object {}}
-                    viewBox="0 0 24 24"
-                    width={24}
+                    viewBox="0 0 20 20"
+                    width={20}
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <circle
-                      cx="12"
-                      cy="12"
-                      fill="#1AB775"
-                      r="12"
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
                       style={Object {}}
                     />
-                    <path
-                      clip-rule="evenodd"
-                      d="M9.74449 16.6294C9.74581 16.6307 9.74713 16.6321 9.74846 16.6334C10.0609 16.9458 10.5674 16.9458 10.8798 16.6334L18.2336 9.2796C18.5461 8.96718 18.5461 8.46065 18.2336 8.14823C17.9212 7.83581 17.4147 7.83581 17.1023 8.14823L10.3142 14.9363L7.29707 11.9192C6.98465 11.6068 6.47812 11.6068 6.1657 11.9192C5.85328 12.2317 5.85328 12.7382 6.1657 13.0506L9.74449 16.6294Z"
-                      fill="white"
-                      fill-rule="evenodd"
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  USD
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  CAD
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  EUR
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#1AB775"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      fill="#1AB775"
+                      r="6"
                       style={Object {}}
                     />
                   </svg>
@@ -383,6 +418,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -413,18 +449,28 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                     }
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
                 </View>
                 <Text
                   numberOfLines={1}
@@ -454,6 +500,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -484,18 +531,28 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                     }
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
                 </View>
                 <Text
                   numberOfLines={1}
@@ -525,6 +582,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -555,18 +613,28 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                     }
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
                 </View>
                 <Text
                   numberOfLines={1}
@@ -596,6 +664,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -626,18 +695,28 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                     }
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
                 </View>
                 <Text
                   numberOfLines={1}
@@ -667,6 +746,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -697,18 +777,28 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                     }
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
                 </View>
                 <Text
                   numberOfLines={1}
@@ -738,6 +828,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -768,18 +859,28 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
                     }
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "borderColor": "#9CA4A9",
-                        "borderRadius": 12,
-                        "borderWidth": 2,
-                        "height": 24,
-                        "paddingTop": 2,
-                        "width": 24,
-                      }
-                    }
-                  />
+                  <svg
+                    height={20}
+                    style={Object {}}
+                    viewBox="0 0 20 20"
+                    width={20}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="9"
+                      stroke="#B4B9BD"
+                      strokeWidth={2}
+                      style={Object {}}
+                    />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="6"
+                      style={Object {}}
+                    />
+                  </svg>
                 </View>
                 <Text
                   numberOfLines={1}

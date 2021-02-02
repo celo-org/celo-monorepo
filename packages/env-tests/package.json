@@ -5,11 +5,11 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@celo/contractkit": "1.0.0-dev",
-    "@celo/utils": "1.0.0-dev",
-    "@celo/base": "1.0.0-dev",
-    "@celo/connect": "1.0.0-dev",
-    "@celo/identity": "1.0.0-dev",
+    "@celo/contractkit": "1.0.1-dev",
+    "@celo/utils": "1.0.1-dev",
+    "@celo/base": "1.0.1-dev",
+    "@celo/connect": "1.0.1-dev",
+    "@celo/identity": "1.0.1-dev",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "bunyan-debug-stream": "2.0.0",
@@ -27,7 +27,8 @@
     "test": "jest --runInBand",
     "baklava-test": "CELO_ENV=baklava CELO_PROVIDER=https://baklava-forno.celo-testnet.org jest --runInBand",
     "alfajores-test": "CELO_ENV=alfajores CELO_PROVIDER=https://alfajores-forno.celo-testnet.org jest --runInBand",
-    "mainnet-test": "CELO_ENV=rc1 CELO_PROVIDER=https://forno.celo.org jest --runInBand"
+    "mainnet-test": "CELO_ENV=rc1 CELO_PROVIDER=https://forno.celo.org jest --runInBand",
+    "staging-test": "CELO_ENV=staging CELO_PROVIDER=https://staging-forno.celo-networks-dev.org jest --runInBand"
   },
   "devDependencies": {
     "typescript": "^3.8.3"
