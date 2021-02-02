@@ -24,7 +24,7 @@ import { removeAccountLocally } from 'src/pincode/authentication'
 import { persistor } from 'src/redux/store'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { getConnectedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { getAccount, getOrCreateAccount } from 'src/web3/saga'
 
 const TAG = 'account/saga'
 
@@ -85,7 +85,7 @@ function* initializeAccount() {
 }
 
 export function* watchDailyLimit() {
-  const account = yield call(getConnectedAccount)
+  const account = yield call(getAccount)
   const channel = yield call(cUsdDailyLimitChannel, account)
   if (!channel) {
     return
