@@ -35,15 +35,13 @@ git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts
-yarn build:sol >> $LOG_FILE
+yarn build >> $LOG_FILE
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
-# Move back to branch from which we started
-echo "- Return to original git commit"
-git checkout - >> $LOG_FILE
-
-echo "- Build verification script"
-yarn build >> $LOG_FILE
 
 echo "- Run verification script"
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $FORNO
+
+# Move back to branch from which we started
+echo "- Return to original git commit"
+git checkout - >> $LOG_FILE
