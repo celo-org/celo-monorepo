@@ -40,13 +40,20 @@ spec:
             configMapKeyRef:
               name: {{ template "common.fullname" . }}-geth-config
               key: networkid
+        {{- if not .Values.geth.overwriteBootnodePrivateKey }}
         volumeMounts:
         - name: data
           mountPath: /etc/bootnode
+        {{- else }}
+        - name: bootnode-pkey
+          mountPath: "/etc/bootnode"
+          readOnly: true
+        {{- end }}
         ports:
         - name: discovery
           containerPort: 30301
           protocol: UDP
+      {{- if not .Values.geth.overwriteBootnodePrivateKey }}
       initContainers:
       - name: generate-node-key
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
@@ -66,9 +73,18 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /etc/bootnode
+      {{- end }}
       volumes:
       - name: data
         emptyDir: {}
+      {{- if .Values.geth.overwriteBootnodePrivateKey }}
+      - name: bootnode-pkey
+        secret:
+          secretName: {{ template "common.fullname" . }}-geth-account
+          items:
+          - key: bootnodePrivateKey
+            path: node.key
+      {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

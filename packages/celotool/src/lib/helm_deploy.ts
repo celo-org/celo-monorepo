@@ -509,9 +509,10 @@ async function upgradeValidatorStaticIPs(
     } catch (e) {
       ipExists = false
     }
-    if (ipExists && (i < proxiesPerValidator.length || i >= newValidatorNodeCount)) {
+    const proxiedValidator = proxiesPerValidator[i] == 0 ? false : true
+    if (ipExists && proxiedValidator) {
       await deleteIPAddress(ipName)
-    } else if (!ipExists && i >= proxiesPerValidator.length && i < newValidatorNodeCount) {
+    } else if (!ipExists && !proxiedValidator) {
       await registerIPAddress(ipName)
     }
   }
@@ -721,6 +722,15 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
 
+  const bootnodeOverwritePkey = fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== '' ?
+    [
+      `--set geth.overwriteBootnodePrivateKey="true"`,
+      `--set geth.bootnodePrivateKey="${fetchEnv(envVar.GETH_BOOTNODE_OVERWRITE_PKEY)}"`,
+    ]
+  : [
+      `--set geth.overwriteBootnodePrivateKey="false"`,
+    ]
+
   const defaultDiskSize = fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')
   const privateTxNodeDiskSize = fetchEnvOrFallback(envVar.PRIVATE_NODE_DISK_SIZE_GB, defaultDiskSize)
 
@@ -765,6 +775,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.privateTxNodediskSizeGB=${privateTxNodeDiskSize}`,
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...gethMetricsOverrides,
+    ...bootnodeOverwritePkey,
     ...(await helmIPParameters(celoEnv)),
   ]
 }
