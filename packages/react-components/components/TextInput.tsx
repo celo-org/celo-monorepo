@@ -18,6 +18,8 @@ import {
   ViewStyle,
 } from 'react-native'
 
+export const LINE_HEIGHT = Platform.select({ android: 22, default: 20 })
+
 type Props = Omit<RNTextInputProps, 'style'> & {
   style?: StyleProp<ViewStyle>
   inputStyle?: RNTextInputProps['style']
@@ -116,7 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 0,
-    lineHeight: Platform.select({ android: 22, ios: 20 }), // vertical align = center
+    lineHeight: LINE_HEIGHT, // vertical align = center
   },
   icon: {
     marginLeft: 8,

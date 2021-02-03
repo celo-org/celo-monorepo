@@ -80,4 +80,5 @@ export enum ErrorMessages {
   COUNTRY_NOT_AVAILABLE = 'countryNotAvailable',
   MAX_ESCROW_TRANSFER_EXCEEDED = 'maxEscrowTransferExceeded',
   FIREBASE_FETCH_FAILED = 'firebaseFetchFailed',
+  PICTURE_LOAD_FAILED = 'pictureLoadFailed',
 }

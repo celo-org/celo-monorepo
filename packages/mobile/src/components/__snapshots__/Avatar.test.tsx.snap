@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Avatar renders correctly with address but without contact 1`] = `
+exports[` renders correctly with address but without contact nor number 1`] = `
 <View
   style={
     Object {
@@ -31,7 +31,7 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#7AD6FE",
+            "backgroundColor": "hsl(0, 53%, 93%)",
             "borderRadius": 20,
             "height": 40,
             "width": 40,
@@ -48,12 +48,13 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
               "fontSize": 16,
             },
             Object {
+              "color": "hsl(0, 67%, 24%)",
               "fontSize": 20,
             },
           ]
         }
       >
-        M
+        W
       </Text>
     </View>
   </View>
@@ -76,7 +77,7 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
       ]
     }
   >
-    mockName
+    walletAddress
   </Text>
   <Text
     ellipsizeMode="tail"
@@ -97,12 +98,12 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
       ]
     }
   >
-    #0x0000000000000000000000000000000000007E57
+    0x0000...7E57
   </Text>
 </View>
 `;
 
-exports[`Avatar renders correctly with contact 1`] = `
+exports[` renders correctly with contact but without number 1`] = `
 <View
   style={
     Object {
@@ -133,7 +134,7 @@ exports[`Avatar renders correctly with contact 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#7AD6FE",
+            "backgroundColor": "hsl(0, 53%, 93%)",
             "borderRadius": 20,
             "height": 40,
             "width": 40,
@@ -141,27 +142,23 @@ exports[`Avatar renders correctly with contact 1`] = `
         ]
       }
     >
-      <Image
-        resizeMode="cover"
-        source={
-          Object {
-            "uri": "mockThumbpath",
-          }
-        }
+      <Text
         style={
           Array [
             Object {
-              "alignSelf": "center",
-              "margin": "auto",
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 16,
             },
             Object {
-              "borderRadius": 20,
-              "height": 40,
-              "width": 40,
+              "color": "hsl(0, 67%, 24%)",
+              "fontSize": 20,
             },
           ]
         }
-      />
+      >
+        M
+      </Text>
     </View>
   </View>
   <Text
@@ -184,6 +181,88 @@ exports[`Avatar renders correctly with contact 1`] = `
     }
   >
     mockName
+  </Text>
+</View>
+`;
+
+exports[` renders correctly with number but without contact 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "marginBottom": 10,
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "hsl(0, 53%, 93%)",
+            "borderRadius": 20,
+            "height": 40,
+            "width": 40,
+          },
+        ]
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 16,
+            },
+            Object {
+              "color": "hsl(0, 67%, 24%)",
+              "fontSize": 20,
+            },
+          ]
+        }
+      >
+        M
+      </Text>
+    </View>
+  </View>
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    style={
+      Array [
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Inter-Medium",
+          "fontSize": 14,
+          "lineHeight": 18,
+        },
+        Object {
+          "marginHorizontal": 20,
+          "paddingTop": 6,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    mobileNumber
   </Text>
   <View
     style={
@@ -229,211 +308,5 @@ exports[`Avatar renders correctly with contact 1`] = `
       +1 415-555-6666
     </Text>
   </View>
-</View>
-`;
-
-exports[`Avatar renders correctly with number but without contact 1`] = `
-<View
-  style={
-    Object {
-      "alignItems": "center",
-      "flexDirection": "column",
-      "justifyContent": "center",
-      "marginBottom": 10,
-    }
-  }
->
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        },
-        undefined,
-      ]
-    }
-  >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#7AD6FE",
-            "borderRadius": 20,
-            "height": 40,
-            "width": 40,
-          },
-        ]
-      }
-    >
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#FFFFFF",
-              "fontFamily": "Inter-Medium",
-              "fontSize": 16,
-            },
-            Object {
-              "fontSize": 20,
-            },
-          ]
-        }
-      >
-        M
-      </Text>
-    </View>
-  </View>
-  <Text
-    ellipsizeMode="tail"
-    numberOfLines={1}
-    style={
-      Array [
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Inter-Medium",
-          "fontSize": 14,
-          "lineHeight": 18,
-        },
-        Object {
-          "marginHorizontal": 20,
-          "paddingTop": 6,
-          "textAlign": "center",
-        },
-      ]
-    }
-  >
-    mockName
-  </Text>
-  <View
-    style={
-      Object {
-        "flexDirection": "row",
-      }
-    }
-  >
-    <Text
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "alignItems": "center",
-            "justifyContent": "center",
-            "marginRight": 4,
-          },
-        ]
-      }
-    >
-      🇺🇸
-    </Text>
-    <Text
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "color": "#9CA4A9",
-          },
-        ]
-      }
-    >
-      +1 415-555-6666
-    </Text>
-  </View>
-</View>
-`;
-
-exports[`Avatar renders correctly without contact and number 1`] = `
-<View
-  style={
-    Object {
-      "alignItems": "center",
-      "flexDirection": "column",
-      "justifyContent": "center",
-      "marginBottom": 10,
-    }
-  }
->
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        },
-        undefined,
-      ]
-    }
-  >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#7AD6FE",
-            "borderRadius": 20,
-            "height": 40,
-            "width": 40,
-          },
-        ]
-      }
-    >
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#FFFFFF",
-              "fontFamily": "Inter-Medium",
-              "fontSize": 16,
-            },
-            Object {
-              "fontSize": 20,
-            },
-          ]
-        }
-      >
-        M
-      </Text>
-    </View>
-  </View>
-  <Text
-    ellipsizeMode="tail"
-    numberOfLines={1}
-    style={
-      Array [
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Inter-Medium",
-          "fontSize": 14,
-          "lineHeight": 18,
-        },
-        Object {
-          "marginHorizontal": 20,
-          "paddingTop": 6,
-          "textAlign": "center",
-        },
-      ]
-    }
-  >
-    mockName
-  </Text>
 </View>
 `;
