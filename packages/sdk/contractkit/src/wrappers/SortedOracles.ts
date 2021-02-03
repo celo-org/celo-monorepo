@@ -51,11 +51,15 @@ export enum OracleCurrencyPair {
   CELOBTC = 'CELOBTC',
 }
 
-export const currencyPairForCeloToken: Partial<Record<CeloToken, OracleCurrencyPair>> = {
-  [CeloContract.StableToken]: OracleCurrencyPair.CELOUSD,
-}
+export type ReportTarget = CeloToken | OracleCurrencyPair
 
-export type ReportTarget = CeloContract.StableToken | OracleCurrencyPair
+/**
+ * Disambiguate a ReportTarget to a CeloToken
+ * @param target ReportTarget
+ */
+const isCeloToken = (target: ReportTarget): target is CeloToken => {
+  return target === CeloContract.StableToken || target === CeloContract.GoldToken
+}
 
 /**
  * Currency price oracle contract.
@@ -286,17 +290,11 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @return the address to be used as an identifier
    */
   async getCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    let pair: OracleCurrencyPair
-    if (target === CeloContract.StableToken) {
-      const pairForToken = currencyPairForCeloToken[target]
-      if (pairForToken === undefined) {
-        throw new Error(`{target} does not have a related currency pair`)
-      }
-      pair = pairForToken
+    if (isCeloToken(target)) {
+      return this.kit.registry.addressFor(target)
     } else {
-      pair = target
+      return this._getCurrencyPairIdentifier(target)
     }
-    return this._getCurrencyPairIdentifier(pair)
   }
 
   private async findLesserAndGreaterKeys(
