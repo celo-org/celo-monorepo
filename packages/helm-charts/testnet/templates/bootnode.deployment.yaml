@@ -40,13 +40,13 @@ spec:
             configMapKeyRef:
               name: {{ template "common.fullname" . }}-geth-config
               key: networkid
-        {{- if not .Values.geth.overwriteBootnodePrivateKey }}
         volumeMounts:
+        {{- if not .Values.geth.overwriteBootnodePrivateKey }}
         - name: data
           mountPath: /etc/bootnode
         {{- else }}
         - name: bootnode-pkey
-          mountPath: "/etc/bootnode"
+          mountPath: /etc/bootnode
           readOnly: true
         {{- end }}
         ports:
