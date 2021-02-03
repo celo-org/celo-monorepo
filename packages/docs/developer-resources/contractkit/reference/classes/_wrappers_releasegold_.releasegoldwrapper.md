@@ -104,7 +104,7 @@ Name | Type |
     tupleParser(valueToString, valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:357](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L357)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:358](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L358)*
 
 Relocks gold that has been unlocked but not withdrawn.
 
@@ -129,7 +129,7 @@ ___
 
 • **createAccount**: *function* = proxySend(this.kit, this.contract.methods.createAccount)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:386](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L386)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:387](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L387)*
 
 Beneficiary creates an account on behalf of the ReleaseGold contract.
 
@@ -172,7 +172,7 @@ ___
 
 • **getBeneficiary**: *function* = proxyCall(this.contract.methods.beneficiary)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L100)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L101)*
 
 Returns the beneficiary of the ReleaseGold contract
 
@@ -188,7 +188,7 @@ ___
 
 • **getCanValidate**: *function* = proxyCall(this.contract.methods.canValidate)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:132](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L132)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L133)*
 
 Returns true if the contract can validate
 
@@ -204,7 +204,7 @@ ___
 
 • **getCanVote**: *function* = proxyCall(this.contract.methods.canVote)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L138)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L139)*
 
 Returns true if the contract can vote
 
@@ -224,7 +224,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:264](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L264)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:265](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L265)*
 
 Returns the total amount that has already released up to now
 
@@ -242,7 +242,7 @@ ___
     this.contract.methods.liquidityProvisionMet
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L124)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L125)*
 
 Returns true if the liquidity provision has been met for this contract
 
@@ -262,7 +262,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L155)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:156](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L156)*
 
 Returns the maximum amount of gold (regardless of release schedule)
 currently allowed for release.
@@ -279,7 +279,7 @@ ___
 
 • **getOwner**: *function* = proxyCall(this.contract.methods.owner)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L118)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:119](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L119)*
 
 Returns the owner's address of the ReleaseGold contract
 
@@ -295,7 +295,7 @@ ___
 
 • **getRefundAddress**: *function* = proxyCall(this.contract.methods.refundAddress)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L112)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L113)*
 
 Returns the refund address of the ReleaseGold contract
 
@@ -311,7 +311,7 @@ ___
 
 • **getReleaseOwner**: *function* = proxyCall(this.contract.methods.releaseOwner)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L106)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L107)*
 
 Returns the releaseOwner address of the ReleaseGold contract
 
@@ -331,7 +331,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:254](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L254)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L255)*
 
 Returns the remaining locked gold balance in the ReleaseGold instance
 
@@ -351,7 +351,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L234)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:235](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L235)*
 
 Returns the the sum of locked and unlocked gold in the ReleaseGold instance
 
@@ -371,7 +371,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L244)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L245)*
 
 Returns the remaining unlocked gold balance in the ReleaseGold instance
 
@@ -391,7 +391,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L224)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:225](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L225)*
 
 Returns the total balance of the ReleaseGold instance
 
@@ -411,7 +411,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:144](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L144)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:145](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L145)*
 
 Returns the total withdrawn amount from the ReleaseGold contract
 
@@ -427,7 +427,7 @@ ___
 
 • **isRevoked**: *function* = proxyCall(this.contract.methods.isRevoked)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:200](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L200)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L201)*
 
 Indicates if the release grant is revoked or not
 
@@ -447,7 +447,7 @@ ___
     tupleParser(valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:292](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L292)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:293](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L293)*
 
 Locks gold to be used for voting.
 
@@ -494,7 +494,7 @@ ___
     this.contract.methods.refundAndFinalize
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:283](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L283)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:284](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L284)*
 
 Refund `refundAddress` and `beneficiary` after the ReleaseGold schedule has been revoked.
 
@@ -513,7 +513,7 @@ ___
     this.contract.methods.revoke
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:274](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L274)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:275](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L275)*
 
 Revoke a Release schedule
 
@@ -529,7 +529,7 @@ ___
 
 • **setAccount**: *function* = proxySend(this.kit, this.contract.methods.setAccount)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:394](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L394)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:395](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L395)*
 
 Beneficiary creates an account on behalf of the ReleaseGold contract.
 
@@ -558,7 +558,7 @@ ___
     this.contract.methods.setAccountDataEncryptionKey
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:418](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L418)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:419](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L419)*
 
 Sets the data encryption of the account
 
@@ -580,7 +580,7 @@ ___
 
 • **setAccountMetadataURL**: *function* = proxySend(this.kit, this.contract.methods.setAccountMetadataURL)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:406](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L406)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:407](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L407)*
 
 Sets the metadataURL for the account
 
@@ -602,7 +602,7 @@ ___
 
 • **setAccountName**: *function* = proxySend(this.kit, this.contract.methods.setAccountName)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:400](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L400)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:401](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L401)*
 
 Sets the name for the account
 
@@ -624,7 +624,7 @@ ___
 
 • **setAccountWalletAddress**: *function* = proxySend(this.kit, this.contract.methods.setAccountWalletAddress)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:412](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L412)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:413](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L413)*
 
 Sets the wallet address for the account
 
@@ -646,7 +646,7 @@ ___
 
 • **setBeneficiary**: *function* = proxySend(this.kit, this.contract.methods.setBeneficiary)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:442](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L442)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:443](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L443)*
 
 Sets the contract's beneficiary
 
@@ -666,7 +666,7 @@ ___
 
 • **setCanExpire**: *function* = proxySend(this.kit, this.contract.methods.setCanExpire)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:432](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L432)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:433](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L433)*
 
 Sets the contract's `canExpire` field to `_canExpire`
 
@@ -688,7 +688,7 @@ ___
 
 • **setLiquidityProvision**: *function* = proxySend(this.kit, this.contract.methods.setLiquidityProvision)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:426](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L426)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:427](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L427)*
 
 Sets the contract's liquidity provision to true
 
@@ -708,7 +708,7 @@ ___
 
 • **setMaxDistribution**: *function* = proxySend(this.kit, this.contract.methods.setMaxDistribution)
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:437](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L437)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:438](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L438)*
 
 Sets the contract's max distribution
 
@@ -732,7 +732,7 @@ ___
     tupleParser(stringIdentity, valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:298](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L298)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:299](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L299)*
 
 #### Type declaration:
 
@@ -755,7 +755,7 @@ ___
     tupleParser(valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:308](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L308)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:309](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L309)*
 
 Unlocks gold that becomes withdrawable after the unlocking period.
 
@@ -781,7 +781,7 @@ ___
     tupleParser(valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:377](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L377)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:378](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L378)*
 
 Transfer released gold from the ReleaseGold instance back to beneficiary.
 
@@ -807,7 +807,7 @@ ___
     tupleParser(valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:367](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L367)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:368](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L368)*
 
 Withdraw gold in the ReleaseGold instance that has been unlocked but not withdrawn.
 
@@ -843,7 +843,7 @@ Contract address
 
 ▸ **authorizeAttestationSigner**(`signer`: Address, `proofOfSigningKeyPossession`: Signature): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:560](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L560)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:561](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L561)*
 
 Authorizes an address to sign attestation messages on behalf of the account.
 
@@ -864,7 +864,7 @@ ___
 
 ▸ **authorizeValidatorSigner**(`signer`: Address, `proofOfSigningKeyPossession`: Signature): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:471](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L471)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:472](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L472)*
 
 Authorizes an address to sign validation messages on behalf of the account.
 
@@ -885,7 +885,7 @@ ___
 
 ▸ **authorizeValidatorSignerAndBls**(`signer`: Address, `proofOfSigningKeyPossession`: Signature, `blsPublicKey`: string, `blsPop`: string): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:522](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L522)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:523](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L523)*
 
 Authorizes an address to sign consensus messages on behalf of the contract's account. Also switch BLS key at the same time.
 
@@ -908,7 +908,7 @@ ___
 
 ▸ **authorizeVoteSigner**(`signer`: Address, `proofOfSigningKeyPossession`: Signature): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:450](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L450)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:451](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L451)*
 
 Authorizes an address to sign votes on behalf of the account.
 
@@ -929,7 +929,7 @@ ___
 
 ▸ **getHumanReadableReleaseSchedule**(): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L85)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L86)*
 
 Returns the underlying Release schedule of the ReleaseGold contract
 
@@ -964,7 +964,7 @@ ___
 
 ▸ **getReleaseSchedule**(): *Promise‹ReleaseSchedule›*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L69)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L70)*
 
 Returns the underlying Release schedule of the ReleaseGold contract
 
@@ -978,7 +978,7 @@ ___
 
 ▸ **getReleasedBalanceAtRevoke**(): *Promise‹string›*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L215)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:216](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L216)*
 
 Returns the balance of released gold when the grant was revoked
 
@@ -992,7 +992,7 @@ ___
 
 ▸ **getRevocationInfo**(): *Promise‹RevocationInfo›*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:165](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L165)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L166)*
 
 Returns the underlying Revocation Info of the ReleaseGold contract
 
@@ -1006,7 +1006,7 @@ ___
 
 ▸ **getRevokeTime**(): *Promise‹number›*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:206](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L206)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:207](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L207)*
 
 Returns the time at which the release schedule was revoked
 
@@ -1020,7 +1020,7 @@ ___
 
 ▸ **isRevocable**(): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:191](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L191)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:192](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L192)*
 
 Indicates if the release grant is revocable or not
 
@@ -1034,7 +1034,7 @@ ___
 
 ▸ **relockGold**(`value`: BigNumber.Value): *Promise‹Array‹CeloTransactionObject‹void›››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:319](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L319)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:320](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L320)*
 
 Relocks gold in the ReleaseGold instance that has been unlocked but not withdrawn.
 
@@ -1052,7 +1052,7 @@ ___
 
 ▸ **revoke**(`account`: Address, `group`: Address, `value`: BigNumber): *Promise‹Array‹CeloTransactionObject‹void›››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:625](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L625)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:626](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L626)*
 
 **Parameters:**
 
@@ -1070,7 +1070,7 @@ ___
 
 ▸ **revokeActive**(`account`: Address, `group`: Address, `value`: BigNumber): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:606](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L606)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:607](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L607)*
 
 Revokes active votes
 
@@ -1090,7 +1090,7 @@ ___
 
 ▸ **revokePending**(`account`: Address, `group`: Address, `value`: BigNumber): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:581](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L581)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:582](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/ReleaseGold.ts#L582)*
 
 Revokes pending votes
 

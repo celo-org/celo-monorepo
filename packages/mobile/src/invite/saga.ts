@@ -23,8 +23,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { WEB_LINK } from 'src/brandingConfig'
-import { APP_STORE_ID } from 'src/config'
+import { APP_STORE_ID, DYNAMIC_DOWNLOAD_LINK } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -185,7 +184,7 @@ export function* sendInvite(
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
     const link = features.ESCROW_WITHOUT_CODE
-      ? WEB_LINK
+      ? DYNAMIC_DOWNLOAD_LINK
       : yield call(generateInviteLink, inviteCode)
 
     const messageProp = amount

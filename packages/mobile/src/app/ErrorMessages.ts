@@ -79,4 +79,6 @@ export enum ErrorMessages {
   GETH_UNEXPECTED_ADDRESS_ON_ADD = 'gethUnexpectedAddressOnAdd',
   COUNTRY_NOT_AVAILABLE = 'countryNotAvailable',
   MAX_ESCROW_TRANSFER_EXCEEDED = 'maxEscrowTransferExceeded',
+  FIREBASE_FETCH_FAILED = 'firebaseFetchFailed',
+  PICTURE_LOAD_FAILED = 'pictureLoadFailed',
 }

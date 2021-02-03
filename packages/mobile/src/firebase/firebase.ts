@@ -244,7 +244,11 @@ export async function knownAddressesChannel() {
 }
 
 export async function notificationsChannel() {
-  return simpleReadChannel('notifications')
+  return simpleReadChannel('notificationsV2')
+}
+
+export async function cUsdDailyLimitChannel(address: string) {
+  return simpleReadChannel(`registrations/${address}/dailyLimitCusd`)
 }
 
 function simpleReadChannel(key: string) {
