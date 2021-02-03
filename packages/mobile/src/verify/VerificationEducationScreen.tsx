@@ -5,18 +5,21 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { Spacing } from '@celo/react-components/styles/styles'
 import { Countries } from '@celo/utils/src/countries'
-import { getDisplayNumberInternational, getRegionCode } from '@celo/utils/src/phoneNumbers'
 import { useFocusEffect } from '@react-navigation/native'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import * as RNLocalize from 'react-native-localize'
 import Modal from 'react-native-modal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { initializeAccount } from 'src/account/actions'
-import { e164NumberSelector } from 'src/account/selectors'
+import { initializeAccount, setPhoneNumber } from 'src/account/actions'
+import { showError } from 'src/alert/actions'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { numberVerifiedSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import { WEB_LINK } from 'src/config'
@@ -33,13 +36,15 @@ import {
 import { feelessVerificationStateSelector, verificationStateSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import useTypedSelector from 'src/redux/useSelector'
+import { getCountryFeatures } from 'src/utils/countryFeatures'
 import Logger from 'src/utils/Logger'
 import GoogleReCaptcha from 'src/verify/safety/GoogleReCaptcha'
+import { getPhoneNumberState } from 'src/verify/utils'
 import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
 import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -54,13 +59,40 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const [showLearnMoreDialog, setShowLearnMoreDialog] = useState(false)
   const [isCaptchaVisible, setIsCaptchaVisible] = useState(false)
   // const [, setSafetyNetAttestation] = useState()
-  const e164PhoneNumber = useSelector(e164NumberSelector)
   const { t } = useTranslation(Namespaces.onboarding)
   const dispatch = useDispatch()
   const headerHeight = useHeaderHeight()
   const insets = useSafeAreaInsets()
   const numberVerified = useSelector(numberVerifiedSelector)
   const partOfOnboarding = !route.params?.hideOnboardingStep
+
+  const cachedNumber = useTypedSelector((state) => state.account.e164PhoneNumber)
+  const cachedCountryCallingCode = useTypedSelector((state) => state.account.defaultCountryCode)
+  const [phoneNumberInfo, setPhoneNumberInfo] = useState(() =>
+    getPhoneNumberState(
+      cachedNumber || '',
+      cachedCountryCallingCode || '',
+      route.params?.selectedCountryCodeAlpha2 || RNLocalize.getCountry()
+    )
+  )
+  const countries = useMemo(() => new Countries(i18n.language), [i18n.language])
+  const country = phoneNumberInfo.countryCodeAlpha2
+    ? countries.getCountryByCodeAlpha2(phoneNumberInfo.countryCodeAlpha2)
+    : undefined
+  useEffect(() => {
+    const newCountryAlpha2 = route.params?.selectedCountryCodeAlpha2
+    if (newCountryAlpha2 && newCountryAlpha2 !== phoneNumberInfo.countryCodeAlpha2) {
+      const countryCallingCode =
+        countries.getCountryByCodeAlpha2(newCountryAlpha2)?.countryCallingCode ?? ''
+      setPhoneNumberInfo(
+        getPhoneNumberState(
+          phoneNumberInfo.internationalPhoneNumber,
+          countryCallingCode,
+          newCountryAlpha2
+        )
+      )
+    }
+  }, [route.params?.selectedCountryCodeAlpha2])
 
   const verificationState = useSelector(verificationStateSelector)
   const feelessVerificationState = useSelector(feelessVerificationStateSelector)
@@ -69,12 +101,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const { actionableAttestations, status } = relevantVerificationState
   const { numAttestationsRemaining } = status
   const withoutRevealing = actionableAttestations.length >= numAttestationsRemaining
-
-  const country = useMemo(() => {
-    const regionCode = getRegionCode(e164PhoneNumber || '')
-    const countries = new Countries(i18n.language)
-    return countries.getCountryByCodeAlpha2(regionCode || '')
-  }, [e164PhoneNumber, i18n.language])
 
   useEffect(() => {
     dispatch(initializeAccount())
@@ -106,7 +132,34 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     }
   }
 
+  const canUsePhoneNumber = () => {
+    const countryCallingCode = country?.countryCallingCode || ''
+    if (
+      cachedNumber === phoneNumberInfo.e164Number &&
+      cachedCountryCallingCode === countryCallingCode
+    ) {
+      return true
+    }
+
+    const { SANCTIONED_COUNTRY } = getCountryFeatures(phoneNumberInfo.countryCodeAlpha2)
+    if (SANCTIONED_COUNTRY) {
+      dispatch(showError(ErrorMessages.COUNTRY_NOT_AVAILABLE))
+      return false
+    }
+
+    ValoraAnalytics.track(OnboardingEvents.phone_number_set, {
+      country: country?.displayNameNoDiacritics || '',
+      countryCode: countryCallingCode,
+    })
+    dispatch(setPhoneNumber(phoneNumberInfo.e164Number, countryCallingCode))
+    return true
+  }
+
   const onPressStart = async () => {
+    if (!canUsePhoneNumber()) {
+      return
+    }
+
     const { sessionActive } = feelessVerificationState.komenci
 
     if (tryFeeless && !sessionActive) {
@@ -161,6 +214,26 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     }
   }
 
+  const onPressCountry = () => {
+    navigate(Screens.SelectCountry, {
+      countries,
+      selectedCountryCodeAlpha2: phoneNumberInfo.countryCodeAlpha2,
+    })
+  }
+
+  const onChangePhoneNumberInput = (
+    internationalPhoneNumber: string,
+    countryCallingCode: string
+  ) => {
+    setPhoneNumberInfo(
+      getPhoneNumberState(
+        internationalPhoneNumber,
+        countryCallingCode,
+        phoneNumberInfo.countryCodeAlpha2
+      )
+    )
+  }
+
   if (feelessVerificationState.isLoading || verificationState.isLoading || !account) {
     return (
       <View style={styles.loader}>
@@ -178,6 +251,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
 
   let bodyText
   let firstButton
+  const continueButtonDisabled = !phoneNumberInfo.isValidNumber
 
   if (numberVerified) {
     // Already verified
@@ -188,6 +262,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         onPress={onPressContinue}
         type={BtnTypes.ONBOARDING}
         style={styles.startButton}
+        disabled={continueButtonDisabled}
         testID="VerificationEducationSkip"
       />
     )
@@ -204,6 +279,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         onPress={onPressStart}
         type={BtnTypes.ONBOARDING}
         style={styles.startButton}
+        disabled={continueButtonDisabled}
         testID="VerificationEducationContinue"
       />
     )
@@ -235,8 +311,9 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           label={t('nuxNamePin1:phoneNumber')}
           style={styles.phoneNumber}
           country={country}
-          internationalPhoneNumber={getDisplayNumberInternational(e164PhoneNumber || '')}
-          editable={false}
+          internationalPhoneNumber={phoneNumberInfo.internationalPhoneNumber}
+          onPressCountry={onPressCountry}
+          onChange={onChangePhoneNumberInput}
         />
         {firstButton}
         <View style={styles.spacer} />

@@ -25,6 +25,7 @@
   "learnMore": "Learn More",
   "activity": "Activity",
   "history": "History",
+  "earnRewards": "Earn Rewards",
   "notEnoughDollarsError": "Not enough Celo Dollars to make exchange",
   "notEnoughGoldError": "Not enough CELO to make exchange",
   "exchangeFailed": "Exchange failed, please retry",
@@ -32,6 +33,7 @@
   "refreshFailedUnexpectedly": "Failed to refresh, please check your connectivity",
   "edit": "Edit",
   "paste": "Paste",
+  "choose": "Choose",
   "receivedPayment": "Received Payment",
   "getStarted": "Get Started",
   "manageCeloDollars": "Manage Celo Dollars",
@@ -185,5 +187,7 @@
   "commentUnavailable": "Comment Unavailable",
   "accountClearFailed": "There was an error while removing your Account Key. You might have to reinstall the app to restore all functionality.",
   "withdraw": "Withdraw",
-  "countryNotAvailable": "{{appName}} is not available in your country"
+  "countryNotAvailable": "{{appName}} is not available in your country",
+  "firebaseFetchFailed": "Server connection failed",
+  "pictureLoadFailed": "There was an error while loading your picture"
 }

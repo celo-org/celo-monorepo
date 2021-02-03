@@ -1,5 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import Touchable from '@celo/react-components/components/Touchable'
+import RadioButton from '@celo/react-components/icons/RadioButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -20,7 +21,6 @@ import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import { openMoonpay } from 'src/fiatExchanges/utils'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
-import RadioIcon from 'src/icons/RadioIcon'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -83,7 +83,7 @@ function CurrencyRadioItem({
           { borderColor: currencyBorderColor(selected) },
         ]}
       >
-        <RadioIcon selected={selected} />
+        <RadioButton selected={selected} disabled={!enabled} />
         <Text style={[styles.currencyItemTitle, enabled ? {} : { color: colors.gray3 }]}>
           {title}
         </Text>
@@ -103,11 +103,11 @@ function PaymentMethodRadioItem({
   onSelect: () => void
   text: string
   enabled?: boolean
-}) {
+}): JSX.Element {
   return (
     <TouchableWithoutFeedback onPress={onSelect} disabled={!enabled}>
       <View style={styles.paymentMethodItemContainer}>
-        <RadioIcon selected={selected} />
+        <RadioButton selected={selected} disabled={!enabled} />
         <Text style={[styles.paymentMethodItemText, enabled ? {} : { color: colors.gray3 }]}>
           {text}
         </Text>
