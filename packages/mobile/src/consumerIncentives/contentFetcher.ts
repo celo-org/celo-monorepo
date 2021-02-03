@@ -5,8 +5,8 @@ interface ContentType {
 }
 
 interface Tier {
-  minBalance: number
-  reward: number
+  minBalanceCusd: number
+  celoReward: number
 }
 
 export interface ConsumerIncentivesData {

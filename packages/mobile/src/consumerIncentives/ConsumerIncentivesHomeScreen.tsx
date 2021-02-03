@@ -102,7 +102,7 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
             <Text style={[styles.body, styles.description]}>{t('description')}</Text>
             {tiers &&
               tiers.map((tier, index) => (
-                <Fragment key={`tier${tier.reward}`}>
+                <Fragment key={`tier${tier.celoReward}`}>
                   {index > 0 && (
                     <LinearGradient
                       start={{ x: 0, y: 0 }}
@@ -115,7 +115,7 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
                     <Trans
                       i18nKey={'getCeloRewards'}
                       ns={Namespaces.consumerIncentives}
-                      tOptions={{ reward: tier.reward, minBalance: tier.minBalance }}
+                      tOptions={{ reward: tier.celoReward, minBalance: tier.minBalanceCusd }}
                     >
                       <Text style={styles.bold} />
                       <Text style={styles.bold} />

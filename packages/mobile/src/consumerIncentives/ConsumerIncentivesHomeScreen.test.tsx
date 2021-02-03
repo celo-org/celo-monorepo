@@ -30,9 +30,9 @@ jest.mock('src/consumerIncentives/contentFetcher', () => ({
         },
       },
       tiers: [
-        { minBalance: 20, reward: 1 },
-        { minBalance: 100, reward: 5 },
-        { minBalance: 500, reward: 10 },
+        { minBalanceCusd: 20, celoReward: 1 },
+        { minBalanceCusd: 100, celoReward: 5 },
+        { minBalanceCusd: 500, celoReward: 10 },
       ],
     })
   ),
