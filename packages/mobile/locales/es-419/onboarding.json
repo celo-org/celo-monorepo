@@ -67,7 +67,7 @@
     "dismiss": "Descartar"
   },
   "importExistingKey": {
-    "explanation": "La clave de tu cuenta es una frase de 24 palabras que escribiste y guardaste cuando configuraste tu cuenta. Por favor ingrésala aquí para restaurar tu cuenta.\n\nRecuerda que tu elección de idioma debe coincidir con el lenguaje usado al crear la cuenta.",
+    "explanation": "La clave de tu cuenta es una frase de 24 palabras que escribiste y guardaste cuando configuraste tu cuenta. Por favor ingrésala aquí para restaurar tu cuenta.",
     "keyPlaceholder": "horse leopard dog monkey ..."
   },
   "verificationInput": {
