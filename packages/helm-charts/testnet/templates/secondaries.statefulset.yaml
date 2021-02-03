@@ -181,11 +181,7 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
-            BOOTNODE_FLAG="--{{ .Release.Name }}"
-          else
-            BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
-          fi
+{{ include  "common.bootnode-flag-script" . | indent 10 }}
 
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -210,7 +206,6 @@ spec:
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
             --etherbase=${ACCOUNT_ADDRESS} \
-            --networkid=${NETWORK_ID} \
             --syncmode=full \
             --consoleformat=json \
             --consoleoutput=stdout \

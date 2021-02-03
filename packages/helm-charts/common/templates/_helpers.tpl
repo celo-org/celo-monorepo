@@ -94,6 +94,16 @@ release: {{ .Release.Name }}
     readOnly: true
 {{- end -}}
 
+{{- define "common.bootnode-flag-script" -}}
+if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
+  BOOTNODE_FLAG="--{{ .Release.Name }}"
+elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
+  BOOTNODE_FLAG=""
+else
+  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+fi
+{{- end -}}
+
 {{- define "common.full-node-container" -}}
 - name: geth
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -168,21 +178,16 @@ release: {{ .Release.Name }}
     PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
     {{- end }}
 
-    if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
-      BOOTNODE_FLAG="--{{ .Release.Name }}"
-    elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
-      BOOTNODE_FLAG=""
-    else
-      BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode)"
-    fi
+{{ include  "common.bootnode-flag-script" . | indent 4 }}
+
 {{ .extra_setup }}
+
     exec geth \
       --port $PORT  \
       "$BOOTNODE_FLAG" \
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
-      --networkid=${NETWORK_ID} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \

@@ -90,7 +90,7 @@ spec:
           cat /root/.celo/bootnodeEnodeAddress
 
           [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
-          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo "enode://$(cat /root/.celo/bootnodeEnodeAddress)@$BOOTNODE_IP_ADDRESS:30301" > /root/.celo/bootnodeEnode
           echo -n "Generating Bootnode enode for the validator: "
           cat /root/.celo/bootnodeEnode
 
@@ -181,13 +181,7 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
-            BOOTNODE_FLAG="--{{ .Release.Name }}"
-          elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
-            BOOTNODE_FLAG=""
-          else
-            BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
-          fi
+{{ include  "common.bootnode-flag-script" . | indent 10 }}
 
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -213,7 +207,6 @@ spec:
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
             --etherbase=${ACCOUNT_ADDRESS} \
-            --networkid=${NETWORK_ID} \
             --syncmode=full \
             --consoleformat=json \
             --consoleoutput=stdout \
