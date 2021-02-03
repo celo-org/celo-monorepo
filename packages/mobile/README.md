@@ -419,7 +419,7 @@ To attach:
 
 If you're having an error with installing packages, or `secrets.json` not existing: 
 
-try to run `yarn postinstall` in the monorepo `/celo-monorepo` after running `yarn install`. 
+try to run `yarn postinstall` in the monorepo root folder after running `yarn install`. 
 
 A successful `yarn postinstall` looks like: [this](https://files.slack.com/files-pri/T9SEZ6M9B-F01JP5VDLJF/screen_shot_2021-01-13_at_2.39.56_pm.png).
 
