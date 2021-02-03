@@ -1,9 +1,18 @@
 import { PhoneNumberUtils } from '@celo/utils'
+import { isValidAddress, publicKeyToAddress } from '@celo/utils/lib/address'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
+import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import Logger from 'bunyan'
 import express from 'express'
 import { Transaction } from 'sequelize'
-import { findAttestationByKey, makeSequelizeLogger, sequelize, SequelizeLogger } from '../db'
+import {
+  findAttestationByKey,
+  makeSequelizeLogger,
+  sequelize,
+  SequelizeLogger,
+  useKit,
+} from '../db'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
@@ -87,10 +96,36 @@ class GetAttestationRequestHandler {
 }
 
 export async function handleGetAttestationRequest(
-  _req: express.Request,
+  req: express.Request,
   res: express.Response,
   getRequest: GetAttestationRequest
 ) {
+  if (getRequest.securityCode) {
+    const {
+      headers: { authentication },
+    } = req
+    if (!authentication) {
+      respondWithError(res, 401, 'Missing authentication')
+      return
+    }
+
+    const typedData = buildSecurityCodeTypedData(getRequest.securityCode)
+    const accounts = await useKit((kit) => kit.contracts.getAccounts())
+    const [walletAddress, dekAddress] = await Promise.all([
+      accounts.getWalletAddress(getRequest.account),
+      accounts.getDataEncryptionKey(getRequest.account).then((x) => x && publicKeyToAddress(x)),
+    ])
+
+    const validSignature = [getRequest.account, walletAddress, dekAddress]
+      .filter(Boolean)
+      .filter(isValidAddress)
+      .find((address) => verifyEIP712TypedDataSigner(typedData, authentication as string, address))
+    if (!validSignature) {
+      respondWithError(res, 401, 'Invalid signature')
+      return
+    }
+  }
+
   try {
     const handler = new GetAttestationRequestHandler(getRequest, res.locals.logger)
 

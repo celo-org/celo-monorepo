@@ -2,8 +2,6 @@
 
 Shows information about reserve
 
-- [`celocli reserve:status`](#celocli-reservestatus)
-- [`celocli reserve:transfergold`](#celocli-reservetransfergold)
 
 ## `celocli reserve:status`
 

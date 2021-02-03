@@ -1,8 +1,11 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import TransferConfirmationCard from 'src/transactions/TransferConfirmationCard'
 import { createMockStore } from 'test/utils'
 import {
@@ -92,12 +95,14 @@ describe('TransferConfirmationCard', () => {
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
     }
 
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
         <TransferConfirmationCard {...props} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
+    fireEvent.press(tree.getByTestId('celoRewards/learnMore'))
+    expect(navigate).toHaveBeenCalledWith(Screens.ConsumerIncentivesHomeScreen)
   })
 
   it('renders correctly for received escrow transaction drilldown', () => {

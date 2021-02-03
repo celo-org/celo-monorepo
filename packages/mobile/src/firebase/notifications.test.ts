@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
+import { SendOrigin } from 'src/analytics/types'
 import { openUrl } from 'src/app/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
@@ -45,13 +46,44 @@ describe(handleNotification, () => {
 
     it('shows the in-app message when the app is already in the foreground', async () => {
       await expectSaga(handleNotification, message, NotificationReceiveState.APP_ALREADY_OPEN)
-        .put(showMessage('My Body', undefined, null, openUrl('https://celo.org'), 'My title'))
+        .put(
+          showMessage(
+            'My Body',
+            undefined,
+            null,
+            openUrl('https://celo.org', false, true),
+            'My title'
+          )
+        )
         .run()
     })
 
     it('directly opens the url if the app is not already in the foreground', async () => {
       await expectSaga(handleNotification, message, NotificationReceiveState.APP_OPENED_FRESH)
-        .put(openUrl('https://celo.org'))
+        .put(openUrl('https://celo.org', false, true))
+        .run()
+    })
+
+    it('directly opens the url externally if the app is not already in the foreground and openExternal is true', async () => {
+      await expectSaga(
+        handleNotification,
+        { ...message, data: { ou: message.data.ou, openExternal: 'true' } },
+        NotificationReceiveState.APP_OPENED_FRESH
+      )
+        .put(openUrl(message.data.ou, true, true))
+        .run()
+    })
+  })
+
+  describe("with a notification with an 'open url' semantic and a deep link", () => {
+    const message = {
+      notification: { title: 'My title', body: 'My Body' },
+      data: { ou: `celo://wallet/openScreen?screen=${Screens.WalletHome}` },
+    }
+
+    it('fires  an event to open the deep link', async () => {
+      await expectSaga(handleNotification, message, NotificationReceiveState.APP_OPENED_FRESH)
+        .put(openUrl(message.data.ou, false, true))
         .run()
     })
   })
@@ -132,6 +164,7 @@ describe(handleNotification, () => {
         .run()
 
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        origin: SendOrigin.AppRequestFlow,
         transactionData: {
           amount: new BigNumber('10'),
           firebasePendingRequestUid: 'abc',

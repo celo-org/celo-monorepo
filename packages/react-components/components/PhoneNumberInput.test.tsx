@@ -24,7 +24,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={countries.getCountryByCodeAlpha2('FR')}
-        nationalPhoneNumber=""
+        internationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={onPressCountry}
       />
@@ -32,7 +32,6 @@ describe('PhoneNumberInput', () => {
     expect(toJSON()).toMatchSnapshot()
 
     expect(getByText('🇫🇷')).toBeTruthy()
-    expect(getByText('+33')).toBeTruthy()
     expect(getByTestId('PhoneNumberField').props.placeholder).toBe('00 00 00 00 00')
     fireEvent.press(getByTestId('CountrySelectionButton'))
     await flushMicrotasksQueue()
@@ -53,7 +52,7 @@ describe('PhoneNumberInput', () => {
         <PhoneNumberInput
           label="Phone number"
           country={undefined}
-          nationalPhoneNumber=""
+          internationalPhoneNumber=""
           onChange={onChange}
           onPressCountry={jest.fn()}
         />
@@ -70,7 +69,7 @@ describe('PhoneNumberInput', () => {
         <PhoneNumberInput
           label="Phone number"
           country={undefined}
-          nationalPhoneNumber=""
+          internationalPhoneNumber=""
           onChange={onChange}
           onPressCountry={jest.fn()}
         />
@@ -88,7 +87,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={undefined}
-        nationalPhoneNumber="123"
+        internationalPhoneNumber="123"
         onChange={onChange}
         onPressCountry={jest.fn()}
       />
@@ -105,7 +104,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={undefined}
-        nationalPhoneNumber=""
+        internationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={jest.fn()}
       />
@@ -124,7 +123,7 @@ describe('PhoneNumberInput', () => {
       <PhoneNumberInput
         label="Phone number"
         country={undefined}
-        nationalPhoneNumber=""
+        internationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={jest.fn()}
       />

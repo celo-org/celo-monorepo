@@ -134,7 +134,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -181,7 +181,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                             "justifyContent": "center",
                           },
                           Object {
-                            "backgroundColor": "#FEB45E",
+                            "backgroundColor": "hsl(338, 53%, 93%)",
                             "borderRadius": 20,
                             "height": 40,
                             "width": 40,
@@ -198,6 +198,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                               "fontSize": 16,
                             },
                             Object {
+                              "color": "hsl(338, 67%, 24%)",
                               "fontSize": 20,
                             },
                           ]
@@ -391,7 +392,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -438,7 +439,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                             "justifyContent": "center",
                           },
                           Object {
-                            "backgroundColor": "#FEB45E",
+                            "backgroundColor": "hsl(338, 53%, 93%)",
                             "borderRadius": 20,
                             "height": 40,
                             "width": 40,
@@ -455,6 +456,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                               "fontSize": 16,
                             },
                             Object {
+                              "color": "hsl(338, 67%, 24%)",
                               "fontSize": 20,
                             },
                           ]
@@ -648,7 +650,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -695,7 +697,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                             "justifyContent": "center",
                           },
                           Object {
-                            "backgroundColor": "#FEB45E",
+                            "backgroundColor": "hsl(338, 53%, 93%)",
                             "borderRadius": 20,
                             "height": 40,
                             "width": 40,
@@ -712,6 +714,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                               "fontSize": 16,
                             },
                             Object {
+                              "color": "hsl(338, 67%, 24%)",
                               "fontSize": 20,
                             },
                           ]
