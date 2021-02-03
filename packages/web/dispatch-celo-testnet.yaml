@@ -1,8 +1,0 @@
-# Host-based routing rules for the celo-testnet project. https://cloud.google.com/appengine/docs/flexible/nodejs/reference/dispatch-yaml
-# Use `yarn deploy:routes:non-prod` to deploy.
-dispatch:
-  - url: dev.celo.org/*
-    service: website-development
-
-  - url: staging.celo.org/*
-    service: website-staging

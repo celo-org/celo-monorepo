@@ -31,24 +31,24 @@ done
 ORIGINAL_GIT_REF=$(git symbolic-ref --short HEAD)
 echo " - Checkout source code of old branch at $OLD_BRANCH"
 BUILD_DIR_1=$(echo build/$(echo $OLD_BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags >> $LOG_FILE
-git checkout $OLD_BRANCH 2>$LOG_FILE > $LOG_FILE
+git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' >> $LOG_FILE
+git checkout $OLD_BRANCH 2>>$LOG_FILE >> $LOG_FILE
 rm -rf build/contracts
 yarn install
 
 echo " - Build contract artifacts ..."
 # TODO: Move to yarn build:sol after the next contract release.
-yarn build > $LOG_FILE
+yarn build >> $LOG_FILE
 rm -rf $BUILD_DIR_1 && mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
 
 echo " - Checkout source code of new branch at $NEW_BRANCH"
 BUILD_DIR_2=$(echo build/$(echo $NEW_BRANCH | sed -e 's/\//_/g'))
-git checkout $NEW_BRANCH 2>$LOG_FILE > $LOG_FILE
+git checkout $NEW_BRANCH 2>>$LOG_FILE >> $LOG_FILE
 rm -rf build/contracts
 yarn install
 echo " - Build contract artifacts ..."
-yarn build:sol > $LOG_FILE
+yarn build:sol >> $LOG_FILE
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
 
@@ -58,7 +58,7 @@ if [ ! -z "$REPORT" ]; then
 fi
 
 echo " - Return to original git ref"
-git checkout $ORIGINAL_GIT_REF > $LOG_FILE
+git checkout $ORIGINAL_GIT_REF >> $LOG_FILE
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.

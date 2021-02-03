@@ -77,10 +77,11 @@ export interface SecureSendPhoneNumberMapping {
 }
 
 export interface SecureSendDetails {
-  address: string | undefined
+  address?: string
   addressValidationType: AddressValidationType
-  isFetchingAddresses: boolean | undefined
-  validationSuccessful: boolean | undefined
+  isFetchingAddresses?: boolean
+  lastFetchSuccessful?: boolean
+  validationSuccessful?: boolean
 }
 
 export interface UpdatableVerificationState {
@@ -249,7 +250,6 @@ export const reducer = (
           ...rehydratedState.feelessVerificationState,
           isLoading: false,
         },
-        isFetchingAddresses: false,
       }
     }
     case Actions.CANCEL_VERIFICATION:
@@ -507,10 +507,10 @@ export const reducer = (
     case Actions.END_FETCHING_ADDRESSES:
       return {
         ...state,
-        secureSendPhoneNumberMapping: dotProp.set(
+        secureSendPhoneNumberMapping: dotProp.merge(
           state.secureSendPhoneNumberMapping,
-          `${action.e164Number}.isFetchingAddresses`,
-          false
+          `${action.e164Number}`,
+          { isFetchingAddresses: false, lastFetchSuccessful: action.lastFetchSuccessful }
         ),
       }
     case Actions.UPDATE_ADDRESS_DEK_MAP:

@@ -210,6 +210,10 @@ describe('Transfer tests', function(this: any) {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator',
@@ -244,7 +248,8 @@ describe('Transfer tests', function(this: any) {
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
     // light clients.
-    etherbase: FeeRecipientAddress,
+    minerValidator: FeeRecipientAddress,
+    txFeeRecipient: FeeRecipientAddress,
   }
 
   const restartWithCleanNodes = async () => {

@@ -81,7 +81,7 @@ The first step to participating is generating your Celo address in a secure loca
     * `git checkout ac3d5603256fc250500e00bae21ba646dd316d6f`
     * `cargo build --release --bin generate`
     * Now you can use `./target/release/generate`
-  * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.1).
+  * Option two - if you prefer using a precompiled binary, download the `generate` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.3).
 * Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
 * Run it in a command line - navigate in the command line to the relevant folder - and follow the instructions.
     * When asked to `Enter some entropy for your Plumo seed:`, you can use any source of entropy.
@@ -104,7 +104,7 @@ cLabs is running the coordinator server, which has a list of approved participan
     * `git checkout ac3d5603256fc250500e00bae21ba646dd316d6f`
     * `cargo build --release --bin contribute`
     * Now you can use `./target/release/contribute`
-  * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.1).
+  * Option two - if you prefer using a precompiled binary, download the `contribute` binary corresponding to your OS from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.1.3).
 * Use `b2sum` to check the hash of the binary against the hash in the download page by running `b2sum FILE`, where `FILE` is the `contribute` binary name for your OS. If you don't have `b2sum` installed, you can download it from `https://github.com/dchest/b2sum`, for example.
 * Run it as follows, assuming your keys reside in KEYS_FILE:
     * Windows users: `./contribute-windows.exe --keys-file KEYS_FILE`

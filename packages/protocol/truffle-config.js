@@ -37,10 +37,12 @@ const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
 const gasLimit = 13000000
+const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
+const hostPort = parseInt(process.env.CELO_NODE_PORT || '8545')
 
 const defaultConfig = {
-  host: '127.0.0.1',
-  port: 8545,
+  host: hostAddress,
+  port: hostPort,
   network_id: 1101,
   from: OG_FROM,
   gas: gasLimit,
@@ -69,8 +71,8 @@ const networks = {
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   rc0: {
-    host: '127.0.0.1',
-    port: 8545,
+    host: hostAddress,
+    port: hostPort,
     from: RC0_FROM,
     network_id: 200312,
     gasPrice: 100000000000,

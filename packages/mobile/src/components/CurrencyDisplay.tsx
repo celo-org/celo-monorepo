@@ -62,6 +62,7 @@ const BIG_LINE_HEIGHT_RATIO = 64 / 48
 function getBigSymbolStyle(fontSize: number, color: ColorValue | undefined): StyleProp<TextStyle> {
   const size = Math.floor(fontSize * BIG_SYMBOL_RATIO)
   return {
+    paddingVertical: 4,
     fontSize: size,
     color,
   }
@@ -188,7 +189,7 @@ export default function CurrencyDisplay({
     ? currency === CURRENCY_ENUM.GOLD
       ? colors.goldBrand
       : colors.greenBrand
-    : StyleSheet.flatten(style)?.color
+    : StyleSheet.flatten(style)?.color ?? colors.dark
 
   if (type === DisplayType.Big) {
     // In this type the symbol is displayed as superscript
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   bigContainer: {
     flexDirection: 'row',
     alignSelf: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginTop: 5,
   },
   bigCurrency: {

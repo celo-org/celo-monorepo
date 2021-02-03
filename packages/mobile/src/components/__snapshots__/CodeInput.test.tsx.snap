@@ -163,6 +163,9 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 2`] = `
         >
           <TextInput
             allowFontScaling={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="visible-password"
             onBlur={[Function]}
             onChangeText={[MockFunction]}
             onFocus={[Function]}

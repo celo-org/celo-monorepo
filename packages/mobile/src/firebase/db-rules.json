@@ -20,7 +20,16 @@
     "registrations": {
       "$address": {
         ".read": "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()",
-        ".write": "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()"
+        "fcmToken": {
+          ".write": "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()"
+        },
+        "language": {
+          ".write": "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()"
+        },
+        "dailyLimitCusd": {
+          ".write": false,
+          ".validate": "newData.isNumber() && newData.val() >= 500"
+        }
       }
     },
     "pendingRequests": {
@@ -42,6 +51,14 @@
       ".write": false
     },
     "notifications": {
+      ".read": true,
+      ".write": false
+    },
+    "notificationsV2": {
+      ".read": true,
+      ".write": false
+    },
+    "consumerIncentives": {
       ".read": true,
       ".write": false
     }

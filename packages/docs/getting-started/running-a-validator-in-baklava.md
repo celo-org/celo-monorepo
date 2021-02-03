@@ -6,6 +6,12 @@ The Baklava Testnet is a non-production Testnet for the Validator community. It 
 - **Detecting vulnerabilities**: Discover bugs in new software releases before they reach Mainnet.
 - **Testing ground**: Experiment with new infrastructure configurations in a low-risk environment.
 
+{% hint style="info" %}
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+
+You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
+{% endhint %}
+
 The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to [Mainnet](mainnet.md).
 
 {% hint style="info" %}
@@ -18,6 +24,12 @@ Key differences are:
 * `ReleaseGold` contracts are available for all previously faucetted addresses [here](https://gist.github.com/nategraf/245232883a34cbb162eb599e34afd7c0)
 {% endhint %}
 
+This page also has separate steps for both ReleaseGold and non-ReleaseGold steps for validating.
+
+{% hint style="info" %}
+If you are new to validating on Celo, please follow the Non-ReleaseGold instructions for validating.
+{% endhint %}
+
 ## Prerequisites
 
 ### Staking Requirements
@@ -26,7 +38,18 @@ Celo uses a [proof-of-stake](../celo-codebase/protocol/proof-of-stake) consensus
 
 Participating in the Baklava testnet requires testnet units of CELO, which can only be used in the Baklava testnet. You can request a distribution of testnet CELO by filling out [the faucet request form](https://forms.gle/JTYkMAJWTAUQp1sv9). If you need any help getting started, please join the discussion on [Discord](https://chat.celo.org) or email community@celo.org.
 
-Faucetted funds will come as two `ReleaseGold` contracts. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-holder-guide/release-gold.md).
+Faucetted funds come two different ways, depending on whether you're using a ReleaseGold smart contract or you are validating the non-ReleaseGold way. For every new validator, we encourage going the non-ReleaseGold route.
+
+#### ReleaseGold
+
+Faucetted funds will come as two `ReleaseGold` contracts. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`](../celo-holder-guide/release-gold.md).
+
+#### Non-ReleaseGold
+{% hint style="info" %}
+If you are new to validating on Celo, please follow the Non-ReleaseGold instructions for validating.
+{% endhint %}
+
+Faucetted funds will come as 2 transactions, one for your validator address and another for your validator group address. 
 
 ### Hardware requirements
 
@@ -117,12 +140,12 @@ There are a number of environment variables in this guide, and you may use this 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
-| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
-| CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
-| CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
-| CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
-| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The validator (group) signer address authorized by the Validator Group account.
-| CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
+| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                           |
+| CELO_VALIDATOR_ADDRESS               | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                             |
+| CELO_VALIDATOR_GROUP_RG_ADDRESS      | The `ReleaseGold` contract address for the Validator Group (Not Applicable for New Validators)                                    |
+| CELO_VALIDATOR_RG_ADDRESS            | The `ReleaseGold` contract address for the Validator (Not Applicable for New Validators)                                                                                          |
+| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS  | The validator (group) signer address authorized by the Validator Group account.
+| CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE | The proof-of-possession of the Validator Group signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_ADDRESS        | The validator signer address authorized by the Validator Account
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
 | CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the Validator signer key                                                                                  |
@@ -167,6 +190,51 @@ docker pull $CELO_IMAGE
 
 The `us.gcr.io/celo-org/geth:baklava` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/tree/master/packages/celotool/genesis_baklava.json) in addition to the Celo Blockchain binary.
 
+#### Account Creation (For non-ReleaseGold)
+{% hint style="info" %}
+Please complete this section if you are new to validating on Celo.
+{% endhint %}
+
+If you're a new validator, then you are going to follow the non-ReleaseGold flow method for this step to create your account keys. 
+
+##### Account and Signer keys
+
+Running a Celo Validator node requires the management of several different keys, each with different privileges. Keys that need to be accessed frequently (e.g. for signing blocks) are at greater risk of being compromised, and thus have more limited permissions, while keys that need to be accessed infrequently (e.g. for locking CELO) are less onerous to store securely, and thus have more expansive permissions. Below is a summary of the various keys that are used in the Celo network, and a description of their permissions.
+
+| Name of the key        | Purpose                                                                                                                                                                                                                                                               |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Account key            | This is the key with the highest level of permissions, and is thus the most sensitive. It can be used to lock and unlock CELO, and authorize vote, validator, and attestation keys. Note that the account key also has all of the permissions of the other keys. |
+| Validator signer key   | This is the key that has permission to register and manage a Validator or Validator Group, and participate in BFT consensus.                                                                                                                                          |
+| Vote signer key        | This key can be used to vote in Validator elections and on-chain governance.                                                                                                                                                                                          |
+| Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |
+
+Note that Account and all the signer keys must be unique and may not be reused.
+
+##### Generating Validator and Validator Group Keys
+
+First, you'll need to generate account keys for your Validator and Validator Group.
+
+{% hint style="danger" %}
+These keys will control your locked CELO, and thus should be handled with care.
+Store and back these keys up in a secure manner, as there will be no way to recover them if lost or stolen.
+{% endhint %}
+
+```bash
+# On your local machine
+mkdir celo-accounts-node
+cd celo-accounts-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+```
+
+This will create a new keystore in the current directory with two new accounts.
+Copy the addresses from the terminal and set the following environment variables:
+```bash
+# On your local machine
+export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
+export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
+```
+
 ### Start your Accounts node
 
 Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator. 
@@ -184,6 +252,55 @@ docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p 127.0.0.1:localport:containerport` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
 
+### Deploy a Validator
+To actually register as a validator, we'll need to generate a validating signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
+
+```bash
+# On the validator machine
+# Note that you have to export $CELO_IMAGE on this machine
+export CELO_IMAGE=us.gcr.io/celo-org/geth:baklava
+mkdir celo-validator-node
+cd celo-validator-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+```
+
+#### Proof-of-Possession (Non-ReleaseGold Step)
+{% hint style="info" %}
+Please complete this step if you are running a validator on Celo for the first time.
+{% endhint %}
+
+In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
+```bash
+# On the validator machine
+# Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
+export CELO_VALIDATOR_ADDRESS=<CELO-VALIDATOR-ADDRESS>
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS
+```
+
+Save the signer address, public key, and proof-of-possession signature to your local machine:
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+export CELO_VALIDATOR_SIGNER_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-PUBLIC-KEY>
+```
+
+Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer key. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
+```bash
+# On the validator machine
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls
+```
+
+Save the resulting signature and public key to your local machine:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
+```
+
+We'll get back to this machine later, but for now, let's give it a proxy.
 
 ### Deploy a proxy
 
@@ -256,19 +373,7 @@ You will also need to export `PROXY_EXTERNAL_IP` on your local machine.
 export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 ```
 
-### Deploy a Validator machine
-
-The Validator machine is node that actually assembles and signs blocks to participate in consensus. We will set it up in this section.
-
-To operate as a validator, you'll need to generate a validator signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
-
-```bash
-# On the validator machine
-mkdir celo-validator-node
-cd celo-validator-node
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
-export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
-```
+### Connect the Validator to the Proxy 
 
 When your Validator starts up it will attempt to create a network connection with the proxy machine. You will need to make sure that your proxy machine has the appropriate firewall settings to allow the Validator to connect to it.
 
@@ -302,7 +407,7 @@ You can run multiple proxies by deploying additional proxies per the instruction
 {% endhint %}
 
 
-## Registering as a Validator
+## Registering as a Validator (ReleaseGold Registration)
 
 In order to operate as a Validator, you must register on-chain and be elected. Elections will run on each epoch boundary, approximately every 24 hours, after elections have been unfrozen by on-chain governance. Eligible validator groups will be considered in an Election mechanism that will select Validator based on the [D'Hondt method](https://en.wikipedia.org/wiki/D%27Hondt_method).
 
@@ -585,7 +690,7 @@ celocli election:show $CELO_VALIDATOR_GROUP_RG_ADDRESS --voter
 celocli election:show $CELO_VALIDATOR_RG_ADDRESS --voter
 ```
 
-If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked Gold voting for your Validator Group. You can see these rewards accumulate with the commands in the previous set, as well as:
+If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked CELO voting for your Validator Group. You can see these rewards accumulate with the commands in the previous set, as well as:
 
 ```bash
 # On your local machine
@@ -615,6 +720,196 @@ You can see additional information about your Validator, including uptime score,
 # On your local machine
 celocli validator:show $CELO_VALIDATOR_RG_ADDRESS
 ```
+
+## Registering as a Validator (Non-ReleaseGold)
+
+If you are new to validating on Baklava, then you most likely need to be following the Non-ReleaseGold steps for getting your validator up and running. ReleaseGold is done in the previous section and only concerns those who are generating accounts with ReleaseGold smart contract.
+
+### Register the Accounts
+
+You've now done all the infrastructure setup to get a validator and proxy running. The cLabs team will review your submission to receive funds and send you 12,000 Baklava testnet CELO to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](https://docs.celo.org/command-line-interface/introduction) and put up a stake to register as a validator and validator group.
+
+You can view your CELO balances by running the following commands:
+
+```bash
+# On your local machine
+celocli account:balance $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:balance $CELO_VALIDATOR_ADDRESS
+```
+
+At some point the output of these commands will change from `0` to `12e12`, indicating you have received the testnet CELO. This process involves a human, so please be patient. If you haven't received a balance within 24 hours, please get in touch again.
+
+You can also look at an account's current balance and transaction history on [Blockscout](https://baklava-blockscout.celo-testnet.org/). Enter the address into the search bar.
+
+Once these accounts have a balance, unlock them so that we can sign transactions. Then, we will register the accounts with the Celo core smart contracts:
+
+```bash
+# On your local machine
+celocli account:unlock $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:unlock $CELO_VALIDATOR_ADDRESS
+celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <NAME YOUR VALIDATOR GROUP>
+celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <NAME YOUR VALIDATOR>
+```
+
+Check that your accounts were registered successfully with the following commands:
+
+```bash
+# On your local machine
+celocli account:show $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:show $CELO_VALIDATOR_ADDRESS`
+```
+
+### Lock up CELO
+
+Lock up testnet CELO for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10,000 CELO to register a validator, and 10,000 CELO _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
+
+```bash
+# On your local machine
+celocli lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
+```
+
+This amount (10,000 CELO) represents the minimum amount needed to be locked in order to register a Validator and Validator group. Since your balance is in fact higher than this, you may wish to lock more with these accounts. Note that you will want to be sure to leave enough CELO unlocked to be able to continue to pay transaction fees for future transactions (such as those issued by running some CLI commands).
+
+Check that your CELO was successfully locked with the following commands:
+
+```bash
+# On your local machine
+celocli lockedgold:show $CELO_VALIDATOR_GROUP_ADDRESS
+celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
+```
+
+### Run for election
+
+In order to be elected as a Validator, you will first need to register your group and Validator. Note that when registering a Validator Group, you need to specify a [commission](../celo-codebase/protocol/proof-of-stake/validator-groups.md#group-share), which is the fraction of epoch rewards paid to the group by its members.
+
+We don't want to use our account key for validating, so first let's authorize the validator signing key:
+
+```bash
+# On your local machine
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS
+```
+
+Confirm by checking the authorized Validator signer for your Validator:
+
+```bash
+# On your local machine
+celocli account:show $CELO_VALIDATOR_ADDRESS
+```
+
+Then, register your Validator Group by running the following command. Note that because we did not authorize a Validator signer for our Validator Group account, we register the Validator Group with the account key.
+
+```bash
+# On your local machine
+celocli validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
+```
+
+You can view information about your Validator Group by running the following command:
+
+```bash
+# On your local machine
+celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
+```
+
+Next, register your Validator by running the following command. Note that because we have authorized a Validator signer, this step could also be performed on the Validator machine. Running it on the local machine allows us to avoid needing to install the [`celocli`](https://docs.celo.org/command-line-interface/introduction) on the Validator machine.
+
+```bash
+# On your local machine
+celocli validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
+```
+
+Affiliate your Validator with your Validator Group. Note that you will not be a member of this group until the Validator Group accepts you. This command could also be run from the Validator signer, if running on the validator machine.
+
+```bash
+# On your local machine
+celocli validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
+```
+
+Accept the affiliation:
+
+```bash
+# On your local machine
+celocli validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
+```
+
+Next, double check that your Validator is now a member of your Validator Group:
+
+```bash
+# On your local machine
+celocli validator:show $CELO_VALIDATOR_ADDRESS
+celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
+```
+
+Use both accounts to vote for your Validator Group. Note that because we have not authorized a vote signer for either account, these transactions must be sent from the account keys. Since you're likely to need to place additional votes throughout the course of the stake-off, consider creating and authorizing vote signers for additional operational security.
+
+```bash
+# On your local machine
+celocli election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+```
+
+Double check that your votes were cast successfully:
+
+```bash
+# On your local machine
+celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --group
+celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --voter
+celocli election:show $CELO_VALIDATOR_ADDRESS --voter
+```
+
+Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable them. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction:
+
+```bash
+# On your local machine
+# Note that this may take some time, as the epoch needs to end before votes can be activated
+celocli election:activate --from $CELO_VALIDATOR_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_ADDRESS --wait
+```
+
+Check that your votes were activated by re-running the following commands:
+
+```bash
+# On your local machine
+celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --voter
+celocli election:show $CELO_VALIDATOR_ADDRESS --voter
+```
+
+If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked CELO voting for your Validator Group from your account addresses. You can see these rewards accumulate with the commands in the previous set, as well as:
+
+```bash
+# On your local machine
+celocli lockedgold:show $CELO_VALIDATOR_GROUP_ADDRESS
+celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
+```
+
+You're all set! Elections are finalized at the end of each epoch, roughly once an hour in the Alfajores or Baklava Testnets. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
+
+{% hint style="info" %}
+**Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
+{% endhint %}
+
+You can inspect the current state of the validator elections by running:
+
+```bash
+# On your local machine
+celocli election:list
+```
+
+If you find your Validator still not getting elected you may need to faucet yourself more funds and lock more gold in order to be able to cast more votes for your Validator Group!
+
+You can check the status of your validator, including whether it is elected and signing blocks, at [baklava-ethstats.celo-testnet.org](https://baklava-ethstats.celo-testnet.org) or by running:
+
+```bash
+# On your local machine with celocli >= 0.0.30-beta9
+celocli validator:status --validator $CELO_VALIDATOR_ADDRESS
+```
+
+You can see additional information about your validator, including uptime score, by running:
+
+```bash
+# On your local machine
+celocli validator:show $CELO_VALIDATOR_ADDRESS
+```
+
 
 ## Running the Attestation Service
 
