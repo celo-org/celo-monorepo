@@ -9,12 +9,10 @@ const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements ReadOnlyWallet {
-  private readonly vaultName: string
   private keyVaultClient: AzureKeyVaultClient | undefined
 
-  constructor(vaultName: string) {
+  constructor(private readonly vaultName: string) {
     super()
-    this.vaultName = vaultName
   }
 
   protected async loadAccountSigners(): Promise<Map<Address, AzureHSMSigner>> {

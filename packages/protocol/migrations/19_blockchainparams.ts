@@ -11,6 +11,7 @@ const initializeArgs = async (_: string): Promise<any[]> => {
     version.patch,
     config.blockchainParameters.gasForNonGoldCurrencies,
     config.blockchainParameters.deploymentBlockGasLimit,
+    config.blockchainParameters.uptimeLookbackWindow,
   ]
 }
 

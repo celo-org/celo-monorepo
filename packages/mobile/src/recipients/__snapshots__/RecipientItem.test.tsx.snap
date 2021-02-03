@@ -54,7 +54,7 @@ exports[`RecipientItem renders correctly 1`] = `
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
+              "backgroundColor": "hsl(0, 53%, 93%)",
               "borderRadius": 20,
               "height": 40,
               "width": 40,
@@ -71,6 +71,7 @@ exports[`RecipientItem renders correctly 1`] = `
                 "fontSize": 16,
               },
               Object {
+                "color": "hsl(0, 67%, 24%)",
                 "fontSize": 20,
               },
             ]

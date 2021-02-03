@@ -25,6 +25,7 @@
   "learnMore": "Saiba mais",
   "activity": "Atividades",
   "history": "Histórico",
+  "earnRewards": "Ganhe recompensas",
   "notEnoughDollarsError": "Celo Dólares insuficientes para fazer o exchange",
   "notEnoughGoldError": "CELO insuficiente para fazer o exchange",
   "exchangeFailed": "O exchange falhou, tente novamente",
@@ -32,6 +33,7 @@
   "refreshFailedUnexpectedly": "Falha ao atualizar, verifique sua conectividade",
   "edit": "Editar",
   "paste": "Colar",
+  "choose": "Escolher",
   "receivedPayment": "Pagamento recebido",
   "getStarted": "Começar",
   "manageCeloDollars": "Gerenciar Celo Dólares ",
@@ -93,7 +95,7 @@
     "1": "alguns recursos desabilitados"
   },
   "networkConnectionFailed": "Não foi possível conectar-se à rede, verifique sua conexão de dados",
-  "firebaseFailed": "A conexão com a Internet está fraca. As informações da conta não podem ser atualizadas até que a conexão seja restaurada.",
+  "firebaseFailed": "Não foi possível estabelecer uma conexão com o servidor. Suas informações de conta não podem ser atualizadas até que a conexão seja restabelecida.",
   "gasPriceUpdateFailed": "Não foi possível atualizar a taxa",
   "appUpdateAvailable": "Atualização de aplicativo disponível",
   "appIsOutdated": "Sua versão atual está desatualizada, atualize para a versão mais recente",
@@ -171,8 +173,8 @@
   "helpFindAccount": "Ajude seu contato a encontrar o número da conta",
   "close": "Fechar",
   "home": "Página inicial",
-  "accountKey": "Chave da Conta",
-  "addAndWithdraw": "Adicionar e sacar",
+  "accountKey": "Chave de Conta",
+  "addAndWithdraw": "Depositar e sacar",
   "invite": "Convidar",
   "settings": "Configurações",
   "help": "Ajuda",
@@ -185,5 +187,7 @@
   "commentUnavailable": "Comentário indisponível",
   "accountClearFailed": "Ocorreu um erro ao remover a chave da sua conta. Pode ser necessário reinstalar o aplicativo para restaurar todas as funcionalidades.",
   "withdraw": "Sacar",
-  "countryNotAvailable": "{{appName}} não está disponível no seu país"
+  "countryNotAvailable": "{{appName}} não está disponível no seu país",
+  "firebaseFetchFailed": "A conexão com o servidor falhou",
+  "pictureLoadFailed": "Ocorreu um erro ao carregar sua imagem"
 }
