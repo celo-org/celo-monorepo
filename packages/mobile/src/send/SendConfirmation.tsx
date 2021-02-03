@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
@@ -17,6 +16,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton'
 import CommentTextInput from 'src/components/CommentTextInput'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import FeeDrawer from 'src/components/FeeDrawer'
@@ -47,6 +47,7 @@ import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
+import { modalScreenOptions } from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -65,10 +66,16 @@ export interface CurrencyInfo {
   localExchangeRate: string
 }
 
-type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
+type OwnProps = StackScreenProps<
+  StackParamList,
+  Screens.SendConfirmation | Screens.SendConfirmationModal
+>
 type Props = OwnProps
 
-export const sendConfirmationScreenNavOptions = () => ({
+export const sendConfirmationScreenNavOptions = (navOptions: Props) => ({
+  ...(navOptions.route.name === Screens.SendConfirmationModal
+    ? modalScreenOptions(navOptions)
+    : undefined),
   ...emptyHeader,
   headerLeft: () => <BackButton eventName={SendEvents.send_confirm_back} />,
 })
@@ -81,7 +88,8 @@ function SendConfirmation(props: Props) {
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.sendFlow7)
 
-  const { transactionData, addressJustValidated, currencyInfo } = props.route.params
+  const fromModal = props.route.name === Screens.SendConfirmationModal
+  const { transactionData, addressJustValidated, currencyInfo, origin } = props.route.params
   const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const confirmationInput = getConfirmationInput(
@@ -158,6 +166,7 @@ function SendConfirmation(props: Props) {
     )
 
     ValoraAnalytics.track(SendEvents.send_confirm_send, {
+      origin,
       isScan: !!props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       isRequest: type === TokenTransactionType.PayRequest,
@@ -175,7 +184,8 @@ function SendConfirmation(props: Props) {
         recipient,
         recipientAddress,
         inviteMethod,
-        firebasePendingRequestUid
+        firebasePendingRequestUid,
+        fromModal
       )
     )
   }
@@ -185,6 +195,7 @@ function SendConfirmation(props: Props) {
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,
+      origin: props.route.params.origin,
     })
   }
 

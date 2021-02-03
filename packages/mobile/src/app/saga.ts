@@ -1,3 +1,5 @@
+import { CURRENCY_ENUM } from '@celo/utils/src'
+import URLSearchParamsReal from '@ungap/url-search-params'
 import { AppState } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import {
@@ -17,6 +19,7 @@ import {
   appLock,
   minAppVersionDetermined,
   OpenDeepLink,
+  openDeepLink,
   OpenUrlAction,
   SetAppState,
   setAppState,
@@ -32,6 +35,7 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { handlePaymentDeeplink } from 'src/send/utils'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
@@ -113,8 +117,29 @@ export function* appRemoteFeatureFlagSaga() {
   }
 }
 
+function parseValue(value: string) {
+  if (['true', 'false'].indexOf(value) >= 0) {
+    return value === 'true'
+  }
+  const number = parseFloat(value)
+  if (!isNaN(number)) {
+    return number
+  }
+  return value
+}
+
+// Parses the query string into an object. Only works with built-in strings, booleans and numbers.
+function convertQueryToScreenParams(query: string) {
+  const decodedParams = new URLSearchParamsReal(decodeURIComponent(query))
+  const params: { [key: string]: any } = {}
+  for (const [key, value] of decodedParams.entries()) {
+    params[key] = parseValue(value)
+  }
+  return params
+}
+
 export function* handleDeepLink(action: OpenDeepLink) {
-  const { deepLink } = action
+  const { deepLink, isSecureOrigin } = action
   Logger.debug(TAG, 'Handling deep link', deepLink)
   const rawParams = parse(deepLink)
   if (rawParams.path) {
@@ -125,7 +150,14 @@ export function* handleDeepLink(action: OpenDeepLink) {
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
     } else if (rawParams.path === '/cashIn') {
-      navigate(Screens.FiatExchangeOptions, { isAddFunds: true })
+      navigate(Screens.FiatExchangeOptions, { isCashIn: true })
+    } else if (rawParams.pathname === '/bidali') {
+      navigate(Screens.BidaliScreen, { currency: CURRENCY_ENUM.DOLLAR })
+    } else if (isSecureOrigin && rawParams.pathname === '/openScreen' && rawParams.query) {
+      // The isSecureOrigin is important. We don't want it to be possible to fire this deep link from outside
+      // of our own notifications for security reasons.
+      const params = convertQueryToScreenParams(rawParams.query)
+      navigate(params.screen as keyof StackParamList, params)
     }
   }
 }
@@ -135,12 +167,17 @@ export function* watchDeepLinks() {
 }
 
 export function* handleOpenUrl(action: OpenUrlAction) {
-  const { url, openExternal } = action
+  const { url, openExternal, isSecureOrigin } = action
   Logger.debug(TAG, 'Handling url', url)
-  if (openExternal) {
-    yield call(navigateToURI, url)
-  } else {
+  if (url.startsWith('celo:')) {
+    // Handle celo links directly, this avoids showing the "Open with App" sheet on Android
+    yield call(handleDeepLink, openDeepLink(url, isSecureOrigin))
+  } else if (/^https?:\/\//i.test(url) === true && !openExternal) {
+    // We display http or https links using our in app browser, unless openExternal is forced
     navigate(Screens.WebViewScreen, { uri: url })
+  } else {
+    // Fallback
+    yield call(navigateToURI, url)
   }
 }
 

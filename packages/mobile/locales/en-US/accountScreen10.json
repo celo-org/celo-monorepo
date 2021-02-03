@@ -64,5 +64,10 @@
   "contactMessagePlaceholder": "Please type your message here...",
   "attachLogs": "Attach logs",
   "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with {{appName}} Support.",
-  "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!"
+  "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!",
+  "namePictureSaved": "Your name and picture were saved successfully.",
+  "addPhoto": "Add Photo",
+  "chooseFromLibrary": "Choose from Library",
+  "takePhoto": "Take Photo",
+  "removePhoto": "Remove Photo"
 }

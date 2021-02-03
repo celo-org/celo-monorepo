@@ -89,7 +89,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -136,7 +136,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "#7AD6FE",
+                    "backgroundColor": "hsl(0, 53%, 93%)",
                     "borderRadius": 20,
                     "height": 40,
                     "width": 40,
@@ -153,6 +153,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                       "fontSize": 16,
                     },
                     Object {
+                      "color": "hsl(0, 67%, 24%)",
                       "fontSize": 20,
                     },
                   ]
@@ -349,7 +350,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                 Array [
                   undefined,
                   Object {
-                    "color": undefined,
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -396,7 +397,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "#7AD6FE",
+                    "backgroundColor": "hsl(0, 53%, 93%)",
                     "borderRadius": 20,
                     "height": 40,
                     "width": 40,
@@ -413,6 +414,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                       "fontSize": 16,
                     },
                     Object {
+                      "color": "hsl(0, 67%, 24%)",
                       "fontSize": 20,
                     },
                   ]
