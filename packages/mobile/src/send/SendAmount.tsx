@@ -21,7 +21,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
 import {
   ALERT_BANNER_DURATION,
-  DAILY_PAYMENT_LIMIT_CUSD,
+  DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
@@ -275,10 +275,10 @@ function SendAmount(props: Props) {
   }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData, origin])
 
   const onRequest = React.useCallback(() => {
-    if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
+    if (dollarAmount.isGreaterThan(DEFAULT_DAILY_PAYMENT_LIMIT_CUSD)) {
       dispatch(
         showError(ErrorMessages.REQUEST_LIMIT, ALERT_BANNER_DURATION, {
-          limit: DAILY_PAYMENT_LIMIT_CUSD,
+          limit: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
         })
       )
       return

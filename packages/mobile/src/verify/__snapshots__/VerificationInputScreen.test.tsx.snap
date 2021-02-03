@@ -154,6 +154,9 @@ exports[`VerificationInputScreen renders correctly 1`] = `
                   >
                     <TextInput
                       allowFontScaling={true}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="visible-password"
                       onBlur={[Function]}
                       onChangeText={[Function]}
                       onFocus={[Function]}

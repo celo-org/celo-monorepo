@@ -7,11 +7,14 @@ import { Log, Response, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
+export const MAX_BLOCKS_TO_WAIT = 120
 
 export enum Currencies {
   GOLD = 'gold',
   DOLLAR = 'dollar',
 }
+
+let processedBlocks: number[] = []
 
 export async function query(path: string) {
   try {
@@ -79,15 +82,13 @@ export function filterAndJoinTransfers(
   return filteredGold.concat(filterdStable)
 }
 
-export function notifyForNewTransfers(
-  transfers: Transfer[],
-  lastBlockNotified: number
-): Promise<void[]> {
+export function notifyForNewTransfers(transfers: Transfer[]): Promise<void[]> {
   const results = new Array<Promise<void>>(transfers.length)
   for (let i = 0; i < transfers.length; i++) {
     const t = transfers[i]
+
     // Skip transactions for which we've already sent notifications
-    if (!t || t.blockNumber <= lastBlockNotified) {
+    if (!t || processedBlocks.find((blockNumber) => blockNumber === t.blockNumber)) {
       continue
     }
 
@@ -118,26 +119,42 @@ export function convertWeiValue(value: string) {
     .valueOf()
 }
 
+export function updateProcessedBlocks(transfers: Transfer[], lastBlock: number) {
+  transfers.forEach((transfer) => {
+    if (transfer && processedBlocks.indexOf(transfer.blockNumber) < 0) {
+      processedBlocks.push(transfer?.blockNumber)
+    }
+  })
+  processedBlocks = processedBlocks.filter(
+    (blockNumber) => blockNumber >= lastBlock - MAX_BLOCKS_TO_WAIT
+  )
+}
+
 export async function handleTransferNotifications(): Promise<void> {
   const lastBlockNotified = getLastBlockNotified()
   if (lastBlockNotified < 0) {
     // Firebase not yet ready
     return
   }
+  // Blockscout is eventually consistent, it doesn't resolve all blocks in order.
+  // To account for this, we save a cache of all blocks already handled in the last |MAX_BLOCKS_TO_WAIT| blocks (|processedBlocks|),
+  // so a transaction has that number of blocks to show up on Blockscout before we miss sending the notification for it.
+  const blockToQuery = lastBlockNotified - MAX_BLOCKS_TO_WAIT
 
   const { goldTokenAddress, stableTokenAddress } = await getTokenAddresses()
   const {
     transfers: goldTransfers,
     latestBlock: goldTransfersLatestBlock,
-  } = await getLatestTokenTransfers(goldTokenAddress, lastBlockNotified, Currencies.GOLD)
+  } = await getLatestTokenTransfers(goldTokenAddress, blockToQuery, Currencies.GOLD)
 
   const {
     transfers: stableTransfers,
     latestBlock: stableTransfersLatestBlock,
-  } = await getLatestTokenTransfers(stableTokenAddress, lastBlockNotified, Currencies.DOLLAR)
-
+  } = await getLatestTokenTransfers(stableTokenAddress, blockToQuery, Currencies.DOLLAR)
+  const lastBlock = Math.max(stableTransfersLatestBlock, goldTransfersLatestBlock)
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
-  await notifyForNewTransfers(allTransfers, lastBlockNotified)
-  return setLastBlockNotified(Math.max(goldTransfersLatestBlock, stableTransfersLatestBlock))
+  await notifyForNewTransfers(allTransfers)
+  updateProcessedBlocks(allTransfers, lastBlock)
+  return setLastBlockNotified(lastBlock)
 }
