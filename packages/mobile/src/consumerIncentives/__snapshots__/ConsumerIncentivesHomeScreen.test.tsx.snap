@@ -159,6 +159,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             },
             Object {
               "marginBottom": 4,
+              "paddingHorizontal": 12,
             },
           ]
         }
@@ -173,28 +174,6 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#9CA4A9",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-        />
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "textAlign": "center",
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
               "fontWeight": "bold",
             }
           }
@@ -204,9 +183,9 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
         style={
           Object {
             "height": 1,
-            "marginVertical": 24,
+            "marginVertical": 18,
             "opacity": 0.3,
-            "width": "80%",
+            "width": "100%",
           }
         }
       >
@@ -266,6 +245,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             },
             Object {
               "marginBottom": 4,
+              "paddingHorizontal": 12,
             },
           ]
         }
@@ -280,28 +260,6 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#9CA4A9",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-        />
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "textAlign": "center",
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
               "fontWeight": "bold",
             }
           }
@@ -311,9 +269,9 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
         style={
           Object {
             "height": 1,
-            "marginVertical": 24,
+            "marginVertical": 18,
             "opacity": 0.3,
-            "width": "80%",
+            "width": "100%",
           }
         }
       >
@@ -373,6 +331,7 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             },
             Object {
               "marginBottom": 4,
+              "paddingHorizontal": 12,
             },
           ]
         }
@@ -384,28 +343,6 @@ exports[`ConsumerIncentivesHomeScreen renders correctly 1`] = `
             }
           }
         />
-        <Text
-          style={
-            Object {
-              "color": "#9CA4A9",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-        />
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "textAlign": "center",
-          }
-        }
-      >
         <Text
           style={
             Object {
