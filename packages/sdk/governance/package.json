@@ -1,6 +1,6 @@
 {
   "name": "@celo/governance",
-  "version": "1.0.3-dev",
+  "version": "1.0.2-beta",
   "description": "Celo's governance proposals",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -21,11 +21,11 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "1.0.3-dev",
-    "@celo/utils": "1.0.3-dev",
-    "@celo/connect": "1.0.3-dev",
-    "@celo/contractkit": "1.0.3-dev",
-    "@celo/explorer": "1.0.3-dev",
+    "@celo/base": "1.0.2-beta",
+    "@celo/utils": "1.0.2-beta",
+    "@celo/connect": "1.0.2-beta",
+    "@celo/contractkit": "1.0.2-beta",
+    "@celo/explorer": "1.0.2-beta",
     "@types/debug": "^4.1.5",
     "@types/inquirer": "^6.5.0",
     "@types/ethereumjs-util": "^5.2.0",
