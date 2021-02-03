@@ -1,7 +1,6 @@
 {
   "title": "Bem-vindo às recompensas CELO",
   "description": "Obter recompensas mensais de economizar em sua conta cUSD Taxa!",
-  "getInCelo": "Obter <0>US${{amount}}</0> em CELO <1>/ mês</1>",
-  "minimumBalance": "com um saldo mínimo de <0>{{amount}} cUSD</0>",
+  "getCeloRewards": "<0>Obter US${{reward}} em CELO</0> por mês com um saldo mínimo de <1>{{minBalance}} cUSD</1>",
   "addCusd": "Adicionar cUSD"
 }

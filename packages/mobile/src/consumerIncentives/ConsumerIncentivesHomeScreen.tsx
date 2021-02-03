@@ -111,22 +111,13 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
                       style={styles.separator}
                     />
                   )}
-                  <Text style={[styles.body, styles.tierFirstLine]}>
+                  <Text style={[styles.body, styles.tier]}>
                     <Trans
-                      i18nKey={'getInCelo'}
+                      i18nKey={'getCeloRewards'}
                       ns={Namespaces.consumerIncentives}
-                      tOptions={{ amount: tier.reward }}
+                      tOptions={{ reward: tier.reward, minBalance: tier.minBalance }}
                     >
                       <Text style={styles.bold} />
-                      <Text style={styles.perMonth} />
-                    </Trans>
-                  </Text>
-                  <Text style={styles.body}>
-                    <Trans
-                      i18nKey={'minimumBalance'}
-                      ns={Namespaces.consumerIncentives}
-                      tOptions={{ amount: tier.minBalance }}
-                    >
                       <Text style={styles.bold} />
                     </Trans>
                   </Text>
@@ -207,12 +198,13 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    width: '80%',
+    width: '100%',
     opacity: 0.3,
-    marginVertical: 24,
+    marginVertical: 18,
   },
-  tierFirstLine: {
+  tier: {
     marginBottom: 4,
+    paddingHorizontal: 12,
   },
   bold: {
     fontWeight: 'bold',
