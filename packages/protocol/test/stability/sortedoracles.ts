@@ -1,4 +1,4 @@
-import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { ensureLeading0x, NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import {
   assertEqualBN,
   assertLogMatches2,
@@ -13,6 +13,7 @@ import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
 import Web3 from 'web3'
+import { keccak256 } from 'web3-utils'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 
@@ -47,30 +48,70 @@ contract('SortedOracles', (accounts: string[]) => {
   })
 
   describe.only('#setPairIdentifier', () => {
-    it('should update the pair identifier', async () => {
-      await sortedOracles.setPairIdentifier('CELOUSD', aToken)
-      const pairHash = Web3.utils.keccak256('CELOUSD')
+    describe('with a non-zero identifier', () => {
+      it('should set the pair identifier to the one given', async () => {
+        await sortedOracles.setPairIdentifier('CELOUSD', aToken)
+        const pairHash = Web3.utils.keccak256('CELOUSD')
 
-      assertSameAddress(await sortedOracles.pairIdentifier(pairHash), aToken)
-    })
+        assertSameAddress(await sortedOracles.pairIdentifier(pairHash), aToken)
+      })
 
-    it('should emit the PairIdentifierSetSet event', async () => {
-      const resp = await sortedOracles.setPairIdentifier('CELOUSD', aToken)
-      const pairHash = Web3.utils.keccak256('CELOUSD')
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'PairIdentifierSet',
-        args: {
-          pairHash,
-          identifier: Web3.utils.toChecksumAddress(aToken),
-          pair: 'CELOUSD',
-        },
+      it('should emit the PairIdentifierSetSet event', async () => {
+        const resp = await sortedOracles.setPairIdentifier('CELOUSD', aToken)
+        const pairHash = Web3.utils.keccak256('CELOUSD')
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'PairIdentifierSet',
+          args: {
+            pairHash,
+            identifier: Web3.utils.toChecksumAddress(aToken),
+            pair: 'CELOUSD',
+          },
+        })
+      })
+
+      it('should revert when called by a non-owner', async () => {
+        await assertRevert(
+          sortedOracles.setPairIdentifier('CELOUSD', aToken, { from: accounts[1] })
+        )
       })
     })
 
-    it('should revert when called by a non-owner', async () => {
-      await assertRevert(sortedOracles.setPairIdentifier('CELOUSD', aToken, { from: accounts[1] }))
+    describe('with a zero identifier', () => {
+      const identifier = ensureLeading0x(
+        Buffer.from(trimLeading0x(keccak256('CELOBTC')))
+          .slice(12, 32)
+          .toString('hex')
+      )
+
+      it('should compute the default from the hash', async () => {
+        await sortedOracles.setPairIdentifier('CELOBTC', NULL_ADDRESS)
+        const pairHash = keccak256('CELOBTC')
+
+        assertSameAddress(await sortedOracles.pairIdentifier(pairHash), identifier)
+      })
+
+      it('should emit the PairIdentifierSetSet event', async () => {
+        const resp = await sortedOracles.setPairIdentifier('CELOUSD', aToken)
+        const pairHash = Web3.utils.keccak256('CELOUSD')
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'PairIdentifierSet',
+          args: {
+            pairHash,
+            identifier: Web3.utils.toChecksumAddress(identifier),
+            pair: 'CELOUSD',
+          },
+        })
+      })
+
+      it('should revert when called by a non-owner', async () => {
+        await assertRevert(
+          sortedOracles.setPairIdentifier('CELOUSD', aToken, { from: accounts[1] })
+        )
+      })
     })
   })
 

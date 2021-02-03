@@ -1,9 +1,7 @@
-import { oracleCurrencyPairIdentifier } from '@celo/base'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Branded } from 'io-ts'
 import { CeloContract, CeloToken } from '../base'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
@@ -48,32 +46,12 @@ export interface MedianRate {
   rate: BigNumber
 }
 
-export type CurrencyPairIdentifier = Branded<Address, 'PairIdentifier'>
-
-/**
- * Used to construct the pair identifier from a pair label (e.g. CELOBTC)
- * This function returns a branded type so we can have a safer interface
- * for the wrapper which only accepts Addresses constructed by this function.
- * @param pair a string
- */
-export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
-  return oracleCurrencyPairIdentifier(pair) as CurrencyPairIdentifier
+export enum OracleCurrencyPair {
+  CELOUSD = 'CELOUSD',
+  CELOBTC = 'CELOBTC',
 }
 
-/**
- * This will act as an enum of common pairs.
- * We can't use a straight enum because we want the value
- * to be a ReportTarget
- *
- * E.g. usage: sortedOracles.getRates(OracleCurrencyPair.CELOBTC)
- */
-type defaultPairs = 'CELOBTC' | 'CELOUSD'
-export const OracleCurrencyPair: Record<defaultPairs, ReportTarget> = {
-  CELOBTC: pairIdentifier('CELOBTC'),
-  CELOUSD: CeloContract.StableToken,
-}
-
-export type ReportTarget = CeloToken | CurrencyPairIdentifier
+export type ReportTarget = CeloToken | OracleCurrencyPair
 
 /**
  * Disambiguate a ReportTarget to a CeloToken
@@ -93,7 +71,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @return The number of reported oracle rates for `token`.
    */
   async numRates(target: ReportTarget): Promise<number> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const response = await this.contract.methods.numRates(identifier).call()
     return valueToInt(response)
   }
@@ -105,7 +83,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    *   amount of that token / equivalent amount in CELO
    */
   async medianRate(target: ReportTarget): Promise<MedianRate> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const response = await this.contract.methods.medianRate(identifier).call()
     return {
       rate: valueToFrac(response[0], response[1]),
@@ -119,7 +97,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @returns boolean describing whether this account is an oracle
    */
   async isOracle(target: ReportTarget, oracle: Address): Promise<boolean> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     return this.contract.methods.isOracle(identifier, oracle).call()
   }
 
@@ -129,7 +107,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @returns The list of whitelisted oracles for a given token.
    */
   async getOracles(target: ReportTarget): Promise<Address[]> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     return this.contract.methods.getOracles(identifier).call()
   }
 
@@ -149,7 +127,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @return The report expiry in seconds.
    */
   async getTokenReportExpirySeconds(target: ReportTarget): Promise<BigNumber> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const response = await this.contract.methods.getTokenReportExpirySeconds(identifier).call()
     return valueToBigNumber(response)
   }
@@ -159,7 +137,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @param target The ReportTarget, either CeloToken or currency pair
    */
   async isOldestReportExpired(target: ReportTarget): Promise<[boolean, Address]> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const response = await this.contract.methods.isOldestReportExpired(identifier).call()
     return response as [boolean, Address]
   }
@@ -175,7 +153,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     target: ReportTarget,
     numReports?: number
   ): Promise<CeloTransactionObject<void>> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     if (!numReports) {
       numReports = (await this.getReports(target)).length - 1
     }
@@ -196,7 +174,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const fixedValue = toFixed(valueToBigNumber(value))
 
     const { lesserKey, greaterKey } = await this.findLesserAndGreaterKeys(
@@ -256,7 +234,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @return An unpacked list of elements from largest to smallest.
    */
   async getRates(target: ReportTarget): Promise<OracleRate[]> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const response = await this.contract.methods.getRates(identifier).call()
     const rates: OracleRate[] = []
     for (let i = 0; i < response[0].length; i++) {
@@ -276,7 +254,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @return An unpacked list of elements from largest to smallest.
    */
   async getTimestamps(target: ReportTarget): Promise<OracleTimestamp[]> {
-    const identifier = await this.toCurrencyPairIdentifier(target)
+    const identifier = await this.getCurrencyPairIdentifier(target)
     const response = await this.contract.methods.getTimestamps(identifier).call()
     const timestamps: OracleTimestamp[] = []
     for (let i = 0; i < response[0].length; i++) {
@@ -303,6 +281,22 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     return reports
   }
 
+  /**
+   * Get the currency pair identifier for a ReportTarget
+   * This function extends the logic of the #getCurrencyPairIdentifier view call
+   * so that we can pass in a CeloToken and resolve the identifier as
+   * the address from the registry.
+   * @param target The ReportTarget, either CeloToken or OracleCurrencyPair
+   * @return the address to be used as an identifier
+   */
+  async getCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
+    if (isCeloToken(target)) {
+      return this.kit.registry.addressFor(target)
+    } else {
+      return this._getCurrencyPairIdentifier(target)
+    }
+  }
+
   private async findLesserAndGreaterKeys(
     target: ReportTarget,
     value: BigNumber.Value,
@@ -327,11 +321,5 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     return { lesserKey, greaterKey }
   }
 
-  private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    if (isCeloToken(target)) {
-      return this.kit.registry.addressFor(target)
-    } else {
-      return target
-    }
-  }
+  private _getCurrencyPairIdentifier = proxyCall(this.contract.methods.getCurrencyPairIdentifier)
 }

@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base'
 import { Address } from '@celo/connect'
 import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
@@ -74,8 +75,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     oracle: Address,
     owner: Address
   ): Promise<void> {
-    // @ts-ignore
-    const identifier = await sortedOraclesInstance.toCurrencyPairIdentifier(target)
+    const identifier = await sortedOraclesInstance.getCurrencyPairIdentifier(target)
     // @ts-ignore
     const sortedOraclesContract = sortedOraclesInstance.contract
     // We're @ts-ignoring the above because there's no wrapper method
@@ -118,6 +118,12 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
       return !stableTokenOracles.includes(addr)
     })!
 
+    // Register the CELOBTC identifier
+    // @ts-ignore
+    await btcSortedOracles.contract.methods.setPairIdentifier('CELOBTC', NULL_ADDRESS).send({
+      from: btcOracleOwner,
+    })
+
     // For StableToken the oracles are setup in migrations, for our
     // custom CELO/BTC oracle we need to add them manually
     for (const oracle of celoBtcOracles) {
@@ -136,11 +142,15 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   const testCases: Array<{ label: string; reportTarget: ReportTarget }> = [
     {
-      label: 'StableToken (CELO/USD)',
+      label: 'CeloContract.StableToken',
       reportTarget: CeloContract.StableToken,
     },
     {
-      label: 'CELO/BTC',
+      label: 'OracleCurrencyPair.CELOUSD',
+      reportTarget: OracleCurrencyPair.CELOUSD,
+    },
+    {
+      label: 'OracleCurrencyPair.CELOBTC',
       reportTarget: OracleCurrencyPair.CELOBTC,
     },
   ]
@@ -150,7 +160,10 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     beforeEach(() => {
       if (reportTarget === OracleCurrencyPair.CELOBTC) {
         sortedOracles = btcSortedOracles
-      } else if (reportTarget === CeloContract.StableToken) {
+      } else if (
+        reportTarget === CeloContract.StableToken ||
+        reportTarget == OracleCurrencyPair.CELOUSD
+      ) {
         sortedOracles = stableTokenSortedOracles
       } else {
         throw new Error(`Unexpected report target: ${reportTarget}`)

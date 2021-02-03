@@ -106,6 +106,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    */
   function setPairIdentifier(string calldata _pair, address _identifier) external onlyOwner {
     bytes32 pairHash = keccak256(abi.encodePacked(_pair));
+    if (_identifier == address(0)) {
+      _identifier = address(uint160(uint256(pairHash)));
+    }
     pairIdentifier[pairHash] = _identifier;
     emit PairIdentifierSet(pairHash, _identifier, _pair);
   }
