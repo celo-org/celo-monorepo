@@ -247,6 +247,10 @@ export async function notificationsChannel() {
   return simpleReadChannel('notificationsV2')
 }
 
+export async function cUsdDailyLimitChannel(address: string) {
+  return simpleReadChannel(`registrations/${address}/dailyLimitCusd`)
+}
+
 function simpleReadChannel(key: string) {
   if (!FIREBASE_ENABLED) {
     return null
