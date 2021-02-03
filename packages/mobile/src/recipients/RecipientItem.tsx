@@ -7,7 +7,13 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import ContactCircle from 'src/components/ContactCircle'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { getDisplayDetail, getDisplayName, Recipient } from 'src/recipients/recipient'
+import Valora from 'src/icons/Valora'
+import {
+  getDisplayDetail,
+  getDisplayName,
+  Recipient,
+  recipientHasAddress,
+} from 'src/recipients/recipient'
 
 interface OwnProps {
   recipient: Recipient
@@ -32,10 +38,11 @@ class RecipientItem extends React.PureComponent<Props> {
             <Text numberOfLines={1} ellipsizeMode={'tail'} style={styles.name}>
               {getDisplayName(recipient, t)}
             </Text>
-            {!recipient.name ? (
+            {recipient.name ? (
               <Text style={styles.phone}>{getDisplayDetail(recipient)}</Text>
             ) : null}
           </View>
+          {recipientHasAddress(recipient) ? <Valora /> : null}
         </View>
       </Touchable>
     )

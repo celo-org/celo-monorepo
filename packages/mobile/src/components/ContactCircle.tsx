@@ -2,7 +2,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import DefaultAvatar from 'src/icons/DefaultAvatar'
-import { Recipient, recipientHasAddress } from 'src/recipients/recipient'
+import { Recipient, recipientHasAddress, recipientHasNumber } from 'src/recipients/recipient'
 
 interface Props {
   style?: ViewStyle
@@ -20,8 +20,9 @@ const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
 function ContactCircle({ size, recipient, style }: Props) {
   const address = recipientHasAddress(recipient) && recipient.address
+  const number = recipientHasNumber(recipient) && recipient.e164PhoneNumber
   const iconSize = size || DEFAULT_ICON_SIZE
-  const iconBackgroundColor = getAddressBackgroundColor(address || '0x0')
+  const iconBackgroundColor = getAddressBackgroundColor(address || number || '0x0')
 
   const renderThumbnail = () => {
     if (recipient.thumbnailPath) {
@@ -37,7 +38,7 @@ function ContactCircle({ size, recipient, style }: Props) {
       )
     }
 
-    const fontColor = getAddressForegroundColor(address || '0x0')
+    const fontColor = getAddressForegroundColor(address || number || '0x0')
     if (recipient.name) {
       const initials = getNameInitial(recipient.name)
       return (

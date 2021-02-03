@@ -61,7 +61,7 @@ export function getDisplayName(recipient: Recipient, t: TFunction) {
   } else if (recipientHasNumber(recipient)) {
     return recipient.e164PhoneNumber
   } else {
-    return t('global:account') + ' ' + formatShortenedAddress(recipient.address)
+    return t('walletFlow5:feedItemAddress', { address: formatShortenedAddress(recipient.address) })
   }
 }
 
@@ -69,7 +69,7 @@ export function getDisplayDetail(recipient: Recipient) {
   if (recipientHasNumber(recipient)) {
     return recipient.displayNumber
   } else {
-    return recipient.address
+    return formatShortenedAddress(recipient.address)
   }
 }
 

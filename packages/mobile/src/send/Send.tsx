@@ -24,13 +24,14 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import {
+  AddressToRecipient,
   filterRecipientFactory,
   NumberToRecipient,
   Recipient,
   sortRecipients,
 } from 'src/recipients/recipient'
 import RecipientPicker from 'src/recipients/RecipientPicker'
-import { phoneRecipientCacheSelector } from 'src/recipients/reducer'
+import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
 import { SendCallToAction } from 'src/send/SendCallToAction'
@@ -50,7 +51,8 @@ type FilterType = (searchQuery: string) => Recipient[]
 
 interface State {
   searchQuery: string
-  allFiltered: Recipient[]
+  phoneFiltered: Recipient[]
+  valoraFiltered: Recipient[]
   recentFiltered: Recipient[]
   hasGivenContactPermission: boolean
 }
@@ -62,7 +64,8 @@ interface StateProps {
   verificationPossible: boolean
   devModeActive: boolean
   recentRecipients: Recipient[]
-  allRecipients: NumberToRecipient
+  phoneRecipients: NumberToRecipient
+  valoraRecipients: AddressToRecipient
   matchedContacts: ContactMatches
 }
 
@@ -85,7 +88,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
   verificationPossible: verificationPossibleSelector(state),
   devModeActive: state.account.devModeActive,
   recentRecipients: state.send.recentRecipients,
-  allRecipients: phoneRecipientCacheSelector(state),
+  phoneRecipients: phoneRecipientCacheSelector(state),
+  valoraRecipients: valoraRecipientCacheSelector(state),
   matchedContacts: state.identity.matchedContacts,
 })
 
@@ -139,7 +143,8 @@ class Send extends React.Component<Props, State> {
   }
 
   throttledSearch!: (searchQuery: string) => void
-  allRecipientsFilter!: FilterType
+  phoneRecipientsFilter!: FilterType
+  valoraRecipientsFilter!: FilterType
   recentRecipientsFilter!: FilterType
 
   constructor(props: Props) {
@@ -147,15 +152,16 @@ class Send extends React.Component<Props, State> {
 
     this.state = {
       searchQuery: '',
-      allFiltered: sortRecipients(
-        Object.values(this.props.allRecipients),
+      phoneFiltered: sortRecipients(
+        Object.values(this.props.phoneRecipients),
         this.props.matchedContacts
       ),
+      valoraFiltered: sortRecipients(Object.values(this.props.valoraRecipients)),
       recentFiltered: this.props.recentRecipients,
       hasGivenContactPermission: true,
     }
 
-    this.createRecipientSearchFilters(true, true)
+    this.createRecipientSearchFilters(true, true, true)
   }
 
   async componentDidMount() {
@@ -167,50 +173,66 @@ class Send extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { recentRecipients, allRecipients } = this.props
+    const { recentRecipients, phoneRecipients, valoraRecipients } = this.props
 
+    // TODO: also check valoraRecipients
     if (
       recentRecipients !== prevProps.recentRecipients ||
-      allRecipients !== prevProps.allRecipients
+      phoneRecipients !== prevProps.phoneRecipients ||
+      valoraRecipients !== prevProps.valoraRecipients
     ) {
       this.createRecipientSearchFilters(
         recentRecipients !== prevProps.recentRecipients,
-        allRecipients !== prevProps.allRecipients
+        phoneRecipients !== prevProps.phoneRecipients,
+        valoraRecipients !== prevProps.valoraRecipients
       )
       // Clear search when recipients change to avoid tricky states
       this.onSearchQueryChanged('')
     }
   }
 
-  createRecipientSearchFilters = (updateRecentFilter: boolean, updateAllFilter: boolean) => {
+  createRecipientSearchFilters = (
+    updateRecentFilter: boolean,
+    updatePhoneFilter: boolean,
+    updateValoraFilter: boolean
+  ) => {
     // To improve search performance, we use these filter factories which pre-process the
     // recipient lists to improve search performance
     if (updateRecentFilter) {
       this.recentRecipientsFilter = filterRecipientFactory(this.props.recentRecipients, false)
     }
-    if (updateAllFilter) {
-      this.allRecipientsFilter = filterRecipientFactory(
-        Object.values(this.props.allRecipients),
+    if (updatePhoneFilter) {
+      this.phoneRecipientsFilter = filterRecipientFactory(
+        Object.values(this.props.phoneRecipients),
         true,
         this.props.matchedContacts
       )
     }
+    if (updateValoraFilter) {
+      this.valoraRecipientsFilter = filterRecipientFactory(
+        Object.values(this.props.valoraRecipients),
+        true
+      )
+    }
+
+    // TODO: update valoraRecipients filter
 
     this.throttledSearch = throttle((searchQuery: string) => {
       this.setState({
         searchQuery,
         recentFiltered: this.recentRecipientsFilter(searchQuery),
-        allFiltered: this.allRecipientsFilter(searchQuery),
+        phoneFiltered: this.phoneRecipientsFilter(searchQuery),
+        valoraFiltered: this.valoraRecipientsFilter(searchQuery),
       })
     }, SEARCH_THROTTLE_TIME)
   }
 
   tryImportContacts = async () => {
-    const { numberVerified, allRecipients } = this.props
+    const { numberVerified, phoneRecipients } = this.props
 
     // Only import contacts if number is verified and
     // recip cache is empty so we haven't already
-    if (!numberVerified || allRecipients.length) {
+    if (!numberVerified || phoneRecipients.length) {
       return
     }
 
@@ -253,10 +275,11 @@ class Send extends React.Component<Props, State> {
 
   buildSections = (): Section[] => {
     const { t } = this.props
-    const { recentFiltered, allFiltered } = this.state
+    const { recentFiltered, phoneFiltered, valoraFiltered } = this.state
     const sections = [
       { key: t('recent'), data: recentFiltered },
-      { key: t('contacts'), data: allFiltered },
+      { key: t('onValora'), data: valoraFiltered },
+      { key: t('contacts'), data: phoneFiltered },
     ].filter((section) => section.data.length > 0)
 
     return sections
