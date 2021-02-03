@@ -17,7 +17,7 @@ const hook: Hook<'prerun'> = async (opts) => {
       process.exit(0)
     }
 
-    // Optional additional/alternative handling
+    // Require @celo/* NPM scope for any package installation
     // If no args are passed in, default to oclif/plugin-plugins error handling
     if (opts.argv.length && !/@celo\/.*/.test(opts.argv[0])) {
       throw new CLIError(
