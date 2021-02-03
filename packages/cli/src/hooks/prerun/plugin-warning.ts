@@ -8,8 +8,7 @@ const hook: Hook<'prerun'> = async (opts) => {
     const response = await prompts({
       type: 'confirm',
       name: 'confirmation',
-      message:
-        'Installing a 3rd party plugin can be *dangerous*! Are you sure you trust this plugin and want to install it? (y/n)',
+      message: 'Are you sure you want to install this plugin? (y/n)',
     })
 
     if (!response.confirmation) {
