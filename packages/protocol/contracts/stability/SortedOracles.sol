@@ -35,6 +35,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   // See: #getTokenReportExpirySeconds
   uint256 public reportExpirySeconds;
   mapping(address => uint256) public tokenReportExpirySeconds;
+  mapping(bytes32 => address) public pairIdentifier;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -48,6 +49,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event PairIdentifierSet(bytes32 indexed pairHash, address indexed identifier, string pair);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -95,6 +97,17 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     );
     tokenReportExpirySeconds[_token] = _reportExpirySeconds;
     emit TokenReportExpirySet(_token, _reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the identifier (address) for a currency pair.
+   * @param _pair The currency pair to set the identifier for (e.g. "CELOUSD") 
+   * @param _identifier The address which acts as the identifier for that currency pair.
+   */
+  function setPairIdentifier(string calldata _pair, address _identifier) external onlyOwner {
+    bytes32 pairHash = keccak256(abi.encodePacked(_pair));
+    pairIdentifier[pairHash] = _identifier;
+    emit PairIdentifierSet(pairHash, _identifier, _pair);
   }
 
   /**
@@ -306,6 +319,17 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     }
 
     return tokenReportExpirySeconds[token];
+  }
+
+  /**
+   * @notice Returns the registered identifier for a currency pair
+   * @param _pair The currnecy pair (e.g. "CELOUSD")
+   * @return The address that can be used as an identifier to read rates 
+   */
+  function getCurrencyPairIdentifier(string memory _pair) public view returns (address) {
+    bytes32 pairHash = keccak256(abi.encodePacked(_pair));
+    require(pairIdentifier[pairHash] != address(0), "currency pair does not have an identifier");
+    return pairIdentifier[pairHash];
   }
 
   /**

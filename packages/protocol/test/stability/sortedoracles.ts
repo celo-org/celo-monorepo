@@ -3,6 +3,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
+  assertSameAddress,
   matchAddress,
   matchAny,
   timeTravel,
@@ -42,6 +43,54 @@ contract('SortedOracles', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(sortedOracles.initialize(aReportExpiry))
+    })
+  })
+
+  describe.only('#setPairIdentifier', () => {
+    it('should update the pair identifier', async () => {
+      await sortedOracles.setPairIdentifier('CELOUSD', aToken)
+      const pairHash = Web3.utils.keccak256('CELOUSD')
+
+      assertSameAddress(await sortedOracles.pairIdentifier(pairHash), aToken)
+    })
+
+    it('should emit the PairIdentifierSetSet event', async () => {
+      const resp = await sortedOracles.setPairIdentifier('CELOUSD', aToken)
+      const pairHash = Web3.utils.keccak256('CELOUSD')
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'PairIdentifierSet',
+        args: {
+          pairHash,
+          identifier: Web3.utils.toChecksumAddress(aToken),
+          pair: 'CELOUSD',
+        },
+      })
+    })
+
+    it('should revert when called by a non-owner', async () => {
+      await assertRevert(sortedOracles.setPairIdentifier('CELOUSD', aToken, { from: accounts[1] }))
+    })
+  })
+
+  describe.only('#getCurrencyPairIdentifier', () => {
+    beforeEach(async () => {
+      await sortedOracles.setPairIdentifier('CELOUSD', aToken)
+      await sortedOracles.addOracle(aToken, anOracle)
+      await sortedOracles.report(aToken, toFixed(10), NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
+    })
+
+    it('should return the pair identifier', async () => {
+      const identifier = await sortedOracles.getCurrencyPairIdentifier('CELOUSD')
+      assertSameAddress(identifier, aToken)
+      assert.equal((await sortedOracles.numRates(identifier)).toNumber(), 1)
+    })
+
+    it('should revert when called with an unregistered pair', async () => {
+      await assertRevert(sortedOracles.getCurrencyPairIdentifier('CELOETH'))
     })
   })
 

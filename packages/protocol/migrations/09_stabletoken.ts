@@ -55,6 +55,8 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
 
+    await sortedOracles.setPairIdentifier('CELOUSD', stableToken.address)
+
     const goldPrice = config.stableToken.goldPrice
     if (goldPrice) {
       const fromAddress = truffle.networks[networkName].from
