@@ -1,7 +1,7 @@
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
-import { Currencies } from './blockscout/transfers'
+import { Currencies, MAX_BLOCKS_TO_WAIT } from './blockscout/transfers'
 import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
 let database: admin.database.Database
@@ -49,6 +49,7 @@ interface ExchangeRateObject {
 
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
+
 let pendingRequests: PendingRequests = {}
 
 export function _setTestRegistrations(testRegistrations: Registrations) {
@@ -91,8 +92,19 @@ export function initializeDb() {
   lastBlockRef.on(
     'value',
     (snapshot) => {
-      console.debug('Latest block data updated: ', snapshot && snapshot.val())
-      lastBlockNotified = (snapshot && snapshot.val()) || 0
+      const lastBlock = (snapshot && snapshot.val()) || 0
+      console.debug('Latest block data updated: ', lastBlock)
+      if (lastBlockNotified < 0) {
+        // On the transfers file, we query using |lastBlockNotified - MAX_BLOCKS_TO_WAIT|, which would resolve to the current time.
+        // This means that any block previous to |lastBlock| which hasn't been notified never will be.
+        // If we just set |lastBlockNotified| to |lastBlock| we would risk sending duplicate notifications to all transfers made in
+        // the last |MAX_BLOCKS_TO_WAIT| blocks.
+        // To make sure all notifications are always sent, we'd have to store processed blocks on Firebase to persist the cache
+        // between deploys.
+        lastBlockNotified = lastBlock + MAX_BLOCKS_TO_WAIT
+      } else if (lastBlock > lastBlockNotified) {
+        lastBlockNotified = lastBlock
+      }
     },
     (errorObject: any) => {
       console.error('Latest block data read failed:', errorObject.code)
