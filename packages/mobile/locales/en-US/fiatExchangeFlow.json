@@ -44,6 +44,5 @@
   "otherFundingOptions": "For more ways to add and withdraw funds, visit <0>How to fund your account</0>",
   "youCanTransfer": "You can transfer {{currency}} to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy.",
   "useBalanceWithMerchants": "Use your balance with supporting merchants",
-  "findMerchants": "Find local merchants near you",
-  "addCusd": "Add cUSD"
+  "findMerchants": "Find local merchants near you"
 }
