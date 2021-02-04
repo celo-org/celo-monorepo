@@ -17,12 +17,10 @@ export const openSimplex = (account: string | null) => {
   navigateToURI(`${SIMPLEX_URI}?address=${account}`)
 }
 
-export const openRamp = (account: string | null, currencyToBuy: CURRENCY_ENUM) => {
-  const asset = {
-    [CURRENCY_ENUM.GOLD]: 'CELO',
-    [CURRENCY_ENUM.DOLLAR]: 'CUSD',
-  }[currencyToBuy]
-  navigateToURI(
-    `${RAMP_URI}?userAddress=${account}&swapAsset=${asset}&hostAppName=Valora&hostLogoUrl=${VALORA_LOGO_URL}`
-  )
+export const openRamp = (currencyCode: LocalCurrencyCode, currencyToBuy: CURRENCY_ENUM) => {
+  navigate(Screens.Ramp, {
+    localAmount: 0,
+    currencyCode,
+    currencyToBuy,
+  })
 }

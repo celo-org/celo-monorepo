@@ -45,6 +45,7 @@ import LocalProviderCashOut, {
   localProviderCashOutOptions,
 } from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
+import Ramp, { rampOptions } from 'src/fiatExchanges/Ramp'
 import ProviderOptionsScreen from 'src/fiatExchanges/ProviderOptionsScreen'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -459,6 +460,7 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={LocalProviderCashOut}
     />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
+    <Navigator.Screen options={rampOptions} name={Screens.Ramp} component={Ramp} />
     <Navigator.Screen
       options={ProviderOptionsScreen.navigationOptions}
       name={Screens.ProviderOptionsScreen}

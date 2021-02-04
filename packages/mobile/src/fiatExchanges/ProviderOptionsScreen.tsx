@@ -101,7 +101,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       {
         name: 'Ramp',
         enabled: true,
-        onSelected: () => openRamp(account, CURRENCY_ENUM.DOLLAR),
+        onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.DOLLAR),
       },
     ],
   }
