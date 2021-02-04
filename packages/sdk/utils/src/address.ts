@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x, hexToBuffer } from '@celo/base/lib/address'
+import { ensureLeading0x, hexToBuffer } from '@celo/base/lib/address'
 import {
   isValidPrivate,
   privateToAddress,
@@ -43,4 +43,4 @@ export const publicKeyToAddress = (publicKey: string) =>
 export const isValidPrivateKey = (privateKey: string) =>
   privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
-export const isValidAddress = (input: string): input is Address => Web3Utils.isAddress(input)
+export const isValidAddress = (input: string) => Web3Utils.isAddress(input)
