@@ -217,8 +217,6 @@ spec:
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
             --istanbul.replica \
-            --istanbul.blockperiod={{ .Values.geth.blocktime }} \
-            --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \

@@ -178,7 +178,6 @@ release: {{ .Release.Name }}
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
-      --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
       --datadir=/root/.celo \
       --ipcpath=geth.ipc \
       ${ADDITIONAL_FLAGS}
