@@ -47,12 +47,22 @@ echo " - Build contract artifacts ..."
 yarn build >> $LOG_FILE
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
+cp lib/registry-utils.ts $BUILD_DIR/
 
 echo " - Return to original git ref"
 # Move back to branch from which we started
 git checkout - >> $LOG_FILE
 
+cp $BUILD_DIR/registry-utils.ts lib/
+
+# Hack since v1 did not yet expose celoRegistryAddress
+if ! cat lib/registry-utils.ts | grep -q "celoRegistryAddress"; then
+  echo "export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'" >> lib/registry-utils.ts
+fi
+
 echo " - Build verification script ..."
 yarn build >> $LOG_FILE
 echo " - Run verification script ..."
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal $PROPOSAL $FORNO $INITIALIZE_DATA
+
+git checkout lib/registry-utils.ts
