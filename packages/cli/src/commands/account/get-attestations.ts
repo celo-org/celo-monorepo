@@ -1,5 +1,6 @@
-import { ContractKit, OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { ContractKit } from '@celo/contractkit'
+import { OdisUtils } from '@celo/identity'
+import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { flags } from '@oclif/command'
 import Web3 from 'web3'
 import { BaseCommand } from '../../base'

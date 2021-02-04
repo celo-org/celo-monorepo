@@ -153,6 +153,32 @@ EXAMPLE
 
 _See code: [src/commands/validator/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list.ts)_
 
+## `celocli validator:list-elected`
+
+List elected Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
+
+```
+List elected Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
+
+USAGE
+  $ celocli validator:list-elected
+
+OPTIONS
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
+
+EXAMPLE
+  list
+```
+
+_See code: [src/commands/validator/list-elected.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list-elected.ts)_
+
 ## `celocli validator:register`
 
 Register a new Validator
