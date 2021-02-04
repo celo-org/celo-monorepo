@@ -29,6 +29,7 @@ async function helmParameters(celoEnv: string) {
     `--set oracle.cronSchedule="${fetchEnv(envVar.MOCK_ORACLE_CRON_SCHEDULE)}"`,
     `--set oracle.image.repository=${fetchEnv(envVar.MOCK_ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set oracle.image.tag=${fetchEnv(envVar.MOCK_ORACLE_DOCKER_IMAGE_TAG)}`,
+    `--set oracle.currencyPair=${fetchEnv(envVar.MOCK_ORACLE_CURRENCY_PAIR)}`,
     `--set celocli.nodeUrl=${nodeUrl}`,
     `--set celocli.image.repository=${fetchEnv(envVar.CELOCLI_STANDALONE_IMAGE_REPOSITORY)}`,
     `--set celocli.image.tag=${fetchEnv(envVar.CELOCLI_STANDALONE_IMAGE_TAG)}`,

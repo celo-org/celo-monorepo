@@ -1,5 +1,6 @@
+import { getContextDynamicEnvVarValues } from 'src/lib/context-utils'
 import { getFornoUrl, getFornoWebSocketUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -26,21 +27,21 @@ export abstract class BaseOracleDeployer {
     this._celoEnv = celoEnv
   }
 
-  async installChart() {
+  async installChart(context: string) {
     return installGenericHelmChart(
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(context)
     )
   }
 
-  async upgradeChart() {
+  async upgradeChart(context: string) {
     return upgradeGenericHelmChart(
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(context)
     )
   }
 
@@ -48,13 +49,24 @@ export abstract class BaseOracleDeployer {
     await removeGenericHelmChart(this.releaseName, this.celoEnv)
   }
 
-  async helmParameters() {
+  async helmParameters(context: string) {
     const httpRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoUrl(this.celoEnv)
       : getFullNodeHttpRpcInternalUrl(this.celoEnv)
     const wsRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoWebSocketUrl(this.celoEnv)
       : getFullNodeWebSocketRpcInternalUrl(this.celoEnv)
+
+    const vars = getContextDynamicEnvVarValues(
+      {
+        currencyPair: DynamicEnvVar.ORACLE_CURRENCY_PAIR
+      },
+      context,
+      {
+        currencyPair: 'CELOUSD'
+      }
+    )
+
     return [
       `--set environment.name=${this.celoEnv}`,
       `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
@@ -64,6 +76,7 @@ export abstract class BaseOracleDeployer {
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
       `--set oracle.metrics.enabled=true`,
       `--set oracle.metrics.prometheusPort=9090`,
+      `--set oracle.currencyPair=${vars.currencyPair}`,
       `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
     ].concat(await this.oracleIdentityHelmParameters())
   }
