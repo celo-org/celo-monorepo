@@ -45,8 +45,8 @@ import LocalProviderCashOut, {
   localProviderCashOutOptions,
 } from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
-import Ramp, { rampOptions } from 'src/fiatExchanges/Ramp'
 import ProviderOptionsScreen from 'src/fiatExchanges/ProviderOptionsScreen'
+import Ramp, { rampOptions } from 'src/fiatExchanges/Ramp'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
