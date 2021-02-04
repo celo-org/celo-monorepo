@@ -8,7 +8,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import WebView from 'src/components/WebView'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { RAMP_URI, VALORA_LOGO_URL } from 'src/config'
+import { VALORA_LOGO_URL } from 'src/config'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -17,6 +17,8 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
+
+const RAMP_URI = config.rampWidgetUrl
 
 export const rampOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
@@ -39,22 +41,21 @@ function FiatExchangeWeb({ route }: Props) {
     [CURRENCY_ENUM.GOLD]: 'CELO',
     [CURRENCY_ENUM.DOLLAR]: 'CUSD',
   }[currencyToBuy]
+  const finalUrl = 'javascript:window.close()'
+  const uri = `
+    ${RAMP_URI}
+      ?userAddress=${account}
+      &swapAsset=${asset}
+      &hostAppName=Valora
+      &hostLogoUrl=${VALORA_LOGO_URL}
+      &fiatCurrency=${currencyCode}
+      &fiatValue=${localAmount}
+      &finalUrl=${encodeURI(finalUrl)}
+    `.replace(/\s+/g, '')
 
   return (
     <View style={styles.container}>
-      <WebView
-        source={{
-          uri: `
-          ${RAMP_URI}
-            ?userAddress=${account}
-            &swapAsset=${asset}
-            &hostAppName=Valora
-            &hostLogoUrl=${VALORA_LOGO_URL}
-            &fiatCurrency=${currencyCode}
-            &fiatValue=${localAmount}
-          `.replace(/\s+/g, ''),
-        }}
-      />
+      <WebView source={{ uri }} />
     </View>
   )
 }
