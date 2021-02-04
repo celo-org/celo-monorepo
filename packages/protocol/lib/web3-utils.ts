@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { Address, CeloTxObject } from '@celo/connect'
-import { retryTx, setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -168,26 +168,14 @@ export async function _setInitialProxyImplementation<
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
-  let receipt: any
-  if (initializerAbi) {
-    // TODO(Martin): check types, not just argument number
-    checkFunctionArgsLength(args, initializerAbi)
-    console.log(`  Setting initial ${contractName} implementation on proxy`)
-    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
-  } else {
-    if (txOptions.from != null) {
-      receipt = await retryTx(proxy._setImplementation, [implementation.address, { from: txOptions.from }])
-      if (txOptions.value != null) {
-        await retryTx(web3.eth.sendTransaction, [{
-          from: txOptions.from,
-          to: proxy.address,
-          value: txOptions.value,
-        }])
-      }
-    } else {
-      receipt = await retryTx(proxy._setImplementation, [implementation.address])
-    }
+  if (!initializerAbi) {
+    throw new Error("Attempting to deploy an implementation contract that does not have an initialize() function. Abort.")
   }
+
+  // TODO(Martin): check types, not just argument number
+  checkFunctionArgsLength(args, initializerAbi)
+  console.log(`  Setting initial ${contractName} implementation on proxy`)
+  const receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   return receipt.tx
 }
 
