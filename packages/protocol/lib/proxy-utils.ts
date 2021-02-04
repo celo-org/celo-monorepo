@@ -65,6 +65,13 @@ export async function setAndInitializeImplementation(
 ) {
   const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
   if (txOptions.from != null) {
+    // First, initialize the implementation contract 
+    await retryTx(web3.eth.call, [{
+      from: txOptions.from,
+      to: implementationAddress,
+      data: callData
+    }]) 
+    // Then, initialize the proxy and connect it to the implementation contract
     // The proxied contract needs to be funded prior to initialization
     if (txOptions.value != null) {
       // Proxy's fallback fn expects the contract's implementation to be set already
@@ -84,6 +91,12 @@ export async function setAndInitializeImplementation(
       { from: txOptions.from },
     ])
   } else {
+    // Initialize the implementation contract 
+    await retryTx(web3.eth.call, [{
+      to: implementationAddress,
+      data: callData
+    }])
+    // Initialize the proxy and connect it to the implementation contract  
     return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
   }
 }

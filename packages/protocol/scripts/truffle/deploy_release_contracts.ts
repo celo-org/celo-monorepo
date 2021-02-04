@@ -8,6 +8,7 @@ import fs from 'fs'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
+  ReleaseGoldInstance,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
@@ -181,6 +182,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       },
       ...contractInitializationArgs
     )
+    assert(await (releaseGoldInstance as ReleaseGoldInstance).initialized())
   } catch (e) {
     console.info(
       'Something went wrong! Consider using the recover-funds.ts script with the below address'
