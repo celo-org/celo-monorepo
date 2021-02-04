@@ -5,8 +5,9 @@
     "azure_subscription_id": "{{env `AZURE_SUBSCRIPTION_ID`}}",
     "gcp_project_id": "{{env `GCP_PROJECT_ID`}}",
     "region": "us-east-1",
-    "celo_image": "us.gcr.io/celo-org/celo-node:mainnet",
-    "sync_mode": "full"
+    "sync_mode": "full",
+    "network_name": "mainnet",
+    "additional_params": ""
   },
   "builders": [
     {
@@ -14,7 +15,7 @@
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
-      "ami_name": "celo-full-node-latest",
+      "ami_name": "celo-{{user `network_name`}}-{{user `sync_mode`}}-node-latest",
       "instance_type": "t2.medium",
       "region": "{{user `region`}}",
       "source_ami_filter": {
@@ -36,7 +37,7 @@
       "image_publisher": "Canonical",
       "image_offer": "UbuntuServer",
       "image_sku": "18.04-LTS",
-      "managed_image_name": "FullNode",
+      "managed_image_name": "celo-{{user `network_name`}}-{{user `sync_mode`}}-node-latest",
       "managed_image_resource_group_name": "CeloNodeImages",
       "location": "West Us",
       "temp_resource_group_name": "CeloNodeBuilder",
@@ -48,6 +49,7 @@
       "type": "googlecompute",
       "project_id": "{{user `gcp_project_id`}}",
       "source_image": "ubuntu-1804-bionic-v20200317",
+      "image_name": "celo-{{user `network_name`}}-{{user `sync_mode`}}-node-latest",
       "ssh_username": "ubuntu",
       "zone": "us-central1-a"
     }
@@ -66,16 +68,14 @@
     {
       "type": "shell",
       "inline": [
-        "echo {{user `celo_image`}} >> celo_image",
-        "echo {{user `network_id`}} >> network_id",
+        "echo {{user `additional_params`}} >> additional_params",
         "echo {{user `sync_mode`}} >> sync_mode"
       ]
     },
     {
       "type": "shell",
       "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
-      "script": "scripts/init.sh",
-      "environment_vars": ["CELO_IMAGE={{user `celo_image`}}"]
+      "script": "scripts/init.sh"
     },
     {
       "type": "file",
