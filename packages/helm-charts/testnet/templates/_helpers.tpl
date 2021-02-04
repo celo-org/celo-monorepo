@@ -66,6 +66,31 @@ spec:
 {{- end }}
     component: {{ .component_label }}
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}-headless
+  labels:
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
+    component: {{ .component_label }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 8545
+    name: rpc
+  - port: 8546
+    name: ws
+  selector:
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
+    component: {{ .component_label }}
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

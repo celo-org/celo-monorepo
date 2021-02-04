@@ -102,7 +102,11 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
               >
                 <TextInput
                   allowFontScaling={true}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="visible-password"
                   multiline={true}
+                  numberOfLines={3}
                   onBlur={[Function]}
                   onChangeText={[Function]}
                   onFocus={[Function]}
