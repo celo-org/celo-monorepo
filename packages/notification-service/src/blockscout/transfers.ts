@@ -3,8 +3,9 @@ import fetch from 'node-fetch'
 import { BLOCKSCOUT_API } from '../config'
 import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
 import { flat, getTokenAddresses, removeEmptyValuesFromObject } from '../util/utils'
-import { Log, Response, Transfer } from './blockscout'
+import { Log, Response, TokenTransfer, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
+import { formatNativeTransfers } from './nativeTransfersFormatter'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
 export const MAX_BLOCKS_TO_WAIT = 120
@@ -32,11 +33,13 @@ export async function query(path: string) {
 async function getLatestTokenTransfers(
   tokenAddress: string,
   lastBlockNotified: number,
-  currency: Currencies
+  currency: Currencies,
+  useLogs: boolean = true
 ) {
-  const response: Response<Log> = await query(
-    `module=logs&action=getLogs&fromBlock=${lastBlockNotified + 1}&toBlock=latest` +
-      `&address=${tokenAddress}`
+  const moduleAndAction = useLogs ? 'module=logs&action=getLogs' : 'module=token&action=tokentx'
+  const response: Response<Log> | Response<TokenTransfer> = await query(
+    `${moduleAndAction}&fromBlock=${lastBlockNotified + 1}&toBlock=latest` +
+      `&${useLogs ? '' : 'contract'}address=${tokenAddress}`
   )
 
   if (!response || !response.result) {
@@ -50,7 +53,9 @@ async function getLatestTokenTransfers(
   }
 
   console.debug('New logs found for token:', tokenAddress, response.result.length)
-  const { transfers, latestBlock } = decodeLogs(response.result)
+  const { transfers, latestBlock } = useLogs
+    ? decodeLogs(response.result as Log[])
+    : formatNativeTransfers(response.result as TokenTransfer[])
   for (const txTransfers of transfers.values()) {
     txTransfers.forEach((t) => (t.currency = currency))
   }
@@ -59,27 +64,32 @@ async function getLatestTokenTransfers(
 
 export function filterAndJoinTransfers(
   goldTransfers: Map<string, Transfer[]> | null,
+  nativeGoldTransfers: Map<string, Transfer[]> | null,
   stableTransfers: Map<string, Transfer[]> | null
 ): Transfer[] {
-  if (!goldTransfers && !stableTransfers) {
+  if (!goldTransfers && !stableTransfers && !nativeGoldTransfers) {
     return []
+  }
+  const nativeGoldFlattenedTransfers = [...(nativeGoldTransfers?.values() ?? [])]
+  if (!goldTransfers && !stableTransfers) {
+    return flat(nativeGoldFlattenedTransfers)
   }
   if (!goldTransfers) {
     // @ts-ignore checked above
-    return flat([...stableTransfers.values()])
+    return flat([...stableTransfers.values(), ...nativeGoldFlattenedTransfers])
   }
   if (!stableTransfers) {
-    return flat([...goldTransfers.values()])
+    return flat([...goldTransfers.values(), ...nativeGoldFlattenedTransfers])
   }
 
   // Exclude transaction found in both maps as those are from exchanges
   const filteredGold = flat([...goldTransfers.values()]).filter(
     (t) => !stableTransfers.has(t.txHash)
   )
-  const filterdStable = flat([...stableTransfers.values()]).filter(
+  const filteredStable = flat([...stableTransfers.values()]).filter(
     (t) => !goldTransfers.has(t.txHash)
   )
-  return filteredGold.concat(filterdStable)
+  return filteredGold.concat(filteredStable).concat(flat(nativeGoldFlattenedTransfers))
 }
 
 export function notifyForNewTransfers(transfers: Transfer[]): Promise<void[]> {
@@ -148,11 +158,19 @@ export async function handleTransferNotifications(): Promise<void> {
   } = await getLatestTokenTransfers(goldTokenAddress, blockToQuery, Currencies.GOLD)
 
   const {
+    transfers: nativeGoldTransfers,
+    latestBlock: nativeGoldTransfersLatestBlock,
+  } = await getLatestTokenTransfers(goldTokenAddress, blockToQuery, Currencies.GOLD, false)
+
+  const {
     transfers: stableTransfers,
     latestBlock: stableTransfersLatestBlock,
   } = await getLatestTokenTransfers(stableTokenAddress, blockToQuery, Currencies.DOLLAR)
-  const lastBlock = Math.max(stableTransfersLatestBlock, goldTransfersLatestBlock)
-  const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
+  const lastBlock = Math.max(
+    Math.max(stableTransfersLatestBlock, goldTransfersLatestBlock),
+    nativeGoldTransfersLatestBlock
+  )
+  const allTransfers = filterAndJoinTransfers(goldTransfers, nativeGoldTransfers, stableTransfers)
 
   await notifyForNewTransfers(allTransfers)
   updateProcessedBlocks(allTransfers, lastBlock)

@@ -10,10 +10,12 @@ import {
 
 export let TRANSFER1: Transfer
 export let TRANSFER2: Transfer
+export let TRANSFER3: Transfer
 export let sendPaymentNotificationMock: any
 export let getLastBlockNotifiedMock: any
 export let setLastBlockNotifiedMock: any
 export let decodeLogsMock: any
+export let formatNativeTransfersMock: any
 const lastNotifiedBlock = 150
 
 jest.mock('node-fetch')
@@ -69,6 +71,29 @@ jest.mock('../src/blockscout/decode', () => {
   }
 })
 
+jest.mock('../src/blockscout/nativeTransfersFormatter', () => {
+  TRANSFER3 = {
+    recipient: 'recipient',
+    sender: 'sender',
+    value: '3',
+    blockNumber: 152,
+    txHash: 'txhash3',
+    timestamp: 123,
+  }
+  const transfers = new Map<string, Transfer[]>()
+
+  transfers.set('txhash', [TRANSFER3])
+
+  formatNativeTransfersMock = jest
+    .fn()
+    .mockReturnValueOnce({ transfers: transfers, latestBlock: 152 })
+
+  return {
+    ...jest.requireActual('../src/blockscout/nativeTransfersFormatter'),
+    formatNativeTransfers: formatNativeTransfersMock,
+  }
+})
+
 const defaultResponse: Response<Log> = {
   status: '',
   result: [
@@ -101,11 +126,12 @@ describe('Transfers', () => {
   it('should exclude exchanges', () => {
     const goldTransfers = new Map<string, Transfer[]>()
     const stableTransfers = new Map<string, Transfer[]>()
+    const nativeCeloTransfers = new Map<string, Transfer[]>()
 
     goldTransfers.set('txhash', [TRANSFER1])
     stableTransfers.set('txhash', [TRANSFER1])
 
-    const concated = filterAndJoinTransfers(goldTransfers, stableTransfers)
+    const concated = filterAndJoinTransfers(goldTransfers, nativeCeloTransfers, stableTransfers)
 
     expect(concated).toEqual([])
   })
@@ -113,13 +139,15 @@ describe('Transfers', () => {
   it('should include unique transactions and update the last block', () => {
     const goldTransfers = new Map<string, Transfer[]>()
     const stableTransfers = new Map<string, Transfer[]>()
+    const nativeCeloTransfers = new Map<string, Transfer[]>()
 
     goldTransfers.set('txhash', [TRANSFER1])
     stableTransfers.set('txhash2', [TRANSFER2])
+    nativeCeloTransfers.set('txhash3', [TRANSFER3])
 
-    const concated = filterAndJoinTransfers(goldTransfers, stableTransfers)
+    const concated = filterAndJoinTransfers(goldTransfers, nativeCeloTransfers, stableTransfers)
 
-    expect(concated).toEqual([TRANSFER1, TRANSFER2])
+    expect(concated).toEqual([TRANSFER1, TRANSFER2, TRANSFER3])
   })
 
   it('should notify for new transfers since last block notified', async () => {
