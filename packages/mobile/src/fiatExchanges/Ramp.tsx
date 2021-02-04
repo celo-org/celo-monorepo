@@ -1,12 +1,9 @@
-import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { useEffect, useRef } from 'react'
+import { StyleSheet, View, BackHandler } from 'react-native'
 import { useSelector } from 'react-redux'
-import { showError } from 'src/alert/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import WebView from 'src/components/WebView'
+import WebView, { WebViewRef } from 'src/components/WebView'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { VALORA_LOGO_URL } from 'src/config'
 import config from 'src/geth/networkConfig'
@@ -19,6 +16,8 @@ import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const RAMP_URI = config.rampWidgetUrl
+
+const navigateHome = () => navigate(Screens.WalletHome)
 
 export const rampOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
@@ -41,7 +40,7 @@ function FiatExchangeWeb({ route }: Props) {
     [CURRENCY_ENUM.GOLD]: 'CELO',
     [CURRENCY_ENUM.DOLLAR]: 'CUSD',
   }[currencyToBuy]
-  const finalUrl = 'javascript:window.close()'
+  const finalUrl = 'https://valoraapp.com/?done=true'
   const uri = `
     ${RAMP_URI}
       ?userAddress=${account}
@@ -53,9 +52,26 @@ function FiatExchangeWeb({ route }: Props) {
       &finalUrl=${encodeURI(finalUrl)}
     `.replace(/\s+/g, '')
 
+  const onNavigationStateChange = ({ url }: any) => url === finalUrl && navigateHome()
+
+  const webview = useRef<WebViewRef>(null)
+  const onAndroidBackPress = (): boolean => {
+    if (webview.current) {
+      webview.current.goBack()
+      return true
+    }
+    return false
+  }
+  useEffect((): (() => void) => {
+    BackHandler.addEventListener('hardwareBackPress', onAndroidBackPress)
+    return (): void => {
+      BackHandler.removeEventListener('hardwareBackPress', onAndroidBackPress)
+    }
+  }, [])
+
   return (
     <View style={styles.container}>
-      <WebView source={{ uri }} />
+      <WebView ref={webview} source={{ uri }} onNavigationStateChange={onNavigationStateChange} />
     </View>
   )
 }
