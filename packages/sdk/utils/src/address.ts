@@ -43,4 +43,4 @@ export const publicKeyToAddress = (publicKey: string) =>
 export const isValidPrivateKey = (privateKey: string) =>
   privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
-export const isValidAddress = (input: string) => Web3Utils.isAddress(input)
+export const isValidAddress = (input: string): boolean => Web3Utils.isAddress(input)
