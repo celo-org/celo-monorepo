@@ -30,7 +30,7 @@
     "test:e2e:packager": "export CELO_TEST_CONFIG=e2e && yarn react-native start",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
-    "deploy:update-disclaimer": "yarn reset && git fetch —tags -f && yarn && yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
+    "deploy:update-disclaimer": "cd ../.. && yarn reset && git fetch —t -f && yarn && cd packages/mobile && yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
     "postinstall": "./scripts/sync_branding.sh && ./scripts/copy_license_to_android_assets.sh"
   },
   "rnpm": {
