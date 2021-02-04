@@ -123,9 +123,8 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
             .filter((provider) => provider.enabled)
             .map((provider) => {
               return (
-                <>
+                <View key={provider.name}>
                   <TouchableOpacity
-                    key={provider.name}
                     onPress={providerOnPress(provider)}
                     style={styles.provider}
                     testID={`Provider/${provider.name}`}
@@ -133,7 +132,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
                     {provider.image || <Text>{provider.name}</Text>}
                   </TouchableOpacity>
                   <View style={styles.separator} />
-                </>
+                </View>
               )
             })}
         </View>
