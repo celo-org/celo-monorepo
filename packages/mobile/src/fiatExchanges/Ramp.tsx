@@ -22,6 +22,7 @@ export const rampOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
   return {
     ...emptyHeader,
+    headerTitle: (RAMP_URI.match(/(?!(w+)\.)\w*(?:\w+\.)+\w+/) || [])[0],
     headerLeft: () => (
       <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
     ),
