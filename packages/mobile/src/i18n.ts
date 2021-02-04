@@ -30,6 +30,7 @@ export enum Namespaces {
   dappkit = 'dappkit',
   onboarding = 'onboarding',
   fiatExchangeFlow = 'fiatExchangeFlow',
+  consumerIncentives = 'consumerIncentives',
 }
 
 function getAvailableResources() {
