@@ -57,7 +57,7 @@ spec:
         - /bin/bash
         - "-c"
         args:
-        - |
+        - |-
           [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
           RID=${BASH_REMATCH[1]}
           echo -n "$RID" >/root/.celo/replica_id
@@ -90,7 +90,7 @@ spec:
           cat /root/.celo/bootnodeEnodeAddress
 
           [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
-          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo "enode://$(cat /root/.celo/bootnodeEnodeAddress)@$BOOTNODE_IP_ADDRESS:30301" > /root/.celo/bootnodeEnode
           echo -n "Generating Bootnode enode for the validator: "
           cat /root/.celo/bootnodeEnode
 
@@ -160,7 +160,7 @@ spec:
           ACCOUNT_ADDRESS=$(cat /root/.celo/address)
           RID=$(cat /root/.celo/replica_id)
 
-          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
@@ -192,6 +192,7 @@ spec:
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
+            --ipcpath=geth.ipc \
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
