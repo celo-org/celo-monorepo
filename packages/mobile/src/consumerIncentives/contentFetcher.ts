@@ -1,12 +1,22 @@
 import firebase from '@react-native-firebase/app'
 
-export interface ContentType {
+interface ContentType {
   [lang: string]: any
+}
+
+interface Tier {
+  minBalanceCusd: number
+  celoReward: number
+}
+
+export interface ConsumerIncentivesData {
+  content: ContentType
+  tiers: Tier[]
 }
 
 export const fetchConsumerRewardsContent = () =>
   firebase
     .database()
-    .ref('consumerIncentives/content')
+    .ref('consumerIncentives')
     .once('value')
     .then((snapshot) => snapshot.val())
