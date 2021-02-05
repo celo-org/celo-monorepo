@@ -143,7 +143,11 @@ const deployCoreContract = async (
   }
 
   // Deploy new versions of the proxy, if needed
-  const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
+  const shouldDeployProxy =
+    report.contracts[contractName].changes.storage.length > 0 ||
+    report.contracts[contractName].changes.major.find(
+      (change: any) => change.type === 'NewContract'
+    )
   if (!shouldDeployProxy) {
     proposal.push(setImplementationTx)
   } else {
@@ -165,7 +169,17 @@ const deployCoreContract = async (
     )
     if (initializeAbi) {
       const args = initializationData[contractName]
-      const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+      let callData
+      try {
+        callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+      } catch (error) {
+        console.error(
+          `Tried to initialize new implementation of ${contractName} with args: ${JSON.stringify(
+            args
+          )}. Initialization ABI spec is: ${JSON.stringify(initializeAbi.inputs)}. \nAborting ...`
+        )
+        throw new Error()
+      }
       setImplementationTx.function = '_setAndInitializeImplementation'
       setImplementationTx.args.push(callData)
     }
