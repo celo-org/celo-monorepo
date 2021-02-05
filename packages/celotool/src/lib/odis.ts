@@ -1,8 +1,6 @@
-import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
-import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
+import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
@@ -10,7 +8,6 @@ import { AksClusterConfig } from './k8s-cluster/aks'
 const helmChartPath = '../helm-charts/odis'
 
 interface ODISSignerKeyVaultConfig {
-  identityName: string
   vaultName: string
   secretName: string
 }
@@ -26,9 +23,8 @@ interface ODISSignerDatabaseConfig {
  * Env vars corresponding to each value for the ODISSignerKeyVaultIdentityConfig for a particular context
  */
 const contextODISSignerKeyVaultConfigDynamicEnvVars: { [k in keyof ODISSignerKeyVaultConfig]: DynamicEnvVar } = {
-  identityName: DynamicEnvVar.ODIS_SIGNER_AZURE_IDENTITY,
-  vaultName: DynamicEnvVar.ODIS_SIGNER_AZURE_VAULT_NAME,
-  secretName: DynamicEnvVar.ODIS_SIGNER_KEYSTORE_AZURE_SECRET_NAME,
+  vaultName: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_NAME,
+  secretName: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_SECRET_NAME,
 }
 
 const contextDatabaseConfigDynamicEnvVars: { [k in keyof ODISSignerDatabaseConfig]: DynamicEnvVar } = {
@@ -45,47 +41,39 @@ function releaseName(celoEnv: string) {
 export async function installODISHelmChart(
   celoEnv: string,
   context: string,
-  useForno: boolean
 ) {
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useForno)
+    await helmParameters(celoEnv, context)
   )
 }
 
 export async function upgradeODISChart(
   celoEnv: string,
   context: string,
-  useFullNodes: boolean
 ) {
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useFullNodes)
+    await helmParameters(celoEnv, context)
   )
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
   await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
-  const odisSignerConfig = getODISSignerConfig(context)
-  if (odisSignerConfig.identity.azureHsmIdentity) {
-      await deleteODISSignerAzureIdentity(context, identity)
-    }
-  }
+  const keyVaultConfig = getContextDynamicEnvVarValues(
+    contextODISSignerKeyVaultConfigDynamicEnvVars,
+    context
+  )  
+
+  await deleteODISSignerAzureIdentity(context, keyVaultConfig)
 }
 
-async function getKeyVaultSecret(vaultName: string, secretName: string) {
-  const [secret] = await execCmdWithExitOnFailure(
-    `az keyvault secret show --name ${secretName} --vault-name ${vaultName} --query value`
-  )
-  return secret
-}
 
-async function helmParameters(celoEnv: string, context: string, useForno: boolean) {
-  const odisSignerConfig = getODISSignerConfig(context)
+async function helmParameters(celoEnv: string, context: string) {
 
   const databaseConfig = getContextDynamicEnvVarValues(
     contextDatabaseConfigDynamicEnvVars,
@@ -95,13 +83,14 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     contextODISSignerKeyVaultConfigDynamicEnvVars,
     context
   )
+
   const vars = getContextDynamicEnvVarValues(
     {
-      network: DynamicEnvVar.ODISSIGNER_NETWORK,
-      blockchainProvider: DynamicEnvVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER,
+      network: DynamicEnvVar.ODIS_NETWORK,
     },
     context
   )
+
   const clusterConfig = getAksClusterConfig(context)
 
   return [
@@ -116,7 +105,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set db.port=${databaseConfig.port}`,
     `--set db.username=${databaseConfig.username}`,
     `--set db.password=${databaseConfig.password}`,
-    `--set blockchainProvider=`${vars.ODIS_SIGNER_BLOCKCHAIN_PROVIDER}`,
+    `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
   ].concat(await ODISSignerKeyVaultIdentityHelmParameters(context, keyVaultConfig))
 }
 
@@ -128,7 +117,6 @@ async function ODISSignerKeyVaultIdentityHelmParameters(
   keyVaultConfig: ODISSignerKeyVaultConfig
 ) {
   const azureKVIdentity = await createODISSignerKeyVaultIdentityIfNotExists(context, keyVaultConfig)
-  const prefix = `--set relayer.identities[${i}]`  
   const params: string[] = [
         `azureKVIdentity.id=${azureKVIdentity.id}`,
         `azureKVIdentity.clientId=${azureKVIdentity.clientId}`,
@@ -145,7 +133,7 @@ async function createODISSignerKeyVaultIdentityIfNotExists(
   keyVaultConfig: ODISSignerKeyVaultConfig
 ) {
   const clusterConfig = getAksClusterConfig(context)
-  const identity = await createIdentityIdempotent(clusterConfig, keyVaultConfig.identityName)
+  const identity = await createIdentityIdempotent(clusterConfig, getODISSignerAzureIdentityName(keyVaultConfig.vaultName, context))
   // We want to grant the identity for the cluster permission to manage the odis signer identity.
   // Get the correct object ID depending on the cluster configuration, either
   // the service principal or the managed service identity.
@@ -171,16 +159,16 @@ async function setODISSIgnerKeyVaultPolicyIfNotSet(
 ) {
   const keyPermissions = ['get', 'list', 'sign']
   const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-    `az keyvault show --name ${keyVaultConfig.keyVaultName} -g ${clusterConfig.resoureGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
+    `az keyvault show --name ${keyVaultConfig.vaultName} -g ${clusterConfig.resourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
   )
   const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
   if (keyVaultPolicies.length) {
-    console.info(`Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${keyVaultConfig.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    console.info(`Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${keyVaultConfig.vaultName} and identity objectId ${azureIdentity.principalId}`)
     return
   }
-  console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${keyVaultConfig.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+  console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${keyVaultConfig.vaultName} and identity objectId ${azureIdentity.principalId}`)
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultConfig.keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${clusterCOnfig.resourseGroup}`
+    `az keyvault set-policy --name ${keyVaultConfig.vaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 
@@ -189,19 +177,29 @@ async function setODISSIgnerKeyVaultPolicyIfNotSet(
  */
 async function deleteODISSignerAzureIdentity(
   context: string,
-  keyVaultConfig: ODISSignerKeyVaultConfig  
+  keyVaultConfig: ODISSignerKeyVaultConfig
 ) {
   const clusterConfig = getAksClusterConfig(context)
-  await deleteODISSignerKeyVaultPolicy(clusterConfig, keyVaultConfig)
-  return deleteIdentity(clusterConfig, keyVaultConfig.identityName)
+  await deleteODISSignerKeyVaultPolicy(clusterConfig, keyVaultConfig, context)
+  return deleteIdentity(clusterConfig, getODISSignerAzureIdentityName(keyVaultConfig.vaultName, context))
 }
 
 async function deleteODISSignerKeyVaultPolicy(
   clusterConfig: AksClusterConfig,
-  keyVaultConfig: ODISSignerKeyVaultConfig  
+  keyVaultConfig: ODISSignerKeyVaultConfig,
+  context: string
 ) {
-  const azureIdentity = await getIdentity(clusterConfig, keyVaultConfig.identityName)
+  const azureIdentity = await getIdentity(clusterConfig, getODISSignerAzureIdentityName(keyVaultConfig.vaultName, context))
   return execCmdWithExitOnFailure(
-    `az keyvault delete-policy --name ${keyVaultConfig.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault delete-policy --name ${keyVaultConfig.vaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
+}
+
+/**
+ * @return the intended name of an azure identity given a key vault name
+ */
+function getODISSignerAzureIdentityName(keyVaultName: string, context: string) {
+  // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
+  const maxIdentityNameLength = 128
+  return `ODISSIGNERID-${keyVaultName}-${context}`.substring(0, maxIdentityNameLength)
 }

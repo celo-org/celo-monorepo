@@ -1,7 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
-import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { upgradeODISChart } from 'src/lib/odis'
-import yargs from 'yargs'
 
 export const command = 'odis'
 
