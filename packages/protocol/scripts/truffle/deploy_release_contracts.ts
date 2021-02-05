@@ -1,6 +1,9 @@
 import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
+import {
+  checkImplementationAbi,
+  _setInitialProxyImplementation,
+} from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -137,6 +140,10 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       return
     }
   }
+  let [initializerAbiMultiSig, transferImplOwnershipAbiMultiSig] = checkImplementationAbi(
+    ReleaseGoldMultiSig,
+    'ReleaseGoldMultiSig'
+  )
   console.info('  Deploying ReleaseGoldMultiSigProxy...')
   const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
     { from: fromAddress },
@@ -154,6 +161,8 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       from: fromAddress,
       value: null,
     },
+    initializerAbiMultiSig,
+    transferImplOwnershipAbiMultiSig,
     [config.releaseOwner, config.beneficiary],
     2,
     2
@@ -164,10 +173,22 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       from: fromAddress,
     },
   ])
+  const [initializerAbiRG, transferImplOwnershipAbiRG] = checkImplementationAbi(
+    ReleaseGold,
+    'ReleaseGold'
+  )
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
+
+  // We need to fund the RG implementation instance in order to initialize it.
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from: fromAddress,
+      value: web3.utils.toWei('1', 'ether'),
+    },
+  ])
 
   let releaseGoldTxHash
   try {
@@ -180,6 +201,8 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
         from: fromAddress,
         value: totalValue.toFixed(),
       },
+      initializerAbiRG,
+      transferImplOwnershipAbiRG,
       ...contractInitializationArgs
     )
     assert(await (releaseGoldInstance as ReleaseGoldInstance).initialized())

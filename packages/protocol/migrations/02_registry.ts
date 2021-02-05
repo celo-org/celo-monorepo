@@ -1,12 +1,14 @@
 import { build_directory, config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance } from 'types'
-import { setInitialProxyImplementation } from '../lib/web3-utils'
+import { checkImplementationAbi, setInitialProxyImplementation } from '../lib/web3-utils'
 
 const Artifactor = require('truffle-artifactor')
 
 const name = 'Registry'
 const Contract = artifacts.require(name)
 const ContractProxy = artifacts.require(name + 'Proxy')
+
+const [initializerAbi, transferImplOwnershipAbi] = checkImplementationAbi(Contract, name)
 
 module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
   // tslint:disable-next-line: no-console
@@ -26,6 +28,12 @@ module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
     const artifactor = new Artifactor(contractsDir)
 
     await artifactor.save(artifact)
-    await setInitialProxyImplementation<RegistryInstance>(web3, artifacts, name)
+    await setInitialProxyImplementation<RegistryInstance>(
+      web3,
+      artifacts,
+      name,
+      initializerAbi,
+      transferImplOwnershipAbi
+    )
   })
 }

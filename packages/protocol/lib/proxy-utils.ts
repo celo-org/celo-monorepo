@@ -1,6 +1,6 @@
-import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address'
+import { Address, bufferToHex, hexToBuffer, NULL_ADDRESS } from '@celo/base/lib/address'
+import { retryTx } from 'lib/web3-utils'
 import { SecureTrie } from 'merkle-patricia-tree'
-import prompts from 'prompts'
 import { encode as rlpEncode } from 'rlp'
 import { ProxyInstance } from 'types'
 import Web3 from 'web3'
@@ -31,46 +31,54 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
   return proof.storageHash === bufferToHex(trie.root)
 }
 
-export async function retryTx(fn: any, args: any[]) {
-  while (true) {
-    try {
-      const rvalue = await fn(...args)
-      return rvalue
-    } catch (e) {
-      console.error(e)
-      // @ts-ignore
-      const { confirmation } = await prompts({
-        type: 'confirm',
-        name: 'confirmation',
-        // @ts-ignore: typings incorrectly only accept string.
-        initial: true,
-        message: 'Error while sending tx. Try again?',
-      })
-      if (!confirmation) {
-        throw e
-      }
-    }
-  }
-}
 export async function setAndInitializeImplementation(
   web3: Web3,
   proxy: ProxyInstance,
   implementationAddress: string,
+  name: string,
   initializerAbi: any,
+  transferImplOwnershipAbi: any,
   txOptions: {
     from?: Address
     value?: string
   },
-  ...args: any[]
+  ...initArgs: any[]
 ) {
-  const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
+  let implInitArgs = initArgs
+  if (name == 'ReleaseGold') {
+    implInitArgs = [
+      Math.round(new Date().getTime() / 1000),
+      0,
+      1,
+      1,
+      1,
+      false, // should not be revokable
+      '0x0000000000000000000000000000000000000001',
+      NULL_ADDRESS,
+      NULL_ADDRESS,
+      true, // subjectToLiquidityProivision
+      0,
+      false, // canValidate
+      false, // canVote
+      '0x0000000000000000000000000000000000000001'
+    ]
+  }
+  const initCallData = web3.eth.abi.encodeFunctionCall(initializerAbi, initArgs)
+  const implInitCallData = web3.eth.abi.encodeFunctionCall(initializerAbi, implInitArgs)
+  const transferImplOwnershipCallData = web3.eth.abi.encodeFunctionCall(transferImplOwnershipAbi, ['0x0000000000000000000000000000000000000001'])
   if (txOptions.from != null) {
-    // First, initialize the implementation contract 
-    await retryTx(web3.eth.call, [{
+    // First, initialize the implementation contract and lock its owneship
+    await retryTx(web3.eth.sendTransaction, [{
       from: txOptions.from,
       to: implementationAddress,
-      data: callData
+      data: implInitCallData
     }]) 
+    await retryTx(web3.eth.sendTransaction, [{
+      from: txOptions.from,
+      to: implementationAddress,
+      data: transferImplOwnershipCallData
+    }]) 
+
     // Then, initialize the proxy and connect it to the implementation contract
     // The proxied contract needs to be funded prior to initialization
     if (txOptions.value != null) {
@@ -87,16 +95,20 @@ export async function setAndInitializeImplementation(
     }
     return retryTx(proxy._setAndInitializeImplementation, [
       implementationAddress,
-      callData as any,
+      initCallData as any,
       { from: txOptions.from },
     ])
   } else {
-    // Initialize the implementation contract 
-    await retryTx(web3.eth.call, [{
+    // Initialize the implementation contract and lock its ownership
+    await retryTx(web3.eth.sendTransaction, [{
       to: implementationAddress,
-      data: callData
+      data: implInitCallData
+    }])
+    await retryTx(web3.eth.sendTransaction, [{
+      to: implementationAddress,
+      data: transferImplOwnershipCallData
     }])
     // Initialize the proxy and connect it to the implementation contract  
-    return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
+    return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, initCallData as any])
   }
 }

@@ -1,7 +1,7 @@
-import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
+import { checkImplementationAbi, _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { retryTx } from './proxy-utils'
+import { retryTx } from './web3-utils'
 
 /**
  * 
@@ -12,6 +12,8 @@ import { retryTx } from './proxy-utils'
 export async function recoverFunds(proxyAddress: Address, from: Address) {
   const ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
   const ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
+
+  const [ initializerAbi, transferImplOwnershipAbi ] = checkImplementationAbi(ReleaseGoldMultiSig, 'ReleaseGoldMultiSig')
 
   const releaseGoldProxy = await ReleaseGoldProxy.at(proxyAddress)
   const balance = await web3.eth.getBalance(releaseGoldProxy.address)
@@ -28,6 +30,8 @@ export async function recoverFunds(proxyAddress: Address, from: Address) {
       from,
       value: null,
     },
+    initializerAbi,
+    transferImplOwnershipAbi,
     [from],
     1,
     1

@@ -1,5 +1,8 @@
 import { retryTx } from '@celo/protocol/lib/proxy-utils'
-import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
+import {
+  checkImplementationAbi,
+  _setInitialProxyImplementation,
+} from '@celo/protocol/lib/web3-utils'
 import { MultiSigContract, ProxyContract } from 'types'
 
 /*
@@ -24,6 +27,8 @@ module.exports = async (callback: (error?: any) => number) => {
     const multSig: MultiSigContract = artifacts.require('MultiSig')
     const Proxy: ProxyContract = artifacts.require('Proxy')
 
+    const [initializerAbi, transferImplOwnershipAbi] = checkImplementationAbi(multSig, 'MultiSig')
+
     console.info('  Deploying MultiSigProxy...')
     const proxy = await retryTx(Proxy.new, [{ from: argv.from }])
     console.info('  Deploying MultiSig...')
@@ -37,6 +42,8 @@ module.exports = async (callback: (error?: any) => number) => {
         from: argv.from,
         value: null,
       },
+      initializerAbi,
+      transferImplOwnershipAbi,
       argv.owners.split(','),
       argv.required,
       argv.internalRequired

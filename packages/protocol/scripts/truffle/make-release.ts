@@ -6,6 +6,8 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { retryTx } from 'lib/proxy-utils'
+import { checkImplementationAbi } from 'lib/web3-utils'
 import { basename, join } from 'path'
 import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
@@ -134,14 +136,33 @@ const deployCoreContract = async (
   isDryRun: boolean,
   from: string
 ) => {
+  const [initializeAbi, transferImplOwnershipAbi] = checkImplementationAbi(instance, contractName)
   const contract = await deployImplementation(contractName, instance, isDryRun, from)
+  // Initilaize implementation and lock ownership
+  const initArgs = initializationData[contractName]
+  const initCallData = web3.eth.abi.encodeFunctionCall(initializeAbi, initArgs)
+  const transferImplOwnershipCallData = web3.eth.abi.encodeFunctionCall(transferImplOwnershipAbi, [
+    '0x0000000000000000000000000000000000000001',
+  ])
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      to: contract.address,
+      data: initCallData,
+    },
+  ])
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      to: contract.address,
+      data: transferImplOwnershipCallData,
+    },
+  ])
+
   const setImplementationTx: ProposalTx = {
     contract: `${contractName}Proxy`,
     function: '_setImplementation',
     args: [contract.address],
     value: '0',
   }
-
   // Deploy new versions of the proxy, if needed
   const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
   if (!shouldDeployProxy) {
@@ -159,16 +180,9 @@ const deployCoreContract = async (
       description: `Registry: ${contractName} -> ${proxy.address}`,
     })
 
-    // If the implementation has an initialize function, add it to the proposal
-    const initializeAbi = (contract as any).abi.find(
-      (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-    )
-    if (initializeAbi) {
-      const args = initializationData[contractName]
-      const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
-      setImplementationTx.function = '_setAndInitializeImplementation'
-      setImplementationTx.args.push(callData)
-    }
+    // Add proxy initialization to proposal
+    setImplementationTx.function = '_setAndInitializeImplementation'
+    setImplementationTx.args.push(initCallData)
     console.log(
       `Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`
     )

@@ -141,13 +141,13 @@ function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, ...args: any[]): Promise<ContractInstance> {
+>(web3: Web3, artifacts: any, contractName: string, initializerAbi: string, transferImplOwnershipAbi: string, ...args: any[]): Promise<ContractInstance> {
   const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
   const ContractProxy: Truffle.Contract<ProxyInstance> = artifacts.require(contractName + 'Proxy')
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, initializerAbi, transferImplOwnershipAbi, ...args)
   return Contract.at(proxy.address) as ContractInstance
 }
 
@@ -162,20 +162,14 @@ export async function _setInitialProxyImplementation<
     from: Address,
     value: string,
   },
+  initializerAbi: string, 
+  transferOwnershipAbi: string,
   ...args: any[]
 ) {
-  const initializerAbi = (implementation as any).abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-  )
-
-  if (!initializerAbi) {
-    throw new Error("Attempting to deploy an implementation contract that does not have an initialize() function. Abort.")
-  }
-
   // TODO(Martin): check types, not just argument number
   checkFunctionArgsLength(args, initializerAbi)
   console.log(`  Setting initial ${contractName} implementation on proxy`)
-  const receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
+  const receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, contractName, initializerAbi, transferOwnershipAbi, txOptions, ...args)
   return receipt.tx
 }
 
@@ -238,6 +232,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
   const Contract = artifacts.require(name)
+  const [ initializerAbi, transferImplOwnershipAbi ] = checkImplementationAbi(Contract, name)
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
@@ -248,7 +243,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
       await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
-      >(web3, artifacts, name, ...(await args(networkName)))
+      >(web3, artifacts, name, initializerAbi, transferImplOwnershipAbi, ...(await args(networkName)))
 
       if (registerAddress) {
         const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
@@ -260,6 +255,25 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
       }
     })
   }
+}
+
+export function checkImplementationAbi(
+  Contract: any,
+  name: string
+) {
+  const initializerAbi: string = Contract.abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+  )
+  if (!initializerAbi) {
+    throw new Error(`Attempting to deploy implementation contract ${name} that does not have an initialize() function. Abort.`)
+  }
+  const transferImplOwnershipAbi: string = Contract.abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === '_transferOwnership'
+  )
+  if (!transferImplOwnershipAbi) {
+    throw new Error(`Attempting to deploy implementation contract ${name} that does not have a _transferOwnership() function. Abort.`)
+  }
+  return [ initializerAbi, transferImplOwnershipAbi ]
 }
 
 export async function submitMultiSigTransaction(
@@ -372,4 +386,26 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
       }
     })
   return selectors
+}
+
+export async function retryTx(fn: any, args: any[]) {
+  while (true) {
+    try {
+      const rvalue = await fn(...args)
+      return rvalue
+    } catch (e) {
+      console.error(e)
+      // @ts-ignore
+      const { confirmation } = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        // @ts-ignore: typings incorrectly only accept string.
+        initial: true,
+        message: 'Error while sending tx. Try again?',
+      })
+      if (!confirmation) {
+        throw e
+      }
+    }
+  }
 }
