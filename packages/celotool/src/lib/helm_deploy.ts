@@ -7,6 +7,7 @@ import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
+import { retrieveBootnodeIPAddress } from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -645,7 +646,7 @@ async function helmIPParameters(celoEnv: string) {
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
-      `--set geth.bootnodeIpAddress=${await retrieveIPAddress(`${celoEnv}-bootnode`)}`
+      `--set geth.bootnodeIpAddress=${await retrieveBootnodeIPAddress(celoEnv)}`
     )
 
     // Validator IPs
