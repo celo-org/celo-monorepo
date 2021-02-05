@@ -10,6 +10,7 @@ alfajores-lightest:
 		-var 'sync_mode=lightest' \
 		-var 'additional_params="--alfajores"' \
 		-var 'network_name=alfajores' \
+		-only azure \
 		-force node.json
 
 mainnet-full:
