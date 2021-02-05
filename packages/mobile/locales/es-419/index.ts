@@ -1,6 +1,7 @@
 // tslint:disable: no-relative-imports
 import accountScreen10 from './accountScreen10.json'
 import backupKeyFlow6 from './backupKeyFlow6.json'
+import consumerIncentives from './consumerIncentives.json'
 import dappkit from './dappkit.json'
 import dev from './dev.json'
 import exchangeFlow9 from './exchangeFlow9.json'
@@ -19,6 +20,7 @@ import walletFlow5 from './walletFlow5.json'
 export default {
   accountScreen10,
   backupKeyFlow6,
+  consumerIncentives,
   exchangeFlow9,
   global,
   inviteFlow11,
