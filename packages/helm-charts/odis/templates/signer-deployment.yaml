@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "name" . }}
+  labels:
+{{- include "odis-signer-component-label" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+    {{- include "odis-signer-component-label" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+{{- include "odis-signer-component-label" . | nindent 8 }}
+    spec:
+      containers:
+        - name:  odis-signer
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}	      
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+	      containerPort: 443
+          resources:
+            {{- toYaml .Values.onboarding.resources | nindent 12 }}
+          env:
+	  - name: SERVER_PORT
+	    value: 80
+	  - name: DB_TYPE
+	    value: postgres
+	  - name: DB_DATABASE
+	    value: phoneNumberPrivacy
+	  - name: KEYSTORE_TYPE
+	    value: AzureKeyVault
+	  - name: LOG_LEVEL
+	    value: trace
+	  - name: LOG_FORMAT
+	    value: stackdriver
+          - name: REPLICA_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+{{ include "common.env-var" (dict "name" "BLOCKCHAIN_PROVIDER" "dict" .Values "value_name" "blockchainProvider") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.db "value_name" "host") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.db "value_name" "port") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.db "value_name" "username") | indent 10 }}
+{{ include "common.env-var" (dict "name" "KEYSTORE_AZURE_VAULT_NAME" "dict" .Values.keystore "value_name" "vaultName") | indent 10 }}
+{{ include "common.env-var" (dict "name" "KEYSTORE_AZURE_SECRET_NAME" "dict" .Values.keystore "value_name" "secretName") | indent 10 }}
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef: dbPassword
+	      key: dbPassword
+      {{- with .Values.signer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.signer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.signer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
