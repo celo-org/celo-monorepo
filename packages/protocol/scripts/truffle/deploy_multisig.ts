@@ -1,6 +1,6 @@
-import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import {
   checkImplementationAbi,
+  retryTx,
   _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { MultiSigContract, ProxyContract } from 'types'

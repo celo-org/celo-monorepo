@@ -1,7 +1,7 @@
-import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import {
   checkImplementationAbi,
+  retryTx,
   _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
