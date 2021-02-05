@@ -94,6 +94,16 @@ bundle exec pod install
 
 If your machine does not recognize the `gem` command, you may need to [download Ruby](https://rubyinstaller.org/) first.
 
+
+1. Run `yarn install` in the monorepo root `/celo-monorepo`. 
+2. Install Google Cloud by running `brew install google-cloud-sdk`. 
+  2a. Follow instructions here for logging in with Google credentials. https://github.com/celo-org/bootnode/blob/4bdd7e7ecb91db54dc2a307ec45887d73aa75394/engsetup/README.md
+3. Run `yarn build:wallet` from the monorepo root `/celo-monorepo`.
+
+4. Run `yarn dev:ios` in the `/celo-monorepo/packages/mobile/ios` folder. 
+
+And the app should be running in the simulator! If you run into any issues, see below for troubleshooting. 
+
 ### Android
 
 #### Install Java
