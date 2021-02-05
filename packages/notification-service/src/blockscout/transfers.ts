@@ -157,9 +157,11 @@ export async function handleTransferNotifications(): Promise<void> {
     latestBlock: goldTransfersLatestBlock,
   } = await getLatestTokenTransfers(goldTokenAddress, blockToQuery, Currencies.GOLD)
 
+  // Native CELO transfers are not returned when fetching with logs, so we need to make an
+  // extra request using a different endpoint to fetch them.
   const {
-    transfers: nativeGoldTransfers,
-    latestBlock: nativeGoldTransfersLatestBlock,
+    transfers: nativeCeloTransfers,
+    latestBlock: nativeCeloTransfersLatestBlock,
   } = await getLatestTokenTransfers(goldTokenAddress, blockToQuery, Currencies.GOLD, false)
 
   const {
@@ -167,10 +169,11 @@ export async function handleTransferNotifications(): Promise<void> {
     latestBlock: stableTransfersLatestBlock,
   } = await getLatestTokenTransfers(stableTokenAddress, blockToQuery, Currencies.DOLLAR)
   const lastBlock = Math.max(
-    Math.max(stableTransfersLatestBlock, goldTransfersLatestBlock),
-    nativeGoldTransfersLatestBlock
+    stableTransfersLatestBlock,
+    goldTransfersLatestBlock,
+    nativeCeloTransfersLatestBlock
   )
-  const allTransfers = filterAndJoinTransfers(goldTransfers, nativeGoldTransfers, stableTransfers)
+  const allTransfers = filterAndJoinTransfers(goldTransfers, nativeCeloTransfers, stableTransfers)
 
   await notifyForNewTransfers(allTransfers)
   updateProcessedBlocks(allTransfers, lastBlock)
