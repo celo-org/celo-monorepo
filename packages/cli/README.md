@@ -20,7 +20,7 @@ Additional plugins can be installed which make the CLI experience smoother. Curr
 
 > ⚠️ **Warning**
 >  
-> *Installing a 3rd party plugin can be _dangerous_! Please always be sure that you trust the plugin provider.*
+> Installing a 3rd party plugin can be dangerous! Please always be sure that you trust the plugin provider.
 
 ## Development
 
