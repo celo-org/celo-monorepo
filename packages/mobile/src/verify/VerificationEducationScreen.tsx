@@ -9,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import * as RNLocalize from 'react-native-localize'
 import Modal from 'react-native-modal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -18,20 +18,13 @@ import { initializeAccount, setPhoneNumber } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { numberVerifiedSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import { WEB_LINK } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import i18n, { Namespaces } from 'src/i18n'
-import {
-  feelessFetchVerificationState,
-  feelessStartVerification,
-  fetchVerificationState,
-  setHasSeenVerificationNux,
-  startVerification,
-} from 'src/identity/actions'
+import { setHasSeenVerificationNux, startVerification } from 'src/identity/actions'
 // import { feelessVerificationStateSelector, verificationStateSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
@@ -42,24 +35,19 @@ import { StackParamList } from 'src/navigator/types'
 import useTypedSelector from 'src/redux/useSelector'
 import { getCountryFeatures } from 'src/utils/countryFeatures'
 import Logger from 'src/utils/Logger'
+import {
+  currentStateSelector,
+  setKomenciContext,
+  startKomenciSession,
+  StateType,
+  stop,
+  useKomenciSelector,
+} from 'src/verify/reducer'
 import GoogleReCaptcha from 'src/verify/safety/GoogleReCaptcha'
 import { getPhoneNumberState } from 'src/verify/utils'
 import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
 import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
 import { currentAccountSelector } from 'src/web3/selectors'
-import {
-  stop,
-  prepareKomenci,
-  komenciContextSelector,
-  ensureRealHumanUser,
-  currentStateSelector,
-  StateType,
-  startKomenciSession,
-  fetchPhoneNumberDetails,
-  setKomenciContext,
-  useKomenciSelector,
-  start,
-} from './reducer'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.VerificationEducationScreen>
 
@@ -108,7 +96,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
 
   // const verificationState = useSelector(verificationStateSelector)
   const currentState = useSelector(currentStateSelector)
-  const komenciContext = useSelector(komenciContextSelector)
   const useKomenci = useSelector(useKomenciSelector)
   // const relevantVerificationState = tryFeeless ? feelessVerificationState : verificationState
   // const { actionableAttestations, status } = relevantVerificationState
@@ -135,16 +122,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
       // dispatch(feelessFetchVerificationState())
     }, [account])
   )
-
-  const onStartVerification = () => {
-    dispatch(setHasSeenVerificationNux(true))
-    // console.log('komenciAvailable: ', komenciAvailable)
-    // if (tryFeeless) {
-    // dispatch(feelessStartVerification(withoutRevealing))
-    // } else {
-    // dispatch(startVerification(withoutRevealing))
-    // }
-  }
 
   const canUsePhoneNumber = () => {
     const countryCallingCode = country?.countryCallingCode || ''
@@ -173,8 +150,8 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     if (!canUsePhoneNumber()) {
       return
     }
-
-    dispatch(start(phoneNumberInfo.e164Number))
+    dispatch(setHasSeenVerificationNux(true))
+    dispatch(startVerification(phoneNumberInfo.e164Number, true))
   }
 
   const onPressSkipCancel = () => {
@@ -240,7 +217,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     )
   }
 
-  useEffect(() => {}, [])
+  // useEffect(() => {}, [])
 
   // TODO: Remove true from here
   // if (feelessVerificationState.isLoading || verificationState.isLoading || !account) {

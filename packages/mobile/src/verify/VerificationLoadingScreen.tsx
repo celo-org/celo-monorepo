@@ -41,14 +41,9 @@ import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 const TAG = 'VerificationLoadingScreen'
 
 const mapStateToProps = (state: RootState) => {
-  const feelessAvailable = state.identity.feelessVerificationState.komenci.serviceAvailable
-  const verificationStatus = feelessAvailable
-    ? state.identity.feelessVerificationStatus
-    : state.identity.verificationStatus
-
   return {
     e164Number: state.account.e164PhoneNumber,
-    verificationStatus,
+    verificationStatus: state.identity.verificationStatus,
     retryWithForno: state.account.retryVerificationWithForno,
     fornoMode: state.web3.fornoMode,
   }

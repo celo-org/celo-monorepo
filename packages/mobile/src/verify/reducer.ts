@@ -1,14 +1,13 @@
-import { createAction, createReducer } from '@reduxjs/toolkit'
-import { RootState } from 'src/redux/reducers'
-import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
-import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { ActionableAttestation } from '@celo/contractkit/src/wrappers/Attestations'
+import { AttestationsStatus } from '@celo/utils/src/attestations'
+import { createAction, createReducer } from '@reduxjs/toolkit'
+import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
+import { RootState } from 'src/redux/reducers'
 
 export const setKomenciContext = createAction<Partial<KomenciContext>>('SET_KOMENCI_CONTEXT')
 
-export const start = createAction<string>('START')
+export const start = createAction<{ e164Number: string; withoutRevealing: boolean }>('START')
 export const stop = createAction('STOP')
-export const prepareKomenci = createAction('PREPARE_KOMENCI')
 export const enableKomenci = createAction('ENABLE_KOMENCI')
 export const disableKomenci = createAction('DISABLE_KOMENCI')
 export const ensureRealHumanUser = createAction('ENSURE_REAL_HUMAN_USER')
@@ -16,6 +15,9 @@ export const startKomenciSession = createAction('START_KOMENCI_SESSION')
 export const fetchPhoneNumberDetails = createAction('FETCH_PHONE_NUMBER')
 export const fetchMtw = createAction('FETCH_MTW')
 export const fetchOnChainData = createAction('FETCH_ON_CHAIN_DATA')
+export const fail = createAction<string>('FAIL')
+export const succeed = createAction('SUCCEED')
+export const doVerificationFlow = createAction<boolean>('DO_VERIFICATION_FLOW')
 
 export const setPhoneHash = createAction<string>('SET_PHONE_HASH')
 export const setVerificationStatus = createAction<Partial<AttestationsStatus>>(
@@ -166,7 +168,7 @@ export const reducer = createReducer(initialState, (builder) => {
     .addCase(start, (state, action) => {
       return {
         ...state,
-        e164Number: action.payload,
+        e164Number: action.payload.e164Number,
         currentState: preparing(),
       }
     })

@@ -34,17 +34,9 @@ import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import { waitForNextBlock } from 'src/geth/saga'
 import i18n from 'src/i18n'
-import {
-  Actions as IdentityActions,
-  FeelessSetVerificationStatusAction,
-  SetVerificationStatusAction,
-} from 'src/identity/actions'
+import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
-import {
-  addressToE164NumberSelector,
-  FeelessVerificationState,
-  feelessVerificationStateSelector,
-} from 'src/identity/reducer'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { isValidPrivateKey } from 'src/invite/utils'
@@ -61,6 +53,7 @@ import {
   TransactionStatus,
 } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { komenciContextSelector, useKomenciSelector } from 'src/verify/reducer'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mtwAddressSelector } from 'src/web3/selectors'
@@ -232,10 +225,7 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
     value: metaTxWalletAddress,
   })
 
-  const { r, s, v }: Sign = await contractKit.connection.web3.eth.accounts.sign(
-    msgHash!,
-    privateKey
-  )
+  const { r, s, v }: Sign = contractKit.connection.web3.eth.accounts.sign(msgHash!, privateKey)
 
   Logger.debug(TAG + '@withdrawFromEscrowViaKomenci', `Signed message hash signature`)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
@@ -245,16 +235,10 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
 
 function* withdrawFromEscrowWithoutCode(komenciActive: boolean = false) {
   try {
-    const [contractKit, walletAddress, mtwAddress, feelessVerificationState]: [
-      ContractKit,
-      string,
-      string,
-      FeelessVerificationState
-    ] = yield all([
+    const [contractKit, walletAddress, mtwAddress]: [ContractKit, string, string] = yield all([
       call(getContractKit),
       call(getConnectedUnlockedAccount),
       select(mtwAddressSelector),
-      select(feelessVerificationStateSelector),
     ])
 
     if (!mtwAddress) {
@@ -339,9 +323,10 @@ function* withdrawFromEscrowWithoutCode(komenciActive: boolean = false) {
         if (!komenciActive) {
           yield call(sendTransaction, withdrawAndTransferTx.txo, walletAddress, context)
         } else {
-          const komenciKit: KomenciKit = new KomenciKit(contractKit, walletAddress, {
-            url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
-            token: feelessVerificationState.komenci.sessionToken,
+          const komenci = yield select(komenciContextSelector)
+          const komenciKit = new KomenciKit(contractKit, walletAddress, {
+            url: komenci.callbackUrl || networkConfig.komenciUrl,
+            token: komenci.sessionToken,
           })
 
           const withdrawAndTransferTxResult: Result<
@@ -580,26 +565,20 @@ export function* watchFetchSentPayments() {
 
 export function* watchVerificationEnd() {
   while (true) {
-    const [update, feelessUpdate]: [
-      SetVerificationStatusAction,
-      FeelessSetVerificationStatusAction
-    ] = yield race([
+    const [update]: [SetVerificationStatusAction] = yield race([
       take(IdentityActions.SET_VERIFICATION_STATUS),
-      take(IdentityActions.FEELESS_SET_VERIFICATION_STATUS),
     ])
 
+    const useKomenci = yield select(useKomenciSelector)
     if (update?.status === VerificationStatus.Done) {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
       if (features.ESCROW_WITHOUT_CODE) {
-        yield call(withdrawFromEscrowWithoutCode, false)
+        yield call(withdrawFromEscrowWithoutCode, useKomenci)
       } else {
         yield call(withdrawFromEscrow)
       }
-    } else if (feelessUpdate?.status === VerificationStatus.Done) {
-      yield waitForNextBlock()
-      yield call(withdrawFromEscrowWithoutCode, true)
     }
   }
 }

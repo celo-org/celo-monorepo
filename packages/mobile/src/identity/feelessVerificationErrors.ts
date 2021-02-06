@@ -2,8 +2,7 @@
 import { RootError } from '@celo/base'
 import { FetchErrorTypes, KomenciKitErrorTypes, TxErrorTypes } from '@celo/komencikit/src/errors'
 import { put, select } from 'redux-saga/effects'
-import { feelessUpdateVerificationState } from 'src/identity/actions'
-import { FeelessVerificationState, feelessVerificationStateSelector } from 'src/identity/reducer'
+import { komenciContextSelector, setKomenciContext } from 'src/verify/reducer'
 
 const KOMENCI_ERROR_WINDOW = 1000 * 60 * 60 * 3 // 3 hours
 const KOMENCI_ERROR_ALLOTMENT = 2
@@ -68,10 +67,7 @@ export const hasExceededKomenciErrorQuota = (komenciErrorTimestamps: number[]) =
 // we won't allow them to attempt feeless verifciation until a certain amount of time has passed
 // in order to give cLabs time to remediate the issue
 export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFlow: boolean) {
-  const feelessVerificationState: FeelessVerificationState = yield select(
-    feelessVerificationStateSelector
-  )
-
+  const komenci = yield select(komenciContextSelector)
   let unexpectedKomenciError = false
   const errorString = error.toString()
 
@@ -97,15 +93,7 @@ export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFl
     return
   }
 
-  const { errorTimestamps } = feelessVerificationState.komenci
+  const { errorTimestamps } = komenci
   errorTimestamps.push(Date.now())
-  yield put(
-    feelessUpdateVerificationState({
-      ...feelessVerificationState,
-      komenci: {
-        ...feelessVerificationState.komenci,
-        errorTimestamps,
-      },
-    })
-  )
+  yield put(setKomenciContext({ errorTimestamps }))
 }

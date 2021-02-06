@@ -2,7 +2,6 @@ import { e164NumberSelector } from 'src/account/selectors'
 import {
   e164NumberToSaltSelector,
   isBalanceSufficientForSigRetrievalSelector,
-  tryFeelessOnboardingSelector,
 } from 'src/identity/reducer'
 import { RootState } from 'src/redux/reducers'
 
@@ -29,10 +28,6 @@ export const sessionIdSelector = (state: RootState) => {
 export const verificationPossibleSelector = (state: RootState): boolean => {
   const e164Number = e164NumberSelector(state)
   const saltCache = e164NumberToSaltSelector(state)
-
-  if (tryFeelessOnboardingSelector(state)) {
-    return true
-  }
 
   return !!(
     (e164Number && saltCache[e164Number]) ||

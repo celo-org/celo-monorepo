@@ -25,7 +25,6 @@ import { features } from 'src/flags'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   cancelVerification,
-  feelessResendAttestations,
   receiveAttestationMessage,
   resendAttestations,
 } from 'src/identity/actions'
@@ -57,14 +56,12 @@ interface StateProps {
   verificationStatus: VerificationStatus
   underlyingError: ErrorMessages | null | undefined
   lastRevealAttempt: number | null
-  feelessIsActive: boolean
 }
 
 interface DispatchProps {
   cancelVerification: typeof cancelVerification
   receiveAttestationMessage: typeof receiveAttestationMessage
   resendAttestations: typeof resendAttestations
-  feelessResendAttestations: typeof feelessResendAttestations
   hideAlert: typeof hideAlert
   showMessage: typeof showMessage
 }
@@ -83,26 +80,14 @@ const mapDispatchToProps = {
   cancelVerification,
   receiveAttestationMessage,
   resendAttestations,
-  feelessResendAttestations,
   hideAlert,
   showMessage,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
-  const feelessIsActive = state.identity.feelessVerificationState.isActive
-  let attestationCodes
-  let numCompleteAttestations
-  let lastRevealAttempt
-
-  if (feelessIsActive) {
-    attestationCodes = state.identity.feelessAttestationCodes
-    numCompleteAttestations = state.identity.feelessNumCompleteAttestations
-    lastRevealAttempt = state.identity.feelessLastRevealAttempt
-  } else {
-    attestationCodes = state.identity.attestationCodes
-    numCompleteAttestations = state.identity.numCompleteAttestations
-    lastRevealAttempt = state.identity.lastRevealAttempt
-  }
+  const attestationCodes = state.identity.attestationCodes
+  const numCompleteAttestations = state.identity.numCompleteAttestations
+  const lastRevealAttempt = state.identity.lastRevealAttempt
 
   return {
     e164Number: state.account.e164PhoneNumber,
@@ -111,7 +96,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     verificationStatus: state.identity.verificationStatus,
     underlyingError: errorSelector(state),
     lastRevealAttempt,
-    feelessIsActive,
   }
 }
 
@@ -247,17 +231,13 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   onPressResend = () => {
-    const { lastRevealAttempt, feelessIsActive } = this.props
+    const { lastRevealAttempt } = this.props
     const isRevealAllowed =
       !lastRevealAttempt ||
       timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
 
     if (isRevealAllowed) {
-      if (feelessIsActive) {
-        this.props.feelessResendAttestations()
-      } else {
-        this.props.resendAttestations()
-      }
+      this.props.resendAttestations()
     } else {
       this.props.showMessage(
         this.props.t('verificationPrematureRevealMessage'),

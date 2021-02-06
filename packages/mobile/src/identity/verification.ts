@@ -1,6 +1,6 @@
-import { eqAddress } from '@celo/base'
-import { CeloTransactionObject } from '@celo/connect'
-import { Address, ContractKit } from '@celo/contractkit'
+import { eqAddress, Result } from '@celo/base'
+import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
+import { Address } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -8,6 +8,7 @@ import {
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
+import { FetchError, TxError } from '@celo/komencikit/src/errors'
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { AttestationRequest } from '@celo/utils/lib/io'
 import { retryAsync } from '@celo/utils/src/async'
@@ -16,6 +17,7 @@ import {
   extractAttestationCodeFromMessage,
   extractSecurityCodeWithPrefix,
 } from '@celo/utils/src/attestations'
+import AwaitLock from 'await-lock'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import {
@@ -40,59 +42,51 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
 import { features } from 'src/flags'
-import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
-import { refreshAllBalances } from 'src/home/actions'
+import networkConfig from 'src/geth/networkConfig'
+import { waitForNextBlock } from 'src/geth/saga'
 import {
   Actions,
+  CancelVerificationAction,
   completeAttestationCode,
-  feelessInputAttestationCode,
-  feelessSetLastRevealAttempt,
   inputAttestationCode,
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   reportRevealStatus,
   ReportRevealStatusAction,
-  resetVerification,
+  ResendAttestations,
   setCompletedCodes,
   setLastRevealAttempt,
   setVerificationStatus,
   StartVerificationAction,
-  udpateVerificationState,
 } from 'src/identity/actions'
-import {
-  feelessCompleteAttestation,
-  feelessRequestAttestations,
-} from 'src/identity/feelessVerification'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   acceptedAttestationCodesSelector,
   attestationCodesSelector,
-  feelessAcceptedAttestationCodesSelector,
-  isBalanceSufficientForSigRetrievalSelector,
-  isVerificationStateExpiredSelector,
-  VerificationState,
-  verificationStateSelector,
+  e164NumberToSaltSelector,
 } from 'src/identity/reducer'
 import { getAttestationCodeForSecurityCode } from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import { clearPasswordCaches } from 'src/pincode/PasswordCache'
-import { waitFor } from 'src/redux/sagas-helpers'
-import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { isVersionBelowMinimum } from 'src/utils/versionCheck'
+import {
+  actionableAttestationsSelector,
+  doVerificationFlow,
+  fail,
+  KomenciContext,
+  komenciContextSelector,
+  phoneHashSelector,
+  start,
+  succeed,
+  useKomenciSelector,
+  verificationStatusSelector,
+} from 'src/verify/reducer'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import {
-  getConnectedAccount,
-  getConnectedUnlockedAccount,
-  unlockAccount,
-  UnlockResult,
-} from 'src/web3/saga'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 const MINIMUM_VERSION_FOR_SHORT_CODES = '1.1.0'
@@ -125,102 +119,47 @@ export interface AttestationCode {
   issuer: string
 }
 
-export function* fetchVerificationState(forceUnlockAccount?: boolean) {
-  try {
-    const account: string = yield call(getConnectedAccount)
-    if (forceUnlockAccount) {
-      // we want to reset password before force unlock account
-      clearPasswordCaches()
-    }
-    const result: UnlockResult = yield call(unlockAccount, account, !!forceUnlockAccount)
-    if (result !== UnlockResult.SUCCESS) {
-      // This navigateBack has no effect if part of onboarding and returns to home or
-      // settings page if the user pressed on the back button when prompted for the PIN.
-      navigateBack()
-      return
-    }
-    const e164Number: string = yield select(e164NumberSelector)
-    const contractKit = yield call(getContractKit)
-    const attestationsWrapper: AttestationsWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getAttestations,
-    ])
+const inputAttestationCodeLock = new AwaitLock()
 
-    const { timeout } = yield race({
-      balances: all([
-        call(waitFor, stableTokenBalanceSelector),
-        call(waitFor, celoTokenBalanceSelector),
-      ]),
-      timeout: delay(BALANCE_CHECK_TIMEOUT),
-    })
-    if (timeout) {
-      Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
-      return
-    }
-    const isBalanceSufficientForSigRetrieval = yield select(
-      isBalanceSufficientForSigRetrievalSelector
-    )
-    if (!isBalanceSufficientForSigRetrieval) {
-      Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
-      return
-    }
-
-    const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
-    ValoraAnalytics.track(VerificationEvents.verification_hash_retrieved, {
-      phoneHash: phoneHashDetails.phoneHash,
-      address: account,
-    })
-
-    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
-    yield put(setVerificationStatus(VerificationStatus.GettingStatus))
-    // Get all relevant info about the account's verification status
-    const status: AttestationsStatus = yield call(
-      getAttestationsStatus,
-      attestationsWrapper,
-      account,
-      phoneHashDetails.phoneHash
-    )
-    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
-      ...status,
-    })
-
-    const actionableAttestations: ActionableAttestation[] = yield call(
-      getActionableAttestations,
-      attestationsWrapper,
-      phoneHashDetails.phoneHash,
-      account
-    )
-
-    yield put(
-      udpateVerificationState({
-        phoneHashDetails,
-        actionableAttestations,
-        status,
-      })
-    )
-  } catch (error) {
-    Logger.error(TAG, 'Error occured during fetching verification state', error)
-  } finally {
-    yield put(setVerificationStatus(VerificationStatus.Stopped))
-  }
-}
-
-export function* startVerification(action: StartVerificationAction) {
+export function* startVerification({ withoutRevealing }: StartVerificationAction) {
   ValoraAnalytics.track(VerificationEvents.verification_start)
-
   Logger.debug(TAG, 'Starting verification')
+  const e164Number = yield select(e164NumberSelector)
 
-  const { result, cancel, timeout } = yield race({
-    result: call(restartableVerification, action.withoutRevealing),
+  yield put(start({ e164Number, withoutRevealing }))
+
+  const {
+    cancel,
+    timeout,
+    restart,
+    success,
+    failure,
+  }: {
+    cancel: CancelVerificationAction
+    timeout: true
+    restart: ResendAttestations
+    success: ReturnType<typeof succeed>
+    failure: ReturnType<typeof fail>
+  } = yield race({
     cancel: take(Actions.CANCEL_VERIFICATION),
     timeout: delay(VERIFICATION_TIMEOUT),
+    restart: take(Actions.RESEND_ATTESTATIONS),
+    success: take(succeed.type),
+    failure: take(fail.type),
   })
 
-  if (result === true) {
+  if (restart) {
+    const status: AttestationsStatus = yield select(verificationStatusSelector)
+    ValoraAnalytics.track(VerificationEvents.verification_resend_messages, {
+      count: status.numAttestationsRemaining,
+    })
+    Logger.debug(TAG, 'Verification has been restarted')
+    yield put(start({ e164Number, withoutRevealing: false }))
+  } else if (success) {
     ValoraAnalytics.track(VerificationEvents.verification_complete)
     Logger.debug(TAG, 'Verification completed successfully')
-  } else if (result) {
-    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result })
+  } else if (failure) {
+    ValoraAnalytics.track(VerificationEvents.verification_error, { error: failure.payload })
     Logger.debug(TAG, 'Verification failed')
     yield call(reportActionableAttestationsStatuses)
   } else if (cancel) {
@@ -234,57 +173,37 @@ export function* startVerification(action: StartVerificationAction) {
     yield put(setVerificationStatus(VerificationStatus.Failed))
     yield call(reportActionableAttestationsStatuses)
   }
-  Logger.debug(TAG, 'Done verification')
-
-  yield put(refreshAllBalances())
 }
 
-export function* restartableVerification(initialWithoutRevealing: boolean) {
-  let isRestarted = false
-  while (true) {
-    const withoutRevealing = !isRestarted && initialWithoutRevealing
-    yield call(navigate, Screens.VerificationLoadingScreen, {
-      withoutRevealing,
-    })
-    yield put(resetVerification())
-    yield call(getConnectedAccount)
-    if (isRestarted || (yield select(isVerificationStateExpiredSelector))) {
-      yield call(fetchVerificationState, true)
-    }
-
-    const { verification, restart } = yield race({
-      verification: call(doVerificationFlow, withoutRevealing),
-      restart: take(Actions.RESEND_ATTESTATIONS),
-    })
-
-    if (restart) {
-      isRestarted = true
-      const { status }: VerificationState = yield select(verificationStateSelector)
-      ValoraAnalytics.track(VerificationEvents.verification_resend_messages, {
-        count: status.numAttestationsRemaining,
-      })
-      Logger.debug(TAG, 'Verification has been restarted')
-      continue
-    }
-
-    return verification
-  }
-}
-
-export function* doVerificationFlow(withoutRevealing: boolean = false) {
+export function* doVerificationFlowSaga(action: ReturnType<typeof doVerificationFlow>) {
   let receiveMessageTask: Task | undefined
   let autoRetrievalTask: Task | undefined
+  const withoutRevealing = action.payload
+  const useKomenci = yield select(useKomenciSelector)
   try {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
-    const {
-      phoneHashDetails,
-      status,
-      actionableAttestations,
-      isBalanceSufficient,
-    }: VerificationState = yield select(verificationStateSelector)
+
+    const status: AttestationsStatus = yield select(verificationStatusSelector)
+    const actionableAttestations: ActionableAttestation[] = yield select(
+      actionableAttestationsSelector
+    )
+    const e164Number: string = yield select(e164NumberSelector)
+    const phoneHash: string = yield select(phoneHashSelector)
+    const pepperCache = yield select(e164NumberToSaltSelector)
+    const pepper = pepperCache[e164Number]
+    const phoneHashDetails: PhoneNumberHashDetails = {
+      phoneHash,
+      pepper,
+      e164Number,
+    }
+
     if (!status.isVerified) {
-      const { phoneHash } = phoneHashDetails
-      const account: string = yield call(getConnectedUnlockedAccount)
+      const komenci: KomenciContext = yield select(komenciContextSelector)
+      const { unverifiedMtwAddress } = komenci
+      const account: string =
+        useKomenci && unverifiedMtwAddress
+          ? unverifiedMtwAddress
+          : yield call(getConnectedUnlockedAccount)
 
       const contractKit = yield call(getContractKit)
 
@@ -307,12 +226,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           yield put(setVerificationStatus(VerificationStatus.Failed))
           return ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT
         }
-      }
-
-      if (!isBalanceSufficient) {
-        yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
-        // Return error message for logging purposes
-        return ErrorMessages.INSUFFICIENT_BALANCE
       }
 
       // Mark codes completed in previous attempts
@@ -364,7 +277,8 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
             phoneHash,
             account,
             attestations,
-            attestations.length + attestationsToRequest
+            attestations.length + attestationsToRequest,
+            useKomenci
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
             issuers,
@@ -416,7 +330,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
 
     yield put(setVerificationStatus(VerificationStatus.Done))
     yield put(setNumberVerified(true))
-    return true
+    yield put(succeed())
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
@@ -427,7 +341,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       yield put(setVerificationStatus(VerificationStatus.Failed))
       yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     }
-    return error.message
+    yield put(fail(error.message))
   } finally {
     receiveMessageTask?.cancel()
     if (Platform.OS === 'android') {
@@ -455,9 +369,7 @@ export function* requestAndRetrieveAttestations(
   account: string,
   currentActionableAttestations: ActionableAttestation[],
   attestationsNeeded: number,
-  isFeelessVerification: boolean = false,
-  contractKit?: ContractKit,
-  komenciKit?: KomenciKit
+  isFeelessVerification: boolean = false
 ) {
   let attestations = currentActionableAttestations
 
@@ -474,25 +386,15 @@ export function* requestAndRetrieveAttestations(
       feeless: isFeelessVerification,
     })
     // Request any additional attestations beyond the original set
-    if (isFeelessVerification && contractKit && komenciKit) {
-      yield call(
-        feelessRequestAttestations,
-        contractKit,
-        komenciKit,
-        attestationsWrapper,
-        attestationsNeeded - attestations.length,
-        phoneHash,
-        account
-      )
-    } else {
-      yield call(
-        requestAttestations,
-        attestationsWrapper,
-        attestationsNeeded - attestations.length,
-        phoneHash,
-        account
-      )
-    }
+    yield call(
+      requestAttestations,
+      attestationsWrapper,
+      attestationsNeeded - attestations.length,
+      phoneHash,
+      account,
+      isFeelessVerification
+    )
+
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_complete, {
       feeless: isFeelessVerification,
     })
@@ -575,8 +477,17 @@ function* requestAttestations(
   attestationsWrapper: AttestationsWrapper,
   numAttestationsRequestsNeeded: number,
   phoneHash: string,
-  account: string
+  account: string,
+  useKomenci: boolean
 ) {
+  const contractKit = yield call(getContractKit)
+  const walletAddress = yield call(getConnectedUnlockedAccount)
+  const komenci = yield select(komenciContextSelector)
+  const komenciKit = new KomenciKit(contractKit, walletAddress, {
+    url: komenci.callbackUrl || networkConfig.komenciUrl,
+    token: komenci.sessionToken,
+  })
+
   if (numAttestationsRequestsNeeded <= 0) {
     Logger.debug(`${TAG}@requestAttestations`, 'No additional attestations requests needed')
     return
@@ -588,6 +499,7 @@ function* requestAttestations(
     phoneHash,
     account
   )
+
   let isUnselectedRequestValid = unselectedRequest.blockNumber !== 0
   if (isUnselectedRequestValid) {
     isUnselectedRequestValid = !(yield call(
@@ -609,60 +521,111 @@ function* requestAttestations(
       `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
     )
-    const approveTx: CeloTransactionObject<boolean> = yield call(
-      [attestationsWrapper, attestationsWrapper.approveAttestationFee],
-      numAttestationsRequestsNeeded
-    )
 
-    yield call(
-      sendTransaction,
-      approveTx.txo,
-      account,
-      newTransactionContext(TAG, 'Approve attestations'),
-      APPROVE_ATTESTATIONS_TX_GAS
-    )
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
+    if (useKomenci) {
+      Logger.debug(
+        `${TAG}@feelessRequestAttestations`,
+        `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
+      )
 
-    // Request the required number of attestations.
-    Logger.debug(
-      `${TAG}@requestAttestations`,
-      `Requesting ${numAttestationsRequestsNeeded} new attestations`
-    )
-    const requestTx: CeloTransactionObject<void> = yield call(
-      [attestationsWrapper, attestationsWrapper.request],
-      phoneHash,
-      numAttestationsRequestsNeeded
-    )
+      // KomenciKit `requestAttestations` method now bundles in the approve tx
+      // so there is no need to approve separately
+      const requestTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+        [komenciKit, komenciKit.requestAttestations],
+        account,
+        phoneHash,
+        numAttestationsRequestsNeeded
+      )
 
-    yield call(
-      sendTransaction,
-      requestTx.txo,
-      account,
-      newTransactionContext(TAG, 'Request attestations'),
-      REQUEST_ATTESTATIONS_TX_GAS
-    )
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
+      if (!requestTxResult.ok) {
+        Logger.debug(TAG, '@feelessRequestAttestations', 'Failed request tx')
+        throw requestTxResult.error
+      }
+
+      ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
+        feeless: true,
+      })
+
+      ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent, {
+        feeless: true,
+      })
+    } else {
+      const approveTx: CeloTransactionObject<boolean> = yield call(
+        [attestationsWrapper, attestationsWrapper.approveAttestationFee],
+        numAttestationsRequestsNeeded
+      )
+
+      yield call(
+        sendTransaction,
+        approveTx.txo,
+        account,
+        newTransactionContext(TAG, 'Approve attestations'),
+        APPROVE_ATTESTATIONS_TX_GAS
+      )
+
+      ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
+
+      // Request the required number of attestations.
+      Logger.debug(
+        `${TAG}@requestAttestations`,
+        `Requesting ${numAttestationsRequestsNeeded} new attestations`
+      )
+      const requestTx: CeloTransactionObject<void> = yield call(
+        [attestationsWrapper, attestationsWrapper.request],
+        phoneHash,
+        numAttestationsRequestsNeeded
+      )
+
+      yield call(
+        sendTransaction,
+        requestTx.txo,
+        account,
+        newTransactionContext(TAG, 'Request attestations'),
+        REQUEST_ATTESTATIONS_TX_GAS
+      )
+      ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
+    }
   }
 
   // Wait for the issuer selection delay to elapse, then select issuers for the attestations.
   Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuers')
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
+  ValoraAnalytics.track(
+    VerificationEvents.verification_request_attestation_await_issuer_selection,
+    { feeless: useKomenci }
+  )
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
   Logger.debug(`${TAG}@requestAttestations`, 'Selecting issuers')
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
+  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer, {
+    feeless: useKomenci,
+  })
 
-  const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)
+  if (useKomenci) {
+    const selectIssuersTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+      [komenciKit, komenciKit.selectIssuers],
+      account,
+      phoneHash
+    )
 
-  yield call(
-    sendTransaction,
-    selectIssuersTx.txo,
-    account,
-    newTransactionContext(TAG, 'Select attestation issuers'),
-    SELECT_ISSUERS_TX_GAS
-  )
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
+    if (!selectIssuersTxResult.ok) {
+      Logger.debug(TAG, '@feelessRequestAttestations', 'Failed selectIssuers tx')
+      throw selectIssuersTxResult.error
+    }
+  } else {
+    const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)
+
+    yield call(
+      sendTransaction,
+      selectIssuersTx.txo,
+      account,
+      newTransactionContext(TAG, 'Select attestation issuers'),
+      SELECT_ISSUERS_TX_GAS
+    )
+  }
+  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent, {
+    feeless: useKomenci,
+  })
 }
 
 export function attestationCodeReceiver(
@@ -711,11 +674,7 @@ export function attestationCodeReceiver(
         throw new Error('No code extracted from message')
       }
 
-      const existingCode: string = yield call(
-        isCodeAlreadyAccepted,
-        attestationCode,
-        isFeelessVerification
-      )
+      const existingCode: string = yield call(isCodeAlreadyAccepted, attestationCode)
 
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
@@ -767,19 +726,9 @@ export function attestationCodeReceiver(
         throw new Error('Code is not valid')
       }
 
-      if (isFeelessVerification) {
-        yield put(
-          feelessInputAttestationCode({
-            code: attestationCode,
-            shortCode: securityCodeWithPrefix,
-            issuer,
-          })
-        )
-      } else {
-        yield put(
-          inputAttestationCode({ code: attestationCode, shortCode: securityCodeWithPrefix, issuer })
-        )
-      }
+      yield put(
+        inputAttestationCode({ code: attestationCode, shortCode: securityCodeWithPrefix, issuer })
+      )
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
@@ -792,10 +741,8 @@ function* getCodeForIssuer(issuer: string) {
   return existingCodes.find((c) => c.issuer === issuer)
 }
 
-function* isCodeAlreadyAccepted(code: string, isFeelessVerification: boolean = false) {
-  const existingCodes: AttestationCode[] = isFeelessVerification
-    ? yield select(feelessAcceptedAttestationCodesSelector)
-    : yield select(acceptedAttestationCodesSelector)
+function* isCodeAlreadyAccepted(code: string) {
+  const existingCodes: AttestationCode[] = yield select(acceptedAttestationCodesSelector)
   return existingCodes.find((c) => c.code === code)
 }
 
@@ -829,11 +776,7 @@ export function* revealAttestations(
     }
     reveals.push(success)
   }
-  if (isFeelessVerification) {
-    yield put(feelessSetLastRevealAttempt(Date.now()))
-  } else {
-    yield put(setLastRevealAttempt(Date.now()))
-  }
+  yield put(setLastRevealAttempt(Date.now()))
   return reveals
 }
 
@@ -841,33 +784,32 @@ export function* completeAttestations(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestations: ActionableAttestation[],
-  isFeelessVerification: boolean = false,
-  komenciKit?: KomenciKit
+  attestations: ActionableAttestation[]
 ) {
   Logger.debug(
     TAG + '@completeNeededAttestations',
     `Completing ${attestations.length} attestations`
   )
-  if (isFeelessVerification && komenciKit) {
-    yield all(
-      attestations.map((attestation) => {
-        return call(feelessCompleteAttestation, komenciKit, account, phoneHashDetails, attestation)
-      })
-    )
-  } else {
-    yield all(
-      attestations.map((attestation) => {
-        return call(
-          completeAttestation,
-          attestationsWrapper,
-          account,
-          phoneHashDetails,
-          attestation
-        )
-      })
-    )
-  }
+  const contractKit = yield call(getContractKit)
+  const komenci = yield select(komenciContextSelector)
+  const walletAddress = yield call(getConnectedUnlockedAccount)
+  const komenciKit = new KomenciKit(contractKit, walletAddress, {
+    url: komenci.callbackUrl || networkConfig.komenciUrl,
+    token: komenci.sessionToken,
+  })
+
+  yield all(
+    attestations.map((attestation) => {
+      return call(
+        completeAttestation,
+        attestationsWrapper,
+        account,
+        phoneHashDetails,
+        attestation,
+        komenciKit
+      )
+    })
+  )
 }
 
 export function* revealAttestation(
@@ -892,36 +834,100 @@ export function* revealAttestation(
   )
 }
 
+// Codes that are auto-imported or pasted in quick sucsession may revert due to being submitted by Komenci
+// with the same nonce as the previous code. Adding retry logic to attempt the tx again in that case
+// TODO: Batch all available `complete` tranactions once Komenci supports it
+function* submitCompleteTxAndRetryOnRevert(
+  komenciKit: KomenciKit,
+  mtwAddress: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  code: AttestationCode
+) {
+  const numOfRetries = 3
+  let completeTxResult: Result<CeloTxReceipt, FetchError | TxError>
+  for (let i = 0; i < numOfRetries; i += 1) {
+    completeTxResult = yield call(
+      [komenciKit, komenciKit.completeAttestation],
+      mtwAddress,
+      phoneHashDetails.phoneHash,
+      code.issuer,
+      code.code
+    )
+
+    if (completeTxResult.ok) {
+      return completeTxResult
+    }
+
+    // If it's not a revert error, or this is the last retry, then return result
+    const errorString = completeTxResult.error.toString().toLowerCase()
+    if (!errorString.includes('revert') || i + 1 === numOfRetries) {
+      return completeTxResult
+    }
+
+    Logger.debug(TAG, '@feelessCompleteAttestation', `Failed complete tx on retry #${i + 1}`)
+    yield call(waitForNextBlock)
+  }
+}
+
 function* completeAttestation(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation
+  attestation: ActionableAttestation,
+  komenciKit: KomenciKit
 ) {
+  const useKomenci = yield select(useKomenciSelector)
   const issuer = attestation.issuer
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_start, {
     issuer,
+    feeless: useKomenci,
   })
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
+  const existingCodes: AttestationCode[] = yield select(attestationCodesSelector)
+  const codePosition = existingCodes.indexOf(code)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_complete, {
     issuer,
+    feeless: useKomenci,
   })
 
   Logger.debug(TAG + '@completeAttestation', `Completing code for issuer: ${code.issuer}`)
 
-  // Generate and send the transaction to complete the attestation from the given issuer.
-  const completeTx: CeloTransactionObject<void> = yield call(
-    [attestationsWrapper, attestationsWrapper.complete],
-    phoneHashDetails.phoneHash,
-    account,
-    code.issuer,
-    code.code
-  )
-  const context = newTransactionContext(TAG, `Complete attestation from ${issuer}`)
-  yield call(sendTransaction, completeTx.txo, account, context, COMPLETE_ATTESTATION_TX_GAS)
+  // Make each concurrent completion attempt wait a sec for where they are relative to other codes
+  // to ensure `processingInputCode` has enough time to properly gate the tx. 0-index code
+  // will have 0 delay, 1-index code will have 1 sec delay, etc.
+  if (useKomenci) {
+    yield delay(codePosition * 1000)
+    yield inputAttestationCodeLock.acquireAsync()
+    const completeTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
+      submitCompleteTxAndRetryOnRevert,
+      komenciKit,
+      account,
+      phoneHashDetails,
+      code
+    )
+    yield inputAttestationCodeLock.release()
+    if (!completeTxResult.ok) {
+      Logger.debug(TAG, '@feelessCompleteAttestation', 'Failed complete tx')
+      throw completeTxResult.error
+    }
+  } else {
+    // Generate and send the transaction to complete the attestation from the given issuer.
+    const completeTx: CeloTransactionObject<void> = yield call(
+      [attestationsWrapper, attestationsWrapper.complete],
+      phoneHashDetails.phoneHash,
+      account,
+      code.issuer,
+      code.code
+    )
+    const context = newTransactionContext(TAG, `Complete attestation from ${issuer}`)
+    yield call(sendTransaction, completeTx.txo, account, context, COMPLETE_ATTESTATION_TX_GAS)
+  }
 
-  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
+  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, {
+    issuer,
+    feeless: useKomenci,
+  })
 
   // Report reveal status from validator
   yield put(
