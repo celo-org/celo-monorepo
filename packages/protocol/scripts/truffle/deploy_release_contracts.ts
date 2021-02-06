@@ -1,8 +1,8 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import {
+  _setInitialProxyImplementation,
   checkImplementationAbi,
   retryTx,
-  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
@@ -140,7 +140,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       return
     }
   }
-  let [initializerAbiMultiSig, transferImplOwnershipAbiMultiSig] = checkImplementationAbi(
+  const [initializerAbiMultiSig, transferImplOwnershipAbiMultiSig] = checkImplementationAbi(
     ReleaseGoldMultiSig,
     'ReleaseGoldMultiSig'
   )

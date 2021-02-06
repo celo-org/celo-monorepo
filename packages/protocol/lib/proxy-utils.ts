@@ -45,7 +45,7 @@ export async function setAndInitializeImplementation(
   ...initArgs: any[]
 ) {
   let implInitArgs = initArgs
-  if (name == 'ReleaseGold') {
+  if (name === 'ReleaseGold') {
     implInitArgs = [
       Math.round(new Date().getTime() / 1000),
       0,
