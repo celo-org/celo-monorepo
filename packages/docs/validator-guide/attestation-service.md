@@ -190,7 +190,7 @@ Twilio configuration options:
 | `TWILIO_ACCOUNT_SID`           | The Twilio account ID                                           |
 | `TWILIO_MESSAGING_SERVICE_SID` | The Twilio Message Service ID. Starts with `MG`                 |
 | `TWILIO_AUTH_TOKEN`            | The API authentication token                                    |
-| `TWILIO_UNSUPPORTED_REGIONS`   | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
+| `TWILIO_UNSUPPORTED_REGIONS`   | Optional. A comma-separated list of country codes to not serve, recommended value `CU,SY,KP,IR,SD`  |
 
 Nexmo configuration options:
 
@@ -199,7 +199,7 @@ Nexmo configuration options:
 | `NEXMO_KEY`                 | The API key to the Nexmo API                                    |
 | `NEXMO_SECRET`              | The API secret to the Nexmo API                                 |
 | `NEXMO_APPLICATION`  | Optional. Use only numbers linked to the Nexmo application with matching ID, rather than the global pool.  |
-| `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
+| `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, recommended value `CU,SY,KP,IR,SD``  |
 | `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
 
 MessageBird configuration options (v1.2.0+):
@@ -207,7 +207,7 @@ MessageBird configuration options (v1.2.0+):
 | Variable                    | Explanation                                                     |
 | --------------------------- | --------------------------------------------------------------- |
 | `MESSAGEBIRD_API_KEY`       | The API key to the MessageBird API                              |
-| `MESSAGEBIRD_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
+| `MESSAGEBIRD_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, recommended value `CU,SY,KP,IR,SD`  |
 
 ## Registering Metadata
 
