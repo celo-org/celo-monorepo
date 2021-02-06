@@ -14,11 +14,20 @@ import {
   InvalidWallet,
   KomenciDown,
   LoginSignatureError,
+  NetworkError,
+  NotFoundError,
+  RequestError,
+  ResponseDecodeError,
+  ServiceUnavailable,
   TxError,
+  TxEventNotFound,
+  TxRevertError,
+  TxTimeoutError,
   WalletValidationError,
 } from '@celo/komencikit/src/errors'
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { verifyWallet } from '@celo/komencikit/src/verifyWallet'
+import { sleep } from '@celo/utils/src/async'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
@@ -32,6 +41,7 @@ import {
   hasExceededKomenciErrorQuota,
   KomenciErrorQuotaExceeded,
   KomenciSessionInvalidError,
+  storeTimestampIfKomenciError,
 } from 'src/identity/feelessVerificationErrors'
 import {
   e164NumberToSaltSelector,
@@ -74,22 +84,34 @@ import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getConnectedUnlockedAccount, unlockAccount, UnlockResult } from 'src/web3/saga'
 
 const TAG = 'verify/saga'
-export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
+const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
+const KOMENCI_READINESS_RETRIES = 3
+const KOMENCI_DEPLOY_MTW_RETRIES = 3
 
-function* fetchKomenciReadiness(komenciKit: KomenciKit, errorTimestamps: number[]) {
-  const serviceStatusResult: Result<true, KomenciDown> = yield call([
-    komenciKit,
-    komenciKit.checkService,
-  ])
-
-  if (!serviceStatusResult.ok) {
-    Logger.debug(TAG, '@fetchKomenciReadiness', 'Komenci service is down')
-    throw serviceStatusResult.error
-  }
-
-  if (hasExceededKomenciErrorQuota(errorTimestamps)) {
+function* checkTooManyErrors() {
+  const komenci = yield select(komenciContextSelector)
+  if (hasExceededKomenciErrorQuota(komenci.errorTimestamps)) {
     Logger.debug(TAG, '@fetchKomenciReadiness', 'Too  many errors')
     throw new KomenciErrorQuotaExceeded()
+  }
+}
+
+function* fetchKomenciReadiness(komenciKit: KomenciKit) {
+  for (let i = 0; i < KOMENCI_READINESS_RETRIES; i += 1) {
+    const serviceStatusResult: Result<true, KomenciDown> = yield call([
+      komenciKit,
+      komenciKit.checkService,
+    ])
+
+    if (!serviceStatusResult.ok) {
+      Logger.debug(TAG, '@fetchKomenciReadiness', 'Komenci service is down')
+      yield checkTooManyErrors()
+      if (serviceStatusResult.error instanceof KomenciDown) {
+        yield sleep(2 ** i * 5000)
+      } else {
+        throw serviceStatusResult.error
+      }
+    }
   }
 
   return true
@@ -216,7 +238,7 @@ function* startSaga(action: ReturnType<typeof start>) {
   const contractKit = yield call(getContractKit)
   const walletAddress = yield call(getConnectedUnlockedAccount)
 
-  Logger.debug(TAG, '@prepareVerification', walletAddress)
+  Logger.debug(TAG, '@startSaga', walletAddress)
   // we want to reset password before force unlock account
   clearPasswordCaches()
   const result: UnlockResult = yield call(unlockAccount, walletAddress, true)
@@ -237,10 +259,11 @@ function* startSaga(action: ReturnType<typeof start>) {
         url: komenci.callbackUrl || networkConfig.komenciUrl,
         token: komenci.sessionToken,
       })
-      const isKomenciReady = yield call(fetchKomenciReadiness, komenciKit, komenci.errorTimestamps)
+      const isKomenciReady = yield call(fetchKomenciReadiness, komenciKit)
       if (!isKomenciReady) {
         yield put(disableKomenci())
         yield put(start(e164Number))
+        return
       }
 
       yield call(fetchKomenciSession, komenciKit, e164Number)
@@ -248,10 +271,9 @@ function* startSaga(action: ReturnType<typeof start>) {
         yield put(ensureRealHumanUser())
       }
     } catch (e) {
-      Logger.error(TAG, '@prepareVerification', e)
-      if (e instanceof KomenciDown) {
-        // TODO: Implement retry
-      } else {
+      Logger.error(TAG, '@startSaga', e)
+      storeTimestampIfKomenciError(e)
+      if (e instanceof KomenciErrorQuotaExceeded) {
         yield put(disableKomenci())
         yield put(start(e164Number))
       }
@@ -352,64 +374,86 @@ function* fetchOrDeployMtwSaga() {
   Logger.debug(TAG, '@fetchOrDeployMtwSaga', 'Starting fetch')
   const storedUnverifiedMtwAddress = komenci.unverifiedMtwAddress
   let deployedUnverifiedMtwAddress: string | null = null
-  let komenciError: FetchError | TxError | InvalidWallet | undefined
+  try {
+    // If there isn't a MTW stored for this session, ask Komenci to deploy one
+    if (!storedUnverifiedMtwAddress) {
+      // This try/catch block is a workaround because Komenci will throw an error
+      // if a wallet was already deployed in a session. This is only fatal if
+      // we can't recover the MTW address or there is no quota left on the session
+      for (let i = 0; i < KOMENCI_DEPLOY_MTW_RETRIES; i += 1) {
+        try {
+          const deployWalletResult: Result<
+            string,
+            FetchError | TxError | InvalidWallet
+          > = yield call(
+            [komenciKit, komenciKit.deployWallet],
+            networkConfig.currentMtwImplementationAddress
+          )
 
-  // If there isn't a MTW stored for this session, ask Komenci to deploy one
-  if (!storedUnverifiedMtwAddress) {
-    // This try/catch block is a workaround because Komenci will throw an error
-    // if a wallet was already deployed in a session. This is only fatal if
-    // we can't recover the MTW address or there is no quota left on the session
-    try {
-      const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
-        [komenciKit, komenciKit.deployWallet],
-        networkConfig.currentMtwImplementationAddress
-      )
+          if (!deployWalletResult.ok) {
+            Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to deploy MTW')
+            throw deployWalletResult.error
+          }
+          deployedUnverifiedMtwAddress = deployWalletResult.result
+        } catch (e) {
+          storeTimestampIfKomenciError(e)
 
-      if (!deployWalletResult.ok) {
-        Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to deploy MTW')
-        throw deployWalletResult.error
+          switch (true) {
+            case e instanceof ServiceUnavailable:
+            case e instanceof NetworkError:
+            case e instanceof RequestError:
+            case e instanceof NotFoundError:
+            case e instanceof ResponseDecodeError:
+            case e instanceof TxTimeoutError:
+            case e instanceof TxRevertError:
+            case e instanceof TxEventNotFound:
+              continue
+
+            case e instanceof InvalidWallet:
+            default:
+              put(disableKomenci())
+              put(start(e164Number))
+              return
+          }
+        }
       }
-
-      deployedUnverifiedMtwAddress = deployWalletResult.result
-    } catch (error) {
-      // Fetch session state now that there should be no cases where we don't have a  MTW
-      yield call(fetchKomenciSession, komenciKit, e164Number)
-      deployedUnverifiedMtwAddress = komenci.unverifiedMtwAddress
-      komenciError = error
     }
+
+    const unverifiedMtwAddress = deployedUnverifiedMtwAddress ?? storedUnverifiedMtwAddress
+
+    // If we couldn't recover or deploy a new the MTW address, then propogate the Komenci error
+    // we recevied from the failed `deployWallet` call. We also need to check if the session
+    // is still active because it's possible the current session ran out of quota
+    if (!unverifiedMtwAddress || !komenci.sessionActive) {
+      Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to deploy or recover a MTW')
+      // The new error on the RHS is mostly to placate the linting rules.
+      // There should be no instances where Komenci is unable to deploy
+      // a MTW yet doesn't return an error
+      throw new Error('Unable to deploy or recover a MTW')
+    }
+
+    // Check if the MTW we have is a valid implementation
+    const validityCheckResult: Result<true, WalletValidationError> = yield call(
+      verifyWallet,
+      contractKit,
+      unverifiedMtwAddress,
+      networkConfig.allowedMtwImplementations,
+      walletAddress
+    )
+
+    if (!validityCheckResult.ok) {
+      Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to validate MTW implementation')
+      throw validityCheckResult.error
+    }
+
+    yield put(setKomenciContext({ unverifiedMtwAddress }))
+    yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
+    yield put(fetchOnChainData())
+  } catch (e) {
+    storeTimestampIfKomenciError(e)
+    put(disableKomenci())
+    put(start(e164Number))
   }
-
-  const unverifiedMtwAddress = deployedUnverifiedMtwAddress ?? storedUnverifiedMtwAddress
-
-  // If we couldn't recover or deploy a new the MTW address, then propogate the Komenci error
-  // we recevied from the failed `deployWallet` call. We also need to check if the session
-  // is still active because it's possible the current session ran out of quota
-  console.log(unverifiedMtwAddress, komenci, komenciError)
-  if (!unverifiedMtwAddress || !komenci.sessionActive) {
-    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to deploy or recover a MTW')
-    // The new error on the RHS is mostly to placate the linting rules.
-    // There should be no instances where Komenci is unable to deploy
-    // a MTW yet doesn't return an error
-    throw komenciError ?? new Error('Unable to deploy or recover a MTW')
-  }
-
-  // Check if the MTW we have is a valid implementation
-  const validityCheckResult: Result<true, WalletValidationError> = yield call(
-    verifyWallet,
-    contractKit,
-    unverifiedMtwAddress,
-    networkConfig.allowedMtwImplementations,
-    walletAddress
-  )
-
-  if (!validityCheckResult.ok) {
-    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to validate MTW implementation')
-    throw validityCheckResult.error
-  }
-
-  yield put(setKomenciContext({ unverifiedMtwAddress }))
-  yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
-  yield put(fetchOnChainData())
 }
 
 function* feelessDekAndWalletRegistration(komenciKit: KomenciKit, walletAddress: string) {

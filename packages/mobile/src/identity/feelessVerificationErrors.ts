@@ -9,7 +9,6 @@ const KOMENCI_ERROR_ALLOTMENT = 2
 
 export enum FeelessVerificationErrors {
   KomenciErrorQuotaExceeded = 'KomenciErrorQuotaExceeded',
-  KomenciDisabledError = 'KomenciDisabledError',
   KomenciSessionInvalidError = 'KomenciSessionInvalidError',
   PepperNotCachedError = 'PepperNotCachedError',
 }
@@ -20,15 +19,6 @@ export class KomenciErrorQuotaExceeded extends RootError<
 > {
   constructor() {
     super(FeelessVerificationErrors.KomenciErrorQuotaExceeded)
-  }
-}
-
-// When feature flag is disabled
-export class KomenciDisabledError extends RootError<
-  FeelessVerificationErrors.KomenciDisabledError
-> {
-  constructor() {
-    super(FeelessVerificationErrors.KomenciDisabledError)
   }
 }
 
@@ -62,11 +52,11 @@ export const hasExceededKomenciErrorQuota = (komenciErrorTimestamps: number[]) =
 }
 
 // If an error occurs during the feeless verification flow that is `unexpected` and likely
-// due to a Komenci service failure, add the timestamp of it's occurrence to `feelessVerificationState`.
+// due to a Komenci service failure, add the timestamp of it's occurrence to komenci Context.
 // If the user encounters more errors than we feel comfortable with during a given window,
 // we won't allow them to attempt feeless verifciation until a certain amount of time has passed
 // in order to give cLabs time to remediate the issue
-export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFlow: boolean) {
+export function* storeTimestampIfKomenciError(error: Error) {
   const komenci = yield select(komenciContextSelector)
   let unexpectedKomenciError = false
   const errorString = error.toString()
@@ -88,7 +78,7 @@ export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFl
     errorString === FetchErrorTypes.QuotaExceededError ||
     errorString === FeelessVerificationErrors.KomenciSessionInvalidError ||
     errorString === FeelessVerificationErrors.PepperNotCachedError ||
-    (errorString === FetchErrorTypes.Unauthorised && !errorOccuredInMainFlow)
+    errorString === FetchErrorTypes.Unauthorised
   ) {
     return
   }

@@ -117,7 +117,6 @@ type InternalState =
 export interface KomenciContext {
   errorTimestamps: number[]
   unverifiedMtwAddress: string | null
-  serviceAvailable: boolean
   sessionActive: boolean
   sessionToken: string
   callbackUrl: string | undefined
@@ -130,7 +129,7 @@ export interface State {
   actionableAttestations: ActionableAttestation[]
   currentState: InternalState
   komenci: KomenciContext
-  disableKomenci: boolean
+  komenciDisabled: boolean
   phoneHash?: string
   e164Number?: string
   retries: number
@@ -141,7 +140,6 @@ const initialState: State = {
   komenci: {
     errorTimestamps: [],
     unverifiedMtwAddress: null,
-    serviceAvailable: true,
     sessionActive: false,
     sessionToken: '',
     callbackUrl: undefined,
@@ -157,7 +155,7 @@ const initialState: State = {
   actionableAttestations: [],
   retries: 0,
   currentState: idle(),
-  disableKomenci: false,
+  komenciDisabled: false,
 }
 
 export const reducer = createReducer(initialState, (builder) => {
@@ -193,14 +191,14 @@ export const reducer = createReducer(initialState, (builder) => {
     .addCase(enableKomenci, (state, action) => {
       return {
         ...state,
-        disableKomenci: false,
+        komenciDisabled: false,
         komenci: initialState.komenci,
       }
     })
     .addCase(disableKomenci, (state, action) => {
       return {
         ...state,
-        disableKomenci: true,
+        komenciDisabled: true,
         komenci: initialState.komenci,
       }
     })
@@ -253,8 +251,7 @@ export const e164NumberSelector = (state: RootState) => state.verify.e164Number
 export const phoneHashSelector = (state: RootState) => state.verify.phoneHash
 export const komenciContextSelector = (state: RootState) => state.verify.komenci
 export const eoaAccountSelector = (state: RootState) => state.verify.eoaAccount
-export const useKomenciSelector = (state: RootState) =>
-  !state.verify.disableKomenci && state.verify.komenci.serviceAvailable
+export const useKomenciSelector = (state: RootState) => !state.verify.komenciDisabled
 export const verificationStatusSelector = (state: RootState): AttestationsStatus =>
   state.verify.status
 export const actionableAttestationsSelector = (state: RootState): ActionableAttestation[] =>
