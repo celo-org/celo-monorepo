@@ -3,8 +3,8 @@
   "inviteWithWhatsapp": "Invite with WhatsApp",
   "inviteWithSMS": "Invite with SMS",
   "inviteFee": "Invite Fee",
-  "whySendFees": "This fee covers costs for the new user to verify their phone number",
-  "whyReceiveFees": "You were sent some money to verify your account",
+  "whySendFees": "This fee covers costs for the new user to confirm their phone number",
+  "whyReceiveFees": "You were sent some money to confirm your account",
   "edit": "Edit",
   "to": "To",
   "inviteSent": "Invite Sent",
@@ -25,7 +25,7 @@
   "sendAndInvite": "Send & Invite",
   "inviteAndSendDialog": {
     "title": "Invite and Send",
-    "body": "Your payment to {{name}} will be waiting for them once they verify their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
+    "body": "Your payment to {{name}} will be waiting for them once they confirm their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
     "button": "Invite"
   }
 }

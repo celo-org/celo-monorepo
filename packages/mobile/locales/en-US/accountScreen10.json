@@ -38,7 +38,7 @@
   },
   "promptConfirmRevokeModal": {
     "header": "Are you sure you want to revoke your Valora account?",
-    "body": "Once revoked, this account will not be able reverify. Only revoke if you are sure you will never need this account again.",
+    "body": "Once revoked, this account will not be able reconfirm. Only revoke if you are sure you will never need this account again.",
     "revoke": "Revoke"
   },
   "testFaqLink": "{{appName}} FAQ",

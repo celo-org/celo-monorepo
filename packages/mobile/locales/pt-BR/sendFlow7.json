@@ -36,7 +36,7 @@
   "inviteSendTo": "Convidar e enviar para",
   "keepMoneySafe": "Manteremos esse dinheiro seguro até que seu amigo crie uma conta no {{appName}} ",
   "searchFriends": "Tente inserir um número de telefone se você não conseguir encontrar quem está procurando",
-  "inviteVerifyPayment": "Convidar e verificar pagamento",
+  "inviteVerifyPayment": "Convidar e confirmar pagamento",
   "inviteFriends": "Convidar amigos",
   "noResultsFor": "Sem resultados para",
   "noContacts": "Não há contatos",
@@ -63,7 +63,7 @@
   "reminderSent": "Lembrete enviado",
   "reclaimPayment": "Reivindicar pagamento",
   "totalRefunded": "Total reembolsado",
-  "loadingVerificationStatus": "Conferindo a verificação do destinatário",
+  "loadingVerificationStatus": "Conferindo a confirmação do destinatário",
   "askForContactsPermissionAction": "Acessar meus contatos",
   "newAccountBalance": "Novo saldo da conta: ",
   "estimatingFee": "Estimando a taxa ",
@@ -71,7 +71,7 @@
   "verificationCta": {
     "header": "Enviando para um amigo?",
     "body": "Verifique seu celular e sincronize seus contatos para enviar rapidamente para seus amigos.",
-    "cta": "Iniciar verificação"
+    "cta": "Iniciar confirmação"
   },
   "importContactsCta": {
     "header": "Importar contatos",

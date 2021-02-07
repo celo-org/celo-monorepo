@@ -51,7 +51,7 @@
     "resume": "Resume",
     "doINeedToConfirm": "Do I need to confirm?",
     "skipForNow": "Skip for now",
-    "bodyInsufficientBalance": "Your current balance is not high enough to complete the verification process.\n\nPlease try again when you have added funds to your wallet.",
+    "bodyInsufficientBalance": "Your current balance is not high enough to complete the confirmation process.\n\nPlease try again when you have added funds to your wallet.",
     "bodyAlreadyVerified": "Your number is already confirmed!"
   },
   "verificationSkipDialog": {
