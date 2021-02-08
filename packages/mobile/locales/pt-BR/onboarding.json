@@ -67,7 +67,7 @@
     "dismiss": "Ignorar"
   },
   "importExistingKey": {
-    "explanation": "Sua Chave de Conta é uma frase de 24 palavras que você anotou e salvou ao configurar sua conta. Insira-a aqui para restaurar sua conta.\n\nObserve que sua preferência de idioma deve corresponder ao idioma escolhido quando você criou sua conta.",
+    "explanation": "Sua Chave de Conta é uma frase de 24 palavras que você anotou e salvou ao configurar sua conta. Insira-a aqui para restaurar sua conta.",
     "keyPlaceholder": "cavalo leopardo cachorro macaco..."
   },
   "verificationInput": {

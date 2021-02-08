@@ -16,7 +16,7 @@
 /packages/docs/ @timmoreton @barbaraliau @critesjosh 
 /packages/faucet/ @eelanagaraj @celo-org/devx
 /packages/helm-charts/ @nambrot @timmoreton
-/packages/mobile/ @jeanregisser @cmcewen @jmrossy @i1skn 
+/packages/mobile/ @celo-org/wallet 
 /packages/moonpay-auth/ @annakaz @i1skn 
 /packages/notification-service/ @annakaz @cmcewen @i1skn @jeanregisser
 /packages/flake-tracker @alecps
@@ -29,13 +29,10 @@ packages/komencikit/ @celo-org/cap
 /packages/attestation-service/ @celo-org/cap
 /packages/metadata-crawler/ @celo-org/cap
 
-/packages/react-components/ @jmrossy @aaronmgdr
+/packages/react-components/ @i1skn @jeanregisser @celo-org/wallet
 /packages/reserve-site/ @aaronmgdr
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/typescript/ @cmcewen
 /packages/sdk/utils/ @barbaraliau @medhak1 @celo-org/devx
 /packages/sdk/base/ @barbaraliau @medhak1 @celo-org/devx
-/packages/web/validator-badges @cla-bel @bohan-zhang @pranaymohan
-/packages/web/openpgpkey @nategraf
-/packages/web/ @aaronmgdr

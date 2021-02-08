@@ -1,3 +1,4 @@
+import ListItem from '@celo/react-components/components/ListItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -5,15 +6,7 @@ import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { FiatExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton'
@@ -21,6 +14,7 @@ import Dialog from 'src/components/Dialog'
 import { openMoonpay, openRamp, openSimplex } from 'src/fiatExchanges/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
+import LinkArrow from 'src/icons/LinkArrow'
 import QuestionIcon from 'src/icons/QuestionIcon'
 import { moonpayLogo, simplexLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -101,7 +95,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       {
         name: 'Ramp',
         enabled: true,
-        onSelected: () => openRamp(account, CURRENCY_ENUM.DOLLAR),
+        onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.DOLLAR),
       },
     ],
   }
@@ -121,21 +115,14 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         <View style={styles.providersContainer}>
           {providers[isCashIn ? 'cashIn' : 'cashOut']
             .filter((provider) => provider.enabled)
-            .map((provider) => {
-              return (
-                <>
-                  <TouchableOpacity
-                    key={provider.name}
-                    onPress={providerOnPress(provider)}
-                    style={styles.provider}
-                    testID={`Provider/${provider.name}`}
-                  >
-                    {provider.image || <Text>{provider.name}</Text>}
-                  </TouchableOpacity>
-                  <View style={styles.separator} />
-                </>
-              )
-            })}
+            .map((provider) => (
+              <ListItem key={provider.name} onPress={providerOnPress(provider)}>
+                <View style={styles.providerListItem} testID={`Provider/${provider.name}`}>
+                  <Text style={styles.optionTitle}>{provider.name}</Text>
+                  <LinkArrow />
+                </View>
+              </ListItem>
+            ))}
         </View>
         <Dialog
           title={t('explanationModal.title')}
@@ -159,11 +146,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     flexDirection: 'column',
-    marginHorizontal: variables.contentPadding,
+    marginRight: variables.contentPadding,
   },
   pleaseSelectProvider: {
     ...fontStyles.regular,
     marginBottom: variables.contentPadding,
+    paddingLeft: variables.contentPadding,
   },
   logo: {
     height: 30,
@@ -179,5 +167,13 @@ const styles = StyleSheet.create({
     height: 1,
     width: '100%',
     backgroundColor: colors.gray2,
+  },
+  providerListItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  optionTitle: {
+    ...fontStyles.regular,
   },
 })
