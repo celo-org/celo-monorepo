@@ -436,6 +436,8 @@ To attach:
 
 ### Troubleshooting
 
+
+#### Postinstall script
 If you're having an error with installing packages, or `secrets.json` not existing: 
 
 try to run `yarn postinstall` in the monorepo root folder after running `yarn install`. 
