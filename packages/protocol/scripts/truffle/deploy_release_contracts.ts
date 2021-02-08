@@ -729,7 +729,7 @@ function checkRGImplementationAbi(Contract: any, name: string) {
   )
   if (!initializerAbi) {
     throw new Error(
-      `Attempting to deploy RG implementation contract ${name} that does not have an initialize() function. Abort.`
+      `Attempting to deploy implementation contract ${name} that does not have an initialize() function. Abort.`
     )
   }
   const transferImplOwnershipAbi: string = Contract.abi.find(
@@ -737,7 +737,7 @@ function checkRGImplementationAbi(Contract: any, name: string) {
   )
   if (!transferImplOwnershipAbi) {
     throw new Error(
-      `Attempting to deploy RG implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
+      `Attempting to deploy implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
     )
   }
   return [initializerAbi, transferImplOwnershipAbi]
