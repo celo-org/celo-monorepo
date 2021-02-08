@@ -245,14 +245,14 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
 
 async function initializeRGImplementation(
   releaseGoldInstance: any,
-  fromAddress: string,
+  from: string,
   initializerAbiRG: string,
   transferImplOwnershipAbiRG: string
 ) {
   // We need to fund the RG implementation instance in order to initialize it.
   await retryTx(web3.eth.sendTransaction, [
     {
-      from: fromAddress,
+      from,
       value: 1,
     },
   ])
@@ -283,7 +283,7 @@ async function initializeRGImplementation(
   )
   await retryTx(web3.eth.sendTransaction, [
     {
-      from: fromAddress,
+      from,
       to: releaseGoldInstance.address,
       data: implInitCallData,
     },
@@ -291,7 +291,7 @@ async function initializeRGImplementation(
   assert(await (releaseGoldInstance as ReleaseGoldInstance).initialized())
   await retryTx(web3.eth.sendTransaction, [
     {
-      from: fromAddress,
+      from,
       to: releaseGoldInstance.address,
       data: transferImplOwnershipCallData,
     },
