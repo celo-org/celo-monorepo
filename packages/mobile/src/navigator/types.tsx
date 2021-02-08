@@ -121,7 +121,12 @@ export type StackParamList = {
         onPressSkip?: () => void
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.NameAndPicture]: undefined
+  [Screens.NameAndNumber]:
+    | {
+        selectedCountryCodeAlpha2: string
+        country: string
+      }
+    | undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList
@@ -213,7 +218,7 @@ export type StackParamList = {
     origin: SendOrigin
   }
   [Screens.VerificationEducationScreen]:
-    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean; selectedCountryCodeAlpha2?: string }
+    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
     | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }

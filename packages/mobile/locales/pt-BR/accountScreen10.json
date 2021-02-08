@@ -64,10 +64,5 @@
   "contactMessagePlaceholder": "Digite sua mensagem aqui...",
   "attachLogs": "Anexar registros",
   "supportLegalCheckbox": "Ao enviar, concordo em compartilhar as informações acima e todos os dados de registro do aplicativo anexados com o serviço de suporte do {{appName}}.",
-  "contactSuccess": "Seu problema foi relatado com sucesso! Aguarde uma resposta por e-mail em breve!",
-  "namePictureSaved": "Seu nome e foto foram salvos com sucesso.",
-  "addPhoto": "Carregar foto",
-  "chooseFromLibrary": "Escolha na galeria",
-  "takePhoto": "Tirar Foto",
-  "removePhoto": "Deletar Foto"
+  "contactSuccess": "Seu problema foi relatado com sucesso! Aguarde uma resposta por e-mail em breve!"
 }

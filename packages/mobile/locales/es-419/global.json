@@ -33,7 +33,6 @@
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
   "paste": "Pegar",
-  "choose": "Elige",
   "receivedPayment": "Pago recibido",
   "getStarted": "Primeros pasos",
   "manageCeloDollars": "Administrar Celo Dólares",
@@ -188,6 +187,5 @@
   "accountClearFailed": "Hubo un error al borrar tu Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",
   "withdraw": "Retirar",
   "countryNotAvailable": "{{appName}} no está disponible en tu país",
-  "firebaseFetchFailed": "La conexión con el servidor falló",
-  "pictureLoadFailed": "Hubo un error al cargar la imagen"
+  "firebaseFetchFailed": "La conexión con el servidor falló"
 }

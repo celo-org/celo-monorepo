@@ -1,6 +1,7 @@
 import { enterPinUi, sleep, waitForElementId } from '../utils/utils'
 import { SAMPLE_BACKUP_KEY } from '../utils/consts'
 
+const VERIFICATION_PHONE_NUMBER = '2052000000'
 const EXAMPLE_NAME = 'Test Name'
 
 export default NewAccountOnboarding = () => {
@@ -19,7 +20,9 @@ export default NewAccountOnboarding = () => {
 
     // Set name and number
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
-    await element(by.id('NameAndPictureContinueButton')).tap()
+    await expect(element(by.id('PhoneNumberField'))).toBeVisible()
+    await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
+    await element(by.id('NameAndNumberContinueButton')).tap()
 
     // Set & Verify pin
     await enterPinUi()

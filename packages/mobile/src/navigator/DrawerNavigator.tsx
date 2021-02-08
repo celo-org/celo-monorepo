@@ -1,3 +1,4 @@
+import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -28,7 +29,12 @@ import deviceInfoModule from 'react-native-device-info'
 import { useDispatch } from 'react-redux'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
-import { defaultCountryCodeSelector, e164NumberSelector, nameSelector } from 'src/account/selectors'
+import {
+  defaultCountryCodeSelector,
+  e164NumberSelector,
+  nameSelector,
+  userContactDetailsSelector,
+} from 'src/account/selectors'
 import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
 import { HomeEvents } from 'src/analytics/Events'
@@ -36,7 +42,6 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { toggleInviteModal } from 'src/app/actions'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
-import ContactCircleSelf from 'src/components/ContactCircleSelf'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
@@ -142,6 +147,7 @@ function CustomDrawerItemList({
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
   const e164PhoneNumber = useSelector(e164NumberSelector)
+  const contactDetails = useSelector(userContactDetailsSelector)
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
   const dollarBalance = useSelector(stableTokenBalanceSelector)
   const dollarAmount = {
@@ -167,7 +173,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
         <View style={styles.drawerHeader}>
-          <ContactCircleSelf size={64} />
+          <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
           <RewardsPill />
         </View>
         <Text style={styles.nameLabel}>{displayName}</Text>

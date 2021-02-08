@@ -7,12 +7,9 @@ import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useDispatch } from 'react-redux'
-import { setBackupCompleted } from 'src/account/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DelayButton from 'src/backup/DelayButton'
-import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -27,7 +24,6 @@ type Props = StackScreenProps<StackParamList, Screens.BackupForceScreen>
 
 function BackupForceScreen({ navigation }: Props) {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
-  const dispatch = useDispatch()
 
   const startBackup = () => {
     ValoraAnalytics.track(OnboardingEvents.backup_start)
@@ -42,11 +38,6 @@ function BackupForceScreen({ navigation }: Props) {
       })
   }
 
-  const skipBackup = () => {
-    dispatch(setBackupCompleted())
-    navigate(Screens.WalletHome)
-  }
-
   // Prevent back button on Android
   useEffect(() => {
     const backPressListener = () => true
@@ -56,7 +47,6 @@ function BackupForceScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <DevSkipButton onSkip={skipBackup} />
       <ScrollView contentContainerStyle={styles.content}>
         <Logo height={32} />
         <Text style={styles.title}>{t('backupSetupTitle')}</Text>

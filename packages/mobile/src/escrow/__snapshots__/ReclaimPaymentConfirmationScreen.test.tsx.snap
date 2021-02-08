@@ -105,7 +105,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -122,7 +122,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -202,7 +201,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "alignItems": "center",
+                    "alignItems": "flex-start",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -222,7 +221,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -241,9 +240,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 24,
-                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -262,7 +260,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -340,7 +338,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -743,7 +741,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -803,7 +801,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Array [
                         undefined,
                         Object {
-                          "color": "#2E3338",
+                          "color": undefined,
                         },
                       ]
                     }
@@ -838,7 +836,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -1127,7 +1125,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1144,7 +1142,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -1224,7 +1221,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
-                    "alignItems": "center",
+                    "alignItems": "flex-start",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -1244,7 +1241,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -1263,9 +1260,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 24,
-                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -1284,7 +1280,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -1362,7 +1358,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -1765,7 +1761,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -1825,7 +1821,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Array [
                         undefined,
                         Object {
-                          "color": "#2E3338",
+                          "color": undefined,
                         },
                       ]
                     }
@@ -1860,7 +1856,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -2149,7 +2145,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2166,7 +2162,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -2246,7 +2241,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
-                    "alignItems": "center",
+                    "alignItems": "flex-start",
                     "alignSelf": "center",
                     "flexDirection": "row",
                     "marginTop": 5,
@@ -2266,7 +2261,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -2285,9 +2280,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "lineHeight": 22,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 24,
-                      "paddingVertical": 4,
                     },
                   ]
                 }
@@ -2306,7 +2300,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -2384,7 +2378,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -2784,7 +2778,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -2844,7 +2838,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Array [
                         undefined,
                         Object {
-                          "color": "#2E3338",
+                          "color": undefined,
                         },
                       ]
                     }
@@ -2879,7 +2873,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }

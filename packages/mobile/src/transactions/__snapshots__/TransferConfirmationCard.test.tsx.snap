@@ -154,7 +154,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -162,12 +162,24 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     ]
                   }
                 >
-                  <svg
-                    fill="hsl(0, 53%, 93%)"
-                    height="40"
-                    style={Object {}}
-                    viewBox="0 0 40 40"
-                    width="40"
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
                   />
                 </View>
               </View>
@@ -232,7 +244,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -249,7 +261,6 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -370,7 +381,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -510,7 +521,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -590,7 +601,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -649,7 +660,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -684,7 +695,7 @@ exports[`TransferConfirmationCard renders correctly for CELO withdrawal transact
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -781,7 +792,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -841,7 +852,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -876,7 +887,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -1034,7 +1045,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(291, 53%, 93%)",
+                        "backgroundColor": "#FEB45E",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1042,23 +1053,25 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                     ]
                   }
                 >
-                  <Text
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Inter-Medium",
-                          "fontSize": 16,
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "color": "hsl(291, 67%, 24%)",
-                          "fontSize": 20,
+                          "height": 40,
+                          "width": 40,
                         },
                       ]
                     }
-                  >
-                    C
-                  </Text>
+                  />
                 </View>
               </View>
               <View
@@ -1122,7 +1135,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1139,7 +1152,6 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -1265,7 +1277,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -1325,7 +1337,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -1360,7 +1372,7 @@ exports[`TransferConfirmationCard renders correctly for received CELO reward 1`]
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -1527,7 +1539,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1535,12 +1547,24 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                     ]
                   }
                 >
-                  <svg
-                    fill="hsl(0, 53%, 93%)"
-                    height="40"
-                    style={Object {}}
-                    viewBox="0 0 40 40"
-                    width="40"
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
                   />
                 </View>
               </View>
@@ -1605,7 +1629,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1622,7 +1646,6 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -1714,7 +1737,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -1774,7 +1797,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -1809,7 +1832,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -1976,7 +1999,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -1984,12 +2007,24 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                     ]
                   }
                 >
-                  <svg
-                    fill="hsl(0, 53%, 93%)"
-                    height="40"
-                    style={Object {}}
-                    viewBox="0 0 40 40"
-                    width="40"
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
                   />
                 </View>
               </View>
@@ -2054,7 +2089,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2071,7 +2106,6 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -2163,7 +2197,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -2223,7 +2257,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -2258,7 +2292,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -2427,7 +2461,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2435,12 +2469,24 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-                  <svg
-                    fill="hsl(0, 53%, 93%)"
-                    height="40"
-                    style={Object {}}
-                    viewBox="0 0 40 40"
-                    width="40"
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
                   />
                 </View>
               </View>
@@ -2505,7 +2551,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -2522,7 +2568,6 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -2643,7 +2688,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -2783,7 +2828,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -2863,7 +2908,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -2922,7 +2967,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -2957,7 +3002,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -3125,7 +3170,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -3133,12 +3178,24 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-                  <svg
-                    fill="hsl(0, 53%, 93%)"
-                    height="40"
-                    style={Object {}}
-                    viewBox="0 0 40 40"
-                    width="40"
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
+                    style={
+                      Array [
+                        Object {
+                          "alignSelf": "center",
+                          "margin": "auto",
+                        },
+                        Object {
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
                   />
                 </View>
               </View>
@@ -3203,7 +3260,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                         "justifyContent": "center",
                       },
                       Object {
-                        "backgroundColor": "hsl(0, 53%, 93%)",
+                        "backgroundColor": "#7AD6FE",
                         "borderRadius": 20,
                         "height": 40,
                         "width": 40,
@@ -3220,7 +3277,6 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                           "fontSize": 16,
                         },
                         Object {
-                          "color": "hsl(0, 67%, 24%)",
                           "fontSize": 20,
                         },
                       ]
@@ -3341,7 +3397,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -3481,7 +3537,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     Array [
                       undefined,
                       Object {
-                        "color": "#2E3338",
+                        "color": undefined,
                       },
                     ]
                   }
@@ -3561,7 +3617,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -3620,7 +3676,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -3655,7 +3711,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -3752,7 +3808,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }
@@ -3811,7 +3867,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -3846,7 +3902,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
               Array [
                 undefined,
                 Object {
-                  "color": "#2E3338",
+                  "color": undefined,
                 },
               ]
             }

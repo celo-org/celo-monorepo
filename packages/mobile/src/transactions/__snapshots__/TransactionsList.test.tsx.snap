@@ -187,7 +187,7 @@ exports[`ignores failed standby transactions 1`] = `
                       "justifyContent": "center",
                     },
                     Object {
-                      "backgroundColor": "hsl(57, 53%, 93%)",
+                      "backgroundColor": "#7AD6FE",
                       "borderRadius": 20,
                       "height": 40,
                       "width": 40,
@@ -195,12 +195,24 @@ exports[`ignores failed standby transactions 1`] = `
                   ]
                 }
               >
-                <svg
-                  fill="hsl(57, 53%, 93%)"
-                  height="40"
-                  style={Object {}}
-                  viewBox="0 0 40 40"
-                  width="40"
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
                 />
               </View>
             </View>
@@ -231,7 +243,7 @@ exports[`ignores failed standby transactions 1`] = `
                   }
                 }
               >
-                0xce10...ce10
+                feedItemSentTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -404,7 +416,7 @@ exports[`ignores failed standby transactions 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                     },
                   ]
                 }
@@ -612,7 +624,7 @@ exports[`ignores pending standby transactions that are completed in the response
                       "justifyContent": "center",
                     },
                     Object {
-                      "backgroundColor": "hsl(57, 53%, 93%)",
+                      "backgroundColor": "#7AD6FE",
                       "borderRadius": 20,
                       "height": 40,
                       "width": 40,
@@ -620,12 +632,24 @@ exports[`ignores pending standby transactions that are completed in the response
                   ]
                 }
               >
-                <svg
-                  fill="hsl(57, 53%, 93%)"
-                  height="40"
-                  style={Object {}}
-                  viewBox="0 0 40 40"
-                  width="40"
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
                 />
               </View>
             </View>
@@ -656,7 +680,7 @@ exports[`ignores pending standby transactions that are completed in the response
                   }
                 }
               >
-                0xce10...ce10
+                feedItemSentTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -829,7 +853,7 @@ exports[`ignores pending standby transactions that are completed in the response
                   Array [
                     undefined,
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                     },
                   ]
                 }
@@ -1128,7 +1152,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                       "justifyContent": "center",
                     },
                     Object {
-                      "backgroundColor": "hsl(57, 53%, 93%)",
+                      "backgroundColor": "#7AD6FE",
                       "borderRadius": 20,
                       "height": 40,
                       "width": 40,
@@ -1136,12 +1160,24 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   ]
                 }
               >
-                <svg
-                  fill="hsl(57, 53%, 93%)"
-                  height="40"
-                  style={Object {}}
-                  viewBox="0 0 40 40"
-                  width="40"
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
                 />
               </View>
             </View>
@@ -1172,7 +1208,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   }
                 }
               >
-                0xce10...ce10
+                feedItemSentTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -1345,7 +1381,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": "#2E3338",
+                      "color": undefined,
                     },
                   ]
                 }
@@ -1456,7 +1492,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                       "justifyContent": "center",
                     },
                     Object {
-                      "backgroundColor": "hsl(35, 53%, 93%)",
+                      "backgroundColor": "#FEB45E",
                       "borderRadius": 20,
                       "height": 40,
                       "width": 40,
@@ -1464,12 +1500,24 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   ]
                 }
               >
-                <svg
-                  fill="hsl(35, 53%, 93%)"
-                  height="40"
-                  style={Object {}}
-                  viewBox="0 0 40 40"
-                  width="40"
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
                 />
               </View>
             </View>
@@ -1500,7 +1548,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   }
                 }
               >
-                0072bv...o23u
+                feedItemSentTitle
               </Text>
               <Text
                 numberOfLines={1}
