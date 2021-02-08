@@ -1,6 +1,6 @@
 import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address'
+import { retryTx } from 'lib/web3-utils'
 import { SecureTrie } from 'merkle-patricia-tree'
-import prompts from 'prompts'
 import { encode as rlpEncode } from 'rlp'
 import { ProxyInstance } from 'types'
 import Web3 from 'web3'
@@ -31,27 +31,6 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
   return proof.storageHash === bufferToHex(trie.root)
 }
 
-export async function retryTx(fn: any, args: any[]) {
-  while (true) {
-    try {
-      const rvalue = await fn(...args)
-      return rvalue
-    } catch (e) {
-      console.error(e)
-      // @ts-ignore
-      const { confirmation } = await prompts({
-        type: 'confirm',
-        name: 'confirmation',
-        // @ts-ignore: typings incorrectly only accept string.
-        initial: true,
-        message: 'Error while sending tx. Try again?',
-      })
-      if (!confirmation) {
-        throw e
-      }
-    }
-  }
-}
 export async function setAndInitializeImplementation(
   web3: Web3,
   proxy: ProxyInstance,

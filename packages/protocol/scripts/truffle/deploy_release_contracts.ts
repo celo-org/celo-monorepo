@@ -1,13 +1,17 @@
-import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
-import { Address, isValidAddress } from '@celo/utils/src/address'
+import {
+  _setInitialProxyImplementation,
+  checkFunctionArgsLength,
+  retryTx,
+} from '@celo/protocol/lib/web3-utils'
+import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs from 'fs'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
+  ReleaseGoldInstance,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
@@ -163,10 +167,63 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       from: fromAddress,
     },
   ])
+  const [initializerAbiRG, transferImplOwnershipAbiRG] = checkRGImplementationAbi(
+    ReleaseGold,
+    'ReleaseGold'
+  )
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
+
+  // We need to fund the RG implementation instance in order to initialize it.
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from: fromAddress,
+      value: web3.utils.toWei('1', 'ether'),
+    },
+  ])
+
+  // Initialize and lock ownership of RG implementation
+  const implementationInitArgs = [
+    Math.round(new Date().getTime() / 1000),
+    0,
+    1,
+    1,
+    1,
+    false, // should not be revokable
+    '0x0000000000000000000000000000000000000001',
+    NULL_ADDRESS,
+    NULL_ADDRESS,
+    true, // subjectToLiquidityProivision
+    0,
+    false, // canValidate
+    false, // canVote
+    '0x0000000000000000000000000000000000000001',
+  ]
+  const implementationTransferOwnershipArgs = ['0x0000000000000000000000000000000000000001']
+  checkFunctionArgsLength(implementationInitArgs, initializerAbiRG)
+  checkFunctionArgsLength(implementationTransferOwnershipArgs, transferImplOwnershipAbiRG)
+  const implInitCallData = web3.eth.abi.encodeFunctionCall(initializerAbiRG, implementationInitArgs)
+  const transferImplOwnershipCallData = web3.eth.abi.encodeFunctionCall(
+    transferImplOwnershipAbiRG,
+    implementationTransferOwnershipArgs
+  )
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from: fromAddress,
+      to: releaseGoldInstance.address,
+      data: implInitCallData,
+    },
+  ])
+  assert(await (releaseGoldInstance as ReleaseGoldInstance).initialized())
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from: fromAddress,
+      to: releaseGoldInstance.address,
+      data: transferImplOwnershipCallData,
+    },
+  ])
 
   let releaseGoldTxHash
   try {
@@ -664,4 +721,24 @@ module.exports = async (callback: (error?: any) => number) => {
   } catch (error) {
     callback(error)
   }
+}
+
+function checkRGImplementationAbi(Contract: any, name: string) {
+  const initializerAbi: string = Contract.abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+  )
+  if (!initializerAbi) {
+    throw new Error(
+      `Attempting to deploy RG implementation contract ${name} that does not have an initialize() function. Abort.`
+    )
+  }
+  const transferImplOwnershipAbi: string = Contract.abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === '_transferOwnership'
+  )
+  if (!transferImplOwnershipAbi) {
+    throw new Error(
+      `Attempting to deploy RG implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
+    )
+  }
+  return [initializerAbi, transferImplOwnershipAbi]
 }
