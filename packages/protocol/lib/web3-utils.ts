@@ -6,6 +6,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
+import prompts from 'prompts'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
 
