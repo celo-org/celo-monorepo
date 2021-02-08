@@ -1,5 +1,5 @@
 import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address'
-import { retryTx } from 'lib/web3-utils'
+import { retryTx } from './web3-utils'
 import { SecureTrie } from 'merkle-patricia-tree'
 import { encode as rlpEncode } from 'rlp'
 import { ProxyInstance } from 'types'
