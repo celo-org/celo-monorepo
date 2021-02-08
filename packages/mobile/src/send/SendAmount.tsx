@@ -9,7 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
@@ -23,7 +23,7 @@ import {
   ALERT_BANNER_DURATION,
   DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
-  NUMBER_INPUT_MAX_DECIMALS
+  NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
@@ -31,19 +31,19 @@ import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,
-  secureSendPhoneNumberMappingSelector
+  secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
 import { RecipientVerificationStatus } from 'src/identity/types'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
-  convertLocalAmountToDollars
+  convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import {
   getLocalCurrencyCode,
   getLocalCurrencyExchangeRate,
-  getLocalCurrencySymbol
+  getLocalCurrencySymbol,
 } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -311,12 +311,16 @@ function SendAmount(props: Props) {
       <DisconnectBanner />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.showAmountContainer}>
-         <View style={styles.currencySymbolContainer}> 
-            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.currencySymbol}>{localCurrencySymbol || localCurrencyCode}</Text>
+          <View style={styles.currencySymbolContainer}>
+            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.currencySymbol}>
+              {localCurrencySymbol || localCurrencyCode}
+            </Text>
           </View>
-          <View style={styles.amountContainer}> 
-            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.amount}>{amount ? amount : '0'}</Text>
-          </View> 
+          <View style={styles.amountContainer}>
+            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.amount}>
+              {amount ? amount : '0'}
+            </Text>
+          </View>
           <View style={styles.currencySymbolContainer}>
             <Text style={styles.currencySymbolTransparent}>
               {localCurrencySymbol || localCurrencyCode}
@@ -353,16 +357,16 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: Dimensions.get("window").width,
   },
+
   showAmountContainer: {
-   flex: 1,
-   flexDirection: 'row',
-   justifyContent: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   amountContainer: {
     justifyContent: 'center',
-    maxWidth: 256,
+    maxWidth: '90%',
   },
   currencySymbolContainer: {
     justifyContent: 'center',
@@ -381,6 +385,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   amount: {
+    ...fontStyles.regular,
     fontSize: 64,
   },
   nextBtn: {
