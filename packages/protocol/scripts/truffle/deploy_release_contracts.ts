@@ -746,7 +746,7 @@ function checkAndReturnInitializationAbi(Contract: any, name: string) {
     )
   }
   const transferImplOwnershipAbi: string = Contract.abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === '_transferOwnership'
+    (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
   )
   if (!transferImplOwnershipAbi) {
     throw new Error(
