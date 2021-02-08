@@ -358,7 +358,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
-
   showAmountContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -366,7 +365,7 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     justifyContent: 'center',
-    maxWidth: '90%',
+    maxWidth: '75%',
   },
   currencySymbolContainer: {
     justifyContent: 'center',
@@ -385,7 +384,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   amount: {
-    ...fontStyles.regular,
     fontSize: 64,
   },
   nextBtn: {
