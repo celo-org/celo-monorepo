@@ -36,12 +36,14 @@ import useTypedSelector from 'src/redux/useSelector'
 import { getCountryFeatures } from 'src/utils/countryFeatures'
 import Logger from 'src/utils/Logger'
 import {
+  actionableAttestationsSelector,
   currentStateSelector,
   setKomenciContext,
   startKomenciSession,
   StateType,
   stop,
   useKomenciSelector,
+  verificationStatusSelector,
 } from 'src/verify/reducer'
 import GoogleReCaptcha from 'src/verify/safety/GoogleReCaptcha'
 import { getPhoneNumberState } from 'src/verify/utils'
@@ -146,12 +148,21 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     return true
   }
 
+  const actionableAttestations = useSelector(actionableAttestationsSelector)
+  const { numAttestationsRemaining } = useSelector(verificationStatusSelector)
+
+  const noActionRequred = !!(
+    NUM_ATTESTATIONS_REQUIRED -
+    numAttestationsRemaining +
+    actionableAttestations.length
+  )
+
   const onPressStart = async () => {
     if (!canUsePhoneNumber()) {
       return
     }
     dispatch(setHasSeenVerificationNux(true))
-    dispatch(startVerification(phoneNumberInfo.e164Number, true))
+    dispatch(startVerification(phoneNumberInfo.e164Number, noActionRequred))
   }
 
   const onPressSkipCancel = () => {
@@ -258,9 +269,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     firstButton = (
       <Button
         text={
-          NUM_ATTESTATIONS_REQUIRED // - numAttestationsRemaining + actionableAttestations.length
-            ? t('verificationEducation.resume')
-            : t('verificationEducation.start')
+          noActionRequred ? t('verificationEducation.resume') : t('verificationEducation.start')
         }
         onPress={onPressStart}
         type={BtnTypes.ONBOARDING}

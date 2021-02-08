@@ -58,6 +58,7 @@ import {
   setLastRevealAttempt,
   setVerificationStatus,
   StartVerificationAction,
+  startVerification,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
@@ -83,6 +84,9 @@ import {
   succeed,
   useKomenciSelector,
   verificationStatusSelector,
+  setActionableAttestation,
+  overrideWithoutVerificationSelector,
+  setOverrideWithoutVerification,
 } from 'src/verify/reducer'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
@@ -121,12 +125,12 @@ export interface AttestationCode {
 
 const inputAttestationCodeLock = new AwaitLock()
 
-export function* startVerification({ withoutRevealing }: StartVerificationAction) {
+export function* startVerificationSaga({ withoutRevealing }: StartVerificationAction) {
   ValoraAnalytics.track(VerificationEvents.verification_start)
   Logger.debug(TAG, 'Starting verification')
   const e164Number = yield select(e164NumberSelector)
-
-  yield put(start({ e164Number, withoutRevealing }))
+  yield put(setOverrideWithoutVerification(withoutRevealing))
+  yield put(start({ e164Number, withoutRevealing: !!withoutRevealing }))
 
   const {
     cancel,
@@ -154,7 +158,7 @@ export function* startVerification({ withoutRevealing }: StartVerificationAction
       count: status.numAttestationsRemaining,
     })
     Logger.debug(TAG, 'Verification has been restarted')
-    yield put(start({ e164Number, withoutRevealing: false }))
+    yield put(startVerification(e164Number, false))
   } else if (success) {
     ValoraAnalytics.track(VerificationEvents.verification_complete)
     Logger.debug(TAG, 'Verification completed successfully')
@@ -164,6 +168,7 @@ export function* startVerification({ withoutRevealing }: StartVerificationAction
     yield call(reportActionableAttestationsStatuses)
   } else if (cancel) {
     ValoraAnalytics.track(VerificationEvents.verification_cancel)
+    yield put(setVerificationStatus(VerificationStatus.Stopped))
     Logger.debug(TAG, 'Verification cancelled')
     yield call(reportActionableAttestationsStatuses)
   } else if (timeout) {
@@ -280,6 +285,8 @@ export function* doVerificationFlowSaga(action: ReturnType<typeof doVerification
             attestations.length + attestationsToRequest,
             useKomenci
           )
+          yield put(setActionableAttestation(attestations))
+
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
             issuers,
           })

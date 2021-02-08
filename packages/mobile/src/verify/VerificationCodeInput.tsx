@@ -48,7 +48,6 @@ function VerificationCodeInput({
   } else if (attestationCodes.length === index) {
     codeStatus = CodeInputStatus.INPUTTING
   }
-
   return (
     <CodeInput
       label={label}

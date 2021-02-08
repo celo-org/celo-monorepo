@@ -29,7 +29,7 @@ import {
 } from 'src/identity/reducer'
 import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { reportRevealStatusSaga, startVerification } from 'src/identity/verification'
+import { reportRevealStatusSaga, startVerificationSaga } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
@@ -116,7 +116,7 @@ function* fetchKnownAddresses() {
 }
 
 function* watchVerification() {
-  yield takeLatest(Actions.START_VERIFICATION, startVerification)
+  yield takeLatest(Actions.START_VERIFICATION, startVerificationSaga)
   yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
 

@@ -35,7 +35,7 @@ import { all, call, delay, put, race, select, takeEvery } from 'redux-saga/effec
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
-import { updateE164PhoneNumberSalts } from 'src/identity/actions'
+import { Actions, updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
 import {
   hasExceededKomenciErrorQuota,
@@ -78,6 +78,9 @@ import {
   start,
   startKomenciSession,
   useKomenciSelector,
+  overrideWithoutVerificationSelector,
+  resetOverrideWithoutVerification,
+  setOverrideWithoutVerification,
 } from 'src/verify/reducer'
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
@@ -229,10 +232,10 @@ function* startOrResumeKomenciSessionSaga(action: ReturnType<typeof startKomenci
   yield put(fetchPhoneNumberDetails())
 }
 
-function* startSaga(action: ReturnType<typeof start>) {
+function* startSaga({ payload: { withoutRevealing } }: ReturnType<typeof start>) {
   // TODO: Move this out of saga
   yield call(navigate, Screens.VerificationLoadingScreen, {
-    withoutRevealing: action.payload.withoutRevealing,
+    withoutRevealing,
   })
 
   const contractKit = yield call(getContractKit)
@@ -262,20 +265,22 @@ function* startSaga(action: ReturnType<typeof start>) {
       const isKomenciReady = yield call(fetchKomenciReadiness, komenciKit)
       if (!isKomenciReady) {
         yield put(disableKomenci())
-        yield put(start(e164Number))
+        yield put(start({ e164Number, withoutRevealing }))
         return
       }
 
       yield call(fetchKomenciSession, komenciKit, e164Number)
       if (!komenci.sessionActive) {
         yield put(ensureRealHumanUser())
+      } else {
+        yield put(fetchPhoneNumberDetails())
       }
     } catch (e) {
       Logger.error(TAG, '@startSaga', e)
       storeTimestampIfKomenciError(e)
       if (e instanceof KomenciErrorQuotaExceeded) {
         yield put(disableKomenci())
-        yield put(start(e164Number))
+        yield put(start({ e164Number, withoutRevealing }))
       }
     }
   } else {
@@ -318,42 +323,42 @@ function* fetchPhoneNumberDetailsSaga(action: ReturnType<typeof fetchPhoneNumber
 
   if (phoneHash && phoneHash.length) {
     Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper is cached')
-    return
-  }
+  } else {
+    if (!ownPepper) {
+      Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper not cached')
+      if (useKomenci) {
+        Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Fetching from Komenci')
 
-  if (!ownPepper) {
-    Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper not cached')
-    if (useKomenci) {
-      Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Fetching from Komenci')
+        const komenci = yield select(komenciContextSelector)
+        const komenciKit = new KomenciKit(contractKit, walletAddress, {
+          url: komenci.callbackUrl || networkConfig.komenciUrl,
+          token: komenci.sessionToken,
+        })
 
-      const komenci = yield select(komenciContextSelector)
-      const komenciKit = new KomenciKit(contractKit, walletAddress, {
-        url: komenci.callbackUrl || networkConfig.komenciUrl,
-        token: komenci.sessionToken,
-      })
+        const blsBlindingClient = new ReactBlsBlindingClient(networkConfig.odisPubKey)
+        const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
+          [komenciKit, komenciKit.getDistributedBlindedPepper],
+          e164Number,
+          DeviceInfo.getVersion(),
+          blsBlindingClient
+        )
 
-      const blsBlindingClient = new ReactBlsBlindingClient(networkConfig.odisPubKey)
-      const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
-        [komenciKit, komenciKit.getDistributedBlindedPepper],
-        e164Number,
-        DeviceInfo.getVersion(),
-        blsBlindingClient
-      )
-
-      if (!pepperQueryResult.ok) {
-        Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Unable to query for pepper')
-        throw pepperQueryResult.error
+        if (!pepperQueryResult.ok) {
+          Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Unable to query for pepper')
+          throw pepperQueryResult.error
+        }
+        ownPepper = pepperQueryResult.result.pepper
+      } else {
+        // TODO: classical fetch
       }
-      ownPepper = pepperQueryResult.result.pepper
-    } else {
-      // TODO: classical fetch
+      Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper is fetched')
+      yield put(updateE164PhoneNumberSalts({ [e164Number]: ownPepper }))
     }
-    Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper is fetched')
-    yield put(updateE164PhoneNumberSalts({ [e164Number]: ownPepper }))
+    phoneHash = getPhoneHash(e164Number, ownPepper)
+    yield put(setPhoneHash(phoneHash))
+    Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Phone Hash is set')
   }
-  phoneHash = getPhoneHash(e164Number, ownPepper)
-  yield put(setPhoneHash(phoneHash))
-  Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Phone Hash is set')
+
   if (useKomenci) {
     yield put(fetchMtw())
   } else {
@@ -412,7 +417,7 @@ function* fetchOrDeployMtwSaga() {
             case e instanceof InvalidWallet:
             default:
               put(disableKomenci())
-              put(start(e164Number))
+              put(start({ e164Number, withoutRevealing: false }))
               return
           }
         }
@@ -515,7 +520,11 @@ function* fetchOnChainDataSaga() {
   )
   Logger.debug(TAG, '@fetchOnChainDataSaga', 'Fetched actionable attestations')
   yield put(setActionableAttestation(actionableAttestations))
-  const withoutRevealing = actionableAttestations.length === status.numAttestationsRemaining
+  const overrideWithoutVerification = yield select(overrideWithoutVerificationSelector)
+  const withoutRevealing =
+    overrideWithoutVerification ?? actionableAttestations.length === status.numAttestationsRemaining
+
+  yield put(setOverrideWithoutVerification(undefined))
   yield put(doVerificationFlow(withoutRevealing))
 }
 
@@ -527,4 +536,6 @@ export function* verifySaga() {
   yield takeEvery(fetchMtw.type, fetchOrDeployMtwSaga)
   yield takeEvery(fetchOnChainData.type, fetchOnChainDataSaga)
   yield takeEvery(doVerificationFlow.type, doVerificationFlowSaga)
+  // TODO: this can be calculated in reducer, once we stop using identify/reducer for verificationmake this
+  yield takeEvery(Actions.COMPLETE_ATTESTATION_CODE, fetchOnChainDataSaga)
 }

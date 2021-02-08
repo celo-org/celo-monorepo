@@ -4,8 +4,13 @@ import { createAction, createReducer } from '@reduxjs/toolkit'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { RootState } from 'src/redux/reducers'
 
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 export const setKomenciContext = createAction<Partial<KomenciContext>>('SET_KOMENCI_CONTEXT')
 
+export const setOverrideWithoutVerification = createAction<boolean | undefined>(
+  'SET_OVERRIDE_WITHOUT_VERIFICATION'
+)
+export const rehydrate = createAction<any>(REHYDRATE)
 export const start = createAction<{ e164Number: string; withoutRevealing: boolean }>('START')
 export const stop = createAction('STOP')
 export const enableKomenci = createAction('ENABLE_KOMENCI')
@@ -121,7 +126,6 @@ export interface KomenciContext {
   sessionToken: string
   callbackUrl: string | undefined
   captchaToken: string
-  pepperFetchedByKomenci: boolean
 }
 
 export interface State {
@@ -134,6 +138,7 @@ export interface State {
   e164Number?: string
   retries: number
   eoaAccount?: string
+  TEMPORAR_override_withoutVerification?: boolean
 }
 
 const initialState: State = {
@@ -144,7 +149,6 @@ const initialState: State = {
     sessionToken: '',
     callbackUrl: undefined,
     captchaToken: '',
-    pepperFetchedByKomenci: false,
   },
   status: {
     isVerified: false,
@@ -160,6 +164,21 @@ const initialState: State = {
 
 export const reducer = createReducer(initialState, (builder) => {
   builder
+    .addCase(rehydrate, (state, action) => {
+      // hack to allow rehydrate actions here
+      const hydrated = getRehydratePayload((action as unknown) as RehydrateAction, 'verify')
+      return {
+        ...state,
+        ...hydrated,
+        komenci: {
+          ...state.komenci,
+          ...hydrated.komenci,
+          captchaToken: initialState.komenci.captchaToken,
+        },
+        retries: 0,
+        currentState: idle(),
+      }
+    })
     .addCase(stop, (state, action) => {
       return { ...state, currentState: idle() }
     })
@@ -244,6 +263,12 @@ export const reducer = createReducer(initialState, (builder) => {
         actionableAttestations: action.payload,
       }
     })
+    .addCase(setOverrideWithoutVerification, (state, action) => {
+      return {
+        ...state,
+        TEMPORAR_override_withoutVerification: action.payload,
+      }
+    })
 })
 
 export const currentStateSelector = (state: RootState) => state.verify.currentState
@@ -256,3 +281,5 @@ export const verificationStatusSelector = (state: RootState): AttestationsStatus
   state.verify.status
 export const actionableAttestationsSelector = (state: RootState): ActionableAttestation[] =>
   state.verify.actionableAttestations
+export const overrideWithoutVerificationSelector = (state: RootState): boolean | undefined =>
+  state.verify.TEMPORAR_override_withoutVerification

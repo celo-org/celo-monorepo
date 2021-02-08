@@ -52,7 +52,7 @@ export enum Actions {
 
 export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
-  withoutRevealing: boolean
+  withoutRevealing: boolean | undefined
   e164Number: string
 }
 
@@ -261,7 +261,7 @@ export type ActionTypes =
 
 export const startVerification = (
   e164Number: string,
-  withoutRevealing: boolean = false
+  withoutRevealing: boolean | undefined
 ): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
   withoutRevealing,
