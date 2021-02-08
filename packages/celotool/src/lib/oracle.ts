@@ -220,7 +220,7 @@ function getPrivateKeyOracleDeployer(celoEnv: string, context: string, useForno:
     return {
       address,
       privateKey: ensureLeading0x(pkey),
-      currencyPair: currencyPair,
+      currencyPair,
     }
   })
 
