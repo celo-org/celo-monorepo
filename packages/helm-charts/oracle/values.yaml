@@ -25,6 +25,7 @@ oracle:
     http: https://alfajoresstaging-forno.celo-testnet.org
   identities:
   - address: 0x0000000000000000000000000000000000000000
+    currencyPair: CELOUSD
     privateKey: 0x000
     azure:
       id: defaultId
@@ -32,6 +33,7 @@ oracle:
       keyVaultName: defaultKeyVaultName
   - address: 0x0000000000000000000000000000000000000001
     privateKey: 0x001
+    currencyPair: CELOUSD
     azure:
       id: defaultId1
       clientId: defaultClientId1
@@ -51,7 +53,6 @@ oracle:
       # dataFetchFrequency
       # minimumTrades
       # scalingRate
-  currencyPair: CELOUSD
   metrics:
     enabled: true
     prometheusPort: 9090

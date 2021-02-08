@@ -109,6 +109,10 @@ spec:
             ADDRESSES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.address }},{{- end }}
             export ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
 
+            # Get the currency pair
+            CURRENCY_PAIRS={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.currencyPair }},{{- end }}
+            export CURRENCY_PAIR=`echo -n $CURRENCY_PAIRS | cut -d ',' -f $((RID + 1))`
+
             exec yarn start
         env:
         - name: REPLICA_NAME
@@ -138,7 +142,6 @@ spec:
 {{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.oracle "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.oracle "value_name" "privateKeyPath" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.oracle.metrics "value_name" "prometheusPort") | indent 8 }}
-{{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
 {{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_FREQUENCY" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredFrequencyMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredOffsetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_FREQUENCY_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeFrequencyOverride" "optional" true) | indent 8 }}

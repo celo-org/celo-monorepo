@@ -28,5 +28,5 @@ export const handler = async (argv: OracleUpgradeArgv) => {
     argv.useForno,
     clusterManager
   )
-  await deployer.upgradeChart(argv.context)
+  await deployer.upgradeChart()
 }

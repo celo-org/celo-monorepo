@@ -1,6 +1,5 @@
-import { getContextDynamicEnvVarValues } from 'src/lib/context-utils'
 import { getFornoUrl, getFornoWebSocketUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -10,6 +9,7 @@ const helmChartPath = '../helm-charts/oracle'
  */
 export interface OracleIdentity {
   address: string
+  currencyPair: string
 }
 
 export interface BaseOracleDeploymentConfig {
@@ -27,21 +27,21 @@ export abstract class BaseOracleDeployer {
     this._celoEnv = celoEnv
   }
 
-  async installChart(context: string) {
+  async installChart() {
     return installGenericHelmChart(
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters(context)
+      await this.helmParameters()
     )
   }
 
-  async upgradeChart(context: string) {
+  async upgradeChart() {
     return upgradeGenericHelmChart(
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters(context)
+      await this.helmParameters()
     )
   }
 
@@ -49,23 +49,13 @@ export abstract class BaseOracleDeployer {
     await removeGenericHelmChart(this.releaseName, this.celoEnv)
   }
 
-  async helmParameters(context: string) {
+  async helmParameters() {
     const httpRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoUrl(this.celoEnv)
       : getFullNodeHttpRpcInternalUrl(this.celoEnv)
     const wsRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoWebSocketUrl(this.celoEnv)
       : getFullNodeWebSocketRpcInternalUrl(this.celoEnv)
-
-    const vars = getContextDynamicEnvVarValues(
-      {
-        currencyPair: DynamicEnvVar.ORACLE_CURRENCY_PAIR
-      },
-      context,
-      {
-        currencyPair: 'CELOUSD'
-      }
-    )
 
     return [
       `--set environment.name=${this.celoEnv}`,
@@ -76,7 +66,6 @@ export abstract class BaseOracleDeployer {
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
       `--set oracle.metrics.enabled=true`,
       `--set oracle.metrics.prometheusPort=9090`,
-      `--set oracle.currencyPair=${vars.currencyPair}`,
       `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
     ].concat(await this.oracleIdentityHelmParameters())
   }
@@ -90,6 +79,7 @@ export abstract class BaseOracleDeployer {
       const oracleIdentity = this.deploymentConfig.identities[i]
       const prefix = `--set oracle.identities[${i}]`
       params.push(`${prefix}.address=${oracleIdentity.address}`)
+      params.push(`${prefix}.currencyPair=${oracleIdentity.currencyPair}`)
     }
     return params
   }

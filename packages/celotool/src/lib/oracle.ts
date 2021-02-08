@@ -63,7 +63,7 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
     }
   )
   const aksClusterConfig = clusterManager.clusterConfig as AksClusterConfig
-  const identities = getAksHsmOracleIdentities(addressKeyVaults, aksClusterConfig.resourceGroup)
+  const identities = getAksHsmOracleIdentities(addressKeyVaults, context, aksClusterConfig.resourceGroup)
   const deploymentConfig: AksHsmOracleDeploymentConfig = {
     context,
     clusterConfig: aksClusterConfig,
@@ -79,7 +79,8 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1:resourceGroup1
  * returns an array of AksHsmOracleIdentity in the same order
  */
-export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, defaultResourceGroup: string): AksHsmOracleIdentity[] {
+export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, context: string, defaultResourceGroup: string): AksHsmOracleIdentity[] {
+  const currencyPairForAddress = getCurrencyPairsFor(context)
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
@@ -90,9 +91,16 @@ export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, default
         `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
       )
     }
+    const currencyPair = currencyPairForAddress.get(address)
+    if (currencyPair === undefined) {
+      throw Error(
+        `No currency pair defined for identity ${address} in context ${context}`
+      )
+    }
     identities.push({
       address,
       keyVaultName,
+      currencyPair,
       resourceGroup: resourceGroup || defaultResourceGroup
     })
   }
@@ -129,7 +137,7 @@ function getAwsHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
     }
   )
 
-  const identities = getAwsHsmOracleIdentities(addressKeyAliases)
+  const identities = getAwsHsmOracleIdentities(addressKeyAliases, context)
   const deploymentConfig: AwsHsmOracleDeploymentConfig = {
     context,
     identities,
@@ -145,7 +153,8 @@ function getAwsHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
  * eg: 0x0000000000000000000000000000000000000000:keyAlias0,0x0000000000000000000000000000000000000001:keyAlias1:region1
  * returns an array of AwsHsmOracleIdentity in the same order
  */
-export function getAwsHsmOracleIdentities(addressKeyAliases: string): AwsHsmOracleIdentity[] {
+export function getAwsHsmOracleIdentities(addressKeyAliases: string, context: string): AwsHsmOracleIdentity[] {
+  const currencyPairForAddress = getCurrencyPairsFor(context)
   const identityStrings = addressKeyAliases.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
@@ -156,9 +165,16 @@ export function getAwsHsmOracleIdentities(addressKeyAliases: string): AwsHsmOrac
         `Address or key alias is invalid. Address: ${address} Key Alias: ${keyAlias}`
       )
     }
+    const currencyPair = currencyPairForAddress.get(address)
+    if (currencyPair === undefined) {
+      throw Error(
+        `No currency pair defined for identity ${address} in context ${context}`
+      )
+    }
     identities.push({
       address,
       keyAlias,
+      currencyPair,
       region
     })
   }
@@ -184,24 +200,61 @@ const awsHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AwsHsmOracleIdenti
  */
 
 /**
- * Gets an AwsHsmOracleDeployer by looking at env var values and generating private keys
+ * Gets an PrivateKeyOracleDeployer by looking at env var values and generating private keys
  * from the mnemonic
  */
 function getPrivateKeyOracleDeployer(celoEnv: string, context: string, useForno: boolean, count: number): PrivateKeyOracleDeployer {
+  const currencyPairForAddress = getCurrencyPairsFor(context)
   const identities: PrivateKeyOracleIdentity[] = getPrivateKeysFor(
     AccountType.PRICE_ORACLE,
     fetchEnv(envVar.MNEMONIC),
     count
-  ).map((pkey) => ({
-    address: privateKeyToAddress(pkey),
-    privateKey: ensureLeading0x(pkey)
-  }))
+  ).map((pkey) => {
+    const address = privateKeyToAddress(pkey)
+    const currencyPair = currencyPairForAddress.get(address)
+    if (currencyPair === undefined) {
+      throw Error(
+        `No currency pair defined for identity ${address} in context ${context}`
+      )
+    }
+    return {
+      address,
+      privateKey: ensureLeading0x(pkey),
+      currencyPair: currencyPair,
+    }
+  })
+
   const deploymentConfig: PrivateKeyOracleDeploymentConfig = {
     context,
     identities,
     useForno
   }
   return new PrivateKeyOracleDeployer(deploymentConfig, celoEnv)
+}
+
+/**
+ * Parses an env var entry of the form `<address0>:<currencyPair0>,<address1>:<currencyPair1>...`
+ * into a Map<address, currencyPair>
+ * @param context The context for the dynamic env vars
+ */
+function getCurrencyPairsFor(context: string): Map<string, string> {
+  const { currencyPairs } = getContextDynamicEnvVarValues(
+    {
+      currencyPairs: DynamicEnvVar.ORACLE_ADDRESS_CURRENCY_PAIRS
+    },
+    context,
+    {
+      currencyPairs: '',
+    }
+  )
+  return currencyPairs.split(',').reduce(
+    (pairs, pair) => {
+      const [address, currencyPair] = pair.split(':')
+      pairs.set(address, currencyPair)
+      return pairs
+    },
+    new Map()
+  )
 }
 
 /**
@@ -218,3 +271,4 @@ interface MnemonicBasedOracleIdentityConfig {
 const mnemonicBasedOracleIdentityConfigDynamicEnvVars: { [k in keyof MnemonicBasedOracleIdentityConfig]: DynamicEnvVar } = {
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
 }
+
