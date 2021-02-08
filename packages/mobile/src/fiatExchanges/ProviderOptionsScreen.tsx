@@ -1,6 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import ListItem from '@celo/react-components/components/ListItem'
 import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useLayoutEffect, useState } from 'react'
@@ -32,6 +33,7 @@ import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
 import { currentAccountSelector } from 'src/web3/selectors'
+import LinkArrow from 'src/icons/LinkArrow'
 
 type Props = StackScreenProps<StackParamList, Screens.ProviderOptionsScreen>
 
@@ -121,20 +123,14 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         <View style={styles.providersContainer}>
           {providers[isCashIn ? 'cashIn' : 'cashOut']
             .filter((provider) => provider.enabled)
-            .map((provider) => {
-              return (
-                <View key={provider.name}>
-                  <TouchableOpacity
-                    onPress={providerOnPress(provider)}
-                    style={styles.provider}
-                    testID={`Provider/${provider.name}`}
-                  >
-                    {provider.image || <Text>{provider.name}</Text>}
-                  </TouchableOpacity>
-                  <View style={styles.separator} />
+            .map((provider) => (
+              <ListItem key={provider.name} onPress={providerOnPress(provider)}>
+                <View style={styles.providerListItem} testID={`Provider/${provider.name}`}>
+                  <Text style={styles.optionTitle}>{provider.name}</Text>
+                  <LinkArrow />
                 </View>
-              )
-            })}
+              </ListItem>
+            ))}
         </View>
         <Dialog
           title={t('explanationModal.title')}
@@ -158,11 +154,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     flexDirection: 'column',
-    marginHorizontal: variables.contentPadding,
+    marginRight: variables.contentPadding,
   },
   pleaseSelectProvider: {
     ...fontStyles.regular,
     marginBottom: variables.contentPadding,
+    paddingLeft: variables.contentPadding,
   },
   logo: {
     height: 30,
@@ -178,5 +175,13 @@ const styles = StyleSheet.create({
     height: 1,
     width: '100%',
     backgroundColor: colors.gray2,
+  },
+  providerListItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  optionTitle: {
+    ...fontStyles.regular,
   },
 })
