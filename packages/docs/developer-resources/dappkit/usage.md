@@ -61,6 +61,7 @@ Let's go from accessing account information to submitting transactions. To alter
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/e3a1c00f2b8a6f6f6891c515a131ff66b55cb563))
 
 ```javascript
+import { toTxResult } from '@celo/connect'
 import {
   requestTxSig,
   waitForSignedTxs
