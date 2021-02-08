@@ -175,11 +175,11 @@ const deployCoreContract = async (
       try {
         callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
       } catch (error) {
-        const msg = `Tried to initialize new implementation of ${contractName} with args: ${JSON.stringify(
-          args
-        )}. Initialization ABI spec is: ${JSON.stringify(initializeAbi.inputs)}.`
-        console.error(msg)
-        throw new Error(msg)
+        throw new Error(
+          `Tried to initialize new implementation of ${contractName} with args: ${JSON.stringify(
+            args
+          )}. Initialization ABI spec is: ${JSON.stringify(initializeAbi.inputs)}.`
+        )
       }
       setImplementationTx.function = '_setAndInitializeImplementation'
       setImplementationTx.args.push(callData)
