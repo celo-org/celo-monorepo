@@ -176,6 +176,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
 
+  console.info('Initializing ReleaseGold...')
   await initializeRGImplementation(
     releaseGoldInstance,
     fromAddress,
@@ -183,6 +184,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     transferImplOwnershipAbiRG
   )
 
+  console.info('Initializing ReleaseGoldProxy...')
   let releaseGoldTxHash
   try {
     releaseGoldTxHash = await _setInitialProxyImplementation(
@@ -250,9 +252,11 @@ async function initializeRGImplementation(
   transferImplOwnershipAbiRG: string
 ) {
   // We need to fund the RG implementation instance in order to initialize it.
+  console.info('Funding ReleaseGold implementation so it can be initialized...')
   await retryTx(web3.eth.sendTransaction, [
     {
       from,
+      to: releaseGoldInstance.address,
       value: 1,
     },
   ])
@@ -281,14 +285,25 @@ async function initializeRGImplementation(
     transferImplOwnershipAbiRG,
     implementationTransferOwnershipArgs
   )
+  console.info('Sending initialize tx...')
   await retryTx(web3.eth.sendTransaction, [
     {
       from,
       to: releaseGoldInstance.address,
       data: implInitCallData,
+      gas: 3000000,
     },
   ])
-  assert(await (releaseGoldInstance as ReleaseGoldInstance).initialized())
+  console.info('Returned from initialization tx')
+  if (!(await (releaseGoldInstance as ReleaseGoldInstance).initialized())) {
+    console.error(
+      `Failed to initialize ReleaseGold implementation at address ${releaseGoldInstance.address}`
+    )
+  }
+  console.info('ReleaseGold implementation has been successfully initialized!')
+  console.info(
+    'Transferring ownsership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
+  )
   await retryTx(web3.eth.sendTransaction, [
     {
       from,
