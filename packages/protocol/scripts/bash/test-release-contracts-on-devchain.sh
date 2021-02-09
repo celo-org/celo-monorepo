@@ -50,8 +50,6 @@ if command -v lsof; then
     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
 fi
 
-cp -r $BUILD_DIR
-
 yarn build:ts
 yarn run truffle exec scripts/truffle/deploy-release-contracts.test.js
 
