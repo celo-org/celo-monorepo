@@ -35,6 +35,7 @@ interface AppEventsProperties {
     deviceInfo?: object
     deviceHeight: number
     deviceWidth: number
+    language: string
   }
   [AppEvents.app_state_error]: {
     error: string
