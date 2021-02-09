@@ -97,16 +97,16 @@ contract('Validators', (accounts: string[]) => {
     adjustmentSpeed: toFixed(0.25),
   }
 
-  const grace = new BigNumber(0.00625)
   const one = new BigNumber(1)
   const max1 = (num: BigNumber) => (num.gt(one) ? one : num)
-  const calculateScore = (uptime: BigNumber) =>
-    max1(uptime.plus(grace)).pow(validatorScoreParameters.exponent)
+  const calculateScore = (uptime: BigNumber, gracePeriod: BigNumber) =>
+    max1(uptime.plus(gracePeriod)).pow(validatorScoreParameters.exponent)
 
   const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
   const commissionUpdateDelay = new BigNumber(3)
+  const downtimeGracePeriod = new BigNumber(0)
 
   // A random 64 byte hex string.
   const blsPublicKey =
@@ -140,7 +140,8 @@ contract('Validators', (accounts: string[]) => {
       membershipHistoryLength,
       slashingMultiplierResetPeriod,
       maxGroupSize,
-      commissionUpdateDelay
+      commissionUpdateDelay,
+      downtimeGracePeriod
     )
   })
 
@@ -210,6 +211,11 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(actualCommissionUpdateDelay, commissionUpdateDelay)
     })
 
+    it('should have set the downtime grace period', async () => {
+      const actualDowntimeGracePeriod = await validators.downtimeGracePeriod()
+      assertEqualBN(actualDowntimeGracePeriod, downtimeGracePeriod)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         validators.initialize(
@@ -223,7 +229,8 @@ contract('Validators', (accounts: string[]) => {
           membershipHistoryLength,
           slashingMultiplierResetPeriod,
           maxGroupSize,
-          commissionUpdateDelay
+          commissionUpdateDelay,
+          downtimeGracePeriod
         )
       )
     })
@@ -1888,14 +1895,15 @@ contract('Validators', (accounts: string[]) => {
       it('should calculate the score correctly', async () => {
         // Compare expected and actual to 8 decimal places.
         const uptime = new BigNumber(0.99)
+        const grace = await validators.downtimeGracePeriod()
         assertEqualDpBN(
           fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
-          calculateScore(uptime),
+          calculateScore(uptime, grace),
           8
         )
         assertEqualDpBN(
           fromFixed(await validators.calculateEpochScore(new BigNumber(0))),
-          calculateScore(new BigNumber(0)),
+          calculateScore(new BigNumber(0), grace),
           8
         )
 
@@ -1912,11 +1920,16 @@ contract('Validators', (accounts: string[]) => {
   })
 
   describe('#calculateGroupEpochScore', () => {
+    let grace: BigNumber
+    before(async () => {
+      grace = await validators.downtimeGracePeriod()
+    })
+
     describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const testGroupUptimeCalculation = (_uptimes) => {
+      const testGroupUptimeCalculation = async (_uptimes) => {
         const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
-          .map((uptime) => calculateScore(uptime))
+          .map((uptime) => calculateScore(uptime, grace))
           .reduce((sum, n) => sum.plus(n))
           .div(_uptimes.length)
         it('should calculate the group score correctly', async () => {
