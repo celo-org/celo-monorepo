@@ -2,7 +2,7 @@
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
@@ -53,8 +53,6 @@ class ContractAddresses {
   }
 }
 
-const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
-
 const isProxiedContract = (contractName: string) => {
   if (contractName.endsWith('Proxy')) {
     return false
@@ -82,7 +80,7 @@ const deployImplementation = async (
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  const contract = await (dryRun ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
+  const contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -115,7 +113,7 @@ const deployProxy = async (
     Proxy.defaults({ from }) // override truffle with provided from address
   }
   // Hack to trick truffle, which checks that the provided address has code
-  const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
+  const proxy = await (dryRun ? Proxy.at(celoRegistryAddress) : Proxy.new())
 
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
@@ -124,6 +122,70 @@ const deployProxy = async (
   }
 
   return proxy
+}
+
+const deployCoreContract = async (
+  contractName: string,
+  instance: Truffle.Contract<Truffle.ContractInstance>,
+  proposal: ProposalTx[],
+  addresses: ContractAddresses,
+  report: ASTDetailedVersionedReport,
+  initializationData: any,
+  isDryRun: boolean,
+  from: string
+) => {
+  const contract = await deployImplementation(contractName, instance, isDryRun, from)
+  const setImplementationTx: ProposalTx = {
+    contract: `${contractName}Proxy`,
+    function: '_setImplementation',
+    args: [contract.address],
+    value: '0',
+  }
+
+  // Deploy new versions of the proxy, if needed
+  const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
+  if (!shouldDeployProxy) {
+    proposal.push(setImplementationTx)
+  } else {
+    const proxy = await deployProxy(contractName, addresses, isDryRun, from)
+
+    // Update the contract's address to the new proxy in the proposal
+    addresses.set(contractName, proxy.address)
+    proposal.push({
+      contract: 'Registry',
+      function: 'setAddressFor',
+      args: [contractName, proxy.address],
+      value: '0',
+      description: `Registry: ${contractName} -> ${proxy.address}`,
+    })
+
+    // If the implementation has an initialize function, add it to the proposal
+    const initializeAbi = (contract as any).abi.find(
+      (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+    )
+    if (initializeAbi) {
+      const args = initializationData[contractName]
+      const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+      setImplementationTx.function = '_setAndInitializeImplementation'
+      setImplementationTx.args.push(callData)
+    }
+    console.log(
+      `Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`
+    )
+    proposal.push(setImplementationTx)
+  }
+}
+
+const deployLibrary = async (
+  contractName: string,
+  contractArtifact: Truffle.Contract<Truffle.ContractInstance>,
+  addresses: ContractAddresses,
+  isDryRun: boolean,
+  from: string
+) => {
+  const contract = await deployImplementation(contractName, contractArtifact, isDryRun, from)
+  addresses.set(contractName, contract.address)
+  return
 }
 
 export interface ProposalTx {
@@ -147,7 +209,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
     )
-    const registry = await artifacts.require('Registry').at(REGISTRY_ADDRESS)
+    const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
@@ -155,80 +217,37 @@ module.exports = async (callback: (error?: any) => number) => {
     const release = async (contractName: string) => {
       if (released.has(contractName)) {
         return
-      } else {
-        // 1. Release all dependencies.
-        const contractDependencies = dependencies.get(contractName)
-        for (const dependency of contractDependencies) {
-          await release(dependency)
-        }
-        // 2. Link dependencies.
-        const Contract = await artifacts.require(contractName)
-        await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
-
-        // 3. Deploy new versions of the contract, if needed.
-        const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
-        const isLibrary = linkedLibraries[contractName]
-        if (shouldDeployImplementation) {
-          const contract = await deployImplementation(
-            contractName,
-            Contract,
-            argv.dry_run,
-            argv.from
-          )
-          const setImplementationTx: ProposalTx = {
-            contract: `${contractName}Proxy`,
-            function: '_setImplementation',
-            args: [contract.address],
-            value: '0',
-          }
-
-          // 4. Deploy new versions of the proxy, if needed
-          const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
-          if (!shouldDeployProxy) {
-            proposal.push(setImplementationTx)
-          } else {
-            const proxy = await deployProxy(contractName, addresses, argv.dry_run, argv.from)
-
-            // 5. Update the contract's address to the new proxy in the proposal
-            addresses.set(contractName, proxy.address)
-            proposal.push({
-              contract: 'Registry',
-              function: 'setAddressFor',
-              args: [contractName, proxy.address],
-              value: '0',
-              description: `Registry: ${contractName} -> ${proxy.address}`,
-            })
-
-            // 6. If the implementation has an initialize function, add it to the proposal
-            const initializeAbi = (contract as any).abi.find(
-              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-            )
-            if (initializeAbi) {
-              const args = initializationData[contractName]
-              const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
-              console.log(`Add 'Initializing ${contractName} with: ${args}' to proposal`)
-              proposal.push({
-                contract: `${contractName}Proxy`,
-                function: '_setAndInitializeImplementation',
-                args: [contract.address, callData],
-                value: '0',
-              })
-            } else {
-              proposal.push(setImplementationTx)
-            }
-          }
-        } else if (isLibrary) {
-          const contract = await deployImplementation(
-            contractName,
-            Contract,
-            argv.dry_run,
-            argv.from
-          )
-          addresses.set(contractName, contract.address)
-        }
-        // 7. Mark the contract as released
-        released.add(contractName)
       }
+      // 1. Release all dependencies.
+      const contractDependencies = dependencies.get(contractName)
+      for (const dependency of contractDependencies) {
+        await release(dependency)
+      }
+      // 2. Link dependencies.
+      const contractArtifact = await artifacts.require(contractName)
+      await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
+
+      // 3. Deploy new versions of the contract, if needed.
+      const shouldDeployCoreContractImplementation = Object.keys(report.contracts).includes(
+        contractName
+      )
+      const isLibrary = linkedLibraries[contractName]
+      if (shouldDeployCoreContractImplementation) {
+        await deployCoreContract(
+          contractName,
+          contractArtifact,
+          proposal,
+          addresses,
+          report,
+          initializationData,
+          argv.dry_run,
+          argv.from
+        )
+      } else if (isLibrary) {
+        await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
+      }
+      // Mark the contract as released
+      released.add(contractName)
     }
     for (const contractName of contracts) {
       if (isCoreContract(contractName) && isProxiedContract(contractName)) {

@@ -417,8 +417,6 @@ ExecStart=/usr/bin/docker run \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\
       --ethstats=${validator_name}@${ethstats_host} \\
-      --istanbul.blockperiod=${block_time} \\
-      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \\
       --maxpeers=${max_peers} \\
       --nat=extip:${ip_address} \\
       --metrics \\
@@ -429,6 +427,7 @@ ExecStart=/usr/bin/docker run \\
       --proxy.proxyenodeurlpair=\\"$PROXY_URL\\" \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
+ExecStopPost=/usr/bin/docker rm -f %N
 
 [Install]
 WantedBy=default.target

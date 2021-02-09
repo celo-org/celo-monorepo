@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.1--dev]**
+### **[1.0.4--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -15,7 +15,18 @@ Bug Fixes
 Other Changes
 - [one-line summary] - [link PR]
 ## Published
-### **[1.0.0]** -- 2021-01-19
+### **[1.0.3]** -- 2021-01-25
+Bug Fixes
+- Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [#6671](https://github.com/celo-org/celo-monorepo/pull/6671)
+
+### **[1.0.2]** -- 2021-01-22
+Bug Fixes
+- Fixed Global Flag Parsing in CLI - [#6619](https://github.com/celo-org/celo-monorepo/pull/6619)
+
+Other Changes
+- Fix libraries versions (`shrinkwrap`) to avoid supply chain attacks - [#6575](https://github.com/celo-org/celo-monorepo/pull/6575)
+
+### **[1.0.1]** -- 2021-01-20
 Features
 - Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
 - CIP 8 Encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)

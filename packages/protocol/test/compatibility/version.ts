@@ -46,6 +46,20 @@ describe('#version()', () => {
         const version = ContractVersion.fromGetVersionNumberReturnValue(buffer)
         assert.equal(version.toString(), '1.2.3.4')
       })
+
+      it('parses larger hex digits correctly', () => {
+        const zeros = '0'.repeat(63)
+        const buffer = Buffer.from(`${zeros}a${zeros}b${zeros}c${zeros}d`, 'hex')
+        const version = ContractVersion.fromGetVersionNumberReturnValue(buffer)
+        assert.equal(version.toString(), '10.11.12.13')
+      })
+
+      it('parses larger hex numbers correctly', () => {
+        const zeros = '0'.repeat(62)
+        const buffer = Buffer.from(`${zeros}10${zeros}11${zeros}fe${zeros}ff`, 'hex')
+        const version = ContractVersion.fromGetVersionNumberReturnValue(buffer)
+        assert.equal(version.toString(), '16.17.254.255')
+      })
     })
   })
 

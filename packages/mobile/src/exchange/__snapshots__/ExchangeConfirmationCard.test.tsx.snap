@@ -122,7 +122,7 @@ exports[`renders correctly with giant numbers 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -152,7 +152,7 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -294,7 +294,7 @@ exports[`renders correctly with giant numbers 1`] = `
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -386,7 +386,7 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -446,7 +446,7 @@ exports[`renders correctly with giant numbers 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -481,7 +481,7 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -620,7 +620,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -650,7 +650,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -792,7 +792,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -884,7 +884,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -944,7 +944,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -979,7 +979,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }

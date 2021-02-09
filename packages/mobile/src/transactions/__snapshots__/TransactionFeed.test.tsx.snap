@@ -253,7 +253,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }

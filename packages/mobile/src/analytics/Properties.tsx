@@ -20,8 +20,9 @@ import {
   TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
-import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
+import { BackQuizProgress, ScrollDirection, SendOrigin } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { PaymentMethod } from 'src/fiatExchanges/FiatExchangeOptions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
@@ -153,12 +154,12 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.celo_education_complete]: undefined
   [OnboardingEvents.celo_education_cancel]: undefined
 
+  [OnboardingEvents.name_and_picture_set]: {
+    includesPhoto: boolean
+  }
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
     country?: string
-  }
-  [OnboardingEvents.phone_number_invalid]: {
-    obfuscatedPhoneNumber: string
   }
 
   [OnboardingEvents.pin_set]: undefined
@@ -476,7 +477,6 @@ interface EscrowEventsProperties {
     error: string
   }
 }
-
 interface SendEventsProperties {
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
@@ -486,6 +486,7 @@ interface SendEventsProperties {
   [SendEvents.send_cancel]: undefined
   [SendEvents.send_amount_back]: undefined
   [SendEvents.send_amount_continue]: {
+    origin: SendOrigin
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
@@ -495,6 +496,7 @@ interface SendEventsProperties {
   }
   [SendEvents.send_confirm_back]: undefined
   [SendEvents.send_confirm_send]: {
+    origin: SendOrigin
     isScan: boolean
     isInvite: boolean
     isRequest: boolean
@@ -711,6 +713,15 @@ interface FiatExchangeEventsProperties {
   [FiatExchangeEvents.spend_merchant_link]: {
     name: string
     link: string
+  }
+  [FiatExchangeEvents.cico_option_chosen]: {
+    isCashIn: boolean
+    paymentMethod: PaymentMethod
+    currency: CURRENCY_ENUM
+  }
+  [FiatExchangeEvents.provider_chosen]: {
+    isCashIn: boolean
+    provider: string
   }
 }
 

@@ -29,7 +29,7 @@ export default function Welcome() {
     if (!acceptedTerms) {
       navigate(Screens.RegulatoryTerms)
     } else {
-      navigate(Screens.NameAndNumber)
+      navigate(Screens.NameAndPicture)
     }
   }
 

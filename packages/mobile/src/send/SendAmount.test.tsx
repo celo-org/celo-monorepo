@@ -5,6 +5,7 @@ import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render, RenderAPI } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { ErrorDisplayType } from 'src/alert/reducer'
+import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -53,6 +54,7 @@ const mockScreenProps = (isOutgoingPaymentRequest?: true) =>
   getMockStackScreenProps(Screens.SendAmount, {
     recipient: mockTransactionData.recipient,
     isOutgoingPaymentRequest,
+    origin: SendOrigin.AppSendFlow,
   })
 
 const enterAmount = (wrapper: RenderAPI, text: string) => {
@@ -214,6 +216,7 @@ describe('SendAmount', () => {
       )
 
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
       })
     })
@@ -241,6 +244,7 @@ describe('SendAmount', () => {
       enterAmount(tree, AMOUNT_VALID)
       fireEvent.press(tree.getByTestId('Review'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
       })
@@ -267,6 +271,7 @@ describe('SendAmount', () => {
       enterAmount(tree, AMOUNT_VALID)
       fireEvent.press(tree.getByTestId('Review'))
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
       })
     })
@@ -295,6 +300,7 @@ describe('SendAmount', () => {
       fireEvent.press(tree.getByTestId('Review'))
 
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+        origin: SendOrigin.AppSendFlow,
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
         isOutgoingPaymentRequest: true,

@@ -6,6 +6,12 @@ source 'https://cdn.cocoapods.org/'
 # `The 'Pods-celo' target has transitive dependencies that include statically linked binaries [...]`
 $RNFirebaseAsStaticFramework = true
 
+# Workaround OpenSSL-Universal react-native-fast-crypto conflict
+$static_framework = ['react-native-flipper', 'react-native-fast-crypto', 'FlipperKit', 'Flipper', 'Flipper-Folly',
+  'CocoaAsyncSocket', 'ComponentKit', 'Flipper-DoubleConversion',
+  'Flipper-Glog', 'Flipper-PeerTalk', 'Flipper-RSocket',
+  'CocoaLibEvent', 'OpenSSL-Universal']
+
 require_relative "../../../node_modules/react-native/scripts/react_native_pods"
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
@@ -14,6 +20,8 @@ platform :ios, '12.4'
 target "celo" do
   use_frameworks!
 
+  # Headers only version of OpenSSL-Universal to workaround libcrypto / libssl conflict between Flipper and react-native-fast-crypto
+  pod 'OpenSSL-Universal', :git => "https://github.com/celo-org/OpenSSL-headers.git"
   
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
   pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
@@ -37,14 +45,14 @@ target "celo" do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  # use_flipper!
+  use_flipper!({ 'Flipper' => '~> 0.69.0' })
 end
 
 # Convert all permission pods into static libraries
 # See https://github.com/react-native-community/react-native-permissions#workaround-for-use_frameworks-issues
 pre_install do |installer|
   installer.pod_targets.each do |pod|
-    if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+    if $static_framework.include?(pod.name) || pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
       def pod.build_type;
         Pod::BuildType.static_library
       end
@@ -53,7 +61,7 @@ pre_install do |installer|
 end
 
 post_install do |installer|
-  # flipper_post_install(installer)
+  flipper_post_install(installer)
 
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
