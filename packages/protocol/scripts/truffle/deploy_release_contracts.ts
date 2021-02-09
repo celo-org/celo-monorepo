@@ -1,8 +1,8 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import {
-  _setInitialProxyImplementation,
   checkFunctionArgsLength,
   retryTx,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
@@ -283,7 +283,7 @@ async function initializeRGImplementation(
     transferImplOwnershipAbiRG,
     implementationTransferOwnershipArgs
   )
-  console.info('Sending initialize tx...')
+  console.debug('Sending initialize tx...')
   await retryTx(web3.eth.sendTransaction, [
     {
       from,
@@ -292,16 +292,15 @@ async function initializeRGImplementation(
       gas: 3000000,
     },
   ])
-  console.info('Returned from initialization tx')
   if (!(await (releaseGoldInstance as ReleaseGoldInstance).initialized())) {
     console.error(
       `Failed to initialize ReleaseGold implementation at address ${releaseGoldInstance.address}`
     )
   }
-  console.info('ReleaseGold implementation has been successfully initialized!')
+  console.debug('ReleaseGold implementation has been successfully initialized!')
 
-  console.info(
-    'Transferring ownsership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
+  console.debug(
+    'Transferring ownership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
   )
   await retryTx(web3.eth.sendTransaction, [
     {
