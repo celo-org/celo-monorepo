@@ -749,15 +749,10 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.resources.requests.memory=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
     `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
-    `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
     `--set geth.secondaries="${fetchEnvOrFallback('SECONDARIES', '0')}"`,
     `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
     `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
-    `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
-      'ISTANBUL_REQUEST_TIMEOUT_MS',
-      '3000'
-    )}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
