@@ -787,7 +787,7 @@ async function installHelmDiffPlugin() {
     )
   } catch ([error]) {
     console.info(`Installing helm-diff plugin...`)
-    execCmdWithExitOnFailure(`helm plugin install https://github.com/databus23/helm-diff`)
+    await execCmdWithExitOnFailure(`helm plugin install https://github.com/databus23/helm-diff`)
   }
 }
 
