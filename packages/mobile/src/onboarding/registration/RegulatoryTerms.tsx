@@ -41,7 +41,7 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 
   goToNextScreen = () => {
-    navigate(Screens.NameAndPicture)
+    navigate(Screens.NameAndNumber)
   }
 
   onPressGoToTerms = () => {
@@ -53,7 +53,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.NameAndPicture} />
+        <DevSkipButton nextScreen={Screens.NameAndNumber} />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}

@@ -6,7 +6,6 @@ import {
   TransferItemFragment,
   UserTransactionsQuery,
 } from 'src/apollo/types'
-import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
@@ -93,11 +92,6 @@ export function getTransferFeedParams(
   )
   const nameOrNumber =
     recipient?.displayName || addressToDisplayName[address]?.name || e164PhoneNumber
-  const displayName =
-    nameOrNumber ||
-    t('feedItemAddress', {
-      address: formatShortenedAddress(address),
-    })
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info
@@ -140,12 +134,18 @@ export function getTransferFeedParams(
       break
     }
     case TokenTransactionType.Sent: {
-      title = t('feedItemSentTitle', { displayName })
+      title = t('feedItemSentTitle', {
+        context: !nameOrNumber ? 'noReceiverDetails' : null,
+        nameOrNumber,
+      })
       info = t('feedItemSentInfo', { context: !comment ? 'noComment' : null, comment })
       break
     }
     case TokenTransactionType.Received: {
-      title = t('feedItemReceivedTitle', { displayName })
+      title = t('feedItemReceivedTitle', {
+        context: !nameOrNumber ? 'noSenderDetails' : null,
+        nameOrNumber,
+      })
       info = t('feedItemReceivedInfo', { context: !comment ? 'noComment' : null, comment })
       break
     }

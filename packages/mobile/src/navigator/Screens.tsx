@@ -31,7 +31,7 @@ export enum Screens {
   LocalProviderCashOut = 'LocalProviderCashOut',
   Main = 'Main',
   MoonPay = 'MoonPay',
-  NameAndPicture = 'NameAndPicture',
+  NameAndNumber = 'NameAndNumber',
   OnboardingEducationScreen = 'OnboardingEducationScreen',
   OnboardingSuccessScreen = 'OnboardingSuccessScreen',
   OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',

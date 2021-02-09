@@ -234,7 +234,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -281,7 +281,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "hsl(0, 53%, 93%)",
+                    "backgroundColor": "#7AD6FE",
                     "borderRadius": 20,
                     "height": 40,
                     "width": 40,
@@ -298,7 +298,6 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                       "fontSize": 16,
                     },
                     Object {
-                      "color": "hsl(0, 67%, 24%)",
                       "fontSize": 20,
                     },
                   ]

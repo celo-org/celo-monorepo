@@ -71,7 +71,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
-import NameAndPicture from 'src/onboarding/registration/NameAndPicture'
+import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
@@ -215,8 +215,8 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={Welcome.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.NameAndPicture}
-      component={NameAndPicture}
+      name={Screens.NameAndNumber}
+      component={NameAndNumber}
       options={{
         ...nuxNavigationOptions,
         headerTitle: () => (
@@ -417,11 +417,7 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen
-      options={Profile.navigationOptions}
-      name={Screens.Profile}
-      component={Profile}
-    />
+    <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
     <Navigator.Screen
       name={Screens.Language}
       component={Language}
@@ -503,7 +499,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     choseToRestoreAccount: state.account.choseToRestoreAccount,
     language: currentLanguageSelector(state),
-    name: state.account.name,
+    e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
@@ -522,7 +518,7 @@ export function MainStackScreen() {
     const {
       choseToRestoreAccount,
       language,
-      name,
+      e164Number,
       acceptedTerms,
       pincodeType,
       redeemComplete,
@@ -533,7 +529,7 @@ export function MainStackScreen() {
 
     if (!language) {
       initialRoute = Screens.Language
-    } else if (!name || !acceptedTerms || pincodeType === PincodeType.Unset) {
+    } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
     } else if (!redeemComplete) {

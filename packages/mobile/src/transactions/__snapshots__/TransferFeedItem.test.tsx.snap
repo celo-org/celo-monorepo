@@ -311,7 +311,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -328,7 +328,6 @@ exports[`transfer feed item renders correctly for known received 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "hsl(0, 67%, 24%)",
                   "fontSize": 20,
                 },
               ]
@@ -471,7 +470,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -488,7 +487,6 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "hsl(0, 67%, 24%)",
                   "fontSize": 20,
                 },
               ]
@@ -753,7 +751,7 @@ exports[`transfer feed item renders correctly for known sent without recipient c
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -770,7 +768,6 @@ exports[`transfer feed item renders correctly for known sent without recipient c
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "hsl(0, 67%, 24%)",
                   "fontSize": 20,
                 },
               ]
@@ -1035,7 +1032,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1043,12 +1040,24 @@ exports[`transfer feed item renders correctly for received 1`] = `
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
           />
         </View>
       </View>
@@ -1313,7 +1322,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1321,12 +1330,24 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
           />
         </View>
       </View>
@@ -1463,7 +1484,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1471,12 +1492,24 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
           />
         </View>
       </View>
@@ -1507,7 +1540,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             }
           }
         >
-          0x0000...7E57
+          feedItemSentTitle
         </Text>
         <Text
           numberOfLines={1}
@@ -1735,7 +1768,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(0, 53%, 93%)",
+                "backgroundColor": "#7AD6FE",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1743,12 +1776,24 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             ]
           }
         >
-          <svg
-            fill="hsl(0, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
           />
         </View>
       </View>
@@ -1779,7 +1824,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             }
           }
         >
-          0x0000...7E57
+          feedItemSentTitle
         </Text>
         <Text
           numberOfLines={1}
@@ -1882,7 +1927,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
                 "justifyContent": "center",
               },
               Object {
-                "backgroundColor": "hsl(151, 53%, 93%)",
+                "backgroundColor": "#FEB45E",
                 "borderRadius": 20,
                 "height": 40,
                 "width": 40,
@@ -1890,12 +1935,24 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             ]
           }
         >
-          <svg
-            fill="hsl(151, 53%, 93%)"
-            height="40"
-            style={Object {}}
-            viewBox="0 0 40 40"
-            width="40"
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
           />
         </View>
       </View>
@@ -1926,7 +1983,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             }
           }
         >
-          0x1Ff4...Bc42
+          feedItemSentTitle
         </Text>
         <Text
           numberOfLines={1}

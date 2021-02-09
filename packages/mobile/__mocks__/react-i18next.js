@@ -38,8 +38,7 @@ const renderNodes = (reactNodes) => {
 // For example, in the TransferFeedItem tests we are checking that the title of the item matches a cached value.
 // Without this it's impossible to check if the used value is the cached one since it only prints the i18n key.
 const printParamInsteadOfKey = {
-  feedItemAddress: 'address',
-  feedItemSentTitle: 'displayName',
+  feedItemSentTitle: 'nameOrNumber',
   feedItemGoldReceived: 'displayName',
 }
 const translationFunction = (key, params) => {

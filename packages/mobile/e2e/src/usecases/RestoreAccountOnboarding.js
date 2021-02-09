@@ -1,6 +1,8 @@
 import { enterPinUi, sleep, waitForElementId } from '../utils/utils'
 import { SAMPLE_BACKUP_KEY } from '../utils/consts'
 
+const VERIFICATION_COUNTRY = 'Germany'
+const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
 
 export default RestoreAccountOnboarding = () => {
@@ -26,9 +28,17 @@ export default RestoreAccountOnboarding = () => {
     await element(by.id('AcceptTermsButton')).tap()
   })
 
-  it('Name and Picture', async () => {
+  it('Name and Number', async () => {
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
-    await element(by.id('NameAndPictureContinueButton')).tap()
+
+    await element(by.id('CountrySelectionButton')).tap()
+    await element(by.id('SearchInput')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('Country_DE')).tap()
+
+    await expect(element(by.id('PhoneNumberField'))).toBeVisible()
+    await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
+
+    await element(by.id('NameAndNumberContinueButton')).tap()
   })
 
   it('Pin', async () => {

@@ -39,7 +39,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "hsl(0, 53%, 93%)",
+              "backgroundColor": "#7AD6FE",
               "borderRadius": 20,
               "height": 40,
               "width": 40,
@@ -56,7 +56,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
                 "fontSize": 16,
               },
               Object {
-                "color": "hsl(0, 67%, 24%)",
                 "fontSize": 20,
               },
             ]
@@ -136,7 +135,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
     style={
       Array [
         Object {
-          "alignItems": "center",
+          "alignItems": "flex-start",
           "alignSelf": "center",
           "flexDirection": "row",
           "marginTop": 5,
@@ -156,7 +155,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "lineHeight": 22,
           },
           Object {
-            "color": "#2E3338",
+            "color": undefined,
             "fontSize": 34,
           },
         ]
@@ -175,9 +174,8 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "lineHeight": 22,
           },
           Object {
-            "color": "#2E3338",
+            "color": undefined,
             "fontSize": 24,
-            "paddingVertical": 4,
           },
         ]
       }
@@ -196,7 +194,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "paddingHorizontal": 3,
           },
           Object {
-            "color": "#2E3338",
+            "color": undefined,
             "fontSize": 48,
             "lineHeight": 64,
           },
@@ -274,7 +272,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }
@@ -599,7 +597,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }
@@ -688,7 +686,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }
@@ -748,7 +746,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             Array [
               undefined,
               Object {
-                "color": "#2E3338",
+                "color": undefined,
               },
             ]
           }
@@ -783,7 +781,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }

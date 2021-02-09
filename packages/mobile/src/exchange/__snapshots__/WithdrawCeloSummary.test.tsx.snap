@@ -68,7 +68,7 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }
@@ -210,7 +210,7 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
                 Array [
                   undefined,
                   Object {
-                    "color": "#2E3338",
+                    "color": undefined,
                   },
                 ]
               }
@@ -290,7 +290,7 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }
@@ -350,7 +350,7 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
             Array [
               undefined,
               Object {
-                "color": "#2E3338",
+                "color": undefined,
               },
             ]
           }
@@ -385,7 +385,7 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
           Array [
             undefined,
             Object {
-              "color": "#2E3338",
+              "color": undefined,
             },
           ]
         }

@@ -11,7 +11,6 @@ import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3
 export interface State {
   name: string | null
   e164PhoneNumber: string | null
-  pictureUri: string | null
   defaultCountryCode: string | null
   contactDetails: UserContactDetails
   devModeActive: boolean
@@ -46,7 +45,6 @@ export interface UserContactDetails {
 export const initialState = {
   name: null,
   e164PhoneNumber: null,
-  pictureUri: null,
   defaultCountryCode: null,
   contactDetails: {
     contactId: null,
@@ -107,17 +105,6 @@ export const reducer = (
       return {
         ...state,
         name: action.name,
-      }
-    case Actions.SET_PICTURE:
-      return {
-        ...state,
-        pictureUri: action.pictureUri,
-      }
-    case Actions.SAVE_NAME_AND_PICTURE:
-      return {
-        ...state,
-        name: action.name,
-        pictureUri: action.pictureUri,
       }
     case Actions.SET_PHONE_NUMBER:
       if (!isE164Number(action.e164PhoneNumber)) {

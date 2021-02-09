@@ -33,7 +33,6 @@
   "refreshFailedUnexpectedly": "Falha ao atualizar, verifique sua conectividade",
   "edit": "Editar",
   "paste": "Colar",
-  "choose": "Escolher",
   "receivedPayment": "Pagamento recebido",
   "getStarted": "Começar",
   "manageCeloDollars": "Gerenciar Celo Dólares ",
@@ -188,6 +187,5 @@
   "accountClearFailed": "Ocorreu um erro ao remover a chave da sua conta. Pode ser necessário reinstalar o aplicativo para restaurar todas as funcionalidades.",
   "withdraw": "Sacar",
   "countryNotAvailable": "{{appName}} não está disponível no seu país",
-  "firebaseFetchFailed": "A conexão com o servidor falhou",
-  "pictureLoadFailed": "Ocorreu um erro ao carregar sua imagem"
+  "firebaseFetchFailed": "A conexão com o servidor falhou"
 }

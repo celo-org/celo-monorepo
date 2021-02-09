@@ -14,13 +14,13 @@ interface Props {
 // An avatar for the wallet user themselves
 export function AvatarSelf({ iconSize, displayNameStyle }: Props) {
   const displayName = useSelector(nameSelector)
-  const e164PhoneNumber = useSelector(e164NumberSelector) ?? undefined
+  const e164PhoneNumber = useSelector(e164NumberSelector)
   const contactDetails = useSelector(userContactDetailsSelector)
   const account = useSelector(currentAccountSelector)
 
   // Recipient refering to the wallet user, used for the avatar
   let recipient: Recipient | undefined
-  if (displayName) {
+  if (displayName && e164PhoneNumber) {
     recipient = {
       kind: RecipientKind.Contact,
       contactId: contactDetails.contactId || 'none',
@@ -36,12 +36,5 @@ export function AvatarSelf({ iconSize, displayNameStyle }: Props) {
     }
   }
 
-  return (
-    <Avatar
-      recipient={recipient}
-      iconSize={iconSize}
-      displayNameStyle={displayNameStyle}
-      address={account ?? undefined}
-    />
-  )
+  return <Avatar recipient={recipient} iconSize={iconSize} displayNameStyle={displayNameStyle} />
 }
