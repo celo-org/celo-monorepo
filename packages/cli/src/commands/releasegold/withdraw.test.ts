@@ -15,7 +15,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   let kit: ContractKit
 
   beforeEach(async () => {
-    const contractCanValidate = false
+    const contractCanValidate = true
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
