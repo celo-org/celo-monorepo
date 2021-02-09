@@ -510,7 +510,7 @@ async function upgradeValidatorStaticIPs(
     } catch (e) {
       ipExists = false
     }
-    const proxiedValidator = proxiesPerValidator[i] == 0 ? false : true
+    const proxiedValidator = proxiesPerValidator[i] === 0 ? false : true
     if (ipExists && proxiedValidator) {
       await deleteIPAddress(ipName)
     } else if (!ipExists && !proxiedValidator) {
