@@ -107,7 +107,7 @@ export async function getContractFromEvent(
               if (topic === target) {
                 matchesFound++
                 // only every match other bc of implementation initializations
-                if ((canValidate && matchesFound == 3) || (!canValidate && matchesFound == 1)) {
+                if ((canValidate && matchesFound === 3) || (!canValidate && matchesFound === 1)) {
                   contractAddress = log.address
                 }
               }
