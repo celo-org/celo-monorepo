@@ -8,13 +8,13 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import BN = require('bn.js')
 import {
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
@@ -303,6 +303,10 @@ contract('Reserve', (accounts: string[]) => {
       })
     })
 
+    it('does not allow an empty address', async () => {
+      await assertRevert(reserve.addExchangeSpender('0x0000000000000000000000000000000000000000'))
+    })
+
     it('has the right list of exchange spenders after addition', async () => {
       await reserve.addExchangeSpender(exchangeAddress)
       await reserve.addExchangeSpender(accounts[1])
@@ -373,12 +377,16 @@ contract('Reserve', (accounts: string[]) => {
     it('emits on add', async () => {
       const addSpenderTx = await reserve.addSpender(spender)
 
-      const addExchangeSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderAdded')
-      assert(addExchangeSpenderTxLogs.length === 1, 'Did not receive event')
+      const addSpenderTxLogs = addSpenderTx.logs.filter((x) => x.event === 'SpenderAdded')
+      assert(addSpenderTxLogs.length === 1, 'Did not receive event')
     })
 
     it('only allows owner', async () => {
       await assertRevert(reserve.addSpender(nonOwner, { from: nonOwner }))
+    })
+
+    it('does not allow an empty address', async () => {
+      await assertRevert(reserve.addSpender('0x0000000000000000000000000000000000000000'))
     })
   })
 
