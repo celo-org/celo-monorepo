@@ -122,7 +122,7 @@ exports[`renders correctly with giant numbers 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -152,7 +152,7 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -170,6 +170,7 @@ exports[`renders correctly with giant numbers 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -192,10 +193,13 @@ exports[`renders correctly with giant numbers 1`] = `
               >
                 <View
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                    }
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -290,7 +294,7 @@ exports[`renders correctly with giant numbers 1`] = `
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -382,7 +386,7 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -442,7 +446,7 @@ exports[`renders correctly with giant numbers 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -477,7 +481,7 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -616,7 +620,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -646,7 +650,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -664,6 +668,7 @@ exports[`renders correctly with no exchange rate 1`] = `
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackground",
+                  "rippleRadius": undefined,
                   "type": "ThemeAttrAndroid",
                 }
               }
@@ -686,10 +691,13 @@ exports[`renders correctly with no exchange rate 1`] = `
               >
                 <View
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                    }
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -784,7 +792,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                         Array [
                           undefined,
                           Object {
-                            "color": undefined,
+                            "color": "#2E3338",
                           },
                         ]
                       }
@@ -876,7 +884,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }
@@ -936,7 +944,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                     Array [
                       undefined,
                       Object {
-                        "color": undefined,
+                        "color": "#2E3338",
                       },
                     ]
                   }
@@ -971,7 +979,7 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     undefined,
                     Object {
-                      "color": undefined,
+                      "color": "#2E3338",
                     },
                   ]
                 }

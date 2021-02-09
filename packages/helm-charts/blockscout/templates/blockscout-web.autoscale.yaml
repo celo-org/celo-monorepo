@@ -3,10 +3,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-web
   labels:
-    app: blockscout
-    chart: blockscout
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-web-autoscaler
 spec:
   minReplicas: {{ .Values.blockscout.web.autoscaling.minReplicas }}

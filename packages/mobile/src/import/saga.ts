@@ -1,4 +1,8 @@
-import { generateKeys, validateMnemonic } from '@celo/utils/src/account'
+import {
+  formatNonAccentedCharacters,
+  generateKeys,
+  validateMnemonic,
+} from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import * as bip39 from 'react-native-bip39'
@@ -17,7 +21,7 @@ import {
   importBackupPhraseSuccess,
 } from 'src/import/actions'
 import { redeemInviteSuccess } from 'src/invite/actions'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateClearingStack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
@@ -29,14 +33,15 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
   Logger.debug(TAG + '@importBackupPhraseSaga', 'Importing backup phrase')
   yield call(waitWeb3LastBlock)
   try {
-    if (!validateMnemonic(phrase, undefined, bip39)) {
+    const mnemonic = formatNonAccentedCharacters(phrase)
+    if (!validateMnemonic(mnemonic, bip39)) {
       Logger.error(TAG + '@importBackupPhraseSaga', 'Invalid mnemonic')
       yield put(showError(ErrorMessages.INVALID_BACKUP_PHRASE))
       yield put(importBackupPhraseFailure())
       return
     }
 
-    const keys = yield call(generateKeys, phrase, undefined, undefined, undefined, bip39)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, undefined, bip39)
     const privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
@@ -65,13 +70,13 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       }
     }
 
-    const account: string | null = yield call(assignAccountFromPrivateKey, privateKey, phrase)
+    const account: string | null = yield call(assignAccountFromPrivateKey, privateKey, mnemonic)
     if (!account) {
       throw new Error('Failed to assign account from private key')
     }
 
     // Set key in phone's secure store
-    yield call(storeMnemonic, phrase, account)
+    yield call(storeMnemonic, mnemonic, account)
     // Set backup complete so user isn't prompted to do backup flow
     yield put(setBackupCompleted())
     // Set redeem invite complete so user isn't brought back into nux flow
@@ -82,7 +87,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       yield put(setHasSeenVerificationNux(true))
       navigateHome()
     } else {
-      navigate(Screens.VerificationEducationScreen)
+      navigateClearingStack(Screens.VerificationEducationScreen)
     }
 
     yield put(importBackupPhraseSuccess())

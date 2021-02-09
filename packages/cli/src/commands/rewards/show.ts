@@ -1,4 +1,4 @@
-import { Address } from '@celo/contractkit/lib/base'
+import { Address } from '@celo/connect'
 import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
 import { AccountSlashed } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { Validator, ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
@@ -23,7 +23,7 @@ export default class Show extends BaseCommand {
     'Show rewards information about a voter, registered Validator, or Validator Group'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     estimate: flags.boolean({ description: 'Estimate voter rewards from current votes' }),
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),

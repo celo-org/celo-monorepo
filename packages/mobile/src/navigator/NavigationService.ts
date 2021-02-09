@@ -1,8 +1,8 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
 
 import { NavigationActions, StackActions } from '@react-navigation/compat'
-import { NavigationContainerRef } from '@react-navigation/native'
-import { createRef } from 'react'
+import { CommonActions, NavigationContainerRef } from '@react-navigation/native'
+import { createRef, MutableRefObject } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -16,17 +16,25 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
 
+const NAVIGATOR_INIT_RETRIES = 5
+
 type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
+export const navigatorIsReadyRef: MutableRefObject<boolean | null> = createRef()
+navigatorIsReadyRef.current = false
 
 async function ensureNavigator() {
   let retries = 0
-  while (!navigationRef.current && retries < 3) {
+  while (
+    !navigationRef.current &&
+    !navigatorIsReadyRef.current &&
+    retries < NAVIGATOR_INIT_RETRIES
+  ) {
     await sleep(200)
     retries++
   }
-  if (!navigationRef.current) {
+  if (!navigationRef.current || !navigatorIsReadyRef.current) {
     throw new Error('navigator is not initialized')
   }
 }
@@ -85,6 +93,24 @@ export function navigate<RouteName extends keyof StackParamList>(
     })
     .catch((reason) => {
       Logger.error(`${TAG}@navigate`, `Navigation failure: ${reason}`)
+    })
+}
+
+export const navigateClearingStack: SafeNavigate = (...args) => {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@navigateClearingStack`, `Dispatch ${routeName}`)
+
+      navigationRef.current?.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: routeName, params }],
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@navigateClearingStack`, `Navigation failure: ${reason}`)
     })
 }
 

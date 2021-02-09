@@ -1,7 +1,9 @@
 import * as React from 'react'
 import 'react-native'
-import { render } from 'react-native-testing-library'
+import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { showError } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
 import { Screens } from 'src/navigator/Screens'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
@@ -157,5 +159,73 @@ describe('VerificationEducationScreen with KOMENCI enabled', () => {
     expect(queryByTestId('VerificationEducationSkip')).toBeFalsy()
     expect(queryByTestId('VerificationEducationContinue')).toBeTruthy()
     expect(queryByTestId('VerificationEducationAlready')).toBeFalsy()
+  })
+
+  it('shows banned country warning', () => {
+    const store = createMockStore({
+      account: {
+        e164PhoneNumber: '51231234',
+        defaultCountryCode: '+53',
+      },
+      stableToken: {
+        balance: '0',
+      },
+      identity: {
+        feelessVerificationState: {
+          komenci: {
+            serviceAvailable: true,
+          },
+          status: {
+            numAttestationsRemaining: 3,
+          },
+          actionableAttestations: [],
+        },
+      },
+    })
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <VerificationEducationScreen
+          {...getMockStackScreenProps(Screens.VerificationEducationScreen)}
+        />
+      </Provider>
+    )
+    fireEvent.press(getByTestId('VerificationEducationContinue'))
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([showError(ErrorMessages.COUNTRY_NOT_AVAILABLE)])
+    )
+  })
+
+  it('continue button disabled when invalid number', () => {
+    const store = createMockStore({
+      account: {
+        e164PhoneNumber: '51231234',
+        defaultCountryCode: '+53',
+      },
+      stableToken: {
+        balance: '0',
+      },
+      identity: {
+        feelessVerificationState: {
+          komenci: {
+            serviceAvailable: true,
+          },
+          status: {
+            numAttestationsRemaining: 3,
+          },
+          actionableAttestations: [],
+        },
+      },
+    })
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <VerificationEducationScreen
+          {...getMockStackScreenProps(Screens.VerificationEducationScreen)}
+        />
+      </Provider>
+    )
+    fireEvent.changeText(getByTestId('PhoneNumberField'), '12345')
+    expect(getByTestId('VerificationEducationContinue').props.disabled).toBe(true)
+    fireEvent.changeText(getByTestId('PhoneNumberField'), '51231234')
+    expect(getByTestId('VerificationEducationContinue').props.disabled).toBe(false)
   })
 })

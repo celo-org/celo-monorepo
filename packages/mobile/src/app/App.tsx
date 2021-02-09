@@ -16,6 +16,7 @@ import ErrorBoundary from 'src/app/ErrorBoundary'
 import { isE2EEnv } from 'src/config'
 import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
+import { waitUntilSagasFinishLoading } from 'src/redux/sagas'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
@@ -37,6 +38,7 @@ YellowBox.ignoreWarnings(ignoreWarnings)
 const { decimalSeparator, groupingSeparator } = getNumberFormatSettings()
 
 BigNumber.config({
+  EXPONENTIAL_AT: 1e9, // toString almost never return exponential notation
   FORMAT: {
     decimalSeparator,
     groupSeparator: groupingSeparator,
@@ -64,7 +66,7 @@ export class App extends React.Component<Props> {
 
     const url = await Linking.getInitialURL()
     if (url) {
-      this.handleOpenURL({ url })
+      await this.handleOpenURL({ url })
     }
 
     this.logAppLoadTime()
@@ -92,7 +94,8 @@ export class App extends React.Component<Props> {
     Linking.removeEventListener('url', this.handleOpenURL)
   }
 
-  handleOpenURL = (event: any) => {
+  handleOpenURL = async (event: any) => {
+    await waitUntilSagasFinishLoading()
     store.dispatch(openDeepLink(event.url))
   }
 

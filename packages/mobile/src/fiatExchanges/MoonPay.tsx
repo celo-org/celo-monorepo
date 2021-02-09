@@ -1,11 +1,13 @@
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import WebView from 'src/components/WebView'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
@@ -15,7 +17,10 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const celoCurrencyCode = 'celo'
+const currencyToCode = {
+  [CURRENCY_ENUM.GOLD]: 'celo',
+  [CURRENCY_ENUM.DOLLAR]: 'cusd',
+}
 
 export const moonPayOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
@@ -32,7 +37,7 @@ type Props = RouteProps
 
 function FiatExchangeWeb({ route }: Props) {
   const [uri, setUri] = React.useState('')
-  const { localAmount, currencyCode } = route.params
+  const { localAmount, currencyCode, currencyToBuy } = route.params
   const account = useSelector(currentAccountSelector)
 
   React.useEffect(() => {
@@ -44,10 +49,10 @@ function FiatExchangeWeb({ route }: Props) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          currency: celoCurrencyCode,
+          currency: currencyToCode[currencyToBuy],
           address: account,
           fiatCurrency: currencyCode,
-          fiatAmount: localAmount?.toString(),
+          fiatAmount: new BigNumber(localAmount).toString(),
         }),
       })
       const json = await response.json()
@@ -64,7 +69,7 @@ function FiatExchangeWeb({ route }: Props) {
       {uri === '' ? (
         <ActivityIndicator size="large" color={colors.greenBrand} />
       ) : (
-        <WebView style={styles.exchangeWebView} source={{ uri }} />
+        <WebView source={{ uri }} />
       )}
     </View>
   )
@@ -75,9 +80,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     justifyContent: 'center',
-  },
-  exchangeWebView: {
-    opacity: 0.99,
   },
 })
 

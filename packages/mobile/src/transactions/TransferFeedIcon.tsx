@@ -1,8 +1,8 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
+import ContactCircle from 'src/components/ContactCircle'
 import { transactionNetwork } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
@@ -12,10 +12,11 @@ interface Props {
   type: TokenTransactionType
   recipient?: Recipient
   address?: string
+  imageUrl?: string | null
 }
 
 export default function TransferFeedIcon(props: Props) {
-  const { recipient, address, type } = props
+  const { recipient, address, type, imageUrl } = props
 
   switch (type) {
     case TokenTransactionType.VerificationFee: // fallthrough
@@ -42,7 +43,7 @@ export default function TransferFeedIcon(props: Props) {
           address={address}
           name={recipient ? recipient.displayName : null}
           size={AVATAR_SIZE}
-          thumbnailPath={getRecipientThumbnail(recipient)}
+          thumbnailPath={imageUrl || getRecipientThumbnail(recipient)}
         />
       )
     }

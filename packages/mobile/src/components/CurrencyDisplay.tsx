@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
+import { ColorValue, StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
 import { useExchangeRate as useGoldToDollarRate } from 'src/exchange/hooks'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -59,9 +59,10 @@ const BIG_SYMBOL_RATIO = 24 / 48
 const BIG_CODE_RATIO = 16 / 48
 const BIG_LINE_HEIGHT_RATIO = 64 / 48
 
-function getBigSymbolStyle(fontSize: number, color: string | undefined) {
+function getBigSymbolStyle(fontSize: number, color: ColorValue | undefined): StyleProp<TextStyle> {
   const size = Math.floor(fontSize * BIG_SYMBOL_RATIO)
   return {
+    paddingVertical: 4,
     fontSize: size,
     color,
   }
@@ -188,7 +189,7 @@ export default function CurrencyDisplay({
     ? currency === CURRENCY_ENUM.GOLD
       ? colors.goldBrand
       : colors.greenBrand
-    : StyleSheet.flatten(style)?.color
+    : StyleSheet.flatten(style)?.color ?? colors.dark
 
   if (type === DisplayType.Big) {
     // In this type the symbol is displayed as superscript
@@ -196,11 +197,18 @@ export default function CurrencyDisplay({
     // and have to involve a View, which prevents this type to be embedded into a Text node
     // see https://medium.com/@aaronmgdr/a-better-superscript-in-react-native-591b83db6caa
     const fontSize = size
-    const signStyle = { fontSize: Math.round(fontSize * BIG_SIGN_RATIO), color }
-    const symbolStyle = getBigSymbolStyle(fontSize, color)
+    const signStyle: StyleProp<TextStyle> = {
+      fontSize: Math.round(fontSize * BIG_SIGN_RATIO),
+      color,
+    }
+    const symbolStyle: StyleProp<TextStyle> = getBigSymbolStyle(fontSize, color)
     const lineHeight = Math.round(fontSize * BIG_LINE_HEIGHT_RATIO)
-    const amountStyle = { fontSize, lineHeight, color }
-    const codeStyle = { fontSize: Math.round(fontSize * BIG_CODE_RATIO), lineHeight, color }
+    const amountStyle: StyleProp<TextStyle> = { fontSize, lineHeight, color }
+    const codeStyle: StyleProp<TextStyle> = {
+      fontSize: Math.round(fontSize * BIG_CODE_RATIO),
+      lineHeight,
+      color,
+    }
 
     return (
       <View style={[styles.bigContainer, style]} testID={testID}>
@@ -253,7 +261,7 @@ const styles = StyleSheet.create({
   bigContainer: {
     flexDirection: 'row',
     alignSelf: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginTop: 5,
   },
   bigCurrency: {

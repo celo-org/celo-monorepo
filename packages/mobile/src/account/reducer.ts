@@ -1,15 +1,17 @@
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
-import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
+import { DAYS_TO_DELAY } from 'src/backup/utils'
+import { DEFAULT_DAILY_PAYMENT_LIMIT_CUSD, DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import Logger from 'src/utils/Logger'
-import { getRemoteTime } from 'src/utils/time'
+import { getRemoteTime, ONE_DAY_IN_MILLIS } from 'src/utils/time'
 import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
 export interface State {
   name: string | null
   e164PhoneNumber: string | null
+  pictureUri: string | null
   defaultCountryCode: string | null
   contactDetails: UserContactDetails
   devModeActive: boolean
@@ -17,9 +19,9 @@ export interface State {
   photosNUXClicked: boolean
   pincodeType: PincodeType
   isSettingPin: boolean
-  accountCreationTime: number
   backupCompleted: boolean
-  backupDelayedTime: number
+  accountCreationTime: number
+  backupRequiredTime: number | null
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   dismissedGoldEducation: boolean
@@ -28,6 +30,7 @@ export interface State {
   acceptedTerms: boolean
   hasMigratedToNewBip39: boolean
   choseToRestoreAccount: boolean | undefined
+  dailyLimitCusd: number
 }
 
 export enum PincodeType {
@@ -43,6 +46,7 @@ export interface UserContactDetails {
 export const initialState = {
   name: null,
   e164PhoneNumber: null,
+  pictureUri: null,
   defaultCountryCode: null,
   contactDetails: {
     contactId: null,
@@ -54,8 +58,8 @@ export const initialState = {
   pincodeType: PincodeType.Unset,
   isSettingPin: false,
   accountCreationTime: 99999999999999,
+  backupRequiredTime: null,
   backupCompleted: false,
-  backupDelayedTime: 0,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   dismissedGoldEducation: false,
@@ -64,6 +68,7 @@ export const initialState = {
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
   hasMigratedToNewBip39: false,
   choseToRestoreAccount: false,
+  dailyLimitCusd: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
 }
 
 export const reducer = (
@@ -72,11 +77,13 @@ export const reducer = (
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
+      const rehydratedPayload = getRehydratePayload(action, 'account')
       // Ignore some persisted properties
       return {
         ...state,
-        ...getRehydratePayload(action, 'account'),
+        ...rehydratedPayload,
         dismissedGetVerified: false,
+        dailyLimitCusd: rehydratedPayload.dailyLimitCusd || state.dailyLimitCusd,
       }
     }
     case Actions.CHOOSE_CREATE_ACCOUNT:
@@ -100,6 +107,17 @@ export const reducer = (
       return {
         ...state,
         name: action.name,
+      }
+    case Actions.SET_PICTURE:
+      return {
+        ...state,
+        pictureUri: action.pictureUri,
+      }
+    case Actions.SAVE_NAME_AND_PICTURE:
+      return {
+        ...state,
+        name: action.name,
+        pictureUri: action.pictureUri,
       }
     case Actions.SET_PHONE_NUMBER:
       if (!isE164Number(action.e164PhoneNumber)) {
@@ -157,13 +175,13 @@ export const reducer = (
     case Actions.SET_BACKUP_DELAYED:
       return {
         ...state,
-        backupDelayedTime: getRemoteTime(),
+        backupRequiredTime: getRemoteTime() + DAYS_TO_DELAY * ONE_DAY_IN_MILLIS,
       }
     case Actions.TOGGLE_BACKUP_STATE:
       return {
         ...state,
         backupCompleted: !state.backupCompleted,
-        backupDelayedTime: 0,
+        backupRequiredTime: null,
       }
     case Actions.DISMISS_INVITE_FRIENDS:
       return {
@@ -201,6 +219,12 @@ export const reducer = (
     case Actions.ACCEPT_TERMS: {
       return { ...state, acceptedTerms: true }
     }
+    case Actions.UPDATE_DAILY_LIMIT:
+      return {
+        ...state,
+        // We don't allow minimum daily limits lower than the default to avoid human error when setting them.
+        dailyLimitCusd: Math.max(action.newLimit, DEFAULT_DAILY_PAYMENT_LIMIT_CUSD),
+      }
     case Web3Actions.SET_ACCOUNT: {
       return {
         ...state,

@@ -1,4 +1,5 @@
 import i18n from 'src/i18n'
+import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'app/actions'
@@ -17,8 +18,6 @@ export enum Actions {
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
   OPEN_DEEP_LINK = 'APP/OPEN_DEEP_LINK',
   RESET_APP_OPENED_STATE = 'APP/RESET_APP_OPENED_STATE',
-  ENTER_BACKUP_FLOW = 'APP/ENTER_BACKUP_FLOW',
-  EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
@@ -30,6 +29,7 @@ export enum Actions {
   SET_PONTO_FEATURE_FLAG = 'APP/SET_PONTO_FEATURE_FLAG',
   SET_KOTANI_FEATURE_FLAG = 'APP/SET_KOTANI_FEATURE_FLAG',
   TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
+  ACTIVE_SCREEN_CHANGED = 'APP/ACTIVE_SCREEN_CHANGED',
 }
 
 export interface SetAppState {
@@ -55,18 +55,11 @@ export interface SetLanguage {
 export interface OpenDeepLink {
   type: Actions.OPEN_DEEP_LINK
   deepLink: string
+  isSecureOrigin: boolean
 }
 
 interface ResetAppOpenedState {
   type: Actions.RESET_APP_OPENED_STATE
-}
-
-interface EnterBackupFlow {
-  type: Actions.ENTER_BACKUP_FLOW
-}
-
-interface ExitBackupFlow {
-  type: Actions.EXIT_BACKUP_FLOW
 }
 
 interface SetAnalyticsEnabled {
@@ -82,6 +75,11 @@ interface SetRequirePinOnAppOpen {
 interface InviteModalAction {
   type: Actions.TOGGLE_INVITE_MODAL
   inviteModalVisible: boolean
+}
+
+interface ActiveScreenChangedAction {
+  type: Actions.ACTIVE_SCREEN_CHANGED
+  activeScreen: Screens
 }
 
 export interface Lock {
@@ -100,6 +98,8 @@ export interface SetSessionId {
 export interface OpenUrlAction {
   type: Actions.OPEN_URL
   url: string
+  openExternal: boolean
+  isSecureOrigin: boolean
 }
 
 interface MinAppVersionDeterminedAction {
@@ -124,8 +124,6 @@ export type ActionTypes =
   | ResetAppOpenedState
   | SetLanguage
   | OpenDeepLink
-  | EnterBackupFlow
-  | ExitBackupFlow
   | SetAnalyticsEnabled
   | SetRequirePinOnAppOpen
   | Lock
@@ -136,6 +134,7 @@ export type ActionTypes =
   | PontoFeatureFlagSetAction
   | KotaniFeatureFlagSetAction
   | InviteModalAction
+  | ActiveScreenChangedAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -163,23 +162,16 @@ export const setLanguage = (language: string) => {
   }
 }
 
-export const openDeepLink = (deepLink: string): OpenDeepLink => {
+export const openDeepLink = (deepLink: string, isSecureOrigin: boolean = false): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
+    isSecureOrigin,
   }
 }
 
 export const resetAppOpenedState = () => ({
   type: Actions.RESET_APP_OPENED_STATE,
-})
-
-export const enterBackupFlow = () => ({
-  type: Actions.ENTER_BACKUP_FLOW,
-})
-
-export const exitBackupFlow = () => ({
-  type: Actions.EXIT_BACKUP_FLOW,
 })
 
 export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
@@ -205,9 +197,15 @@ export const setSessionId = (sessionId: string) => ({
   sessionId,
 })
 
-export const openUrl = (url: string): OpenUrlAction => ({
+export const openUrl = (
+  url: string,
+  openExternal = false,
+  isSecureOrigin = false
+): OpenUrlAction => ({
   type: Actions.OPEN_URL,
   url,
+  openExternal,
+  isSecureOrigin,
 })
 
 export const minAppVersionDetermined = (
@@ -230,4 +228,9 @@ export const setKotaniFeatureFlag = (enabled: boolean) => ({
 export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
   type: Actions.TOGGLE_INVITE_MODAL,
   inviteModalVisible,
+})
+
+export const activeScreenChanged = (activeScreen: Screens): ActiveScreenChangedAction => ({
+  type: Actions.ACTIVE_SCREEN_CHANGED,
+  activeScreen,
 })

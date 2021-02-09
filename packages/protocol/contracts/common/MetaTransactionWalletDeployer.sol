@@ -1,22 +1,17 @@
 pragma solidity ^0.5.13;
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWalletDeployer.sol";
 import "./proxies/MetaTransactionWalletProxy.sol";
 
 contract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloVersionedContract {
-  using SafeMath for uint256;
-  using BytesLib for bytes;
-
   event WalletDeployed(address indexed owner, address indexed wallet, address implementation);
 
   /**
      * @notice Returns the storage, major, minor, and patch version of the contract.
      * @return The storage, major, minor, and patch version of the contract.
      */
-  function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
   }
 

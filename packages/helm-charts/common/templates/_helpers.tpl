@@ -39,6 +39,13 @@ app: {{ template "common.name" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "common.conditional-init-genesis-container" -}}
+{{- $production_envs := list "rc1" "baklava" "alfajores" -}}
+{{- if not (has .Release.Name $production_envs) -}}
+{{ include "common.init-genesis-container" . }}
+{{- end -}}
+{{- end -}}
+
 {{- define "common.init-genesis-container" -}}
 - name: init-genesis
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -48,14 +55,19 @@ release: {{ .Release.Name }}
   - -c
   args:
   - |
-      mkdir -p /var/geth /root/celo
+      mkdir -p /var/geth /root/.celo
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
         wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
         wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
       fi
-      geth init /root/.celo/genesis.json
+      # There are issues with running geth init over existing chaindata around the use of forks.
+      # The case that this could cause problems is when a network is set up with Base64 genesis files & chaindata
+      # as that could interfere with accessing bootnodes for newly created nodes.
+      if [ "{{ .Values.geth.use_gstorage_data | default false }}" == "false" ]; then
+        geth init /root/.celo/genesis.json
+      fi
   volumeMounts:
   - name: data
     mountPath: /root/.celo
@@ -80,6 +92,16 @@ release: {{ .Release.Name }}
   - name: account
     mountPath: "/root/.celo/account"
     readOnly: true
+{{- end -}}
+
+{{- define "common.bootnode-flag-script" -}}
+if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
+  BOOTNODE_FLAG="--{{ .Release.Name }}"
+elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
+  BOOTNODE_FLAG=""
+else
+  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+fi
 {{- end -}}
 
 {{- define "common.full-node-container" -}}
@@ -156,15 +178,16 @@ release: {{ .Release.Name }}
     PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
     {{- end }}
 
+{{ include  "common.bootnode-flag-script" . | indent 4 }}
+
 {{ .extra_setup }}
 
     exec geth \
       --port $PORT  \
-      --bootnodes=$(cat /root/.celo/bootnodeEnode) \
-      --light.serve {{ .light_serve | default 90 }} \
-      --light.maxpeers {{ .light_maxpeers | default 1000 }} \
+      "$BOOTNODE_FLAG" \
+      --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
+      --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
-      --networkid=${NETWORK_ID} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -174,6 +197,8 @@ release: {{ .Release.Name }}
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
       --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
+      --datadir=/root/.celo \
+      --ipcpath=geth.ipc \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -429,4 +454,54 @@ Annotations to indicate to the prometheus server that this node should be scrape
 prometheus.io/scrape: "true"
 prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
+{{- end -}}
+
+{{- define "common.remove-old-chaindata" -}}
+- name: remove-old-chaindata
+  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+  imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
+  command: ["/bin/sh"]
+  args:
+  - "-c"
+  - |
+    if [ -d /root/.celo/celo/chaindata ]; then
+      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      day=$(date +%s)
+      diff=$(($day - $lastBlockTimestamp))
+      # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
+      if [ "$diff" -gt 86400 ]; then
+        echo Chaindata is more than one day out of date. Wiping existing chaindata.
+        rm -rf /root/.celo/celo/chaindata
+      else
+        echo Chaindata is less than one day out of date. Using existing chaindata.
+      fi
+    else
+      echo No chaindata at all.
+    fi
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}
+
+{{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
+{{- define "common.gsutil-sync-data-init-container" -}}
+- name: gsutil-sync-data
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+  imagePullPolicy: Always
+  command:
+  - /bin/sh
+  - -c
+  args:
+  - |
+     if [ -d /root/.celo/celo/chaindata ]; then
+       echo Using pre-existing chaindata
+       exit 0
+     fi
+     mkdir -p /root/.celo/celo
+     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
+     tar -xzvf chaindata.tar.gz -C /root/.celo/celo
+     rm chaindata.tar.gz
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
 {{- end -}}

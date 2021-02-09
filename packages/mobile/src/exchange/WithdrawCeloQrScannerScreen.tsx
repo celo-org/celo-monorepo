@@ -61,7 +61,7 @@ WithdrawCeloQrScannerScreen.navigationOptions = () => {
     headerTitle: i18n.t('exchangeFlow9:withdrawScanQrTitle'),
     headerTitleStyle: {
       ...fontStyles.navigationHeader,
-      textAlign: 'center',
+      headerTitleAlign: 'center',
       fontWeight: undefined,
       color: colors.light,
     },

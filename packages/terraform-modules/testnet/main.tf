@@ -91,7 +91,7 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["9200"]
+    ports    = ["6060", "9200"]
   }
 }
 
@@ -198,7 +198,7 @@ module "tx_node_private" {
   gcmode                                = "archive"
   node_count                            = var.private_tx_node_count
   rpc_apis                              = "eth,net,web3,debug,txpool"
-  node_disk_size_gb                     = var.node_disk_size_gb
+  node_disk_size_gb                     = var.private_node_disk_size_gb
 }
 
 # used for access by blockscout

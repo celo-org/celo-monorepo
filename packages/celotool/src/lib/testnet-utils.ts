@@ -1,5 +1,5 @@
-import { StaticNodeUtils } from '@celo/contractkit'
-import { GenesisBlocksGoogleStorageBucketName } from '@celo/contractkit/lib/network-utils/genesis-block-utils'
+import { StaticNodeUtils } from '@celo/network-utils'
+import { GenesisBlocksGoogleStorageBucketName } from '@celo/network-utils/lib/genesis-block-utils'
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
@@ -200,9 +200,7 @@ export async function uploadFileToGoogleStorage(
 // Reads the envVar VALIDATOR_PROXY_COUNTS, which indicates how many validators
 // have a certain number of proxies in the format:
 // <# of validators>:<proxy count>;<# of validators>:<proxy count>;...
-// For example, VALIDATOR_PROXY_COUNTS='2:1,3:2' will give [1,1,2,2,2]
-// The resulting array does not necessarily have the same length as the total
-// number of validators because non-proxied validators are not represented in the array
+// For example, VALIDATOR_PROXY_COUNTS='1:0,2:1,3:2' will give [0,1,1,2,2,2]
 export function getProxiesPerValidator() {
   const arr = []
   const valProxyCountsStr = fetchEnvOrFallback(envVar.VALIDATOR_PROXY_COUNTS, '')

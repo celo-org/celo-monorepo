@@ -1,4 +1,5 @@
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
+import { Provider } from '@celo/connect/lib/types'
+import { stopProvider } from '@celo/connect/lib/utils/provider-utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
@@ -12,7 +13,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     "Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block."
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     signer: Flags.address({
       description: 'address of the signer to check for signatures',
       exclusive: ['signers'],
@@ -134,7 +135,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
             } while (response !== 'q' && response !== '\u0003' /* ctrl-c */)
           } finally {
             await subscription.unsubscribe()
-            await stopProvider(web3.currentProvider)
+            stopProvider(web3.currentProvider as Provider)
           }
         }
       } finally {

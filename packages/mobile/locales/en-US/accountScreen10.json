@@ -36,6 +36,11 @@
     "body": "You will no longer be able to access your funds or your Account Key from this device. There's no way to recover your Account Key if you haven't written it down.",
     "resetNow": "Reset Now"
   },
+  "promptConfirmRevokeModal": {
+    "header": "Are you sure you want to revoke your Valora account?",
+    "body": "Once revoked, this account will not be able reverify. Only revoke if you are sure you will never need this account again.",
+    "revoke": "Revoke"
+  },
   "testFaqLink": "{{appName}} FAQ",
   "termsOfServiceLink": "Terms of Service",
   "editProfile": "Edit Profile",
@@ -59,5 +64,10 @@
   "contactMessagePlaceholder": "Please type your message here...",
   "attachLogs": "Attach logs",
   "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with {{appName}} Support.",
-  "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!"
+  "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!",
+  "namePictureSaved": "Your name and picture were saved successfully.",
+  "addPhoto": "Add Photo",
+  "chooseFromLibrary": "Choose from Library",
+  "takePhoto": "Take Photo",
+  "removePhoto": "Remove Photo"
 }

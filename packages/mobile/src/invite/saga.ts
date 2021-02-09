@@ -1,6 +1,6 @@
-import { CeloTransactionObject } from '@celo/contractkit'
-import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { CeloTransactionObject } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { UnlockableWallet } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
 import { Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -23,8 +23,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { WEB_LINK } from 'src/brandingConfig'
-import { APP_STORE_ID } from 'src/config'
+import { APP_STORE_ID, DYNAMIC_DOWNLOAD_LINK } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -95,9 +94,13 @@ export async function getInviteFee(
   account: string,
   currency: CURRENCY_ENUM,
   amount: string,
+  dollarBalance: string,
   comment: string
 ) {
   try {
+    if (new BigNumber(amount).isGreaterThan(new BigNumber(dollarBalance))) {
+      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
     const gas = await getInviteTxGas(account, currency, amount, comment)
     return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
   } catch (error) {
@@ -181,7 +184,7 @@ export function* sendInvite(
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
     const link = features.ESCROW_WITHOUT_CODE
-      ? WEB_LINK
+      ? DYNAMIC_DOWNLOAD_LINK
       : yield call(generateInviteLink, inviteCode)
 
     const messageProp = amount

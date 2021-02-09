@@ -1,5 +1,5 @@
-import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { printValueMapRecursive } from '../../utils/cli'
+import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class Show extends ReleaseGoldBaseCommand {
   static description = 'Show info on a ReleaseGold instance contract.'
@@ -31,6 +31,7 @@ export default class Show extends ReleaseGoldBaseCommand {
       beneficiary: await this.releaseGoldWrapper.getBeneficiary(),
       authorizedSigners,
       releaseOwner: await this.releaseGoldWrapper.getReleaseOwner(),
+      owner: await this.releaseGoldWrapper.getOwner(),
       refundAddress: await this.releaseGoldWrapper.getRefundAddress(),
       liquidityProvisionMet: await this.releaseGoldWrapper.getLiquidityProvisionMet(),
       canValidate: await this.releaseGoldWrapper.getCanValidate(),
