@@ -1,8 +1,8 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import {
+  _setInitialProxyImplementation,
   checkFunctionArgsLength,
   retryTx,
-  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
