@@ -7,6 +7,7 @@ import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
+import { retrieveBootnodeIPAddress } from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -509,9 +510,10 @@ async function upgradeValidatorStaticIPs(
     } catch (e) {
       ipExists = false
     }
-    if (ipExists && (i < proxiesPerValidator.length || i >= newValidatorNodeCount)) {
+    const proxiedValidator = proxiesPerValidator[i] === 0 ? false : true
+    if (ipExists && proxiedValidator) {
       await deleteIPAddress(ipName)
-    } else if (!ipExists && i >= proxiesPerValidator.length && i < newValidatorNodeCount) {
+    } else if (!ipExists && !proxiedValidator) {
       await registerIPAddress(ipName)
     }
   }
@@ -644,7 +646,7 @@ async function helmIPParameters(celoEnv: string) {
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
-      `--set geth.bootnodeIpAddress=${await retrieveIPAddress(`${celoEnv}-bootnode`)}`
+      `--set geth.bootnodeIpAddress=${await retrieveBootnodeIPAddress(celoEnv)}`
     )
 
     // Validator IPs
@@ -721,6 +723,18 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
 
+  const bootnodeOverwritePkey = fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== '' ?
+    [
+      `--set geth.overwriteBootnodePrivateKey="true"`,
+      `--set geth.bootnodePrivateKey="${fetchEnv(envVar.GETH_BOOTNODE_OVERWRITE_PKEY)}"`,
+    ]
+  : [
+      `--set geth.overwriteBootnodePrivateKey="false"`,
+    ]
+
+  const defaultDiskSize = fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')
+  const privateTxNodeDiskSize = fetchEnvOrFallback(envVar.PRIVATE_NODE_DISK_SIZE_GB, defaultDiskSize)
+
   return [
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
@@ -755,10 +769,12 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
-    `--set geth.diskSizeGB=${fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')}`,
+    `--set geth.diskSizeGB=${defaultDiskSize}`,
+    `--set geth.privateTxNodediskSizeGB=${privateTxNodeDiskSize}`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...gethMetricsOverrides,
+    ...bootnodeOverwritePkey,
     ...(await helmIPParameters(celoEnv)),
   ]
 }
