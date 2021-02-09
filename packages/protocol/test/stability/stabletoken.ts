@@ -37,25 +37,6 @@ contract('StableToken', (accounts: string[]) => {
   const amountToMint = 10
   const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7
 
-  // beforeAll(async () => {
-  //   const _registry = await Registry.new()
-  //   await _registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-  //   const _stableToken = await StableToken.new()
-
-  //   // should fail with an invalid exchange address
-  //   await assertRevert(_stableToken.initialize(
-  //     'Celo Dollar',
-  //     'cUSD',
-  //     18,
-  //     registry.address,
-  //     fixed1,
-  //     SECONDS_IN_A_WEEK,
-  //     [],
-  //     [],
-  //     'foo' // non-existing exchange
-  //   ))
-  // })
-
   beforeEach(async () => {
     registry = await Registry.new()
     freezer = await Freezer.new()
