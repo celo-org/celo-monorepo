@@ -22,6 +22,7 @@ import { soliditySha3 } from 'web3-utils'
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const Registry: RegistryContract = artifacts.require('Registry')
 const StableToken: StableTokenContract = artifacts.require('StableToken')
+const exchangeEUR: StableTokenContract = artifacts.require('exchangeEUR')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN.js
@@ -36,11 +37,33 @@ contract('StableToken', (accounts: string[]) => {
   const amountToMint = 10
   const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7
 
+  // beforeAll(async () => {
+  //   const _registry = await Registry.new()
+  //   await _registry.setAddressFor(CeloContractName.Freezer, freezer.address)
+  //   const _stableToken = await StableToken.new()
+
+  //   // should fail with an invalid exchange address
+  //   await assertRevert(_stableToken.initialize(
+  //     'Celo Dollar',
+  //     'cUSD',
+  //     18,
+  //     registry.address,
+  //     fixed1,
+  //     SECONDS_IN_A_WEEK,
+  //     [],
+  //     [],
+  //     'foo' // non-existing exchange
+  //   ))
+  // })
+
   beforeEach(async () => {
     registry = await Registry.new()
     freezer = await Freezer.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     stableToken = await StableToken.new()
+    const exchange = accounts[0]
+    await registry.setAddressFor(CeloContractName.Exchange, exchange)
+
     const response = await stableToken.initialize(
       'Celo Dollar',
       'cUSD',
@@ -59,6 +82,23 @@ contract('StableToken', (accounts: string[]) => {
     it('should have set a name', async () => {
       const name: string = await stableToken.name()
       assert.equal(name, 'Celo Dollar')
+    })
+
+    it('should not be able to be initialized with wrong exchange name', async () => {
+      const stableToken2 = await StableToken.new()
+      await assertRevert(
+        stableToken2.initialize(
+          'Celo Dollar',
+          'cUSD',
+          18,
+          registry.address,
+          fixed1,
+          SECONDS_IN_A_WEEK,
+          [],
+          [],
+          'foo' // invalid
+        )
+      )
     })
 
     it('should have set a symbol', async () => {
@@ -397,6 +437,10 @@ contract('StableToken', (accounts: string[]) => {
   describe('#getExchangeRegistryId()', () => {
     it('should match initialized value', async () => {
       const stableToken2 = await StableToken.new()
+
+      const exchange = await exchangeEUR.new()
+
+      await registry.setAddressFor(CeloContractName.ExchangeEUR, exchange.address)
       await stableToken2.initialize(
         'Celo Dollar',
         'cUSD',

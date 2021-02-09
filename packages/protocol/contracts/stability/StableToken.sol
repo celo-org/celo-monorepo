@@ -139,7 +139,10 @@ contract StableToken is
       _mint(initialBalanceAddresses[i], initialBalanceValues[i]);
     }
     setRegistry(registryAddress);
+
     exchangeRegistryId = keccak256(abi.encodePacked(exchangeIdentifier));
+    // fail in case exchangeRegistryId can't be looked up in the registry
+    registry.getAddressForOrDie(getExchangeRegistryId());
   }
 
   /**
