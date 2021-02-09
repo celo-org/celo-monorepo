@@ -1926,7 +1926,7 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const testGroupUptimeCalculation = async (_uptimes) => {
+      const testGroupUptimeCalculation = (_uptimes) => {
         const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
           .map((uptime) => calculateScore(uptime, grace))
