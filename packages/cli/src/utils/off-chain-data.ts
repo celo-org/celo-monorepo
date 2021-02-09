@@ -5,7 +5,7 @@ import {
   GoogleStorageWriter,
   LocalStorageWriter,
 } from '@celo/identity/lib/offchain/storage-writers'
-import { privateKeyToAddress } from '@celo/utils/src/address'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'
