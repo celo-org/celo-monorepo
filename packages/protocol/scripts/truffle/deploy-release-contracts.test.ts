@@ -1,12 +1,10 @@
-import { assertEqualBN, exec } from '@celo/protocol/lib/test-utils'
-import BN from 'bn.js'
+import { exec } from '@celo/protocol/lib/test-utils'
 import chai from 'chai'
 import { readFileSync, writeFileSync } from 'fs-extra'
 import { ReleaseGoldContract, ReleaseGoldMultiSigContract, ReleaseGoldProxyContract } from 'types'
 const expect = chai.expect
-const assert = chai.assert
 
-const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+const DEVELOPMENT_FROM = '0x5409ED021D9299bf6814279A6A1411A7e866A631'
 const ONE_ADDRESS = '0x0000000000000000000000000000000000000001'
 const removeFile = async (filePath: string) => exec('sh', ['-c', `rm ${filePath} || true`])
 
@@ -66,22 +64,20 @@ module.exports = async (callback: (error?: any) => number) => {
       'multisig owners are different'
     )
 
-    assertEqualBN(
-      await web3.eth.getBalance(deployedGrant.ContractAddress),
-      new BN(480).mul(new BN(10).pow(new BN(18))),
-      'contract does not have the right balance'
-    )
-
     const releaseGoldProxyContract = await ReleaseGoldProxy.at(deployedGrant.ContractAddress)
     const implementationAddress = await releaseGoldProxyContract._getImplementation()
 
     const releaseGoldImplementationContract = await ReleaseGold.at(implementationAddress)
 
-    expect(await releaseGoldImplementationContract.initialized()).to.be.true(
+    expect(await releaseGoldImplementationContract.initialized()).to.equal(
+      true,
       'ReleaseGold implementation is not yet initialized'
     )
 
-    assert(1 === 1 + 1, 'test assertion')
+    expect(await releaseGoldImplementationContract.owner()).to.equal(
+      ONE_ADDRESS,
+      'implementation owner is not 0x1'
+    )
   } catch (error) {
     console.error('Error doing release contract deployment')
     console.error(error)
