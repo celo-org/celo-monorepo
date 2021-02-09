@@ -39,8 +39,6 @@ set -x
       --consoleoutput=stdout \
       --verbosity=${GETH_VERBOSITY} \
       --ethstats=${PROXY_NAME}@${ETHSTATS_HOST} \
-      --istanbul.blockperiod=${BLOCK_TIME} \
-      --istanbul.requesttimeout=${ISTANBUL_REQUEST_TIMEOUT_MS} \
       --maxpeers=${PROXY_MAX_PEERS} \
       --nat=extip:${PROXY_EXTERNAL_IP_ADDRESS} \
       --metrics \
