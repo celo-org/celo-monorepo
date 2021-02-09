@@ -2230,13 +2230,10 @@ contract('Validators', (accounts: string[]) => {
         const uptime = new BigNumber(0.99)
         const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
 
-        console.log('>>>', adjustmentSpeed)
         expectedScore = adjustmentSpeed.times(
           calculateScore(new BigNumber(0.99), await validators.downtimeGracePeriod())
         )
-        console.log('>>>', expectedScore)
         expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
-        console.log('>>>', expectedTotalPayment)
         expectedGroupPayment = expectedTotalPayment
           .times(fromFixed(commission))
           .dp(0, BigNumber.ROUND_FLOOR)
