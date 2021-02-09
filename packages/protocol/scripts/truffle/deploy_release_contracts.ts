@@ -4,7 +4,7 @@ import {
   checkFunctionArgsLength,
   retryTx,
 } from '@celo/protocol/lib/web3-utils'
-import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/src/address'
+import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs from 'fs'
@@ -167,10 +167,8 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       from: fromAddress,
     },
   ])
-  const [initializerAbiRG, transferImplOwnershipAbiRG] = checkAndReturnInitializationAbi(
-    ReleaseGold,
-    'ReleaseGold'
-  )
+  const initializerAbiRG = checkAndReturnInitializationAbi(ReleaseGold, 'ReleaseGold')
+  const transferImplOwnershipAbiRG = checkAndReturnTransferOwnershipAbi(ReleaseGold, 'ReleaseGold')
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
@@ -301,6 +299,7 @@ async function initializeRGImplementation(
     )
   }
   console.info('ReleaseGold implementation has been successfully initialized!')
+
   console.info(
     'Transferring ownsership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
   )
@@ -760,6 +759,10 @@ function checkAndReturnInitializationAbi(Contract: any, name: string) {
       `Attempting to deploy implementation contract ${name} that does not have an initialize() function. Abort.`
     )
   }
+  return initializerAbi
+}
+
+function checkAndReturnTransferOwnershipAbi(Contract: any, name: string) {
   const transferImplOwnershipAbi: string = Contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
   )
@@ -768,5 +771,5 @@ function checkAndReturnInitializationAbi(Contract: any, name: string) {
       `Attempting to deploy implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
     )
   }
-  return [initializerAbi, transferImplOwnershipAbi]
+  return transferImplOwnershipAbi
 }
