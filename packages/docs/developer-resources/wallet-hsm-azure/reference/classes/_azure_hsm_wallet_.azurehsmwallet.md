@@ -41,7 +41,7 @@
 
 \+ **new AzureHSMWallet**(`vaultName`: string): *[AzureHSMWallet](_azure_hsm_wallet_.azurehsmwallet.md)*
 
-*Defined in [wallet-hsm-azure/src/azure-hsm-wallet.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-hsm-wallet.ts#L13)*
+*Defined in [wallet-hsm-azure/src/azure-hsm-wallet.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-hsm-wallet.ts#L12)*
 
 **Parameters:**
 
@@ -127,7 +127,7 @@ ___
 
 ▸ **getAddressFromKeyName**(`keyName`: string): *Promise‹Address›*
 
-*Defined in [wallet-hsm-azure/src/azure-hsm-wallet.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-hsm-wallet.ts#L52)*
+*Defined in [wallet-hsm-azure/src/azure-hsm-wallet.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-hsm-azure/src/azure-hsm-wallet.ts#L50)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName

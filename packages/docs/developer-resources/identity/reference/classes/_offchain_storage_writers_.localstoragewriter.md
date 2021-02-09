@@ -10,6 +10,8 @@
 
   ↳ [GoogleStorageWriter](_offchain_storage_writers_.googlestoragewriter.md)
 
+  ↳ [AwsStorageWriter](_offchain_storage_writers_.awsstoragewriter.md)
+
   ↳ [MockStorageWriter](_offchain_storage_writers_.mockstoragewriter.md)
 
 ## Index
