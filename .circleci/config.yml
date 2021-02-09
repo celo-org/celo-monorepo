@@ -522,6 +522,32 @@ jobs:
             BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
             yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
+  protocol-test-release-gold-deployment:
+    <<: *defaults
+    resource_class: large
+    environment:
+      RELEASE_TAG: celo-core-contracts-v2.rc0
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Copy DevChain and Build generated from released tag
+          command: |
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+            (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+      - run:
+          name: Test release gold deployment
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against $RELEASE_TAG"
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+
   protocol-test-common:
     <<: *defaults
     resource_class: large
@@ -1081,6 +1107,10 @@ workflows:
           requires:
             - lint-checks
       - protocol-test-release:
+          requires:
+            - lint-checks
+            - pre-protocol-test-release
+      - protocol-test-release-gold-deployment:
           requires:
             - lint-checks
             - pre-protocol-test-release

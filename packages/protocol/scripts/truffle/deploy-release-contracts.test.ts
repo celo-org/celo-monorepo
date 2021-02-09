@@ -3,8 +3,8 @@ import BN from 'bn.js'
 import chai from 'chai'
 import { readFileSync, writeFileSync } from 'fs-extra'
 import { ReleaseGoldContract, ReleaseGoldMultiSigContract, ReleaseGoldProxyContract } from 'types'
+const expect = chai.expect
 const assert = chai.assert
-chai.config.showDiff = true
 
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const ONE_ADDRESS = '0x0000000000000000000000000000000000000001'
@@ -61,9 +61,8 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const multiSig = await ReleaseGoldMultiSig.at(deployedGrant.MultiSigProxyAddress)
 
-    console.log(await multiSig.getOwners())
-    assert(
-      (await multiSig.getOwners()) === [DEVELOPMENT_FROM, ONE_ADDRESS],
+    expect(await multiSig.getOwners()).to.deep.equal(
+      [DEVELOPMENT_FROM, ONE_ADDRESS],
       'multisig owners are different'
     )
 
@@ -78,8 +77,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const releaseGoldImplementationContract = await ReleaseGold.at(implementationAddress)
 
-    assert(
-      (await releaseGoldImplementationContract.initialized()) === true,
+    expect(await releaseGoldImplementationContract.initialized()).to.be.true(
       'ReleaseGold implementation is not yet initialized'
     )
 
