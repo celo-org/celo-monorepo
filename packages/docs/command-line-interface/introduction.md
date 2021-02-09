@@ -50,7 +50,11 @@ The Celo CLI supports using a [Ledger hardware wallet](../celo-holder-guide/ledg
 
 ### Plugins
 
-Additional plugins can be installed which make the CLI experience smoother.
+Additional plugins can be installed which make the CLI experience smoother. Currently, `celocli` only supports installing plugins published on NPM within the `@celo/*` and `@clabs/*` scopes.
+
+{% hint style="danger" %}
+Installing a 3rd party plugin can be _dangerous_! Please always be sure that you trust the plugin provider.
+{% endhint %}
 
 The autocomplete plugin adds an interactive autocomplete for `bash` and `zsh` shells. To enable the autocomplete plugin, follow the instructions provided at:
 
