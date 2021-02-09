@@ -42,6 +42,7 @@ export async function installODISHelmChart(
   celoEnv: string,
   context: string,
 ) {
+  console.log('Installing ODIS helm chart')
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -105,8 +106,15 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set db.port=${databaseConfig.port}`,
     `--set db.username=${databaseConfig.username}`,
     `--set db.password=${databaseConfig.password}`,
+    `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
+    `--set keystore.secretName=${keyVaultConfig.secretName}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
+    `--set publicHostname=${ODISSignerPublicHostname(clusterConfig.regionName, celoEnv)}`,    
   ].concat(await ODISSignerKeyVaultIdentityHelmParameters(context, keyVaultConfig))
+}
+
+function ODISSignerPublicHostname(regionName: string, celoEnv: string): string{
+  return regionName + '.odissigner.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
 }
 
 /**
@@ -118,8 +126,8 @@ async function ODISSignerKeyVaultIdentityHelmParameters(
 ) {
   const azureKVIdentity = await createODISSignerKeyVaultIdentityIfNotExists(context, keyVaultConfig)
   const params: string[] = [
-        `azureKVIdentity.id=${azureKVIdentity.id}`,
-        `azureKVIdentity.clientId=${azureKVIdentity.clientId}`,
+        `--set azureKVIdentity.id=${azureKVIdentity.id}`,
+        `--set azureKVIdentity.clientId=${azureKVIdentity.clientId}`,
   ]
   
   return params
