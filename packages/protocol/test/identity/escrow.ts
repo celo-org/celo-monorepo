@@ -27,6 +27,8 @@ const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
 
+const isTest = true
+
 interface EscrowedPayment {
   recipientPhoneHash: string
   sender: string
@@ -64,8 +66,8 @@ contract('Escrow', (accounts: string[]) => {
   let registry: RegistryInstance
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    escrow = await Escrow.new({ from: owner })
+    registry = await Registry.new(isTest)
+    escrow = await Escrow.new(isTest, { from: owner })
     await escrow.initialize(registry.address)
     mockAttestations = await MockAttestations.new({ from: owner })
     await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)

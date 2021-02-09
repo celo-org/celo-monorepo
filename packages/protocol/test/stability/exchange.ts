@@ -43,6 +43,8 @@ MockReserve.numberFormat = 'BigNumber'
 // @ts-ignore
 GoldToken.numberFormat = 'BigNumber'
 
+const isTest = true
+
 contract('Exchange', (accounts: string[]) => {
   let exchange: ExchangeInstance
   let freezer: FreezerInstance
@@ -105,11 +107,11 @@ contract('Exchange', (accounts: string[]) => {
   }
 
   beforeEach(async () => {
-    freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
+    freezer = await Freezer.new(isTest)
+    goldToken = await GoldToken.new(isTest)
     mockReserve = await MockReserve.new()
-    stableToken = await StableToken.new()
-    registry = await Registry.new()
+    stableToken = await StableToken.new(isTest)
+    registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
@@ -136,7 +138,7 @@ contract('Exchange', (accounts: string[]) => {
 
     await fundReserve()
 
-    exchange = await Exchange.new()
+    exchange = await Exchange.new(isTest)
     await exchange.initialize(
       registry.address,
       stableToken.address,

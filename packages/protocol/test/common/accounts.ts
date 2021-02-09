@@ -30,6 +30,10 @@ const authorizationTestDescriptions = {
   },
 }
 
+// Set isTest to true and pass it to the constructors of initializable contracts
+// so that their implementations aren't initialized upon deployment
+const isTest = true
+
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let mockValidators: MockValidatorsInstance
@@ -44,9 +48,9 @@ contract('Accounts', (accounts: string[]) => {
     '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new({ from: account })
+    accountsInstance = await Accounts.new(isTest, { from: account })
     mockValidators = await MockValidators.new()
-    const registry = await Registry.new()
+    const registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await accountsInstance.initialize(registry.address)
 

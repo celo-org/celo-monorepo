@@ -3,6 +3,10 @@ import { FeeCurrencyWhitelistContract, FeeCurrencyWhitelistInstance } from 'type
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
 
+// Set isTest to true and pass it to the constructors of initializable contracts
+// so that their implementations aren't initialized upon deployment
+const isTest = true
+
 contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   let feeCurrencyWhitelist: FeeCurrencyWhitelistInstance
 
@@ -11,7 +15,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
-    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new()
+    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(isTest)
     await feeCurrencyWhitelist.initialize()
   })
 

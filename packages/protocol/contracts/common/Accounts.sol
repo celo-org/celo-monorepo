@@ -69,6 +69,12 @@ contract Accounts is
   event AccountCreated(address indexed account);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization for tests that use contracts un-proxied.
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */

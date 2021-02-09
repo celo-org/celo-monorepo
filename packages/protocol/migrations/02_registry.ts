@@ -7,12 +7,13 @@ const Artifactor = require('truffle-artifactor')
 const name = 'Registry'
 const Contract = artifacts.require(name)
 const ContractProxy = artifacts.require(name + 'Proxy')
+const notTest = false
 
 module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
   // tslint:disable-next-line: no-console
   console.info('Deploying Registry')
   deployer.deploy(ContractProxy)
-  deployer.deploy(Contract)
+  deployer.deploy(Contract, notTest)
   deployer.then(async () => {
     const networkId = await web3.eth.net.getId()
     // Hack to create build artifact.

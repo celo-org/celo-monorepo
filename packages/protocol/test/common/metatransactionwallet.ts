@@ -8,6 +8,7 @@ const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
 )
 
+const isTest = true
 interface MetaTransaction {
   destination: Address
   value: number
@@ -102,7 +103,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     wallet.executeTransaction(wallet.address, value, data, { from: signer })
 
   beforeEach(async () => {
-    wallet = await MetaTransactionWallet.new()
+    wallet = await MetaTransactionWallet.new(isTest)
     initializeRes = await wallet.initialize(signer)
   })
 

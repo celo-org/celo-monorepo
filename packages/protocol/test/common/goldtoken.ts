@@ -20,6 +20,10 @@ const Registry: RegistryContract = artifacts.require('Registry')
 // TODO(mcortesi): Use BN
 GoldToken.numberFormat = 'BigNumber'
 
+// Set isTest to true and pass it to the constructors of initializable contracts
+// so that their implementations aren't initialized upon deployment
+const isTest = true
+
 contract('GoldToken', (accounts: string[]) => {
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
@@ -30,9 +34,9 @@ contract('GoldToken', (accounts: string[]) => {
   const receiver = accounts[1]
 
   beforeEach(async () => {
-    freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
-    registry = await Registry.new()
+    freezer = await Freezer.new(isTest)
+    goldToken = await GoldToken.new(isTest)
+    registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
   })

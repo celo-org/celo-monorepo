@@ -24,6 +24,8 @@ const Registry: RegistryContract = artifacts.require('Registry')
 // @ts-ignore
 GovernanceSlasher.numberFormat = 'BigNumber'
 
+const isTest = true
+
 contract('GovernanceSlasher', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: MockValidatorsInstance
@@ -34,12 +36,12 @@ contract('GovernanceSlasher', (accounts: string[]) => {
   const validator = accounts[1]
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(isTest)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     validators = await MockValidators.new()
-    slasher = await GovernanceSlasher.new()
+    slasher = await GovernanceSlasher.new(isTest)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)

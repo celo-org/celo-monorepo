@@ -21,6 +21,8 @@ const HasInitializer: Truffle.Contract<HasInitializerInstance> = artifacts.requi
 const MsgSenderCheck: Truffle.Contract<MsgSenderCheckInstance> = artifacts.require('MsgSenderCheck')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
+const isTest = true
+
 contract('Proxy', (accounts: string[]) => {
   let proxy: ProxyInstance
   let getSet: GetSetV0Instance
@@ -236,9 +238,9 @@ contract('Proxy', (accounts: string[]) => {
     GoldToken.numberFormat = 'BigNumber'
     const Registry: RegistryContract = artifacts.require('Registry')
 
-    const freezer = await Freezer.new()
-    const goldToken = await GoldToken.new()
-    const registry = await Registry.new()
+    const freezer = await Freezer.new(isTest)
+    const goldToken = await GoldToken.new(isTest)
+    const registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
 

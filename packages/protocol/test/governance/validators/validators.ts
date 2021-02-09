@@ -38,6 +38,8 @@ const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
+const isTest = true
+
 // @ts-ignore
 // TODO(mcortesi): Use BN
 Validators.numberFormat = 'BigNumber'
@@ -115,14 +117,14 @@ contract('Validators', (accounts: string[]) => {
     '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(isTest)
     // Do not register an account for the last address so it can be used as an authorized validator signer.
     await Promise.all(
       accounts.slice(0, -1).map((account) => accountsInstance.createAccount({ from: account }))
     )
     mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     validators = await Validators.new()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)

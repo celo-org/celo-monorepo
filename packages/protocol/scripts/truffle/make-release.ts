@@ -73,14 +73,23 @@ const deployImplementation = async (
   contractName: string,
   Contract: TruffleContract<Truffle.ContractInstance>,
   dryRun: boolean,
-  from: string
+  from: string,
+  isInitializable: boolean
 ) => {
+  const notTest = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  const contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new())
+  let contract
+  if (dryRun) {
+    contract = await Contract.at(celoRegistryAddress)
+  } else {
+    // if the contract is initializable we need to specify that we aren't testing
+    // so the implementation gets locked upon deployment
+    contract = await (isInitializable ? Contract.new(notTest) : Contract.new())
+  }
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -134,7 +143,7 @@ const deployCoreContract = async (
   isDryRun: boolean,
   from: string
 ) => {
-  const contract = await deployImplementation(contractName, instance, isDryRun, from)
+  const contract = await deployImplementation(contractName, instance, isDryRun, from, true)
   const setImplementationTx: ProposalTx = {
     contract: `${contractName}Proxy`,
     function: '_setImplementation',
@@ -183,7 +192,7 @@ const deployLibrary = async (
   isDryRun: boolean,
   from: string
 ) => {
-  const contract = await deployImplementation(contractName, contractArtifact, isDryRun, from)
+  const contract = await deployImplementation(contractName, contractArtifact, isDryRun, from, false)
   addresses.set(contractName, contract.address)
   return
 }

@@ -42,6 +42,8 @@ const TestTransactions: TestTransactionsContract = artifacts.require('TestTransa
 // TODO(mcortesi): Use BN
 Governance.numberFormat = 'BigNumber'
 
+const isTest = true
+
 const parseProposalParams = (proposalParams: any) => {
   return {
     proposer: proposalParams[0],
@@ -112,11 +114,11 @@ contract('Governance', (accounts: string[]) => {
   let hotfixHash: Buffer
   let hotfixHashStr: string
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(isTest)
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     testTransactions = await TestTransactions.new()
     await governance.initialize(
       registry.address,

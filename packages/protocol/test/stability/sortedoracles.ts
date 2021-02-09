@@ -19,6 +19,8 @@ const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 // TODO(mcortesi): Use BN.js
 SortedOracles.numberFormat = 'BigNumber'
 
+const isTest = true
+
 contract('SortedOracles', (accounts: string[]) => {
   let sortedOracles: SortedOraclesInstance
   const anOracle = accounts[9]
@@ -26,7 +28,7 @@ contract('SortedOracles', (accounts: string[]) => {
   const aReportExpiry: number = 3600
 
   beforeEach(async () => {
-    sortedOracles = await SortedOracles.new()
+    sortedOracles = await SortedOracles.new(isTest)
     await sortedOracles.initialize(aReportExpiry)
   })
 

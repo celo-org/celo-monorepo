@@ -6,6 +6,8 @@ import { MultiSigContract, MultiSigInstance } from 'types'
 
 const MultiSig: MultiSigContract = artifacts.require('MultiSig')
 
+const isTest = true
+
 // TODO(asa): Test more governance configurations, calling functions on external contracts.
 contract('MultiSig', (accounts: any) => {
   let multiSig: MultiSigInstance
@@ -15,7 +17,7 @@ contract('MultiSig', (accounts: any) => {
   const internalRequiredSignatures = 2
 
   beforeEach(async () => {
-    multiSig = await MultiSig.new()
+    multiSig = await MultiSig.new(isTest)
     await multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
   })
 

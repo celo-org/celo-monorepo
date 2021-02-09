@@ -44,6 +44,8 @@ MockLockedGold.numberFormat = 'BigNumber'
 // Hard coded in ganache.
 const EPOCH = 100
 
+const isTest = true
+
 contract('Election', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let election: ElectionTestInstance
@@ -61,13 +63,13 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = toFixed(1 / 100)
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(isTest)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
-    freezer = await Freezer.new()
+    freezer = await Freezer.new(isTest)
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)

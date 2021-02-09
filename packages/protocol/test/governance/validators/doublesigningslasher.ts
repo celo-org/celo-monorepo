@@ -22,6 +22,8 @@ const DoubleSigningSlasher: DoubleSigningSlasherTestContract = artifacts.require
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
+const isTest = true
+
 // @ts-ignore
 // TODO(mcortesi): Use BN
 DoubleSigningSlasher.numberFormat = 'BigNumber'
@@ -41,10 +43,10 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   const slashingReward = 100
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(isTest)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     validators = await MockValidators.new()
     slasher = await DoubleSigningSlasher.new()
     await accountsInstance.initialize(registry.address)

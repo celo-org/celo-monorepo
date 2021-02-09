@@ -12,6 +12,10 @@ import {
 const Registry: RegistryContract = artifacts.require('Registry')
 const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')
 
+// Set isTest to true and pass it to the constructors of initializable contracts
+// so that their implementations aren't initialized upon deployment
+const isTest = true
+
 // @ts-ignore
 // TODO(mcortesi): Use BN
 GasPriceMinimum.numberFormat = 'BigNumber'
@@ -26,8 +30,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
   const adjustmentSpeed = toFixed(1 / 2)
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    gasPriceMinimum = await GasPriceMinimum.new()
+    registry = await Registry.new(isTest)
+    gasPriceMinimum = await GasPriceMinimum.new(isTest)
 
     await gasPriceMinimum.initialize(
       registry.address,

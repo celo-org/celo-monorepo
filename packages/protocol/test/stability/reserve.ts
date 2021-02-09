@@ -28,6 +28,8 @@ const MockSortedOracles: Truffle.Contract<MockSortedOraclesInstance> = artifacts
 // @ts-ignore
 Reserve.numberFormat = 'BigNumber'
 
+const isTest = true
+
 contract('Reserve', (accounts: string[]) => {
   let reserve: ReserveInstance
   let registry: RegistryInstance
@@ -45,8 +47,8 @@ contract('Reserve', (accounts: string[]) => {
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
-    reserve = await Reserve.new()
-    registry = await Registry.new()
+    reserve = await Reserve.new(isTest)
+    registry = await Registry.new(isTest)
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)

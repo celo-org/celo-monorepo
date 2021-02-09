@@ -16,6 +16,8 @@ const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
 
 const Proxy: ProxyContract = artifacts.require('Proxy')
 
+const isTest = true
+
 contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
   let deployer: MetaTransactionWalletDeployerInstance
   const valoraAccount = accounts[1]
@@ -30,7 +32,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
     let walletDeployedEvent
 
     before(async () => {
-      implementation = await MetaTransactionWallet.new()
+      implementation = await MetaTransactionWallet.new(isTest)
     })
 
     beforeEach(async () => {

@@ -9,6 +9,8 @@ import {
 const TransferWhitelist: TransferWhitelistContract = artifacts.require('TransferWhitelist')
 const Registry: RegistryContract = artifacts.require('Registry')
 
+const isTest = true
+
 contract('TransferWhitelist', (accounts: string[]) => {
   let transferWhitelist: TransferWhitelistInstance
   let registry: RegistryInstance
@@ -23,7 +25,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     transferWhitelist = await TransferWhitelist.new(registry.address)
   })
 

@@ -48,6 +48,8 @@ const MockValidators: MockValidatorsContract = artifacts.require('MockValidators
 const Random: MockRandomContract = artifacts.require('MockRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
 
+const isTest = true
+
 contract('Attestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let attestations: AttestationsTestInstance
@@ -132,7 +134,7 @@ contract('Attestations', (accounts: string[]) => {
   }
 
   beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(isTest)
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
     const mockValidators = await MockValidators.new()
@@ -141,7 +143,7 @@ contract('Attestations', (accounts: string[]) => {
     await random.initialize(256)
     await random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 

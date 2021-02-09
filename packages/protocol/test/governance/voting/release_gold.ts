@@ -54,6 +54,8 @@ const authorizationTestDescriptions = {
   },
 }
 
+const isTest = true
+
 interface ReleaseGoldConfig {
   releaseStartTime: number
   releaseCliffTime: number
@@ -139,7 +141,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3: Web3
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-    releaseGoldInstance = await ReleaseGold.new()
+    releaseGoldInstance = await ReleaseGold.new(isTest)
     await goldTokenInstance.transfer(
       releaseGoldInstance.address,
       releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
@@ -172,16 +174,16 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3.eth.getBlock('latest').then((block) => Number(block.timestamp))
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
-    freezerInstance = await Freezer.new()
-    goldTokenInstance = await GoldToken.new()
-    lockedGoldInstance = await LockedGold.new()
+    accountsInstance = await Accounts.new(isTest)
+    freezerInstance = await Freezer.new(isTest)
+    goldTokenInstance = await GoldToken.new(isTest)
+    lockedGoldInstance = await LockedGold.new(isTest)
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
     mockValidators = await MockValidators.new()
     mockStableToken = await MockStableToken.new()
 
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezerInstance.address)

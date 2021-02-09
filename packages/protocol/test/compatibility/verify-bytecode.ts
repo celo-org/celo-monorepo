@@ -17,6 +17,8 @@ import truffleContract = require('truffle-contract')
 const Registry = artifacts.require('Registry')
 const Proxy = artifacts.require('Proxy')
 
+const isTest = true
+
 const makeTruffleContract = (artifact: Artifact) => {
   const Contract = truffleContract({
     abi: artifact.abi,
@@ -107,7 +109,7 @@ contract('', (accounts) => {
     let library3
     let testContract
     beforeEach(async () => {
-      registry = await Registry.new()
+      registry = await Registry.new(isTest)
 
       library1 = await LinkedLibrary1.new({ from: accounts[0] })
       library3 = await LinkedLibrary3.new({ from: accounts[0] })

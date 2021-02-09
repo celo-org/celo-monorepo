@@ -45,6 +45,12 @@ contract MetaTransactionWallet is
   );
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization for tests that use contracts un-proxied.
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @dev Fallback function allows to deposit ether.
    */
   function() external payable {

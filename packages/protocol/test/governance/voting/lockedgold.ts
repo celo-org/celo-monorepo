@@ -30,7 +30,7 @@ import {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
-const ElectionTest: ElectionTestContract = artifacts.require('Election')
+const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
@@ -47,6 +47,8 @@ ElectionTest.numberFormat = 'BigNumber'
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 
+const isTest = true
+
 contract('LockedGold', (accounts: string[]) => {
   const account = accounts[0]
   const nonOwner = accounts[1]
@@ -62,12 +64,12 @@ contract('LockedGold', (accounts: string[]) => {
 
   beforeEach(async () => {
     mockGoldToken = await MockGoldToken.new()
-    accountsInstance = await Accounts.new()
-    lockedGold = await LockedGold.new()
+    accountsInstance = await Accounts.new(isTest)
+    lockedGold = await LockedGold.new(isTest)
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
-    registry = await Registry.new()
+    registry = await Registry.new(isTest)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
