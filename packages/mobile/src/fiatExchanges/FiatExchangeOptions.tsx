@@ -18,7 +18,6 @@ import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import { KOTANI_URI, PONTO_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
-import { openMoonpay } from 'src/fiatExchanges/utils'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -153,10 +152,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.BidaliScreen, { currency: selectedCurrency })
     } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
       navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
-    } else if (selectedCurrency === CURRENCY_ENUM.DOLLAR) {
-      navigate(Screens.ProviderOptionsScreen, { isCashIn: true })
     } else {
-      openMoonpay(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.GOLD)
+      navigate(Screens.ProviderOptionsScreen, { isCashIn: true, currency: selectedCurrency })
     }
   }
 

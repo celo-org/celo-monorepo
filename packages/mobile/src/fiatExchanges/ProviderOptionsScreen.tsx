@@ -59,6 +59,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
   const localCurrency = useSelector(getLocalCurrencyCode)
   const isCashIn = route.params?.isCashIn ?? true
   const { MOONPAY_DISABLED } = useCountryFeatures()
+  const selectedCurrency = route.params.currency || CURRENCY_ENUM.DOLLAR
 
   useLayoutEffect(() => {
     const showExplanation = () => setShowExplanation(true)
@@ -84,7 +85,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         name: 'Moonpay',
         enabled: !MOONPAY_DISABLED,
         image: <Image source={moonpayLogo} style={styles.logo} resizeMode={'contain'} />,
-        onSelected: () => openMoonpay(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.DOLLAR),
+        onSelected: () => openMoonpay(localCurrency || FALLBACK_CURRENCY, selectedCurrency),
       },
       {
         name: 'Simplex',
@@ -95,7 +96,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       {
         name: 'Ramp',
         enabled: true,
-        onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.DOLLAR),
+        onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, selectedCurrency),
       },
     ],
   }
