@@ -70,8 +70,9 @@ export default class GetAttestations extends BaseCommand {
         value: 'tel://' + phoneNumber + '__' + pepper,
       })
       identifier = computedIdentifier!
+      console.log('Identifier: ' + identifier)
     }
-    console.log(await attestations.lookupAccountsForIdentifier(identifier))
+    console.log('Accounts:\n' + (await attestations.lookupAccountsForIdentifier(identifier)))
   }
 
   async getPhoneNumberPepper(
