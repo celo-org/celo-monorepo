@@ -171,7 +171,7 @@ async function repl(config: GethRunConfig) {
         ...o,
         [formatName(instance.name)]: {
           web3: new Web3(getRpcUrl(instance)),
-          kit: new newKit(getRpcUrl(instance)),
+          kit: newKit(getRpcUrl(instance)),
           admin: new Admin(getRpcUrl(instance)),
           config: instance,
           kill: (signal?: string) => {
