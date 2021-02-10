@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -29,12 +28,7 @@ import deviceInfoModule from 'react-native-device-info'
 import { useDispatch } from 'react-redux'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
-import {
-  defaultCountryCodeSelector,
-  e164NumberSelector,
-  nameSelector,
-  userContactDetailsSelector,
-} from 'src/account/selectors'
+import { defaultCountryCodeSelector, e164NumberSelector, nameSelector } from 'src/account/selectors'
 import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
 import { HomeEvents } from 'src/analytics/Events'
@@ -42,6 +36,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { toggleInviteModal } from 'src/app/actions'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
+import ContactCircleSelf from 'src/components/ContactCircleSelf'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
@@ -49,7 +44,7 @@ import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { AccountKey } from 'src/icons/navigator/AccountKey'
 import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
 import { Gold } from 'src/icons/navigator/Gold'
@@ -147,7 +142,6 @@ function CustomDrawerItemList({
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
   const e164PhoneNumber = useSelector(e164NumberSelector)
-  const contactDetails = useSelector(userContactDetailsSelector)
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
   const dollarBalance = useSelector(stableTokenBalanceSelector)
   const dollarAmount = {
@@ -173,7 +167,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
         <View style={styles.drawerHeader}>
-          <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
+          <ContactCircleSelf size={64} />
           <RewardsPill />
         </View>
         <Text style={styles.nameLabel}>{displayName}</Text>
@@ -221,7 +215,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       </View>
       <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
-        <Text style={fontStyles.label}>Account No.</Text>
+        <Text style={fontStyles.label}>{i18n.t('dappkit:address')}</Text>
         <View style={styles.accountOuterContainer}>
           <View style={styles.accountInnerContainer}>
             <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />

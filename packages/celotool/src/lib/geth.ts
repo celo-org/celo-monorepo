@@ -88,12 +88,14 @@ export const getBootnodeEnode = async (namespace: string) => {
   return [getEnodeAddress(nodeId, ip, BOOTNODE_DISCOVERY_PORT)]
 }
 
-const retrieveBootnodeIPAddress = async (namespace: string) => {
+export const retrieveBootnodeIPAddress = async (namespace: string) => {
   if (isVmBased()) {
     const outputs = await getTestnetOutputs(namespace)
     return outputs.bootnode_ip_address.value
   } else {
-    const resourceName = `${namespace}-bootnode`
+    // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
+    const resourceName = namespace === 'baklava' ?
+     `${namespace}-bootnode-address` : `${namespace}-bootnode`
     if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
       return retrieveIPAddress(resourceName)
     } else {

@@ -6,6 +6,8 @@ export enum Actions {
   CANCEL_CREATE_OR_RESTORE_ACCOUNT = 'ACCOUNT/CANCEL_CREATE_OR_RESTORE_ACCOUNT',
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
+  SET_PICTURE = 'ACCOUNT/SET_PICTURE',
+  SAVE_NAME_AND_PICTURE = 'ACCOUNT/SAVE_NAME_AND_PICTURE',
   DEV_MODE_TRIGGER_CLICKED = 'ACCOUNT/NAME_CLICKED',
   PHOTOSNUX_CLICKED = 'ACCOUNT/PHOTOSNUX_CLICKED',
   SET_PINCODE = 'ACCOUNT/SET_PINCODE',
@@ -26,6 +28,7 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   CLEAR_STORED_ACCOUNT = 'ACCOUNT/CLEAR_STORED_ACCOUNT',
+  UPDATE_DAILY_LIMIT = 'ACCOUNT/UPDATE_DAILY_LIMIT',
 }
 
 export interface ChooseCreateAccountAction {
@@ -48,6 +51,17 @@ export interface SetPhoneNumberAction {
   type: Actions.SET_PHONE_NUMBER
   e164PhoneNumber: string
   countryCode: string
+}
+
+export interface SetPictureAction {
+  type: Actions.SET_PICTURE
+  pictureUri: string | null
+}
+
+export interface SaveNameAndPictureAction {
+  type: Actions.SAVE_NAME_AND_PICTURE
+  name: string
+  pictureUri: string | null
 }
 
 export interface DevModeTriggerClickedAction {
@@ -137,12 +151,19 @@ export interface ClearStoredAccountAction {
   account: string
 }
 
+export interface UpdateDailyLimitAction {
+  type: Actions.UPDATE_DAILY_LIMIT
+  newLimit: number
+}
+
 export type ActionTypes =
   | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
   | CancelCreateOrRestoreAccountAction
   | SetNameAction
   | SetPhoneNumberAction
+  | SetPictureAction
+  | SaveNameAndPictureAction
   | DevModeTriggerClickedAction
   | PhotosNUXClickedAction
   | SetPincodeAction
@@ -163,6 +184,7 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | ClearStoredAccountAction
+  | UpdateDailyLimitAction
 
 export function chooseCreateAccount(): ChooseCreateAccountAction {
   return {
@@ -188,6 +210,7 @@ export function setName(name: string): SetNameAction {
     name,
   }
 }
+
 export function acceptTerms(): AcceptTermsAction {
   return {
     type: Actions.ACCEPT_TERMS,
@@ -199,6 +222,24 @@ export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): Se
     type: Actions.SET_PHONE_NUMBER,
     e164PhoneNumber,
     countryCode,
+  }
+}
+
+export function saveNameAndPicture(
+  name: string,
+  pictureUri: string | null
+): SaveNameAndPictureAction {
+  return {
+    type: Actions.SAVE_NAME_AND_PICTURE,
+    name,
+    pictureUri,
+  }
+}
+
+export function setPicture(pictureUri: string | null): SetPictureAction {
+  return {
+    type: Actions.SET_PICTURE,
+    pictureUri,
   }
 }
 
@@ -288,4 +329,9 @@ export const setUserContactDetails = (
 export const clearStoredAccount = (account: string): ClearStoredAccountAction => ({
   type: Actions.CLEAR_STORED_ACCOUNT,
   account,
+})
+
+export const updateCusdDailyLimit = (newLimit: number): UpdateDailyLimitAction => ({
+  type: Actions.UPDATE_DAILY_LIMIT,
+  newLimit,
 })

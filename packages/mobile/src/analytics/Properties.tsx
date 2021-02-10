@@ -35,6 +35,7 @@ interface AppEventsProperties {
     deviceInfo?: object
     deviceHeight: number
     deviceWidth: number
+    language: string | null
   }
   [AppEvents.app_state_error]: {
     error: string
@@ -154,12 +155,12 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.celo_education_complete]: undefined
   [OnboardingEvents.celo_education_cancel]: undefined
 
+  [OnboardingEvents.name_and_picture_set]: {
+    includesPhoto: boolean
+  }
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
     country?: string
-  }
-  [OnboardingEvents.phone_number_invalid]: {
-    obfuscatedPhoneNumber: string
   }
 
   [OnboardingEvents.pin_set]: undefined
