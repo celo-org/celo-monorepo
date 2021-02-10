@@ -117,10 +117,13 @@ export function assertAlmostEqual(
 type Signal = 'TERM' | 'KILL' | 'INT' | 'STOP' | 'CONT'
 
 export async function signalProcess(identifier: string | number, signal: Signal): Promise<void> {
-  if (typeof identifier === 'number') {
-    await spawnCmd('kill', ['-s', signal, identifier.toString()], { silent: true })
-  } else {
-    await spawnCmd('pkill', [`-SIG${signal}`, identifier], { silent: true })
+  const result =
+    typeof identifier === 'number'
+      ? await spawnCmd('kill', ['-s', signal, identifier.toString()], { silent: true })
+      : await spawnCmd('pkill', [`-SIG${signal}`, identifier], { silent: true })
+
+  if (result !== 0) {
+    console.warn(`Attempt to send signal ${signal} to ${identifier} exited with code ${result}`)
   }
 }
 
