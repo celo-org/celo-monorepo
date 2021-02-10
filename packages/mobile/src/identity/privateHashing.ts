@@ -11,11 +11,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
-import {
-  e164NumberToSaltSelector,
-  E164NumberToSaltType,
-  isBalanceSufficientForSigRetrievalSelector,
-} from 'src/identity/reducer'
+import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { isUserBalanceSufficient } from 'src/identity/utils'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -24,6 +20,7 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { isBalanceSufficientForSigRetrievalSelector } from 'src/verify/reducer'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
 import { getAccount, getAccountAddress, unlockAccount, UnlockResult } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -65,18 +62,18 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
  * otherwise query from the service
  */
 function* doFetchPhoneHashPrivate(e164Number: string) {
-  Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
+  Logger.debug(`${TAG}@doFetchPhoneHashPrivate`, 'Fetching phone hash details')
   const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
   const cachedSalt = saltCache[e164Number]
 
   if (cachedSalt) {
-    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
+    Logger.debug(`${TAG}@doFetchPhoneHashPrivate`, 'Salt was cached')
     const phoneHash = getPhoneHash(e164Number, cachedSalt)
     const cachedDetails: PhoneNumberHashDetails = { e164Number, phoneHash, pepper: cachedSalt }
     return cachedDetails
   }
 
-  Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
+  Logger.debug(`${TAG}@doFetchPhoneHashPrivate`, 'Salt was not cached, fetching')
   const isBalanceSufficientForQuota = yield select(isBalanceSufficientForSigRetrievalSelector)
   if (!isBalanceSufficientForQuota) {
     throw new Error(ErrorMessages.ODIS_INSUFFICIENT_BALANCE)

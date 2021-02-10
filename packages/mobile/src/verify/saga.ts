@@ -1,4 +1,5 @@
 import { Result } from '@celo/base/lib/result'
+import { ContractKit } from '@celo/contractkit/src'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -31,11 +32,25 @@ import { sleep } from '@celo/utils/src/async'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
-import { all, call, delay, put, race, select, takeEvery } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  put,
+  race,
+  select,
+  takeEvery,
+  spawn,
+  takeLatest,
+} from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
-import { Actions, updateE164PhoneNumberSalts } from 'src/identity/actions'
+import {
+  Actions,
+  setVerificationStatus as setOldVerificationStatus,
+  updateE164PhoneNumberSalts,
+} from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
 import {
   hasExceededKomenciErrorQuota,
@@ -43,11 +58,8 @@ import {
   KomenciSessionInvalidError,
   storeTimestampIfKomenciError,
 } from 'src/identity/feelessVerificationErrors'
-import {
-  e164NumberToSaltSelector,
-  E164NumberToSaltType,
-  isBalanceSufficientForSigRetrievalSelector,
-} from 'src/identity/reducer'
+import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
+import { VerificationStatus } from 'src/identity/types'
 import {
   doVerificationFlowSaga,
   getActionableAttestations,
@@ -60,31 +72,34 @@ import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import Logger from 'src/utils/Logger'
 import {
-  disableKomenci,
+  checkIfKomenciAvailable,
   doVerificationFlow,
   e164NumberSelector,
   ensureRealHumanUser,
-  eoaAccountSelector,
+  fail,
   fetchMtw,
   fetchOnChainData,
   fetchPhoneNumberDetails,
+  isBalanceSufficientForSigRetrievalSelector,
   KomenciContext,
   komenciContextSelector,
+  overrideWithoutVerificationSelector,
   phoneHashSelector,
+  reset,
   setActionableAttestation,
+  setKomenciAvailable,
   setKomenciContext,
+  setOverrideWithoutVerification,
   setPhoneHash,
   setVerificationStatus,
+  shouldUseKomenciSelector,
   start,
   startKomenciSession,
-  useKomenciSelector,
-  overrideWithoutVerificationSelector,
-  resetOverrideWithoutVerification,
-  setOverrideWithoutVerification,
 } from 'src/verify/reducer'
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
-import { getConnectedUnlockedAccount, unlockAccount, UnlockResult } from 'src/web3/saga'
+import { getAccount, getConnectedUnlockedAccount, unlockAccount, UnlockResult } from 'src/web3/saga'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 
 const TAG = 'verify/saga'
 const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
@@ -177,7 +192,7 @@ function* fetchKomenciSession(komenciKit: KomenciKit, e164Number: string) {
   yield put(setKomenciContext({ unverifiedMtwAddress, sessionActive }))
 }
 
-function* startOrResumeKomenciSessionSaga(action: ReturnType<typeof startKomenciSession>) {
+function* startOrResumeKomenciSessionSaga() {
   Logger.debug(TAG, '@startOrResumeKomenciSession', 'Starting session')
   // Fetch session state to make sure we have the most up-to-date session info
   // yield call(fetchKomenciSessionState, komenciKit, e164Number)
@@ -232,79 +247,98 @@ function* startOrResumeKomenciSessionSaga(action: ReturnType<typeof startKomenci
   yield put(fetchPhoneNumberDetails())
 }
 
-function* startSaga({ payload: { withoutRevealing } }: ReturnType<typeof start>) {
-  // TODO: Move this out of saga
-  yield call(navigate, Screens.VerificationLoadingScreen, {
-    withoutRevealing,
+function* checkIfKomenciAvailableSaga() {
+  const contractKit = yield call(getContractKit)
+  const walletAddress = yield call(getAccount)
+  const komenci = yield select(komenciContextSelector)
+  const komenciKit = new KomenciKit(contractKit, walletAddress, {
+    url: komenci.callbackUrl || networkConfig.komenciUrl,
+    token: komenci.sessionToken,
   })
 
-  const contractKit = yield call(getContractKit)
-  const walletAddress = yield call(getConnectedUnlockedAccount)
+  // const isKomenciAvailable = yield call(fetchKomenciReadiness, komenciKit)
+  const isKomenciAvailable = false
+  yield put(setKomenciAvailable(isKomenciAvailable))
+}
 
-  Logger.debug(TAG, '@startSaga', walletAddress)
-  // we want to reset password before force unlock account
-  clearPasswordCaches()
-  const result: UnlockResult = yield call(unlockAccount, walletAddress, true)
-  if (result !== UnlockResult.SUCCESS) {
-    // This navigateBack has no effect if part of onboarding and returns to home or
-    // settings page if the user pressed on the back button when prompted for the PIN.
-    navigateBack()
-    return
-  }
+function* startSaga({ payload: { withoutRevealing } }: ReturnType<typeof start>) {
+  // TODO: Move this out of saga
+  try {
+    yield call(navigate, Screens.VerificationLoadingScreen, {
+      withoutRevealing,
+    })
 
-  const e164Number = yield select(e164NumberSelector)
-  const useKomenci = yield select(useKomenciSelector)
+    const contractKit = yield call(getContractKit)
+    const walletAddress = yield call(getConnectedUnlockedAccount)
 
-  if (useKomenci) {
-    try {
-      const komenci = yield select(komenciContextSelector)
-      const komenciKit = new KomenciKit(contractKit, walletAddress, {
-        url: komenci.callbackUrl || networkConfig.komenciUrl,
-        token: komenci.sessionToken,
+    Logger.debug(TAG, '@startSaga', walletAddress)
+    // we want to reset password before force unlock account
+    clearPasswordCaches()
+    const result: UnlockResult = yield call(unlockAccount, walletAddress, true)
+    if (result !== UnlockResult.SUCCESS) {
+      // This navigateBack has no effect if part of onboarding and returns to home or
+      // settings page if the user pressed on the back button when prompted for the PIN.
+      navigateBack()
+      return
+    }
+    const e164Number = yield select(e164NumberSelector)
+    const shouldUseKomenci = yield select(shouldUseKomenciSelector)
+
+    if (shouldUseKomenci) {
+      try {
+        const komenci = yield select(komenciContextSelector)
+        const komenciKit = new KomenciKit(contractKit, walletAddress, {
+          url: komenci.callbackUrl || networkConfig.komenciUrl,
+          token: komenci.sessionToken,
+        })
+        yield call(fetchKomenciSession, komenciKit, e164Number)
+        if (!komenci.sessionActive) {
+          yield put(ensureRealHumanUser())
+        } else {
+          yield put(fetchPhoneNumberDetails())
+        }
+      } catch (e) {
+        Logger.error(TAG, '@startSaga', e)
+        storeTimestampIfKomenciError(e)
+        if (e instanceof KomenciErrorQuotaExceeded) {
+          yield put(setKomenciAvailable(false))
+          yield put(start({ e164Number, withoutRevealing }))
+        }
+      }
+    } else {
+      const { timeout } = yield race({
+        balances: all([
+          call(waitFor, stableTokenBalanceSelector),
+          call(waitFor, celoTokenBalanceSelector),
+        ]),
+        timeout: delay(BALANCE_CHECK_TIMEOUT),
       })
-      const isKomenciReady = yield call(fetchKomenciReadiness, komenciKit)
-      if (!isKomenciReady) {
-        yield put(disableKomenci())
-        yield put(start({ e164Number, withoutRevealing }))
+      if (timeout) {
+        Logger.debug(TAG, '@startSaga', 'Token balances is null or undefined')
+        yield put(fail(ErrorMessages.VERIFICATION_FAILURE))
         return
       }
+      const isBalanceSufficientForSigRetrieval = yield select(
+        isBalanceSufficientForSigRetrievalSelector
+      )
+      if (!isBalanceSufficientForSigRetrieval) {
+        Logger.debug(TAG, '@startSaga', 'Insufficient balance for sig retrieval')
 
-      yield call(fetchKomenciSession, komenciKit, e164Number)
-      if (!komenci.sessionActive) {
-        yield put(ensureRealHumanUser())
-      } else {
-        yield put(fetchPhoneNumberDetails())
-      }
-    } catch (e) {
-      Logger.error(TAG, '@startSaga', e)
-      storeTimestampIfKomenciError(e)
-      if (e instanceof KomenciErrorQuotaExceeded) {
-        yield put(disableKomenci())
-        yield put(start({ e164Number, withoutRevealing }))
-      }
-    }
-  } else {
-    const { timeout } = yield race({
-      balances: all([
-        call(waitFor, stableTokenBalanceSelector),
-        call(waitFor, celoTokenBalanceSelector),
-      ]),
-      timeout: delay(BALANCE_CHECK_TIMEOUT),
-    })
-    if (timeout) {
-      Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
-      // TODO: Error Screen
-      return
-    }
-    const isBalanceSufficientForSigRetrieval = yield select(
-      isBalanceSufficientForSigRetrievalSelector
-    )
-    if (!isBalanceSufficientForSigRetrieval) {
-      Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
+        // TODO: redirect to buy more quota screen instead of Failed
 
-      yield put(fail(ErrorMessages.INSUFFICIENT_BALANCE))
-      // TODO: direct to buy more quota screen
+        return
+      }
+      yield put(fetchPhoneNumberDetails())
+    }
+  } catch (error) {
+    Logger.error(TAG, '@startSaga', error)
+    if (error.message === ErrorMessages.PIN_INPUT_CANCELED) {
+      // This navigateBack has no effect if part of onboarding and returns to home or
+      // settings page if the user pressed on the back button when prompted for the PIN.
+      navigateBack()
       return
+    } else {
+      yield put(fail(ErrorMessages.VERIFICATION_FAILURE))
     }
   }
 }
@@ -314,19 +348,19 @@ function* fetchPhoneNumberDetailsSaga(action: ReturnType<typeof fetchPhoneNumber
   const e164Number = yield select(e164NumberSelector)
   let phoneHash = yield select(phoneHashSelector)
   const pepperCache = yield select(e164NumberToSaltSelector)
-  const useKomenci = yield select(useKomenciSelector)
+  const shouldUseKomenci = yield select(shouldUseKomenciSelector)
   let ownPepper = pepperCache[e164Number]
 
   const contractKit = yield call(getContractKit)
   const walletAddress = yield call(getConnectedUnlockedAccount)
   Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', walletAddress)
 
-  if (phoneHash && phoneHash.length) {
-    Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper is cached')
+  if (phoneHash && ownPepper) {
+    Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Phone Hash and Pepper is cached')
   } else {
     if (!ownPepper) {
       Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper not cached')
-      if (useKomenci) {
+      if (shouldUseKomenci) {
         Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Fetching from Komenci')
 
         const komenci = yield select(komenciContextSelector)
@@ -348,22 +382,95 @@ function* fetchPhoneNumberDetailsSaga(action: ReturnType<typeof fetchPhoneNumber
           throw pepperQueryResult.error
         }
         ownPepper = pepperQueryResult.result.pepper
+        phoneHash = getPhoneHash(e164Number, ownPepper)
       } else {
-        // TODO: classical fetch
+        const phoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+        ownPepper = phoneNumberHashDetails.pepper
+        phoneHash = phoneNumberHashDetails.phoneHash
       }
       Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Pepper is fetched')
       yield put(updateE164PhoneNumberSalts({ [e164Number]: ownPepper }))
     }
-    phoneHash = getPhoneHash(e164Number, ownPepper)
     yield put(setPhoneHash(phoneHash))
     Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Phone Hash is set')
   }
 
-  if (useKomenci) {
+  if (shouldUseKomenci) {
     yield put(fetchMtw())
   } else {
     yield put(fetchOnChainData())
   }
+}
+
+function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164Number: string) {
+  Logger.debug(TAG, '@fetchVerifiedMtw', 'Starting fetch')
+  const pepperCache = yield select(e164NumberToSaltSelector)
+  const ownPepper = pepperCache[e164Number]
+  const phoneHash = getPhoneHash(e164Number, ownPepper)
+
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  const associatedAccounts: string[] = yield call(
+    [attestationsWrapper, attestationsWrapper.lookupAccountsForIdentifier],
+    phoneHash
+  )
+
+  const accountAttestationStatuses: AttestationsStatus[] = yield all(
+    associatedAccounts.map((account) =>
+      call(getAttestationsStatus, attestationsWrapper, account, phoneHash)
+    )
+  )
+
+  const possibleMtwAddressIndexes: number[] = associatedAccounts
+    .map((_, i) => i)
+    .filter((i) => accountAttestationStatuses[i].isVerified)
+
+  if (!possibleMtwAddressIndexes.length) {
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'No possible MTWs found')
+    return null
+  }
+
+  const verificationResults: Array<Result<true, WalletValidationError>> = yield all(
+    possibleMtwAddressIndexes.map((possibleMtwAddressIndex) =>
+      call(
+        verifyWallet,
+        contractKit,
+        associatedAccounts[possibleMtwAddressIndex],
+        networkConfig.allowedMtwImplementations,
+        walletAddress
+      )
+    )
+  )
+
+  const verifiedMtwAddressIndexes = possibleMtwAddressIndexes.filter(
+    (_, i) => verificationResults[i].ok
+  )
+
+  if (verifiedMtwAddressIndexes.length > 1) {
+    throw Error(
+      'More than one verified MTW with walletAddress as signer found. Should never happen'
+    )
+  }
+
+  if (!verifiedMtwAddressIndexes[0]) {
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
+    return null
+  }
+
+  const verifiedMtwAddress = associatedAccounts[verifiedMtwAddressIndexes[0]]
+  const verifiedMtwStatus = accountAttestationStatuses[verifiedMtwAddressIndexes[0]]
+
+  yield put(
+    setKomenciContext({
+      unverifiedMtwAddress: verifiedMtwAddress,
+    })
+  )
+  yield put(setVerificationStatus(verifiedMtwStatus))
+
+  return verifiedMtwAddress
 }
 
 function* fetchOrDeployMtwSaga() {
@@ -376,10 +483,18 @@ function* fetchOrDeployMtwSaga() {
     token: komenci.sessionToken,
   })
 
-  Logger.debug(TAG, '@fetchOrDeployMtwSaga', 'Starting fetch')
-  const storedUnverifiedMtwAddress = komenci.unverifiedMtwAddress
-  let deployedUnverifiedMtwAddress: string | null = null
   try {
+    // Now that we are guarnateed to have the phoneHash, check again to see if the
+    // user already has a verified MTW
+    const verifiedMtwAddress = yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
+    if (verifiedMtwAddress) {
+      yield put(doVerificationFlow(true))
+      return
+    }
+
+    Logger.debug(TAG, '@fetchOrDeployMtwSaga', 'Starting fetch')
+    const storedUnverifiedMtwAddress = komenci.unverifiedMtwAddress
+    let deployedUnverifiedMtwAddress: string | null = null
     // If there isn't a MTW stored for this session, ask Komenci to deploy one
     if (!storedUnverifiedMtwAddress) {
       // This try/catch block is a workaround because Komenci will throw an error
@@ -416,7 +531,7 @@ function* fetchOrDeployMtwSaga() {
 
             case e instanceof InvalidWallet:
             default:
-              put(disableKomenci())
+              put(setKomenciAvailable(false))
               put(start({ e164Number, withoutRevealing: false }))
               return
           }
@@ -456,7 +571,7 @@ function* fetchOrDeployMtwSaga() {
     yield put(fetchOnChainData())
   } catch (e) {
     storeTimestampIfKomenciError(e)
-    put(disableKomenci())
+    put(setKomenciAvailable(false))
     put(start(e164Number))
   }
 }
@@ -477,65 +592,90 @@ function* feelessDekAndWalletRegistration(komenciKit: KomenciKit, walletAddress:
 function* fetchOnChainDataSaga() {
   Logger.debug(TAG, '@fetchOnChainDataSaga', 'Starting fetch')
   const contractKit = yield call(getContractKit)
-  const useKomenci = yield select(useKomenciSelector)
+  const shouldUseKomenci = yield select(shouldUseKomenciSelector)
   const phoneHash = yield select(phoneHashSelector)
   let account
-  if (useKomenci) {
-    Logger.debug(TAG, '@fetchOnChainDataSaga', 'Using Komenci')
-    const komenci = yield select(komenciContextSelector)
+  try {
+    if (shouldUseKomenci) {
+      Logger.debug(TAG, '@fetchOnChainDataSaga', 'Using Komenci')
+      const komenci = yield select(komenciContextSelector)
 
-    const { unverifiedMtwAddress } = komenci
+      const { unverifiedMtwAddress } = komenci
 
-    // If there isn't an address stored in state or we already know that the
-    // MTW is verified, then there is nothing to check the progress of
-    if (!unverifiedMtwAddress) {
-      throw Error('unverifiedMtwAddress is not set')
+      // If there isn't an address stored in state or we already know that the
+      // MTW is verified, then there is nothing to check the progress of
+      if (!unverifiedMtwAddress) {
+        throw Error('unverifiedMtwAddress is not set')
+      }
+      account = unverifiedMtwAddress
+    } else {
+      Logger.debug(TAG, '@fetchOnChainDataSaga', 'Using Classic')
+      account = yield call(getAccount)
     }
-    account = unverifiedMtwAddress
-  } else {
-    Logger.debug(TAG, '@fetchOnChainDataSaga', 'Using Classic')
-    account = yield select(eoaAccountSelector)
+    Logger.debug(TAG, '@fetchOnChainDataSaga', 'Account to fetch: ' + account)
+    const attestationsWrapper: AttestationsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAttestations,
+    ])
+
+    const status: AttestationsStatus = yield call(
+      getAttestationsStatus,
+      attestationsWrapper,
+      account,
+      phoneHash
+    )
+
+    Logger.debug(TAG, '@fetchOnChainDataSaga', 'Fetched status')
+    yield put(setVerificationStatus(status))
+
+    const actionableAttestations: ActionableAttestation[] = yield call(
+      getActionableAttestations,
+      attestationsWrapper,
+      phoneHash,
+      account
+    )
+    Logger.debug(TAG, '@fetchOnChainDataSaga', 'Fetched actionable attestations')
+    yield put(setActionableAttestation(actionableAttestations))
+    const overrideWithoutVerification = yield select(overrideWithoutVerificationSelector)
+    const withoutRevealing =
+      overrideWithoutVerification ??
+      actionableAttestations.length === status.numAttestationsRemaining
+
+    yield put(setOverrideWithoutVerification(undefined))
+    yield put(doVerificationFlow(withoutRevealing))
+  } catch (error) {
+    Logger.error(TAG, '@fetchOnChainDataSaga', error)
+    yield put(fail(ErrorMessages.VERIFICATION_FAILURE))
   }
-  Logger.debug(TAG, '@fetchOnChainDataSaga', 'Account to fetch: ' + account)
-  const attestationsWrapper: AttestationsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAttestations,
-  ])
+}
 
-  const status: AttestationsStatus = yield call(
-    getAttestationsStatus,
-    attestationsWrapper,
-    account,
-    phoneHash
+function* failSaga(action: ReturnType<typeof fail>) {
+  Logger.error(TAG, `@failSaga: ${action.payload}`)
+  yield put(setOldVerificationStatus(VerificationStatus.Failed))
+}
+
+function* resetSaga(action: ReturnType<typeof fail>) {
+  Logger.debug(
+    TAG,
+    `@resetSaga: Reset the verification state with komenci set to ${action.payload}`
   )
-
-  Logger.debug(TAG, '@fetchOnChainDataSaga', 'Fetched status')
-  yield put(setVerificationStatus(status))
-
-  const actionableAttestations: ActionableAttestation[] = yield call(
-    getActionableAttestations,
-    attestationsWrapper,
-    phoneHash,
-    account
-  )
-  Logger.debug(TAG, '@fetchOnChainDataSaga', 'Fetched actionable attestations')
-  yield put(setActionableAttestation(actionableAttestations))
-  const overrideWithoutVerification = yield select(overrideWithoutVerificationSelector)
-  const withoutRevealing =
-    overrideWithoutVerification ?? actionableAttestations.length === status.numAttestationsRemaining
-
-  yield put(setOverrideWithoutVerification(undefined))
-  yield put(doVerificationFlow(withoutRevealing))
+  const e164Number = yield select(e164NumberSelector)
+  Logger.debug(TAG, `@resetSaga: Reseting pepper`)
+  yield put(updateE164PhoneNumberSalts({ [e164Number]: null }))
 }
 
 export function* verifySaga() {
   Logger.debug(TAG, 'Initializing verify sagas')
+  yield spawn(checkIfKomenciAvailableSaga)
+  yield takeEvery(checkIfKomenciAvailable.type, checkIfKomenciAvailableSaga)
   yield takeEvery(start.type, startSaga)
   yield takeEvery(startKomenciSession.type, startOrResumeKomenciSessionSaga)
   yield takeEvery(fetchPhoneNumberDetails.type, fetchPhoneNumberDetailsSaga)
   yield takeEvery(fetchMtw.type, fetchOrDeployMtwSaga)
   yield takeEvery(fetchOnChainData.type, fetchOnChainDataSaga)
-  yield takeEvery(doVerificationFlow.type, doVerificationFlowSaga)
-  // TODO: this can be calculated in reducer, once we stop using identify/reducer for verificationmake this
+  yield takeLatest(doVerificationFlow.type, doVerificationFlowSaga)
+  yield takeEvery(fail.type, failSaga)
+  yield takeEvery(reset.type, resetSaga)
+  // TODO: this can be calculated in reducer, once we stop using identify/reducer for verification
   yield takeEvery(Actions.COMPLETE_ATTESTATION_CODE, fetchOnChainDataSaga)
 }

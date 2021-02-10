@@ -53,7 +53,7 @@ import {
   TransactionStatus,
 } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { komenciContextSelector, useKomenciSelector } from 'src/verify/reducer'
+import { komenciContextSelector, shouldUseKomenciSelector } from 'src/verify/reducer'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mtwAddressSelector } from 'src/web3/selectors'
@@ -569,13 +569,13 @@ export function* watchVerificationEnd() {
       take(IdentityActions.SET_VERIFICATION_STATUS),
     ])
 
-    const useKomenci = yield select(useKomenciSelector)
+    const shouldUseKomenci = yield select(shouldUseKomenciSelector)
     if (update?.status === VerificationStatus.Done) {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
       if (features.ESCROW_WITHOUT_CODE) {
-        yield call(withdrawFromEscrowWithoutCode, useKomenci)
+        yield call(withdrawFromEscrowWithoutCode, shouldUseKomenci)
       } else {
         yield call(withdrawFromEscrow)
       }

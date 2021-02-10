@@ -1,27 +1,16 @@
 import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
-import {
-  isBalanceSufficientForSigRetrieval,
-  PhoneNumberHashDetails,
-} from '@celo/identity/lib/odis/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
-import BigNumber from 'bignumber.js'
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
-import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
-import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { removeKeyFromMapping } from 'src/identity/utils'
-import {
-  AttestationCode,
-  ESTIMATED_COST_PER_ATTESTATION,
-  NUM_ATTESTATIONS_REQUIRED,
-} from 'src/identity/verification'
+import { AttestationCode, NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { Actions as SendActions, StoreLatestInRecentsAction } from 'src/send/actions'
-import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
@@ -175,17 +164,12 @@ export const reducer = (
         ...state,
         ...rehydratedState,
         verificationStatus: VerificationStatus.Stopped,
-        feelessVerificationStatus: VerificationStatus.Stopped,
         importContactsProgress: {
           status: ImportContactsStatus.Stopped,
           current: 0,
           total: 0,
         },
         verificationState: initialState.verificationState,
-        feelessVerificationState: {
-          ...rehydratedState.feelessVerificationState,
-          isLoading: false,
-        },
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -442,38 +426,3 @@ export const importContactsProgressSelector = (state: RootState) =>
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
 export const addressToDisplayNameSelector = (state: RootState) =>
   state.identity.addressToDisplayName
-
-export const isBalanceSufficientForSigRetrievalSelector = (state: RootState) => {
-  const dollarBalance = stableTokenBalanceSelector(state) || 0
-  const celoBalance = celoTokenBalanceSelector(state) || 0
-  return isBalanceSufficientForSigRetrieval(dollarBalance, celoBalance)
-}
-
-function isBalanceSufficientForAttestations(state: RootState, attestationsRemaining: number) {
-  const userBalance = stableTokenBalanceSelector(state) || 0
-  return new BigNumber(userBalance).isGreaterThan(
-    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
-  )
-}
-
-const identityVerificationStateSelector = (state: RootState) => state.identity.verificationState
-
-const isBalanceSufficientSelector = (state: RootState) => {
-  const verificationState = state.identity.verificationState
-  const { phoneHashDetails, status, actionableAttestations } = verificationState
-  const attestationsRemaining = status.numAttestationsRemaining - actionableAttestations.length
-  const isBalanceSufficient = !phoneHashDetails.phoneHash
-    ? isBalanceSufficientForSigRetrievalSelector(state)
-    : isBalanceSufficientForAttestations(state, attestationsRemaining)
-
-  return isBalanceSufficient
-}
-
-export const verificationStateSelector = createSelector(
-  identityVerificationStateSelector,
-  isBalanceSufficientSelector,
-  (verificationState, isBalanceSufficient): VerificationState => ({
-    ...verificationState,
-    isBalanceSufficient,
-  })
-)

@@ -1,8 +1,11 @@
 import { e164NumberSelector } from 'src/account/selectors'
+import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import {
-  e164NumberToSaltSelector,
   isBalanceSufficientForSigRetrievalSelector,
-} from 'src/identity/reducer'
+  shouldUseKomenciSelector,
+  verificationStatusSelector,
+} from 'src/verify/reducer'
+
 import { RootState } from 'src/redux/reducers'
 
 export const getRequirePinOnAppOpen = (state: RootState) => {
@@ -28,10 +31,13 @@ export const sessionIdSelector = (state: RootState) => {
 export const verificationPossibleSelector = (state: RootState): boolean => {
   const e164Number = e164NumberSelector(state)
   const saltCache = e164NumberToSaltSelector(state)
+  const shouldUseKomenci = shouldUseKomenciSelector(state)
+  const { komenci } = verificationStatusSelector(state)
 
   return !!(
-    (e164Number && saltCache[e164Number]) ||
-    isBalanceSufficientForSigRetrievalSelector(state)
+    (e164Number && saltCache[e164Number] && !komenci) ||
+    isBalanceSufficientForSigRetrievalSelector(state) ||
+    shouldUseKomenci
   )
 }
 

@@ -57,8 +57,8 @@ import {
   setCompletedCodes,
   setLastRevealAttempt,
   setVerificationStatus,
-  StartVerificationAction,
   startVerification,
+  StartVerificationAction,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
@@ -80,13 +80,12 @@ import {
   KomenciContext,
   komenciContextSelector,
   phoneHashSelector,
+  setActionableAttestation,
+  setOverrideWithoutVerification,
   start,
   succeed,
-  useKomenciSelector,
+  shouldUseKomenciSelector,
   verificationStatusSelector,
-  setActionableAttestation,
-  overrideWithoutVerificationSelector,
-  setOverrideWithoutVerification,
 } from 'src/verify/reducer'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
@@ -96,7 +95,6 @@ const TAG = 'identity/verification'
 const MINIMUM_VERSION_FOR_SHORT_CODES = '1.1.0'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
-export const ESTIMATED_COST_PER_ATTESTATION = 0.051
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
@@ -184,7 +182,7 @@ export function* doVerificationFlowSaga(action: ReturnType<typeof doVerification
   let receiveMessageTask: Task | undefined
   let autoRetrievalTask: Task | undefined
   const withoutRevealing = action.payload
-  const useKomenci = yield select(useKomenciSelector)
+  const shouldUseKomenci = yield select(shouldUseKomenciSelector)
   try {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
 
@@ -206,7 +204,7 @@ export function* doVerificationFlowSaga(action: ReturnType<typeof doVerification
       const komenci: KomenciContext = yield select(komenciContextSelector)
       const { unverifiedMtwAddress } = komenci
       const account: string =
-        useKomenci && unverifiedMtwAddress
+        shouldUseKomenci && unverifiedMtwAddress
           ? unverifiedMtwAddress
           : yield call(getConnectedUnlockedAccount)
 
@@ -283,7 +281,7 @@ export function* doVerificationFlowSaga(action: ReturnType<typeof doVerification
             account,
             attestations,
             attestations.length + attestationsToRequest,
-            useKomenci
+            shouldUseKomenci
           )
           yield put(setActionableAttestation(attestations))
 
@@ -327,7 +325,9 @@ export function* doVerificationFlowSaga(action: ReturnType<typeof doVerification
 
       // Set acccount and data encryption key in Accounts contract
       // This is done in other places too, intentionally keeping it for more coverage
-      yield spawn(registerAccountDek, account)
+      if (!shouldUseKomenci) {
+        yield spawn(registerAccountDek, account)
+      }
 
       receiveMessageTask?.cancel()
       if (Platform.OS === 'android') {
@@ -485,7 +485,7 @@ function* requestAttestations(
   numAttestationsRequestsNeeded: number,
   phoneHash: string,
   account: string,
-  useKomenci: boolean
+  shouldUseKomenci: boolean
 ) {
   const contractKit = yield call(getContractKit)
   const walletAddress = yield call(getConnectedUnlockedAccount)
@@ -529,7 +529,7 @@ function* requestAttestations(
       `Approving ${numAttestationsRequestsNeeded} new attestations`
     )
 
-    if (useKomenci) {
+    if (shouldUseKomenci) {
       Logger.debug(
         `${TAG}@feelessRequestAttestations`,
         `Approving and requesting ${numAttestationsRequestsNeeded} new attestations`
@@ -598,17 +598,17 @@ function* requestAttestations(
   Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuers')
   ValoraAnalytics.track(
     VerificationEvents.verification_request_attestation_await_issuer_selection,
-    { feeless: useKomenci }
+    { feeless: shouldUseKomenci }
   )
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
   Logger.debug(`${TAG}@requestAttestations`, 'Selecting issuers')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer, {
-    feeless: useKomenci,
+    feeless: shouldUseKomenci,
   })
 
-  if (useKomenci) {
+  if (shouldUseKomenci) {
     const selectIssuersTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
       [komenciKit, komenciKit.selectIssuers],
       account,
@@ -631,7 +631,7 @@ function* requestAttestations(
     )
   }
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent, {
-    feeless: useKomenci,
+    feeless: shouldUseKomenci,
   })
 }
 
@@ -883,11 +883,11 @@ function* completeAttestation(
   attestation: ActionableAttestation,
   komenciKit: KomenciKit
 ) {
-  const useKomenci = yield select(useKomenciSelector)
+  const shouldUseKomenci = yield select(shouldUseKomenciSelector)
   const issuer = attestation.issuer
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_start, {
     issuer,
-    feeless: useKomenci,
+    feeless: shouldUseKomenci,
   })
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
   const existingCodes: AttestationCode[] = yield select(attestationCodesSelector)
@@ -895,7 +895,7 @@ function* completeAttestation(
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_complete, {
     issuer,
-    feeless: useKomenci,
+    feeless: shouldUseKomenci,
   })
 
   Logger.debug(TAG + '@completeAttestation', `Completing code for issuer: ${code.issuer}`)
@@ -903,7 +903,7 @@ function* completeAttestation(
   // Make each concurrent completion attempt wait a sec for where they are relative to other codes
   // to ensure `processingInputCode` has enough time to properly gate the tx. 0-index code
   // will have 0 delay, 1-index code will have 1 sec delay, etc.
-  if (useKomenci) {
+  if (shouldUseKomenci) {
     yield delay(codePosition * 1000)
     yield inputAttestationCodeLock.acquireAsync()
     const completeTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
@@ -933,7 +933,7 @@ function* completeAttestation(
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, {
     issuer,
-    feeless: useKomenci,
+    feeless: shouldUseKomenci,
   })
 
   // Report reveal status from validator
@@ -1124,31 +1124,35 @@ export function* reportRevealStatusSaga({
 }
 
 export function* reportActionableAttestationsStatuses() {
-  const account: string = yield call(getConnectedUnlockedAccount)
-  const e164Number: string = yield select(e164NumberSelector)
-  const contractKit = yield call(getContractKit)
-  const attestationsWrapper: AttestationsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAttestations,
-  ])
-  const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
-  const actionableAttestations: ActionableAttestation[] = yield call(
-    getActionableAttestations,
-    attestationsWrapper,
-    phoneHashDetails.phoneHash,
-    account
-  )
-
-  for (const attestation of actionableAttestations) {
-    yield put(
-      reportRevealStatus(
-        attestation.attestationServiceURL,
-        account,
-        attestation.issuer,
-        phoneHashDetails.e164Number,
-        phoneHashDetails.pepper
-      )
+  try {
+    const account: string = yield call(getConnectedUnlockedAccount)
+    const e164Number: string = yield select(e164NumberSelector)
+    const contractKit = yield call(getContractKit)
+    const attestationsWrapper: AttestationsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAttestations,
+    ])
+    const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
+    const actionableAttestations: ActionableAttestation[] = yield call(
+      getActionableAttestations,
+      attestationsWrapper,
+      phoneHashDetails.phoneHash,
+      account
     )
+
+    for (const attestation of actionableAttestations) {
+      yield put(
+        reportRevealStatus(
+          attestation.attestationServiceURL,
+          account,
+          attestation.issuer,
+          phoneHashDetails.e164Number,
+          phoneHashDetails.pepper
+        )
+      )
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@reportActionableAttestationsStatuses`, 'Can not report', error)
   }
 }
 
