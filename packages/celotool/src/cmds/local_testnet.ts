@@ -1,3 +1,4 @@
+import { newKit } from '@celo/contractkit'
 import { extend, range } from 'lodash'
 import { getHooks, sleep } from 'src/e2e-tests/utils'
 import { privateKeyToPublicKey } from 'src/lib/generate_utils'
@@ -170,6 +171,7 @@ async function repl(config: GethRunConfig) {
         ...o,
         [formatName(instance.name)]: {
           web3: new Web3(getRpcUrl(instance)),
+          kit: new newKit(getRpcUrl(instance)),
           admin: new Admin(getRpcUrl(instance)),
           config: instance,
           kill: (signal?: string) => {
