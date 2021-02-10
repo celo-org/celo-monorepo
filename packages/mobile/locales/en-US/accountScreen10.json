@@ -9,6 +9,7 @@
   "legal": "Legal",
   "securityAndData": "Security and Data",
   "requirePinOnAppOpen": "Require PIN on App Open",
+  "changePin": "Change PIN",
   "analytics": "Analytics",
   "shareAnalytics": "Share Analytics",
   "shareAnalytics_detail": "We collect anonymized data about how you use {{appName}} to help improve the application for everyone.",
