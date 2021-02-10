@@ -149,7 +149,7 @@ export async function killInstance(instance: GethInstanceConfig) {
 export async function shutdownOrKill(identifier: string | number) {
   await signalProcess(identifier, 'INT')
 
-  // Poll for remaining processes for up to ~30s with exponetial backoff.
+  // Poll for remaining processes for up to ~30s with exponential backoff.
   let processRemaining = true
   for (let i = 0; i < 10 && processRemaining; i++) {
     await sleep(0.03 * Math.pow(2, i))
