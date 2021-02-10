@@ -20,15 +20,8 @@ files=(
   "packages/moonpay-auth/.env"
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
-  ".env.mnemonic.alfajoresstaging"
   ".env.mnemonic.baklava"
-  ".env.mnemonic.baklavastaging"
-  ".env.mnemonic.integration"
-  ".env.mnemonic.pilot"
-  ".env.mnemonic.pilotstaging"
-  ".env.mnemonic.rc0"
   ".env.mnemonic.rc1"
-  ".env.mnemonic.staging"
 )
 
 if [[ -z "$1" ]]; then

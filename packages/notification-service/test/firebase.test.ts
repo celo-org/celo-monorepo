@@ -1,6 +1,12 @@
 import * as admin from 'firebase-admin'
 import { Currencies } from '../src/blockscout/transfers'
-import { sendPaymentNotification, _setTestRegistrations } from '../src/firebase'
+import {
+  sendPaymentNotification,
+  updateCeloRewardsSenderAddresses,
+  _setTestRegistrations,
+} from '../src/firebase'
+
+const SENDER_ADDRESS = '0x123456'
 
 const messagingMock = {
   send: jest.fn(),
@@ -23,8 +29,14 @@ describe('sendPaymentNotification', () => {
     expect.hasAssertions()
 
     _setTestRegistrations({ '0xabc': { fcmToken: 'TEST_FCM_TOKEN' } })
+    updateCeloRewardsSenderAddresses({
+      [SENDER_ADDRESS]: {
+        name: 'CELO Rewards',
+        isCeloRewardSender: false,
+      },
+    })
 
-    await sendPaymentNotification('0xabc', '10', Currencies.DOLLAR, {})
+    await sendPaymentNotification(SENDER_ADDRESS, '0xabc', '10', Currencies.DOLLAR, {})
 
     expect(mockedMessagingSend).toHaveBeenCalledTimes(1)
     expect(mockedMessagingSend.mock.calls[0]).toMatchInlineSnapshot(`
@@ -50,5 +62,20 @@ describe('sendPaymentNotification', () => {
         true,
       ]
     `)
+  })
+
+  it('should send a reward received notification', async () => {
+    _setTestRegistrations({ '0xabc': { fcmToken: 'TEST_FCM_TOKEN' } })
+    updateCeloRewardsSenderAddresses({
+      [SENDER_ADDRESS]: {
+        name: 'CELO Rewards',
+        isCeloRewardSender: true,
+      },
+    })
+
+    await sendPaymentNotification(SENDER_ADDRESS, '0xabc', '10', Currencies.DOLLAR, {})
+
+    expect(mockedMessagingSend).toHaveBeenCalledTimes(1)
+    expect(mockedMessagingSend.mock.calls[0][0].notification.title).toEqual('Reward Received')
   })
 })

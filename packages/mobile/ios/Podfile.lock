@@ -1,6 +1,8 @@
 PODS:
   - Analytics (4.1.2)
   - boost-for-react-native (1.63.0)
+  - BVLinearGradient (2.5.6):
+    - React
   - CeloBlockchain (0.0.319)
   - CocoaAsyncSocket (7.6.5)
   - CocoaLibEvent (1.0.0)
@@ -587,6 +589,7 @@ PODS:
     - Yoga (~> 1.14)
 
 DEPENDENCIES:
+  - BVLinearGradient (from `../../../node_modules/react-native-linear-gradient`)
   - "CeloBlockchain (from `../../../node_modules/@celo/client/CeloBlockchain.podspec`)"
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
@@ -727,6 +730,8 @@ SPEC REPOS:
     - YogaKit
 
 EXTERNAL SOURCES:
+  BVLinearGradient:
+    :path: "../../../node_modules/react-native-linear-gradient"
   CeloBlockchain:
     :path: "../../../node_modules/@celo/client/CeloBlockchain.podspec"
   DoubleConversion:
@@ -886,6 +891,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Analytics: 177da2c597aba83a6882b706ca6e0a071fd7cd26
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   CeloBlockchain: 2b3bc8846dff06152d3fcc59c14c43c9740c0a72
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
