@@ -53,7 +53,7 @@ describe('ProviderOptionsScreen', () => {
     )
 
     fireEvent.press(getByTestId('Provider/Moonpay'))
-    expect(navigate).toHaveBeenCalledWith(Screens.MoonPay, {
+    expect(navigate).toHaveBeenCalledWith(Screens.MoonPayScreen, {
       localAmount: 0,
       currencyCode: LocalCurrencyCode.BRL,
       currencyToBuy: CURRENCY_ENUM.DOLLAR,
@@ -68,7 +68,7 @@ describe('ProviderOptionsScreen', () => {
     )
 
     fireEvent.press(getByTestId('Provider/Ramp'))
-    expect(navigate).toHaveBeenCalledWith(Screens.MoonPay, {
+    expect(navigate).toHaveBeenCalledWith(Screens.RampScreen, {
       localAmount: 0,
       currencyCode: LocalCurrencyCode.BRL,
       currencyToBuy: CURRENCY_ENUM.DOLLAR,

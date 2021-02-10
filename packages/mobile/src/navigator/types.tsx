@@ -102,12 +102,12 @@ export type StackParamList = {
     isCashIn?: boolean
     amount?: BigNumber
   }
-  [Screens.MoonPay]: {
+  [Screens.MoonPayScreen]: {
     localAmount: number
     currencyCode: LocalCurrencyCode
     currencyToBuy: CURRENCY_ENUM
   }
-  [Screens.Ramp]: {
+  [Screens.RampScreen]: {
     localAmount: number
     currencyCode: LocalCurrencyCode
     currencyToBuy: CURRENCY_ENUM
