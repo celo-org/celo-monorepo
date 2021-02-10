@@ -1,6 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack'
-import { useEffect, useRef } from 'react'
-import * as React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { BackHandler, StyleSheet, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import WebView, { WebViewRef } from 'src/components/WebView'
