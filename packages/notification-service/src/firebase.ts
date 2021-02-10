@@ -8,6 +8,7 @@ let database: admin.database.Database
 let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
+let knownAddressesRef: admin.database.Reference
 
 export interface Registrations {
   [address: string]:
@@ -47,13 +48,30 @@ interface ExchangeRateObject {
   timestamp: number // timestamp in milliseconds
 }
 
+export interface KnownAddressInfo {
+  name: string
+  imageUrl?: string
+  isCeloRewardSender?: boolean
+}
+
+export interface AddressToDisplayNameType {
+  [address: string]: KnownAddressInfo | undefined
+}
+
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 
 let pendingRequests: PendingRequests = {}
+let celoRewardsSenders: string[] = []
 
 export function _setTestRegistrations(testRegistrations: Registrations) {
   registrations = testRegistrations
+}
+
+export function updateCeloRewardsSenderAddresses(knownAddressesInfo: AddressToDisplayNameType) {
+  celoRewardsSenders = Object.entries(knownAddressesInfo)
+    .filter(([_, value]) => value?.isCeloRewardSender)
+    .map(([key, _]) => key)
 }
 
 function paymentObjectToNotification(po: PaymentRequest): { [key: string]: string } {
@@ -75,6 +93,7 @@ export function initializeDb() {
   registrationsRef = database.ref('/registrations')
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
+  knownAddressesRef = database.ref('/addressesExtraInfo')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -119,6 +138,18 @@ export function initializeDb() {
     },
     (errorObject: any) => {
       console.error('Latest payment requests data read failed:', errorObject.code)
+    }
+  )
+
+  knownAddressesRef.on(
+    'value',
+    (snapshot) => {
+      const knownAddressesInfo: AddressToDisplayNameType = (snapshot && snapshot.val()) || {}
+      updateCeloRewardsSenderAddresses(knownAddressesInfo)
+      console.debug('Latest known addresses updated: ', celoRewardsSenders)
+    },
+    (errorObject: any) => {
+      console.error('Known addresses data read failed:', errorObject.code)
     }
   )
 }
@@ -187,20 +218,22 @@ export function setLastBlockNotified(newBlock: number): Promise<void> | undefine
 }
 
 export async function sendPaymentNotification(
-  address: string,
+  senderAddress: string,
+  recipientAddress: string,
   amount: string,
   currency: Currencies,
   data: { [key: string]: string }
 ) {
-  const t = getTranslatorForAddress(address)
+  const t = getTranslatorForAddress(recipientAddress)
   data.type = NotificationTypes.PAYMENT_RECEIVED
+  const isCeloReward = celoRewardsSenders.indexOf(senderAddress) >= 0
   return sendNotification(
-    t('paymentReceivedTitle'),
+    t(isCeloReward ? 'rewardReceivedTitle' : 'paymentReceivedTitle'),
     t('paymentReceivedBody', {
       amount,
       currency: t(currency, { count: parseInt(amount, 10) }),
     }),
-    address,
+    recipientAddress,
     data
   )
 }
