@@ -104,7 +104,6 @@ class GitHub {
   }
 
   async fetchFlakeIssues() {
-    return []
     const fn = () =>
       this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
@@ -119,7 +118,6 @@ class GitHub {
   }
 
   async fetchKnownFlakesToSkip() {
-    return []
     const flakeIssues = await this.fetchFlakeIssues()
     const mandatoryTests = await this.fetchMandatoryTestsForPR()
     const knownFlakesToSkip = flakeIssues.filter(
@@ -131,7 +129,6 @@ class GitHub {
   }
 
   async handleObsoleteIssues(obsoleteIssues) {
-    return []
     if (!process.env.CIRCLECI) return
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
     if (process.env.CIRCLE_BRANCH === 'master') {
