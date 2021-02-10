@@ -25,7 +25,7 @@
     "test:ci": "yarn test --coverage",
     "test:watch": "yarn test --watch --maxWorkers=4",
     "test:verbose": "export TZ=UTC && jest --verbose",
-    "test:e2e:android": "./scripts/run_e2e.sh -p android",
+    "test:e2e:android": "./scripts/run_e2e.sh -p android -r",
     "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
     "test:e2e:packager": "export CELO_TEST_CONFIG=e2e && yarn react-native start",
     "test:verify-locales": "./scripts/verify_locales.sh",
