@@ -80,11 +80,12 @@ export function spawnCmd(
 // Returns a Promise which resolves to [stdout, stderr] array
 export function execCmdWithExitOnFailure(
   cmd: string,
-  options: any = {}
+  options: any = {},
+  pipeOutput = false
 ): Promise<[string, string]> {
   return new Promise((resolve, reject) => {
     try {
-      resolve(execCmd(cmd, options))
+      resolve(execCmd(cmd, options, false, pipeOutput))
     } catch (error) {
       console.error(error)
       process.exit(1)
