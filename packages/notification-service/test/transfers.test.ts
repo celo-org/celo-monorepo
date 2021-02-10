@@ -155,6 +155,7 @@ describe('Transfers', () => {
     const returned = await notifyForNewTransfers(transfers)
 
     expect(sendPaymentNotificationMock).toHaveBeenCalledWith(
+      TRANSFER1.sender,
       TRANSFER1.recipient,
       convertWeiValue(TRANSFER1.value),
       TRANSFER1.currency,
@@ -166,6 +167,7 @@ describe('Transfers', () => {
     )
 
     expect(sendPaymentNotificationMock).toHaveBeenCalledWith(
+      TRANSFER1.sender,
       TRANSFER2.recipient,
       convertWeiValue(TRANSFER2.value),
       TRANSFER2.currency,

@@ -109,6 +109,7 @@ export function notifyForNewTransfers(transfers: Transfer[]): Promise<void[]> {
       timestamp: String(t.timestamp),
     }
     const result: Promise<void> = sendPaymentNotification(
+      t.sender,
       t.recipient,
       convertWeiValue(t.value),
       t.currency,
