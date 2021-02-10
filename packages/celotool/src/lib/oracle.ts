@@ -77,7 +77,7 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
     }
   )
   const aksClusterConfig = clusterManager.clusterConfig as AksClusterConfig
-  const identities = getAksHsmOracleIdentities(addressKeyVaults, aksClusterConfig.resourceGroup)
+  const identities = getAksHsmOracleIdentities(addressKeyVaults, aksClusterConfig.resourceGroup, currencyPair)
   const deploymentConfig: AksHsmOracleDeploymentConfig = {
     context,
     clusterConfig: aksClusterConfig,
@@ -94,7 +94,11 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1:resourceGroup1
  * returns an array of AksHsmOracleIdentity in the same order
  */
-export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, defaultResourceGroup: string): AksHsmOracleIdentity[] {
+export function getAksHsmOracleIdentities(
+  addressAzureKeyVaults: string, 
+  defaultResourceGroup: string,
+  currencyPair: CurrencyPair,
+): AksHsmOracleIdentity[] {
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
@@ -107,6 +111,7 @@ export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, default
     }
     identities.push({
       address,
+      currencyPair,
       keyVaultName,
       resourceGroup: resourceGroup || defaultResourceGroup
     })
@@ -144,7 +149,7 @@ function getAwsHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
     }
   )
 
-  const identities = getAwsHsmOracleIdentities(addressKeyAliases)
+  const identities = getAwsHsmOracleIdentities(addressKeyAliases, currencyPair)
   const deploymentConfig: AwsHsmOracleDeploymentConfig = {
     context,
     clusterConfig: clusterManager.clusterConfig as AwsClusterConfig,
@@ -161,7 +166,10 @@ function getAwsHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
  * eg: 0x0000000000000000000000000000000000000000:keyAlias0,0x0000000000000000000000000000000000000001:keyAlias1:region1
  * returns an array of AwsHsmOracleIdentity in the same order
  */
-export function getAwsHsmOracleIdentities(addressKeyAliases: string): AwsHsmOracleIdentity[] {
+export function getAwsHsmOracleIdentities(
+  addressKeyAliases: string, 
+  currencyPair: CurrencyPair
+): AwsHsmOracleIdentity[] {
   const identityStrings = addressKeyAliases.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
@@ -174,6 +182,7 @@ export function getAwsHsmOracleIdentities(addressKeyAliases: string): AwsHsmOrac
     }
     identities.push({
       address,
+      currencyPair,
       keyAlias,
       region
     })
@@ -210,6 +219,7 @@ function getPrivateKeyOracleDeployer(celoEnv: string, context: string, currencyP
     count
   ).map((pkey) => ({
     address: privateKeyToAddress(pkey),
+    currencyPair,
     privateKey: ensureLeading0x(pkey)
   }))
   const deploymentConfig: PrivateKeyOracleDeploymentConfig = {

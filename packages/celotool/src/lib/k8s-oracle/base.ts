@@ -11,6 +11,7 @@ export type CurrencyPair = 'CELOUSD' | 'CELOEUR' | 'CELOBTC'
  */
 export interface OracleIdentity {
   address: string
+  currencyPair: CurrencyPair
 }
 
 export interface BaseOracleDeploymentConfig {
