@@ -1,10 +1,8 @@
 # README GUIDE FOR CELO DEVELOPERS
 
-## How to create a local testnet
+## How to run a local testnet
 
 Often when developing, it is useful to create a test network localy using the full celo-blockchain binary to go beyond what can be done with other options such as [Ganache](https://www.trufflesuite.com/ganache)
-
-The `celotool` package provides two options for creating local testnets. One is `celotool local-testnet` and the other is `celotool geth start`.
 
 The quickest way to get started with a local testnet is by running `yarn celotool local-testnet` from the `monorepo` root.
 This command will create a local testnet with a single validator node and deploy all smart contract migrations to it.

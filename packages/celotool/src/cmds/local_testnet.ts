@@ -36,6 +36,7 @@ variables are defined with useful values including {
   testnet: GethRunConfig (Configuration values for the tesnet)
   [nodeType][index] (e.g. validator0, txNode2): {
     web3: Web3 (A web3 object connected to the node over RPC)
+    kit: ContractKit (A contractkit object connected to the node over RPC)
     admin: Admin (An Admin object connected to the node over RPC)
     config: GethInstanceConfig (Configuration values for the node)
     kill(signal?: string): (Send a signal, default SIGTERM, to the node. e.g. SIGINT, SIGSTOP)
@@ -48,9 +49,9 @@ When the network is created without a bootnode, all nodes will be connected as f
 * Proxy nodes are connected to their validators, other proxies and unproxied validators.
 * Unproxied validator nodes are connected to all other proxies and unproxied validators.
 * Transaction nodes are connected to proxies and unproxied validators and other transaction nodes.
-* Light clients are connected to all transaction nodes
+* Light clients are connected to all transaction nodes.
 
-If the network is started with the --bootnode flag, a bootnode will be created and all node will be
+If the network is started with the --bootnode flag, a bootnode will be created and all nodes will be
 connected to it, rather than each other directly.
 
 By default, the celo-blockchain repository will be cloned to a temporary location and built from
