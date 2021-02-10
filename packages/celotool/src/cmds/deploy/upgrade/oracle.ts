@@ -1,7 +1,12 @@
+import { flow } from 'lodash'
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
-import { getOracleDeployerForContext } from 'src/lib/oracle'
+import {
+  addCurrencyPairMiddleware,
+  addUseFornoMiddleware,
+  getOracleDeployerForContext,
+} from 'src/lib/oracle'
 import yargs from 'yargs'
 
 export const command = 'oracle'
@@ -15,18 +20,7 @@ type OracleUpgradeArgv = UpgradeArgv &
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addContextMiddleware(argv)
-    .option('useForno', {
-      description: 'Uses forno for RPCs from the oracle clients',
-      default: false,
-      type: 'boolean',
-    })
-    .option('currencyPair', {
-      choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
-      description: 'Oracle deployment to target based on currency pair',
-      demandOption: true,
-      type: 'string',
-    })
+  return flow([addContextMiddleware, addCurrencyPairMiddleware, addUseFornoMiddleware])(argv)
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {

@@ -1,6 +1,7 @@
+import { flow } from 'lodash'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
-import { getOracleDeployerForContext } from 'src/lib/oracle'
+import { addCurrencyPairMiddleware, getOracleDeployerForContext } from 'src/lib/oracle'
 import yargs from 'yargs'
 import { DestroyArgv } from '../../deploy/destroy'
 
@@ -14,12 +15,7 @@ type OracleDestroyArgv = DestroyArgv &
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addContextMiddleware(argv).option('currencyPair', {
-    choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
-    description: 'Oracle deployment to target based on currency pair',
-    demandOption: true,
-    type: 'string',
-  })
+  return flow([addContextMiddleware, addCurrencyPairMiddleware])(argv)
 }
 
 export const handler = async (argv: OracleDestroyArgv) => {

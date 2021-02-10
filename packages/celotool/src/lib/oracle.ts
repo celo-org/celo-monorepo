@@ -1,5 +1,6 @@
 import { ensureLeading0x } from '@celo/utils/src/address'
 import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
+import yargs from 'yargs'
 import { getCloudProviderFromContext, getDynamicEnvVarValues } from './context-utils'
 import { AccountType, getPrivateKeysFor, privateKeyToAddress } from './generate_utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
@@ -16,10 +17,10 @@ import { PrivateKeyOracleDeployer, PrivateKeyOracleDeploymentConfig, PrivateKeyO
  */
 const hsmOracleDeployerGetterByCloudProvider: {
   [key in CloudProvider]?: (
-    celoEnv: string, 
-    context: string, 
-    currencyPair: CurrencyPair, 
-    useForno: boolean, 
+    celoEnv: string,
+    context: string,
+    currencyPair: CurrencyPair,
+    useForno: boolean,
     clusterManager: BaseClusterManager
   ) => BaseOracleDeployer
 } = {
@@ -54,9 +55,9 @@ export function getOracleDeployerForContext(celoEnv: string, context: string, cu
   const getDeployer = hsmOracleDeployerGetterByCloudProvider[cloudProvider]
   if (getDeployer === undefined) {
     throw new Error(
-      `Deployer not defined for CloudProvider: ${cloudProvider}. `+
+      `Deployer not defined for CloudProvider: ${cloudProvider}. ` +
       `Expecting one of: ${Object.keys(hsmOracleDeployerGetterByCloudProvider)}`
-     )
+    )
   }
   return getDeployer(celoEnv, context, currencyPair, useForno, clusterManager)
 }
@@ -95,7 +96,7 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
  * returns an array of AksHsmOracleIdentity in the same order
  */
 export function getAksHsmOracleIdentities(
-  addressAzureKeyVaults: string, 
+  addressAzureKeyVaults: string,
   defaultResourceGroup: string,
   currencyPair: CurrencyPair,
 ): AksHsmOracleIdentity[] {
@@ -167,7 +168,7 @@ function getAwsHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
  * returns an array of AwsHsmOracleIdentity in the same order
  */
 export function getAwsHsmOracleIdentities(
-  addressKeyAliases: string, 
+  addressKeyAliases: string,
   currencyPair: CurrencyPair
 ): AwsHsmOracleIdentity[] {
   const identityStrings = addressKeyAliases.split(',')
@@ -244,4 +245,29 @@ interface MnemonicBasedOracleIdentityConfig {
  */
 const mnemonicBasedOracleIdentityConfigDynamicEnvVars: { [k in keyof MnemonicBasedOracleIdentityConfig]: DynamicEnvVar } = {
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
+}
+
+/**
+ * Add currencyPair to command arguments
+ * @param argv the yargs arguments list to add to
+ */
+export function addCurrencyPairMiddleware(argv: yargs.Argv) {
+  return argv.option('currencyPair', {
+    choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
+    description: 'Oracle deployment to target based on currency pair',
+    demandOption: true,
+    type: 'string',
+  })
+}
+
+/**
+ * Add useForno to command arguments
+ * @param argv the yargs arguments list to add to
+ */
+export function addUseFornoMiddleware(argv: yargs.Argv) {
+  return argv.option('useForno', {
+    description: 'Uses forno for RPCs from the oracle clients',
+    default: false,
+    type: 'boolean',
+  })
 }
