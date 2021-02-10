@@ -99,7 +99,7 @@ contract StableToken is
    * @param _decimals Tokens are divisible to this many decimal places.
    * @param registryAddress Address of the Registry contract.
    * @param inflationRate Weekly inflation rate.
-   * @param inflationFactorUpdatePeriod How often the inflation factor is updated.
+   * @param inflationFactorUpdatePeriod How often the inflation factor is updated, in seconds.
    * @param initialBalanceAddresses Array of addresses with an initial balance.
    * @param initialBalanceValues Array of balance values corresponding to initialBalanceAddresses.
    */
