@@ -51,9 +51,7 @@ oracle:
       # dataFetchFrequency
       # minimumTrades
       # scalingRate
-  baseCurrency: GoldToken
-  quoteCurrency: USD
-  token: StableToken
+  currencyPair: CELOUSD
   metrics:
     enabled: true
     prometheusPort: 9090

@@ -4,6 +4,8 @@ import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChar
 
 const helmChartPath = '../helm-charts/oracle'
 
+export type CurrencyPair = 'CELOUSD' | 'CELOEUR' | 'CELOBTC'
+
 /**
  * Represents the identity of a single oracle
  */
@@ -13,6 +15,7 @@ export interface OracleIdentity {
 
 export interface BaseOracleDeploymentConfig {
   context: string
+  currencyPair: CurrencyPair
   identities: OracleIdentity[]
   useForno: boolean
 }
@@ -64,6 +67,7 @@ export abstract class BaseOracleDeployer {
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
       `--set oracle.metrics.enabled=true`,
       `--set oracle.metrics.prometheusPort=9090`,
+      `--set oracle.currencyPair=${this.currencyPair}`,
       `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
     ].concat(await this.oracleIdentityHelmParameters())
   }
@@ -103,5 +107,9 @@ export abstract class BaseOracleDeployer {
 
   get context(): string {
     return this.deploymentConfig.context
+  }
+
+  get currencyPair(): CurrencyPair {
+    return this.deploymentConfig.currencyPair
   }
 }
