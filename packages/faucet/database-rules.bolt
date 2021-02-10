@@ -78,14 +78,14 @@ isLoggedIn() { auth != null }
 
 isNew(ref) { prior(ref) == null }
 
-// uid of ashishb+faucet@celo.org is gYOD4GPV86OlqQh33Loc5lh0Yo02 on celo-faucet
+// uid of service_account_firebase_faucet@clabs.co is LFH1B0m3tqdWGSugIvM2EkjARVR2 on celo-faucet
 // This account can be seen/modified at https://console.firebase.google.com/project/celo-faucet/authentication/users
 //
-// uid of ashishb+faucet@celo.org is LLnGFlilnxbXrb5pZzvjiDeUJ6l2 on celo-faucet-staging
+// uid of service_account_firebase_faucet@clabs.co is ldA2DGvtgWP1xa8QFrtB7BYKc7l2 on celo-faucet-staging
 // This account can be seen/modified at https://console.firebase.google.com/project/celo-faucet-staging/authentication/users
 isAllowed(ref) {
   // TODO(ashishb): In the longer run, it would be better to choose only one uid based on whether
   // we are on staging network or the production network.
-  return auth.uid == "gYOD4GPV86OlqQh33Loc5lh0Yo02" || auth.uid == "LLnGFlilnxbXrb5pZzvjiDeUJ6l2"
+  return auth.uid == "LFH1B0m3tqdWGSugIvM2EkjARVR2" || auth.uid == "ldA2DGvtgWP1xa8QFrtB7BYKc7l2"
 }
 

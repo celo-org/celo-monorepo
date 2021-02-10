@@ -331,7 +331,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
         const nameClaim = metadata.findClaim(ClaimTypes.NAME)
 
-        const resp = await fetch(`${attestationServiceURLClaim.url}status`)
+        const resp = await fetch(
+          `${attestationServiceURLClaim.url}${
+            attestationServiceURLClaim.url.substr(-1) === '/' ? '' : '/'
+          }status`
+        )
         if (!resp.ok) {
           throw new Error(`Request failed with status ${resp.status}`)
         }
@@ -712,6 +716,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     if (!metadataURL) {
       ret.state = AttestationServiceStatusState.NoMetadataURL
+      return ret
+    }
+
+    if (metadataURL.startsWith('http://')) {
+      ret.state = AttestationServiceStatusState.InvalidAttestationServiceURL
+      return ret
     }
 
     try {
@@ -805,6 +815,7 @@ export enum AttestationServiceStatusState {
   NoMetadataURL = 'NoMetadataURL',
   InvalidMetadata = 'InvalidMetadata',
   NoAttestationServiceURL = 'NoAttestationServiceURL',
+  InvalidAttestationServiceURL = 'InvalidAttestationServiceURL',
   UnreachableAttestationService = 'UnreachableAttestationService',
   Valid = 'Valid',
   UnreachableHealthz = 'UnreachableHealthz',

@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "1.0.0-dev",
+  "version": "1.0.3-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -19,8 +19,15 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "1.0.0-dev",
-    "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
+    "@celo/base": "1.0.3-dev",
+    "@umpirsky/country-list": "https://github.com/umpirsky/country-list#05fda51",
+    "@types/country-data": "^0.0.0",
+    "@types/elliptic": "^6.4.9",
+    "@types/ethereumjs-util": "^5.2.0",
+    "@types/google-libphonenumber": "^7.4.17",
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^10.12.18",
+    "@types/randombytes": "^2.0.0",
     "bigi": "^1.1.0",
     "bignumber.js": "^9.0.0",
     "bip32": "2.0.5",
@@ -43,14 +50,7 @@
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
-    "@celo/typescript": "0.0.1",
-    "@types/country-data": "^0.0.0",
-    "@types/elliptic": "^6.4.9",
-    "@types/ethereumjs-util": "^5.2.0",
-    "@types/google-libphonenumber": "^7.4.17",
-    "@types/lodash": "^4.14.136",
-    "@types/node": "^10.12.18",
-    "@types/randombytes": "^2.0.0"
+    "@celo/typescript": "0.0.1"
   },
   "resolutions": {
     "elliptic/bn.js": "4.11.8",

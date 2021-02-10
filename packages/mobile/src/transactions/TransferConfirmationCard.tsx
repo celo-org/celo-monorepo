@@ -1,4 +1,3 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
@@ -11,11 +10,12 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
+import ContactCircle from 'src/components/ContactCircle'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
-import { CELO_REWARDS_LINK, FAQ_LINK } from 'src/config'
+import { FAQ_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
@@ -228,7 +228,7 @@ function CeloRewardContent({ address, amount, recipient }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const openLearnMore = () => {
-    navigate(Screens.WebViewScreen, { uri: `${CELO_REWARDS_LINK}?origin=transaction-detail` })
+    navigate(Screens.ConsumerIncentivesHomeScreen)
   }
 
   return (
@@ -239,7 +239,7 @@ function CeloRewardContent({ address, amount, recipient }: Props) {
         expandable={false}
         avatar={<TransferAvatars type="received" address={address} recipient={recipient} />}
       />
-      <TouchableOpacity onPress={openLearnMore}>
+      <TouchableOpacity onPress={openLearnMore} testID={'celoRewards/learnMore'}>
         <Text style={styles.learnMore}>{t('learnMore')}</Text>
       </TouchableOpacity>
       <HorizontalLine />

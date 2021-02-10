@@ -103,7 +103,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   componentDidUpdate = (prevProps: Props) => {
-    const { validationSuccessful, isOutgoingPaymentRequest, transactionData } = this.props
+    const { validationSuccessful, isOutgoingPaymentRequest, transactionData, route } = this.props
 
     if (validationSuccessful && prevProps.validationSuccessful === false) {
       if (isOutgoingPaymentRequest) {
@@ -115,6 +115,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         navigate(Screens.SendConfirmation, {
           transactionData,
           addressJustValidated: true,
+          origin: route.params.origin,
         })
       }
     }

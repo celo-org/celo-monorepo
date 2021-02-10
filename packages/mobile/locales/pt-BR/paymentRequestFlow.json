@@ -12,6 +12,6 @@
   "requestUnavailableBody": "O número {{e164PhoneNumber}} não tem uma conta ou ainda não foi verificado. As solicitações só podem ser enviadas para números verificados.",
   "requestUnavailableNoNumberBody": "Seu contato não tem uma conta ou ainda não a verificou. As solicitações só podem ser enviadas para números verificados.",
   "requesting": "Solicitando",
-  "request": "Solicitação",
+  "request": "Solicitar",
   "requestSent": "Solicitação enviada"
 }

@@ -162,7 +162,7 @@ contract Validators is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -402,6 +402,9 @@ contract Validators is
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
+    // Grace period of 0.625%
+    uint256 grace_period = 6250000000000000000000;
+    uptime = Math.min(uptime.add(grace_period), FixidityLib.fixed1().unwrap());
     (numerator, denominator) = fractionMulExp(
       FixidityLib.fixed1().unwrap(),
       FixidityLib.fixed1().unwrap(),

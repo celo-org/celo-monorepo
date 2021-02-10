@@ -88,12 +88,14 @@ export const getBootnodeEnode = async (namespace: string) => {
   return [getEnodeAddress(nodeId, ip, BOOTNODE_DISCOVERY_PORT)]
 }
 
-const retrieveBootnodeIPAddress = async (namespace: string) => {
+export const retrieveBootnodeIPAddress = async (namespace: string) => {
   if (isVmBased()) {
     const outputs = await getTestnetOutputs(namespace)
     return outputs.bootnode_ip_address.value
   } else {
-    const resourceName = `${namespace}-bootnode`
+    // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
+    const resourceName = namespace === 'baklava' ?
+     `${namespace}-bootnode-address` : `${namespace}-bootnode`
     if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
       return retrieveIPAddress(resourceName)
     } else {
@@ -885,17 +887,13 @@ export async function startGeth(
 
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
-  const etherbase = instance.etherbase || ''
-  const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
-  let blocktime: number = 1
-
-  if (
-    gethConfig.genesisConfig &&
-    gethConfig.genesisConfig.blockTime !== undefined &&
-    gethConfig.genesisConfig.blockTime >= 0
-  ) {
-    blocktime = gethConfig.genesisConfig.blockTime
+  const minerValidator = instance.minerValidator
+  if (instance.validating && !minerValidator) {
+    throw new Error('miner.validator address from the instance is required')
   }
+  // TODO(ponti): add flag after Donut fork
+  // const txFeeRecipient = instance.txFeeRecipient || minerValidator
+  const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
 
   const gethArgs = [
     '--datadir',
@@ -915,9 +913,17 @@ export async function startGeth(
     'extip:127.0.0.1',
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
-    '--istanbul.blockperiod',
-    blocktime.toString(),
   ]
+
+  if (minerValidator) {
+    gethArgs.push(
+      '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
+      minerValidator
+    )
+    // TODO(ponti): add flag after Donut fork
+    // '--tx-fee-recipient',
+    // txFeeRecipient
+  }
 
   if (rpcport) {
     gethArgs.push(
@@ -937,10 +943,6 @@ export async function startGeth(
       wsport.toString(),
       '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
-  }
-
-  if (etherbase) {
-    gethArgs.push('--etherbase', etherbase)
   }
 
   if (lightserv) {
@@ -1047,8 +1049,9 @@ export async function startGeth(
 export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[], verbose: boolean) {
   const genesis: string = generateGenesis({
     validators,
+    blockTime: 1,
     epoch: 10,
-    lookbackwindow: 2,
+    lookbackwindow: 3,
     requestTimeout: 3000,
     chainId: gethConfig.networkId,
     ...gethConfig.genesisConfig,
@@ -1201,6 +1204,9 @@ export async function migrateContracts(
         validatorKeys: validatorPrivateKeys.map(ensure0x),
         attestationKeys: attestationKeys.map(ensure0x),
       },
+      blockchainParameters: {
+        uptimeLookbackWindow: 3, // same as our default in `writeGenesis()`
+      },      
     },
     overrides
   )

@@ -4,7 +4,7 @@
   "exchanges": "Exchanges",
   "buySellOnExchanges": "Comprar/Vender em exchanges",
   "cashOut": "Sacar fundos",
-  "cashOutSubtitle": "Envie fundos a uma corretora ou a outra conta",
+  "cashOutSubtitle": "Adquira vales-presente, faça compras ou envie fundos para uma corretora de criptomoedas.",
   "cashOutComingSoon": "Sacar fundos (em breve)",
   "spend": "Gastos",
   "spendSubtitle": "Use seu saldo com comerciantes apoiadores",
@@ -25,6 +25,7 @@
   "receiveOnAddress": "Endereço cUSD/CELO",
   "receiveWithPonto": "GCash (com Ponto)",
   "receiveWithKotani": "M-PESA (com Kotani Pay)",
+  "receiveWithBidali": "Vales-Presente e Recargas de Celular",
   "fundingEducationDialog": {
     "title": "Adicionar fundos com {{appName}} ",
     "body": "{{appName}} é alimentado pela Rede Celo. O {{appName}} gerencia Celo Dólares (cUSD), uma moeda digital estável que acompanha o dólar americano.Para adicionar fundos à sua conta do {{appName}}, compre o cUSD de um dos fornecedores terceirizados disponíveis em sua localidade. Para mais informações visite <0>{{link}}</0>",
@@ -37,8 +38,9 @@
   },
   "explanationModal": {
     "title": "Sobre os fornecedores",
-    "body": "Os fornecedores permitem que você adicione ou saque fundos da sua conta. Eles determinam suas próprias taxas e restrições dependendo da localidade, quantidade e outros fatores. Visite o site do fornecedor para obter ajuda específica. Visite as Perguntas frequentes para saber mais."
+    "body": "Esses provedores permitem que você adicione ou retire fundos da sua conta. Os provedores determinam suas próprias tarifas e restrições, dependendo de diversos fatores. Visite o site do provedor para obter ajuda."
   },
+  "pleaseSelectProvider": "Por favor, selecione um provedor. Esses links são conectados a serviços de terceiros.",
   "otherFundingOptions": "Para conhecer mais maneiras de adicionar e sacar fundos, visite <0>Como adicionar fundos à sua conta</0>",
   "youCanTransfer": "Você pode transferir {{currency}} de ou para os seguintes exchanges. Você precisará do seu Número da Conta (também conhecido como endereço) – toque abaixo para copiar.",
   "useBalanceWithMerchants": "Use seu saldo com comerciantes apoiadores",
