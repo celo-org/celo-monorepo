@@ -311,6 +311,10 @@ contract Reserve is
     emit SpenderRemoved(spender);
   }
 
+  /**
+   * @notice Checks if an address is able to spend as an exchange.
+   * @param spender The address to checked.
+   */
   function isAllowedToSpendExchange(address spender) public view returns (bool) {
     return
       isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender);
