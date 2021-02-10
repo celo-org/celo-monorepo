@@ -46,6 +46,8 @@ export const handler = async (argv: TestnetArgv) => {
   } else {
     await upgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
   }
-  await uploadTestnetStaticNodesToGoogleStorage(argv.celoEnv)
-  await uploadEnvFileToGoogleStorage(argv.celoEnv)
+  if (process.env.CELOTOOL_HELM_DRY_RUN !== 'true') {
+    await uploadTestnetStaticNodesToGoogleStorage(argv.celoEnv)
+    await uploadEnvFileToGoogleStorage(argv.celoEnv)
+  }
 }

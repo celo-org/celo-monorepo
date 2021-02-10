@@ -66,6 +66,31 @@ spec:
 {{- end }}
     component: {{ .component_label }}
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}-headless
+  labels:
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
+    component: {{ .component_label }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 8545
+    name: rpc
+  - port: 8546
+    name: ws
+  selector:
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
+    component: {{ .component_label }}
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -87,7 +112,8 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ .Values.geth.diskSizeGB }}Gi
+          {{- $disk_size := ((eq .name "tx-nodes-private" ) | ternary .Values.geth.privateTxNodediskSizeGB .Values.geth.diskSizeGB ) }}
+          storage: {{ $disk_size }}Gi
   {{ end }}
   podManagementPolicy: Parallel
   replicas: {{ .replicas }}
@@ -115,7 +141,7 @@ spec:
 {{- end }}
     spec:
       initContainers:
-{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
 {{ include "common.celotool-validator-container" (dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix "ip_addresses" .ip_addresses "validator_index" .validator_index) | indent 6 }}
 {{ if .unlock | default false }}
 {{ include "common.import-geth-account-container" .  | indent 6 }}

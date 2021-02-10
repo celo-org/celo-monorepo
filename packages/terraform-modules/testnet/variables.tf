@@ -112,10 +112,14 @@ variable network_name {
   type        = string
   description = "The name of the network to use"
 }
-
 variable node_disk_size_gb {
   type        = number
-  description = "The size in GB of disks for all types of nodes"
+  description = "The size in GB of disks for validators, proxies, and txnodes"
+}
+
+variable private_node_disk_size_gb {
+  type        = number
+  description = "The size in GB of disks for all private txnodes"
 }
 
 variable private_tx_node_count {
