@@ -8,7 +8,7 @@ import { decodeLogs } from './decode'
 import { formatNativeTransfers } from './nativeTransfersFormatter'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
-export const MAX_BLOCKS_TO_WAIT = 120
+export const MAX_BLOCKS_TO_WAIT = 600
 
 export enum Currencies {
   GOLD = 'gold',
