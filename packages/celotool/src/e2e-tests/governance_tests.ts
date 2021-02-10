@@ -9,12 +9,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import {
-  connectBipartiteClique,
-  connectPeers,
-  /*connectValidatorPeers,*/ importGenesis,
-  initAndStartGeth,
-} from '../lib/geth'
+import { connectBipartiteClique, connectPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import {
@@ -971,7 +966,6 @@ describe('governance tests', () => {
       console.log('wait for end of epoch')
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
-      await sleep(5.5)
 
       const groupWeb3Url = 'ws://localhost:8555'
       const groupWeb3 = new Web3(groupWeb3Url)
