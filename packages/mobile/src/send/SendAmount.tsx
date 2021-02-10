@@ -384,6 +384,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   amount: {
+    ...fontStyles.regular,
     fontSize: 64,
     lineHeight: undefined,
   },
