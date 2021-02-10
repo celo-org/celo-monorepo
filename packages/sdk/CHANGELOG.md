@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.2--dev]**
+### **[1.0.3--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -17,6 +17,20 @@ Other Changes
 
 
 ## Published
+
+### **[1.0.2-beta]** -- 2021-02-03
+Features
+- Show owner in `releasegold:show` - [#6608](https://github.com/celo-org/celo-monorepo/pull/6608)
+- Metadata HTTPS Monitoring in `identity:current-attestation-services` - [#6806](https://github.com/celo-org/celo-monorepo/pull/6806)
+- Determine signing algorithm based on key type for Azure HSM - [#6010](https://github.com/celo-org/celo-monorepo/pull/6010)
+
+Bug Fixes
+- Fix 8 digit codes for mainnet - [#6663](https://github.com/celo-org/celo-monorepo/pull/6663)
+- Fix Azure HSM Wallet PublicKey to Address conversion - [#6829](https://github.com/celo-org/celo-monorepo/pull/6829)
+
+Other Changes
+- Small Docs Fixes related to CK1 release - [#6576](https://github.com/celo-org/celo-monorepo/pull/6576)
+
 ### **[1.0.1]** -- 2021-01-20
 Features
 - Moved into SDK directory, and made compatible with SDK modularization changes - [#4790](https://github.com/celo-org/celo-monorepo/pull/4790)

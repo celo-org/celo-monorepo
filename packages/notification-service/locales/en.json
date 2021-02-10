@@ -5,5 +5,6 @@
   "dollar_plural": "Celo Dollars",
   "gold": "CELO",
   "paymentRequestedTitle": "Payment Requested",
-  "paymentRequestedBody": "Payment of {{amount}} {{currency}} has been requested"
+  "paymentRequestedBody": "Payment of {{amount}} {{currency}} has been requested",
+  "rewardReceivedTitle": "Reward Received"
 }

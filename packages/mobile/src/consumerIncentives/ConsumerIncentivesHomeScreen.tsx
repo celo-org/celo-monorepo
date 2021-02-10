@@ -1,20 +1,28 @@
 import Button, { BtnSizes } from '@celo/react-components/components/Button'
+import Touchable from '@celo/react-components/components/Touchable'
+import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { Fragment } from 'react'
 import { useAsync } from 'react-async-hook'
-import { ActivityIndicator, ScrollView, StyleSheet, Text } from 'react-native'
+import { Trans, useTranslation } from 'react-i18next'
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import LinearGradient from 'react-native-linear-gradient'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CELO_REWARDS_LINK } from 'src/brandingConfig'
-import { ContentType, fetchConsumerRewardsContent } from 'src/consumerIncentives/contentFetcher'
-import i18n from 'src/i18n'
-import { headerWithCloseButton } from 'src/navigator/Headers'
+import {
+  ConsumerIncentivesData,
+  fetchConsumerRewardsContent,
+} from 'src/consumerIncentives/contentFetcher'
+import { Namespaces } from 'src/i18n'
+import { consumerIncentives, leaves } from 'src/images/Images'
+import { noHeader } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -25,24 +33,25 @@ import Logger from 'src/utils/Logger'
 const TAG = 'ConsumerIncentivesHomeScreen'
 
 const useConsumerIncentivesContent = () => {
-  const contentResult = useAsync<ContentType>(fetchConsumerRewardsContent, [])
+  const contentResult = useAsync<ConsumerIncentivesData>(fetchConsumerRewardsContent, [])
   let texts
   if (contentResult.result) {
-    texts = getContentForCurrentLang(contentResult.result)
+    texts = getContentForCurrentLang(contentResult.result.content)
   }
   return {
     content: texts,
+    tiers: contentResult.result?.tiers,
     loading: contentResult.loading,
     error: contentResult.error,
   }
 }
 
-const range = (n: number) => (n === 0 ? [] : [...Array(n).keys()].map((i) => i + 1))
-
 type Props = StackScreenProps<StackParamList, Screens.ConsumerIncentivesHomeScreen>
 export default function ConsumerIncentivesHomeScreen(props: Props) {
+  const { t } = useTranslation(Namespaces.consumerIncentives)
   const userIsVerified = useTypedSelector((state) => state.app.numberVerified)
-  const { content, loading, error } = useConsumerIncentivesContent()
+  const { content, tiers, loading, error } = useConsumerIncentivesContent()
+  const insets = useSafeAreaInsets()
   const dispatch = useDispatch()
 
   if (!loading && error) {
@@ -51,15 +60,6 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
     navigateBack()
     return null
   }
-
-  // Content key names are formatted like subtitleN and bodyN 1-indexed.
-  // This is to allow an arbitrary number of sections.
-  const sectionCount = content
-    ? Object.keys(content).reduce(
-        (max, item) => Math.max(max, parseInt(item.slice(-1), 10) || 0),
-        0
-      )
-    : 0
 
   const onPressCTA = () => {
     if (userIsVerified) {
@@ -72,8 +72,21 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   const onLearnMore = () => navigate(Screens.WebViewScreen, { uri: CELO_REWARDS_LINK })
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
-      <SafeAreaView edges={['bottom']}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <Image source={leaves} style={styles.backgroundImage} resizeMode={'stretch'} />
+      <SafeAreaView edges={['bottom']} style={styles.contentContainer}>
+        <Touchable
+          style={[styles.closeButton, { marginTop: insets.top + 20 }]}
+          onPress={navigateBack}
+          borderless={true}
+          hitSlop={variables.iconHitslop}
+        >
+          <Times />
+        </Touchable>
         {loading && (
           <ActivityIndicator
             size="large"
@@ -84,33 +97,50 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
         )}
         {content && (
           <>
-            <Text style={styles.title}>{content.title}</Text>
-            <Text style={styles.body}>{content.description}</Text>
-            {range(sectionCount).map((section) => (
-              <Fragment key={`section${section}`}>
-                <Text style={styles.subtitle}>{content[`subtitle${section}`]}</Text>
-                <Text style={styles.body}>{content[`body${section}`]}</Text>
-              </Fragment>
-            ))}
+            <Image source={consumerIncentives} />
+            <Text style={styles.title}>{t('title')}</Text>
+            <Text style={[styles.body, styles.description]}>{t('description')}</Text>
+            {tiers &&
+              tiers.map((tier, index) => (
+                <Fragment key={`tier${tier.celoReward}`}>
+                  {index > 0 && (
+                    <LinearGradient
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      colors={[colors.light, colors.dark, colors.light]}
+                      style={styles.separator}
+                    />
+                  )}
+                  <Text style={[styles.body, styles.tier]}>
+                    <Trans
+                      i18nKey={'getCeloRewards'}
+                      ns={Namespaces.consumerIncentives}
+                      tOptions={{ reward: tier.celoReward, minBalance: tier.minBalanceCusd }}
+                    >
+                      <Text style={styles.bold} />
+                      <Text style={styles.bold} />
+                    </Trans>
+                  </Text>
+                </Fragment>
+              ))}
+            {content.extraSubtitle && <Text style={styles.subtitle}>{content.extraSubtitle}</Text>}
+            {content.extraBody && <Text style={styles.body}>{content.extraBody}</Text>}
             {!userIsVerified && (
               <>
                 <Text style={styles.subtitle}>{content.unverifiedSubtitle}</Text>
                 <Text style={styles.body}>{content.unverifiedBody}</Text>
               </>
             )}
-            <Button
-              style={styles.button}
-              size={BtnSizes.FULL}
-              text={
-                userIsVerified
-                  ? i18n.t('fiatExchangeFlow:addCusd')
-                  : i18n.t('accountScreen10:confirmNumber')
-              }
-              onPress={onPressCTA}
-              testID="ConsumerIncentives/CTA"
-            />
+            <View style={styles.buttonContainer}>
+              <Button
+                size={BtnSizes.FULL}
+                text={userIsVerified ? t('addCusd') : t('accountScreen10:confirmNumber')}
+                onPress={onPressCTA}
+                testID="ConsumerIncentives/CTA"
+              />
+            </View>
             <TouchableOpacity onPress={onLearnMore} testID="ConsumerIncentives/learnMore">
-              <Text style={styles.learnMore}>{i18n.t('global:learnMore')}</Text>
+              <Text style={styles.learnMore}>{t('global:learnMore')}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -119,17 +149,29 @@ export default function ConsumerIncentivesHomeScreen(props: Props) {
   )
 }
 
-ConsumerIncentivesHomeScreen.navOptions = {
-  ...headerWithCloseButton,
-}
+ConsumerIncentivesHomeScreen.navOptions = noHeader
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: variables.contentPadding,
   },
   scrollContainer: {
     flexGrow: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 24,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  closeButton: {
+    alignSelf: 'flex-start',
   },
   loading: {
     height: '100%',
@@ -137,24 +179,49 @@ const styles = StyleSheet.create({
   title: {
     ...fontStyles.h2,
     marginTop: 16,
-    marginBottom: 8,
+    textAlign: 'center',
+  },
+  description: {
+    marginBottom: 36,
+    marginTop: 10,
   },
   subtitle: {
-    ...fontStyles.sectionHeader,
-    fontSize: 17,
-    marginTop: 24,
+    ...fontStyles.h2,
+    fontSize: 20,
+    marginTop: 40,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   body: {
-    ...fontStyles.small,
-    marginTop: 16,
+    ...fontStyles.regular,
+    textAlign: 'center',
   },
-  button: {
-    marginTop: 24,
+  separator: {
+    height: 1,
+    width: '100%',
+    opacity: 0.3,
+    marginVertical: 18,
+  },
+  tier: {
+    marginBottom: 4,
+    paddingHorizontal: 12,
+  },
+  bold: {
+    fontWeight: 'bold',
+  },
+  perMonth: {
+    ...fontStyles.small,
+    color: colors.gray4,
+  },
+  buttonContainer: {
+    marginTop: 36,
+    width: '100%',
   },
   learnMore: {
+    ...fontStyles.notificationHeadline,
+    fontSize: 17,
     alignSelf: 'center',
-    ...fontStyles.small500,
-    marginTop: 24,
+    marginVertical: 24,
     color: colors.greenUI,
   },
 })
