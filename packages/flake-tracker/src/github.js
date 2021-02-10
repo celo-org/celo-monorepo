@@ -104,12 +104,14 @@ class GitHub {
   }
 
   async fetchFlakeIssues() {
+    return []
     const fn = () =>
       this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
         state: 'open',
         labels: getLabels(),
       })
+
     console.log('\nFetching known flakey tests from GitHub...')
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
     const issues = (await this.safeExec(fn, errMsg)) || []
@@ -117,6 +119,7 @@ class GitHub {
   }
 
   async fetchKnownFlakesToSkip() {
+    return []
     const flakeIssues = await this.fetchFlakeIssues()
     const mandatoryTests = await this.fetchMandatoryTestsForPR()
     const knownFlakesToSkip = flakeIssues.filter(
@@ -128,6 +131,7 @@ class GitHub {
   }
 
   async handleObsoleteIssues(obsoleteIssues) {
+    return []
     if (!process.env.CIRCLECI) return
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
     if (process.env.CIRCLE_BRANCH === 'master') {
