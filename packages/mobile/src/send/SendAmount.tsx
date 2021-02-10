@@ -312,10 +312,14 @@ function SendAmount(props: Props) {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.showAmountContainer}>
           <View style={styles.currencySymbolContainer}>
-            <Text style={styles.currencySymbol}>{localCurrencySymbol || localCurrencyCode}</Text>
+            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.currencySymbol}>
+              {localCurrencySymbol || localCurrencyCode}
+            </Text>
           </View>
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>{amount ? amount : '0'}</Text>
+            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.amount}>
+              {amount ? amount : '0'}
+            </Text>
           </View>
           <View style={styles.currencySymbolContainer}>
             <Text style={styles.currencySymbolTransparent}>
@@ -361,6 +365,7 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     justifyContent: 'center',
+    maxWidth: '75%',
   },
   currencySymbolContainer: {
     justifyContent: 'center',
@@ -381,7 +386,7 @@ const styles = StyleSheet.create({
   amount: {
     ...fontStyles.regular,
     fontSize: 64,
-    lineHeight: 88,
+    lineHeight: undefined,
   },
   nextBtn: {
     paddingVertical: variables.contentPadding,
