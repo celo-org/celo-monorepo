@@ -213,8 +213,8 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
   const numProxies = proxyInstances.length
 
-  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
-  const proxyEnodes = proxyPrivateKeys.map((x: string, i: number) => [
+  const proxyNodeKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
+  const proxyEnodes = proxyNodeKeys.map((x: string, i: number) => [
     proxyInstances[i].name,
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport!),
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port),
@@ -261,7 +261,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       } else if (instance.isProxy) {
-        instance.nodekey = instance.privateKey || proxyPrivateKeys[proxyIndex]
+        instance.nodekey = instance.privateKey || proxyNodeKeys[proxyIndex]
         proxyIndex++
       }
 
