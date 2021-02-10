@@ -56,11 +56,6 @@ spec:
             secretKeyRef:
               name: {{ .Values.environment }}-attestation-bot-secrets
               key: twilioAccountSid
-        - name: TWILIO_ADDRESS_SID
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.environment }}-attestation-bot-secrets
-              key: twilioAddressSid
         - name: TWILIO_ACCOUNT_AUTH_TOKEN
           valueFrom:
             secretKeyRef:
