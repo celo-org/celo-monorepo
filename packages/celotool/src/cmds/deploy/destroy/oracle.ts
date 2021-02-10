@@ -17,6 +17,7 @@ export const builder = (argv: yargs.Argv) => {
   return addContextMiddleware(argv).option('currencyPair', {
     choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
     description: 'Oracle deployment to target based on currency pair',
+    demandOption: true,
     type: 'string',
   })
 }

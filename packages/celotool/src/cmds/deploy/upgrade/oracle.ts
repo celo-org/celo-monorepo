@@ -24,6 +24,7 @@ export const builder = (argv: yargs.Argv) => {
     .option('currencyPair', {
       choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
       description: 'Oracle deployment to target based on currency pair',
+      demandOption: true,
       type: 'string',
     })
 }

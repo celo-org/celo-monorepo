@@ -24,11 +24,13 @@ export const builder = (argv: yargs.Argv) => {
     .option('currencyPair', {
       choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
       description: 'Oracle deployment to target based on currency pair',
+      demandOption: true,
       type: 'string',
     })
 }
 
 export const handler = async (argv: OracleInitialArgv) => {
+  console.log(argv)
   const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
   const deployer = getOracleDeployerForContext(
     argv.celoEnv,
