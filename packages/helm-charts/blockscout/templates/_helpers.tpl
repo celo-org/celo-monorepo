@@ -106,6 +106,8 @@ blockscout components.
   value: {{ .Values.blockscout.subnetwork }}
 - name: COIN
   value: cGLD
+- name: SEGMENT_KEY
+  value: {{ .Values.blockscout.segment_key }}
 - name: ECTO_USE_SSL
   value: "false"
 - name: ETHEREUM_JSONRPC_VARIANT
