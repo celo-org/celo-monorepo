@@ -23,7 +23,7 @@ import {
   ALERT_BANNER_DURATION,
   DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
-  NUMBER_INPUT_MAX_DECIMALS,
+  NUMBER_INPUT_MAX_DECIMALS
 } from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
@@ -31,19 +31,19 @@ import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,
-  secureSendPhoneNumberMappingSelector,
+  secureSendPhoneNumberMappingSelector
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
 import { RecipientVerificationStatus } from 'src/identity/types'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
-  convertLocalAmountToDollars,
+  convertLocalAmountToDollars
 } from 'src/localCurrency/convert'
 import {
   getLocalCurrencyCode,
   getLocalCurrencyExchangeRate,
-  getLocalCurrencySymbol,
+  getLocalCurrencySymbol
 } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -385,6 +385,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 64,
+    lineHeight: undefined,
   },
   nextBtn: {
     paddingVertical: variables.contentPadding,
