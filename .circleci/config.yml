@@ -407,7 +407,6 @@ jobs:
               --ignore @celo/celotool \
               --ignore @celo/celocli \
               --ignore @celo/env-tests \
-              --ignore @celo/web \
               --ignore @celo/identity \
               --ignore @celo/transactions-uri \
               --ignore '@celo/wallet-*' \
