@@ -34,11 +34,11 @@ type Props = RouteProps
 function RampScreen({ route }: Props) {
   const { localAmount, currencyCode, currencyToBuy } = route.params
   const account = useSelector(currentAccountSelector)
+  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
 
   let minTxAmount = MIN_USD_TX_AMOUNT
 
   if (currencyCode !== LocalCurrencyCode.USD) {
-    const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
     const localTxMin = convertDollarsToLocalAmount(minTxAmount, localCurrencyExchangeRate)
     minTxAmount = localTxMin?.toNumber() || MIN_USD_TX_AMOUNT
   }
