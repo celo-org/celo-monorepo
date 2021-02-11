@@ -46,7 +46,7 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization for tests that use contracts un-proxied.
+   * @param test  Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
 

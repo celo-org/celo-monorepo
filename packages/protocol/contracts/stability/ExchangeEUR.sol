@@ -5,7 +5,7 @@ import "./Exchange.sol";
 contract ExchangeEUR is Exchange {
   /**
    * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization for tests that use contracts un-proxied.
+   * @param test  Set to true to skip implementation initialization
    */
   constructor(bool test) public Exchange(test) {}
 
