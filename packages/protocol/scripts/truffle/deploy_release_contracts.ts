@@ -7,7 +7,6 @@ import fs from 'fs'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
-  ReleaseGoldInstance,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,

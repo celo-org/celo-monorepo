@@ -82,14 +82,11 @@ const deployImplementation = async (
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  let contract
-  if (dryRun) {
-    contract = await Contract.at(celoRegistryAddress)
-  } else {
-    // if the contract is initializable we need to specify that we aren't testing
-    // so the implementation gets locked upon deployment
-    contract = await (isInitializable ? Contract.new(notTest) : Contract.new())
-  }
+  const contract = await (dryRun
+    ? Contract.at(celoRegistryAddress)
+    : isInitializable
+    ? Contract.new(notTest)
+    : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
