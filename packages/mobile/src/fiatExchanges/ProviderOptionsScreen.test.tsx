@@ -12,6 +12,7 @@ import { createMockStore, getMockStackScreenProps } from 'test/utils'
 const mockScreenProps = (isCashIn: boolean) =>
   getMockStackScreenProps(Screens.ProviderOptionsScreen, {
     isCashIn,
+    currency: CURRENCY_ENUM.DOLLAR,
   })
 
 const mockStore = createMockStore({
@@ -52,7 +53,22 @@ describe('ProviderOptionsScreen', () => {
     )
 
     fireEvent.press(getByTestId('Provider/Moonpay'))
-    expect(navigate).toHaveBeenCalledWith(Screens.MoonPay, {
+    expect(navigate).toHaveBeenCalledWith(Screens.MoonPayScreen, {
+      localAmount: 0,
+      currencyCode: LocalCurrencyCode.BRL,
+      currencyToBuy: CURRENCY_ENUM.DOLLAR,
+    })
+  })
+
+  it('opens Ramp correctly', () => {
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <ProviderOptionsScreen {...mockScreenProps(true)} />
+      </Provider>
+    )
+
+    fireEvent.press(getByTestId('Provider/Ramp'))
+    expect(navigate).toHaveBeenCalledWith(Screens.RampScreen, {
       localAmount: 0,
       currencyCode: LocalCurrencyCode.BRL,
       currencyToBuy: CURRENCY_ENUM.DOLLAR,
