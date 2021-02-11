@@ -18,19 +18,14 @@ import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import { KOTANI_URI, PONTO_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
-import { openMoonpay } from 'src/fiatExchanges/utils'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
 import Logger from 'src/utils/Logger'
-
-const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
 type RouteProps = StackScreenProps<StackParamList, Screens.FiatExchangeOptions>
 type Props = RouteProps
@@ -119,7 +114,6 @@ function PaymentMethodRadioItem({
 function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const isCashIn = route.params?.isCashIn ?? true
-  const localCurrency = useSelector(getLocalCurrencyCode)
   const { MOONPAY_DISABLED, KOTANI_SUPPORTED, PONTO_SUPPORTED } = useCountryFeatures()
   const pontoEnabled = useSelector(pontoEnabledSelector)
   const kotaniEnabled = useSelector(kotaniEnabledSelector)
@@ -153,10 +147,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.BidaliScreen, { currency: selectedCurrency })
     } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
       navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
-    } else if (selectedCurrency === CURRENCY_ENUM.DOLLAR) {
-      navigate(Screens.ProviderOptionsScreen, { isCashIn: true })
     } else {
-      openMoonpay(localCurrency || FALLBACK_CURRENCY, CURRENCY_ENUM.GOLD)
+      navigate(Screens.ProviderOptionsScreen, { isCashIn: true, currency: selectedCurrency })
     }
   }
 
