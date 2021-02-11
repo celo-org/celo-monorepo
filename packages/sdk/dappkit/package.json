@@ -1,14 +1,14 @@
 {
   "name": "@celo/dappkit",
-  "version": "1.0.2-beta",
+  "version": "1.0.2-beta-1",
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/connect": "1.0.2-beta",
-    "@celo/contractkit": "1.0.2-beta",
-    "@celo/utils": "1.0.2-beta",
+    "@celo/connect": "1.0.2-beta-1",
+    "@celo/contractkit": "1.0.2-beta-1",
+    "@celo/utils": "1.0.2-beta-1",
     "expo": "^36.0.2",
     "expo-contacts": "8.0.0",
     "libphonenumber-js": "^1.7.22"
