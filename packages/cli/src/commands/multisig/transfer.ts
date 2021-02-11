@@ -12,9 +12,14 @@ export default class MultiSigTransfer extends BaseCommand {
     ...BaseCommand.flags,
     to: Flags.address({ required: true, description: 'Recipient of transfer' }),
     amount: flags.string({ required: true, description: 'Amount to transfer, e.g. 10e18' }),
-    transferFrom: flags.boolean({ description: 'Perform transferFrom instead of transfer' }),
+    transferFrom: flags.boolean({
+      description: 'Perform transferFrom instead of transfer in the ERC-20 interface',
+    }),
     sender: Flags.address({ description: 'Identify sender if performing transferFrom' }),
-    from: Flags.address({ required: true, description: 'account performing transaction' }),
+    from: Flags.address({
+      required: true,
+      description: 'Account transferring value to the recipient',
+    }),
   }
 
   static args = [Args.address('address')]

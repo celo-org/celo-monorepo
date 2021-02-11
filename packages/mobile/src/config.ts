@@ -169,6 +169,9 @@ export const SPEND_MERCHANT_LINKS: SpendMerchant[] = [
   },
 ]
 
+export const VALORA_LOGO_URL =
+  'https://storage.googleapis.com/celo-mobile-mainnet.appspot.com/images/valora-icon.png'
+
 export const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 export const PONTO_URI = 'https://withponto.com/partners/celo/valora'
 export const KOTANI_URI = 'https://kotanipay.com/partners/valora'
