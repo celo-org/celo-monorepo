@@ -30,6 +30,8 @@ Bug Fixes
 
 Other Changes
 - Small Docs Fixes related to CK1 release - [#6576](https://github.com/celo-org/celo-monorepo/pull/6576)
+- Simplify SortedOracles API by allowing consumers to report to arbitrary Addresses - [#6898](https://github.com/celo-org/celo-monorepo/pull/6898)
+
 
 ### **[1.0.1]** -- 2021-01-20
 Features
