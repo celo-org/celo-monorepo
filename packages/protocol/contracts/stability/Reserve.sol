@@ -313,7 +313,7 @@ contract Reserve is
 
   /**
    * @notice Checks if an address is able to spend as an exchange.
-   * @param spender The address to checked.
+   * @param spender The address to be checked.
    */
   function isAllowedToSpendExchange(address spender) public view returns (bool) {
     return
