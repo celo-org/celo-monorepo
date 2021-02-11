@@ -50,6 +50,7 @@ export interface AddressInfoToDisplay {
   name: string
   imageUrl: string | null
   isCeloRewardSender?: boolean
+  isProviderAddress?: boolean
 }
 
 export interface AddressToDisplayNameType {
@@ -692,4 +693,10 @@ export const tryFeelessOnboardingSelector = ({
 }: RootState) => {
   const { errorTimestamps } = feelessVerificationState.komenci
   return !hasExceededKomenciErrorQuota(errorTimestamps) && features.KOMENCI
+}
+
+export const providerAddressesSelector = ({ identity: { addressToDisplayName } }: RootState) => {
+  return Object.entries(addressToDisplayName)
+    .filter(([_, info]) => info?.isProviderAddress)
+    .map(([address, _]) => address)
 }

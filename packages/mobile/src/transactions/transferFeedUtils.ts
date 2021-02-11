@@ -9,7 +9,7 @@ import {
 import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
-import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { KnownFeedTransactionsType } from 'src/transactions/reducer'
@@ -74,9 +74,9 @@ export function getTransferFeedParams(
   t: TFunction,
   recipientCache: NumberToRecipient,
   recentTxRecipientsCache: NumberToRecipient,
+  name: string | undefined,
   address: string,
   addressToE164Number: AddressToE164NumberType,
-  addressToDisplayName: AddressToDisplayNameType,
   rawComment: string | null,
   commentKey: string | null,
   timestamp: number,
@@ -91,8 +91,7 @@ export function getTransferFeedParams(
     timestamp,
     invitees
   )
-  const nameOrNumber =
-    recipient?.displayName || addressToDisplayName[address]?.name || e164PhoneNumber
+  const nameOrNumber = name || recipient?.displayName || e164PhoneNumber
   const displayName =
     nameOrNumber ||
     t('feedItemAddress', {

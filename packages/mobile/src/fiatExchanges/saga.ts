@@ -1,15 +1,24 @@
 import BigNumber from 'bignumber.js'
-import { call, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
+import { call, put, race, select, spawn, take, takeEvery, takeLeading } from 'redux-saga/effects'
 import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { Actions as AppActions, ActionTypes as AppActionTypes } from 'src/app/actions'
-import { Actions, BidaliPaymentRequestedAction } from 'src/fiatExchanges/actions'
+import {
+  Actions,
+  assignProviderToTxHash,
+  BidaliPaymentRequestedAction,
+} from 'src/fiatExchanges/actions'
 import { updateKnownAddresses } from 'src/identity/actions'
+import { providerAddressesSelector } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RecipientKind, RecipientWithAddress } from 'src/recipients/recipient'
 import { Actions as SendActions } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import {
+  Actions as TransactionActions,
+  NewTransactionsInFeedAction,
+} from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'fiatExchanges/saga'
@@ -91,10 +100,40 @@ function* bidaliPaymentRequest({
   }
 }
 
+function* searchNewItemsForProviderTxs({ transactions }: NewTransactionsInFeedAction) {
+  try {
+    if (!transactions || !transactions.length) {
+      return
+    }
+    Logger.debug(TAG + 'searchNewItemsForProviderTxs', `Checking ${transactions.length} txs`)
+
+    const providerAddresses = yield select(providerAddressesSelector)
+
+    for (const tx of transactions) {
+      if (tx.__typename !== 'TokenTransfer' || tx.type !== TokenTransactionType.Received) {
+        continue
+      }
+
+      if (providerAddresses.indexOf(tx.address) >= 0) {
+        yield put(assignProviderToTxHash(tx.hash, tx.amount.currencyCode))
+      }
+    }
+
+    Logger.debug(TAG + 'searchNewItemsForProviderTxs', 'Done checking txs')
+  } catch (error) {
+    Logger.error(TAG + 'searchNewItemsForProviderTxs', error)
+  }
+}
+
 export function* watchBidaliPaymentRequests() {
   yield takeLeading(Actions.BIDALI_PAYMENT_REQUESTED, bidaliPaymentRequest)
 }
 
+function* watchNewFeedTransactions() {
+  yield takeEvery(TransactionActions.NEW_TRANSACTIONS_IN_FEED, searchNewItemsForProviderTxs)
+}
+
 export function* fiatExchangesSaga() {
   yield spawn(watchBidaliPaymentRequests)
+  yield spawn(watchNewFeedTransactions)
 }
