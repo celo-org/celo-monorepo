@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.7.2",
+  "version": "1.9.2",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -30,7 +30,7 @@
     "test:e2e:packager": "export CELO_TEST_CONFIG=e2e && yarn react-native start",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
-    "deploy:update-disclaimer": "yarn reset && git fetch —tags -f && yarn && yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
+    "deploy:update-disclaimer": "cd ../.. && yarn reset && git fetch —t -f && yarn && cd packages/mobile && yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
     "postinstall": "./scripts/sync_branding.sh && ./scripts/copy_license_to_android_assets.sh"
   },
   "rnpm": {
@@ -115,6 +115,7 @@
     "react-native-image-crop-picker": "^0.35.1",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keychain": "6.0.0",
+    "react-native-linear-gradient": "~2.5.6",
     "react-native-localize": "^1.4.0",
     "react-native-mail": "^6.0.0",
     "react-native-modal": "^11.5.6",

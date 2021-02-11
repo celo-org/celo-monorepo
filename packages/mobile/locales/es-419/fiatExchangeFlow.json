@@ -44,6 +44,5 @@
   "otherFundingOptions": "Para conocer más formas de agregar y retirar fondos, a <0>Cómo depositar fondos en mi cuenta</0>",
   "youCanTransfer": "Puedes transferir {{currency}} desde/hacia los siguientes exchanges utilizando tu Número de Cuenta (también conocido como dirección de Celo) - toca abajo para copiar.",
   "useBalanceWithMerchants": "Usa tu balance con comercios asociados",
-  "findMerchants": "Encuentra comercios asociados cerca de ti",
-  "addCusd": "Añadir cUSD"
+  "findMerchants": "Encuentra comercios asociados cerca de ti"
 }
