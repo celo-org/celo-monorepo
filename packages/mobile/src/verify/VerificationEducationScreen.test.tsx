@@ -6,6 +6,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
 import { Screens } from 'src/navigator/Screens'
+import { idle } from 'src/verify/reducer'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
@@ -23,6 +24,12 @@ describe('VerificationEducationScreen', () => {
   it('shows the `skip` button when already verified', () => {
     const store = createMockStore({
       app: { numberVerified: true },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 0 },
+        actionableAttestations: [],
+        komenciAvailable: false,
+      },
     })
     const { toJSON, queryByTestId, queryByText } = render(
       <Provider store={store}>
@@ -42,6 +49,12 @@ describe('VerificationEducationScreen', () => {
     const store = createMockStore({
       stableToken: {
         balance: '50',
+      },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 3 },
+        actionableAttestations: [],
+        komenciAvailable: false,
       },
     })
     const { toJSON, queryByTestId, queryByText } = render(
@@ -63,6 +76,12 @@ describe('VerificationEducationScreen', () => {
       stableToken: {
         balance: '0',
       },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 3 },
+        actionableAttestations: [],
+        komenciAvailable: false,
+      },
     })
     const { toJSON, queryByTestId, queryByText } = render(
       <Provider store={store}>
@@ -79,30 +98,15 @@ describe('VerificationEducationScreen', () => {
   })
 
   it('allows to skip if verification is loading', () => {
-    const defaultVerificationState = {
-      phoneHashDetails: {
-        e164Number: '',
-        phoneHash: '',
-        pepper: '',
-      },
-      actionableAttestations: [],
-      status: {
-        isVerified: false,
-        numAttestationsRemaining: 3,
-        total: 0,
-        completed: 0,
-      },
-      lastFetch: null,
-    }
     const store = createMockStore({
       stableToken: {
         balance: '0',
       },
-      identity: {
-        verificationState: {
-          ...defaultVerificationState,
-          isLoading: true,
-        },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 3 },
+        actionableAttestations: [],
+        komenciAvailable: undefined,
       },
     })
     const { getByTestId, toJSON } = render(
@@ -130,21 +134,16 @@ describe('VerificationEducationScreen with KOMENCI enabled', () => {
     features.KOMENCI = komenciEnabled
   })
 
-  it('shows the `continue` button when the user is not already verified and doesnt have enough balance', () => {
+  it("shows the `continue` button when the user is not yet verified and doesn't have enough balance", () => {
     const store = createMockStore({
       stableToken: {
         balance: '0',
       },
-      identity: {
-        feelessVerificationState: {
-          komenci: {
-            serviceAvailable: true,
-          },
-          status: {
-            numAttestationsRemaining: 3,
-          },
-          actionableAttestations: [],
-        },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 3 },
+        actionableAttestations: [],
+        komenciAvailable: true,
       },
     })
     const { toJSON, queryByTestId, queryByText } = render(
@@ -170,16 +169,11 @@ describe('VerificationEducationScreen with KOMENCI enabled', () => {
       stableToken: {
         balance: '0',
       },
-      identity: {
-        feelessVerificationState: {
-          komenci: {
-            serviceAvailable: true,
-          },
-          status: {
-            numAttestationsRemaining: 3,
-          },
-          actionableAttestations: [],
-        },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 3 },
+        actionableAttestations: [],
+        komenciAvailable: true,
       },
     })
     const { getByTestId } = render(
@@ -204,16 +198,11 @@ describe('VerificationEducationScreen with KOMENCI enabled', () => {
       stableToken: {
         balance: '0',
       },
-      identity: {
-        feelessVerificationState: {
-          komenci: {
-            serviceAvailable: true,
-          },
-          status: {
-            numAttestationsRemaining: 3,
-          },
-          actionableAttestations: [],
-        },
+      verify: {
+        currentState: idle(),
+        status: { numAttestationsRemaining: 3 },
+        actionableAttestations: [],
+        komenciAvailable: true,
       },
     })
     const { getByTestId } = render(

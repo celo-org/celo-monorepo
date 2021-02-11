@@ -2,10 +2,12 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import {
   isBalanceSufficientForSigRetrievalSelector,
+  komenciContextSelector,
   shouldUseKomenciSelector,
   verificationStatusSelector,
 } from 'src/verify/reducer'
 
+import { hasExceededKomenciErrorQuota } from 'src/identity/feelessVerificationErrors'
 import { RootState } from 'src/redux/reducers'
 
 export const getRequirePinOnAppOpen = (state: RootState) => {
@@ -34,10 +36,13 @@ export const verificationPossibleSelector = (state: RootState): boolean => {
   const shouldUseKomenci = shouldUseKomenciSelector(state)
   const { komenci } = verificationStatusSelector(state)
 
+  const { errorTimestamps } = komenciContextSelector(state)
+
   return !!(
-    (e164Number && saltCache[e164Number] && !komenci) ||
-    isBalanceSufficientForSigRetrievalSelector(state) ||
-    shouldUseKomenci
+    !hasExceededKomenciErrorQuota(errorTimestamps) &&
+    ((e164Number && saltCache[e164Number] && !komenci) ||
+      isBalanceSufficientForSigRetrievalSelector(state) ||
+      shouldUseKomenci)
   )
 }
 

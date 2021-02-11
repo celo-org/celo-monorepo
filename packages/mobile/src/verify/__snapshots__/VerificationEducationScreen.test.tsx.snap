@@ -3392,7 +3392,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
 </View>
 `;
 
-exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\` button when the user is not already verified and doesnt have enough balance 1`] = `
+exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\` button when the user is not yet verified and doesn't have enough balance 1`] = `
 <View
   style={
     Object {

@@ -26,6 +26,7 @@ describe('Account', () => {
           identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
           stableToken: { balance: '0.00' },
           goldToken: { balance: '0.00' },
+          verify: { komenciAvailable: true, komenci: { errorTimestamps: [] }, status: {} },
         })}
       >
         <Settings {...getMockStackScreenProps(Screens.Settings)} />
@@ -45,6 +46,7 @@ describe('Account', () => {
             devModeActive: true,
             e164PhoneNumber: mockE164Number,
           },
+          verify: { komenci: { errorTimestamps: [] }, komenciAvailable: true, status: {} },
         })}
       >
         <Settings {...getMockStackScreenProps(Screens.Settings)} />
@@ -53,8 +55,27 @@ describe('Account', () => {
     expect(tree).toMatchSnapshot()
   })
   it('renders correctly when verification is not possible', () => {
-    const tree = renderer.create(
-      <Provider store={createMockStore({})}>
+    const now = Date.now()
+    let tree = renderer.create(
+      <Provider
+        store={createMockStore({
+          verify: { komenci: { errorTimestamps: [] }, status: {} },
+        })}
+      >
+        <Settings {...getMockStackScreenProps(Screens.Settings)} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+    tree = renderer.create(
+      <Provider
+        store={createMockStore({
+          verify: {
+            komenciAvailable: true,
+            komenci: { errorTimestamps: [now, now, now] },
+            status: {},
+          },
+        })}
+      >
         <Settings {...getMockStackScreenProps(Screens.Settings)} />
       </Provider>
     )

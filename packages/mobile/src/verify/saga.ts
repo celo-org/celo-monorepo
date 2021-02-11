@@ -39,8 +39,8 @@ import {
   put,
   race,
   select,
-  takeEvery,
   spawn,
+  takeEvery,
   takeLatest,
 } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -58,6 +58,7 @@ import {
   KomenciSessionInvalidError,
   storeTimestampIfKomenciError,
 } from 'src/identity/feelessVerificationErrors'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
@@ -99,7 +100,6 @@ import {
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getAccount, getConnectedUnlockedAccount, unlockAccount, UnlockResult } from 'src/web3/saga'
-import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 
 const TAG = 'verify/saga'
 const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
@@ -256,8 +256,7 @@ function* checkIfKomenciAvailableSaga() {
     token: komenci.sessionToken,
   })
 
-  // const isKomenciAvailable = yield call(fetchKomenciReadiness, komenciKit)
-  const isKomenciAvailable = false
+  const isKomenciAvailable = yield call(fetchKomenciReadiness, komenciKit)
   yield put(setKomenciAvailable(isKomenciAvailable))
 }
 
@@ -343,7 +342,7 @@ function* startSaga({ payload: { withoutRevealing } }: ReturnType<typeof start>)
   }
 }
 
-function* fetchPhoneNumberDetailsSaga(action: ReturnType<typeof fetchPhoneNumberDetails>) {
+function* fetchPhoneNumberDetailsSaga() {
   Logger.debug(TAG, '@fetchPhoneNumberDetailsSaga', 'Starting fetch')
   const e164Number = yield select(e164NumberSelector)
   let phoneHash = yield select(phoneHashSelector)

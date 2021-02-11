@@ -12,6 +12,7 @@ describe(verificationPossibleSelector, () => {
           stableToken: { balance: '0' },
           goldToken: { balance: '0' },
           identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
+          verify: { komenci: { errorTimestamps: [] }, status: {} },
         })
       )
     ).toBe(true)
@@ -26,12 +27,8 @@ describe(verificationPossibleSelector, () => {
           goldToken: { balance: '0' },
           identity: {
             e164NumberToSalt: {},
-            feelessVerificationState: {
-              komenci: {
-                errorTimestamps: [],
-              },
-            },
           },
+          verify: { komenci: { errorTimestamps: [] }, status: {} },
         })
       )
     ).toBe(true)
@@ -42,11 +39,13 @@ describe(verificationPossibleSelector, () => {
           stableToken: { balance: '0' },
           goldToken: { balance: '0.005' },
           identity: { e164NumberToSalt: {} },
+          verify: { komenci: { errorTimestamps: [] }, status: {} },
         })
       )
     ).toBe(true)
   })
   it('returns false when balance is not sufficient and there are Komenci errors', () => {
+    const now = Date.now()
     // balance is not sufficient
     expect(
       verificationPossibleSelector(
@@ -56,11 +55,11 @@ describe(verificationPossibleSelector, () => {
           goldToken: { balance: '0.004' },
           identity: {
             e164NumberToSalt: {},
-            feelessVerificationState: {
-              komenci: {
-                errorTimestamps: [Date.now(), Date.now(), Date.now()],
-              },
-            },
+          },
+          verify: {
+            komenci: { errorTimestamps: [now, now, now] },
+            komenciAvailable: true,
+            status: {},
           },
         })
       )
@@ -77,12 +76,8 @@ describe(verificationPossibleSelector, () => {
           goldToken: { balance: '0.004' },
           identity: {
             e164NumberToSalt: {},
-            feelessVerificationState: {
-              komenci: {
-                errorTimestamps: [Date.now()],
-              },
-            },
           },
+          verify: { komenci: { errorTimestamps: [0, 0, 0] }, komenciAvailable: true, status: {} },
         })
       )
     ).toBe(true)

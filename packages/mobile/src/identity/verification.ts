@@ -82,9 +82,9 @@ import {
   phoneHashSelector,
   setActionableAttestation,
   setOverrideWithoutVerification,
+  shouldUseKomenciSelector,
   start,
   succeed,
-  shouldUseKomenciSelector,
   verificationStatusSelector,
 } from 'src/verify/reducer'
 import { getContractKit } from 'src/web3/contracts'
@@ -227,7 +227,8 @@ export function* doVerificationFlowSaga(action: ReturnType<typeof doVerification
         if (!associated) {
           yield put(showError(ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT, 10000))
           yield put(setVerificationStatus(VerificationStatus.Failed))
-          return ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT
+          yield put(fail(ErrorMessages.CANT_VERIFY_REVOKED_ACCOUNT))
+          return
         }
       }
 

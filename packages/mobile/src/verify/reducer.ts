@@ -309,7 +309,7 @@ export const shouldUseKomenciSelector = (state: RootState) => {
   if (state.verify.komenciAvailable === undefined) {
     return undefined
   }
-  const verificationHasStarted = state.verify.status.completed > 0
+  const verificationHasStarted = state.verify.status.total > 0
   // Only use Komenci when verification has not started with classic flow
   return state.verify.komenciAvailable && !(verificationHasStarted && !state.verify.status.komenci)
 }
