@@ -38,7 +38,7 @@ interface NetworkConfig {
 }
 
 const signMoonpayUrlStaging =
-  'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpayStaging'
+  'https://us-central1-celo-testnet-production.cloudfunctions.net/signMoonpayStaging'
 const signMoonpayUrlProd =
   'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/signMoonpayProd'
 

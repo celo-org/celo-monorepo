@@ -1,19 +1,16 @@
 import crypto from 'crypto'
 import * as functions from 'firebase-functions'
-import {
-  MOONPAY_PUBLIC_KEY_PROD,
-  MOONPAY_PUBLIC_KEY_STAGING,
-  MOONPAY_SECRET_KEY_PROD,
-  MOONPAY_SECRET_KEY_STAGING,
-  MOONPAY_URL_PROD,
-  MOONPAY_URL_STAGING,
-} from './config'
 const URL = require('url').URL
 
 // TODO: This staging function is left in place to test the cUSD integration
 // that we are waiting on from Moonpay. It will be removed after
 // cUSD is added and tested
 export const signMoonpayStaging = functions.https.onRequest((request, response) => {
+  const {
+    MOONPAY_PUBLIC_KEY_STAGING,
+    MOONPAY_SECRET_KEY_STAGING,
+    MOONPAY_URL_STAGING,
+  } = require('./congif')
   const fiatCurrency = request.body.fiatCurrency || 'USD'
   let fiatAmount = request.body.fiatAmount || '20'
   if (parseFloat(fiatAmount) < 20) {
@@ -44,6 +41,7 @@ export const signMoonpayStaging = functions.https.onRequest((request, response) 
 })
 
 export const signMoonpayProd = functions.https.onRequest((request, response) => {
+  const { MOONPAY_PUBLIC_KEY_PROD, MOONPAY_SECRET_KEY_PROD, MOONPAY_URL_PROD } = require('./congif')
   console.log(`Public key (non sensitive): ${MOONPAY_PUBLIC_KEY_PROD}`)
   const fiatCurrency = request.body.fiatCurrency || 'USD'
   let fiatAmount = request.body.fiatAmount || '20'
