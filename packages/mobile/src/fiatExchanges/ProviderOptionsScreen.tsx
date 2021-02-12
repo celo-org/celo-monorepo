@@ -58,7 +58,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
   const account = useSelector(currentAccountSelector)
   const localCurrency = useSelector(getLocalCurrencyCode)
   const isCashIn = route.params?.isCashIn ?? true
-  const { MOONPAY_DISABLED } = useCountryFeatures()
+  const { MOONPAY_DISABLED, RAMP_DISABLED } = useCountryFeatures()
   const selectedCurrency = route.params.currency || CURRENCY_ENUM.DOLLAR
 
   useLayoutEffect(() => {
@@ -95,7 +95,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       },
       {
         name: 'Ramp',
-        enabled: true,
+        enabled: !RAMP_DISABLED,
         onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, selectedCurrency),
       },
     ],
