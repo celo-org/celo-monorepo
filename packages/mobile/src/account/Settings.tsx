@@ -2,7 +2,7 @@ import SectionHead from '@celo/react-components/components/SectionHead'
 import {
   SettingsExpandedItem,
   SettingsItemSwitch,
-  SettingsItemTextValue,
+  SettingsItemTextValue
 } from '@celo/react-components/components/SettingsItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -18,7 +18,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
@@ -32,7 +32,7 @@ import {
   setAnalyticsEnabled,
   setNumberVerified,
   setRequirePinOnAppOpen,
-  setSessionId,
+  setSessionId
 } from 'src/app/actions'
 import { sessionIdSelector, verificationPossibleSelector } from 'src/app/selectors'
 import Dialog from 'src/components/Dialog'
@@ -350,6 +350,11 @@ export class Account extends React.Component<Props, State> {
               onPress={this.goToLocalCurrencySetting}
             />
             <SectionHead text={t('securityAndData')} style={styles.sectionTitle} />
+            <SettingsItemSwitch
+              title={t('changePin')}
+              value={this.props.changePin}
+              onValueChange={this.handleRequirePinToggle}
+            />
             <SettingsItemSwitch
               title={t('requirePinOnAppOpen')}
               value={this.props.requirePinOnAppOpen}
