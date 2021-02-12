@@ -81,7 +81,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'EpochRewards',
       'Escrow',
       'Exchange',
-      'ExchangeEUR',
       'FeeCurrencyWhitelist',
       'Freezer',
       'GasPriceMinimum',
@@ -94,7 +93,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Reserve',
       'SortedOracles',
       'StableToken',
-      'StableTokenEUR',
       'Validators',
     ]
 
