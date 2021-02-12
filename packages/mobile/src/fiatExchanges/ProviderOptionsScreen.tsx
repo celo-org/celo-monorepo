@@ -61,7 +61,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
   const account = useSelector(currentAccountSelector)
   const localCurrency = useSelector(getLocalCurrencyCode)
   const isCashIn = route.params?.isCashIn ?? true
-  const { MOONPAY_DISABLED } = useCountryFeatures()
+  const { MOONPAY_DISABLED, RAMP_DISABLED } = useCountryFeatures()
   const selectedCurrency = route.params.currency || CURRENCY_ENUM.DOLLAR
 
   const dispatch = useDispatch()
@@ -104,7 +104,7 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
       },
       {
         name: 'Ramp',
-        enabled: true,
+        enabled: !RAMP_DISABLED,
         icon:
           'https://firebasestorage.googleapis.com/v0/b/celo-mobile-mainnet.appspot.com/o/images%2Framp.png?alt=media&token=548ab5b9-7b03-49a2-a196-198f45958852',
         onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, selectedCurrency),
