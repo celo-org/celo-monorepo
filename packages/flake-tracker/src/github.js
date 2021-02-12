@@ -110,7 +110,6 @@ class GitHub {
         state: 'open',
         labels: getLabels(),
       })
-
     console.log('\nFetching known flakey tests from GitHub...')
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
     const issues = (await this.safeExec(fn, errMsg)) || []

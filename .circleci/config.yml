@@ -53,7 +53,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v5-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: |
@@ -106,7 +106,7 @@ commands:
             fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v5-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
@@ -118,14 +118,14 @@ jobs:
     steps:
       - restore_cache:
           keys:
-            - source-v2-{{ .Branch }}-{{ .Revision }}
-            - source-v2-{{ .Branch }}-
-            - source-v2-
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+            - source-v1-{{ .Branch }}-
+            - source-v1-
 
       - checkout
 
       - save_cache:
-          key: source-v2-{{ .Branch }}-{{ .Revision }}
+          key: source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - '.git'
 
