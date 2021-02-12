@@ -212,16 +212,6 @@ variable istanbul_request_timeout_ms {
   default     = 10000
 }
 
-variable geth_exporter_docker_image {
-  description = "The geth exporter docker image"
-  type        = map(string)
-
-  default = {
-    repository = "us.gcr.io/celo-testnet/geth-exporter"
-    tag        = "ed7d21bd50592709173368cd697ef73c1774a261"
-  }
-}
-
 #not yet implemented.  intent is to only install the stackdriver agents and inject the log exclusions if 'true'
 variable "enable_stackdriver" {
   description = "If set to true, enable Stackdriver for monitoring and logging"

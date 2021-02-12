@@ -34,7 +34,7 @@ export default function ClipboardAwarePasteIcon({
       }
       return (
         <Touchable testID={testID} style={style} onPress={onPressPaste} hitSlop={iconHitslop}>
-          <Paste color={color} />
+          <Paste width={32} height={32} color={color} />
         </Touchable>
       )
     }

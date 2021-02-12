@@ -77,6 +77,7 @@ const testnetEnvVars: TerraformVars = {
   network_id: envVar.NETWORK_ID,
   private_tx_node_count: envVar.PRIVATE_TX_NODES,
   node_disk_size_gb: envVar.NODE_DISK_SIZE_GB,
+  private_node_disk_size_gb: envVar.PRIVATE_NODE_DISK_SIZE_GB,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
 }

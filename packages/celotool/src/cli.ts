@@ -15,10 +15,16 @@ yargs
     description: 'Reply "yes" to prompts about changing staging/production (be careful!)',
     default: false,
   })
+  .option('helmdryrun', {
+    type: 'boolean',
+    description: 'Simulate the Helm deployment. Other deployment operations can be executed',
+    default: false,
+  })
   .middleware([
     (argv: any) => {
       process.env.CELOTOOL_VERBOSE = argv.verbose
       process.env.CELOTOOL_CONFIRMED = argv.yesreally
+      process.env.CELOTOOL_HELM_DRY_RUN = argv.helmdryrun
     },
   ])
   .commandDir('cmds', { extensions: ['ts'] })
