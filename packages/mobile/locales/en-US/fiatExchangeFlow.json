@@ -45,6 +45,6 @@
   "youCanTransfer": "You can transfer {{currency}} to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy.",
   "useBalanceWithMerchants": "Use your balance with supporting merchants",
   "findMerchants": "Find local merchants near you",
-  "celoDeposit": "CELO Deposit",
-  "cUsdDeposit": "cUSD Deposit"
+  "celoDeposit": "CELO Purchase",
+  "cUsdDeposit": "cUSD Purchase"
 }

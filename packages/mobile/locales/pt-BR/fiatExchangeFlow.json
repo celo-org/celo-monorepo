@@ -45,6 +45,6 @@
   "youCanTransfer": "Você pode transferir {{currency}} de ou para os seguintes exchanges. Você precisará do seu Número da Conta (também conhecido como endereço) – toque abaixo para copiar.",
   "useBalanceWithMerchants": "Use seu saldo com comerciantes apoiadores",
   "findMerchants": "Encontre comerciantes locais perto de você",
-  "celoDeposit": "Depósito de CELO",
-  "cUsdDeposit": "Depósito de cUSD"
+  "celoDeposit": "Compra de CELO",
+  "cUsdDeposit": "Compra de cUSD"
 }

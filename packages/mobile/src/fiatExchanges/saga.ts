@@ -100,7 +100,7 @@ function* bidaliPaymentRequest({
   }
 }
 
-function* searchNewItemsForProviderTxs({ transactions }: NewTransactionsInFeedAction) {
+export function* searchNewItemsForProviderTxs({ transactions }: NewTransactionsInFeedAction) {
   try {
     if (!transactions || !transactions.length) {
       return

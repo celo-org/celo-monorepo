@@ -1,4 +1,6 @@
 import { RehydrateAction } from 'redux-persist'
+import { FiatExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions, ActionTypes } from 'src/fiatExchanges/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -38,6 +40,10 @@ export const reducer = (state: State = initialState, action: ActionTypes | Rehyd
       }
     case Actions.ASSIGN_PROVIDER_TO_TX_HASH:
       let providerToAssign = state.lastUsedProvider
+      ValoraAnalytics.track(FiatExchangeEvents.cash_in_success, {
+        provider: providerToAssign?.name || 'unknown',
+        currency: action.currencyCode,
+      })
       if (!providerToAssign) {
         const nameKey =
           action.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code

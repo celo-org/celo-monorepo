@@ -724,6 +724,10 @@ interface FiatExchangeEventsProperties {
     isCashIn: boolean
     provider: string
   }
+  [FiatExchangeEvents.cash_in_success]: {
+    provider: string
+    currency: string
+  }
 }
 
 interface GethEventsProperties {
