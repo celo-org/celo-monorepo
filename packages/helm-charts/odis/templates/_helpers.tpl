@@ -34,12 +34,12 @@ app.kubernetes.io/component: odis-signer
 The name of the azure identity binding for the odis signer
 */}}
 {{- define "azure-identity-binding-name" -}}
-{{ template "name" . }}-identity-binding
+{{- template "name" . -}}-identity-binding
 {{- end -}}
 
 {{/*
 The name of the azure identity for the odis signer
 */}}
 {{- define "azure-identity-name" -}}
-{{ template "name" . }}-identity
+{{- template "name" . -}}-identity
 {{- end -}}

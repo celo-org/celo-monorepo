@@ -13,7 +13,7 @@ spec:
     metadata:
       labels:
 {{- include "odis-signer-component-label" . | nindent 8 }}
-        aadpodidbinding: {{ template "azure-identity-binding-name" }}
+        aadpodidbinding: {{ template "azure-identity-binding-name" . }}
     spec:
       containers:
         - name:  odis-signer
