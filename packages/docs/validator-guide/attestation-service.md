@@ -76,7 +76,10 @@ Under [Settings](https://dashboard.nexmo.com/settings), copy the API key into th
 
 If you wish to partition the numbers used within this account, you may choose to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number. Copy each application's `Application Id` value into the appropriate instance's `NEXMO_APPLICATION` configuration value. There is no need to generate or use a public/private keypair. By default an Attestation Service will pick a number from the global pool of numbers not linked to a specific Nexmo application. The only effect of supplying `NEXMO_APPLICATION` is to select numbers from those linked to that application.
 
-Note that Attestation Service from version 1.2.0 no longer requires callback URLs to be supplied in the Nexmo dashboard, so supports using a single account for multiple Attestation Services.
+Note that Attestation Service from version 1.2.0 no longer requires callback URLs to be supplied in the Nexmo dashboard. This means one can support multiple Attestation Services using a single account. However to receive the read receipts from Nexmo, it is important to update the default HTTP method in the Nexmo dashboard to `POST-JSON` (see image below) and ensure routing rule allow POST requests to the /delivery_status_nexmo endpoint.
+
+![](https://storage.googleapis.com/celo-website/nexmo-post-json-default-1.png)
+
 
 ### MessageBird
 
