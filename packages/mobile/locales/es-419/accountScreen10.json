@@ -9,6 +9,7 @@
   "legal": "Legal",
   "securityAndData": "Seguridad y datos",
   "requirePinOnAppOpen": "Requerir PIN cuando la app esté abierta",
+  "changePin": "Cambiar PIN",
   "analytics": "Estadisticas de uso",
   "shareAnalytics": "Compartir estadísticas de uso",
   "shareAnalytics_detail": "Recopilamos datos anónimos sobre cómo utilizas {{appName}} para mejorar la aplicación para todos.",
