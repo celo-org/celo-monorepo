@@ -106,7 +106,7 @@ apply from: "../../../../node_modules/react-native/react.gradle"
  */
 def isDetoxTestBuild = Boolean.valueOf(project.properties['isDetoxBuild'] ?: 'false')
 
-if (!isDetoxBuild) {
+if (!isDetoxTestBuild) {
   apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 }
 
