@@ -186,7 +186,7 @@ export const reducer = createReducer(initialState, (builder) => {
         currentState: idle(),
       }
     })
-    .addCase(stop, (state, action) => {
+    .addCase(stop, (state) => {
       return { ...state, currentState: idle() }
     })
     .addCase(start, (state, action) => {
@@ -196,19 +196,19 @@ export const reducer = createReducer(initialState, (builder) => {
         currentState: preparing(),
       }
     })
-    .addCase(ensureRealHumanUser, (state, action) => {
+    .addCase(ensureRealHumanUser, (state) => {
       return {
         ...state,
         currentState: ensuringRealHumanUser(),
       }
     })
-    .addCase(startKomenciSession, (state, action) => {
+    .addCase(startKomenciSession, (state) => {
       return {
         ...state,
         currentState: startingKomenciSession(),
       }
     })
-    .addCase(fetchPhoneNumberDetails, (state, action) => {
+    .addCase(fetchPhoneNumberDetails, (state) => {
       return {
         ...state,
         currentState: fetchingPhoneNumberDetails(),
@@ -227,13 +227,13 @@ export const reducer = createReducer(initialState, (builder) => {
         phoneHash: action.payload,
       }
     })
-    .addCase(fetchMtw, (state, action) => {
+    .addCase(fetchMtw, (state) => {
       return {
         ...state,
         currentState: fetchingMtw(),
       }
     })
-    .addCase(fetchOnChainData, (state, action) => {
+    .addCase(fetchOnChainData, (state) => {
       return {
         ...state,
         currentState: fetchingOnChainData(),

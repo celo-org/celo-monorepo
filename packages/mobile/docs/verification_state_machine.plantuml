@@ -1,0 +1,59 @@
+@startuml
+[*] --> Idle
+Idle --> Preparing : User presses Start/Resume button
+note right of Idle
+Even before this step we
+check Komenci availability
+end note
+
+
+Preparing: if Komenci is availabe, check
+Preparing: is there an active session.
+Preparing: Otherwise check sufficient
+Preparing: balance for classic flow.
+
+state a <<choice>>
+state b <<choice>>
+Preparing -left-> a 
+a -left-> Error: !sufficientBalance
+a --> b
+b --> EnsuringRealHumanUser
+note on link
+komenciAvailable
+AND
+!activeKomenciSession
+end note
+b --> FetchingPhoneNumberDetails 
+note on link
+!komenciAvailable
+OR
+activeKomenciSession
+end note
+
+EnsuringRealHumanUser: showing user captcha
+EnsuringRealHumanUser --> StartingKomenciSession
+note on link: captcha was solved
+
+StartingKomenciSession --> FetchingPhoneNumberDetails
+
+FetchingPhoneNumberDetails: fetching ODIS pepper and set phone number hash
+FetchingPhoneNumberDetails --> FetchingMtw
+note on link: activeKomenciSession
+FetchingOnChainData: fetching verification status and
+FetchingOnChainData: actionable attestations from chain
+FetchingMtw --> FetchingOnChainData
+FetchingMtw: fetching existing or deploing new MTW wallet
+FetchingPhoneNumberDetails --> FetchingOnChainData
+
+state doVerificationFlowSaga {
+  [*] --> RequestingAttestations
+  RequestingAttestations --> RevealingAttestations
+  RevealingAttestations --> CompletingAttestations
+}
+doVerificationFlowSaga: this part has not been implemented yet
+
+FetchingOnChainData --> doVerificationFlowSaga
+CompletingAttestations --> Success
+Success --> [*]
+Error --> [*]
+@enduml
