@@ -165,18 +165,18 @@ async function setODISSIgnerKeyVaultPolicyIfNotSet(
   keyVaultConfig: ODISSignerKeyVaultConfig,
   azureIdentity: any
 ) {
-  const keyPermissions = ['get', 'list', 'sign']
+  const secretPermissions = ['get']
   const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-    `az keyvault show --name ${keyVaultConfig.vaultName} -g ${clusterConfig.resourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
+    `az keyvault show --name ${keyVaultConfig.vaultName} -g ${clusterConfig.resourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.secrets) == [${secretPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
   )
   const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
   if (keyVaultPolicies.length) {
-    console.info(`Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${keyVaultConfig.vaultName} and identity objectId ${azureIdentity.principalId}`)
+    console.info(`Skipping setting secret permissions, ${secretPermissions.join(' ')} already set for vault ${keyVaultConfig.vaultName} and identity objectId ${azureIdentity.principalId}`)
     return
   }
-  console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${keyVaultConfig.vaultName} and identity objectId ${azureIdentity.principalId}`)
+  console.info(`Setting secret permissions ${secretPermissions.join(' ')} for vault ${keyVaultConfig.vaultName} and identity objectId ${azureIdentity.principalId}`)
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultConfig.vaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault set-policy --name ${keyVaultConfig.vaultName} --secret-permissions ${secretPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 

@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
 {{- include "odis-signer-component-label" . | nindent 8 }}
+        aadpodidbinding: {{ template "azure-identity-binding-name" }}
     spec:
       containers:
         - name:  odis-signer
@@ -24,31 +25,32 @@ spec:
             - name: http
               containerPort: 80
               containerPort: 443
+          command:
+            - bash
+            - "-c"
+            - |
+              sleep 60; yarn start:docker
           env:
-          - name: SERVER_PORT
-            value: 80
-          - name: DB_TYPE
-            value: postgres
-          - name: DB_DATABASE
-            value: phoneNumberPrivacy
-          - name: KEYSTORE_TYPE
-            value: AzureKeyVault
-          - name: LOG_LEVEL
-            value: trace
-          - name: LOG_FORMAT
-            value: stackdriver
-          - name: REPLICA_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-{{ include "common.env-var" (dict "name" "BLOCKCHAIN_PROVIDER" "dict" .Values "value_name" "blockchainProvider") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.db "value_name" "host") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.db "value_name" "port") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.db "value_name" "username") | indent 10 }}
-{{ include "common.env-var" (dict "name" "KEYSTORE_AZURE_VAULT_NAME" "dict" .Values.keystore "value_name" "vaultName") | indent 10 }}
-{{ include "common.env-var" (dict "name" "KEYSTORE_AZURE_SECRET_NAME" "dict" .Values.keystore "value_name" "secretName") | indent 10 }}
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: db-password
-                key: db-password
+            - name: SERVER_PORT
+              value: "80"
+            - name: DB_TYPE
+              value: "postgres"
+            - name: DB_DATABASE
+              value: "phoneNumberPrivacy"
+            - name: KEYSTORE_TYPE
+              value: "AzureKeyVault"
+            - name: LOG_LEVEL
+              value: "trace"
+            - name: LOG_FORMAT
+              value: "stackdriver"
+{{ include "common.env-var" (dict "name" "BLOCKCHAIN_PROVIDER" "dict" .Values "value_name" "blockchainProvider") | indent 12 }}
+{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.db "value_name" "host") | indent 12 }}
+{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.db "value_name" "port") | indent 12 }}
+{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.db "value_name" "username") | indent 12 }}
+{{ include "common.env-var" (dict "name" "KEYSTORE_AZURE_VAULT_NAME" "dict" .Values.keystore "value_name" "vaultName") | indent 12 }}
+{{ include "common.env-var" (dict "name" "KEYSTORE_AZURE_SECRET_NAME" "dict" .Values.keystore "value_name" "secretName") | indent 12 }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: db-password
