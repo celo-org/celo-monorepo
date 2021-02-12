@@ -392,6 +392,7 @@ jobs:
 
   general-test:
     <<: *defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
