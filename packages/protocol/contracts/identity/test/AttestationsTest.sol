@@ -7,7 +7,7 @@ import "../Attestations.sol";
  * but mocks the implementations of the validator set getters. Otherwise we
  * couldn't test `request` with the current ganache local testnet.
  */
-contract AttestationsTest is Attestations {
+contract AttestationsTest is Attestations(true) {
   address[] private __testValidators;
 
   function __setValidators(address[] memory validators) public {
