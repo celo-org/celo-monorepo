@@ -2,7 +2,6 @@ import { ContractKit } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
 import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { flags } from '@oclif/command'
-import Web3 from 'web3'
 import { BaseCommand } from '../../base'
 
 export default class GetAttestations extends BaseCommand {
@@ -46,17 +45,14 @@ export default class GetAttestations extends BaseCommand {
     let identifier = res.flags.identifier
     let pepper = res.flags.pepper
     if (!account && !pepper && !identifier) {
-      console.error('Must specify either --from or --pepper or --identifier')
-      return
+      throw Error('Must specify either --from or --pepper or --identifier')
     }
     const network = res.flags.network
-
-    const web3 = new Web3()
     const attestations = await this.kit.contracts.getAttestations()
 
     if (!identifier) {
       if (!phoneNumber) {
-        console.error('Must specify phoneNumber if identifier not provided')
+        throw Error('Must specify phoneNumber if identifier not provided')
       }
       // Get Phone number pepper
       // Needs a balance to perform query
@@ -65,7 +61,7 @@ export default class GetAttestations extends BaseCommand {
         console.log('Pepper: ' + pepper)
       }
 
-      const computedIdentifier = web3.utils.soliditySha3({
+      const computedIdentifier = this.kit.connection.web3.utils.soliditySha3({
         type: 'string',
         value: 'tel://' + phoneNumber + '__' + pepper,
       })
