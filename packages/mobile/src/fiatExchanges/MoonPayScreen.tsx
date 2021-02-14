@@ -11,7 +11,7 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
@@ -22,20 +22,15 @@ const currencyToCode = {
   [CURRENCY_ENUM.DOLLAR]: 'cusd',
 }
 
-export const moonPayOptions = () => {
-  const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
-  return {
-    ...emptyHeader,
-    headerLeft: () => (
-      <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
-    ),
-  }
-}
+export const moonPayOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <TopBarTextButton title={i18n.t('global:done')} onPress={navigateBack} />,
+})
 
-type RouteProps = StackScreenProps<StackParamList, Screens.MoonPay>
+type RouteProps = StackScreenProps<StackParamList, Screens.MoonPayScreen>
 type Props = RouteProps
 
-function FiatExchangeWeb({ route }: Props) {
+function MoonPayScreen({ route }: Props) {
   const [uri, setUri] = React.useState('')
   const { localAmount, currencyCode, currencyToBuy } = route.params
   const account = useSelector(currentAccountSelector)
@@ -83,4 +78,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default FiatExchangeWeb
+export default MoonPayScreen

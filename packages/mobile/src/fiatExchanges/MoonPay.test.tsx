@@ -3,13 +3,13 @@ import * as React from 'react'
 import 'react-native'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import MoonPay from 'src/fiatExchanges/MoonPay'
+import MoonPayScreen from 'src/fiatExchanges/MoonPayScreen'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const mockScreenProps = () =>
-  getMockStackScreenProps(Screens.MoonPay, {
+  getMockStackScreenProps(Screens.MoonPayScreen, {
     localAmount: 1,
     currencyCode: LocalCurrencyCode.USD,
     currencyToBuy: CURRENCY_ENUM.GOLD,
@@ -20,7 +20,7 @@ describe('MoonPay', () => {
   it('renders correctly', () => {
     const { toJSON } = render(
       <Provider store={store}>
-        <MoonPay {...mockScreenProps()} />
+        <MoonPayScreen {...mockScreenProps()} />
       </Provider>
     )
     expect(toJSON()).toMatchSnapshot()

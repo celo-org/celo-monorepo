@@ -25,6 +25,7 @@
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "dotenv": "^8.2.0",
+    "compare-versions": "^3.5.1",
     "ecurve": "^1.0.6",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.14",
