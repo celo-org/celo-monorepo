@@ -307,6 +307,7 @@ export async function installAndEnableMetricsDeps(
   }
 }
 
+// Currently only used for AWS. TODO do for AKS
 export async function installFluentdStackdriver(
   clusterConfig: AwsClusterConfig
 ) {
