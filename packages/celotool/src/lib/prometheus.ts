@@ -11,7 +11,8 @@ import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import {
   createServiceAccountWithRole,
   getServiceAccountEmail,
-  getGcloudServiceAccountWithRoleKeyBase64
+  getGcloudServiceAccountWithRoleKeyBase64,
+  validServiceAccountName
 } from './service-account-utils'
 import { outputIncludes } from './utils'
 const yaml = require('js-yaml')
@@ -174,7 +175,7 @@ export function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
 function getServiceAccountName(clusterName: string, cloudProvider: string) {
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
-  return `prometheus-${cloudProvider}-${clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+  return validServiceAccountName(`prometheus-${cloudProvider}-${clusterName}`)
 }
 
 export async function installGrafanaIfNotExists() {

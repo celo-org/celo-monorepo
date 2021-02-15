@@ -2,6 +2,7 @@ import { range } from 'lodash'
 import { createNamespaceIfNotExists } from '../cluster'
 import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
 import { generatePrivateKeyWithDerivations, privateKeyToPublicKey } from '../generate_utils'
+import { grantIamRoleForBucketOrObjectIdempotent, revokeIamRoleForBucketOrObjectIdempotent } from '../gsutil-utils'
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
@@ -9,8 +10,10 @@ import {
   upgradeGenericHelmChart
 } from '../helm_deploy'
 import { scaleResource } from '../kubernetes'
+import { createServiceAccountIfNotExists, getServiceAccountEmail, getServiceAccountEmailWithRetry, getServiceAccountKeyBase64, validServiceAccountName, deleteServiceAccountIfExists } from '../service-account-utils'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
+const chainDataObjectReaderRole = 'roles/storage.legacyObjectReader'
 
 export interface NodeKeyGenerationInfo {
   mnemonic: string
@@ -30,10 +33,13 @@ export interface BaseFullNodeDeploymentConfig {
 export abstract class BaseFullNodeDeployer {
   protected _deploymentConfig: BaseFullNodeDeploymentConfig
   private _celoEnv: string
+  protected _context: string
+  protected useChainDataServiceAccountCredentials: boolean = false;
 
-  constructor(deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) {
+  constructor(deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string, context: string) {
     this._deploymentConfig = deploymentConfig
     this._celoEnv = celoEnv
+    this._context = context
   }
 
   // If the node key is generated, then a promise containing the enodes is returned.
@@ -78,6 +84,20 @@ export abstract class BaseFullNodeDeployer {
     await removeGenericHelmChart(this.releaseName, this.kubeNamespace)
     await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
     await this.deallocateAllIPs()
+    if (this.useChainDataServiceAccountCredentials) {
+      const serviceAccountEmail = await getServiceAccountEmail(this.chainDataServiceAccountName)
+      // If the service account doesn't exist, there's nothing to do
+      if (!serviceAccountEmail) {
+        return
+      }
+      const member = `serviceAccount:${serviceAccountEmail}`
+      await revokeIamRoleForBucketOrObjectIdempotent(
+        this.chainDataGcsObjectPath,
+        member,
+        chainDataObjectReaderRole
+      )
+      await deleteServiceAccountIfExists(serviceAccountEmail)
+    }
   }
 
   async helmParameters() {
@@ -96,6 +116,8 @@ export abstract class BaseFullNodeDeployer {
       gethFlags = '--alfajores'
     }
 
+    const useGstorageData = fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false").toLowerCase() === 'true'
+
     const rpcApis = 'eth,net,rpc,web3'
     return [
       `--set namespace=${this.kubeNamespace}`,
@@ -109,11 +131,31 @@ export abstract class BaseFullNodeDeployer {
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
       `--set geth.flags=${gethFlags}`,
-      `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
-      `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
+      `--set geth.use_gstorage_data=${useGstorageData}`,
+      `--set geth.gstorage_data_bucket=${fetchEnvOrFallback(envVar.GSTORAGE_DATA_BUCKET, "")}`,
+      `--set chainDataServiceAccountKeyBase64=${useGstorageData ? await this.chainDataServiceAccountCredentialsBase64() : ''}`,
       ...(await this.additionalHelmParameters()),
       (nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '')
     ]
+  }
+
+  async chainDataServiceAccountCredentialsBase64() {
+    if (!this.useChainDataServiceAccountCredentials) {
+      return ''
+    }
+    await createServiceAccountIfNotExists(
+      this.chainDataServiceAccountName
+    )
+    // Retry here because sometimes it takes some time after service
+    // account creation to get the email
+    const serviceAccountEmail = await getServiceAccountEmailWithRetry(this.chainDataServiceAccountName)
+    const member = `serviceAccount:${serviceAccountEmail}`
+    await grantIamRoleForBucketOrObjectIdempotent(
+      this.chainDataGcsObjectPath,
+      member,
+      chainDataObjectReaderRole
+    )
+    return getServiceAccountKeyBase64(serviceAccountEmail)
   }
 
   async getEnodes() {
@@ -157,7 +199,21 @@ export abstract class BaseFullNodeDeployer {
     return `${this.celoEnv}-fullnodes`
   }
 
+  get chainDataServiceAccountName() {
+    return validServiceAccountName(
+      `${this.celoEnv}-${this.context}-chaindata-reader`
+    )
+  }
+
+  get chainDataGcsObjectPath() {
+    return `gs://celo-chain-backup/${this.celoEnv}/chaindata-latest.tar.gz`
+  }
+
   get celoEnv(): string {
     return this._celoEnv
+  }
+
+  get context(): string {
+    return this._context
   }
 }

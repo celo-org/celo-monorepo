@@ -479,6 +479,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
        echo Using pre-existing chaindata
        exit 0
      fi
+     if [ -s /chaindata-sa-creds/chaindata-sa-creds-key.json ]; then
+      echo "Using service account..."
+      gcloud auth activate-service-account --key-file /chaindata-sa-creds/chaindata-sa-creds-key.json
+     fi
      mkdir -p /root/.celo/celo
      gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
      tar -xzvf chaindata.tar.gz -C /root/.celo/celo
@@ -486,4 +490,6 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+  - name: chaindata-sa-creds
+    mountPath: /chaindata-sa-creds/
 {{- end -}}

@@ -18,6 +18,7 @@ enum Protocols {
  * services.
  */
 export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
+  useChainDataServiceAccountCredentials = true;
   /**
    * Gets AWS-specific helm parameters.
    */
