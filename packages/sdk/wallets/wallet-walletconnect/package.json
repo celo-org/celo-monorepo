@@ -24,12 +24,13 @@
     "@celo/utils": "1.0.3-dev",
     "@celo/wallet-base": "1.0.3-dev",
     "@celo/wallet-remote": "1.0.3-dev",
+    "@walletconnect/client": "^2",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "@celo/dev-utils": "0.0.1-dev",
-    "@celo/contractkit": "1.0.3-dev"
+    "@celo/contractkit": "1.0.3-dev",
+    "@celo/dev-utils": "0.0.1-dev"
   },
   "engines": {
     "node": ">=8.13.0"

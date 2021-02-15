@@ -1,2 +1,2 @@
-export * from './rpc-signer'
-export * from './rpc-wallet'
+export * from './wc-signer'
+export * from './wc-wallet'
