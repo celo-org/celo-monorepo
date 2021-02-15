@@ -119,7 +119,7 @@ const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 // Gas refund for resetting to the original non-zero value
 const sstoreCleanRefundEIP2200 = 4200
 // Transfer cost of a stable token transfer, accounting for the refund above.
-const stableTokenTransferGasCost = 23631
+const stableTokenTransferGasCost = 23653
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
