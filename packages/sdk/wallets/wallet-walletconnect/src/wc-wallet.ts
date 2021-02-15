@@ -25,8 +25,6 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
 
   onSessionProposal = (proposal: SessionTypes.Proposal) => {
     console.log('onSessionProposal', proposal)
-    // client.approve({ proposal, response })
-    // wc?.reject({ proposal: pendingSession! })
   }
   onSessionCreated = (session: SessionTypes.Created) => {
     console.log('onSessionCreated', session)
@@ -80,7 +78,6 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
           },
         },
       })
-      console.log(session)
 
       session.state.accounts.forEach((accountWithChain) => {
         const [account] = accountWithChain.split('@')
@@ -91,16 +88,4 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
       resolve(addressToSigner)
     })
   }
-
-  /**
-   * Gets the signer based on the 'from' field in the tx body
-   * @param txParams Transaction to sign
-   * @dev overrides WalletBase.signTransaction
-   */
-  // async signTransaction(txParams: CeloTx) {
-  //   // Get the signer from the 'from' field
-  //   const fromAddress = txParams.from!.toString()
-  //   const signer = this.getSigner(fromAddress)
-  //   return signer.signRawTransaction(txParams)
-  // }
 }

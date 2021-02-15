@@ -8,22 +8,6 @@ kit.addAccount(privateKey)
 const wallet = kit.getWallet()!
 const [account] = wallet.getAccounts()
 
-console.log('>>>', account)
-
-// function parsePersonalSign(req: SessionTypes.Payload): { from: string; payload: string } {
-//   // @ts-ignore
-//   const [payload, from] = req.payload.params
-//   return { from, payload }
-// }
-// function parseSignTypedData(req: any): { from: string; payload: EIP712TypedData } {
-//   const [from, payload] = req.payload.params
-//   return { from, payload: JSON.parse(payload) }
-// }
-
-// function hexToUtf8(hex: string) {
-//   return Buffer.from(hex.replace('0x', ''), 'hex').toString()
-// }
-
 enum Methods {
   accounts = 'eth_accounts',
   sendTransaction = 'eth_sendTransaction',
@@ -88,7 +72,6 @@ export async function initialiseTestWallet(uri: string) {
     if (method === Methods.personalSign) {
       const { payload, from } = parsePersonalSign(event)
       const signature = await wallet.signPersonalMessage(from, payload)
-      console.log('>>> signature', signature)
       client.respond({
         topic,
         response: {
@@ -99,41 +82,6 @@ export async function initialiseTestWallet(uri: string) {
       })
       return
     }
-    // if (method === Actions.signTypedData) {
-    //   const { from, payload } = parseSignTypedData(pendingRequest)
-    //   console.log('trying to sign', payload)
-    //   const signature = await wallet.signTypedData(from, payload)
-    //   wc?.respond({
-    //     // @ts-ignore
-    //     topic: pendingRequest.topic,
-    //     response: {
-    //       id: pendingRequest.payload.id,
-    //       jsonrpc: '2.0',
-    //       result: signature,
-    //     },
-    //   })
-    //   setPendingRequest(null)
-    //   return
-    // }
-    // if (method === 'eth_sendTransaction') {
-    //   // @ts-ignore
-    //   const [tx] = pendingRequest.payload.params
-    //   const kit = await getContractKitAsync(false)
-    //   const sent = await kit.sendTransaction(tx)
-    //   const hash = await sent.getHash()
-    //   console.log('hash', hash)
-    //   wc?.respond({
-    //     // @ts-ignore
-    //     topic: pendingRequest.topic,
-    //     response: {
-    //       id: pendingRequest.payload.id,
-    //       jsonrpc: '2.0',
-    //       result: hash,
-    //     },
-    //   })
-    //   setPendingRequest(null)
-    //   return
-    // }
   }
 
   const client = await WalletConnect.init({
