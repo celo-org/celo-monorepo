@@ -19,14 +19,21 @@ const createStore = (numberVerified: boolean) =>
 jest.mock('src/consumerIncentives/contentFetcher', () => ({
   fetchConsumerRewardsContent: jest.fn(() =>
     Promise.resolve({
-      en: {
-        title: 'Title',
-        description: 'Description',
-        subtitle1: 'Subtitle 1',
-        body1: 'Body 1',
-        subtitle2: 'Subtitle 2',
-        body2: 'Body 2',
+      content: {
+        en: {
+          title: 'Title',
+          description: 'Description',
+          subtitle1: 'Subtitle 1',
+          body1: 'Body 1',
+          subtitle2: 'Subtitle 2',
+          body2: 'Body 2',
+        },
       },
+      tiers: [
+        { minBalanceCusd: 20, celoReward: 1 },
+        { minBalanceCusd: 100, celoReward: 5 },
+        { minBalanceCusd: 500, celoReward: 10 },
+      ],
     })
   ),
 }))

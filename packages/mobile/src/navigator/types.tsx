@@ -102,7 +102,12 @@ export type StackParamList = {
     isCashIn?: boolean
     amount?: BigNumber
   }
-  [Screens.MoonPay]: {
+  [Screens.MoonPayScreen]: {
+    localAmount: number
+    currencyCode: LocalCurrencyCode
+    currencyToBuy: CURRENCY_ENUM
+  }
+  [Screens.RampScreen]: {
     localAmount: number
     currencyCode: LocalCurrencyCode
     currencyToBuy: CURRENCY_ENUM
@@ -121,12 +126,7 @@ export type StackParamList = {
         onPressSkip?: () => void
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.NameAndNumber]:
-    | {
-        selectedCountryCodeAlpha2: string
-        country: string
-      }
-    | undefined
+  [Screens.NameAndPicture]: undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList
@@ -165,6 +165,7 @@ export type StackParamList = {
   [Screens.Profile]: undefined
   [Screens.ProviderOptionsScreen]: {
     isCashIn?: boolean
+    currency: CURRENCY_ENUM
   }
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
@@ -218,7 +219,7 @@ export type StackParamList = {
     origin: SendOrigin
   }
   [Screens.VerificationEducationScreen]:
-    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
+    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean; selectedCountryCodeAlpha2?: string }
     | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }

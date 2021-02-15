@@ -44,8 +44,9 @@ import FiatExchangeOptions, {
 import LocalProviderCashOut, {
   localProviderCashOutOptions,
 } from 'src/fiatExchanges/LocalProviderCashOut'
-import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
+import MoonPayScreen, { moonPayOptions } from 'src/fiatExchanges/MoonPayScreen'
 import ProviderOptionsScreen from 'src/fiatExchanges/ProviderOptionsScreen'
+import RampScreen, { rampOptions } from 'src/fiatExchanges/RampScreen'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -71,7 +72,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
-import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
+import NameAndPicture from 'src/onboarding/registration/NameAndPicture'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
@@ -215,8 +216,8 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={Welcome.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.NameAndNumber}
-      component={NameAndNumber}
+      name={Screens.NameAndPicture}
+      component={NameAndPicture}
       options={{
         ...nuxNavigationOptions,
         headerTitle: () => (
@@ -417,7 +418,11 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
+    <Navigator.Screen
+      options={Profile.navigationOptions}
+      name={Screens.Profile}
+      component={Profile}
+    />
     <Navigator.Screen
       name={Screens.Language}
       component={Language}
@@ -454,7 +459,12 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.LocalProviderCashOut}
       component={LocalProviderCashOut}
     />
-    <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
+    <Navigator.Screen
+      options={moonPayOptions}
+      name={Screens.MoonPayScreen}
+      component={MoonPayScreen}
+    />
+    <Navigator.Screen options={rampOptions} name={Screens.RampScreen} component={RampScreen} />
     <Navigator.Screen
       options={ProviderOptionsScreen.navigationOptions}
       name={Screens.ProviderOptionsScreen}
@@ -499,7 +509,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     choseToRestoreAccount: state.account.choseToRestoreAccount,
     language: currentLanguageSelector(state),
-    e164Number: state.account.e164PhoneNumber,
+    name: state.account.name,
     acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
@@ -518,7 +528,7 @@ export function MainStackScreen() {
     const {
       choseToRestoreAccount,
       language,
-      e164Number,
+      name,
       acceptedTerms,
       pincodeType,
       redeemComplete,
@@ -529,7 +539,7 @@ export function MainStackScreen() {
 
     if (!language) {
       initialRoute = Screens.Language
-    } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
+    } else if (!name || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
     } else if (!redeemComplete) {

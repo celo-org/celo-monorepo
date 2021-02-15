@@ -374,6 +374,7 @@ jobs:
 
   lint-checks:
     <<: *defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -391,6 +392,7 @@ jobs:
 
   general-test:
     <<: *defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app

@@ -1,5 +1,6 @@
 import { PincodeType } from 'src/account/reducer'
 import { AppState } from 'src/app/actions'
+import { DEFAULT_DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { RootState } from 'src/redux/reducers'
 
@@ -475,6 +476,8 @@ export const v7Schema = {
   account: {
     ...v6Schema.account,
     backupRequiredTime: null,
+    pictureUri: null,
+    dailyLimitCusd: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
   },
   home: {
     loading: false,
