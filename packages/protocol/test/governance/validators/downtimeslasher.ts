@@ -100,7 +100,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new(isTest)
     validators = await MockValidators.new()
-    slasher = await DowntimeSlasher.new(isTest)
+    slasher = await DowntimeSlasher.new()
     epochSize = (await slasher.getEpochSize()).toNumber()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
