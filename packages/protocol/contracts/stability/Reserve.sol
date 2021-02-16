@@ -316,9 +316,12 @@ contract Reserve is
    * @notice Checks if an address is able to spend as an exchange.
    * @param spender The address to be checked.
    */
-  function isAllowedToSpendExchange(address spender) public view returns (bool) {
-    return
-      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender);
+  modifier isAllowedToSpendExchange(address spender) {
+    require(
+      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender),
+      "Address not allowed to spend"
+    );
+    _;
   }
 
   /**
@@ -396,8 +399,11 @@ contract Reserve is
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
-    require(isAllowedToSpendExchange(msg.sender), "Address not allowed to spend");
+  function transferExchangeGold(address payable to, uint256 value)
+    external
+    isAllowedToSpendExchange(msg.sender)
+    returns (bool)
+  {
     return _transferGold(to, value);
   }
 
