@@ -770,6 +770,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...gethMetricsOverrides,
     ...bootnodeOverwritePkey,
+    ...rollingUpdateHelmVariables(),
     ...(await helmIPParameters(celoEnv)),
   ]
 }
@@ -993,4 +994,14 @@ export async function checkHelmVersion() {
     console.error(`Error checking local helm version. Minimum Helm version required ${requiredMinHelmVersion}`)
     process.exit(1)
   }
+}
+
+function rollingUpdateHelmVariables() {
+  return [
+    `--set updateStrategy.validators.rollingUpdate.partition=${fetchEnvOrFallback(envVar.VALIDATORS_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.secondaries.rollingUpdate.partition=${fetchEnvOrFallback(envVar.SECONDARIES_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.proxy.rollingUpdate.partition=${fetchEnvOrFallback(envVar.PROXY_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.tx_nodes.rollingUpdate.partition=${fetchEnvOrFallback(envVar.TX_NODES_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.tx_nodes_private.rollingUpdate.partition=${fetchEnvOrFallback(envVar.TX_NODES_PRIVATE_ROLLING_UPDATE_PARTITION, "0")}`,
+  ]
 }
