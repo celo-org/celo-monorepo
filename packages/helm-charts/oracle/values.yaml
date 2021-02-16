@@ -51,7 +51,6 @@ oracle:
       # dataFetchFrequency
       # minimumTrades
       # scalingRate
-  currencyPair: CELOUSD
   metrics:
     enabled: true
     prometheusPort: 9090

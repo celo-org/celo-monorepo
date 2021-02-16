@@ -109,8 +109,8 @@ export function getDynamicEnvVarValues<T, P extends object>(
   dynamicProps: P,
   defaultValues?: { [k in keyof T]: string }
 ): {
-  [k in keyof T]: string
-} {
+    [k in keyof T]: string
+  } {
   return Object.keys(dynamicEnvVars).reduce(
     (values: any, k: string) => {
       const key = k as keyof T
@@ -122,7 +122,7 @@ export function getDynamicEnvVarValues<T, P extends object>(
         [key]: value,
       }
     },
-  {})
+    {})
 }
 
 /**
@@ -140,9 +140,9 @@ export function getContextDynamicEnvVarValues<T>(
   context: string,
   defaultValues?: { [k in keyof T]: string }
 ): {
-  [k in keyof T]: string
-} {
-  return getDynamicEnvVarValues(dynamicEnvVars, {context}, defaultValues)
+    [k in keyof T]: string
+  } {
+  return getDynamicEnvVarValues(dynamicEnvVars, { context }, defaultValues)
 }
 
 /**

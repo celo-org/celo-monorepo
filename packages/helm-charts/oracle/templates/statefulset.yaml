@@ -122,6 +122,7 @@ spec:
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.oracle.azureHsm "value_name" "initTryCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
+{{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
 {{ include "common.env-var" (dict "name" "DATA_FETCH_FREQUENCY" "dict" .Values.oracle.aggregation.trades "value_name" "dataFetchFrequency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
 {{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
@@ -142,8 +143,8 @@ spec:
 {{ include "common.env-var" (dict "name" "REPORT_FREQUENCY_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeFrequencyOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "reportOffsetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_STRATEGY" "dict" .Values.oracle "value_name" "reportStrategy") | indent 8 }}
+{{ include "common.env-var" (dict "name" "REPORT_TARGET_OVERRIDE" "dict" .Values.oracle "value_name" "reportTargetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "TARGET_MAX_HEARTBEAT_PERIOD_MS" "dict" .Values.oracle.reporter.blockBased "value_name" "targetMaxHeartbeatPeriodMs" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
 {{ include "common.env-var" (dict "name" "UNUSED_ORACLE_ADDRESSES" "dict" .Values.oracle "value_name" "unusedOracleAddresses") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.oracle "value_name" "walletType") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WS_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "ws") | indent 8 }}

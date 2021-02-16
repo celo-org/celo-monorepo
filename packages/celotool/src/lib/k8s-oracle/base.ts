@@ -35,7 +35,9 @@ export abstract class BaseOracleDeployer {
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(),
+      true,
+      `${this.currencyPair}.yaml`
     )
   }
 
@@ -44,7 +46,8 @@ export abstract class BaseOracleDeployer {
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(),
+      `${this.currencyPair}.yaml`
     )
   }
 
@@ -91,7 +94,7 @@ export abstract class BaseOracleDeployer {
   }
 
   get releaseName() {
-    return `${this.celoEnv}-oracle`
+    return `${this.celoEnv}-${this.currencyPair.toLocaleLowerCase()}-oracle`
   }
 
   get kubeNamespace() {
