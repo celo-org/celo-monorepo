@@ -72,7 +72,7 @@ describe('e2e tests', () => {
     // todo: this is not working
     setTimeout(() => {
       process.exit(0)
-    }, 1000)
+    }, 2000)
   })
 
   it('getAccounts()', async () => {
@@ -113,8 +113,8 @@ describe('e2e tests', () => {
       gas: '10',
       gasPrice: '99',
       feeCurrency: '0x',
-      gatewayFeeRecipient: '0x1234',
-      gatewayFee: '0x5678',
+      gatewayFeeRecipient: '0x',
+      gatewayFee: '0x',
       data: '0xabcdef',
     }
     const signedTx = await wallet.signTransaction(tx)
@@ -123,7 +123,7 @@ describe('e2e tests', () => {
     expect(eqAddress(recoveredSigner, testAddress)).toBe(true)
   })
 
-  it.only('decrypt()', async () => {
+  it('decrypt()', async () => {
     const message = 'Hello'
     const encrypted = ECIES.Encrypt(
       Buffer.from(trimLeading0x(privateKeyToPublicKey(testPrivateKey)), 'hex'),
