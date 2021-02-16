@@ -48,7 +48,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new(isTest)
     validators = await MockValidators.new()
-    slasher = await DoubleSigningSlasher.new()
+    slasher = await DoubleSigningSlasher.new(isTest)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
