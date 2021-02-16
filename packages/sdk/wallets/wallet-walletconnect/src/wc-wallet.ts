@@ -2,40 +2,56 @@ import { sleep } from '@celo/base'
 import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
-import { PairingTypes, SessionTypes } from '@walletconnect/types'
+import { ClientOptions, PairingTypes, SessionTypes } from '@walletconnect/types'
 import { SupportedMethods } from './types'
 import { WalletConnectSigner } from './wc-signer'
+
+/**
+ * Session establishment happens out of band so after somehow
+ * communicating the connection URI (often via QR code) we can
+ * continue with the setup process
+ */
+async function waitForTruthy(getValue: () => any, attempts: number = 10) {
+  let waitDuration = 500
+  for (let i = 0; i < attempts; i++) {
+    if (getValue()) {
+      return
+    }
+
+    await sleep(waitDuration)
+    waitDuration = waitDuration * 1.5
+  }
+
+  throw new Error('Unable to get paing session, did you lose internet connection?')
+}
 
 /*
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
  */
 export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
-  private metadata: any
+  private options: ClientOptions
+  private metadata: SessionTypes.Metadata
 
   private client?: WalletConnect
   private pairing?: PairingTypes.Proposal
   private session?: SessionTypes.Settled
 
-  constructor(metadata: any) {
+  constructor({ options, metadata }: { options?: ClientOptions; metadata: SessionTypes.Metadata }) {
     super()
 
+    this.options = { relayProvider: 'wss://staging.walletconnect.org', ...options }
     this.metadata = metadata
+
+    this.setupClient()
   }
 
   /**
-   *
+   * Get the URI needed for out of band session establishment
    */
-  getUri = async () => {
-    for (let i = 0; i < 5; i++) {
-      if (this.pairing?.signal?.params?.uri) {
-        return this.pairing.signal.params.uri
-      }
-
-      await sleep(1000)
-    }
-
-    throw new Error('Unable to get URI, did the session connect?')
+  public async getUri() {
+    await waitForTruthy(() => this.pairing)
+    return this.pairing!.signal.params.uri
   }
 
   onSessionProposal = (proposal: SessionTypes.Proposal) => {
@@ -52,7 +68,6 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   }
 
   onPairingProposal = (pairing: PairingTypes.Proposal) => {
-    console.log('onPairingProposal', pairing)
     this.pairing = pairing
   }
   onPairingCreated = (pairing: PairingTypes.Created) => {
@@ -65,45 +80,52 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     console.log('onPairingDeleted', pairing)
   }
 
-  async loadAccountSigners(): Promise<Map<string, WalletConnectSigner>> {
-    const addressToSigner = new Map<string, WalletConnectSigner>()
+  private async setupClient() {
+    this.client = await WalletConnect.init(this.options)
 
-    const client = await WalletConnect.init({
-      relayProvider: 'wss://staging.walletconnect.org',
-    })
-    this.client = client
+    this.client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
+    this.client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
+    this.client.on(CLIENT_EVENTS.session.updated, this.onSessionUpdated)
+    this.client.on(CLIENT_EVENTS.session.deleted, this.onSessionDeleted)
 
-    client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
-    client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
-    client.on(CLIENT_EVENTS.session.updated, this.onSessionUpdated)
-    client.on(CLIENT_EVENTS.session.deleted, this.onSessionDeleted)
+    this.client.on(CLIENT_EVENTS.pairing.proposal, this.onPairingProposal)
+    this.client.on(CLIENT_EVENTS.pairing.created, this.onPairingCreated)
+    this.client.on(CLIENT_EVENTS.pairing.updated, this.onPairingUpdated)
+    this.client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
 
-    client.on(CLIENT_EVENTS.pairing.proposal, this.onPairingProposal)
-    client.on(CLIENT_EVENTS.pairing.created, this.onPairingCreated)
-    client.on(CLIENT_EVENTS.pairing.updated, this.onPairingUpdated)
-    client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
-
-    return new Promise(async (resolve) => {
-      this.session = await client.connect({
+    // @ts-ignore no-dangling-promise
+    this.client
+      .connect({
         metadata: this.metadata,
         permissions: {
           blockchain: {
-            chains: ['celo:44787'],
+            // alfajores, mainnet, baklava
+            chains: ['celo:44787', 'celo:42220', 'celo:62320'],
           },
           jsonrpc: {
             methods: Object.values(SupportedMethods),
           },
         },
       })
+      .then((session) => (this.session = session))
+  }
 
-      this.session.state.accounts.forEach((accountWithChain) => {
-        const [account] = accountWithChain.split('@')
-        const signer = new WalletConnectSigner(client, this.session!, account)
-        addressToSigner.set(account, signer)
-      })
+  async loadAccountSigners(): Promise<Map<string, WalletConnectSigner>> {
+    /**
+     * Session establishment happens out of band so after somehow
+     * communicating the connection URI (often via QR code) we can
+     * continue with the setup process
+     */
+    await waitForTruthy(() => this.session)
 
-      resolve(addressToSigner)
+    const addressToSigner = new Map<string, WalletConnectSigner>()
+    this.session!.state.accounts.forEach((accountWithChain) => {
+      const [account] = accountWithChain.split('@')
+      const signer = new WalletConnectSigner(this.client!, this.session!, account)
+      addressToSigner.set(account, signer)
     })
+
+    return addressToSigner
   }
 
   /**

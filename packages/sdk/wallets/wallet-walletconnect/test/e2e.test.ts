@@ -51,98 +51,173 @@ const TYPED_DATA = {
     contents: 'Hello, Bob!',
   },
 }
+const testTx = {
+  from: testAddress,
+  to: privateKeyToAddress('1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'),
+  chainId: CHAIN_ID,
+  value: Web3.utils.toWei('1', 'ether'),
+  nonce: 0,
+  gas: '10',
+  gasPrice: '99',
+  feeCurrency: '0x',
+  gatewayFeeRecipient: '0x',
+  gatewayFee: '0x',
+  data: '0xabcdef',
+}
+const decryptMessage = 'Hello'
 
 describe('e2e tests', () => {
   const wallet = new WalletConnectWallet({
-    name: 'Example Dapp',
-    description: 'Example Dapp for WalletConnect',
-    url: 'https://example.org/',
-    icons: ['https://example.org/favicon.ico'],
+    metadata: {
+      name: 'Example Dapp',
+      description: 'Example Dapp for WalletConnect',
+      url: 'https://example.org/',
+      icons: ['https://example.org/favicon.ico'],
+    },
   })
   const testWallet = getTestWallet()
 
-  beforeAll(async () => {
-    wallet.getUri().then((uri) => testWallet.init(uri))
-    await wallet.init()
-  }, 5000)
+  beforeAll(async (done) => {
+    wallet.init().then(done)
+    const uri = await wallet.getUri()
+    await testWallet.init(uri)
+  }, 10000)
 
   afterAll(async () => {
     await testWallet.close()
     await wallet.close()
 
-    // todo: asked in WC discord why .disconnect()
-    // is not closing connections
+    // bug in server side WC V2.0
+    // where closing wallets doesn't exit
     setTimeout(() => {
-      process.exit(0)
+      process.exit()
     }, 2000)
   })
 
   it('getAccounts()', async () => {
     const accounts = await wallet.getAccounts()
-
     expect(accounts.length).toBe(1)
     expect(eqAddress(accounts[0], testAddress)).toBe(true)
   })
 
-  it('hasAccount()', async () => {
-    expect(wallet.hasAccount(testAddress)).toBeTruthy()
-  })
-
-  it('signPersonalMessage()', async () => {
-    const hexString = ensureLeading0x(Buffer.from('hello').toString('hex'))
-    const signedMessage = await wallet.signPersonalMessage(testAddress, hexString)
-
-    expect(signedMessage).not.toBeUndefined()
-    const valid = verifySignature(hexString, signedMessage, testAddress)
-    expect(valid).toBeTruthy()
-  })
-
-  it('signTypedData()', async () => {
-    const signedMessage = await wallet.signTypedData(testAddress, TYPED_DATA)
-
-    expect(signedMessage).not.toBeUndefined()
-    const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, testAddress)
-    expect(valid).toBeTruthy()
-  })
-
-  it('signTransaction()', async () => {
-    const tx = {
-      from: testAddress,
-      to: privateKeyToAddress('1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'),
-      chainId: CHAIN_ID,
-      value: Web3.utils.toWei('1', 'ether'),
-      nonce: 0,
-      gas: '10',
-      gasPrice: '99',
-      feeCurrency: '0x',
-      gatewayFeeRecipient: '0x',
-      gatewayFee: '0x',
-      data: '0xabcdef',
-    }
-    const signedTx = await wallet.signTransaction(tx)
-    const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-    console.log(recoveredSigner)
-    expect(eqAddress(recoveredSigner, testAddress)).toBe(true)
-  })
-
-  it('decrypt()', async () => {
-    const message = 'Hello'
-    const encrypted = ECIES.Encrypt(
-      Buffer.from(trimLeading0x(privateKeyToPublicKey(testPrivateKey)), 'hex'),
-      Buffer.from(message)
-    )
-
-    const decrypted = await wallet.decrypt(testAddress, encrypted)
-    expect(decrypted.toString()).toBe(message)
-  })
-
-  it('computeSharedSecret()', async () => {
-    const otherPubKey = privateKeyToPublicKey(
+  describe('operations with an unknown address', () => {
+    const unknownAddress = privateKeyToAddress(
       '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'
     )
-    const sharedSecret = await wallet.computeSharedSecret(testAddress, otherPubKey)
-    expect(sharedSecret).toEqual(computeECDHSecret(testPrivateKey, otherPubKey))
+
+    function assertInvalidAddress(e: Error) {
+      // dealing with checksum addresses
+      expect(e.message.toLowerCase()).toBe(`Could not find address ${unknownAddress}`.toLowerCase())
+    }
+
+    it('hasAccount()', async () => {
+      expect(wallet.hasAccount(unknownAddress)).toBeFalsy()
+    })
+
+    it('signPersonalMessage()', async () => {
+      const hexString = ensureLeading0x(Buffer.from('hello').toString('hex'))
+      try {
+        await wallet.signPersonalMessage(unknownAddress, hexString)
+        throw new Error('Expected exception to be thrown')
+      } catch (e) {
+        assertInvalidAddress(e)
+      }
+    })
+
+    it('signTypedData()', async () => {
+      try {
+        console.log(await wallet.signTypedData(unknownAddress, TYPED_DATA))
+        throw new Error('Expected exception to be thrown')
+      } catch (e) {
+        assertInvalidAddress(e)
+      }
+    })
+
+    it('signTransaction()', async () => {
+      try {
+        await wallet.signTransaction({
+          ...testTx,
+          from: unknownAddress,
+        })
+        throw new Error('Expected exception to be thrown')
+      } catch (e) {
+        assertInvalidAddress(e)
+      }
+    })
+
+    it('decrypt()', async () => {
+      const encrypted = ECIES.Encrypt(
+        Buffer.from(trimLeading0x(privateKeyToPublicKey(testPrivateKey)), 'hex'),
+        Buffer.from(decryptMessage)
+      )
+
+      try {
+        await wallet.decrypt(unknownAddress, encrypted)
+        throw new Error('Expected exception to be thrown')
+      } catch (e) {
+        assertInvalidAddress(e)
+      }
+    })
+
+    it('computeSharedSecret()', async () => {
+      const otherPubKey = privateKeyToPublicKey(
+        '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'
+      )
+      try {
+        await wallet.computeSharedSecret(unknownAddress, otherPubKey)
+        throw new Error('Expected exception to be thrown')
+      } catch (e) {
+        assertInvalidAddress(e)
+      }
+    })
   })
 
-  it.skip('sendTransaction', () => {})
+  describe('with a new address', () => {
+    it('hasAccount()', async () => {
+      expect(wallet.hasAccount(testAddress)).toBeTruthy()
+    })
+
+    it('signPersonalMessage()', async () => {
+      const hexString = ensureLeading0x(Buffer.from('hello').toString('hex'))
+      const signedMessage = await wallet.signPersonalMessage(testAddress, hexString)
+
+      expect(signedMessage).not.toBeUndefined()
+      const valid = verifySignature(hexString, signedMessage, testAddress)
+      expect(valid).toBeTruthy()
+    })
+
+    it('signTypedData()', async () => {
+      const signedMessage = await wallet.signTypedData(testAddress, TYPED_DATA)
+
+      expect(signedMessage).not.toBeUndefined()
+      const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, testAddress)
+      expect(valid).toBeTruthy()
+    })
+
+    it('signTransaction()', async () => {
+      const signedTx = await wallet.signTransaction(testTx)
+      const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+      expect(eqAddress(recoveredSigner, testAddress)).toBe(true)
+    })
+
+    it('decrypt()', async () => {
+      const encrypted = ECIES.Encrypt(
+        Buffer.from(trimLeading0x(privateKeyToPublicKey(testPrivateKey)), 'hex'),
+        Buffer.from(decryptMessage)
+      )
+
+      const decrypted = await wallet.decrypt(testAddress, encrypted)
+      expect(decrypted.toString()).toBe(decryptMessage)
+    })
+
+    it('computeSharedSecret()', async () => {
+      const otherPubKey = privateKeyToPublicKey(
+        '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'
+      )
+      const sharedSecret = await wallet.computeSharedSecret(testAddress, otherPubKey)
+      expect(sharedSecret).toEqual(computeECDHSecret(testPrivateKey, otherPubKey))
+    })
+
+    it.skip('sendTransaction', () => {})
+  })
 })
