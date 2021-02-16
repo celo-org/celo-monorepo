@@ -298,6 +298,7 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
     isSpender[spender] = true;
     emit SpenderAdded(spender);
   }
@@ -328,6 +329,7 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addExchangeSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
     require(!isExchangeSpender[spender], "Address is already Exchange Spender");
     isExchangeSpender[spender] = true;
     exchangeSpenderAddresses.push(spender);
