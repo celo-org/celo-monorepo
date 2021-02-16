@@ -119,10 +119,12 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     await waitForTruthy(() => this.session)
 
     const addressToSigner = new Map<string, WalletConnectSigner>()
-    this.session!.state.accounts.forEach((accountWithChain) => {
-      const [account] = accountWithChain.split('@')
-      const signer = new WalletConnectSigner(this.client!, this.session!, account)
-      addressToSigner.set(account, signer)
+    this.session!.state.accounts.forEach((fullyQualifiedAccount) => {
+      // 0x123@celo:1234 = <address>@<chain>:<network_id>
+      const [address, , networkId] = fullyQualifiedAccount.split(/[@:]/)
+
+      const signer = new WalletConnectSigner(this.client!, this.session!, address, networkId)
+      addressToSigner.set(address, signer)
     })
 
     return addressToSigner
