@@ -308,7 +308,7 @@ contract Reserve is
    * @param spender The address that is to be no longer allowed to spend Reserve funds.
    */
   function removeSpender(address spender) external onlyOwner {
-    delete isSpender[spender];
+    isSpender[spender] = false;
     emit SpenderRemoved(spender);
   }
 
