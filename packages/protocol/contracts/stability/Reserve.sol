@@ -311,6 +311,10 @@ contract Reserve is
     emit SpenderRemoved(spender);
   }
 
+  /**
+   * @notice Checks if an address is able to spend as an exchange.
+   * @param spender The address to be checked.
+   */
   modifier isAllowedToSpendExchange(address spender) {
     require(
       isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender),
