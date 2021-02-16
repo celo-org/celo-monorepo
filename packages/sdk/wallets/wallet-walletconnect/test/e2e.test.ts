@@ -67,9 +67,11 @@ describe('e2e tests', () => {
   }, 5000)
 
   afterAll(async () => {
-    testWallet.close()
-    wallet.close()
-    // todo: this is not working
+    await testWallet.close()
+    await wallet.close()
+
+    // todo: asked in WC discord why .disconnect()
+    // is not closing connections
     setTimeout(() => {
       process.exit(0)
     }, 2000)

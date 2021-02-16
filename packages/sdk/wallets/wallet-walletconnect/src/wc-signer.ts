@@ -8,8 +8,6 @@ import * as ethUtil from 'ethereumjs-util'
  * Implements the signer interface on top of the WalletConnect interface.
  */
 export class WalletConnectSigner implements Signer {
-  // private client?: WalletConnect
-
   /**
    * Construct a new instance of a WalletConnectSigner
    */

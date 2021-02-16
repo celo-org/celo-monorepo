@@ -15,6 +15,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
 
   private client?: WalletConnect
   private pairing?: PairingTypes.Proposal
+  private session?: SessionTypes.Settled
 
   constructor(metadata: any) {
     super()
@@ -83,7 +84,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
 
     return new Promise(async (resolve) => {
-      const session = await client.connect({
+      this.session = await client.connect({
         metadata: this.metadata,
         permissions: {
           blockchain: {
@@ -95,9 +96,9 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
         },
       })
 
-      session.state.accounts.forEach((accountWithChain) => {
+      this.session.state.accounts.forEach((accountWithChain) => {
         const [account] = accountWithChain.split('@')
-        const signer = new WalletConnectSigner(client, session, account)
+        const signer = new WalletConnectSigner(client, this.session!, account)
         addressToSigner.set(account, signer)
       })
 
@@ -117,9 +118,10 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   }
 
   close = () => {
-    if (!this.client || !this.pairing) {
+    if (!this.client || !this.session) {
       throw new Error('Wallet must be initialized before calling close()')
     }
-    this.client.disconnect({ topic: this.pairing.topic, reason: 'Pairing closed' })
+
+    return this.client.disconnect({ topic: this.session.topic, reason: 'Session closed' })
   }
 }

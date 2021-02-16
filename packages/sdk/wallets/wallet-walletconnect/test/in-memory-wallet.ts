@@ -40,11 +40,10 @@ function parseDecrypt(req: any): { from: string; payload: Buffer } {
 
 export function getTestWallet() {
   let client: WalletConnect
-  let pairingTopic: string
+  let sessionTopic: string
 
   function onSessionProposal(proposal: SessionTypes.Proposal) {
     console.log('WalletConnect proposal', proposal)
-    pairingTopic = proposal.topic
     const response: SessionTypes.Response = {
       metadata: {
         name: 'Wallet',
@@ -60,6 +59,7 @@ export function getTestWallet() {
   }
   function onSessionCreated(session: SessionTypes.Created) {
     console.log('onSessionCreated', session)
+    sessionTopic = session.topic
   }
   function onSessionUpdated(session: SessionTypes.Update) {
     console.log('onSessionUpdated', session)
@@ -139,7 +139,7 @@ export function getTestWallet() {
       await client.pair({ uri })
     },
     close() {
-      client.disconnect({ reason: 'End of session', topic: pairingTopic })
+      return client.disconnect({ reason: 'End of session', topic: sessionTopic })
     },
   }
 }
