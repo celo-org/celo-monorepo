@@ -1284,7 +1284,7 @@ contract Validators is
 
   /**
    * @notice Sets the downtimeGracePeriod property if called by owner.
-   * @param value New downtime gracec period for calculating epoch scores.
+   * @param value New downtime grace period for calculating epoch scores.
    */
   function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
     downtimeGracePeriod = value;
