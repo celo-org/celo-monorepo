@@ -1,5 +1,5 @@
-import { Signer } from '@celo/connect'
-import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
+import { CeloTx, EncodedTransaction, Signer } from '@celo/connect'
+import { EIP712TypedData } from '@celo/utils/src/sign-typed-data-utils'
 import WalletConnect from '@walletconnect/client'
 import { SessionTypes } from '@walletconnect/types'
 import * as ethUtil from 'ethereumjs-util'
@@ -23,12 +23,30 @@ export class WalletConnectSigner implements Signer {
     throw new Error('signTransaction unimplemented; use signRawTransaction')
   }
 
-  async signTypedData(_: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    return {
-      v: 0,
-      r: Buffer.from([]),
-      s: Buffer.from([]),
-    }
+  async signRawTransaction(tx: CeloTx): Promise<EncodedTransaction> {
+    const result = await this.client.request({
+      topic: this.session.topic,
+      chainId: '44787',
+      request: {
+        method: 'eth_signTransaction',
+        params: tx,
+      },
+    })
+    return result
+  }
+
+  async signTypedData(data: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const params = [this.account, JSON.stringify(data)]
+    const result = await this.client.request({
+      topic: this.session.topic,
+      chainId: '44787',
+      request: {
+        method: 'eth_signTypedData',
+        params,
+      },
+    })
+
+    return ethUtil.fromRpcSig(result) as { v: number; r: Buffer; s: Buffer }
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
@@ -47,11 +65,29 @@ export class WalletConnectSigner implements Signer {
 
   getNativeKey = () => this.account
 
-  async decrypt(_: Buffer) {
-    return Buffer.from([])
+  async decrypt(data: Buffer) {
+    const params = [this.account, data]
+    const result = await this.client.request({
+      topic: this.session.topic,
+      chainId: '44787',
+      request: {
+        method: 'personal_decrypt',
+        params,
+      },
+    })
+    return Buffer.from(result, 'hex')
   }
 
-  computeSharedSecret(_publicKey: string) {
-    return Promise.resolve(Buffer.from([]))
+  async computeSharedSecret(publicKey: string) {
+    const params = [this.account, publicKey]
+    const result = await this.client.request({
+      topic: this.session.topic,
+      chainId: '44787',
+      request: {
+        method: 'personal_computeSharedSecret',
+        params,
+      },
+    })
+    return Buffer.from(result, 'hex')
   }
 }

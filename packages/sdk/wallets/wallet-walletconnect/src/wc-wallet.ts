@@ -1,12 +1,10 @@
+import { sleep } from '@celo/base'
+import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { PairingTypes, SessionTypes } from '@walletconnect/types'
+import { SupportedMethods } from './types'
 import { WalletConnectSigner } from './wc-signer'
-
-export enum RpcWalletErrors {
-  FetchAccounts = 'RpcWallet: failed to fetch accounts from server',
-  AccountAlreadyExists = 'RpcWallet: account already exists',
-}
 
 /*
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
@@ -14,13 +12,29 @@ export enum RpcWalletErrors {
  */
 export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private metadata: any
-  private onUri: any
 
-  constructor(onUri: (x: string) => void, metadata: any) {
+  private client?: WalletConnect
+  private pairing?: PairingTypes.Proposal
+
+  constructor(metadata: any) {
     super()
 
-    this.onUri = onUri
     this.metadata = metadata
+  }
+
+  /**
+   *
+   */
+  getUri = async () => {
+    for (let i = 0; i < 5; i++) {
+      if (this.pairing?.signal?.params?.uri) {
+        return this.pairing.signal.params.uri
+      }
+
+      await sleep(1000)
+    }
+
+    throw new Error('Unable to get URI, did the session connect?')
   }
 
   onSessionProposal = (proposal: SessionTypes.Proposal) => {
@@ -37,8 +51,8 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   }
 
   onPairingProposal = (pairing: PairingTypes.Proposal) => {
-    console.log('onPairingProposal', pairing, this)
-    this.onUri(pairing.signal.params.uri)
+    console.log('onPairingProposal', pairing)
+    this.pairing = pairing
   }
   onPairingCreated = (pairing: PairingTypes.Created) => {
     console.log('onPairingCreated', pairing)
@@ -56,6 +70,8 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     const client = await WalletConnect.init({
       relayProvider: 'wss://staging.walletconnect.org',
     })
+    this.client = client
+
     client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
     client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
     client.on(CLIENT_EVENTS.session.updated, this.onSessionUpdated)
@@ -74,7 +90,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
             chains: ['celo:44787'],
           },
           jsonrpc: {
-            methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData'],
+            methods: Object.values(SupportedMethods),
           },
         },
       })
@@ -87,5 +103,23 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
 
       resolve(addressToSigner)
     })
+  }
+
+  /**
+   * Gets the signer based on the 'from' field in the tx body
+   * @param txParams Transaction to sign
+   * @dev overrides WalletBase.signTransaction
+   */
+  async signTransaction(txParams: CeloTx) {
+    const fromAddress = txParams.from!.toString()
+    const signer = this.getSigner(fromAddress)
+    return signer.signRawTransaction(txParams)
+  }
+
+  close = () => {
+    if (!this.client || !this.pairing) {
+      throw new Error('Wallet must be initialized before calling close()')
+    }
+    this.client.disconnect({ topic: this.pairing.topic, reason: 'Pairing closed' })
   }
 }
