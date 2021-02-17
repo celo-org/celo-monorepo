@@ -15,10 +15,9 @@ oracle:
   metrics:
     enabled: true
     prometheusPort: 9090
-  allowNotCGLD: false
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  exchanges: BITTREX,OKCOIN,COINBASE
+  exchanges: BITTREX,COINBASE
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

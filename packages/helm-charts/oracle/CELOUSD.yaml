@@ -1,7 +1,5 @@
 oracle:
   currencyPair: CELOUSD
-  replicas: 2
-  identities:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
@@ -17,7 +15,6 @@ oracle:
   metrics:
     enabled: true
     prometheusPort: 9090
-  allowNotCGLD: false
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   exchanges: BITTREX,OKCOIN,COINBASE

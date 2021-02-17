@@ -69,9 +69,6 @@ export abstract class BaseOracleDeployer {
       `--set oracle.replicas=${this.replicas}`,
       `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
-      `--set oracle.metrics.enabled=true`,
-      `--set oracle.metrics.prometheusPort=9090`,
-      `--set oracle.currencyPair=${this.currencyPair}`,
       `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
     ].concat(await this.oracleIdentityHelmParameters())
   }
