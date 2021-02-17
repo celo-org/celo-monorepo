@@ -23,6 +23,7 @@ export interface NodeKeyGenerationInfo {
 export interface BaseFullNodeDeploymentConfig {
   diskSizeGb: number
   replicas: number
+  rollingUpdatePartition: number
   // If undefined, node keys will not be predetermined and will be random
   nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
@@ -93,6 +94,7 @@ export abstract class BaseFullNodeDeployer {
     return [
       `--set namespace=${this.kubeNamespace}`,
       `--set replicaCount=${this._deploymentConfig.replicas}`,
+      `--set geth.updateStrategy.rollingUpdate.partition=${this._deploymentConfig.rollingUpdatePartition}`,
       `--set storage.size=${this._deploymentConfig.diskSizeGb}Gi`,
       `--set geth.expose_rpc_externally=false`,
       `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
