@@ -18,7 +18,7 @@ Other Changes
 
 ## Published
 
-### **[1.0.2-beta-1]** -- 2021-02-10
+### **[1.0.2]** -- 2021-02-16
 Features
 - Show owner in `releasegold:show` - [#6608](https://github.com/celo-org/celo-monorepo/pull/6608)
 - Metadata HTTPS Monitoring in `identity:current-attestation-services` - [#6806](https://github.com/celo-org/celo-monorepo/pull/6806)
