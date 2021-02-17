@@ -11,7 +11,7 @@ import { FiatExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
-import { openMoonpay, openRamp, openSimplex } from 'src/fiatExchanges/utils'
+import { openMoonpay, openRamp, openSimplex, openTransak } from 'src/fiatExchanges/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import LinkArrow from 'src/icons/LinkArrow'
@@ -97,6 +97,11 @@ function ProviderOptionsScreen({ route, navigation }: Props) {
         name: 'Ramp',
         enabled: !RAMP_DISABLED,
         onSelected: () => openRamp(localCurrency || FALLBACK_CURRENCY, selectedCurrency),
+      },
+      {
+        name: 'Transak',
+        enabled: true,
+        onSelected: () => openTransak(localCurrency || FALLBACK_CURRENCY, selectedCurrency),
       },
     ],
   }
