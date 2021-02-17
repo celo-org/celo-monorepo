@@ -2303,9 +2303,6 @@
       "version": "2.0.26",
       "resolved": "https://registry.npmjs.org/asn1js/-/asn1js-2.0.26.tgz",
       "integrity": "sha512-yG89F0j9B4B0MKIcFyWWxnpZPLaNTjCj4tkE3fjbAoo0qmpGw0PYYqSbX/4ebnd9Icn8ZgK4K1fvDyEtW1JYtQ==",
-      "requires": {
-        "pvutils": "latest"
-      },
       "dependencies": {
         "pvutils": {
           "version": "1.0.17",
