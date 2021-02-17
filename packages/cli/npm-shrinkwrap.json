@@ -2302,10 +2302,7 @@
     "asn1js": {
       "version": "2.0.26",
       "resolved": "https://registry.npmjs.org/asn1js/-/asn1js-2.0.26.tgz",
-      "integrity": "sha512-yG89F0j9B4B0MKIcFyWWxnpZPLaNTjCj4tkE3fjbAoo0qmpGw0PYYqSbX/4ebnd9Icn8ZgK4K1fvDyEtW1JYtQ==",
-      "requires": {
-        "pvutils": "latest"
-      }
+      "integrity": "sha512-yG89F0j9B4B0MKIcFyWWxnpZPLaNTjCj4tkE3fjbAoo0qmpGw0PYYqSbX/4ebnd9Icn8ZgK4K1fvDyEtW1JYtQ=="
     },
     "assert-plus": {
       "version": "1.0.0",
@@ -3483,10 +3480,6 @@
         "randombytes": "^2.0.0"
       }
     },
-    "dir-glob": {
-      "version": "2.0.0",
-      "dev": true
-    },
     "dom-storage": {
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/dom-storage/-/dom-storage-2.1.0.tgz",
@@ -4291,17 +4284,6 @@
         "process": "^0.11.10"
       }
     },
-    "globby": {
-      "version": "8.0.2",
-      "dev": true,
-      "requires": {
-        "dir-glob": "2.0.0",
-        "glob": "^7.1.2",
-        "ignore": "^3.3.5",
-        "pify": "^3.0.0",
-        "slash": "^1.0.0"
-      }
-    },
     "google-auth-library": {
       "version": "6.1.4",
       "resolved": "https://registry.npmjs.org/google-auth-library/-/google-auth-library-6.1.4.tgz",
@@ -4576,10 +4558,6 @@
       "version": "1.2.1",
       "resolved": "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz",
       "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
-    },
-    "ignore": {
-      "version": "3.3.10",
-      "dev": true
     },
     "indent-string": {
       "version": "4.0.0",
@@ -5920,10 +5898,6 @@
       "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-2.2.2.tgz",
       "integrity": "sha512-q0M/9eZHzmr0AulXyPwNfZjtwZ/RBZlbN3K3CErVrk50T2ASYI7Bye0EvekFY3IP1Nt2DHu0re+V2ZHIpMkuWg=="
     },
-    "pify": {
-      "version": "3.0.0",
-      "dev": true
-    },
     "prebuild-install": {
       "version": "5.3.3",
       "resolved": "https://registry.npmjs.org/prebuild-install/-/prebuild-install-5.3.3.tgz",
@@ -6418,10 +6392,6 @@
       "version": "1.0.5",
       "resolved": "https://registry.npmjs.org/sisteransi/-/sisteransi-1.0.5.tgz",
       "integrity": "sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg=="
-    },
-    "slash": {
-      "version": "1.0.0",
-      "dev": true
     },
     "source-map": {
       "version": "0.6.1",
