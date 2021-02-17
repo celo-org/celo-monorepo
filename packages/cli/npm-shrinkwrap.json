@@ -2302,7 +2302,17 @@
     "asn1js": {
       "version": "2.0.26",
       "resolved": "https://registry.npmjs.org/asn1js/-/asn1js-2.0.26.tgz",
-      "integrity": "sha512-yG89F0j9B4B0MKIcFyWWxnpZPLaNTjCj4tkE3fjbAoo0qmpGw0PYYqSbX/4ebnd9Icn8ZgK4K1fvDyEtW1JYtQ=="
+      "integrity": "sha512-yG89F0j9B4B0MKIcFyWWxnpZPLaNTjCj4tkE3fjbAoo0qmpGw0PYYqSbX/4ebnd9Icn8ZgK4K1fvDyEtW1JYtQ==",
+      "requires": {
+        "pvutils": "latest"
+      },
+      "dependencies": {
+        "pvutils": {
+          "version": "1.0.17",
+          "resolved": "https://registry.npmjs.org/pvutils/-/pvutils-1.0.17.tgz",
+          "integrity": "sha512-wLHYUQxWaXVQvKnwIDWFVKDJku9XDCvyhhxoq8dc5MFdIlRenyPI9eSfEtcvgHgD7FlvCyGAlWgOzRnZD99GZQ=="
+        }
+      }
     },
     "assert-plus": {
       "version": "1.0.0",
@@ -6041,11 +6051,6 @@
       "version": "2.1.1",
       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz",
       "integrity": "sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A=="
-    },
-    "pvutils": {
-      "version": "1.0.17",
-      "resolved": "https://registry.npmjs.org/pvutils/-/pvutils-1.0.17.tgz",
-      "integrity": "sha512-wLHYUQxWaXVQvKnwIDWFVKDJku9XDCvyhhxoq8dc5MFdIlRenyPI9eSfEtcvgHgD7FlvCyGAlWgOzRnZD99GZQ=="
     },
     "qs": {
       "version": "6.7.0",
