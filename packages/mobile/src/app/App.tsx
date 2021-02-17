@@ -87,6 +87,7 @@ export class App extends React.Component<Props> {
       deviceWidth: width,
       reactLoadDuration,
       appLoadDuration,
+      language: i18n.language || store.getState().app.language,
     })
   }
 

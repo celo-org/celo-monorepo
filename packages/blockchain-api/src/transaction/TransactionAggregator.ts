@@ -22,7 +22,7 @@ export class TransactionAggregator {
     currentIndex: number,
     array: ClassifiedTransaction[]
   ): ClassifiedTransaction[] {
-    if (currentTransaction.type.isAggregatable()) {
+    if (currentTransaction.type.isAggregatable() && accumulator.length > 0) {
       const transactionFees = currentTransaction.type.getFees(currentTransaction.transaction)
 
       transactionFees.forEach((fee) => accumulator[accumulator.length - 1].transaction.addFee(fee))
