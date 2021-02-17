@@ -153,6 +153,7 @@ spec:
             command:
             - /celo-oracle/readinessProbe.sh
             - "{{ .Values.oracle.metrics.prometheusPort }}"
+            - "{{ .Values.oracle.currencyPair }}"
           initialDelaySeconds: 10
           periodSeconds: 5
         volumeMounts:
@@ -162,4 +163,4 @@ spec:
       volumes:
         - name: private-key-volume
           secret:
-            secretName: pkey-secret
+            secretName: {{ template "pkey-secret-name" . }}
