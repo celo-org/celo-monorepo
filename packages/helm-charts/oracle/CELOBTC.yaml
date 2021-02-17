@@ -1,5 +1,5 @@
 oracle:
-  currencyPair: CELOUSD
+  currencyPair: CELOBTC
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
