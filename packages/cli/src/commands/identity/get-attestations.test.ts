@@ -18,17 +18,6 @@ describe('identity:get-attetstations', () => {
       ).rejects.toThrow('Must specify phoneNumber if identifier not provided')
     })
 
-    it('Fails if account is unknown', async () => {
-      await expect(
-        GetAttestations.run([
-          '--phoneNumber',
-          '+15555555555',
-          '--from',
-          '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95',
-        ])
-      ).rejects.toThrow('unknown account')
-    })
-
     it('Successfully prints identifier when given pepper and number', async () => {
       console.log = jest.fn()
       await GetAttestations.run(['--phoneNumber', '+15555555555', '--pepper', 'XQke2bjvN7mPt'])
