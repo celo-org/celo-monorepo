@@ -6,7 +6,7 @@ import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 
 export const openMoonpay = (currencyCode: LocalCurrencyCode, currencyToBuy: CURRENCY_ENUM) => {
-  navigate(Screens.MoonPay, {
+  navigate(Screens.MoonPayScreen, {
     localAmount: 0,
     currencyCode,
     currencyToBuy,
@@ -15,4 +15,12 @@ export const openMoonpay = (currencyCode: LocalCurrencyCode, currencyToBuy: CURR
 
 export const openSimplex = (account: string | null) => {
   navigateToURI(`${SIMPLEX_URI}?address=${account}`)
+}
+
+export const openRamp = (currencyCode: LocalCurrencyCode, currencyToBuy: CURRENCY_ENUM) => {
+  navigate(Screens.RampScreen, {
+    localAmount: 0,
+    currencyCode,
+    currencyToBuy,
+  })
 }

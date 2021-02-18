@@ -21,7 +21,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
 import {
   ALERT_BANNER_DURATION,
-  DAILY_PAYMENT_LIMIT_CUSD,
+  DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
@@ -275,10 +275,10 @@ function SendAmount(props: Props) {
   }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData, origin])
 
   const onRequest = React.useCallback(() => {
-    if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
+    if (dollarAmount.isGreaterThan(DEFAULT_DAILY_PAYMENT_LIMIT_CUSD)) {
       dispatch(
         showError(ErrorMessages.REQUEST_LIMIT, ALERT_BANNER_DURATION, {
-          limit: DAILY_PAYMENT_LIMIT_CUSD,
+          limit: DEFAULT_DAILY_PAYMENT_LIMIT_CUSD,
         })
       )
       return
@@ -312,10 +312,14 @@ function SendAmount(props: Props) {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.showAmountContainer}>
           <View style={styles.currencySymbolContainer}>
-            <Text style={styles.currencySymbol}>{localCurrencySymbol || localCurrencyCode}</Text>
+            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.currencySymbol}>
+              {localCurrencySymbol || localCurrencyCode}
+            </Text>
           </View>
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>{amount ? amount : '0'}</Text>
+            <Text adjustsFontSizeToFit={true} numberOfLines={1} style={styles.amount}>
+              {amount ? amount : '0'}
+            </Text>
           </View>
           <View style={styles.currencySymbolContainer}>
             <Text style={styles.currencySymbolTransparent}>
@@ -361,6 +365,7 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     justifyContent: 'center',
+    maxWidth: '75%',
   },
   currencySymbolContainer: {
     justifyContent: 'center',
@@ -381,7 +386,7 @@ const styles = StyleSheet.create({
   amount: {
     ...fontStyles.regular,
     fontSize: 64,
-    lineHeight: 88,
+    lineHeight: undefined,
   },
   nextBtn: {
     paddingVertical: variables.contentPadding,

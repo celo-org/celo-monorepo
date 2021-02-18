@@ -94,6 +94,16 @@ bundle exec pod install
 
 If your machine does not recognize the `gem` command, you may need to [download Ruby](https://rubyinstaller.org/) first.
 
+
+1. Run `yarn install` in the monorepo root `/celo-monorepo`. 
+2. Install Google Cloud by running `brew install google-cloud-sdk`. 
+  2a. Follow instructions here for logging in with Google credentials. https://github.com/celo-org/bootnode/blob/4bdd7e7ecb91db54dc2a307ec45887d73aa75394/engsetup/README.md
+3. Run `yarn build:wallet` from the monorepo root `/celo-monorepo`.
+
+4. Run `yarn dev:ios` in the `/celo-monorepo/packages/mobile/ios` folder. 
+
+And the app should be running in the simulator! If you run into any issues, see below for troubleshooting. 
+
 ### Android
 
 #### Install Java
@@ -435,6 +445,59 @@ To attach:
 2. Using a geth binary on your computer, run `geth attach http://<DEVICE_IP_ADDRESS>:8545`
 
 ### Troubleshooting
+
+
+#### Postinstall script
+If you're having an error with installing packages, or `secrets.json` not existing: 
+
+try to run `yarn postinstall` in the monorepo root folder after running `yarn install`. 
+
+A successful `yarn postinstall` looks like: 
+```
+$ yarn postinstall
+yarn run v1.22.10
+$ yarn run lerna run postinstall && patch-package && yarn keys:decrypt
+$ /Users/michewong/development/celo-monorepo/node_modules/.bin/lerna run postinstall
+lerna notice cli v3.16.0
+lerna info versioning independent
+lerna info Executing command in 1 package: "yarn run postinstall"
+lerna info run Ran npm script 'postinstall' in '@celo/mobile' in 1.5s:
+$ ./scripts/sync_branding.sh && ./scripts/copy_license_to_android_assets.sh
+.
+~/development/celo-monorepo/packages/mobile/branding/valora ~/development/celo-monorepo/packages/mobile
+~/development/celo-monorepo/packages/mobile
+Using branding/valora
+building file list ... done
+ios/
+
+sent 6907 bytes  received 26 bytes  13866.00 bytes/sec
+total size is 5736337  speedup is 827.40
+building file list ... done
+
+sent 96 bytes  received 20 bytes  232.00 bytes/sec
+total size is 2762108  speedup is 23811.28
+lerna success run Ran npm script 'postinstall' in 1 package in 1.5s:
+lerna success - @celo/mobile
+patch-package 6.2.2
+Applying patches...
+@react-native-firebase/database@6.7.1 ✔
+@segment/analytics-react-native@1.3.2 ✔
+bn.js@4.11.9 ✔
+react-native-reanimated@2.0.0-rc.1 ✔
+react-native-splash-screen@3.2.0 ✔
+react-native-tab-view@2.15.2 ✔
+tslint@5.20.0 ✔
+$ bash scripts/key_placer.sh decrypt
+Processing encrypted files
+
+Encrypted files decrypted
+✨  Done in 24.82s. 
+``` 
+
+#### Google Cloud Setup (for cLabs employees only) 
+ 
+Make sure to follow the steps [here](https://github.com/celo-org/celo-labs/blob/master/packages/docs/eng-setup.md) to set up Google Cloud correctly with the wallet. 
+
 
 #### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
 

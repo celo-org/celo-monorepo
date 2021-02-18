@@ -41,8 +41,9 @@ export const handler = async (argv: TestnetInitialArgv) => {
   await createStaticIPs(argv.celoEnv)
 
   await installHelmChart(argv.celoEnv, argv.useExistingGenesis)
-  // When using an external bootnode, we have to await the bootnode's LB to be up first
-  await pollForBootnodeLoadBalancer(argv.celoEnv)
-
-  await uploadTestnetInfoToGoogleStorage(argv.celoEnv, !argv.useExistingGenesis)
+  if (process.env.CELOTOOL_HELM_DRY_RUN !== 'true') {
+    // When using an external bootnode, we have to await the bootnode's LB to be up first
+    await pollForBootnodeLoadBalancer(argv.celoEnv)
+    await uploadTestnetInfoToGoogleStorage(argv.celoEnv, !argv.useExistingGenesis)
+  }
 }

@@ -53,3 +53,9 @@ export interface Transfer {
   comment?: string
   currency?: Currencies
 }
+
+export interface TokenTransfer extends Log {
+  fromAddressHash: string
+  toAddressHash: string
+  amount: string
+}
