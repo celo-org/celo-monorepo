@@ -102,6 +102,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   let allAccounts: Address[]
   let stableTokenAddress: Address
+  let stableTokenEURAddress: Address
   let nonOracleAddress: Address
   let btcOracleOwner: Address
   const CELOBTCIdentifier: Address = web3.utils.toChecksumAddress(
@@ -116,6 +117,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     btcSortedOracles = await newSortedOracles(btcOracleOwner)
     stableTokenSortedOracles = await kit.contracts.getSortedOracles()
     stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+    stableTokenEURAddress = await kit.registry.addressFor(CeloContract.StableTokenEUR)
 
     nonOracleAddress = allAccounts.find((addr) => {
       return !stableTokenOracles.includes(addr)
@@ -375,6 +377,14 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
       const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress)
       await tx.sendAndWaitForReceipt()
       expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
+    })
+  })
+
+  describe('#reportStableTokenEUR', () => {
+    it('calls report with the address for StableTokenEUR', async () => {
+      const tx = await stableTokenSortedOracles.reportStableTokenEUR(14, oracleAddress)
+      await tx.sendAndWaitForReceipt()
+      expect(tx.txo.arguments[0]).toEqual(stableTokenEURAddress)
     })
   })
 

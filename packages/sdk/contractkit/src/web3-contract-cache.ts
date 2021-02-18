@@ -9,6 +9,7 @@ import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
+import { newExchangeEur } from './generated/ExchangeEUR'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
@@ -24,6 +25,7 @@ import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
+import { newStableTokenEur } from './generated/StableTokenEUR'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
@@ -40,6 +42,7 @@ export const ContractFactories = {
   [CeloContract.EpochRewards]: newEpochRewards,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
+  [CeloContract.ExchangeEUR]: newExchangeEur,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
@@ -54,6 +57,7 @@ export const ContractFactories = {
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
+  [CeloContract.StableTokenEUR]: newStableTokenEur,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
@@ -100,6 +104,9 @@ export class Web3ContractCache {
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
+  getExchangeEUR() {
+    return this.getContract(CeloContract.ExchangeEUR)
+  }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
   }
@@ -141,6 +148,9 @@ export class Web3ContractCache {
   }
   getStableToken() {
     return this.getContract(CeloContract.StableToken)
+  }
+  getStableTokenEUR() {
+    return this.getContract(CeloContract.StableTokenEUR)
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)

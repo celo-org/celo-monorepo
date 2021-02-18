@@ -9,6 +9,7 @@ import { ElectionWrapper } from './wrappers/Election'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
+import { ExchangeEURWrapper } from './wrappers/ExchangeEUR'
 import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -20,6 +21,7 @@ import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
+import { StableTokenEURWrapper } from './wrappers/StableTokenEURWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {
@@ -32,6 +34,7 @@ const WrapperFactories = {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
+  [CeloContract.ExchangeEUR]: ExchangeEURWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
@@ -46,6 +49,7 @@ const WrapperFactories = {
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
+  [CeloContract.StableTokenEUR]: StableTokenEURWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
 }
 
@@ -62,6 +66,7 @@ interface WrapperCacheMap {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
+  [CeloContract.ExchangeEUR]?: ExchangeEURWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -76,6 +81,7 @@ interface WrapperCacheMap {
   [CeloContract.Reserve]?: ReserveWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
+  [CeloContract.StableTokenEUR]?: StableTokenEURWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
@@ -117,6 +123,9 @@ export class WrapperCache {
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
+  getExchangeEUR() {
+    return this.getContract(CeloContract.ExchangeEUR)
+  }
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
   }
@@ -155,6 +164,9 @@ export class WrapperCache {
   }
   getStableToken() {
     return this.getContract(CeloContract.StableToken)
+  }
+  getStableTokenEUR() {
+    return this.getContract(CeloContract.StableTokenEUR)
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)

@@ -189,6 +189,17 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   /**
+   * Updates an oracle value and the median.
+   * @param value The amount of Euros equal to one CELO.
+   */
+  async reportStableTokenEUR(
+    value: BigNumber.Value,
+    oracleAddress: Address
+  ): Promise<CeloTransactionObject<void>> {
+    return this.report(CeloContract.StableTokenEUR, value, oracleAddress)
+  }
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<SortedOraclesConfig> {
