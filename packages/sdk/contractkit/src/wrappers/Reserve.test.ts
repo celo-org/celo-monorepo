@@ -29,7 +29,7 @@ testWithGanache('Reserve Wrapper', (web3) => {
 
   test('can get sum of reserve unfrozen balance + other reserve address balances', async () => {
     const balanceWithOtherAddresses = await reserve.getUnfrozenReserveCeloBalance()
-    expect(balanceWithOtherAddresses).toEqBigNumber('1e+26')
+    expect(balanceWithOtherAddresses).toEqBigNumber('3e+26')
   })
 
   test('test is spender', async () => {
