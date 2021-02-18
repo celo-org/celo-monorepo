@@ -155,6 +155,18 @@ contract('Exchange', (accounts: string[]) => {
       assert.equal(expectedOwner, accounts[0])
     })
 
+    it('should allow empty stableToken address', async () => {
+      const exchange2 = await Exchange.new()
+      await exchange2.initialize(
+        registry.address,
+        '0x0000000000000000000000000000000000000000',
+        spread,
+        reserveFraction,
+        updateFrequency,
+        minimumReports
+      )
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         exchange.initialize(
