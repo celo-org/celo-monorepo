@@ -52,8 +52,7 @@ export default class Propose extends BaseCommand {
     // builder.addProxyRepointingTx
 
     const proposal = await builder.build()
-
-    printValueMapRecursive(proposalToJSON(this.kit, proposal))
+    printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx(
