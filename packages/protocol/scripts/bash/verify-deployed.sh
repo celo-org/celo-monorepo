@@ -45,7 +45,7 @@ cp lib/registry-utils.ts $BUILD_DIR/
 echo "- Return to original git commit"
 git checkout - >> $LOG_FILE
 
-# cp $BUILD_DIR/registry-utils.ts lib/
+cp $BUILD_DIR/registry-utils.ts lib/
 
 # Hack since v1 did not yet expose celoRegistryAddress
 if ! cat lib/registry-utils.ts | grep -q "celoRegistryAddress"; then
