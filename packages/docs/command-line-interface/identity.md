@@ -26,6 +26,41 @@ OPTIONS
 
 _See code: [src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
 
+## `celocli identity:get-attestations`
+
+Looks up attestations associated with the provided phone number. If a pepper is not provided, it uses the --from account's balance to query the pepper.
+
+```
+Looks up attestations associated with the provided phone number. If a pepper is not provided, it uses the --from account's balance to query the pepper.
+
+USAGE
+  $ celocli identity:get-attestations
+
+OPTIONS
+  --from=from                Account whose balance to use for querying ODIS for the
+                             pepper lookup
+
+  --identifier=identifier    On-chain identifier
+
+  --network=network          The ODIS service to hit: mainnet, alfajores,
+                             alfajoresstaging
+
+  --pepper=pepper            ODIS phone number pepper
+
+  --phoneNumber=phoneNumber  Phone number to check attestations for
+
+EXAMPLES
+  get-attestations --phoneNumber +15555555555 --from
+  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+
+  get-attestations --phoneNumber +15555555555 --pepper XgnKVpplZc0p1
+
+  get-attestations --identifier
+  0x4952c9db9c283a62721b13f56c4b5e84a438e2569af3de21cb3440efa8840872
+```
+
+_See code: [src/commands/identity/get-attestations.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/get-attestations.ts)_
+
 ## `celocli identity:identifier`
 
 Queries ODIS for the on-chain identifier and pepper corresponding to a given phone number.
