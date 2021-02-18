@@ -57,6 +57,8 @@ const fornoUrls = {
   baklava: 'https://baklava-forno.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
+  // requires you to port forward `celotooljs port-forward -e staging`
+  staging: 'http://localhost:8545',
 }
 
 const networks = {

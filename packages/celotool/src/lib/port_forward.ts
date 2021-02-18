@@ -51,7 +51,7 @@ async function getPortForwardArgs(celoEnv: string, component?: string, ports = d
   // It's not expected to ever have a situation where a namespace has pods with
   // both labels.
   const podName = await execCmd(
-    `kubectl get pods --namespace ${celoEnv} -l "app in (ethereum,testnet), component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}"`
+    `kubectl get pods --namespace ${celoEnv} -l "app in (ethereum,testnet), component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[1].metadata.name}"`
   )
   return ['port-forward', `--namespace=${celoEnv}`, podName[0], ...ports.split(' ')]
 }
