@@ -4,10 +4,10 @@ import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot } from './scaffold'
-import { runAttestationTest } from './tests/attestation'
-import { runExchangeTest } from './tests/exchange'
-import { runOracleTest } from './tests/oracle'
-import { runReserveTest } from './tests/reserve'
+// import { runAttestationTest } from './tests/attestation'
+// import { runExchangeTest } from './tests/exchange'
+// import { runOracleTest } from './tests/oracle'
+// import { runReserveTest } from './tests/reserve'
 import { runTransfercUSDTest } from './tests/transfer'
 
 jest.setTimeout(120000)
@@ -25,10 +25,10 @@ function runTests() {
     const context = { kit, mnemonic, logger: rootLogger, reserveSpenderMultiSigAddress }
     // TODO: Assert maximum loss after test
     runTransfercUSDTest(context)
-    runExchangeTest(context)
-    runOracleTest(context)
-    runReserveTest(context)
-    runAttestationTest(context)
+    // runExchangeTest(context)
+    // runOracleTest(context)
+    // runReserveTest(context)
+    // runAttestationTest(context)
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing
