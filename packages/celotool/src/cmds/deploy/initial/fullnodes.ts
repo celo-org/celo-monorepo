@@ -1,4 +1,5 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
+import { CloudProvider } from 'src/lib/k8s-cluster/base'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { installFullNodeChart } from 'src/lib/fullnodes'
 import { kubectlAnnotateKSA, linkSAForWorkloadIdentity } from 'src/lib/gcloud_utils'
@@ -31,8 +32,13 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: FullNodeInitialArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
-  await linkSAForWorkloadIdentity(argv.celoEnv)
+  const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
+  const isGCP = clusterManager.clusterConfig.cloudProvider === CloudProvider.GCP
+  if (isGCP) {
+    await linkSAForWorkloadIdentity(argv.celoEnv)
+  }
   await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
-  await kubectlAnnotateKSA(argv.celoEnv)
+  if (isGCP) {
+    await kubectlAnnotateKSA(argv.celoEnv)
+  }
 }

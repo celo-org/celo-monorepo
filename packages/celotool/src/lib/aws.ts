@@ -73,34 +73,23 @@ export async function getPolicyArn(policyName: string) {
 }
 
 /**
- * Given a cluster name, finds the NodeInstanceRole that's used by the nodes.
- * There's no easy way to query this directly, so this command searches through
- * roles and finds the correct one.
+ * Given a cluster name, finds the RoleArn that's used by the worker nodes.
+ * Note this only supports EKS clusters with a single autoscaling group.
  */
-export async function getEKSNodeInstanceGroupRoleArn(clusterName: string) {
-  const existingRoles = await execCmdAndParseJson(
-    `aws iam list-roles --query 'Roles' --output json`
+export async function getEKSWorkerInstanceRoleArn(clusterName: string) {
+  const launchConfigurations = await execCmdAndParseJson(
+    `aws autoscaling describe-launch-configurations --query LaunchConfigurations --output json`
   )
-  const potentialRoles = existingRoles.filter((role: any) => {
-    // The role name doesn't necessarily include the cluster name, but it will include
-    // 'NodeInstanceRole'.
-    const re = new RegExp(`.+-NodeInstanceRole-.+`)
-    return re.test(role.RoleName)
+  const launchConfigRegex = new RegExp(`${clusterName}.+`)
+  const launchConfigMatch = launchConfigurations.find((launchConfig: any) => {
+    return launchConfigRegex.test(launchConfig.LaunchConfigurationName)
   })
-  let roleArn: string | undefined
-  for (const role of potentialRoles) {
-    const [clusterNameTag] = await execCmdAndParseJson(
-      `aws iam list-role-tags --role-name ${role.RoleName} --query 'Tags[?Key == \`alpha.eksctl.io/cluster-name\`]'`
-    )
-    if (clusterNameTag && clusterNameTag.Value === clusterName) {
-      roleArn = role.Arn
-      break
-    }
+  if (!launchConfigMatch) {
+    throw Error(`Could not find launch configuration for cluster ${clusterName}`)
   }
-  if (!roleArn) {
-    throw Error(`Could not find NodeInstanceRole for cluster ${clusterName}`)
-  }
-  return roleArn
+  return execCmdAndParseJson(
+    `aws iam get-instance-profile --instance-profile-name ${launchConfigMatch.IamInstanceProfile} --query InstanceProfile.Roles[0].Arn --output json`
+  )
 }
 
 export function attachPolicyIdempotent(roleName: string, policyArn: string) {
@@ -140,12 +129,13 @@ export async function createPolicyIdempotent(policyName: string, policyDocumentJ
 }
 
 /**
- * A cluster will have a security group that applies to all nodes (ie VMs) in the cluster.
- * This returns a description of that security group.
+ * A cluster will have a security group that applies to all worker nodes (ie VMs)
+ * in the cluster. This returns a description of that security group.
+ * Note this only supports single autoscale group clusters.
  */
-export function getClusterSharedNodeSecurityGroup(clusterConfig: AwsClusterConfig) {
+export function getEKSWorkerSecurityGroup(clusterConfig: AwsClusterConfig) {
   return execCmdAndParseJson(
-    `aws ec2 describe-security-groups --filters "Name=tag:aws:cloudformation:logical-id,Values=ClusterSharedNodeSecurityGroup" "Name=tag:eksctl.cluster.k8s.io/v1alpha1/cluster-name,Values=${clusterConfig.clusterName}" --query "SecurityGroups[0]" --output json`
+    `aws ec2 describe-security-groups --filter "Name=tag:Name,Values=${clusterConfig.clusterName}-eks_worker_sg" --query "SecurityGroups[0]" --output json`
   )
 }
 

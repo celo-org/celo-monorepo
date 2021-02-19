@@ -1,4 +1,4 @@
-import { authorizeSecurityGroupIngress, getClusterSharedNodeSecurityGroup, revokeSecurityGroupIngress } from '../aws'
+import { authorizeSecurityGroupIngress, getEKSWorkerSecurityGroup, revokeSecurityGroupIngress } from '../aws'
 import { AwsClusterConfig } from '../k8s-cluster/aws'
 import { BaseFullNodeDeploymentConfig } from './base'
 import { BaseNodePortFullNodeDeployer } from './base-nodeport'
@@ -18,6 +18,7 @@ enum Protocols {
  * services.
  */
 export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
+  useChainDataServiceAccountCredentials = true;
   /**
    * Gets AWS-specific helm parameters.
    */
@@ -48,8 +49,7 @@ export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
    */
   async setIngressRulesTCPAndUDP(ports: number[], authorize: boolean) {
     const cidrRange = '0.0.0.0/0'
-    const securityGroup = await getClusterSharedNodeSecurityGroup(this.deploymentConfig.clusterConfig)
-
+    const securityGroup = await getEKSWorkerSecurityGroup(this.deploymentConfig.clusterConfig)
     // Record the existing relevant rules on the security group. We want to know
     // if both udp and tcp ingress traffic has been enabled for the ports.
     const existingRulesByPort: {

@@ -5,7 +5,7 @@ import {
   deletePolicy,
   deleteRole,
   detachPolicyIdempotent,
-  getEKSNodeInstanceGroupRoleArn,
+  getEKSWorkerInstanceRoleArn,
   getKeyArnFromAlias,
   getPolicyArn
 } from '../aws'
@@ -57,6 +57,7 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
       const prefix = `--set oracle.identities[${i}]`
       const awsRoleArn = await this.createAwsHsmRoleIdempotent(identity)
       params = params.concat([
+        `${prefix}.aws.keyRegion=${identity.region}`,
         `${prefix}.aws.roleArn=${awsRoleArn}`,
       ])
     }
@@ -70,7 +71,7 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
    */
   async createAwsHsmRoleIdempotent(identity: AwsHsmOracleIdentity) {
     // The role that each node (ie VM) uses
-    const nodeInstanceGroupRoleArn = await getEKSNodeInstanceGroupRoleArn(this.deploymentConfig.clusterConfig.clusterName)
+    const eksWorkerInstanceRoleArn = await getEKSWorkerInstanceRoleArn(this.deploymentConfig.clusterConfig.clusterName)
     // This is a "trust relationship" that allows the node instance group role
     // to assume this role (via kube2iam).
     const rolePolicy = {
@@ -80,7 +81,7 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
           Sid: '',
           Effect: 'Allow',
           Principal: {
-            AWS: nodeInstanceGroupRoleArn
+            AWS: eksWorkerInstanceRoleArn
           },
           Action: 'sts:AssumeRole'
         }

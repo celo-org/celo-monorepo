@@ -1,5 +1,5 @@
 import stringHash from 'string-hash'
-import { getAksClusterConfig, getAwsClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig } from './context-utils'
+import { getAksClusterConfig, getAwsClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext } from './context-utils'
 import { DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from './env-utils'
 import { CloudProvider } from './k8s-cluster/base'
 import { AksFullNodeDeploymentConfig } from './k8s-fullnode/aks'
@@ -56,7 +56,7 @@ export function getFullNodeDeployerForContext(celoEnv: string, context: string, 
       createNEG: true
     } as unknown as GCPFullNodeDeploymentConfig // make typescript happy
   }
-  return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
+  return getFullNodeDeployer(cloudProvider, celoEnv, readableContext(context), deploymentConfig)
 }
 
 /**

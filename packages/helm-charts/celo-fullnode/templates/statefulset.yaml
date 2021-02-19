@@ -93,3 +93,6 @@ spec:
         configMap:
           name: {{ template "common.fullname" . }}-health-check
           defaultMode: 0555
+      - name: chaindata-sa-creds
+        secret:
+          secretName: {{ template "common.fullname" . }}-chaindata-sa-creds

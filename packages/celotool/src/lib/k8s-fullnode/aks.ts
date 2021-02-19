@@ -15,6 +15,8 @@ export interface AksFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfi
 }
 
 export class AksFullNodeDeployer extends BaseFullNodeDeployer {
+  useChainDataServiceAccountCredentials = true;
+
   async additionalHelmParameters() {
     const staticIps = (await this.allocateStaticIPs()).join(',')
     return [
