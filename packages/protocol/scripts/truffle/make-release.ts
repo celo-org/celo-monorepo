@@ -6,6 +6,7 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { checkInheritance } from 'lib/web3-utils'
 import { basename, join } from 'path'
 import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
@@ -75,12 +76,17 @@ const deployImplementation = async (
   dryRun: boolean,
   from: string
 ) => {
+  const notTest = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  const contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new())
+  const contract = await (dryRun
+    ? Contract.at(celoRegistryAddress)
+    : checkInheritance('InitializableV2', Contract)
+    ? Contract.new(notTest)
+    : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
