@@ -89,3 +89,6 @@ packages/docs/_book/
 
 */.next/*
 .env.local
+
+# old packages
+packages/reserve-site/*

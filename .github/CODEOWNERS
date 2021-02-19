@@ -23,14 +23,13 @@
 
 /packages/protocol/ @celo-org/cap
 /packages/sdk/contractkit/ @celo-org/cap
-packages/komencikit/ @celo-org/cap
+/packages/komencikit/ @celo-org/cap
 /packages/phone-number-privacy/ @celo-org/cap
 /packages/attestation-proxy/ @celo-org/cap
 /packages/attestation-service/ @celo-org/cap
 /packages/metadata-crawler/ @celo-org/cap
 
 /packages/react-components/ @i1skn @jeanregisser @celo-org/wallet
-/packages/reserve-site/ @aaronmgdr
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/typescript/ @cmcewen
