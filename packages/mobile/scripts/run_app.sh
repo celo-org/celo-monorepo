@@ -61,7 +61,8 @@ startPackager() {
       fi
       echo "Packager server already running"
     else
-      terminal="${RCT_TERMINAL-${REACT_TERMINAL-$TERM_PROGRAM}}"
+      # '${param:-word}' expands to word if param is empty or unset
+      terminal="${RCT_TERMINAL:-${REACT_TERMINAL:-${TERM_PROGRAM:-}}}"
       echo "Starting packager in new terminal..."
 
       if [ "$MACHINE" = "Mac" ]; then
