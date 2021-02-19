@@ -10,8 +10,8 @@ import { EnvTestContext } from './context'
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 export const StableTokenToRegistryName: Record<string, string> = {
-  cUSD: 'StableToken',
-  cEUR: 'StableTokenEur',
+  CUSD: 'StableToken',
+  CEUR: 'StableTokenEur',
 }
 
 export async function fundAccount(
@@ -27,6 +27,7 @@ export async function fundAccount(
     value: value.toString(),
     address: recipient.address,
   })
+  context.kit.connection.addAccount(root.privateKey)
 
   for (const stableToken of context.stableTokensToTest) {
     let stableTokenAddress = await context.kit.registry.addressFor(
@@ -34,8 +35,6 @@ export async function fundAccount(
     )
     let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
     let stableTokenInstance = new StableTokenWrapper(context.kit, stableTokenContract)
-
-    //const stableToken = await context.kit.contracts.getStableToken()
 
     const rootBalance = await stableTokenInstance.balanceOf(root.address)
     if (rootBalance.lte(value)) {
