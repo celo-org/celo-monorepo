@@ -8,13 +8,13 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import BN = require('bn.js')
 import {
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
@@ -27,6 +27,8 @@ const MockSortedOracles: Truffle.Contract<MockSortedOraclesInstance> = artifacts
 
 // @ts-ignore
 Reserve.numberFormat = 'BigNumber'
+
+const isTest = true
 
 contract('Reserve', (accounts: string[]) => {
   let reserve: ReserveInstance
@@ -45,7 +47,7 @@ contract('Reserve', (accounts: string[]) => {
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
-    reserve = await Reserve.new()
+    reserve = await Reserve.new(isTest)
     registry = await Registry.new()
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)

@@ -38,6 +38,8 @@ const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSort
 const Registry: RegistryContract = artifacts.require('Registry')
 const Reserve: ReserveContract = artifacts.require('Reserve')
 
+const isTest = true
+
 // @ts-ignore
 // TODO(mcortesi): Use BN
 EpochRewards.numberFormat = 'BigNumber'
@@ -582,7 +584,7 @@ contract('EpochRewards', (accounts: string[]) => {
     let reserve: ReserveInstance
 
     beforeEach(async () => {
-      reserve = await Reserve.new()
+      reserve = await Reserve.new(isTest)
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(
         registry.address,
@@ -760,7 +762,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     beforeEach(async () => {
       const totalSupply = new BigNumber(129762987346298761037469283746)
-      reserve = await Reserve.new()
+      reserve = await Reserve.new(isTest)
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(
         registry.address,
