@@ -564,3 +564,153 @@ Array.from([
     })
   })
 )
+
+contract('Integration: Adding StableToken', (accounts: string[]) => {
+  const Exchange: RegistryContract = artifacts.require('Exchange')
+  const StableToken: StableTokenContract = artifacts.require('StableToken')
+  let exchangeABC: ExchangeInstance
+  let stableTokenABC: StableTokenInstance
+  const sellAmount = 1
+  const decimals = 18
+
+  // 0. Make ourselves the owner of the various contracts we will need to interact with, as
+  // passing a governance proposal for each one will be a pain in the butt.
+  before(async () => {
+    const proposalId = 2
+    const dequeuedIndex = 0
+    const lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
+    // @ts-ignore
+    await lockedGold.lock({ value: '10000000000000000000000000' })
+    const value = await lockedGold.getAccountTotalLockedGold(accounts[0])
+    const multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
+    const governance = await getDeployedProxiedContract('Governance', artifacts)
+    const registry = await getDeployedProxiedContract('Registry', artifacts)
+    const contractsToOwn = ['Freezer', 'Registry', 'Reserve', 'SortedOracles']
+    const proposalTransactions = await Promise.all(
+      contractsToOwn.map(async (x: string) => {
+        return {
+          value: 0,
+          destination: (await getDeployedProxiedContract(x, artifacts)).address,
+          data: Buffer.from(
+            stripHexEncoding(
+              // Any contract's `setOwner` function will work here as the function signatures are all the same.
+              // @ts-ignore
+              registry.contract.methods.setOwner(accounts[0]).encodeABI()
+            ),
+            'hex'
+          ),
+        }
+      })
+    )
+    await governance.propose(
+      proposalTransactions.map((x: any) => x.value),
+      proposalTransactions.map((x: any) => x.destination),
+      // @ts-ignore
+      Buffer.concat(proposalTransactions.map((x: any) => x.data)),
+      proposalTransactions.map((x: any) => x.data.length),
+      'URL',
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+      { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+    )
+
+    await governance.upvote(proposalId, 0, 0)
+    await timeTravel(config.governance.dequeueFrequency, web3)
+    // @ts-ignore
+    const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+    await multiSig.submitTransaction(governance.address, 0, txData, {
+      from: accounts[0],
+    })
+    await timeTravel(config.governance.approvalStageDuration, web3)
+    await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+    await timeTravel(config.governance.referendumStageDuration, web3)
+    await governance.execute(proposalId, dequeuedIndex)
+  })
+
+  // 1. Mimic the state of the world post-contracts-release
+  //   a) Deploy the contracts. For simplicity, omit proxies for now.
+  //   b) Initialize and register the contracts
+  //   c) Confirm mento is effectively frozen
+  describe('When the contracts have been deployed and initialized', () => {
+    before(async () => {
+      exchangeABC = await Exchange.new()
+      stableTokenABC = await StableToken.new()
+
+      // TODO: This is not very readable, what are these parameters and why were these values chosen?
+      // TODO: Which happens first, initialization or registration?
+      await stableTokenAbc.initialize(
+        'Celo Abc',
+        'cABC',
+        18,
+        '0x000000000000000000000000000000000000ce10',
+        '1000000000000000000000000',
+        '47304000',
+        [accounts[0]],
+        [web3.utils.toWei(1, 'ether')],
+        'ExchangeABC'
+      )
+      await exchange.initialize(
+        '0x000000000000000000000000000000000000ce10',
+        stableToken.address,
+        '5000000000000000000000',
+        '1300000000000000000000',
+        '300',
+        '1'
+      )
+    })
+
+    it(`should be impossible to buy stable token`, async () => {
+      await goldToken.approve(exchange.address, 1)
+      await assertRevert(exchange.buy(1, 0, true))
+    })
+
+    it(`should be impossible to sell stable token`, async () => {
+      await stableTokenAbc.approve(exchange.address, 1)
+      await assertRevert(exchange.sell(1, 0, false))
+    })
+  })
+
+  // 2. Mimic the state of the world post-oracle-activation-proposal
+  //   a) Activate the oracles and freeze the mento
+  //   b) Make an oracle report
+  //   c) Confirm mento is effectively frozen
+  describe('When the contracts have been frozen and an oracle report has been made', () => {
+    before(async () => {
+      await sortedOracles.addOracle(stableTokenAbc.address, ensureLeading0x(accounts[0]))
+      await freezer.freeze(stableTokenAbc.address)
+      await freezer.freeze(exchangeAbc.address)
+      await sortedOracles.report(stableTokenAbc.address, toFixed(1), NULL_ADDRESS, NULL_ADDRESS)
+    })
+
+    it(`should be impossible to buy stable token`, async () => {
+      await goldToken.approve(exchange.address, 1)
+      await assertRevert(exchange.buy(1, 0, true))
+    })
+
+    it(`should be impossible to sell stable token`, async () => {
+      await stableTokenAbc.approve(exchange.address, 1)
+      await assertRevert(exchange.sell(1, 0, false))
+    })
+  })
+
+  // 3. Mimic the state of the world post-mento-activation-proposal
+  //   a) Add the stable token to the reserve
+  //   b) Unfreeze the mento
+  //   c) Confirm mento is functional
+  describe('When the contracts have been unfrozen and the mento has been activated', () => {
+    before(async () => {
+      await reserve.addToken(stableToken.address)
+      await freezer.unfreeze(stableTokenAbc.address)
+      await freezer.unfreeze(exchangeAbc.address)
+    })
+
+    it(`should be possible to buy stable token`, async () => {
+      await goldToken.approve(exchange.address, 1)
+      await exchange.buy(1, 0, true)
+    })
+
+    it(`should be possible to sell stable token`, async () => {
+      await stableTokenAbc.approve(exchange.address, 1)
+      await exchange.sell(1, 0, false)
+    })
+  })
+})
