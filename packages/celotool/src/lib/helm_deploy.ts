@@ -1,7 +1,7 @@
+import { concurrentMap } from '@celo/utils/lib/async'
 import compareVersions from 'compare-versions'
 import fs from 'fs'
 import { entries, range } from 'lodash'
-import pLimit from 'p-limit'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
@@ -637,10 +637,7 @@ async function helmIPParameters(celoEnv: string) {
 
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
 
-  const apiLimit = pLimit(5)
-  const txAddresses = await Promise.all(
-    range(numTxNodes).map((i) => apiLimit(() => retrieveIPAddress(`${celoEnv}-tx-nodes-${i}`)))
-  )
+  const txAddresses = await concurrentMap(5, range(numTxNodes), (i) => retrieveIPAddress(`${celoEnv}-tx-nodes-${i}`))
 
   // Tx-node IPs
   const txNodeIpParams = setHelmArray('geth.txNodesIPAddressArray', txAddresses)
