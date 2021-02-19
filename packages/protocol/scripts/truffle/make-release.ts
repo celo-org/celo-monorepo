@@ -3,10 +3,10 @@
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+import { checkInheritanceDeep } from '@celo/protocol/lib/web3-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { checkInheritance } from 'lib/web3-utils'
 import { basename, join } from 'path'
 import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
@@ -84,7 +84,7 @@ const deployImplementation = async (
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
-    : checkInheritance('InitializableV2', Contract)
+    : checkInheritanceDeep('InitializableV2', Contract, artifacts)
     ? Contract.new(notTest)
     : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
