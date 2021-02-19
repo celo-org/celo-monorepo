@@ -54,6 +54,8 @@ const authorizationTestDescriptions = {
   },
 }
 
+const isTest = true
+
 interface ReleaseGoldConfig {
   releaseStartTime: number
   releaseCliffTime: number
@@ -139,7 +141,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3: Web3
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-    releaseGoldInstance = await ReleaseGold.new()
+    releaseGoldInstance = await ReleaseGold.new(isTest)
     await goldTokenInstance.transfer(
       releaseGoldInstance.address,
       releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(

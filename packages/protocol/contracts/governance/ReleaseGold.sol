@@ -8,10 +8,10 @@ import "./interfaces/IReleaseGold.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/UsingRegistry.sol";
 
-contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
+contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, InitializableV2 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using Address for address payable; // prettier-ignore
@@ -155,6 +155,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     );
     _;
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test  Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   function() external payable {} // solhint-disable no-empty-blocks
 
