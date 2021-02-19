@@ -6,7 +6,7 @@ import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
@@ -20,7 +20,7 @@ import "../common/libraries/ReentrancyGuard.sol";
 contract Exchange is
   IExchange,
   ICeloVersionedContract,
-  Initializable,
+  InitializableV2,
   Ownable,
   UsingRegistry,
   ReentrancyGuard,
@@ -60,11 +60,17 @@ contract Exchange is
   }
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test  Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**

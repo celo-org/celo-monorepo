@@ -4,6 +4,12 @@ import "./Exchange.sol";
 
 contract ExchangeEUR is Exchange {
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test  Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Exchange(test) {}
+
+  /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
   * @return The storage, major, minor, and patch version of the contract.
   */

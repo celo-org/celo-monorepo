@@ -43,6 +43,8 @@ MockReserve.numberFormat = 'BigNumber'
 // @ts-ignore
 GoldToken.numberFormat = 'BigNumber'
 
+const isTest = true
+
 contract('Exchange', (accounts: string[]) => {
   let exchange: ExchangeInstance
   let freezer: FreezerInstance
@@ -136,7 +138,7 @@ contract('Exchange', (accounts: string[]) => {
 
     await fundReserve()
 
-    exchange = await Exchange.new()
+    exchange = await Exchange.new(isTest)
     await exchange.initialize(
       registry.address,
       stableToken.address,
