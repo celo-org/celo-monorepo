@@ -29,6 +29,7 @@ export enum Actions {
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   CLEAR_STORED_ACCOUNT = 'ACCOUNT/CLEAR_STORED_ACCOUNT',
   PROFILE_UPLOADED = 'ACCOUNT/PROFILE_UPLOADED',
+  UPDATE_DAILY_LIMIT = 'ACCOUNT/UPDATE_DAILY_LIMIT',
 }
 
 export interface ChooseCreateAccountAction {
@@ -155,6 +156,11 @@ export interface ProfileUploadedAction {
   type: Actions.PROFILE_UPLOADED
 }
 
+export interface UpdateDailyLimitAction {
+  type: Actions.UPDATE_DAILY_LIMIT
+  newLimit: number
+}
+
 export type ActionTypes =
   | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
@@ -184,6 +190,7 @@ export type ActionTypes =
   | AcceptTermsAction
   | ClearStoredAccountAction
   | ProfileUploadedAction
+  | UpdateDailyLimitAction
 
 export function chooseCreateAccount(): ChooseCreateAccountAction {
   return {
@@ -332,4 +339,9 @@ export const clearStoredAccount = (account: string): ClearStoredAccountAction =>
 
 export const profileUploaded = (): ProfileUploadedAction => ({
   type: Actions.PROFILE_UPLOADED,
+})
+
+export const updateCusdDailyLimit = (newLimit: number): UpdateDailyLimitAction => ({
+  type: Actions.UPDATE_DAILY_LIMIT,
+  newLimit,
 })

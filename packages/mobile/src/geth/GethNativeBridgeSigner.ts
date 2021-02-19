@@ -103,20 +103,18 @@ export class GethNativeBridgeSigner implements Signer {
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 
-  decrypt(ciphertext: Buffer): Promise<Buffer> {
-    const ciphertextBase64 = ciphertext.toString('base64')
-    return this.geth.decrypt(this.account, ciphertextBase64).then((textBase64) => {
-      return Buffer.from(textBase64, 'base64')
-    })
+  async decrypt(ciphertext: Buffer): Promise<Buffer> {
+    const textBase64 = await this.geth.decrypt(this.account, ciphertext.toString('base64'))
+    return Buffer.from(textBase64, 'base64')
   }
 
-  computeSharedSecret(publicKey: string): Promise<Buffer> {
+  async computeSharedSecret(publicKey: string): Promise<Buffer> {
     const uncompressedPublicKey = ensureUncompressed(publicKey)
-    return this.geth
-      .computeSharedSecret(this.account, this.hexToBase64(uncompressedPublicKey))
-      .then((secretBase64) => {
-        return Buffer.from(secretBase64, 'base64')
-      })
+    const secretBase64 = await this.geth.computeSharedSecret(
+      this.account,
+      this.hexToBase64(uncompressedPublicKey)
+    )
+    return Buffer.from(secretBase64, 'base64')
   }
 
   hexToBase64(hex: string) {
