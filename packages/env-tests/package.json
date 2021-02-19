@@ -25,7 +25,6 @@
     "build": "tsc -b .",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "test": "jest --runInBand",
-    "alfajores-local": "CELO_ENV=alfajores CELO_PROVIDER=http://localhost:8545 jest --runInBand",
     "baklava-test": "CELO_ENV=baklava CELO_PROVIDER=https://baklava-forno.celo-testnet.org jest --runInBand",
     "alfajores-test": "CELO_ENV=alfajores CELO_PROVIDER=https://alfajores-forno.celo-testnet.org jest --runInBand",
     "mainnet-test": "CELO_ENV=rc1 CELO_PROVIDER=https://forno.celo.org jest --runInBand",
