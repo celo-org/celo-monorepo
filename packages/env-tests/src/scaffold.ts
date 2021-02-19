@@ -1,4 +1,7 @@
 import { concurrentMap } from '@celo/base'
+import { CeloContract } from '@celo/contractkit'
+import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
@@ -19,24 +22,33 @@ export async function fundAccount(
     value: value.toString(),
     address: recipient.address,
   })
-  context.kit.connection.addAccount(root.privateKey)
 
-  const stableToken = await context.kit.contracts.getStableToken()
+  const stableTokensToTest = context.stableTokensToTest
 
-  const rootBalance = await stableToken.balanceOf(root.address)
-  if (rootBalance.lte(value)) {
-    logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
-    throw new Error(
-      `Root account ${root.address}'s balance (${rootBalance.toPrecision(
-        4
-      )}) is not enough for transferring ${value.toPrecision(4)}`
+  for (const [stableToken, stableTokenRegistryName] of stableTokensToTest) {
+    let stableTokenAddress = await context.kit.registry.addressFor(
+      stableTokenRegistryName as CeloContract
     )
-  }
-  const receipt = await stableToken
-    .transfer(recipient.address, value.toString())
-    .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableToken.address })
+    let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
+    let stableTokenInstance = new StableTokenWrapper(context.kit, stableTokenContract)
 
-  logger.debug({ receipt }, 'funded test account')
+    //const stableToken = await context.kit.contracts.getStableToken()
+
+    const rootBalance = await stableTokenInstance.balanceOf(root.address)
+    if (rootBalance.lte(value)) {
+      logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
+      throw new Error(
+        `Root account ${root.address}'s balance (${rootBalance.toPrecision(
+          4
+        )}) is not enough for transferring ${value.toPrecision(4)}`
+      )
+    }
+    const receipt = await stableTokenInstance
+      .transfer(recipient.address, value.toString())
+      .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
+
+    logger.debug({ receipt }, `funded test account with ${stableToken}`)
+  }
 }
 
 export async function getKey(mnemonic: string, account: TestAccounts) {

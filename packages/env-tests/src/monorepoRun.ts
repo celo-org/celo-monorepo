@@ -1,14 +1,9 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { describe } from '@jest/globals'
 import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot } from './scaffold'
-// import { runAttestationTest } from './tests/attestation'
-// import { runExchangeTest } from './tests/exchange'
-// import { runOracleTest } from './tests/oracle'
-// import { runReserveTest } from './tests/reserve'
-import { runTransfercUSDTest } from './tests/transfer'
+import { runExchangeTest } from './tests/exchange'
 
 jest.setTimeout(120000)
 function runTests() {
@@ -20,12 +15,28 @@ function runTests() {
   const kit = newKitFromWeb3(new Web3(process.env.CELO_PROVIDER || 'http://localhost:8545'))
   const mnemonic = process.env.MNEMONIC!
   const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
+  let stableTokensToTest: [String, String][]
+  if (process.env.SECOND_STABLETOKEN) {
+    stableTokensToTest = [
+      ['cUSD', 'StableToken'],
+      ['cEUR', 'StableTokenEUR'],
+    ]
+  } else {
+    stableTokensToTest = [['cUSD', 'StableToken']]
+  }
 
   describe('Run tests in context of monorepo', () => {
-    const context = { kit, mnemonic, logger: rootLogger, reserveSpenderMultiSigAddress }
+    const context = {
+      kit,
+      mnemonic,
+      logger: rootLogger,
+      reserveSpenderMultiSigAddress,
+      stableTokensToTest,
+    }
+
     // TODO: Assert maximum loss after test
-    runTransfercUSDTest(context)
-    // runExchangeTest(context)
+    //runTransfercUSDTest(context)
+    runExchangeTest(context)
     // runOracleTest(context)
     // runReserveTest(context)
     // runAttestationTest(context)

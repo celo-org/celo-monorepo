@@ -1,9 +1,9 @@
-import { describe, expect, test } from '@jest/globals'
-import { EnvTestContext } from '../context'
-import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 import { CeloContract } from '@celo/contractkit'
 import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { describe, expect, test } from '@jest/globals'
+import { EnvTestContext } from '../context'
+import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
 export function runTransfercUSDTest(context: EnvTestContext) {
   describe('Transfer Test', () => {
@@ -12,10 +12,11 @@ export function runTransfercUSDTest(context: EnvTestContext) {
       await fundAccount(context, TestAccounts.TransferFrom, ONE.times(10))
     })
 
-    const stableTokensToTest: [string, string][] = [
-      ['cUSD', 'StableToken'],
-      // ['cEUR', 'StableTokenEUR'],
-    ]
+    const stableTokensToTest = context.stableTokensToTest
+    //: [string, string][] = [
+    //  ['cUSD', 'StableToken'],
+    // ['cEUR', 'StableTokenEUR'],
+    //]
 
     for (const [stableToken, stableTokenRegistryName] of stableTokensToTest) {
       test(`transfer ${stableToken}`, async () => {
@@ -23,15 +24,15 @@ export function runTransfercUSDTest(context: EnvTestContext) {
           stableTokenRegistryName as CeloContract
         )
         let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
-        let stableTokenWrapper = new StableTokenWrapper(context.kit, stableTokenContract)
+        let stableTokenInstance = new StableTokenWrapper(context.kit, stableTokenContract)
 
         const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
         const to = await getKey(context.mnemonic, TestAccounts.TransferTo)
         context.kit.connection.addAccount(from.privateKey)
         context.kit.connection.addAccount(to.privateKey)
-        context.kit.connection.defaultFeeCurrency = stableTokenWrapper.address
+        context.kit.connection.defaultFeeCurrency = stableTokenInstance.address
 
-        const toBalanceBefore = await stableTokenWrapper.balanceOf(to.address)
+        const toBalanceBefore = await stableTokenInstance.balanceOf(to.address)
         logger.debug(
           {
             balance: toBalanceBefore.toString(),
@@ -40,13 +41,13 @@ export function runTransfercUSDTest(context: EnvTestContext) {
           'Get Balance Before'
         )
 
-        const receipt = await stableTokenWrapper
+        const receipt = await stableTokenInstance
           .transfer(to.address, ONE.toString())
           .sendAndWaitForReceipt({ from: from.address })
 
         logger.debug({ receipt }, 'Transferred')
 
-        const toBalanceAfter = await stableTokenWrapper.balanceOf(to.address)
+        const toBalanceAfter = await stableTokenInstance.balanceOf(to.address)
         logger.debug(
           {
             balance: toBalanceAfter.toString(),
