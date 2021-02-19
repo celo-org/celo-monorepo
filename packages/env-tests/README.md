@@ -14,7 +14,7 @@ The `env-tests` package is a set of tests that is designed to be run against CEL
 
 All keys derive funds from the "root key" which should be funded. From it, all test keys are funded in the test setup, increase verbosity with the `LOG_LEVEL` env var to `info` or `debug` to see more information.
 
-By default transfer and exchange tests are performed for cUSD. By setting environmental variable `STABLETOKENS` other stabletokens can be included in testing. `STABLETOKENS`can be set to a comma-separated string of stabletokens to test (e.g. `'cEUR'` for only testing cEUR or `'cUSD,cEUR'` for testing cUSD and cEUR). The input is not case sensitive but cannot contain whitespaces.  
+By default, transfer and exchange tests are performed for cUSD. By setting the env variable `STABLETOKENS` other stabletokens can be included in testing. `STABLETOKENS` can be set to a comma-separated string of stabletokens to test (e.g. `‘CEUR’` for only testing cEUR or `‘CUSD,EUR’` for testing both cUSD and cEUR). 
 
 As part of the testnet contract deploys in `celotool`, privileged keys like reserve spender or oracles can be authorized directly in the migrations. Hence, the relevant tests will pass on environments like `staging` while failing on public environments as the keys are not yet authorized.
 
