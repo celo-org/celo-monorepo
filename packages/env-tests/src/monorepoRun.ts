@@ -4,6 +4,10 @@ import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, StableTokenToRegistryName } from './scaffold'
 import { runExchangeTest } from './tests/exchange'
+import { runTransfersTest } from './tests/transfer'
+import { runReserveTest } from './tests/reserve'
+import { runAttestationTest } from './tests/attestation'
+import { runOracleTest } from './tests/oracle'
 
 jest.setTimeout(120000)
 function runTests() {
@@ -16,12 +20,12 @@ function runTests() {
   const mnemonic = process.env.MNEMONIC!
   const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
 
+  const defaultTokensToTest = ['CUSD']
   let stableTokensToTest: string[]
   if (!process.env.STABLETOKENS) {
-    stableTokensToTest = ['CUSD']
+    stableTokensToTest = defaultTokensToTest
   } else {
-    let tokens = process.env.STABLETOKENS?.split(',')
-    tokens = tokens.map((x) => x.toUpperCase())
+    const tokens = process.env.STABLETOKENS.split(',').map((t) => t.toUpperCase())
     for (let token of tokens) {
       if (!StableTokenToRegistryName[token]) {
         throw new Error(`Invalid token: ${token}`)
@@ -40,11 +44,11 @@ function runTests() {
     }
 
     // TODO: Assert maximum loss after test
-    //runTransfercUSDTest(context)
+    runTransfersTest(context)
     runExchangeTest(context)
-    // runOracleTest(context)
-    // runReserveTest(context)
-    // runAttestationTest(context)
+    runOracleTest(context)
+    runReserveTest(context)
+    runAttestationTest(context)
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing
