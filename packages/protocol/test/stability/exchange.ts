@@ -33,6 +33,8 @@ const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 const Registry: RegistryContract = artifacts.require('Registry')
 const StableToken: StableTokenContract = artifacts.require('StableToken')
 
+const isTest = true
+
 // @ts-ignore
 // TODO(mcortesi): Use BN.js
 StableToken.numberFormat = 'BigNumber'
@@ -42,8 +44,6 @@ Exchange.numberFormat = 'BigNumber'
 MockReserve.numberFormat = 'BigNumber'
 // @ts-ignore
 GoldToken.numberFormat = 'BigNumber'
-
-const isTest = true
 
 contract('Exchange', (accounts: string[]) => {
   let exchange: ExchangeInstance
@@ -110,7 +110,7 @@ contract('Exchange', (accounts: string[]) => {
     freezer = await Freezer.new()
     goldToken = await GoldToken.new()
     mockReserve = await MockReserve.new()
-    stableToken = await StableToken.new()
+    stableToken = await StableToken.new(isTest)
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)

@@ -1,22 +1,10 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  assertLogMatches,
-  assertLogMatches2,
-  assertRevert,
-  timeTravel,
-} from '@celo/protocol/lib/test-utils'
+import { assertLogMatches, assertLogMatches2, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
-import {
-  FreezerContract,
-  FreezerInstance,
-  RegistryContract,
-  RegistryInstance,
-  StableTokenContract,
-  StableTokenInstance,
-} from 'types'
+import { FreezerContract, FreezerInstance, RegistryContract, RegistryInstance, StableTokenContract, StableTokenInstance } from 'types'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -25,6 +13,8 @@ const StableToken: StableTokenContract = artifacts.require('StableToken')
 // @ts-ignore
 // TODO(mcortesi): Use BN.js
 StableToken.numberFormat = 'BigNumber'
+
+const isTest = true
 
 contract('StableToken', (accounts: string[]) => {
   let freezer: FreezerInstance
@@ -39,7 +29,7 @@ contract('StableToken', (accounts: string[]) => {
     registry = await Registry.new()
     freezer = await Freezer.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-    stableToken = await StableToken.new()
+    stableToken = await StableToken.new(isTest)
     const response = await stableToken.initialize(
       'Celo Dollar',
       'cUSD',
@@ -388,6 +378,31 @@ contract('StableToken', (accounts: string[]) => {
 
     it('should not allow anyone else to burn', async () => {
       await assertRevert(stableToken.burn(amountToBurn, { from: accounts[1] }))
+    })
+  })
+
+  describe('#getExchangeRegistryId()', () => {
+    it('should match initialized value', async () => {
+      const stableToken2 = await StableToken.new(isTest)
+      await stableToken2.initialize(
+        'Celo Dollar',
+        'cUSD',
+        18,
+        registry.address,
+        fixed1,
+        SECONDS_IN_A_WEEK,
+        [],
+        [],
+        CeloContractName.ExchangeEUR
+      )
+      const fetchedId = await stableToken2.getExchangeRegistryId()
+      assert.equal(fetchedId, soliditySha3(CeloContractName.ExchangeEUR))
+    })
+
+    it('should fallback to default when uninitialized', async () => {
+      const stableToken2 = await StableToken.new(isTest)
+      const fetchedId = await stableToken2.getExchangeRegistryId()
+      assert.equal(fetchedId, soliditySha3(CeloContractName.Exchange))
     })
   })
 
