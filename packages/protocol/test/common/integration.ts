@@ -571,15 +571,16 @@ Array.from([
   })
 )
 
+// DO NOT FORGET TO REMOVE THE ONLYS HERE
 contract('Integration: Adding StableToken', (accounts: string[]) => {
   const Exchange: ExchangeContract = artifacts.require('Exchange')
   const StableToken: StableTokenContract = artifacts.require('StableToken')
   let exchangeAbc: ExchangeInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
-  let sortedOracles: SortedOraclesInstance
   let stableTokenAbc: StableTokenInstance
-  const sellAmount = 1
+  const sellAmount = web3.utils.toWei('0.1', 'ether')
+  const minBuyAmount = 1
 
   // 0. Make ourselves the owner of the various contracts we will need to interact with, as
   // passing a governance proposal for each one will be a pain in the butt.
@@ -594,7 +595,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     )
     const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
 
-    const proposalId = 2
+    const proposalId = 1
     const dequeuedIndex = 0
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
@@ -606,9 +607,9 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
           destination: (await getDeployedProxiedContract(x, artifacts)).address,
           data: Buffer.from(
             stripHexEncoding(
-              // Any contract's `setOwner` function will work here as the function signatures are all the same.
+              // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
               // @ts-ignore
-              registry.contract.methods.setOwner(accounts[0]).encodeABI()
+              registry.contract.methods.transferOwnership(accounts[0]).encodeABI()
             ),
             'hex'
           ),
@@ -641,24 +642,28 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
   // 1. Mimic the state of the world post-contracts-release
   //   a) Deploy the contracts. For simplicity, omit proxies for now.
-  //   b) Initialize and register the contracts
-  //   c) Confirm mento is effectively frozen
-  describe('When the contracts have been deployed and initialized', () => {
+  //   b) Register the contracts
+  //   c) Initialize the contracts
+  //   d) Confirm mento is effectively frozen
+  describe.only('When the contracts have been deployed and initialized', () => {
     before(async () => {
       exchangeAbc = await Exchange.new()
       stableTokenAbc = await StableToken.new()
 
+      const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+      await registry.setAddressFor('ExchangeABC', exchangeAbc.address)
+      await registry.setAddressFor('StableTokenABC', stableTokenAbc.address)
+
       // TODO: This is not very readable, what are these parameters and why were these values chosen?
-      // TODO: Which happens first, initialization or registration?
       await stableTokenAbc.initialize(
         'Celo Abc',
         'cABC',
-        18,
+        '18',
         '0x000000000000000000000000000000000000ce10',
         '1000000000000000000000000',
         '47304000',
         [accounts[0]],
-        [web3.utils.toWei(1, 'ether')],
+        ['1000000000000000000'],
         'ExchangeABC'
       )
       await exchangeAbc.initialize(
@@ -671,14 +676,15 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       )
     })
 
-    it(`should be impossible to buy stable token`, async () => {
+    it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.buy(sellAmount, 0, true))
+      // TODO: It appears this succeeds if minBuyAmount is zero, seems fine but should think through more thoroughly.
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, 0, false))
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
     })
   })
 
@@ -686,22 +692,26 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   a) Activate the oracles and freeze the mento
   //   b) Make an oracle report
   //   c) Confirm mento is effectively frozen
-  describe('When the contracts have been frozen and an oracle report has been made', () => {
+  describe.only('When the contracts have been frozen and an oracle report has been made', () => {
     before(async () => {
+      const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract(
+        'SortedOracles',
+        artifacts
+      )
       await sortedOracles.addOracle(stableTokenAbc.address, ensureLeading0x(accounts[0]))
       await freezer.freeze(stableTokenAbc.address)
       await freezer.freeze(exchangeAbc.address)
       await sortedOracles.report(stableTokenAbc.address, toFixed(1), NULL_ADDRESS, NULL_ADDRESS)
     })
 
-    it(`should be impossible to buy stable token`, async () => {
+    it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.buy(sellAmount, 0, true))
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, 0, false))
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
     })
   })
 
@@ -709,22 +719,23 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   a) Add the stable token to the reserve
   //   b) Unfreeze the mento
   //   c) Confirm mento is functional
-  describe('When the contracts have been unfrozen and the mento has been activated', () => {
+  describe.only('When the contracts have been unfrozen and the mento has been activated', () => {
     before(async () => {
       const reserve: ReserveInstance = await getDeployedProxiedContract('Reserve', artifacts)
       await reserve.addToken(stableTokenAbc.address)
+      await reserve.addExchangeSpender(exchangeAbc.address)
       await freezer.unfreeze(stableTokenAbc.address)
       await freezer.unfreeze(exchangeAbc.address)
     })
 
-    it(`should be possible to buy stable token`, async () => {
+    it(`should be possible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await exchangeAbc.buy(1, 0, true)
+      await exchangeAbc.sell(sellAmount, minBuyAmount, true)
     })
 
     it(`should be possible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await exchangeAbc.sell(sellAmount, 0, false)
+      await exchangeAbc.sell(sellAmount, minBuyAmount, false)
     })
   })
 })
