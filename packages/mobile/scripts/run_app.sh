@@ -67,7 +67,7 @@ startPackager() {
       if [ "$MACHINE" = "Mac" ]; then
         open -a "$terminal" ./scripts/launch_packager.command || open ./scripts/launch_packager.command || open_failed=1
       elif [ "$MACHINE" = "Linux" ]; then
-        "$terminal" -e "sh ./scripts/launch_packager.command" || open_failed=1
+        "$terminal" -e "./scripts/launch_packager.command" || open_failed=1
       else 
         echo "Unsupported machine for running in new terminal"
         open_failed=1
