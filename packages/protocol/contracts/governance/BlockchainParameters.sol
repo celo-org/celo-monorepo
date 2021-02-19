@@ -2,13 +2,13 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/UsingPrecompiles.sol";
 
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
-contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
+contract BlockchainParameters is Ownable, InitializableV2, UsingPrecompiles {
   using SafeMath for uint256;
 
   struct ClientVersion {
@@ -35,6 +35,12 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
   event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test  Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
