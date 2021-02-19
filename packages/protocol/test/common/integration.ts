@@ -571,7 +571,7 @@ Array.from([
   })
 )
 
-// DO NOT FORGET TO REMOVE THE ONLYS HERE
+// TODO: DO NOT FORGET TO REMOVE THE ONLYS HERE
 contract('Integration: Adding StableToken', (accounts: string[]) => {
   const Exchange: ExchangeContract = artifacts.require('Exchange')
   const StableToken: StableTokenContract = artifacts.require('StableToken')
