@@ -50,3 +50,12 @@ export const phoneRecipientCacheSelector = (state: RootState) =>
   state.recipients.phoneRecipientCache
 export const valoraRecipientCacheSelector = (state: RootState) =>
   state.recipients.valoraRecipientCache
+
+export const recipientInfoSelector = (state: RootState) => {
+  return {
+    addressToE164Number: state.identity.addressToE164Number,
+    phoneRecipientCache: state.recipients.phoneRecipientCache,
+    valoraRecipientCache: state.recipients.valoraRecipientCache,
+    addressToDisplayName: state.identity.addressToDisplayName,
+  }
+}

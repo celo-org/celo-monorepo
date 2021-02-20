@@ -5,7 +5,7 @@ import { showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { openUrl } from 'src/app/actions'
 import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
-import { addressToDisplayNameSelector, addressToE164NumberSelector } from 'src/identity/reducer'
+import { addressToDisplayNameSelector } from 'src/identity/reducer'
 import {
   NotificationReceiveState,
   NotificationTypes,
@@ -13,7 +13,7 @@ import {
 } from 'src/notifications/types'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
-import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
+import { recipientInfoSelector } from 'src/recipients/reducer'
 import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
@@ -36,12 +36,7 @@ function* handlePaymentRequested(
     return
   }
 
-  const info: RecipientInfo = {
-    addressToE164Number: yield select(addressToE164NumberSelector),
-    phoneRecipientCache: yield select(phoneRecipientCacheSelector),
-    valoraRecipientCache: yield select(valoraRecipientCacheSelector),
-    addressToDisplayName: yield select(addressToDisplayNameSelector),
-  }
+  const info: RecipientInfo = yield select(recipientInfoSelector)
   const targetRecipient = getRecipientFromAddress(paymentRequest.requesterAddress, info)
 
   navigateToRequestedPaymentReview({
@@ -59,12 +54,7 @@ function* handlePaymentReceived(
 ) {
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
     const addressToDisplayName = yield select(addressToDisplayNameSelector)
-    const info: RecipientInfo = {
-      addressToE164Number: yield select(addressToE164NumberSelector),
-      phoneRecipientCache: yield select(phoneRecipientCacheSelector),
-      valoraRecipientCache: yield select(valoraRecipientCacheSelector),
-      addressToDisplayName,
-    }
+    const info: RecipientInfo = yield select(recipientInfoSelector)
     const address = transferNotification.sender.toLowerCase()
     const currency = resolveCurrency(transferNotification.currency)
 

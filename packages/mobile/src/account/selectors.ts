@@ -1,4 +1,5 @@
 import { RootState } from 'src/redux/reducers'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 export const getE164PhoneNumber = (state: RootState) => {
   return state.account.e164PhoneNumber
@@ -13,3 +14,12 @@ export const pincodeTypeSelector = (state: RootState) => state.account.pincodeTy
 export const promptFornoIfNeededSelector = (state: RootState) => state.account.promptFornoIfNeeded
 export const isProfileUploadedSelector = (state: RootState) => state.account.profileUploaded
 export const cUsdDailyLimitSelector = (state: RootState) => state.account.dailyLimitCusd
+
+export const currentUserRecipientSelector = (state: RootState) => {
+  return {
+    address: currentAccountSelector(state)!,
+    name: state.account.name ?? undefined,
+    thumbnailPath:
+      state.account.pictureUri ?? state.account.contactDetails.thumbnailPath ?? undefined,
+  }
+}

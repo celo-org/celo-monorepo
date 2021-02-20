@@ -6,12 +6,7 @@ import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import {
-  addressToDisplayNameSelector,
-  addressToE164NumberSelector,
-  e164NumberToAddressSelector,
-  E164NumberToAddressType,
-} from 'src/identity/reducer'
+import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { notificationOutgoingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -21,7 +16,7 @@ import { listItemRenderer } from 'src/paymentRequest/OutgoingPaymentRequestListS
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
-import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
+import { recipientInfoSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
@@ -42,12 +37,7 @@ type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-  recipientInfo: {
-    addressToE164Number: addressToE164NumberSelector(state),
-    phoneRecipientCache: phoneRecipientCacheSelector(state),
-    valoraRecipientCache: valoraRecipientCacheSelector(state),
-    addressToDisplayName: addressToDisplayNameSelector(state),
-  },
+  recipientInfo: recipientInfoSelector(state),
 })
 
 // Payment Request notification for the notification center on home screen

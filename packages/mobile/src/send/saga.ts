@@ -9,18 +9,14 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentEncryption'
-import {
-  addressToDisplayNameSelector,
-  addressToE164NumberSelector,
-  e164NumberToAddressSelector,
-} from 'src/identity/reducer'
+import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { completePaymentRequest } from 'src/paymentRequest/actions'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientHasNumber, RecipientInfo } from 'src/recipients/recipient'
-import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
+import { recipientInfoSelector } from 'src/recipients/reducer'
 import {
   Actions,
   HandleBarcodeDetectedAction,
@@ -93,12 +89,7 @@ export function* watchQrCodeDetections() {
   while (true) {
     const action: HandleBarcodeDetectedAction = yield take(Actions.BARCODE_DETECTED)
     Logger.debug(TAG, 'Barcode detected in watcher')
-    const recipientInfo: RecipientInfo = {
-      addressToE164Number: yield select(addressToE164NumberSelector),
-      phoneRecipientCache: yield select(phoneRecipientCacheSelector),
-      valoraRecipientCache: yield select(valoraRecipientCacheSelector),
-      addressToDisplayName: yield select(addressToDisplayNameSelector),
-    }
+    const recipientInfo: RecipientInfo = yield select(recipientInfoSelector)
 
     const e164NumberToAddress = yield select(e164NumberToAddressSelector)
     const isOutgoingPaymentRequest = action.isOutgoingPaymentRequest

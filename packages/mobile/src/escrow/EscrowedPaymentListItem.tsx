@@ -2,6 +2,7 @@ import RequestMessagingCard from '@celo/react-components/components/RequestMessa
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
+import { connect } from 'react-redux'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -15,7 +16,8 @@ import { InviteDetails } from 'src/invite/actions'
 import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { Recipient } from 'src/recipients/recipient'
+import { NumberToRecipient, Recipient } from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -24,11 +26,21 @@ interface OwnProps {
   invitees: InviteDetails[]
 }
 
-type Props = OwnProps & WithTranslation
+interface StateProps {
+  phoneRecipientCache: NumberToRecipient
+}
+
+type Props = OwnProps & WithTranslation & StateProps
 
 const TAG = 'EscrowedPaymentListItem'
 
 const testID = 'EscrowedPaymentListItem'
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    phoneRecipientCache: state.recipients.phoneRecipientCache,
+  }
+}
 
 export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onRemind = async () => {
@@ -86,15 +98,14 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   }
 
   render() {
-    const { t, payment } = this.props
+    const { t, payment, phoneRecipientCache } = this.props
     const amount = {
       value: divideByWei(payment.amount),
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
-    const recipient: Recipient = {
+    const recipient: Recipient = phoneRecipientCache[payment.recipientPhone] ?? {
       e164PhoneNumber: payment.recipientPhone,
     }
-    // TODO: get display number from recipient cache
 
     return (
       <View style={styles.container}>
@@ -122,4 +133,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation<Props>(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
+export default connect<StateProps, {}, {}, RootState>(
+  mapStateToProps,
+  {}
+)(withTranslation<Props>(Namespaces.inviteFlow11)(EscrowedPaymentListItem))
