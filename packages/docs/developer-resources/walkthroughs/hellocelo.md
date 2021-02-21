@@ -32,6 +32,7 @@ git clone https://github.com/critesjosh/helloCelo.git
 We will be using the Celo ContractKit SDK to interact with the Celo test network (Alfajores). Let's install it. It is already defined in the package.json, so we can get it with
 
 ```
+cd helloCelo
 npm install
 ```
 
