@@ -3,8 +3,11 @@ import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, PairingTypes, SessionTypes } from '@walletconnect/types'
+import debugConfig from 'debug'
 import { SupportedMethods } from './types'
 import { WalletConnectSigner } from './wc-signer'
+
+const debug = debugConfig('kit:wallet:wallet-connect-wallet')
 
 /**
  * Session establishment happens out of band so after somehow
@@ -42,45 +45,12 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
 
     this.options = { relayProvider: 'wss://staging.walletconnect.org', ...options }
     this.metadata = metadata
-
-    this.setupClient()
   }
 
   /**
    * Get the URI needed for out of band session establishment
    */
   public async getUri() {
-    await waitForTruthy(() => this.pairing)
-    return this.pairing!.signal.params.uri
-  }
-
-  onSessionProposal = (proposal: SessionTypes.Proposal) => {
-    console.log('onSessionProposal', proposal)
-  }
-  onSessionCreated = (session: SessionTypes.Created) => {
-    console.log('onSessionCreated', session)
-  }
-  onSessionUpdated = (session: SessionTypes.Update) => {
-    console.log('onSessionUpdated', session)
-  }
-  onSessionDeleted = (session: SessionTypes.DeleteParams) => {
-    console.log('onSessionDeleted', session)
-  }
-
-  onPairingProposal = (pairing: PairingTypes.Proposal) => {
-    this.pairing = pairing
-  }
-  onPairingCreated = (pairing: PairingTypes.Created) => {
-    console.log('onPairingCreated', pairing)
-  }
-  onPairingUpdated = (pairing: PairingTypes.Update) => {
-    console.log('onPairingUpdated', pairing)
-  }
-  onPairingDeleted = (pairing: PairingTypes.DeleteParams) => {
-    console.log('onPairingDeleted', pairing)
-  }
-
-  private async setupClient() {
     this.client = await WalletConnect.init(this.options)
 
     this.client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
@@ -93,21 +63,47 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     this.client.on(CLIENT_EVENTS.pairing.updated, this.onPairingUpdated)
     this.client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
 
-    // @ts-ignore no-dangling-promise
-    this.client
-      .connect({
-        metadata: this.metadata,
-        permissions: {
-          blockchain: {
-            // alfajores, mainnet, baklava
-            chains: ['celo:44787', 'celo:42220', 'celo:62320'],
-          },
-          jsonrpc: {
-            methods: Object.values(SupportedMethods),
-          },
+    this.client.connect({
+      metadata: this.metadata,
+      permissions: {
+        blockchain: {
+          // alfajores, mainnet, baklava
+          chains: ['celo:44787', 'celo:42220', 'celo:62320'],
         },
-      })
-      .then((session) => (this.session = session))
+        jsonrpc: {
+          methods: Object.values(SupportedMethods),
+        },
+      },
+    })
+    await waitForTruthy(() => this.pairing)
+
+    return this.pairing!.signal.params.uri
+  }
+
+  onSessionProposal = (proposal: SessionTypes.Proposal) => {
+    debug('onSessionProposal', proposal)
+  }
+  onSessionCreated = (session: SessionTypes.Created) => {
+    this.session = session
+  }
+  onSessionUpdated = (session: SessionTypes.Update) => {
+    debug('onSessionUpdated', session)
+  }
+  onSessionDeleted = (session: SessionTypes.DeleteParams) => {
+    debug('onSessionDeleted', session)
+  }
+
+  onPairingProposal = (pairing: PairingTypes.Proposal) => {
+    this.pairing = pairing
+  }
+  onPairingCreated = (pairing: PairingTypes.Created) => {
+    debug('onPairingCreated', pairing)
+  }
+  onPairingUpdated = (pairing: PairingTypes.Update) => {
+    debug('onPairingUpdated', pairing)
+  }
+  onPairingDeleted = (pairing: PairingTypes.DeleteParams) => {
+    debug('onPairingDeleted', pairing)
   }
 
   async loadAccountSigners(): Promise<Map<string, WalletConnectSigner>> {

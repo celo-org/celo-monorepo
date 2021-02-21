@@ -24,7 +24,6 @@ export class WalletConnectSigner implements Signer {
   }
 
   private request(method: SupportedMethods, params: any) {
-    console.log(this.session, this.client)
     return this.client.request({
       topic: this.session.topic,
       chainId: this.chainId,

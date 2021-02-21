@@ -77,10 +77,10 @@ describe('e2e tests', () => {
   })
   const testWallet = getTestWallet()
 
-  beforeAll(async (done) => {
-    wallet.init().then(done)
+  beforeAll(async () => {
     const uri = await wallet.getUri()
     await testWallet.init(uri)
+    await wallet.init()
   }, 10000)
 
   afterAll(async () => {
@@ -126,7 +126,7 @@ describe('e2e tests', () => {
 
     it('signTypedData()', async () => {
       try {
-        console.log(await wallet.signTypedData(unknownAddress, TYPED_DATA))
+        await wallet.signTypedData(unknownAddress, TYPED_DATA)
         throw new Error('Expected exception to be thrown')
       } catch (e) {
         assertInvalidAddress(e)

@@ -4,7 +4,10 @@ import { toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { PairingTypes, SessionTypes } from '@walletconnect/types'
+import debugConfig from 'debug'
 import { SupportedMethods } from '../src/types'
+
+const debug = debugConfig('in-memory-wallet')
 
 const privateKey = '04f9d516be49bb44346ca040bdd2736d486bca868693c74d51d274ad92f61976'
 const kit = newKit('https://alfajores-forno.celo-testnet.org')
@@ -42,8 +45,7 @@ export function getTestWallet() {
   let client: WalletConnect
   let sessionTopic: string
 
-  function onSessionProposal(proposal: SessionTypes.Proposal) {
-    console.log('WalletConnect proposal', proposal)
+  const onSessionProposal = (proposal: SessionTypes.Proposal) => {
     const response: SessionTypes.Response = {
       metadata: {
         name: 'Wallet',
@@ -57,28 +59,27 @@ export function getTestWallet() {
     }
     client.approve({ proposal, response })
   }
-  function onSessionCreated(session: SessionTypes.Created) {
-    console.log('onSessionCreated', session)
+  const onSessionCreated = (session: SessionTypes.Created) => {
     sessionTopic = session.topic
   }
-  function onSessionUpdated(session: SessionTypes.Update) {
-    console.log('onSessionUpdated', session)
+  const onSessionUpdated = (session: SessionTypes.Update) => {
+    debug('onSessionUpdated', session)
   }
-  function onSessionDeleted(session: SessionTypes.DeleteParams) {
-    console.log('onSessionDeleted', session)
+  const onSessionDeleted = (session: SessionTypes.DeleteParams) => {
+    debug('onSessionDeleted', session)
   }
 
-  function onPairingProposal(pairing: PairingTypes.Proposal) {
-    console.log('onPairingProposal', pairing)
+  const onPairingProposal = (pairing: PairingTypes.Proposal) => {
+    debug('onPairingProposal', pairing)
   }
-  function onPairingCreated(pairing: PairingTypes.Created) {
-    console.log('onPairingCreated', pairing)
+  const onPairingCreated = (pairing: PairingTypes.Created) => {
+    debug('onPairingCreated', pairing)
   }
-  function onPairingUpdated(pairing: PairingTypes.Update) {
-    console.log('onPairingUpdated', pairing)
+  const onPairingUpdated = (pairing: PairingTypes.Update) => {
+    debug('onPairingUpdated', pairing)
   }
-  function onPairingDeleted(pairing: PairingTypes.DeleteParams) {
-    console.log('onPairingDeleted', pairing)
+  const onPairingDeleted = (pairing: PairingTypes.DeleteParams) => {
+    debug('onPairingDeleted', pairing)
   }
 
   async function onSessionPayload(event: SessionTypes.PayloadEvent) {
@@ -107,6 +108,8 @@ export function getTestWallet() {
       result = (await wallet.decrypt(from, payload)).toString('hex')
     } else {
       // client.reject({})
+      // in memory wallet should always approve actions
+      debug('unknown method', method)
       return
     }
 
