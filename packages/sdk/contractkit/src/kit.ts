@@ -17,16 +17,16 @@ import { CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { ExchangeConfig } from './wrappers/BaseExchange'
+import { StableTokenConfig } from './wrappers/BaseStableTokenWrapper'
 import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
-import { ExchangeConfig } from './wrappers/BaseExchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
 import { LockedGoldConfig } from './wrappers/LockedGold'
 import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
-import { StableTokenConfig } from './wrappers/BaseStableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
 
 /**
@@ -102,7 +102,7 @@ export class ContractKit {
   /** factory for core contract's kit wrappers  */
   readonly contracts: WrapperCache
 
-  /** Basic info for each supported Celo Token **/
+  /** Basic info for each supported Celo Token */
   private readonly celoTokenInfos: {
     [token in CeloTokenSymbol]: CeloTokenInfo
   }

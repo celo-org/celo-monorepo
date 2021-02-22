@@ -1,5 +1,5 @@
-import { BaseExchangeWrapper } from './BaseExchange'
 import { Exchange } from '../generated/Exchange'
+import { BaseExchangeWrapper } from './BaseExchange'
 
 /**
  * Contract that allows to exchange StableToken (cUSD) for GoldToken and vice versa

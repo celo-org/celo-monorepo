@@ -1,7 +1,7 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { StableToken } from '../generated/StableToken'
 import { ContractKit } from '../kit'
 import { BaseStableTokenWrapper } from './BaseStableTokenWrapper'
-import { StableToken } from '../generated/StableToken'
 
 // TEST NOTES: balances defined in test-utils/migration-override
 

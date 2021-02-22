@@ -20,8 +20,8 @@ import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransaction
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
-import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { StableTokenEURWrapper } from './wrappers/StableTokenEURWrapper'
+import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {

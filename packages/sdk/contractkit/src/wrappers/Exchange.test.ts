@@ -1,8 +1,8 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { newKitFromWeb3 } from '../kit'
+import { testExchange } from './BaseExchange.test'
 import { ExchangeWrapper } from './Exchange'
 import { StableTokenWrapper } from './StableTokenWrapper'
-import { testExchange } from './BaseExchange.test'
 
 /*
 TEST NOTES:

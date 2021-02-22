@@ -1,9 +1,9 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { Exchange } from '../generated/Exchange'
+import { StableToken } from '../generated/StableToken'
 import { ContractKit } from '../kit'
 import { BaseExchangeWrapper } from './BaseExchange'
 import { BaseStableTokenWrapper } from './BaseStableTokenWrapper'
-import { Exchange } from '../generated/Exchange'
-import { StableToken } from '../generated/StableToken'
 
 /*
 TEST NOTES:
