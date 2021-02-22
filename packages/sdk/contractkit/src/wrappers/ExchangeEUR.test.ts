@@ -5,10 +5,10 @@ import { StableTokenWrapper } from './StableTokenWrapper'
 
 /*
 TEST NOTES:
-- In migrations: The only account that has cUSD is accounts[0]
+- In migrations: The only account that has cEUR is accounts[0]
 */
 
-testWithGanache('Exchange Wrapper', (web3) => {
+testWithGanache('ExchangeEUR Wrapper', (web3) => {
   const ONE = web3.utils.toWei('1', 'ether')
 
   const LARGE_BUY_AMOUNT = web3.utils.toWei('1000', 'ether')
@@ -59,12 +59,12 @@ testWithGanache('Exchange Wrapper', (web3) => {
 
   describe('#buy', () => {
     test('executes successfully', async () => {
-      const usdAmount = (await exchange.quoteGoldBuy(ONE)).toString()
+      const stableAmount = (await exchange.quoteGoldBuy(ONE)).toString()
       await stableToken
-        .approve(exchange.address, usdAmount)
+        .approve(exchange.address, stableAmount)
         .sendAndWaitForReceipt({ from: accounts[0] })
       const result = await exchange
-        .buy(ONE, usdAmount, true)
+        .buy(ONE, stableAmount, true)
         .sendAndWaitForReceipt({ from: accounts[0] })
       expect(result.events?.Exchanged).toBeDefined()
       expect(result.events?.Exchanged.returnValues.buyAmount).toBe(ONE)
@@ -73,55 +73,39 @@ testWithGanache('Exchange Wrapper', (web3) => {
   })
 
   test('SBAT quoteStableSell', () => expect(exchange.quoteStableSell(ONE)).resolves.toBeBigNumber())
-  test('SBAT use quoteUsdSell as an alias for quoteStableSell', () => {
-    const spy = jest.spyOn(exchange, 'quoteStableSell')
-    expect(exchange.quoteUsdSell(ONE)).resolves.toBeBigNumber()
-    expect(spy).toHaveBeenCalledWith(ONE)
-  })
   test('SBAT quoteGoldSell', () => expect(exchange.quoteGoldSell(ONE)).resolves.toBeBigNumber())
-
   test('SBAT quoteStableBuy', () => expect(exchange.quoteStableBuy(ONE)).resolves.toBeBigNumber())
-  test('SBAT usd quoteUsdBuy as an alias for quoteStableBuy', () => {
-    const spy = jest.spyOn(exchange, 'quoteStableBuy')
-    expect(exchange.quoteUsdBuy(ONE)).resolves.toBeBigNumber()
-    expect(spy).toHaveBeenCalledWith(ONE)
-  })
   test('SBAT quoteGoldBuy', () => expect(exchange.quoteGoldBuy(ONE)).resolves.toBeBigNumber())
 
-  test('SBAT sellDollar', async () => {
-    const goldAmount = await exchange.quoteUsdSell(ONE)
+  test('SBAT sellStable', async () => {
+    const goldAmount = await exchange.quoteStableSell(ONE)
     const approveTx = await stableToken.approve(exchange.address, ONE).send()
     await approveTx.waitReceipt()
-    const sellTx = await exchange.sellDollar(ONE, goldAmount).send()
+    const sellTx = await exchange.sellStable(ONE, goldAmount).send()
     const result = await sellTx.waitReceipt()
     expect(result.events?.Exchanged).toBeDefined()
     expect(result.events?.Exchanged.returnValues.sellAmount).toBe(ONE)
     expect(result.events?.Exchanged.returnValues.soldGold).toBe(false)
   })
-  test('SBAT use sellDollar as an alias for sellStable', () => {
-    const spy = jest.spyOn(exchange, 'sellStable')
-    expect(exchange.quoteUsdBuy(ONE)).resolves.toBeBigNumber()
-    expect(spy).toHaveBeenCalledWith(ONE)
-  })
 
   test('SBAT sellGold', async () => {
-    const usdAmount = await exchange.quoteGoldSell(ONE)
+    const stableAmount = await exchange.quoteGoldSell(ONE)
     const goldToken = await kit.contracts.getGoldToken()
     const approveTx = await goldToken.approve(exchange.address, ONE).send()
     await approveTx.waitReceipt()
-    const sellTx = await exchange.sellGold(ONE, usdAmount).send()
+    const sellTx = await exchange.sellGold(ONE, stableAmount).send()
     const result = await sellTx.waitReceipt()
     expect(result.events?.Exchanged).toBeDefined()
     expect(result.events?.Exchanged.returnValues.sellAmount).toBe(ONE)
     expect(result.events?.Exchanged.returnValues.soldGold).toBe(true)
   })
 
-  test('SBAT buyDollar', async () => {
-    const goldAmount = await exchange.quoteUsdBuy(ONE)
+  test('SBAT buyStable', async () => {
+    const goldAmount = await exchange.quoteStableBuy(ONE)
     const goldToken = await kit.contracts.getGoldToken()
     const approveTx = await goldToken.approve(exchange.address, goldAmount.toString()).send()
     await approveTx.waitReceipt()
-    const buyTx = await exchange.buyDollar(ONE, goldAmount).send()
+    const buyTx = await exchange.buyStable(ONE, goldAmount).send()
     const result = await buyTx.waitReceipt()
     expect(result.events?.Exchanged).toBeDefined()
     expect(result.events?.Exchanged.returnValues.buyAmount).toBe(ONE)
@@ -129,10 +113,10 @@ testWithGanache('Exchange Wrapper', (web3) => {
   })
 
   test('SBAT buyGold', async () => {
-    const usdAmount = await exchange.quoteGoldBuy(ONE)
-    const approveTx = await stableToken.approve(exchange.address, usdAmount.toString()).send()
+    const stableAmount = await exchange.quoteGoldBuy(ONE)
+    const approveTx = await stableToken.approve(exchange.address, stableAmount.toString()).send()
     await approveTx.waitReceipt()
-    const buyTx = await exchange.buyGold(ONE, usdAmount).send()
+    const buyTx = await exchange.buyGold(ONE, stableAmount).send()
     const result = await buyTx.waitReceipt()
     expect(result.events?.Exchanged).toBeDefined()
     expect(result.events?.Exchanged.returnValues.buyAmount).toBe(ONE)
@@ -144,8 +128,8 @@ testWithGanache('Exchange Wrapper', (web3) => {
     expect(sellGoldRate.toNumber()).toBeGreaterThan(0)
   })
 
-  test('SBAT getExchangeRate for selling dollars', async () => {
-    const sellGoldRate = await exchange.getUsdExchangeRate(LARGE_BUY_AMOUNT)
+  test('SBAT getExchangeRate for selling stables', async () => {
+    const sellGoldRate = await exchange.getStableExchangeRate(LARGE_BUY_AMOUNT)
     expect(sellGoldRate.toNumber()).toBeGreaterThan(0)
   })
 })

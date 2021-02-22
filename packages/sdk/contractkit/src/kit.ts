@@ -55,6 +55,7 @@ export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWal
 export interface NetworkConfig {
   election: ElectionConfig
   exchange: ExchangeConfig
+  exchangeEUR: ExchangeConfig
   attestations: AttestationsConfig
   governance: GovernanceConfig
   lockedGold: LockedGoldConfig
@@ -62,16 +63,35 @@ export interface NetworkConfig {
   gasPriceMinimum: GasPriceMinimumConfig
   reserve: ReserveConfig
   stableToken: StableTokenConfig
+  stableTokenEUR: StableTokenConfig
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
   blockchainParameters: BlockchainParametersConfig
 }
 
-interface AccountBalance {
-  CELO: BigNumber
-  cUSD: BigNumber
+enum CeloTokenSymbol {
+  CELO = 'CELO',
+  cUSD = 'cUSD',
+  cEUR = 'cEUR',
+}
+
+type AccountCeloTokenBalance = {
+  [key in keyof typeof CeloTokenSymbol]: BigNumber
+}
+
+interface AccountBalance extends AccountCeloTokenBalance {
   lockedCELO: BigNumber
   pending: BigNumber
+}
+
+interface CeloTokenInfo {
+  contract: CeloToken
+  symbol: CeloTokenSymbol
+}
+
+interface CeloTokenBalanceInfo {
+  balance: BigNumber
+  symbol: CeloTokenSymbol
 }
 
 export class ContractKit {
@@ -82,6 +102,11 @@ export class ContractKit {
   /** factory for core contract's kit wrappers  */
   readonly contracts: WrapperCache
 
+  /** Basic info for each supported Celo Token **/
+  private readonly celoTokenInfos: {
+    [token in CeloTokenSymbol]: CeloTokenInfo
+  }
+
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   gasPriceSuggestionMultiplier = 5
 
@@ -89,6 +114,20 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+    this.celoTokenInfos = {
+      CELO: {
+        contract: CeloContract.GoldToken,
+        symbol: CeloTokenSymbol.CELO,
+      },
+      cUSD: {
+        contract: CeloContract.StableToken,
+        symbol: CeloTokenSymbol.cUSD,
+      },
+      cEUR: {
+        contract: CeloContract.StableTokenEUR,
+        symbol: CeloTokenSymbol.cEUR,
+      },
+    }
   }
 
   getWallet() {
@@ -96,12 +135,8 @@ export class ContractKit {
   }
 
   async getTotalBalance(address: string): Promise<AccountBalance> {
-    const celoToken = await this.contracts.getGoldToken()
-    const stableToken = await this.contracts.getStableToken()
     const lockedCelo = await this.contracts.getLockedGold()
-    const goldBalance = await celoToken.balanceOf(address)
     const lockedBalance = await lockedCelo.getAccountTotalLockedGold(address)
-    const dollarBalance = await stableToken.balanceOf(address)
     let pending = new BigNumber(0)
     try {
       pending = await lockedCelo.getPendingWithdrawalsTotalValue(address)
@@ -109,22 +144,50 @@ export class ContractKit {
       // Just means that it's not an account
     }
 
+    const balanceInfos: CeloTokenBalanceInfo[] = await Promise.all(
+      Object.values(this.celoTokenInfos).map(async (info: CeloTokenInfo) => {
+        const token = await this.contracts.getContract(info.contract)
+        return {
+          symbol: info.symbol,
+          balance: await token.balanceOf(address),
+        }
+      })
+    )
+
+    const balancesPerToken = balanceInfos.reduce(
+      (
+        obj: {
+          [token in CeloTokenSymbol]?: BigNumber
+        },
+        balanceInfo: CeloTokenBalanceInfo
+      ) => ({
+        ...obj,
+        [balanceInfo.symbol]: balanceInfo.balance,
+      }),
+      {}
+    ) as {
+      [token in CeloTokenSymbol]: BigNumber
+    }
+
     return {
-      CELO: goldBalance,
       lockedCELO: lockedBalance,
-      cUSD: dollarBalance,
       pending,
+      ...balancesPerToken,
     }
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
-    const token1 = await this.registry.addressFor(CeloContract.GoldToken)
-    const token2 = await this.registry.addressFor(CeloContract.StableToken)
+    const attestationFeeTokens: string[] = await Promise.all(
+      Object.values(this.celoTokenInfos).map((info: CeloTokenInfo) =>
+        this.registry.addressFor(info.contract)
+      )
+    )
     // There can only be `10` unique parametrized types in Promise.all call, that is how
     // its typescript typing is setup. Thus, since we crossed threshold of 10
     // have to explicitly cast it to just any type and discard type information.
     const promises: Array<Promise<any>> = [
       this.contracts.getExchange(),
+      this.contracts.getExchangeEUR(),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
@@ -133,6 +196,7 @@ export class ContractKit {
       this.contracts.getGasPriceMinimum(),
       this.contracts.getReserve(),
       this.contracts.getStableToken(),
+      this.contracts.getStableTokenEUR(),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
@@ -141,8 +205,8 @@ export class ContractKit {
     const res = await Promise.all([
       contracts[0].getConfig(),
       contracts[1].getConfig(),
-      contracts[2].getConfig([token1, token2]),
-      contracts[3].getConfig(),
+      contracts[2].getConfig(),
+      contracts[3].getConfig(attestationFeeTokens),
       contracts[4].getConfig(),
       contracts[5].getConfig(),
       contracts[6].getConfig(),
@@ -151,28 +215,36 @@ export class ContractKit {
       contracts[9].getConfig(),
       contracts[10].getConfig(),
       contracts[11].getConfig(),
+      contracts[12].getConfig(),
+      contracts[13].getConfig(),
     ])
     return {
       exchange: res[0],
-      election: res[1],
-      attestations: res[2],
-      governance: res[3],
-      lockedGold: res[4],
-      sortedOracles: res[5],
-      gasPriceMinimum: res[6],
-      reserve: res[7],
-      stableToken: res[8],
-      validators: res[9],
-      downtimeSlasher: res[10],
-      blockchainParameters: res[11],
+      exchangeEUR: res[1],
+      election: res[2],
+      attestations: res[3],
+      governance: res[4],
+      lockedGold: res[5],
+      sortedOracles: res[6],
+      gasPriceMinimum: res[7],
+      reserve: res[8],
+      stableToken: res[9],
+      stableTokenEUR: res[10],
+      validators: res[11],
+      downtimeSlasher: res[12],
+      blockchainParameters: res[13],
     }
   }
 
   async getHumanReadableNetworkConfig() {
-    const token1 = await this.registry.addressFor(CeloContract.GoldToken)
-    const token2 = await this.registry.addressFor(CeloContract.StableToken)
+    const attestationFeeTokens: string[] = await Promise.all(
+      Object.values(this.celoTokenInfos).map((info: CeloTokenInfo) =>
+        this.registry.addressFor(info.contract)
+      )
+    )
     const promises: Array<Promise<any>> = [
       this.contracts.getExchange(),
+      this.contracts.getExchangeEUR(),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
@@ -181,6 +253,7 @@ export class ContractKit {
       this.contracts.getGasPriceMinimum(),
       this.contracts.getReserve(),
       this.contracts.getStableToken(),
+      this.contracts.getStableTokenEUR(),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
@@ -188,37 +261,41 @@ export class ContractKit {
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
       contracts[0].getHumanReadableConfig(),
-      contracts[1].getConfig(),
-      contracts[2].getHumanReadableConfig([token1, token2]),
-      contracts[3].getHumanReadableConfig(),
+      contracts[1].getHumanReadableConfig(),
+      contracts[2].getConfig(),
+      contracts[3].getHumanReadableConfig(attestationFeeTokens),
       contracts[4].getHumanReadableConfig(),
       contracts[5].getHumanReadableConfig(),
-      contracts[6].getConfig(),
+      contracts[6].getHumanReadableConfig(),
       contracts[7].getConfig(),
-      contracts[8].getHumanReadableConfig(),
+      contracts[8].getConfig(),
       contracts[9].getHumanReadableConfig(),
       contracts[10].getHumanReadableConfig(),
-      contracts[11].getConfig(),
+      contracts[11].getHumanReadableConfig(),
+      contracts[12].getHumanReadableConfig(),
+      contracts[13].getConfig(),
     ])
     return {
       exchange: res[0],
-      election: res[1],
-      attestations: res[2],
-      governance: res[3],
-      lockedGold: res[4],
-      sortedOracles: res[5],
-      gasPriceMinimum: res[6],
-      reserve: res[7],
-      stableToken: res[8],
-      validators: res[9],
-      downtimeSlasher: res[10],
-      blockchainParameters: res[11],
+      exchangeEUR: res[1],
+      election: res[2],
+      attestations: res[3],
+      governance: res[4],
+      lockedGold: res[5],
+      sortedOracles: res[6],
+      gasPriceMinimum: res[7],
+      reserve: res[8],
+      stableToken: res[9],
+      stableTokenEUR: res[10],
+      validators: res[11],
+      downtimeSlasher: res[12],
+      blockchainParameters: res[13],
     }
   }
 
   /**
    * Set CeloToken to use to pay for gas fees
-   * @param token cUSD (StableToken) or CELO (GoldToken)
+   * @param token CELO (GoldToken) or a supported StableToken
    */
   async setFeeCurrency(token: CeloToken): Promise<void> {
     const address =
