@@ -68,7 +68,7 @@ yarn truffle exec --network development ./scripts/truffle/make-release.js --buil
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
+yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --initialize_data $INITIALIZATION_FILE
 
 if [[ -n $GANACHE_PID ]]; then
     kill $GANACHE_PID
