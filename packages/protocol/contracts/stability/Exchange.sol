@@ -1,6 +1,7 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
@@ -34,8 +35,10 @@ contract Exchange is
   event MinimumReportsSet(uint256 minimumReports);
   event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
+  event StableBucketFractionCapSet(uint256 stableBucketFractionCap);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
+  event MinSupplyForStableBucketCapSet(uint256 minSupplyForStableBucketCap);
 
   FixidityLib.Fraction public spread;
 
@@ -54,6 +57,9 @@ contract Exchange is
   uint256 public updateFrequency;
   uint256 public minimumReports;
 
+  uint256 public minSupplyForStableBucketCap;
+  FixidityLib.Fraction public stableBucketFractionCap;
+
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
     _;
@@ -64,7 +70,7 @@ contract Exchange is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -85,7 +91,9 @@ contract Exchange is
     uint256 _spread,
     uint256 _reserveFraction,
     uint256 _updateFrequency,
-    uint256 _minimumReports
+    uint256 _minimumReports,
+    uint256 _minSupplyForStableBucketCap,
+    uint256 _stableBucketFractionCap
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -94,6 +102,9 @@ contract Exchange is
     setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
+    setMinSupplyForStableBucketCap(_minSupplyForStableBucketCap);
+    setStableBucketFractionCap(_stableBucketFractionCap);
+
     _updateBucketsIfNecessary();
   }
 
@@ -284,6 +295,20 @@ contract Exchange is
   }
 
   /**
+    * @notice Allows owner to set the Stable Bucket Fraction Cap
+    * @param newStableBucketFractionCap The new value for the Stable Bucket Fraction CAP
+    */
+  function setStableBucketFractionCap(uint256 newStableBucketFractionCap) public onlyOwner {
+    stableBucketFractionCap = FixidityLib.wrap(newStableBucketFractionCap);
+    require(
+      stableBucketFractionCap.lt(FixidityLib.fixed1()),
+      "bucket fraction must be smaller than 1"
+    );
+    require(newStableBucketFractionCap > 0, "bucket fraction must be greather than 0");
+    emit StableBucketFractionCapSet(newStableBucketFractionCap);
+  }
+
+  /**
     * @notice Allows owner to set the Reserve Fraction
     * @param newReserveFraction The new value for the reserve fraction
     */
@@ -291,6 +316,19 @@ contract Exchange is
     reserveFraction = FixidityLib.wrap(newReserveFraction);
     require(reserveFraction.lt(FixidityLib.fixed1()), "reserve fraction must be smaller than 1");
     emit ReserveFractionSet(newReserveFraction);
+  }
+
+  /**
+    * @notice Allows owner to set the minSupplyForStableBucketCap, the minimal stableToken supply considered for the stableToken cap
+    * @param newMinSupplyForStableBucketCap The new value for the minSupplyForStableBucketCap
+    */
+  function setMinSupplyForStableBucketCap(uint256 newMinSupplyForStableBucketCap) public onlyOwner {
+    minSupplyForStableBucketCap = newMinSupplyForStableBucketCap;
+    require(
+      newMinSupplyForStableBucketCap > 0,
+      "min supply for stable bucket cap must be greather than 0"
+    );
+    emit MinSupplyForStableBucketCapSet(newMinSupplyForStableBucketCap);
   }
 
   /**
@@ -368,7 +406,31 @@ contract Exchange is
     uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
       exchangeRateDenominator
     );
+
+    uint256 maxStableBucketSize = getStableBucketCap();
+
+    // check if the bucket is bigger
+    uint256 cappedUpdatedStableBucket = Math.min(maxStableBucketSize, updatedStableBucket);
+
+    if (cappedUpdatedStableBucket < updatedStableBucket) {
+      // resize Celo bucket
+      uint256 cappedUpdatedGoldBucket = exchangeRateDenominator.mul((maxStableBucketSize)).div(
+        exchangeRateNumerator
+      );
+      return (cappedUpdatedGoldBucket, cappedUpdatedStableBucket);
+
+    }
+
     return (updatedGoldBucket, updatedStableBucket);
+  }
+
+  /**
+   * @notice returns the max size the stableToken can be set during a bucket update. if the supply of stableToken
+   * is smaller than minSupplyForStableBucketCap, the cap is calculated based on minSupplyForStableBucketCap.
+   */
+  function getStableBucketCap() public view returns (uint256) {
+    uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap);
+    return FixidityLib.newFixed(stableTokenSupply).multiply(stableBucketFractionCap).fromFixed();
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
