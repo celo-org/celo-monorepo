@@ -51,7 +51,11 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   }
 
   rbacHelmParameters() {
-    return [`--set environment.name=${this.celoEnv}`, `--set oracle.replicas=${this.replicas}`]
+    return [
+      `--set environment.name=${this.celoEnv}`,
+      `--set environment.currencyPair=${this.currencyPair}`,
+      `--set oracle.replicas=${this.replicas}`
+    ]
   }
 
   async rbacServiceAccountSecretNames() {
@@ -64,6 +68,6 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   }
 
   rbacReleaseName() {
-    return `${this.celoEnv}-oracle-rbac`
+    return `${this.celoEnv}-${this.currencyPair.toLocaleLowerCase()}-oracle-rbac`
   }
 }
