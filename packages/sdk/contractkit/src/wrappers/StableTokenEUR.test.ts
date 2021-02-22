@@ -6,5 +6,5 @@ import { testStableToken } from './BaseStableToken.test'
 
 testWithGanache('StableToken Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
-  testStableToken(web3, kit.contracts.getStableToken.bind(kit.contracts), 'Celo Dollar', 'cUSD')
+  testStableToken(web3, kit.contracts.getStableTokenEUR.bind(kit.contracts), 'Celo Euro', 'cEUR')
 })
