@@ -28,6 +28,7 @@ import {
   generateInviteLink,
   initiateEscrowTransfer,
   moveAllFundsFromAccount,
+  sendInvite as sendInviteSaga,
   watchRedeemInvite,
   watchSendInvite,
 } from 'src/invite/saga'
@@ -240,6 +241,16 @@ describe('watchSendInvite with Komenci enabled', () => {
       link: WEB_LINK,
     })
     expect(Share.share).toHaveBeenCalledWith({ message: 'sendFlow7:inviteWithEscrowedPayment' })
+  })
+
+  it('adds invitee details when sending invite', async () => {
+    await expectSaga(
+      sendInviteSaga,
+      mockInviteDetails.e164Number,
+      InviteBy.SMS,
+      AMOUNT_TO_SEND,
+      CURRENCY_ENUM.DOLLAR
+    ).put(storeInviteeData(mockInviteDetails))
   })
 })
 

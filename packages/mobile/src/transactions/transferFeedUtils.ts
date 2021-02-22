@@ -77,7 +77,8 @@ function getRecipient(
     if (recipient) {
       return recipient
     } else {
-      return { e164PhoneNumber: phoneNumber }
+      recipient = { e164PhoneNumber: phoneNumber }
+      return recipient
     }
   }
   return getRecipientFromAddress(address, recipientInfo)
