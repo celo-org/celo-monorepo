@@ -37,7 +37,6 @@ function parseComputeSharedSecret(req: any): { from: Address; publicKey: string 
 }
 function parseDecrypt(req: any): { from: string; payload: Buffer } {
   const [from, payload] = req.payload.params
-  console.log(req.payload)
   return { from, payload: Buffer.from(payload, 'hex') }
 }
 

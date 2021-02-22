@@ -1,7 +1,7 @@
 {
   "name": "@celo/wallet-walletconnect",
-  "version": "0.0.1-dev",
-  "description": "Wallet Connect wallet implementation",
+  "version": "1.0.3-dev",
+  "description": "WalletConnect wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "./lib/index.js",
@@ -9,7 +9,9 @@
   "keywords": [
     "celo",
     "blockchain",
-    "sdk"
+    "sdk",
+    "WalletConnect",
+    "wallet"
   ],
   "scripts": {
     "build": "tsc -b .",

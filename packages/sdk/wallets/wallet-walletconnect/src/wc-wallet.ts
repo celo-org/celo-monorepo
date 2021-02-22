@@ -25,7 +25,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
     waitDuration = waitDuration * 1.5
   }
 
-  throw new Error('Unable to get paing session, did you lose internet connection?')
+  throw new Error('Unable to get pairing session, did you lose internet connection?')
 }
 
 /*
