@@ -36,9 +36,9 @@ spec:
     statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ .node_name }}-{{ .index }}
   type: {{ .service_type }}
   publishNotReadyAddresses: true
-  {{ if (eq .service_type "LoadBalancer") }}
+  {{- if (eq .service_type "LoadBalancer") }}
   loadBalancerIP: {{ .load_balancer_ip }}
-  {{ end }}
+  {{- end -}}
 {{- end -}}
 
 {{- define "celo.full-node-statefulset" -}}
@@ -47,8 +47,8 @@ kind: Service
 metadata:
   name: {{ .name }}
   labels:
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
     component: {{ .component_label }}
@@ -60,8 +60,8 @@ spec:
   - port: 8546
     name: ws
   selector:
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
     component: {{ .component_label }}
@@ -71,8 +71,8 @@ kind: Service
 metadata:
   name: {{ .name }}-headless
   labels:
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
     component: {{ .component_label }}
@@ -85,8 +85,8 @@ spec:
   - port: 8546
     name: ws
   selector:
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
     component: {{ .component_label }}
@@ -98,12 +98,12 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: {{ .component_label }}
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
 spec:
-  {{ if .Values.geth.ssd_disks }}
+  {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -114,7 +114,7 @@ spec:
         requests:
           {{- $disk_size := ((eq .name "tx-nodes-private" ) | ternary .Values.geth.privateTxNodediskSizeGB .Values.geth.diskSizeGB ) }}
           storage: {{ $disk_size }}Gi
-  {{ end }}
+  {{- end }}
   podManagementPolicy: Parallel
   replicas: {{ .replicas }}
   serviceName: {{ .name }}
@@ -122,8 +122,8 @@ spec:
     matchLabels:
 {{ include "common.standard.labels" .  | indent 6 }}
       component: {{ .component_label }}
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
       validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
   template:
