@@ -1,9 +1,10 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarValue } from './env-utils'
 import {
   installGenericHelmChart,
+  setHelmArray,
   removeGenericHelmChart,
   upgradeGenericHelmChart
 } from './helm_deploy'
@@ -13,7 +14,7 @@ import {
   getServiceAccountEmail,
   getServiceAccountKey
 } from './service-account-utils'
-import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
+import { outputIncludes, switchToGCPProject } from './utils'
 const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
@@ -30,7 +31,7 @@ const prometheusImageTag = 'v2.22.2'
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
 
-export async function installPrometheusIfNotExists(clusterConfig?: BaseClusterConfig) {
+export async function installPrometheusIfNotExists(context?: string, clusterConfig?: BaseClusterConfig) {
   const prometheusExists = await outputIncludes(
     `helm list -n prometheus`,
     releaseName,
@@ -38,17 +39,17 @@ export async function installPrometheusIfNotExists(clusterConfig?: BaseClusterCo
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(clusterConfig)
+    await installPrometheus(context, clusterConfig)
   }
 }
 
-async function installPrometheus(clusterConfig?: BaseClusterConfig) {
+async function installPrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(clusterConfig)
+    await helmParameters(context, clusterConfig)
   )
 }
 
@@ -61,7 +62,7 @@ export async function upgradePrometheus() {
   return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
-async function helmParameters(clusterConfig?: BaseClusterConfig) {
+async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
   // To save $, don't send metrics to SD that probably won't be used
   // nginx metrics currently breaks sidecar
   const exclusions = [
@@ -95,11 +96,16 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     '__name__!~"workqueue_.+"',
     '__name__!~"nginx_.+"'
   ]
+
+  const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
+  const clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
+  let gcloudProject = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT, {context}) : fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  let gcloudRegion = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_REGION, {context}) : fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+
   const params = [
     `--set namespace=${kubeNamespace}`,
-    `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
-    `--set cluster=${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`,
-    `--set gcloud.region=${fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)}`,
+    `--set gcloud.project=${gcloudProject}`,
+    `--set gcloud.region=${gcloudRegion}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set stackdriver_metrics_prefix=${prometheusImageTag}`,
@@ -109,20 +115,20 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     // of k8s resources as metric labels. If some k8s resources have too many labels,
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
+    `--set cluster=${clusterName}`,
+    `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`
   ]
-  if ((clusterConfig) && (clusterConfig.cloudProvider) !== CloudProvider.GCP ) {
-    const clusterName = clusterConfig.clusterName
-    const cloudProvider = getCloudProviderPrefix(clusterConfig)
+  
+  if (!usingGCP) {
+    const cloudProvider = getCloudProviderPrefix(clusterConfig!)
     params.push(
-      `--set cluster=${clusterConfig.clusterName}`,
-      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterConfig.clusterName}`,
+      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterConfig!.clusterName}`,
       `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-        clusterName, cloudProvider
+        clusterName, cloudProvider, gcloudProject
       )}`
     )
   } else {
     // GCP
-    const clusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
     const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     const cloudProvider = 'gcp'
     const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
@@ -130,21 +136,42 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     console.info(serviceAccountName)
     const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     params.push(
-      `--set cluster=${clusterName}`,
       `--set storageClassName=ssd`,
-      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
       `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
     )
     if (fetchEnvOrFallback(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS, '')) {
       params.push(`--set gcloud.gceScrapeZones={${fetchEnv(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS)}}`)
     }
   }
+
+  // Set scrape job if set for the context
+  if (context) {
+     const scrapeJobName = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_JOB_NAME, {context})
+     const scrapeTargets = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_TARGETS, {context})     
+     const scrapeLabels = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_LABELS, {context})
+
+     if (scrapeJobName) {
+     	params.push(
+	  `--set scrapeJob.Name=${scrapeJobName}`
+	)
+     }
+
+     if (scrapeTargets) {
+  	const targetParams = setHelmArray('scrapeJob.Targets', scrapeTargets.split(','))
+	params.push(...targetParams)	
+     }
+
+     if (scrapeLabels) {
+  	const labelParams = setHelmArray('scrapeJob.Labels', scrapeLabels.split(','))
+	params.push(...labelParams)
+     }
+  }
+
   return params
 }
 
-async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string) {
-  await switchToGCPProjectFromEnv()
-  const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string, gcloudProjectName: string) {
+  await switchToGCPProject(gcloudProjectName)
   const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
 
   await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
@@ -159,7 +186,7 @@ async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, c
 // name and the proper permissions for writing metrics to stackdriver
 async function createPrometheusGcloudServiceAccount(serviceAccountName: string, gcloudProjectName: string) {
   await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
-  const accountCreated = await createServiceAccountIfNotExists(serviceAccountName)
+  const accountCreated = await createServiceAccountIfNotExists(serviceAccountName, gcloudProjectName)
   if (accountCreated) {
     let serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     while (!serviceAccountEmail) {

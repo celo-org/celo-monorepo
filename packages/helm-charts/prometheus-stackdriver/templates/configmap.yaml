@@ -196,3 +196,18 @@ data:
             replacement: '{{ $.Values.cluster }}'
             target_label: cluster_name
 {{ end }}
+{{ if .Values.scrapeJob.Name }}
+      - job_name: {{ .Values.scrapeJob.Name }}
+{{ if .Values.scrapeTargets }}
+      - targets:
+{{- range .Values.scrapeTargets }}
+        -- {{ . }}
+{{ end }}
+{{ end }}
+{{ if .Values.scrapeLabels }}
+      - labels:
+{{- range .Values.scrapeLabels }}
+        {{ . }}
+{{ end }}
+{{ end }}
+{{ end }}

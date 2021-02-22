@@ -28,8 +28,8 @@ export class AksClusterManager extends BaseClusterManager {
     )
   }
 
-  async setupCluster() {
-    await super.setupCluster()
+  async setupCluster(context?: string) {
+    await super.setupCluster(context)
     await this.installAADPodIdentity()
   }
 

@@ -286,6 +286,7 @@ export async function installCertManager() {
 
 export async function installAndEnableMetricsDeps(
   installPrometheus: boolean,
+  context?: string,
   clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
@@ -299,7 +300,7 @@ export async function installAndEnableMetricsDeps(
     )
   }
   if (installPrometheus) {
-    await installPrometheusIfNotExists(clusterConfig)
+    await installPrometheusIfNotExists(context, clusterConfig)
   }
 }
 

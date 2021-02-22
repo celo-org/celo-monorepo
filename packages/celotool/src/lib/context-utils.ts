@@ -138,7 +138,7 @@ export async function switchToContextCluster(celoEnv: string, context: string, c
     await doCheckOrPromptIfStagingOrProduction()
   }
   const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
-  await clusterManager.switchToClusterContext()
+  await clusterManager.switchToClusterContext(false, context)
   return clusterManager
 }
 
