@@ -28,7 +28,7 @@ testWithGanache('Exchange Wrapper', (web3) => {
   })
 
   testExchange(
-    web3,
+    kit,
     kit.contracts.getExchange.bind(kit.contracts),
     kit.contracts.getStableToken.bind(kit.contracts)
   )

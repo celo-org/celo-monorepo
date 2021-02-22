@@ -1,19 +1,19 @@
-import Web3 from 'web3'
-import { newKitFromWeb3 } from '../kit'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { ContractKit } from '../kit'
 import { BaseStableTokenWrapper } from './BaseStableTokenWrapper'
 import { StableToken } from '../generated/StableToken'
 
 // TEST NOTES: balances defined in test-utils/migration-override
 
 export function testStableToken<ST extends StableToken>(
-  web3: Web3,
+  kit: ContractKit,
   stableTokenGetter: () => Promise<BaseStableTokenWrapper<ST>>,
   expectedName: string,
   expectedSymbol: string
 ) {
+  const web3 = kit.web3
   const ONE_STABLE = web3.utils.toWei('1', 'ether')
 
-  const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
   let stableToken: BaseStableTokenWrapper<ST>
 
@@ -32,6 +32,9 @@ export function testStableToken<ST extends StableToken>(
 
   test('SBAT transfer', async () => {
     const before = await stableToken.balanceOf(accounts[1])
+    console.log('defaultAccount', kit.defaultAccount)
+    // @ts-ignore
+    console.log('stableToken default', stableToken.kit.defaultAccount)
     const tx = await stableToken.transfer(accounts[1], ONE_STABLE).send()
     await tx.waitReceipt()
 
@@ -61,3 +64,9 @@ export function testStableToken<ST extends StableToken>(
     expect(after.minus(before)).toEqBigNumber(ONE_STABLE)
   })
 }
+
+testWithGanache('Base Stable Token', () => {
+  test('intentionally empty', () => {
+    // This is intentionally empty to silence an error that there are no tests in this file
+  })
+})

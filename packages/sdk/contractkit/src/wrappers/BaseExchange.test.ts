@@ -1,6 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import Web3 from 'web3'
-import { newKitFromWeb3 } from '../kit'
+import { ContractKit } from '../kit'
 import { BaseExchangeWrapper } from './BaseExchange'
 import { BaseStableTokenWrapper } from './BaseStableTokenWrapper'
 import { Exchange } from '../generated/Exchange'
@@ -12,15 +11,15 @@ TEST NOTES:
 */
 
 export function testExchange<E extends Exchange, ST extends StableToken>(
-  web3: Web3,
+  kit: ContractKit,
   exchangeGetter: () => Promise<BaseExchangeWrapper<E>>,
   stableTokenGetter: () => Promise<BaseStableTokenWrapper<ST>>
 ) {
+  const web3 = kit.web3
   const ONE = web3.utils.toWei('1', 'ether')
 
   const LARGE_BUY_AMOUNT = web3.utils.toWei('1000', 'ether')
 
-  const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
   let exchange: BaseExchangeWrapper<E>
   let stableToken: BaseStableTokenWrapper<ST>
@@ -142,7 +141,7 @@ export function testExchange<E extends Exchange, ST extends StableToken>(
 }
 
 testWithGanache('Base Exchange', () => {
-  test('empty', () => {
-    // This is intentionally empty
+  test('intentionally empty', () => {
+    // This is intentionally empty to silence an error that there are no tests in this file
   })
 })

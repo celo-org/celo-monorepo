@@ -5,7 +5,7 @@ import { testExchange } from './BaseExchange.test'
 testWithGanache('ExchangeEUR Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   testExchange(
-    web3,
+    kit,
     kit.contracts.getExchangeEUR.bind(kit.contracts),
     kit.contracts.getStableTokenEUR.bind(kit.contracts)
   )
