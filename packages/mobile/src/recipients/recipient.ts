@@ -18,14 +18,7 @@ export type Recipient = {
   contactId?: string // unique ID given by phone OS
   thumbnailPath?: string
   displayNumber?: string
-} & (
-  | {
-      e164PhoneNumber: string
-    }
-  | {
-      address: string
-    }
-)
+} & ({ e164PhoneNumber: string } | { address: string })
 
 export type MobileRecipient = Recipient & {
   e164PhoneNumber: string

@@ -35,6 +35,9 @@ export const countryFeatures = {
   MOONPAY_DISABLED: {
     US: true,
   },
+  RAMP_DISABLED: {
+    US: true,
+  },
   PONTO_SUPPORTED: {
     PH: true,
   },

@@ -27,6 +27,7 @@ import {
   RecipientInfo,
 } from 'src/recipients/recipient'
 import RecipientItem from 'src/recipients/RecipientItem'
+import { recipientInfoSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
 interface Section {
@@ -50,12 +51,7 @@ interface StateProps {
 type RecipientProps = Props & WithTranslation & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  recipientInfo: {
-    addressToE164Number: state.identity.addressToE164Number,
-    phoneRecipientCache: state.recipients.phoneRecipientCache,
-    valoraRecipientCache: state.recipients.valoraRecipientCache,
-    addressToDisplayName: state.identity.addressToDisplayName,
-  },
+  recipientInfo: recipientInfoSelector(state),
 })
 
 export class RecipientPicker extends React.Component<RecipientProps> {

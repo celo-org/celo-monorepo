@@ -4,10 +4,11 @@ import { SendOrigin } from 'src/analytics/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { Actions as AppActions, ActionTypes as AppActionTypes } from 'src/app/actions'
 import { Actions, BidaliPaymentRequestedAction } from 'src/fiatExchanges/actions'
+import i18n from 'src/i18n'
 import { updateKnownAddresses } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RecipientKind, RecipientWithAddress } from 'src/recipients/recipient'
+import { AddressRecipient, getDisplayName } from 'src/recipients/recipient'
 import { Actions as SendActions } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
@@ -34,11 +35,9 @@ function* bidaliPaymentRequest({
     throw new Error(`Unsupported payment currency from Bidali: ${currency}`)
   }
 
-  const recipient: RecipientWithAddress = {
-    kind: RecipientKind.Address,
+  const recipient: AddressRecipient = {
     address,
-    displayId: 'BIDALI',
-    displayName: 'Bidali',
+    name: 'Bidali',
     thumbnailPath:
       'https://firebasestorage.googleapis.com/v0/b/celo-mobile-mainnet.appspot.com/o/images%2Fbidali.png?alt=media',
   }
@@ -81,7 +80,10 @@ function* bidaliPaymentRequest({
       // Keep address mapping locally
       yield put(
         updateKnownAddresses({
-          [address]: { name: recipient.displayName, imageUrl: recipient.thumbnailPath || null },
+          [address]: {
+            name: getDisplayName(recipient, i18n.t),
+            imageUrl: recipient.thumbnailPath || null,
+          },
         })
       )
       break

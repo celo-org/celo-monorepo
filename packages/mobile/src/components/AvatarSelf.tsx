@@ -26,20 +26,13 @@ export function AvatarSelf({ iconSize, displayNameStyle }: Props) {
       thumbnailPath: contactDetails.thumbnailPath || undefined,
       name: displayName,
       e164PhoneNumber,
-      address: account || undefined,
+      address: account!,
     }
-  } else if (account) {
+  } else {
     recipient = {
-      address: account,
+      address: account!,
     }
   }
 
-  return (
-    <Avatar
-      // @ts-ignore
-      recipient={recipient}
-      iconSize={iconSize}
-      displayNameStyle={displayNameStyle}
-    />
-  )
+  return <Avatar recipient={recipient} iconSize={iconSize} displayNameStyle={displayNameStyle} />
 }

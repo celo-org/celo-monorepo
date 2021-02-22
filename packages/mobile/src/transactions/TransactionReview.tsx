@@ -5,15 +5,11 @@ import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard, {
   ExchangeConfirmationCardProps,
 } from 'src/exchange/ExchangeConfirmationCard'
-import {
-  addressToDisplayNameSelector,
-  addressToE164NumberSelector,
-  SecureSendPhoneNumberMapping,
-} from 'src/identity/reducer'
+import { SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
-import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
+import { recipientInfoSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import TransferConfirmationCard, {
   TransferConfirmationCardProps,
@@ -62,12 +58,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { confirmationProps } = ownProps.route.params
   const { secureSendPhoneNumberMapping } = state.identity
   const addressHasChanged = hasAddressChanged(confirmationProps, secureSendPhoneNumberMapping)
-  const recipientInfo = {
-    addressToE164Number: addressToE164NumberSelector(state),
-    phoneRecipientCache: phoneRecipientCacheSelector(state),
-    valoraRecipientCache: valoraRecipientCacheSelector(state),
-    addressToDisplayName: addressToDisplayNameSelector(state),
-  }
+  const recipientInfo = recipientInfoSelector(state)
 
   return { addressHasChanged, recipientInfo }
 }

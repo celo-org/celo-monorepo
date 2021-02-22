@@ -3,12 +3,7 @@ import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import {
-  addressToDisplayNameSelector,
-  addressToE164NumberSelector,
-  e164NumberToAddressSelector,
-  E164NumberToAddressType,
-} from 'src/identity/reducer'
+import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
@@ -18,7 +13,7 @@ import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRe
 import { getOutgoingPaymentRequests } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRecipientFromAddress, RecipientInfo } from 'src/recipients/recipient'
-import { phoneRecipientCacheSelector, valoraRecipientCacheSelector } from 'src/recipients/reducer'
+import { recipientInfoSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -37,12 +32,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
   paymentRequests: getOutgoingPaymentRequests(state),
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-  recipientInfo: {
-    addressToE164Number: addressToE164NumberSelector(state),
-    phoneRecipientCache: phoneRecipientCacheSelector(state),
-    valoraRecipientCache: valoraRecipientCacheSelector(state),
-    addressToDisplayName: addressToDisplayNameSelector(state),
-  },
+  recipientInfo: recipientInfoSelector(state),
 })
 
 type Props = WithTranslation & StateProps & DispatchProps

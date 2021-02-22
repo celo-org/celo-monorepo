@@ -24,11 +24,12 @@ import config from 'src/geth/networkConfig'
 import { extensionToMimeType, getDataURL, saveRecipientPicture } from 'src/utils/image'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getWallet } from 'src/web3/contracts'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector, dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'account/profileInfo'
 
-async function makeCall(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
+async function authorizeURLs(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
   const response = await fetch(config.CIP8AuthorizerUrl, {
     method: 'POST',
     headers: {
@@ -103,7 +104,7 @@ class UploadServiceDataWrapper implements OffchainDataWrapper {
       Buffer.from(JSON.stringify(signedUrlsPayload)).toString('hex')
     )
     const authorization = await this.kit.getWallet().signPersonalMessage(this.signer, hexPayload)
-    const signedUrls = await makeCall(signedUrlsPayload, authorization)
+    const signedUrls = await authorizeURLs(signedUrlsPayload, authorization)
     await Promise.all(
       signedUrls.map(({ url, fields }, i) => {
         const formData = new FormData()
@@ -174,17 +175,14 @@ class UploadServiceDataWrapper implements OffchainDataWrapper {
   }
 }
 
-// requires that the DEK has already been registered
 export function* uploadProfileInfo() {
   const isAlreadyUploaded = yield select(isProfileUploadedSelector)
   if (isAlreadyUploaded) {
     return
   }
   try {
-    yield call(unlockDEK, true)
-    // yield call(addMetadataClaim)
+    // TODO: yield call(addMetadataClaim)
     yield call(uploadNameAndPicture)
-
     yield put(profileUploaded())
   } catch (e) {
     Logger.error(TAG + '@uploadProfileInfo', 'Error uploading profile', e)
@@ -220,9 +218,10 @@ export function* uploadProfileInfo() {
 //   }
 // }
 
+// requires that the DEK has already been registered on chain
 export function* uploadNameAndPicture() {
-  console.log('uploading name and picture')
-  yield call(unlockDEK)
+  yield call(getConnectedUnlockedAccount)
+  yield call(unlockDEK, true)
 
   const contractKit = yield call(getContractKit)
   const account = yield select(currentAccountSelector)
@@ -253,7 +252,7 @@ export function* uploadNameAndPicture() {
 }
 
 // this function gives permission to the recipient to view the user's profile info
-export function* uploadSymmetricKeys(recipientAddresses: string[]) {
+export function* giveProfileAccess(recipientAddresses: string[]) {
   // TODO: check if key for recipient already exists, skip if yes
   const account = yield select(currentAccountSelector)
   const contractKit = yield call(getContractKit)
@@ -262,19 +261,22 @@ export function* uploadSymmetricKeys(recipientAddresses: string[]) {
 
   const nameAccessor = new PrivateNameAccessor(offchainWrapper)
   let writeError = yield call([nameAccessor, 'allowAccess'], recipientAddresses)
+  if (writeError) {
+    Logger.error(TAG + '@giveProfileAccess', writeError)
+    throw Error(`Unable to give ${recipientAddresses} access to name`)
+  }
 
   const pictureUri = yield select(pictureSelector)
   if (pictureUri) {
     const pictureAccessor = new PrivatePictureAccessor(offchainWrapper)
     writeError = yield call([pictureAccessor, 'allowAccess'], recipientAddresses)
+    if (writeError) {
+      Logger.error(TAG + '@giveProfileAccess', writeError)
+      throw Error(`Unable to give ${recipientAddresses} access to picture`)
+    }
   }
 
-  Logger.info(TAG + '@uploadSymmetricKeys', 'uploaded symmetric keys for ' + recipientAddresses)
-
-  if (writeError) {
-    Logger.error(TAG + '@uploadSymmetricKeys', writeError)
-    throw Error('Unable to write keys')
-  }
+  Logger.info(TAG + '@giveProfileAccess', 'uploaded symmetric keys for ' + recipientAddresses)
 }
 
 export function* getProfileInfo(address: string) {
@@ -307,16 +309,16 @@ function* unlockDEK(addAccount = false) {
   if (!privateDataKey) {
     throw new Error('No data key in store. Should never happen.')
   }
-  const dataKeyaddress = normalizeAddressWith0x(
+  const dataKeyAddress = normalizeAddressWith0x(
     privateKeyToAddress(ensureLeading0x(privateDataKey))
   )
   const wallet: UnlockableWallet = yield call(getWallet)
   if (addAccount) {
     try {
       yield call([wallet, wallet.addAccount], privateDataKey, '')
-    } catch (e) {
-      Logger.warn('Tried adding DEK to geth wallet when it already exists')
+    } catch (error) {
+      Logger.warn('Unable to add DEK to geth wallet', error)
     }
   }
-  yield call([wallet, wallet.unlockAccount], dataKeyaddress, '', 0)
+  yield call([wallet, wallet.unlockAccount], dataKeyAddress, '', 0)
 }
