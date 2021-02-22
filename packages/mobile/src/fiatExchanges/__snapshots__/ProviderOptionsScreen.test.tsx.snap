@@ -14,7 +14,7 @@ exports[`ProviderOptionsScreen renders correctly 1`] = `
         Object {
           "flex": 1,
           "flexDirection": "column",
-          "marginHorizontal": 16,
+          "marginRight": 16,
         }
       }
     >
@@ -26,6 +26,7 @@ exports[`ProviderOptionsScreen renders correctly 1`] = `
             "fontSize": 16,
             "lineHeight": 22,
             "marginBottom": 16,
+            "paddingLeft": 16,
           }
         }
       >
@@ -40,95 +41,227 @@ exports[`ProviderOptionsScreen renders correctly 1`] = `
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "marginVertical": 24,
-              },
-              Object {
-                "opacity": 1,
-              },
-            ]
+            Object {
+              "backgroundColor": "#FFFFFF",
+            }
           }
-          testID="Provider/Moonpay"
         >
-          <Image
-            resizeMode="contain"
-            source={
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
               Object {
-                "testUri": "../../../packages/mobile/src/images/moonpay.png",
+                "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
+                "type": "ThemeAttrAndroid",
               }
             }
-            style={
-              Object {
-                "height": 30,
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
               }
-            }
-          />
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                  }
+                }
+                testID="Provider/Moonpay"
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                >
+                  Moonpay
+                </Text>
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/link-arrow.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "height": 32,
+                      "width": 32,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
         </View>
         <View
           style={
             Object {
-              "backgroundColor": "#EDEEEF",
-              "height": 1,
-              "width": "100%",
+              "backgroundColor": "#FFFFFF",
             }
           }
-        />
-        <View
-          accessible={true}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "marginVertical": 24,
-              },
-              Object {
-                "opacity": 1,
-              },
-            ]
-          }
-          testID="Provider/Simplex"
         >
-          <Image
-            resizeMode="contain"
-            source={
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
               Object {
-                "testUri": "../../../packages/mobile/src/images/simplex.png",
+                "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
+                "type": "ThemeAttrAndroid",
               }
             }
-            style={
-              Object {
-                "height": 30,
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
               }
-            }
-          />
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                  }
+                }
+                testID="Provider/Simplex"
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                >
+                  Simplex
+                </Text>
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/link-arrow.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "height": 32,
+                      "width": 32,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
         </View>
         <View
           style={
             Object {
-              "backgroundColor": "#EDEEEF",
-              "height": 1,
-              "width": "100%",
+              "backgroundColor": "#FFFFFF",
             }
           }
-        />
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "rippleRadius": undefined,
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                  }
+                }
+                testID="Provider/Ramp"
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                >
+                  Ramp
+                </Text>
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/link-arrow.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "height": 32,
+                      "width": 32,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+        </View>
       </View>
       <Modal
         animationType="none"

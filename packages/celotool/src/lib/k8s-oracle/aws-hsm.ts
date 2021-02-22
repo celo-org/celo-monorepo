@@ -152,11 +152,11 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
   }
 
   awsHsmRoleName(identity: AwsHsmOracleIdentity) {
-    return `${identity.keyAlias}-${identity.address}`.substring(0, 64)
+    return `${identity.keyAlias}-${identity.currencyPair}-${identity.address}`.substring(0, 64)
   }
 
   awsHsmPolicyName(identity: AwsHsmOracleIdentity) {
-    return `${identity.keyAlias}-${identity.address}`
+    return `${identity.keyAlias}-${identity.currencyPair}-${identity.address}`
   }
 
   get deploymentConfig(): AwsHsmOracleDeploymentConfig {
