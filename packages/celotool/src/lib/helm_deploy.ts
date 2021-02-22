@@ -708,15 +708,15 @@ async function helmIPParameters(celoEnv: string) {
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   const gethMetricsOverrides = fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === "true"
     ? [
-        `--set metrics="true"`,
-        `--set pprof.enabled="true"`,
-        `--set pprof.path="/debug/metrics/prometheus"`,
-        `--set pprof.port="6060"`,
-      ]
+      `--set metrics="true"`,
+      `--set pprof.enabled="true"`,
+      `--set pprof.path="/debug/metrics/prometheus"`,
+      `--set pprof.port="6060"`,
+    ]
     : [
-        `--set metrics="false"`,
-        `--set pprof.enabled="false"`,
-      ]
+      `--set metrics="false"`,
+      `--set pprof.enabled="false"`,
+    ]
 
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
@@ -727,7 +727,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       `--set geth.overwriteBootnodePrivateKey="true"`,
       `--set geth.bootnodePrivateKey="${fetchEnv(envVar.GETH_BOOTNODE_OVERWRITE_PKEY)}"`,
     ]
-  : [
+    : [
       `--set geth.overwriteBootnodePrivateKey="false"`,
     ]
 
@@ -801,12 +801,21 @@ async function installHelmDiffPlugin() {
   }
 }
 
+function valuesOverrideArg(chartDir: string, filename: string | undefined) {
+  if (filename === undefined) {
+    return ""
+  }
+
+  return `-f ${chartDir}/${filename}`
+}
+
 export async function installGenericHelmChart(
   celoEnv: string,
   releaseName: string,
   chartDir: string,
   parameters: string[],
-  buildDependencies: boolean = true
+  buildDependencies: boolean = true,
+  valuesOverrideFile?: string
 ) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
@@ -815,10 +824,14 @@ export async function installGenericHelmChart(
   if (isCelotoolHelmDryRun()) {
     console.info(`This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${celoEnv} with parameters:`)
     console.info(parameters)
+    if (valuesOverrideFile !== undefined) {
+      console.info(`And with values override: ${valuesOverrideFile}`)
+    }
   } else {
     console.info(`Installing helm release ${releaseName}`)
+    const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
     await helmCommand(
-      `helm install ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+      `helm install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
     )
   }
 }
@@ -827,21 +840,23 @@ export async function upgradeGenericHelmChart(
   celoEnv: string,
   releaseName: string,
   chartDir: string,
-  parameters: string[]
+  parameters: string[],
+  valuesOverrideFile?: string
 ) {
   await buildHelmChartDependencies(chartDir)
+  const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
 
   if (isCelotoolHelmDryRun()) {
     console.info(`Simulating the upgrade of helm release ${releaseName}`)
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`,
+      `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`,
       true
     )
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
     )
     console.info(`Upgraded helm release ${releaseName} successful`)
   }

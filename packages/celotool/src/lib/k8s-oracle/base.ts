@@ -4,15 +4,19 @@ import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChar
 
 const helmChartPath = '../helm-charts/oracle'
 
+export type CurrencyPair = 'CELOUSD' | 'CELOEUR' | 'CELOBTC'
+
 /**
  * Represents the identity of a single oracle
  */
 export interface OracleIdentity {
   address: string
+  currencyPair: CurrencyPair
 }
 
 export interface BaseOracleDeploymentConfig {
   context: string
+  currencyPair: CurrencyPair
   identities: OracleIdentity[]
   useForno: boolean
 }
@@ -31,7 +35,9 @@ export abstract class BaseOracleDeployer {
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(),
+      true,
+      `${this.currencyPair}.yaml`
     )
   }
 
@@ -40,7 +46,8 @@ export abstract class BaseOracleDeployer {
       this.celoEnv,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters()
+      await this.helmParameters(),
+      `${this.currencyPair}.yaml`
     )
   }
 
@@ -62,8 +69,6 @@ export abstract class BaseOracleDeployer {
       `--set oracle.replicas=${this.replicas}`,
       `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
-      `--set oracle.metrics.enabled=true`,
-      `--set oracle.metrics.prometheusPort=9090`,
       `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
     ].concat(await this.oracleIdentityHelmParameters())
   }
@@ -86,7 +91,7 @@ export abstract class BaseOracleDeployer {
   }
 
   get releaseName() {
-    return `${this.celoEnv}-oracle`
+    return `${this.celoEnv}-${this.currencyPair.toLocaleLowerCase()}-oracle`
   }
 
   get kubeNamespace() {
@@ -103,5 +108,9 @@ export abstract class BaseOracleDeployer {
 
   get context(): string {
     return this.deploymentConfig.context
+  }
+
+  get currencyPair(): CurrencyPair {
+    return this.deploymentConfig.currencyPair
   }
 }
