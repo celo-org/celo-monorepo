@@ -37,7 +37,7 @@ npm install
 
 ## Importing ContractKit
 
-We will be writing our Node.js app in the `helloCello.js` file.
+We will be writing our Node.js app in the `helloCelo.js` file.
 
 Import the contract kit into our script with
 
