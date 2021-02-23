@@ -146,10 +146,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/reserve-web": {
-    "location": "packages/reserve-site",
-    "dependencies": []
-  },
   "@celo/typescript": {
     "location": "packages/typescript",
     "dependencies": []
