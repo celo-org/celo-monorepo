@@ -1,10 +1,23 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertLogMatches, assertLogMatches2, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertLogMatches,
+  assertLogMatches2,
+  assertRevert,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
-import { FreezerContract, FreezerInstance, RegistryContract, RegistryInstance, StableTokenContract, StableTokenInstance } from 'types'
+import {
+  FreezerContract,
+  FreezerInstance,
+  RegistryContract,
+  RegistryInstance,
+  StableTokenContract,
+  StableTokenInstance,
+} from 'types'
+import { soliditySha3 } from 'web3-utils'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -38,7 +51,8 @@ contract('StableToken', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK,
       [],
-      []
+      [],
+      'Exchange' // USD
     )
     initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
@@ -92,7 +106,8 @@ contract('StableToken', (accounts: string[]) => {
           fixed1,
           SECONDS_IN_A_WEEK,
           [],
-          []
+          [],
+          'Exchange' // USD
         )
       )
     })
