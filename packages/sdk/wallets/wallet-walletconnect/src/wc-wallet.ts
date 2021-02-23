@@ -2,7 +2,7 @@ import { sleep } from '@celo/base'
 import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
-import { ClientOptions, PairingTypes, SessionTypes } from '@walletconnect/types'
+import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
 import debugConfig from 'debug'
 import { SupportedMethods } from './types'
 import { WalletConnectSigner } from './wc-signer'
@@ -28,31 +28,51 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
   throw new Error('Unable to get pairing session, did you lose internet connection?')
 }
 
+const defaultInitOptions: ClientOptions = { relayProvider: 'wss://staging.walletconnect.org' }
+const defaultConnectOptions: ClientTypes.ConnectParams = {
+  metadata: {
+    name: 'ContractKit',
+    description:
+      "Celo's ContractKit is a library to help developers and validators to interact with the celo-blockchain.",
+    url: 'https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit',
+    icons: [],
+  },
+  permissions: {
+    blockchain: {
+      // alfajores, mainnet, baklava
+      chains: ['celo:44787', 'celo:42220', 'celo:62320'],
+    },
+    jsonrpc: {
+      methods: Object.values(SupportedMethods),
+    },
+  },
+}
+
 /*
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
  */
 export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
-  private options: ClientOptions
-  private metadata: SessionTypes.Metadata
+  private initOptions: ClientOptions
+  private connectOptions: ClientTypes.ConnectParams
 
   private client?: WalletConnect
   private pairing?: PairingTypes.Settled
   private pairingProposal?: PairingTypes.Proposal
   private session?: SessionTypes.Settled
 
-  constructor({ options, metadata }: { options?: ClientOptions; metadata: SessionTypes.Metadata }) {
+  constructor({ init, connect }: { init?: ClientOptions; connect?: ClientTypes.ConnectParams }) {
     super()
 
-    this.options = { relayProvider: 'wss://staging.walletconnect.org', ...options }
-    this.metadata = metadata
+    this.initOptions = { ...defaultInitOptions, ...init }
+    this.connectOptions = { ...defaultConnectOptions, ...connect }
   }
 
   /**
    * Get the URI needed for out of band session establishment
    */
   public async getUri() {
-    this.client = await WalletConnect.init(this.options)
+    this.client = await WalletConnect.init(this.initOptions)
 
     this.client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
     this.client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
@@ -64,18 +84,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     this.client.on(CLIENT_EVENTS.pairing.updated, this.onPairingUpdated)
     this.client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
 
-    this.client.connect({
-      metadata: this.metadata,
-      permissions: {
-        blockchain: {
-          // alfajores, mainnet, baklava
-          chains: ['celo:44787', 'celo:42220', 'celo:62320'],
-        },
-        jsonrpc: {
-          methods: Object.values(SupportedMethods),
-        },
-      },
-    })
+    this.client.connect(this.connectOptions)
 
     await waitForTruthy(() => this.pairingProposal)
     return this.pairingProposal!.signal.params.uri
