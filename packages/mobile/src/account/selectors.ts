@@ -11,5 +11,4 @@ export const defaultCountryCodeSelector = (state: RootState) => state.account.de
 export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
 export const pincodeTypeSelector = (state: RootState) => state.account.pincodeType
 export const promptFornoIfNeededSelector = (state: RootState) => state.account.promptFornoIfNeeded
-export const isProfileUploadedSelector = (state: RootState) => state.account.profileUploaded
 export const cUsdDailyLimitSelector = (state: RootState) => state.account.dailyLimitCusd

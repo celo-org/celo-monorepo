@@ -1,7 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { giveProfileAccess } from 'src/account/profileInfo'
 import { showErrorOrFallback } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -179,7 +178,6 @@ function* sendPayment(
       amount: amount.toString(),
       currency,
     })
-    yield call(giveProfileAccess, [recipientAddress])
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
     ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })

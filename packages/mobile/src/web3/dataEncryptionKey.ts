@@ -18,7 +18,6 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { compressedPubKey, deriveDek } from '@celo/utils/src/dataEncryptionKey'
 import * as bip39 from 'react-native-bip39'
 import { call, put, select } from 'redux-saga/effects'
-import { uploadProfileInfo } from 'src/account/profileInfo'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -128,7 +127,6 @@ export function* registerAccountDek(walletAddress: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
-      yield call(uploadProfileInfo)
       return
     }
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_start)
@@ -189,7 +187,6 @@ export function* registerAccountDek(walletAddress: string) {
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
       newRegistration: true,
     })
-    yield call(uploadProfileInfo)
   } catch (error) {
     // DEK registration failures are not considered fatal. Swallow the error and allow calling saga to proceed.
     // Registration will be re-attempted on next payment send
@@ -276,8 +273,6 @@ export function* registerWalletAndDekViaKomenci(
     newRegistration: true,
     feeless: true,
   })
-
-  yield call(uploadProfileInfo)
 }
 
 // Check if account address and DEK match what's in

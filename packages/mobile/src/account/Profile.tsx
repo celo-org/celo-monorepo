@@ -35,6 +35,7 @@ function Profile({ navigation, route }: Props) {
   useLayoutEffect(() => {
     const onSave = () => {
       dispatch(saveNameAndPicture(newName, newPictureUri))
+      // TODO: Save name and picture on CIP-8.
       dispatch(showMessage(t('namePictureSaved')))
       navigation.goBack()
 
