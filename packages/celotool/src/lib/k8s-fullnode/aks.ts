@@ -26,7 +26,8 @@ export class AksFullNodeDeployer extends BaseFullNodeDeployer {
       // Fix for LES server panic-- don't serve any LES clients!
       `--set geth.maxpeers=150`,
       `--set geth.light.maxpeers=0`,
-      `--set geth.light.serve=0`
+      `--set geth.light.serve=0`,
+      `--set geth.use_gstorage_data=false`
     ]
   }
 
