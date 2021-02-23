@@ -97,8 +97,6 @@ release: {{ .Release.Name }}
 {{- define "common.bootnode-flag-script" -}}
 if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Release.Name }}"
-elif [[ "{{ .Release.Name }}" == "rc1" ]]; then
-  BOOTNODE_FLAG=""
 else
   BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi
@@ -184,7 +182,9 @@ fi
 
     exec geth \
       --port $PORT  \
+{{- if not (contains "rc1" .Release.Name) }}
       "$BOOTNODE_FLAG" \
+{{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
