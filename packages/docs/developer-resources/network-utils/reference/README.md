@@ -136,6 +136,8 @@ Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions a
 See the [contributing guide](https://docs.celo.org/community/contributing) for details on how to participate.
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
 
+All communication and contributions to the Celo project are subject to the [Celo Code of Conduct](https://celo.org/code-of-conduct).
+
 Not yet ready to contribute but do like the project? Support Celo with a ⭐ or share the love in a [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fcelo.org%2F)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DkKggE5OvyhE&via=celohq&text=Checkout%20celo%21%20Love%20what%20they%20are%20building.&hashtags=celo)
 
 <!--

@@ -1,0 +1,26 @@
+oracle:
+  currencyPair: CELOBTC
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      askMaxPercentageDeviation: 0.05
+      bidMaxPercentageDeviation: 0.05
+      maxPercentageBidAskSpread: 0.025
+      # minReportPriceChangeThreshold
+    trades:
+      periodMs: 300000
+      # dataFetchFrequency
+      # minimumTrades
+      # scalingRate
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  exchanges: BITTREX,COINBASE
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%
+    timer:
+      removeExpiredFrequencyMs: 60000

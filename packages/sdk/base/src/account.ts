@@ -14,6 +14,7 @@ export enum MnemonicLanguages {
   japanese,
   korean,
   spanish,
+  portuguese,
 }
 
 export type RandomNumberGenerator = (

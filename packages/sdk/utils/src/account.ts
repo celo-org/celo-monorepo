@@ -214,6 +214,8 @@ function getWordList(language?: MnemonicLanguages) {
       return bip39.wordlists.korean
     case MnemonicLanguages.spanish:
       return bip39.wordlists.spanish
+    case MnemonicLanguages.portuguese:
+      return bip39.wordlists.portuguese
     default:
       return bip39.wordlists.english
   }
@@ -229,6 +231,7 @@ function getAllLanguages() {
     MnemonicLanguages.japanese,
     MnemonicLanguages.korean,
     MnemonicLanguages.spanish,
+    MnemonicLanguages.portuguese,
   ]
 }
 

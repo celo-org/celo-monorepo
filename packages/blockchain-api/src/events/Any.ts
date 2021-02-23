@@ -7,7 +7,7 @@ export class Any extends TransactionType {
   }
 
   getEvent(transaction: Transaction) {
-    return
+    throw new Error('Unknown transaction type')
   }
 
   isAggregatable(): boolean {

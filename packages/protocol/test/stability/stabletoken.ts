@@ -17,6 +17,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { soliditySha3 } from 'web3-utils'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -48,7 +49,8 @@ contract('StableToken', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK,
       [],
-      []
+      [],
+      'Exchange' // USD
     )
     initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
@@ -102,7 +104,8 @@ contract('StableToken', (accounts: string[]) => {
           fixed1,
           SECONDS_IN_A_WEEK,
           [],
-          []
+          [],
+          'Exchange' // USD
         )
       )
     })
@@ -388,6 +391,31 @@ contract('StableToken', (accounts: string[]) => {
 
     it('should not allow anyone else to burn', async () => {
       await assertRevert(stableToken.burn(amountToBurn, { from: accounts[1] }))
+    })
+  })
+
+  describe('#getExchangeRegistryId()', () => {
+    it('should match initialized value', async () => {
+      const stableToken2 = await StableToken.new()
+      await stableToken2.initialize(
+        'Celo Dollar',
+        'cUSD',
+        18,
+        registry.address,
+        fixed1,
+        SECONDS_IN_A_WEEK,
+        [],
+        [],
+        CeloContractName.ExchangeEUR
+      )
+      const fetchedId = await stableToken2.getExchangeRegistryId()
+      assert.equal(fetchedId, soliditySha3(CeloContractName.ExchangeEUR))
+    })
+
+    it('should fallback to default when uninitialized', async () => {
+      const stableToken2 = await StableToken.new()
+      const fetchedId = await stableToken2.getExchangeRegistryId()
+      assert.equal(fetchedId, soliditySha3(CeloContractName.Exchange))
     })
   })
 
