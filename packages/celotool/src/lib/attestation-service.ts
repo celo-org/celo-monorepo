@@ -62,6 +62,7 @@ async function helmParameters(celoEnv: string) {
     `--set geth.genesisFile=${genesisFileJsonB64}`,
     `--set geth.staticNodes="${staticNodesJsonB64}"`,
     `--set geth.genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
+    `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.verbosity=${fetchEnvOrFallback(envVar.GETH_VERBOSITY, '3')}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,

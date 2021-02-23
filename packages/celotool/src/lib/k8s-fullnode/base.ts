@@ -101,6 +101,7 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
+      `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
       `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
       ...(await this.additionalHelmParameters()),
