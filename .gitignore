@@ -92,3 +92,8 @@ packages/docs/_book/
 
 # old packages
 packages/reserve-site/*
+packages/blockchain-api/*
+packages/mobile/*
+packages/moonpay-auth/*
+packages/notification-service/*
+packages/react-components/*
