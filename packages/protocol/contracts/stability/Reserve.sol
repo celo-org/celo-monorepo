@@ -298,6 +298,7 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
     isSpender[spender] = true;
     emit SpenderAdded(spender);
   }
@@ -307,13 +308,20 @@ contract Reserve is
    * @param spender The address that is to be no longer allowed to spend Reserve funds.
    */
   function removeSpender(address spender) external onlyOwner {
-    delete isSpender[spender];
+    isSpender[spender] = false;
     emit SpenderRemoved(spender);
   }
 
-  function isAllowedToSpendExchange(address spender) public view returns (bool) {
-    return
-      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender);
+  /**
+   * @notice Checks if an address is able to spend as an exchange.
+   * @param spender The address to be checked.
+   */
+  modifier isAllowedToSpendExchange(address spender) {
+    require(
+      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender),
+      "Address not allowed to spend"
+    );
+    _;
   }
 
   /**
@@ -321,6 +329,7 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addExchangeSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
     require(!isExchangeSpender[spender], "Address is already Exchange Spender");
     isExchangeSpender[spender] = true;
     exchangeSpenderAddresses.push(spender);
@@ -390,8 +399,11 @@ contract Reserve is
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferExchangeGold(address payable to, uint256 value) external returns (bool) {
-    require(isAllowedToSpendExchange(msg.sender), "Address not allowed to spend");
+  function transferExchangeGold(address payable to, uint256 value)
+    external
+    isAllowedToSpendExchange(msg.sender)
+    returns (bool)
+  {
     return _transferGold(to, value);
   }
 

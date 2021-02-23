@@ -138,7 +138,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
    */
   azureHsmIdentityName(identity: AksHsmOracleIdentity) {
     // Max length from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
-    return `${identity.keyVaultName}-${identity.address}`.substring(0, 128)
+    return `${identity.keyVaultName}-${identity.currencyPair}-${identity.address}`.substring(0, 128)
   }
 
   get deploymentConfig(): AksHsmOracleDeploymentConfig {
