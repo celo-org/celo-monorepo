@@ -37,7 +37,8 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private metadata: SessionTypes.Metadata
 
   private client?: WalletConnect
-  private pairing?: PairingTypes.Proposal
+  private pairing?: PairingTypes.Settled
+  private pairingProposal?: PairingTypes.Proposal
   private session?: SessionTypes.Settled
 
   constructor({ options, metadata }: { options?: ClientOptions; metadata: SessionTypes.Metadata }) {
@@ -75,9 +76,9 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
         },
       },
     })
-    await waitForTruthy(() => this.pairing)
 
-    return this.pairing!.signal.params.uri
+    await waitForTruthy(() => this.pairingProposal)
+    return this.pairingProposal!.signal.params.uri
   }
 
   onSessionProposal = (proposal: SessionTypes.Proposal) => {
@@ -94,16 +95,20 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   }
 
   onPairingProposal = (pairing: PairingTypes.Proposal) => {
-    this.pairing = pairing
+    this.pairingProposal = pairing
   }
   onPairingCreated = (pairing: PairingTypes.Created) => {
-    debug('onPairingCreated', pairing)
+    this.pairing = pairing
   }
   onPairingUpdated = (pairing: PairingTypes.Update) => {
-    debug('onPairingUpdated', pairing)
+    if (!this.pairing) {
+      debug('Attempted to update non existant pairing', pairing)
+      return
+    }
+    this.pairing.peer.metadata = pairing.peer.metadata
   }
-  onPairingDeleted = (pairing: PairingTypes.DeleteParams) => {
-    debug('onPairingDeleted', pairing)
+  onPairingDeleted = () => {
+    this.pairing = undefined
   }
 
   async loadAccountSigners(): Promise<Map<string, WalletConnectSigner>> {
@@ -137,11 +142,15 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     return signer.signRawTransaction(txParams)
   }
 
-  close = () => {
-    if (!this.client || !this.session) {
+  close = async () => {
+    if (!this.client) {
       throw new Error('Wallet must be initialized before calling close()')
     }
 
-    return this.client.disconnect({ topic: this.session.topic, reason: 'Session closed' })
+    if (this.session) {
+      await this.client.disconnect({ topic: this.session.topic, reason: 'Session closed' })
+    }
+
+    await this.client.pairing.delete({ topic: this.pairing!.topic, reason: 'Session closed' })
   }
 }

@@ -84,15 +84,9 @@ describe('e2e tests', () => {
   }, 10000)
 
   afterAll(async () => {
-    await testWallet.close()
     await wallet.close()
-
-    // bug in server side WC V2.0
-    // where closing wallets doesn't exit
-    setTimeout(() => {
-      process.exit()
-    }, 2000)
-  })
+    await testWallet.close()
+  }, 10000)
 
   it('getAccounts()', async () => {
     const accounts = await wallet.getAccounts()
@@ -217,7 +211,5 @@ describe('e2e tests', () => {
       const sharedSecret = await wallet.computeSharedSecret(testAddress, otherPubKey)
       expect(sharedSecret).toEqual(computeECDHSecret(testPrivateKey, otherPubKey))
     })
-
-    it.skip('sendTransaction', () => {})
   })
 })

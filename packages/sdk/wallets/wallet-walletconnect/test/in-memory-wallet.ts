@@ -43,6 +43,7 @@ function parseDecrypt(req: any): { from: string; payload: Buffer } {
 export function getTestWallet() {
   let client: WalletConnect
   let sessionTopic: string
+  let pairingTopic: string
 
   const onSessionProposal = (proposal: SessionTypes.Proposal) => {
     const response: SessionTypes.Response = {
@@ -140,8 +141,9 @@ export function getTestWallet() {
 
       await client.pair({ uri })
     },
-    close() {
-      return client.disconnect({ reason: 'End of session', topic: sessionTopic })
+    async close() {
+      await client.disconnect({ reason: 'End of session', topic: sessionTopic })
+      await client.pairing.delete({ topic: pairingTopic, reason: 'End of session' })
     },
   }
 }

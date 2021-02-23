@@ -27,8 +27,8 @@
     "@celo/wallet-base": "1.0.3-dev",
     "@celo/wallet-remote": "1.0.3-dev",
     "@walletconnect/client": "2.0.0-alpha.26",
-    "bignumber.js": "^9.0.0",
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "ethereumjs-util": "^7.0.8"
   },
   "devDependencies": {
     "@celo/contractkit": "1.0.3-dev",
