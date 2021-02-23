@@ -3,6 +3,7 @@
   "version": "1.0.3-dev",
   "scripts": {
     "build": "tsc",
+    "clean": "tsc -b . --clean",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {

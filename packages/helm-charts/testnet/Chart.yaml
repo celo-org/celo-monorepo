@@ -1,5 +1,5 @@
 name: testnet
-version: 0.2.0
+version: 0.2.1
 description: private Ethereum network Helm chart for Kubernetes
 keywords:
 - celo
@@ -15,5 +15,5 @@ icon: https://avatars1.githubusercontent.com/u/37552875?s=200&v=4
 appVersion: v1.0.0
 dependencies:
 - name: common
-  version: 0.1.0
+  version: 0.1.1
   repository: file://../common

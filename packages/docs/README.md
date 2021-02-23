@@ -72,7 +72,7 @@ Highlights include:
 
 ### Current Status
 
-The Celo project is at a prototype stage.
+The Celo project is live on [Mainnet](https://medium.com/celoorg/its-official-celo-mainnet-is-here-6a3a71763f68)!
 
 The code is entirely open source and available on [GitHub](https://github.com/celo-org). Versions of all the major components of both the protocol and wallet exist, but the platform as a whole is under active development and testing by the Celo community.
 

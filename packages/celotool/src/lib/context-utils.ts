@@ -95,6 +95,37 @@ export function getGCPClusterConfig(context: string): GCPClusterConfig {
 }
 
 /**
+ * Helper function used to extract multiple dynamic env vars based on
+ * an object of dynamic props used for templating.
+ * @param dynamicEnvVars an object whose values correspond to the desired
+ *   dynamic env vars to fetch.
+ * @param dynamicProps the properties used for templatin the variables
+ * @param defaultValues Optional default values if the dynamic env vars are not found
+ * @return an object with the same keys as dynamicEnvVars, but the values are
+ *   the values of the dynamic env vars for the particular context
+ */
+export function getDynamicEnvVarValues<T, P extends object>(
+  dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
+  dynamicProps: P,
+  defaultValues?: { [k in keyof T]: string }
+): {
+    [k in keyof T]: string
+  } {
+  return Object.keys(dynamicEnvVars).reduce(
+    (values: any, k: string) => {
+      const key = k as keyof T
+      const dynamicEnvVar = dynamicEnvVars[key]
+      const defaultValue = defaultValues ? defaultValues[key] : undefined
+      const value = getDynamicEnvVarValue(dynamicEnvVar, dynamicProps, defaultValue)
+      return {
+        ...values,
+        [key]: value,
+      }
+    },
+    {})
+}
+
+/**
  * Given if the desired context is primary, gives the appropriate OracleAzureContext
  * Gives an object with the values of dynamic environment variables for a context.
  * @param dynamicEnvVars an object whose values correspond to the desired
@@ -109,22 +140,9 @@ export function getContextDynamicEnvVarValues<T>(
   context: string,
   defaultValues?: { [k in keyof T]: string }
 ): {
-  [k in keyof T]: string
-} {
-  return Object.keys(dynamicEnvVars).reduce(
-    (values: any, k: string) => {
-      const key = k as keyof T
-      const dynamicEnvVar = dynamicEnvVars[key]
-      const defaultValue = defaultValues ? defaultValues[key] : undefined
-      const value = getDynamicEnvVarValue(dynamicEnvVar, {
-        context
-      }, defaultValue)
-      return {
-        ...values,
-        [key]: value,
-      }
-    },
-  {})
+    [k in keyof T]: string
+  } {
+  return getDynamicEnvVarValues(dynamicEnvVars, { context }, defaultValues)
 }
 
 /**
