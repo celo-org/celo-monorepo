@@ -1,11 +1,16 @@
-import { CeloTx } from '@celo/connect'
-import { Address, newKit } from '@celo/contractkit'
+import { newKit } from '@celo/contractkit'
 import { toChecksumAddress } from '@celo/utils/lib/address'
-import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { PairingTypes, SessionTypes } from '@walletconnect/types'
 import debugConfig from 'debug'
-import { SupportedMethods } from '../src/types'
+import { SupportedMethods } from '../types'
+import {
+  parseComputeSharedSecret,
+  parseDecrypt,
+  parsePersonalSign,
+  parseSignTransaction,
+  parseSignTypedData,
+} from './common'
 
 const debug = debugConfig('in-memory-wallet')
 
@@ -17,28 +22,6 @@ const [account] = wallet.getAccounts()
 
 export const testPrivateKey = privateKey
 export const testAddress = toChecksumAddress(account)
-
-// personal_sign is the one RPC that has [payload, from] rather
-// than [from, payload]
-function parsePersonalSign(req: any): { from: string; payload: string } {
-  const [payload, from] = req.payload.params
-  return { from, payload }
-}
-function parseSignTypedData(req: any): { from: string; payload: EIP712TypedData } {
-  const [from, payload] = req.payload.params
-  return { from, payload: JSON.parse(payload) }
-}
-function parseSignTransaction(req: any): CeloTx {
-  return req.payload.params
-}
-function parseComputeSharedSecret(req: any): { from: Address; publicKey: string } {
-  const [from, publicKey] = req.payload.params
-  return { from, publicKey }
-}
-function parseDecrypt(req: any): { from: string; payload: Buffer } {
-  const [from, payload] = req.payload.params
-  return { from, payload: Buffer.from(payload, 'hex') }
-}
 
 export function getTestWallet() {
   let client: WalletConnect
@@ -126,7 +109,7 @@ export function getTestWallet() {
   return {
     init: async (uri: string) => {
       client = await WalletConnect.init({
-        relayProvider: 'wss://staging.walletconnect.org',
+        relayProvider: process.env.WALLET_CONNECT_BRIGDE,
       })
       client.on(CLIENT_EVENTS.session.proposal, onSessionProposal)
       client.on(CLIENT_EVENTS.session.created, onSessionCreated)

@@ -10,8 +10,9 @@ import { ECIES } from '@celo/utils/lib/ecies'
 import { verifyEIP712TypedDataSigner, verifySignature } from '@celo/utils/src/signatureUtils'
 import { recoverTransaction } from '@celo/wallet-base'
 import Web3 from 'web3'
-import { WalletConnectWallet } from '../src'
-import { getTestWallet, testAddress, testPrivateKey } from './in-memory-wallet'
+import { WalletConnectWallet } from '.'
+import { getTestWallet, testAddress, testPrivateKey } from './test/in-memory-wallet'
+import { MockWalletConnectClient } from './test/mock-client'
 
 const CHAIN_ID = 44378
 const TYPED_DATA = {
@@ -66,26 +67,49 @@ const testTx = {
 }
 const decryptMessage = 'Hello'
 
-describe('e2e tests', () => {
-  const wallet = new WalletConnectWallet({
-    metadata: {
-      name: 'Example Dapp',
-      description: 'Example Dapp for WalletConnect',
-      url: 'https://example.org/',
-      icons: ['https://example.org/favicon.ico'],
+const walletConnectBridge = process.env.WALLET_CONNECT_BRIGDE
+const E2E = !!walletConnectBridge
+
+describe('WalletConnectWallet tests', () => {
+  let wallet: WalletConnectWallet
+  let testWallet: any
+
+  wallet = new WalletConnectWallet({
+    init: {
+      relayProvider: walletConnectBridge,
+    },
+    connect: {
+      metadata: {
+        name: 'Example Dapp',
+        description: 'Example Dapp for WalletConnect',
+        url: 'https://example.org/',
+        icons: [],
+      },
     },
   })
-  const testWallet = getTestWallet()
+
+  if (E2E) {
+    testWallet = getTestWallet()
+  } else {
+    jest
+      .spyOn<any, any>(wallet, 'getWalletConnectClient')
+      .mockImplementation(() => new MockWalletConnectClient())
+  }
 
   beforeAll(async () => {
     const uri = await wallet.getUri()
-    await testWallet.init(uri)
+    await testWallet?.init(uri)
     await wallet.init()
   }, 10000)
 
   afterAll(async () => {
     await wallet.close()
-    await testWallet.close()
+    await testWallet?.close()
+
+    // TODO: bug in WalletConnect V2
+    setTimeout(() => {
+      process.exit(0)
+    }, 10000)
   }, 10000)
 
   it('getAccounts()', async () => {

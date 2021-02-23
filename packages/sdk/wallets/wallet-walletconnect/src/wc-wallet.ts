@@ -28,7 +28,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
   throw new Error('Unable to get pairing session, did you lose internet connection?')
 }
 
-const defaultInitOptions: ClientOptions = { relayProvider: 'wss://staging.walletconnect.org' }
+const defaultInitOptions: ClientOptions = { relayProvider: 'wss://bridge.walletconnect.org' }
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
     name: 'ContractKit',
@@ -48,6 +48,15 @@ const defaultConnectOptions: ClientTypes.ConnectParams = {
   },
 }
 
+/**
+ * Utility for making the API of this package nicer.
+ *
+ * We want to force passing metadata (name, description, etc), but not permissions,
+ * which will likely remain static across dapps.
+ */
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
+type ConnectOptions = Optional<ClientTypes.ConnectParams, 'permissions'>
+
 /*
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
@@ -61,7 +70,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private pairingProposal?: PairingTypes.Proposal
   private session?: SessionTypes.Settled
 
-  constructor({ init, connect }: { init?: ClientOptions; connect?: ClientTypes.ConnectParams }) {
+  constructor({ init, connect }: { init?: ClientOptions; connect?: ConnectOptions }) {
     super()
 
     this.initOptions = { ...defaultInitOptions, ...init }
@@ -69,10 +78,17 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   }
 
   /**
+   * Pulled out to allow mocking
+   */
+  private getWalletConnectClient() {
+    return WalletConnect.init(this.initOptions)
+  }
+
+  /**
    * Get the URI needed for out of band session establishment
    */
   public async getUri() {
-    this.client = await WalletConnect.init(this.initOptions)
+    this.client = await this.getWalletConnectClient()
 
     this.client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
     this.client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
@@ -90,8 +106,8 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     return this.pairingProposal!.signal.params.uri
   }
 
-  onSessionProposal = (proposal: SessionTypes.Proposal) => {
-    debug('onSessionProposal', proposal)
+  onSessionProposal = (sessionProposal: SessionTypes.Proposal) => {
+    debug('onSessionProposal', sessionProposal)
   }
   onSessionCreated = (session: SessionTypes.Created) => {
     this.session = session
@@ -99,12 +115,12 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   onSessionUpdated = (session: SessionTypes.Update) => {
     debug('onSessionUpdated', session)
   }
-  onSessionDeleted = (session: SessionTypes.DeleteParams) => {
-    debug('onSessionDeleted', session)
+  onSessionDeleted = () => {
+    this.session = undefined
   }
 
-  onPairingProposal = (pairing: PairingTypes.Proposal) => {
-    this.pairingProposal = pairing
+  onPairingProposal = (pairingProposal: PairingTypes.Proposal) => {
+    this.pairingProposal = pairingProposal
   }
   onPairingCreated = (pairing: PairingTypes.Created) => {
     this.pairing = pairing
