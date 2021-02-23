@@ -4,8 +4,8 @@ import { execCmdWithExitOnFailure } from './cmd-utils'
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarValue } from './env-utils'
 import {
   installGenericHelmChart,
-  setHelmArray,
   removeGenericHelmChart,
+  setHelmArray,  
   upgradeGenericHelmChart
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
@@ -99,8 +99,8 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   const clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  let gcloudProject = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT, {context}) : fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  let gcloudRegion = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_REGION, {context}) : fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  const gcloudProject = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT, {context}) : fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  const gcloudRegion = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_REGION, {context}) : fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
 
   const params = [
     `--set namespace=${kubeNamespace}`,

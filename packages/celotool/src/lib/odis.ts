@@ -1,7 +1,7 @@
 import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import { createKeyVaultIdentityIfNotExists, deleteAzureKeyVaultIdentity, getAzureKeyVaultIdentityName } from './azure'
 import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
-import { createKeyVaultIdentityIfNotExists, deleteAzureKeyVaultIdentity, getAzureKeyVaultIdentityName } from './aks'
 
 const helmChartPath = '../helm-charts/odis'
 
@@ -54,7 +54,6 @@ export async function installODISHelmChart(
   celoEnv: string,
   context: string,
 ) {
-  console.log('Installing ODIS helm chart')
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -140,6 +139,7 @@ async function ODISSignerKeyVaultIdentityHelmParameters(
   const azureKVIdentity = await createKeyVaultIdentityIfNotExists(context,
 								  getAzureKeyVaultIdentityName(context, identityNamePrefix, keyVaultConfig.vaultName),
 								  keyVaultConfig.vaultName,
+								  null,
 								  null,
 								  ['get'])
   const params: string[] = [
