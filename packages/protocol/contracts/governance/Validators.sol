@@ -120,6 +120,7 @@ contract Validators is
   // The number of blocks to delay a ValidatorGroup's commission update
   uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
+  uint256 public downtimeGracePeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
@@ -162,7 +163,7 @@ contract Validators is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -191,7 +192,8 @@ contract Validators is
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
-    uint256 _commissionUpdateDelay
+    uint256 _commissionUpdateDelay,
+    uint256 _downtimeGracePeriod
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -202,6 +204,7 @@ contract Validators is
     setCommissionUpdateDelay(_commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
+    setDowntimeGracePeriod(_downtimeGracePeriod);
   }
 
   /**
@@ -402,9 +405,7 @@ contract Validators is
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
-    // Grace period of 0.625%
-    uint256 grace_period = 6250000000000000000000;
-    uptime = Math.min(uptime.add(grace_period), FixidityLib.fixed1().unwrap());
+    uptime = Math.min(uptime.add(downtimeGracePeriod), FixidityLib.fixed1().unwrap());
     (numerator, denominator) = fractionMulExp(
       FixidityLib.fixed1().unwrap(),
       FixidityLib.fixed1().unwrap(),
@@ -1279,6 +1280,14 @@ contract Validators is
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
     slashingMultiplierResetPeriod = value;
+  }
+
+  /**
+   * @notice Sets the downtimeGracePeriod property if called by owner.
+   * @param value New downtime grace period for calculating epoch scores.
+   */
+  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
+    downtimeGracePeriod = value;
   }
 
   /**
