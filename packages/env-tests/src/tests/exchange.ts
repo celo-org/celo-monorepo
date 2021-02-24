@@ -2,7 +2,14 @@ import { sleep } from '@celo/base'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { fundAccount, getKey, initStableTokenFromRegistry, ONE, TestAccounts } from '../scaffold'
+import {
+  fundAccount,
+  getKey,
+  initExchangeFromRegistry,
+  initStableTokenFromRegistry,
+  ONE,
+  TestAccounts,
+} from '../scaffold'
 
 export function runExchangeTest(context: EnvTestContext) {
   describe('Exchange Test', () => {
@@ -20,8 +27,8 @@ export function runExchangeTest(context: EnvTestContext) {
         context.kit.defaultAccount = from.address
         context.kit.connection.defaultFeeCurrency = stableTokenInstance.address
         const goldToken = await context.kit.contracts.getGoldToken()
-        const exchange = await context.kit.contracts.getExchange()
 
+        let exchange = await initExchangeFromRegistry(stableToken, context.kit)
         const previousGoldBalance = await goldToken.balanceOf(from.address)
         const goldAmount = await exchange.getBuyTokenAmount(ONE, false)
         logger.debug({ rate: goldAmount.toString() }, `quote selling ${stableToken}`)
@@ -29,13 +36,14 @@ export function runExchangeTest(context: EnvTestContext) {
         const approveTx = await stableTokenInstance.approve(exchange.address, ONE.toString()).send()
         await approveTx.waitReceipt()
         const sellTx = await exchange
-          .sellDollar(
+          .sell(
             ONE,
             // Allow 5% deviation from the quoted price
             goldAmount
               .times(0.95)
               .integerValue(BigNumber.ROUND_DOWN)
-              .toString()
+              .toString(),
+            false
           )
           .send()
         await sellTx.getHash()
