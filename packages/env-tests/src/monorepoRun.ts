@@ -3,10 +3,6 @@ import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, StableTokenToRegistryName } from './scaffold'
-import { runAttestationTest } from './tests/attestation'
-import { runExchangeTest } from './tests/exchange'
-import { runOracleTest } from './tests/oracle'
-import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
 
 jest.setTimeout(120000)
@@ -20,12 +16,14 @@ function runTests() {
   const mnemonic = process.env.MNEMONIC!
   const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
 
-  const defaultTokensToTest = ['CUSD']
+  const defaultTokensToTest = ['cUSD']
   let stableTokensToTest: string[]
   if (!process.env.STABLETOKENS) {
     stableTokensToTest = defaultTokensToTest
   } else {
-    const tokens = process.env.STABLETOKENS.split(',').map((t) => t.toUpperCase())
+    const tokens = process.env.STABLETOKENS.split(',').map(
+      (t) => t.slice(0, 1).toLowerCase() + t.slice(1).toUpperCase()
+    )
     for (let token of tokens) {
       if (!StableTokenToRegistryName[token]) {
         throw new Error(`Invalid token: ${token}`)

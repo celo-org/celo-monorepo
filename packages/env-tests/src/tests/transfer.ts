@@ -1,9 +1,6 @@
-import { CeloContract } from '@celo/contractkit'
-import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { describe, expect, test } from '@jest/globals'
 import { EnvTestContext } from '../context'
-import { fundAccount, getKey, ONE, StableTokenToRegistryName, TestAccounts } from '../scaffold'
+import { fundAccount, getKey, initStableTokenFromRegistry, ONE, TestAccounts } from '../scaffold'
 
 export function runTransfersTest(context: EnvTestContext) {
   describe('Transfer Test', () => {
@@ -14,11 +11,7 @@ export function runTransfersTest(context: EnvTestContext) {
 
     for (const stableToken of context.stableTokensToTest) {
       test(`transfer ${stableToken}`, async () => {
-        let stableTokenAddress = await context.kit.registry.addressFor(
-          StableTokenToRegistryName[stableToken] as CeloContract
-        )
-        let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
-        let stableTokenInstance = new StableTokenWrapper(context.kit, stableTokenContract)
+        let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context)
 
         const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
         const to = await getKey(context.mnemonic, TestAccounts.TransferTo)

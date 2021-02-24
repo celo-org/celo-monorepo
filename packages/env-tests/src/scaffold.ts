@@ -9,9 +9,9 @@ import { EnvTestContext } from './context'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
-export const StableTokenToRegistryName: Record<string, string> = {
-  CUSD: 'StableToken',
-  CEUR: 'StableTokenEur',
+export const StableTokenToRegistryName: Record<string, CeloContract> = {
+  cUSD: CeloContract.StableToken,
+  cEUR: 'StableTokenEur' as CeloContract,
 }
 
 export async function fundAccount(
@@ -30,11 +30,7 @@ export async function fundAccount(
   context.kit.connection.addAccount(root.privateKey)
 
   for (const stableToken of context.stableTokensToTest) {
-    let stableTokenAddress = await context.kit.registry.addressFor(
-      StableTokenToRegistryName[stableToken] as CeloContract
-    )
-    let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
-    let stableTokenInstance = new StableTokenWrapper(context.kit, stableTokenContract)
+    let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context)
 
     const rootBalance = await stableTokenInstance.balanceOf(root.address)
     if (rootBalance.lte(value)) {
@@ -129,4 +125,15 @@ export async function clearAllFundsToRoot(context: EnvTestContext) {
       )
     }
   })
+}
+
+// This function creates as stabletoken instance from a registry address and the StableToken ABI and wraps it with StableTokenWrapper.
+// It is required for cEUR testing until cEUR stabletoken wrapper is included in ContractKit.
+// Function is supposed to be dprecated as soon as cEUR stabeletoken is wrapped.
+export async function initStableTokenFromRegistry(stableToken: string, context: EnvTestContext) {
+  let stableTokenAddress = await context.kit.registry.addressFor(
+    StableTokenToRegistryName[stableToken]
+  )
+  let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
+  return new StableTokenWrapper(context.kit, stableTokenContract)
 }
