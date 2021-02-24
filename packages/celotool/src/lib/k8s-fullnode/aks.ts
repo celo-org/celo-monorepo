@@ -27,7 +27,9 @@ export class AksFullNodeDeployer extends BaseFullNodeDeployer {
       `--set geth.maxpeers=150`,
       `--set geth.light.maxpeers=0`,
       `--set geth.light.serve=0`,
-      `--set geth.use_gstorage_data=false`
+      `--set geth.use_gstorage_data=false`,
+      `--set geth.resources.requests.cpu=1`,
+      `--set geth.resources.requests.memory=1Gi`,
     ]
   }
 
