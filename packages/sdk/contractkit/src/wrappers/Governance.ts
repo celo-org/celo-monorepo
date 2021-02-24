@@ -384,7 +384,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the approver multisig contract for proposals and hotfixes.
    */
-  getApproverMultisig = () => this.getApprover().then(this.kit.contracts.getMultiSig)
+  getApproverMultisig = () =>
+    this.getApprover().then((address) => this.kit.contracts.getMultiSig(address))
 
   async getProposalStage(proposalID: BigNumber.Value): Promise<ProposalStage> {
     // NOTE: `methods.getProposalStage` is broken for case where proposal is queued and expired
