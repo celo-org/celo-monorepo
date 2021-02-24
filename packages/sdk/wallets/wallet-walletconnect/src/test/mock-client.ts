@@ -44,7 +44,7 @@ export class MockWalletConnectClient extends EventEmitter {
 
   async request(event: SessionTypes.PayloadEvent) {
     const {
-      // tslint:disable-next-line
+      // @ts-ignore
       request: { method },
     } = event
 
