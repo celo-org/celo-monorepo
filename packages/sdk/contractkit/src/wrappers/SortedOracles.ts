@@ -303,12 +303,14 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    if (target === CeloContract.StableToken) {
+    if (target === CeloContract.StableToken || target === CeloContract.StableTokenEUR) {
       return this.kit.registry.addressFor(target)
     } else if (isValidAddress(target)) {
       return target
     } else {
-      throw new Error(`${target} is neither CeloContract.StableToken or a valid Address`)
+      throw new Error(
+        `${target} is neither CeloContract.StableToken, CeloContract.StableTokenEUR or a valid Address`
+      )
     }
   }
 }
