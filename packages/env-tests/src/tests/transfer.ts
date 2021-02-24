@@ -11,7 +11,7 @@ export function runTransfersTest(context: EnvTestContext) {
 
     for (const stableToken of context.stableTokensToTest) {
       test(`transfer ${stableToken}`, async () => {
-        let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context)
+        let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
         const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
         const to = await getKey(context.mnemonic, TestAccounts.TransferTo)

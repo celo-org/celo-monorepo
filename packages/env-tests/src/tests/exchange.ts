@@ -13,7 +13,7 @@ export function runExchangeTest(context: EnvTestContext) {
 
     for (const stableToken of context.stableTokensToTest) {
       test(`exchange ${stableToken} for CELO`, async () => {
-        let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context)
+        let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
         const from = await getKey(context.mnemonic, TestAccounts.Exchange)
         context.kit.connection.addAccount(from.privateKey)

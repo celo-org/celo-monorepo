@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, StableTokenToRegistryName } from './scaffold'
-import { runTransfersTest } from './tests/transfer'
+import { runExchangeTest } from './tests/exchange'
 
 jest.setTimeout(120000)
 function runTests() {
@@ -21,9 +21,8 @@ function runTests() {
   if (!process.env.STABLETOKENS) {
     stableTokensToTest = defaultTokensToTest
   } else {
-    const tokens = process.env.STABLETOKENS.split(',').map(
-      (t) => t.slice(0, 1).toLowerCase() + t.slice(1).toUpperCase()
-    )
+    const tokens = process.env.STABLETOKENS.split(',')
+
     for (let token of tokens) {
       if (!StableTokenToRegistryName[token]) {
         throw new Error(`Invalid token: ${token}`)
@@ -42,11 +41,11 @@ function runTests() {
     }
 
     // TODO: Assert maximum loss after test
-    runTransfersTest(context)
+    //runTransfersTest(context)
     runExchangeTest(context)
-    runOracleTest(context)
-    runReserveTest(context)
-    runAttestationTest(context)
+    //runOracleTest(context)
+    //runReserveTest(context)
+    //runAttestationTest(context)
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing

@@ -1,5 +1,5 @@
 import { concurrentMap } from '@celo/base'
-import { CeloContract } from '@celo/contractkit'
+import { CeloContract, ContractKit } from '@celo/contractkit'
 import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { generateKeys } from '@celo/utils/lib/account'
@@ -30,7 +30,7 @@ export async function fundAccount(
   context.kit.connection.addAccount(root.privateKey)
 
   for (const stableToken of context.stableTokensToTest) {
-    let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context)
+    let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
     const rootBalance = await stableTokenInstance.balanceOf(root.address)
     if (rootBalance.lte(value)) {
@@ -129,11 +129,9 @@ export async function clearAllFundsToRoot(context: EnvTestContext) {
 
 // This function creates as stabletoken instance from a registry address and the StableToken ABI and wraps it with StableTokenWrapper.
 // It is required for cEUR testing until cEUR stabletoken wrapper is included in ContractKit.
-// Function is supposed to be dprecated as soon as cEUR stabeletoken is wrapped.
-export async function initStableTokenFromRegistry(stableToken: string, context: EnvTestContext) {
-  let stableTokenAddress = await context.kit.registry.addressFor(
-    StableTokenToRegistryName[stableToken]
-  )
-  let stableTokenContract = newStableToken(context.kit.web3, stableTokenAddress)
-  return new StableTokenWrapper(context.kit, stableTokenContract)
+// Function is supposed to be deprecated as soon as cEUR stabeletoken is wrapped.
+export async function initStableTokenFromRegistry(stableToken: string, kit: ContractKit) {
+  let stableTokenAddress = await kit.registry.addressFor(StableTokenToRegistryName[stableToken])
+  let stableTokenContract = newStableToken(kit.web3, stableTokenAddress)
+  return new StableTokenWrapper(kit, stableTokenContract)
 }
