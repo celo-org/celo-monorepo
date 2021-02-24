@@ -9,6 +9,10 @@
     "frozen": false,
     "minimumReports": 1
   },
+  "exchangeEUR": {
+    "frozen": false,
+    "minimumReports": 1
+  },
   "goldToken": {
     "frozen": false
   },
