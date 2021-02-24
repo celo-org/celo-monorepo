@@ -13,7 +13,7 @@ BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 export const StableTokenToRegistryName: Record<string, CeloContract> = {
   cUSD: CeloContract.StableToken,
-  cEUR: 'StableTokenEur' as CeloContract,
+  cEUR: 'StableTokenEUR' as CeloContract,
 }
 
 export const ExchangeToRegistryName: Record<string, CeloContract> = {
@@ -134,7 +134,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext) {
   })
 }
 
-// This function creates as stabletoken instance from a registry address and the StableToken ABI and wraps it with StableTokenWrapper.
+// This function creates an stabletoken instance from a registry address and the StableToken ABI and wraps it with StableTokenWrapper.
 // It is required for cEUR testing until cEUR stabletoken wrapper is included in ContractKit.
 // Function is supposed to be deprecated as soon as cEUR stabletoken is wrapped.
 export async function initStableTokenFromRegistry(stableToken: string, kit: ContractKit) {
@@ -143,6 +143,9 @@ export async function initStableTokenFromRegistry(stableToken: string, kit: Cont
   return new StableTokenWrapper(kit, stableTokenContract)
 }
 
+// This function creates an exchange instance from a registry address and the Exchange ABI and wraps it with ExchangeWrapper.
+// It is required for cEUR testing until cEUR exchange wrapper is included in ContractKit.
+// Function is supposed to be deprecated as soon as cEUR exchange is wrapped.
 export async function initExchangeFromRegistry(stableToken: string, kit: ContractKit) {
   let exchangeAddress = await kit.registry.addressFor(ExchangeToRegistryName[stableToken])
   let exchangeContract = newExchange(kit.web3, exchangeAddress)
