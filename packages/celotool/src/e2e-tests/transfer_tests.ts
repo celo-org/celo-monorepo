@@ -135,19 +135,18 @@ interface BalanceWatcher {
 }
 
 async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<BalanceWatcher> {
-  const stableToken = await kit.contracts.getStableToken()
   const goldToken = await kit.contracts.getGoldToken()
+  const stableToken = await kit.contracts.getStableToken()
+  const stableTokenEUR = await kit.contracts.getStableTokenEUR()
 
   async function fetch() {
-    const balances: Record<
-      string,
-      { [CeloContract.GoldToken]: BigNumber; [CeloContract.StableToken]: BigNumber }
-    > = {}
+    const balances: Record<string, { [key in CeloToken]: BigNumber }> = {}
     await Promise.all(
       accounts.map(async (a) => {
         balances[a] = {
           [CeloContract.GoldToken]: await goldToken.balanceOf(a),
           [CeloContract.StableToken]: await stableToken.balanceOf(a),
+          [CeloContract.StableTokenEUR]: await stableTokenEUR.balanceOf(a),
         }
       })
     )
