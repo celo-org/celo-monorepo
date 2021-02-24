@@ -40,7 +40,7 @@ export function getTestWallet() {
         accounts: [`${account}@celo:44787`],
       },
     }
-    client.approve({ proposal, response })
+    return client.approve({ proposal, response })
   }
   const onSessionCreated = (session: SessionTypes.Created) => {
     sessionTopic = session.topic
@@ -56,7 +56,7 @@ export function getTestWallet() {
     debug('onPairingProposal', pairing)
   }
   const onPairingCreated = (pairing: PairingTypes.Created) => {
-    debug('onPairingCreated', pairing)
+    pairingTopic = pairing.topic
   }
   const onPairingUpdated = (pairing: PairingTypes.Update) => {
     debug('onPairingUpdated', pairing)
@@ -96,7 +96,7 @@ export function getTestWallet() {
       return
     }
 
-    client.respond({
+    return client.respond({
       topic,
       response: {
         id,

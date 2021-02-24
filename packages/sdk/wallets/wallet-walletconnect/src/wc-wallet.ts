@@ -100,9 +100,11 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     this.client.on(CLIENT_EVENTS.pairing.updated, this.onPairingUpdated)
     this.client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
 
+    // tslint:disable-next-line
     this.client.connect(this.connectOptions)
 
     await waitForTruthy(() => this.pairingProposal)
+
     return this.pairingProposal!.signal.params.uri
   }
 

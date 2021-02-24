@@ -15,6 +15,7 @@ import {
 const pairingTopic = 'XXX'
 
 export class MockWalletConnectClient extends EventEmitter {
+  // tslint:disable-next-line
   init() {}
 
   async connect() {
@@ -29,6 +30,7 @@ export class MockWalletConnectClient extends EventEmitter {
       topic: pairingTopic,
       peer: {
         metadata: {},
+        // tslint:disable-next-line
         delete: () => {},
       },
     })
@@ -42,7 +44,7 @@ export class MockWalletConnectClient extends EventEmitter {
 
   async request(event: SessionTypes.PayloadEvent) {
     const {
-      // @ts-ignore
+      // tslint:disable-next-line
       request: { method },
     } = event
 
@@ -75,5 +77,6 @@ export class MockWalletConnectClient extends EventEmitter {
     return result
   }
 
+  // tslint:disable-next-line
   disconnect() {}
 }
