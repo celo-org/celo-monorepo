@@ -1,12 +1,11 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import { createKeyVaultIdentityIfNotExists, deleteAzureKeyVaultIdentity } from './azure'
 import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
-import { AksClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/komenci'
 const rbacHelmChartPath = '../helm-charts/komenci-rbac'
@@ -120,7 +119,7 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   for (const identity of komenciConfig.identities) {
     // If the identity is using Azure HSM signing, clean it up too
     if (identity.azureHsmIdentity) {
-      await deleteAzureKeyVaultIdentity(context, komenciIdentity.azureHsmIdentity.identityName, komenciIdentity.azureHsmIdentity.keyVaultName)
+      await deleteAzureKeyVaultIdentity(context, identity.azureHsmIdentity.identityName, identity.azureHsmIdentity.keyVaultName)
     }
   }
 }
@@ -219,7 +218,7 @@ async function komenciIdentityHelmParameters(
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
     if (komenciIdentity.azureHsmIdentity) {
-      const azureIdentity = await createKeyVaultIdentityIfNotExists(context, komenciIdentity.identityName, komenciIdentity.keyVaultName, komenciIdentity.resourceGroup, ['get', 'list', 'sign'], null)
+      const azureIdentity = await createKeyVaultIdentityIfNotExists(context, komenciIdentity.azureHsmIdentity.identityName, komenciIdentity.azureHsmIdentity.keyVaultName, komenciIdentity.azureHsmIdentity.resourceGroup, ['get', 'list', 'sign'], null)
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,

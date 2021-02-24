@@ -165,7 +165,7 @@ export async function createKeyVaultIdentityIfNotExists(
   context: string,
   identityName: string,
   keyVaultName: string,
-  keyVaultResourceGroup: string | null,
+  keyVaultResourceGroup: string | null | undefined,
   keyPermissions: string[] | null,
   secretPermissions: string[] | null
 ) {
@@ -192,7 +192,7 @@ export async function createKeyVaultIdentityIfNotExists(
 async function setKeyVaultPolicyIfNotSet(
   clusterConfig: AksClusterConfig,
   keyVaultName: string,
-  keyVaultResourceGroup: string,
+  keyVaultResourceGroup: string | null | undefined,
   azureIdentity: any,
   keyPermissions: string[] | null,
   secretPermissions: string[] | null
