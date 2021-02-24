@@ -32,9 +32,6 @@ export function testStableToken<ST extends StableToken>(
 
   test('SBAT transfer', async () => {
     const before = await stableToken.balanceOf(accounts[1])
-    console.log('defaultAccount', kit.defaultAccount)
-    // @ts-ignore
-    console.log('stableToken default', stableToken.kit.defaultAccount)
     const tx = await stableToken.transfer(accounts[1], ONE_STABLE).send()
     await tx.waitReceipt()
 

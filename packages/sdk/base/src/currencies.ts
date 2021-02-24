@@ -32,11 +32,12 @@ export const CURRENCIES: CurrencyObject = {
 
 export const resolveCurrency = (label: string): CURRENCY_ENUM => {
   if (label) {
-    if (label.toLowerCase().includes('dollar')) {
+    const lowerCaseLabel = label.toLowerCase()
+    if (lowerCaseLabel.includes('dollar')) {
       return CURRENCY_ENUM.DOLLAR
-    } else if (label.toLowerCase().includes('euro')) {
+    } else if (lowerCaseLabel.includes('euro')) {
       return CURRENCY_ENUM.EURO
-    } else if (label.toLowerCase().includes('gold')) {
+    } else if (lowerCaseLabel.includes('gold')) {
       return CURRENCY_ENUM.GOLD
     }
   }

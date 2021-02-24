@@ -1,8 +1,6 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-// import { Address } from '@celo/base'
-// import 'bignumber.js'
 import BigNumber from 'bignumber.js'
 import { Ierc20 } from '../generated/IERC20'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
@@ -60,9 +58,4 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
     undefined,
     valueToBigNumber
   )
-  // balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(valueToBigNumber)
-  /* WARNING: The actual call to the Gold contract of the balanceOf:
-   * `balanceOf = proxyCall(this.contract.methods.balanceOf, undefined, valueToBigNumber)`
-   * has issues with web3. Keep the one calling getBalance
-   */
 }

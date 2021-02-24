@@ -1,7 +1,6 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-// import { Address } from '@celo/base'
 import 'bignumber.js'
 import { ICeloToken } from '../generated/ICeloToken'
 import { Ierc20 } from '../generated/IERC20'
