@@ -9,6 +9,7 @@ import {
   generatePrivateKey,
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { portForwardAnd } from 'src/lib/port_forward'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
@@ -41,6 +42,7 @@ function getEnvMnemonic(env: string): string {
 }
 
 export const handler = async (argv: UpgradeFaucetArgs) => {
+  exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv()
   console.info(`Upgrading faucet for network ${argv.celoEnv} on project ${argv.firebaseProject}`)
 
