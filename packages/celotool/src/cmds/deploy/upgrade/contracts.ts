@@ -1,6 +1,7 @@
 import { downloadArtifacts, uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { migrationOverrides, truffleOverrides } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import yargs from 'yargs'
@@ -23,6 +24,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: ContractsArgv) => {
+  exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv()
 
   console.info(`Upgrading smart contracts on ${argv.celoEnv}`)
