@@ -56,8 +56,8 @@ geth:
     imagePullPolicy: IfNotPresent
   resources:
     requests:
-      memory: "512Mi"
-      cpu: "1000m"
+      memory: "4Gi"
+      cpu: "2"
     # limits:
     #   memory: "1Gi"
     #   cpu: "2000m"
@@ -79,6 +79,7 @@ geth:
   azure_mixed_protocols: true
   use_static_ips: true
   readiness_probe_max_block_age_seconds: 30
+  readiness_probe_max_block_epoch_age_seconds: 300
   rpc_apis: eth,net,rpc,web3
   create_network_endpoint_group: false
   updateStrategy:
@@ -97,6 +98,7 @@ genesis:
   network: baklavastaging
   useGenesisFileBase64: false
   genesisFileBase64: ""
+  epoch_size: 17280
 
 # If Prometheus is true, metrics and pprof set to true
 prometheus: true
