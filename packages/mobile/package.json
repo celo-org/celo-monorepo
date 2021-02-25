@@ -25,8 +25,8 @@
     "test:ci": "yarn test --coverage",
     "test:watch": "yarn test --watch --maxWorkers=4",
     "test:verbose": "export TZ=UTC && jest --verbose",
-    "test:e2e:android": "./scripts/run_e2e.sh -p android",
-    "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
+    "test:e2e:android": "./scripts/run_e2e.sh -p android -r",
+    "test:e2e:ios": "./scripts/run_e2e.sh -p ios -r",
     "test:e2e:packager": "export CELO_TEST_CONFIG=e2e && yarn react-native start",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
@@ -250,7 +250,7 @@
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Release -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
+        "build": "set -o pipefail && xcodebuild -verbose -workspace ios/celo.xcworkspace -scheme celo-test -configuration Release -sdk iphonesimulator -derivedDataPath ios/build",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"

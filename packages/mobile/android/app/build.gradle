@@ -99,13 +99,16 @@ project.ext.sentryCli = [
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 apply from: "../../../../node_modules/react-native/react.gradle"
-apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
 /**
  * Build for Detox should be minSdkVersion >= 18
  * Use passed property to recognize the build is for detox
  */
 def isDetoxTestBuild = Boolean.valueOf(project.properties['isDetoxBuild'] ?: 'false')
+
+if (!isDetoxTestBuild) {
+  apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
+}
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -120,7 +123,7 @@ def enableSeparateBuildPerCPUArchitecture = true
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = true
+def enableProguardInReleaseBuilds = !isDetoxTestBuild
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -170,7 +173,12 @@ android {
     }
     signingConfigs {
         release {
-            if (project.hasProperty('CELO_RELEASE_STORE_FILE')) {
+            if (isDetoxTestBuild) {
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            } else if (project.hasProperty('CELO_RELEASE_STORE_FILE')) {
                 storeFile file(CELO_RELEASE_STORE_FILE)
                 storePassword System.getenv("CELO_RELEASE_STORE_PASSWORD")
                 keyAlias CELO_RELEASE_KEY_ALIAS
