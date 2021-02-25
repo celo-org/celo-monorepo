@@ -212,11 +212,15 @@ export function isValidContext(context: string) {
  * Must be one of the contexts specified in the environment
  * variable CONTEXTS.
  */
-export function addContextMiddleware(argv: Argv) {
+export function addOptionalContextMiddleware(argv: Argv) {
   return addCeloEnvMiddleware(argv)
     .option('context', {
       description: 'Context to perform the deployment in',
       type: 'string',
     })
+}
+
+ export function addContextMiddleware(argv: Argv) {
+  return addOptionalContextMiddleware(argv)
     .coerce('context', coerceContext)
 }

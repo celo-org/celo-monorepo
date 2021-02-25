@@ -1,6 +1,6 @@
 import { createNamespaceIfNotExists } from '../cluster'
 import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
-import { installAndEnableMetricsDeps, installCertManagerAndNginx } from '../helm_deploy'
+import { installAndEnableMetricsDeps, installCertManagerAndNginx, isCelotoolHelmDryRun } from '../helm_deploy'
 
 export enum CloudProvider {
   AWS,
@@ -66,11 +66,12 @@ export abstract class BaseClusterManager {
 
   async setupCluster() {
     await createNamespaceIfNotExists(this.celoEnv)
+    if (isCelotoolHelmDryRun()) {
+      console.info('Performing any cluster setup that needs to be done...')
 
-    console.info('Performing any cluster setup that needs to be done...')
-
-    await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
-    await installAndEnableMetricsDeps(true, this.clusterConfig)
+      await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
+      await installAndEnableMetricsDeps(true, this.clusterConfig)
+    }
   }
 
   abstract switchToSubscription(): Promise<void>

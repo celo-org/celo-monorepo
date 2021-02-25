@@ -23,9 +23,9 @@ const kubeServiceAccountName = releaseName
 // stackdriver-prometheus-sidecar relevant links:
 // GitHub: https://github.com/Stackdriver/stackdriver-prometheus-sidecar
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
-const sidecarImageTag = '0.8.0'
+const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.22.2'
+const prometheusImageTag = 'v2.25.0'
 
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
