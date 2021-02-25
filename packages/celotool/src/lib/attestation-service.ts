@@ -6,7 +6,7 @@ import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 const helmChartPath = '../helm-charts/attestation-service'
 
 export async function installHelmChart(celoEnv: string) {
-  return await installGenericHelmChart(
+  await installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
