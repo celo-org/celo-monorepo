@@ -277,7 +277,7 @@ export async function installCertManager() {
 
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
-    `kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml`
+    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
   )
   console.info('Updating cert-manager-cluster-issuers dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)

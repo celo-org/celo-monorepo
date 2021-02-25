@@ -24,8 +24,9 @@ export class AksClusterManager extends BaseClusterManager {
   }
 
   async getAndSwitchToClusterContext() {
+    const kubeconfig = process.env['KUBECONFIG'] ? `--file ${process.env['KUBECONFIG']}` : ''
     await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing`
+      `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing ${kubeconfig}`
     )
   }
 

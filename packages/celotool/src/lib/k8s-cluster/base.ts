@@ -66,7 +66,7 @@ export abstract class BaseClusterManager {
 
   async setupCluster() {
     await createNamespaceIfNotExists(this.celoEnv)
-    if (isCelotoolHelmDryRun()) {
+    if (!isCelotoolHelmDryRun()) {
       console.info('Performing any cluster setup that needs to be done...')
 
       await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
