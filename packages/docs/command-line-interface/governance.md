@@ -241,6 +241,14 @@ OPTIONS
   --whitelisters                       If set, displays validators that have whitelisted
                                        the hotfix.
 
+ALIASES
+  $ celocli governance:show
+  $ celocli governance:showhotfix
+  $ celocli governance:showaccount
+  $ celocli governance:view
+  $ celocli governance:viewhotfix
+  $ celocli governance:viewaccount
+
 EXAMPLES
   show --proposalID 99
 
@@ -280,55 +288,6 @@ EXAMPLE
 ```
 
 _See code: [src/commands/governance/upvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/upvote.ts)_
-
-## `celocli governance:view`
-
-View governance proposal information from ID
-
-```
-View governance proposal information from ID
-
-USAGE
-  $ celocli governance:view
-
-OPTIONS
-  --proposalID=proposalID  (required) UUID of proposal to view
-  --raw                    Display proposal in raw bytes format
-
-EXAMPLES
-  view --proposalID 99
-
-  view --proposalID 99 --raw
-```
-
-_See code: [src/commands/governance/view.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/view.ts)_
-
-## `celocli governance:viewhotfix`
-
-View information associated with hotfix
-
-```
-View information associated with hotfix
-
-USAGE
-  $ celocli governance:viewhotfix
-
-OPTIONS
-  --hash=hash        (required) Hash of hotfix transactions
-  --nonwhitelisters  If set, displays validators that have not whitelisted the hotfix.
-  --whitelisters     If set, displays validators that have whitelisted the hotfix.
-
-EXAMPLES
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  --whitelisters
-
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  --nonwhitelisters
-```
-
-_See code: [src/commands/governance/viewhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/viewhotfix.ts)_
 
 ## `celocli governance:vote`
 
