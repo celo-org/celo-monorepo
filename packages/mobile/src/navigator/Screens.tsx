@@ -64,6 +64,7 @@ export enum Screens {
   SupportContact = 'SupportContact',
   Sync = 'Sync',
   TransactionReview = 'TransactionReview',
+  TransakScreen = 'TransakScreen',
   UpgradeScreen = 'UpgradeScreen',
   ValidateRecipientAccount = 'ValidateRecipientAccount',
   ValidateRecipientIntro = 'ValidateRecipientIntro',

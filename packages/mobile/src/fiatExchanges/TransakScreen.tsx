@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react'
 import { BackHandler, StyleSheet, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import WebView, { WebViewRef } from 'src/components/WebView'
-import { VALORA_LOGO_URL } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
@@ -17,21 +16,22 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const RAMP_URI = config.rampWidgetUrl
+const TRANSAK_URI = config.transakWidgetUrl
+const TRANSAK_API_KEY = '3b816bdb-f5a9-40b8-99d7-fb5ddcb5f4c2'
 const MIN_USD_TX_AMOUNT = 15
 
 const navigateHome = () => navigate(Screens.WalletHome)
 
-export const rampOptions = () => ({
+export const transakOptions = () => ({
   ...emptyHeader,
-  headerTitle: (RAMP_URI.match(/(?!(w+)\.)(-|\w)*(?:\w+\.)+\w+/) || [])[0],
+  headerTitle: (TRANSAK_URI.match(/(?!(w+)\.)(-|\w)*(?:\w+\.)+\w+/) || [])[0],
   headerLeft: () => <TopBarTextButton title={i18n.t('global:done')} onPress={navigateBack} />,
 })
 
-type RouteProps = StackScreenProps<StackParamList, Screens.RampScreen>
+type RouteProps = StackScreenProps<StackParamList, Screens.TransakScreen>
 type Props = RouteProps
 
-function RampScreen({ route }: Props) {
+function TransakScreen({ route }: Props) {
   const { localAmount, currencyCode, currencyToBuy } = route.params
   const account = useSelector(currentAccountSelector)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -49,17 +49,16 @@ function RampScreen({ route }: Props) {
   }[currencyToBuy]
   const finalUrl = 'https://valoraapp.com/?done=true'
   const uri = `
-    ${RAMP_URI}
-      ?userAddress=${account}
-      &swapAsset=${asset}
-      &hostAppName=Valora
-      &hostLogoUrl=${VALORA_LOGO_URL}
+    ${TRANSAK_URI}
+      ?apiKey=${TRANSAK_API_KEY}
+      &walletAddress=${account}
+      &cryptoCurrencyCode=${asset}
       &fiatCurrency=${currencyCode}
-      &fiatValue=${localAmount || minTxAmount}
-      &finalUrl=${encodeURI(finalUrl)}
+      &defaultFiatAmount=${localAmount || minTxAmount}
+      &redirectURL=${encodeURI(finalUrl)}
     `.replace(/\s+/g, '')
 
-  const onNavigationStateChange = ({ url }: any) => url === finalUrl && navigateHome()
+  const onNavigationStateChange = ({ url }: any) => !url.indexOf(finalUrl) && navigateHome()
 
   const webview = useRef<WebViewRef>(null)
   const onAndroidBackPress = (): boolean => {
@@ -91,4 +90,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default RampScreen
+export default TransakScreen

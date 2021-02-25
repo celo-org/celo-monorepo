@@ -24,3 +24,11 @@ export const openRamp = (currencyCode: LocalCurrencyCode, currencyToBuy: CURRENC
     currencyToBuy,
   })
 }
+
+export const openTransak = (currencyCode: LocalCurrencyCode, currencyToBuy: CURRENCY_ENUM) => {
+  navigate(Screens.TransakScreen, {
+    localAmount: 0,
+    currencyCode,
+    currencyToBuy,
+  })
+}
