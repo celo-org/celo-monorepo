@@ -17,6 +17,7 @@ const contextFullNodeDeploymentEnvVars: {
 } = {
   diskSizeGb: DynamicEnvVar.FULL_NODES_DISK_SIZE,
   replicas: DynamicEnvVar.FULL_NODES_COUNT,
+  rollingUpdatePartition: DynamicEnvVar.FULL_NODES_ROLLING_UPDATE_PARTITION
 }
 
 /**
@@ -128,6 +129,7 @@ function getFullNodeDeploymentConfig(context: string) : BaseFullNodeDeploymentCo
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = {
     diskSizeGb: parseInt(fullNodeDeploymentEnvVarValues.diskSizeGb, 10),
     replicas: parseInt(fullNodeDeploymentEnvVarValues.replicas, 10),
+    rollingUpdatePartition: parseInt(fullNodeDeploymentEnvVarValues.rollingUpdatePartition, 10),
   }
   return fullNodeDeploymentConfig
 }

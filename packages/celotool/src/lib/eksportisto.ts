@@ -1,32 +1,26 @@
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
+import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
-import { execCmdWithExitOnFailure } from './cmd-utils'
+
+const chartDir = '../helm-charts/eksportisto/'
+
+function releaseName(celoEnv: string, suffix: string) {
+  return `${celoEnv}-eksportisto-${suffix}`
+}
 
 export async function installHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  console.info(`Installing helm release ${celoEnv}-eksportisto-${suffix}`)
-  const params = await helmParameters(celoEnv)
-  await execCmdWithExitOnFailure(
-    `helm install ${celoEnv}-eksportisto-${suffix} ../helm-charts/eksportisto/ ${params.join(
-      ' '
-    )}
-  `
-  )
+  await installGenericHelmChart(celoEnv, releaseName(celoEnv, suffix), chartDir, await helmParameters(celoEnv))
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  console.info(`Upgrading helm release ${celoEnv}-eksportisto`)
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  const params = await helmParameters(celoEnv)
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${celoEnv}-eksportisto-${suffix} ../helm-charts/eksportisto/ ${params.join(' ')}`
-  )
+  await upgradeGenericHelmChart(celoEnv, releaseName(celoEnv, suffix), chartDir, await helmParameters(celoEnv))
 }
 
 export async function removeHelmRelease(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  console.info(`Deleting helm chart ${celoEnv}-eksportisto-${suffix}`)
-  await execCmdWithExitOnFailure(`helm uninstall --namespace ${celoEnv} ${celoEnv}-eksportisto-${suffix}`)
+  await removeGenericHelmChart(releaseName(celoEnv, suffix), celoEnv)
 }
 
 function fetchSensitiveAccounts() {
