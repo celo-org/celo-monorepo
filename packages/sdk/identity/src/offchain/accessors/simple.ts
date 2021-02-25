@@ -86,7 +86,7 @@ export class PrivateSimpleAccessor<DataType> implements PrivateAccessor<DataType
     return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
   }
 
-  allowAccess(toAddresses: Address[], symmetricKey?: Buffer) {
+  async allowAccess(toAddresses: Address[], symmetricKey?: Buffer) {
     return writeSymmetricKeys(this.wrapper, this.dataPath, toAddresses, symmetricKey)
   }
 

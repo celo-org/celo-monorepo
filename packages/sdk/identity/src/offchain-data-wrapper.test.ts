@@ -230,7 +230,7 @@ testWithGanache('Offchain Data', (web3) => {
     it('can re-encrypt data to more recipients', async () => {
       const nameAccessor = new PrivateNameAccessor(writer.wrapper)
       await nameAccessor.write(testPayload, [reader.address])
-      await nameAccessor.write(testPayload, [reader2.address])
+      await nameAccessor.allowAccess([reader2.address])
 
       const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
       const receivedName = await readerNameAccessor.readAsResult(writer.address)

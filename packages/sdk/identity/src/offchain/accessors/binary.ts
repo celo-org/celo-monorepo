@@ -45,7 +45,7 @@ export class PrivateBinaryAccessor implements PrivateAccessor<Buffer> {
     return writeEncrypted(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
   }
 
-  allowAccess(toAddresses: Address[], symmetricKey?: Buffer) {
+  async allowAccess(toAddresses: Address[], symmetricKey?: Buffer) {
     return writeSymmetricKeys(this.wrapper, this.dataPath, toAddresses, symmetricKey)
   }
 
