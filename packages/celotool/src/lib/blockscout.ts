@@ -2,9 +2,11 @@ import fs from 'fs'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { getCurrentGcloudAccount } from './gcloud_utils'
-import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
+import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from './helm_deploy'
 import { outputIncludes } from './utils'
 import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
+
+const helmChartPath = '../helm-charts/blockscout'
 
 export function getInstanceName(celoEnv: string) {
   const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
@@ -26,7 +28,7 @@ export async function installHelmChart(
   return installGenericHelmChart(
     celoEnv,
     releaseName,
-    '../helm-charts/blockscout',
+    helmChartPath,
     await helmParameters(
       celoEnv,
       blockscoutDBUsername,
@@ -55,15 +57,9 @@ export async function upgradeHelmChart(
       blockscoutDBPassword,
       blockscoutDBConnectionName
     )
-  ).join(' ')
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(
-      `helm upgrade --debug --dry-run ${helmReleaseName} ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
-    )
-  }
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${helmReleaseName} ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
   )
+  await upgradeGenericHelmChart(celoEnv, helmReleaseName, helmChartPath, params)
+
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }
 

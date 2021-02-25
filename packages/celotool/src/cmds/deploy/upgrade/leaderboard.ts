@@ -1,5 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
+import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/leaderboard'
 import yargs from 'yargs'
 
@@ -20,10 +21,12 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: LeaderboardArgv) => {
-  await createClusterIfNotExists()
+  if (!isCelotoolHelmDryRun()) {
+    await createClusterIfNotExists()
+  }
   await switchToClusterFromEnv()
 
-  if (argv.reset === true) {
+  if (argv.reset === true && !isCelotoolHelmDryRun()) {
     await removeHelmRelease(argv.celoEnv)
     await installHelmChart(argv.celoEnv)
   } else {

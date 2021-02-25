@@ -871,6 +871,13 @@ export function isCelotoolHelmDryRun() {
   return process.env.CELOTOOL_HELM_DRY_RUN === 'true'
 }
 
+export function exitIfCelotoolHelmDryRun() {
+  if (isCelotoolHelmDryRun()) {
+    console.error('Option --helmdryrun is not allowed for this command. Exiting.')
+    process.exit(1)
+  }
+}
+
 export async function removeGenericHelmChart(releaseName: string, namespace: string) {
   console.info(`Deleting helm chart ${releaseName} from namespace ${namespace}`)
   try {

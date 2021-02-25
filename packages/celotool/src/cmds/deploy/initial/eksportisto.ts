@@ -10,6 +10,5 @@ export const builder = {}
 
 export const handler = async (argv: InitialArgv) => {
   await switchToClusterFromEnv()
-
   await installHelmChart(argv.celoEnv)
 }
