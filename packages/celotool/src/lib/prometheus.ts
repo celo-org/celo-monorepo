@@ -99,8 +99,15 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   const clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  const gcloudProject = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT, {context}) : fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  const gcloudRegion = context ? getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_REGION, {context}) : fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  let gcloudProject
+  let gcloudRegion
+  if (context) {
+     gcloudProject = getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT, {context}, fetchEnv(envVar.TESTNET_PROJECT_NAME))
+     gcloudRegion = getDynamicEnvVarValue(DynamicEnvVar.PROM_SIDECAR_GCP_REGION, {context}, fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE))
+  } else {
+    gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+    gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  }
 
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -146,22 +153,22 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
 
   // Set scrape job if set for the context
   if (context) {
-     const scrapeJobName = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_JOB_NAME, {context})
-     const scrapeTargets = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_TARGETS, {context})     
-     const scrapeLabels = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_LABELS, {context})
+     const scrapeJobName = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_JOB_NAME, {context}, "")
+     const scrapeTargets = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_TARGETS, {context}, "")
+     const scrapeLabels = getDynamicEnvVarValue(DynamicEnvVar.PROM_SCRAPE_LABELS, {context}, "")
 
-     if (scrapeJobName) {
+     if (scrapeJobName !== "") {
      	params.push(
 	  `--set scrapeJob.Name=${scrapeJobName}`
 	)
      }
 
-     if (scrapeTargets) {
+     if (scrapeTargets !== "") {
   	const targetParams = setHelmArray('scrapeJob.Targets', scrapeTargets.split(','))
 	params.push(...targetParams)	
      }
 
-     if (scrapeLabels) {
+     if (scrapeLabels !== "") {
   	const labelParams = setHelmArray('scrapeJob.Labels', scrapeLabels.split(','))
 	params.push(...labelParams)
      }
