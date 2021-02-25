@@ -156,15 +156,15 @@ There have been reports of a possible [issue](https://github.com/celo-org/celo-l
 
 ## Using Your Ledger with Celo Wallet app
 
-An alternative to using `celocli` is [celowallet.app](https://celowallet.app)
+An alternative to using `celocli` is [celowallet.app](https://celowallet.app) which supports Ledger and provides a simple interface for transacting with Celo accounts.
 
-1. To get started using it with your Ledger, go to the wallet [here](https://celowallet.app)
+1. Load the [wallet app](https://celowallet.app) in a modern browser, Chrome is recommended.
 2. Click on `Use Existing Account` option.
 3. Click on the Ledger icon.
 4. Connect your Ledger Nano to your computer.
 5. Unlock your Ledger Nano with your PIN.
 6. Go to the Celo app on your Ledger Nano and open it.
 7. On `celowallet.app` website, click on `Import Account`. Make sure you are using the right Address Index. Index 0 means the first address on the list.
-8. There will be a popup in on the website to approve the Ledger device, click on Nano in the popup and click `Connect`.
+8. There will be a popup in the web browser to approve the Ledger device, click on Nano in the popup and click `Connect`.
 9. Verify on your Ledger Nano that this is the address you want to use, then click the right button on the Ledger until you see `Approve` then click both buttons to approve.
 10. You are now using celowallet.app with your Ledger
