@@ -1,30 +1,30 @@
 {
-  "getVerified": "Verificar el Teléfono",
+  "getVerified": "Confirmar el Teléfono",
   "notReadyForCode": "Aún no está listo para ingresar el código",
   "emptyVerificationCode": "Sin Código en el Portapapeles",
   "invalidVerificationCode": "Código de Verification Inválido",
-  "repeatVerificationCode": "Código de Verificación Repetido",
+  "repeatVerificationCode": "Código de confirmación Repetido",
   "revealAttestationFailure": "Error al solicitar mensaje SMS",
-  "verificationFailure": "Fallo en la Verificación",
+  "verificationFailure": "Fallo en la confirmación",
   "cantVerifyRevokedAccount": "Esta cuenta ha sido revocada previamente. Crea una nueva cuenta e inténtalo de nuevo.",
-  "verificationTimeout": "Verificación no pudo ser verificada a tiempo",
+  "verificationTimeout": "Confirmación no pudo ser verificada a tiempo",
   "errorRequestCode": "Error al solicitar los códigos.",
   "errorRedeemingCode": "Error al canjear el código.",
-  "pleaseRetry": "Por favor reinicie la verificación.",
-  "retryVerification": "Reintentar la verificación",
+  "pleaseRetry": "Por favor reinicie la confirmación.",
+  "retryVerification": "Reintentar la confirmación",
   "education": {
-    "header": "Verificar el celular",
+    "header": "Confirmar el celular",
     "body1": "Te solicitamos que verifiques tu número telefónico.",
     "body2": "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
-    "learnMore": "Más información sobre la verificación telefónica",
-    "start": "Comenzar la verificación",
+    "learnMore": "Más información sobre la confirmación telefónica",
+    "start": "Comenzar la confirmación",
     "skip": "Omitir por ahora"
   },
   "learnMore": {
-    "header": "Verificación del celular",
-    "intro": "La verificación del número telefónico consiste en asociar tu billetera de Celo con tu celular.",
+    "header": "Confirmación del celular",
+    "intro": "La confirmación del número telefónico consiste en asociar tu billetera de Celo con tu celular.",
     "section1Header": "¿Tengo que completar este paso?",
-    "section1Body": "La verificación no es obligatoria.  Sin verificar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
+    "section1Body": "La confirmación no es obligatoria.  Sin confirmar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
     "section2Header": "Seguridad y privacidad",
     "section2Body": "Para proteger tu privacidad, solo se guarda una versión oculta de tu celular en la cadena de bloques de Celo."
   },
@@ -38,15 +38,15 @@
     "card4": "Requerimos tres mensajes de confirmación para mantener tu cuenta más segura."
   },
   "skipModal": {
-    "header": "¿Omitir la verificación?",
-    "body1": "La verificación permite que otras personas te envíen valores a tu número telefónico.",
-    "body2": "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de cuenta o códigos QR."
+    "header": "¿Omitir la confirmación?",
+    "body1": "La confirmación permite que otras personas te envíen valores a tu número telefónico.",
+    "body2": "Sin la confirmación, igual podrá recibir pagos, pero solo mediante las direcciones de cuenta o códigos QR."
   },
   "failModal": {
-    "header": "Error de verificación",
-    "body1": "Se produjo un problema al verificar tu número de teléfono.",
-    "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
-    "body1InsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de verificación.",
+    "header": "Error de confirmación",
+    "body1": "Se produjo un problema al confirmar tu número de teléfono.",
+    "body2": "Puede saltar la confirmación y volver a intentarlo más tarde.",
+    "body1InsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de confirmación.",
     "body2InsufficientBalance": "Intenta nuevamente cuando hayas agregado fondos a tu app.",
     "body1SaltQuotaExceeded": "Tu cuota de búsqueda de número de teléfono está agotada",
     "body2SaltQuotaExceeded": "Intente nuevamente cuando haya comprado más búsquedas",
@@ -54,8 +54,8 @@
     "enterCodesButton": "Ingresar códigos"
   },
   "retryWithFornoModal": {
-    "header": "¿Volver a intentar la verificación con Ahorro de Datos?",
-    "body1": "Se ha producido un problema al verificar tu número de teléfono. Recomendamos volver a intentarlo con el modo Ahorro de Datos habilitado",
+    "header": "¿Volver a intentar la confirmación con Ahorro de Datos?",
+    "body1": "Se ha producido un problema al confirmar tu número de teléfono. Recomendamos volver a intentarlo con el modo Ahorro de Datos habilitado",
     "body2": "Ahorro de Datos le permite comunicarse en la red de Celo de manera más consistente utilizando una conexión confiable",
     "retryButton": "Reintentar con Ahorro de Datos"
   },

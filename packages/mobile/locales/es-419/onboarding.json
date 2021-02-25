@@ -51,7 +51,7 @@
     "resume": "Reanudar",
     "doINeedToConfirm": "¿Necesito confirmar?",
     "skipForNow": "Saltar por ahora",
-    "bodyInsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de verificación.\n\nIntenta nuevamente cuando hayas agregado fondos a tu app.",
+    "bodyInsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de confirmación.\n\nIntenta nuevamente cuando hayas agregado fondos a tu app.",
     "bodyAlreadyVerified": "¡Tu número ya está confirmado!"
   },
   "verificationSkipDialog": {

@@ -26,7 +26,7 @@
   "inviteFee": "Invitation Fee",
   "feeEducation": "Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Learn More",
-  "inviteMoneyEscrow": "We’ll invite this contact and keep their funds safe until they verify their account.",
+  "inviteMoneyEscrow": "We’ll invite this contact and keep their funds safe until they confirm their account.",
   "reviewPayment": "Review Payment",
   "requestPayment": "Request Payment",
   "continue": "Continue",
@@ -36,7 +36,7 @@
   "inviteSendTo": "Invite & send to",
   "keepMoneySafe": "We'll keep this money safe until your friend creates a {{appName}} account",
   "searchFriends": "Try entering a phone number if you are unable to find who you're looking for",
-  "inviteVerifyPayment": "Invite & Verify Payment",
+  "inviteVerifyPayment": "Invite & Confirm Payment",
   "inviteFriends": "Invite Friends",
   "noResultsFor": "No results for",
   "noContacts": "No contacts",
@@ -63,15 +63,15 @@
   "reminderSent": "Reminder Sent",
   "reclaimPayment": "Reclaim Payment",
   "totalRefunded": "Total Refunded",
-  "loadingVerificationStatus": "Checking recipient verification",
+  "loadingVerificationStatus": "Checking recipient confirmation",
   "askForContactsPermissionAction": "Get my Contacts",
   "newAccountBalance": "New account balance: ",
   "estimatingFee": "Estimating fee ",
   "estimatedFee": "Estimated fee: ",
   "verificationCta": {
     "header": "Sending to a friend?",
-    "body": "Verify your phone and sync your contacts to quickly send to your friends.",
-    "cta": "Start Verification"
+    "body": "Confirm your phone and sync your contacts to quickly send to your friends.",
+    "cta": "Start Confirmation"
   },
   "importContactsCta": {
     "header": "Import Contacts",
