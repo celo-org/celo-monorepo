@@ -114,8 +114,8 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
 
   let implementationAddress: string
-  if (isImplementationChanged(contract, context)) {
-    implementationAddress = getProposedImplementationAddress(contract, context)
+  if (isImplementationChanged(contract, context.proposal)) {
+    implementationAddress = getProposedImplementationAddress(contract, context.proposal)
   } else if (isLibrary(contract, context)) {
     implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
   } else {
