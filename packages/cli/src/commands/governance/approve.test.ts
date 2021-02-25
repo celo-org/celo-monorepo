@@ -1,10 +1,6 @@
 import { Address } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import {
-  GovernanceWrapper,
-  Proposal,
-  ProposalStage,
-} from '@celo/contractkit/lib/wrappers/Governance'
+import { GovernanceWrapper } from '@celo/contractkit/lib/wrappers/Governance'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import Approve from './approve'
