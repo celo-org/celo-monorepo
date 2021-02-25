@@ -211,7 +211,7 @@ export class ProposalBuilder {
         throw new Error(
           `Transaction to unregistered contract ${tx.contract} only supported by address`
         )
-      } else if (tx.function === '' || tx.args !== []) {
+      } else if (tx.function !== '' || tx.args !== []) {
         throw new Error(
           `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
         )
