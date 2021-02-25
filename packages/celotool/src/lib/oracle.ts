@@ -2,7 +2,7 @@ import { ensureLeading0x } from '@celo/utils/src/address'
 import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
 import yargs from 'yargs'
 import { getCloudProviderFromContext, getDynamicEnvVarValues } from './context-utils'
-import { AccountType, getPrivateKeysFor, privateKeyToAddress } from './generate_utils'
+import { getOraclePrivateKeysFor, privateKeyToAddress } from './generate_utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterManager, CloudProvider } from './k8s-cluster/base'
@@ -214,8 +214,8 @@ const awsHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AwsHsmOracleIdenti
  * from the mnemonic
  */
 function getPrivateKeyOracleDeployer(celoEnv: string, context: string, currencyPair: CurrencyPair, useForno: boolean, count: number): PrivateKeyOracleDeployer {
-  const identities: PrivateKeyOracleIdentity[] = getPrivateKeysFor(
-    AccountType.PRICE_ORACLE,
+  const identities: PrivateKeyOracleIdentity[] = getOraclePrivateKeysFor(
+    currencyPair,
     fetchEnv(envVar.MNEMONIC),
     count
   ).map((pkey) => ({
