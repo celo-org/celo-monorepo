@@ -61,13 +61,14 @@ startPackager() {
       fi
       echo "Packager server already running"
     else
-      terminal="${RCT_TERMINAL-${REACT_TERMINAL-$TERM_PROGRAM}}"
+      # '${param:-word}' expands to word if param is empty or unset
+      terminal="${RCT_TERMINAL:-${REACT_TERMINAL:-${TERM_PROGRAM:-}}}"
       echo "Starting packager in new terminal..."
 
       if [ "$MACHINE" = "Mac" ]; then
         open -a "$terminal" ./scripts/launch_packager.command || open ./scripts/launch_packager.command || open_failed=1
       elif [ "$MACHINE" = "Linux" ]; then
-        "$terminal" -e "sh ./scripts/launch_packager.command" || open_failed=1
+        "$terminal" -e "./scripts/launch_packager.command" || open_failed=1
       else 
         echo "Unsupported machine for running in new terminal"
         open_failed=1
