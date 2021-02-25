@@ -36,6 +36,29 @@ geth:
       memory: "4Gi"
       cpu: "4"
 
+# UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
+updateStrategy:
+  validators:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  secondaries:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  proxy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  tx_nodes:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  tx_nodes_private:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+
 gethexporter:
   image:
     repository: gcr.io/celo-testnet/geth-exporter
