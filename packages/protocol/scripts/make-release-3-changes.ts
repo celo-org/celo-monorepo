@@ -1,4 +1,4 @@
-import fs = require('fs')
+import { readJsonSync, writeJsonSync } from 'fs-extra'
 import {
   getProposedProxyAddress,
   isProxyRepointAndInitializeTransaction,
@@ -6,7 +6,7 @@ import {
 import { ProposalTx } from './truffle/make-release'
 
 const proposalFile = 'proposal.json'
-const releaseProposal: ProposalTx[] = JSON.parse(fs.readFileSync(proposalFile, 'utf-8'))
+const releaseProposal: ProposalTx[] = readJsonSync(proposalFile)
 const stableTokenEURaddr = getProposedProxyAddress('StableTokenEUR', releaseProposal)
 const idx = releaseProposal.findIndex(
   (tx) => tx.contract === 'ExchangeEUR' && isProxyRepointAndInitializeTransaction(tx)
@@ -29,8 +29,6 @@ const modifiedReleaseProposal = [
   modifiedExchangeEURinit,
   ...releaseProposal.slice(idx + 1),
 ]
-const newJSON = JSON.stringify(modifiedReleaseProposal, null, 2)
 const newFile = `modified_${proposalFile}`
-console.log(newJSON)
-fs.writeFileSync(newFile, newJSON)
+writeJsonSync(newFile, modifiedReleaseProposal)
 console.log(`Modified proposal written to ${newFile}`)
