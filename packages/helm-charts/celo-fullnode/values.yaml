@@ -84,9 +84,10 @@ geth:
   create_network_endpoint_group: false
   updateStrategy:
     type: RollingUpdate
-    # rollingUpdate:
-    #   maxUnavailable: 25%
-    #   maxSurge: 25%
+    rollingUpdate:
+      partition: 0
+      # maxUnavailable: 25%
+      # maxSurge: 25%
   maxpeers: 1100
   light:
     maxpeers: 1000

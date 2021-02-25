@@ -1,6 +1,11 @@
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import { failIfVmBased } from 'src/lib/env-utils'
-import { createStaticIPs, installHelmChart, pollForBootnodeLoadBalancer } from 'src/lib/helm_deploy'
+import {
+  createStaticIPs,
+  installHelmChart,
+  isCelotoolHelmDryRun,
+  pollForBootnodeLoadBalancer,
+} from 'src/lib/helm_deploy'
 import { uploadTestnetInfoToGoogleStorage } from 'src/lib/testnet-utils'
 import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
@@ -41,7 +46,7 @@ export const handler = async (argv: TestnetInitialArgv) => {
   await createStaticIPs(argv.celoEnv)
 
   await installHelmChart(argv.celoEnv, argv.useExistingGenesis)
-  if (process.env.CELOTOOL_HELM_DRY_RUN !== 'true') {
+  if (!isCelotoolHelmDryRun()) {
     // When using an external bootnode, we have to await the bootnode's LB to be up first
     await pollForBootnodeLoadBalancer(argv.celoEnv)
     await uploadTestnetInfoToGoogleStorage(argv.celoEnv, !argv.useExistingGenesis)
