@@ -31,11 +31,10 @@ export default class Approve extends BaseCommand {
     const id = res.flags.proposalID
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
-    const multiSigAddress = useMultiSig ? await governance.getApprover() : ''
     const governanceApproverMultiSig = useMultiSig
-      ? await this.kit.contracts.getMultiSig(multiSigAddress)
+      ? await governance.getApproverMultisig()
       : undefined
-    const approver = useMultiSig ? multiSigAddress : account
+    const approver = useMultiSig ? governanceApproverMultiSig!.address : account
 
     // in case target is queued
     if (await governance.isQueued(id)) {
@@ -44,10 +43,8 @@ export default class Approve extends BaseCommand {
 
     await newCheckBuilder(this)
       .isApprover(approver)
-      .addConditionalCheck(`${account} is multisig signatory`, useMultiSig, async () =>
-        governanceApproverMultiSig !== undefined
-          ? governanceApproverMultiSig.isowner(account)
-          : new Promise<boolean>(() => false)
+      .addConditionalCheck(`${account} is multisig signatory`, useMultiSig, () =>
+        governanceApproverMultiSig!.isowner(account)
       )
       .proposalExists(id)
       .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
@@ -55,13 +52,12 @@ export default class Approve extends BaseCommand {
       .runChecks()
 
     const governanceTx = await governance.approve(id)
-    const tx =
-      governanceApproverMultiSig === undefined
-        ? governanceTx
-        : await governanceApproverMultiSig.submitOrConfirmTransaction(
-            governance.address,
-            governanceTx.txo
-          )
+    const tx = useMultiSig
+      ? await governanceApproverMultiSig!.submitOrConfirmTransaction(
+          governance.address,
+          governanceTx.txo
+        )
+      : governanceTx
     await displaySendTx<string | void | boolean>('approveTx', tx, {}, 'ProposalApproved')
   }
 }
