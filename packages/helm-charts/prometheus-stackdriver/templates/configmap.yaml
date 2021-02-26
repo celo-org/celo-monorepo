@@ -202,7 +202,7 @@ data:
   {{ end -}}
   {{- if .Values.scrapeJob.Targets }}
       - targets:
-    {{- range .Values.scrape.Targets }}
+    {{- range .Values.scrapeJob.Targets }}
         -- {{ . }}
     {{ end -}}
   {{ end -}}
