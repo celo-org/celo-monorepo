@@ -1,34 +1,25 @@
+import { ensureLeading0x, trimLeading0x } from '@celo/base'
 import { readJsonSync, writeJsonSync } from 'fs-extra'
 import {
   getProposedProxyAddress,
-  isProxyRepointAndInitializeTransaction,
-} from 'lib/compatibility/verify-bytecode'
+  isProxyRepointAndInitForIdTransaction,
+} from '../lib/compatibility/verify-bytecode'
 import { ProposalTx } from './truffle/make-release'
 
-const proposalFile = 'proposal.json'
+const proposalFile = 'release3_proposal_mock.json'
+
 const releaseProposal: ProposalTx[] = readJsonSync(proposalFile)
 const stableTokenEURaddr = getProposedProxyAddress('StableTokenEUR', releaseProposal)
-const idx = releaseProposal.findIndex(
-  (tx) => tx.contract === 'ExchangeEUR' && isProxyRepointAndInitializeTransaction(tx)
+const exchangeInitIndex = releaseProposal.findIndex((tx) =>
+  isProxyRepointAndInitForIdTransaction(tx, 'ExchangeEURProxy')
 )
-const exchangeEURinit = releaseProposal[idx]
-const modifiedExchangeEURinit: ProposalTx = {
-  contract: exchangeEURinit.contract,
-  function: exchangeEURinit.function,
-  value: exchangeEURinit.value,
-  args: [
-    // see Exchange.sol initialize
-    exchangeEURinit.args[0],
-    stableTokenEURaddr,
-    ...exchangeEURinit.args.slice(2),
-  ],
-  description: `${exchangeEURinit.description} MODIFIED with knowledge of StableTokenEUR (proxy) address`,
-}
-const modifiedReleaseProposal = [
-  ...releaseProposal.slice(0, idx),
-  modifiedExchangeEURinit,
-  ...releaseProposal.slice(idx + 1),
-]
+const initCallData = trimLeading0x(releaseProposal[exchangeInitIndex].args[1])
+const paramPosition = (4 + 32) * 2 // (functionSelector + 1 parameter) * 2 hex
+releaseProposal[exchangeInitIndex].args[1] = ensureLeading0x(
+  initCallData.slice(0, paramPosition) +
+    trimLeading0x(stableTokenEURaddr).padStart(64, '0') +
+    initCallData.slice(paramPosition + 32 * 2) // offset 1 parameter * 2 hex
+)
 const newFile = `modified_${proposalFile}`
-writeJsonSync(newFile, modifiedReleaseProposal)
+writeJsonSync(newFile, releaseProposal, { spaces: 2 })
 console.log(`Modified proposal written to ${newFile}`)

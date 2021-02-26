@@ -47,6 +47,9 @@ const isProxyRepointTransaction = (tx: ProposalTx) =>
 export const isProxyRepointAndInitializeTransaction = (tx: ProposalTx) =>
   tx.contract.endsWith('Proxy') && tx.function === '_setAndInitializeImplementation'
 
+export const isProxyRepointAndInitForIdTransaction = (tx: ProposalTx, registryId: string) =>
+  tx.contract === registryId && isProxyRepointAndInitializeTransaction(tx)
+
 const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
   tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
