@@ -12,7 +12,7 @@ import {
   SignTxResponseSuccess,
   TxToSignParam,
 } from '@celo/utils'
-import { Linking } from 'expo'
+import { Linking } from 'react-native'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
