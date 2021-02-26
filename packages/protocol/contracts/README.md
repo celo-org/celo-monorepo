@@ -29,7 +29,7 @@ pragma solidity ^0.5.13;
 import '@celo/contracts/common/UsingRegistry.sol';
 
 contract Example is UsingRegistry {
-  constructor() {
+  constructor() public {
     require(getAccounts().createAccount());
   }
 }
