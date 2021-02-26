@@ -40,7 +40,7 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
         )
 
         expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
-        //check whether difference  of balance  of 'from' account  before/after is greater than 1 (transfer + fee)
+        //check whether difference of balance of 'from' account before/after is greater than 1 (transfer amount + fee)
         expect(fromBalanceBefore.minus(fromBalanceAfter).isGreaterThan(ONE)).toBeTruthy()
       })
     }

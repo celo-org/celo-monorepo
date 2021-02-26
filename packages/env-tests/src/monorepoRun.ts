@@ -9,7 +9,7 @@ import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
 
-export const DefaultTokensToTest = ['cUSD']
+export const DEFAULTTOKENSTOTEST = ['cUSD']
 jest.setTimeout(120000)
 function runTests() {
   const envName = loadFromEnvFile()
@@ -23,13 +23,10 @@ function runTests() {
 
   const stableTokensToTest = process.env.STABLETOKENS
     ? process.env.STABLETOKENS.split(',')
-    : DefaultTokensToTest
+    : DEFAULTTOKENSTOTEST
+  if (stableTokensToTest.find((token) => !StableTokenToRegistryName[token]))
+    throw new Error('Invalid token')
 
-  stableTokensToTest.map((token) => {
-    if (!StableTokenToRegistryName[token]) {
-      throw new Error(`Invalid token: ${token}`)
-    }
-  })
   describe('Run tests in context of monorepo', () => {
     const context = {
       kit,
