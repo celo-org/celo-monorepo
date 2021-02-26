@@ -16,11 +16,17 @@ export type PrometheusArgv = InitialArgv &
   }
 
 export const builder = (argv: PrometheusArgv) => {
-  return addContextMiddleware(argv).option('deploy-grafana', {
-    type: 'boolean',
-    description: 'Include the deployment of grafana helm chart',
-    default: false,
-  })
+  return addContextMiddleware(argv)
+    .option('deploy-grafana', {
+      type: 'boolean',
+      description: 'Include the deployment of grafana helm chart',
+      default: false,
+    })
+    .option('skipClusterSetup', {
+      type: 'boolean',
+      description: 'If you know that you can skip the cluster setup',
+      default: false,
+    })
 }
 
 export const handler = async (argv: PrometheusArgv) => {

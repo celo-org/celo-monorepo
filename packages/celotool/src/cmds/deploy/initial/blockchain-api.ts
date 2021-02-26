@@ -13,7 +13,7 @@ type BlockchainApiArgv = UpgradeArgv
 
 export const handler = async (argv: BlockchainApiArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   const newFaucetAddress = getAddressFromEnv(AccountType.VALIDATOR, 0) // We use the 0th validator as the faucet
   console.info(`updating blockchain-api yaml file for env ${argv.celoEnv}`)
   await execCmd(

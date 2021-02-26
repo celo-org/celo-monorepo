@@ -1,21 +1,21 @@
 import fs from 'fs'
 import { PrometheusArgv } from 'src/cmds/deploy/initial/prometheus'
+import { createNamespaceIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getClusterConfigForContext, switchToContextCluster } from 'src/lib/context-utils'
-import { createNamespaceIfNotExists, switchToClusterFromEnv } from './cluster'
-import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart
-} from './helm_deploy'
-import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
+} from 'src/lib/helm_deploy'
+import { BaseClusterConfig, CloudProvider } from 'src/lib/k8s-cluster/base'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey
-} from './service-account-utils'
-import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
+} from 'src/lib/service-account-utils'
+import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from 'src/lib/utils'
 const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
@@ -145,16 +145,37 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
 }
 
 async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string) {
-  await switchToGCPProjectFromEnv()
-  const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
+  // First check if value already exist in helm release. If so we pass the same value 
+  // and we avoid creating a new key for the service account
+  const gcloudServiceAccountKeyBase64 = getPrometheusGcloudServiceAccountKeyBase64FromHelm()
+  if (gcloudServiceAccountKeyBase64) {
+    return gcloudServiceAccountKeyBase64
+  } else {
+    // We do not have the service account key in helm so we need to create the SA (if it does not exist)
+    // and create a new key for the service account in any case
+    await switchToGCPProjectFromEnv()
+    const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+    const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
 
-  await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
+    await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
 
-  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
-  await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
-  return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
+    await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
+    return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+  }
+}
+
+async function getPrometheusGcloudServiceAccountKeyBase64FromHelm() {
+  const prometheusInstalled = await outputIncludes(
+    `helm list -n ${kubeNamespace}`,
+    `${releaseName}`,
+  )
+  if (prometheusInstalled) {
+    const [output] = await execCmd(`helm get values -n ${kubeNamespace} ${releaseName}`)
+    const prometheusValues: any = yaml.safeLoad(output)
+    return prometheusValues.gcloudServiceAccountKeyBase64
+  }
 }
 
 // createPrometheusGcloudServiceAccount creates a gcloud service account with a given
@@ -321,9 +342,10 @@ async function setupWorkloadIdentities(serviceAccountName: string, gcloudProject
   )
 }
 
-export async function switchPrometheusContext(argv: PrometheusArgv) {
+export async function switchPrometheusContext(argv: PrometheusArgv, skipClusterSetup = false) {
   if (argv.context === undefined) {
-    await switchToClusterFromEnv()
+    // GCP top level cluster.
+    await switchToClusterFromEnv(argv.celoEnv, true, skipClusterSetup)
   } else {
     await switchToContextCluster(argv.celoEnv, argv.context)
     return getClusterConfigForContext(argv.context)

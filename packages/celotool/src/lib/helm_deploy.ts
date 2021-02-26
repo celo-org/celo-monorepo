@@ -131,9 +131,10 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
 async function createAndUploadKubernetesSecretIfNotExists(
   secretName: string,
-  serviceAccountName: string
+  serviceAccountName: string,
+  celoEnv: string
 ) {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(celoEnv)
   const keyfilePath = `/tmp/${serviceAccountName}_key.json`
   const secretExists = await outputIncludes(
     `kubectl get secrets`,
@@ -153,12 +154,12 @@ async function createAndUploadKubernetesSecretIfNotExists(
   }
 }
 
-export async function createAndUploadCloudSQLSecretIfNotExists(serviceAccountName: string) {
-  return createAndUploadKubernetesSecretIfNotExists(CLOUDSQL_SECRET_NAME, serviceAccountName)
+export async function createAndUploadCloudSQLSecretIfNotExists(serviceAccountName: string, celoEnv: string) {
+  return createAndUploadKubernetesSecretIfNotExists(CLOUDSQL_SECRET_NAME, serviceAccountName, celoEnv)
 }
 
-export async function createAndUploadBackupSecretIfNotExists(serviceAccountName: string) {
-  return createAndUploadKubernetesSecretIfNotExists(BACKUP_GCS_SECRET_NAME, serviceAccountName)
+export async function createAndUploadBackupSecretIfNotExists(serviceAccountName: string, celoEnv: string) {
+  return createAndUploadKubernetesSecretIfNotExists(BACKUP_GCS_SECRET_NAME, serviceAccountName, celoEnv)
 }
 
 export function getServiceAccountName(prefix: string) {

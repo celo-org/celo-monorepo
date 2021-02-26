@@ -9,7 +9,7 @@ export const describe = 'Create K8s cluster and deploy common tools'
 export const handler = async (argv: InitialArgv) => {
   exitIfCelotoolHelmDryRun()
   const createdCluster = await createClusterIfNotExists()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   await setupCluster(argv.celoEnv, createdCluster)
 }

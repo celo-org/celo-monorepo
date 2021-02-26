@@ -30,7 +30,11 @@ export abstract class BaseClusterManager {
     // Reset back to default namespace
     await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
     if (!skipSetup) {
-      await this.setupCluster()
+      if (!isCelotoolHelmDryRun()) {
+        await this.setupCluster()
+      } else {
+        console.log(`Skipping cluster setup due to --helmdryrun`)
+      }
     }
   }
 

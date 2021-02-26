@@ -8,7 +8,8 @@ import {
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
-  installGCPSSDStorageClass
+  installGCPSSDStorageClass,
+  isCelotoolHelmDryRun
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -21,13 +22,25 @@ const SYSTEM_HELM_RELEASES = [
 ]
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
 
-export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction = true) {
+export async function switchToClusterFromEnv(celoEnv: string, checkOrPromptIfStagingOrProduction = true, skipClusterSetup = true) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
   await checkHelmVersion()
 
   await switchToProjectFromEnv()
+
+  if (!skipClusterSetup) {
+    if (!isCelotoolHelmDryRun()) {
+      // In this case we create the cluster if it does not exist
+      const createdCluster = await createClusterIfNotExists()
+      // Install common helm charts
+      await setupCluster(celoEnv, createdCluster)
+    } else {
+      console.info(`Skipping cluster setup due to --helmdryrun`)
+    }
+
+  }
 
   let currentCluster = null
   try {
@@ -105,7 +118,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   // Source: https://cloud.google.com/kubernetes-engine/docs/how-to/iam
   await grantRoles(blockchainBackupServiceAccountName, 'roles/container.viewer')
 
-  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName)
+  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName, celoEnv)
 
   // poll for cluster availability
   if (createdCluster) {

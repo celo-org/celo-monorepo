@@ -10,7 +10,7 @@ export const describe = 'deletes the cluster for the given environment'
 
 export const builder = {}
 
-export const handler = async (_argv: DestroyArgv) => {
+export const handler = async (argv: DestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   const envType = fetchEnv(envVar.ENV_TYPE)
   if (envType !== EnvTypes.DEVELOPMENT) {
@@ -18,7 +18,7 @@ export const handler = async (_argv: DestroyArgv) => {
     process.exit(1)
   }
 
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   const releases = await getNonSystemHelmReleases()
   if (releases.length > 0) {
     console.error('Cannot delete cluster, contains deployed packages that should be removed first')

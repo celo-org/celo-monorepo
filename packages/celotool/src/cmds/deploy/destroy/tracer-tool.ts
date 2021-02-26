@@ -13,6 +13,6 @@ export const builder = {}
 
 export const handler = async (argv: TracerToolArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await removeHelmRelease(argv.celoEnv)
 }
