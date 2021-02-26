@@ -1,6 +1,6 @@
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
-import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
+import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
+import { isCelotoolHelmDryRun } from '../helm_deploy'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 

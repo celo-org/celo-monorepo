@@ -1,21 +1,21 @@
 import fs from 'fs'
-import { PrometheusArgv } from 'src/cmds/deploy/initial/prometheus'
-import { createNamespaceIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getClusterConfigForContext, switchToContextCluster } from 'src/lib/context-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { PrometheusArgv } from '../cmds/deploy/initial/prometheus'
+import { createNamespaceIfNotExists, switchToClusterFromEnv } from './cluster'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
+import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart
-} from 'src/lib/helm_deploy'
-import { BaseClusterConfig, CloudProvider } from 'src/lib/k8s-cluster/base'
+} from './helm_deploy'
+import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey
-} from 'src/lib/service-account-utils'
-import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from 'src/lib/utils'
+} from './service-account-utils'
+import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
