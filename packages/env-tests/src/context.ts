@@ -6,5 +6,4 @@ export interface EnvTestContext {
   mnemonic: string
   reserveSpenderMultiSigAddress: Address | undefined
   logger: Logger
-  stableTokensToTest: string[]
 }

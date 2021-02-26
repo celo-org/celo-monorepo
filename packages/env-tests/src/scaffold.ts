@@ -24,7 +24,8 @@ export const ExchangeToRegistryName: Record<string, CeloContract> = {
 export async function fundAccount(
   context: EnvTestContext,
   account: TestAccounts,
-  value: BigNumber
+  value: BigNumber,
+  stableTokensToFund: string[]
 ) {
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   const recipient = await getKey(context.mnemonic, account)
@@ -36,14 +37,14 @@ export async function fundAccount(
   })
   context.kit.connection.addAccount(root.privateKey)
 
-  for (const stableToken of context.stableTokensToTest) {
-    let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+  for (const stableToken of stableTokensToFund) {
+    const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
     const rootBalance = await stableTokenInstance.balanceOf(root.address)
     if (rootBalance.lte(value)) {
       logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
       throw new Error(
-        `Root account ${root.address}'s balance (${rootBalance.toPrecision(
+        `Root account ${root.address}'s ${stableToken} balance (${rootBalance.toPrecision(
           4
         )}) is not enough for transferring ${value.toPrecision(4)}`
       )
@@ -52,7 +53,10 @@ export async function fundAccount(
       .transfer(recipient.address, value.toString())
       .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
 
-    logger.debug({ receipt }, `funded test account with ${stableToken}`)
+    logger.debug(
+      { stableToken: stableToken, receipt: receipt },
+      `funded test account with ${stableToken}`
+    )
   }
 }
 
@@ -74,14 +78,13 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(context: EnvTestContext) {
+export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensToClear: string[]) {
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
   )
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   context.logger.debug({ account: root.address }, 'clear test fund accounts')
-  const stableToken = await context.kit.contracts.getStableToken()
   const goldToken = await context.kit.contracts.getGoldToken()
   await concurrentMap(5, accounts, async (_val, index) => {
     if (index === 0) {
@@ -110,26 +113,32 @@ export async function clearAllFundsToRoot(context: EnvTestContext) {
         'cleared CELO'
       )
     }
-
-    const balance = await stableToken.balanceOf(account.address)
-    if (balance.gt(ONE)) {
-      await stableToken
-        .transfer(
-          root.address,
-          balance
-            .times(0.99)
-            .integerValue(BigNumber.ROUND_DOWN)
-            .toString()
+    for (const stableToken of stableTokensToClear) {
+      const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+      const balance = await stableTokenInstance.balanceOf(account.address)
+      if (balance.gt(ONE)) {
+        await stableTokenInstance
+          .transfer(
+            root.address,
+            balance
+              .times(0.99)
+              .integerValue(BigNumber.ROUND_DOWN)
+              .toString()
+          )
+          .sendAndWaitForReceipt({
+            feeCurrency: stableTokenInstance.address,
+            from: account.address,
+          })
+        context.logger.debug(
+          {
+            index,
+            stableToken: stableToken,
+            value: balance.toString(),
+            address: account.address,
+          },
+          `cleared ${stableToken}`
         )
-        .sendAndWaitForReceipt({ feeCurrency: stableToken.address, from: account.address })
-      context.logger.debug(
-        {
-          index,
-          value: balance.toString(),
-          address: account.address,
-        },
-        'cleared cUSD'
-      )
+      }
     }
   })
 }

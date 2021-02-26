@@ -9,6 +9,7 @@ import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
 
+const DefaultTokensToTest = ['cUSD']
 jest.setTimeout(120000)
 function runTests() {
   const envName = loadFromEnvFile()
@@ -20,33 +21,26 @@ function runTests() {
   const mnemonic = process.env.MNEMONIC!
   const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
 
-  const defaultTokensToTest = ['cUSD']
-  let stableTokensToTest: string[]
-  if (!process.env.STABLETOKENS) {
-    stableTokensToTest = defaultTokensToTest
-  } else {
-    const tokens = process.env.STABLETOKENS.split(',')
+  const stableTokensToTest = process.env.STABLETOKENS
+    ? process.env.STABLETOKENS.split(',')
+    : DefaultTokensToTest
 
-    for (let token of tokens) {
-      if (!StableTokenToRegistryName[token]) {
-        throw new Error(`Invalid token: ${token}`)
-      }
+  stableTokensToTest.map((token) => {
+    if (!StableTokenToRegistryName[token]) {
+      throw new Error(`Invalid token: ${token}`)
     }
-    stableTokensToTest = tokens
-  }
-
+  })
   describe('Run tests in context of monorepo', () => {
     const context = {
       kit,
       mnemonic,
       logger: rootLogger,
       reserveSpenderMultiSigAddress,
-      stableTokensToTest,
     }
 
     // TODO: Assert maximum loss after test
-    runTransfersTest(context)
-    runExchangeTest(context)
+    runTransfersTest(context, stableTokensToTest)
+    runExchangeTest(context, stableTokensToTest)
     runOracleTest(context)
     runReserveTest(context)
     runAttestationTest(context)
@@ -55,7 +49,7 @@ function runTests() {
     // TODO: Validator election + Slashing
 
     afterAll(async () => {
-      await clearAllFundsToRoot(context)
+      await clearAllFundsToRoot(context, stableTokensToTest)
     })
   })
 }

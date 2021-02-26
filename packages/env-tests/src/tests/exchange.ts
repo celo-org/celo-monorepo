@@ -11,16 +11,16 @@ import {
   TestAccounts,
 } from '../scaffold'
 
-export function runExchangeTest(context: EnvTestContext) {
+export function runExchangeTest(context: EnvTestContext, stableTokensToTest: string[]) {
   describe('Exchange Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.Exchange, ONE.times(10))
+      await fundAccount(context, TestAccounts.Exchange, ONE.times(10), stableTokensToTest)
     })
 
-    for (const stableToken of context.stableTokensToTest) {
+    for (const stableToken of stableTokensToTest) {
       test(`exchange ${stableToken} for CELO`, async () => {
-        let stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+        const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
         const from = await getKey(context.mnemonic, TestAccounts.Exchange)
         context.kit.connection.addAccount(from.privateKey)
@@ -31,7 +31,10 @@ export function runExchangeTest(context: EnvTestContext) {
         let exchange = await initExchangeFromRegistry(stableToken, context.kit)
         const previousGoldBalance = await goldToken.balanceOf(from.address)
         const goldAmount = await exchange.getBuyTokenAmount(ONE, false)
-        logger.debug({ rate: goldAmount.toString() }, `quote selling ${stableToken}`)
+        logger.debug(
+          { rate: goldAmount.toString(), stableToken: stableToken },
+          `quote selling ${stableToken}`
+        )
 
         const approveTx = await stableTokenInstance.approve(exchange.address, ONE.toString()).send()
         await approveTx.waitReceipt()
@@ -48,8 +51,7 @@ export function runExchangeTest(context: EnvTestContext) {
           .send()
         await sellTx.getHash()
         const receipt = await sellTx.waitReceipt()
-
-        logger.debug({ receipt }, `Sold ${stableToken}`)
+        logger.debug({ stableToken: stableToken, receipt: receipt }, `Sold ${stableToken}`)
 
         // Sell more to receive at least 1 cUSD / cEUR back
         const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(
@@ -60,6 +62,7 @@ export function runExchangeTest(context: EnvTestContext) {
           {
             goldAmount: goldAmount.toString(),
             goldAmountToSell: goldAmountToSell.toString(),
+            stableToken: stableToken,
           },
           'Loss to exchange'
         )
@@ -80,7 +83,7 @@ export function runExchangeTest(context: EnvTestContext) {
           .send()
         const sellGoldReceipt = await sellGoldTx.waitReceipt()
 
-        logger.debug({ receipt: sellGoldReceipt }, 'Sold CELO')
+        logger.debug({ stableToken: stableToken, receipt: sellGoldReceipt }, 'Sold CELO')
       })
     }
   })
