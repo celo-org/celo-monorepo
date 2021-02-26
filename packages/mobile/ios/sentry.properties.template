@@ -1,5 +1,0 @@
-defaults.url=https://sentry.io/
-defaults.org=dummy
-defaults.project=dummy
-auth.token=dummy
-cli.executable=node_modules/@sentry/cli/bin/sentry-cli
