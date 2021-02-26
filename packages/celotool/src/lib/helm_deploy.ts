@@ -189,7 +189,7 @@ export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?
 
   // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
-    `helm list -n default`,
+    `helm list -n cert-manager`,
     `cert-manager-cluster-issuers`,
     `cert-manager-cluster-issuers exists, skipping install`
   )
@@ -275,15 +275,20 @@ export async function helmUpdateNginxRepo() {
 export async function installCertManager() {
   const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
 
+  console.info('Create the namespace for cert-manager')
+  await execCmdWithExitOnFailure(
+    `kubectl create namespace cert-manager`
+  )
+
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
     `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
   )
-  console.info('Updating cert-manager-cluster-issuers dependencies')
+  console.info('Updating cert-manager-cluster-issuers chart dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
   console.info('Installing cert-manager-cluster-issuers')
   await execCmdWithExitOnFailure(
-    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath} -n default`
+    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath} -n cert-manager`
   )
 }
 
@@ -849,7 +854,7 @@ export async function upgradeGenericHelmChart(
   const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
 
   if (isCelotoolHelmDryRun()) {
-    console.info(`Simulating the upgrade of helm release ${releaseName}`)
+    console.info(`Simulating the upgrade of helm release ${releaseName}. No output means no change in the helm release`)
     await installHelmDiffPlugin()
     await helmCommand(
       `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`,

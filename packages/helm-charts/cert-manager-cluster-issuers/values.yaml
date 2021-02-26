@@ -5,6 +5,6 @@ cert-manager:
   ingressShim:
     defaultIssuerKind: ClusterIssuer
     defaultIssuerName: letsencrypt-prod
-  installCRDs: true
+  # installCRDs: true
   webhook:
     enabled: false
