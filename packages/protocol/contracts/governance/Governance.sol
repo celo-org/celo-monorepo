@@ -544,7 +544,10 @@ contract Governance is
       return
         isQueuedProposalExpired(proposalId) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      return proposals[proposalId].getDequeuedStage(stageDurations);
+      return
+        isDequeuedProposalExpired(proposalId)
+          ? Proposals.Stage.Expiration
+          : proposals[proposalId].getDequeuedStage(stageDurations);
     }
   }
 
@@ -646,6 +649,7 @@ contract Governance is
     emit ProposalVoted(proposalId, account, uint256(value), weight);
     return true;
   }
+
   /* solhint-enable code-complexity */
 
   /**
@@ -1090,7 +1094,6 @@ contract Governance is
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
-
   }
 
   /**
