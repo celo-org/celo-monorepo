@@ -1,4 +1,4 @@
-import OffchainDataWrapper from '../../offchain-data-wrapper'
+import { OffchainDataWrapper } from '../../offchain-data-wrapper'
 import { PrivateBinaryAccessor, PublicBinaryAccessor } from './binary'
 
 export class PublicPictureAccessor extends PublicBinaryAccessor {
