@@ -1,4 +1,4 @@
-import OffchainDataWrapper from '@celo/identity/lib/offchain-data-wrapper'
+import { BasicDataWrapper } from '@celo/identity/lib/offchain-data-wrapper'
 import { GitStorageWriter, LocalStorageWriter } from '@celo/identity/lib/offchain/storage-writers'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -24,11 +24,11 @@ export abstract class OffchainDataCommand extends BaseCommand {
   }
 
   // @ts-ignore Can't encode that this is happening in init
-  offchainDataWrapper: OffchainDataWrapper
+  offchainDataWrapper: BasicDataWrapper
 
   async init() {
     const res: ParserOutput<any, any> = this.parse()
-    this.offchainDataWrapper = new OffchainDataWrapper(res.flags.from, this.kit)
+    this.offchainDataWrapper = new BasicDataWrapper(res.flags.from, this.kit)
 
     this.offchainDataWrapper.storageWriter = res.flags.uploadWithGit
       ? new GitStorageWriter(res.flags.directory)
