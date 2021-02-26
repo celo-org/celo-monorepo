@@ -1,7 +1,10 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
-import { installGrafanaIfNotExists, installPrometheusIfNotExists } from 'src/lib/prometheus'
+import { addContextMiddleware, ContextArgv } from 'src/lib/context-utils'
+import {
+  installGrafanaIfNotExists,
+  installPrometheusIfNotExists,
+  switchPrometheusContext,
+} from 'src/lib/prometheus'
 
 export const command = 'prometheus'
 
@@ -21,12 +24,9 @@ export const builder = (argv: PrometheusArgv) => {
 }
 
 export const handler = async (argv: PrometheusArgv) => {
-  if (argv.context === undefined) {
-    await switchToClusterFromEnv()
-  } else {
-    await switchToContextCluster(argv.celoEnv, argv.context)
-  }
-  await installPrometheusIfNotExists()
+  const context = await switchPrometheusContext(argv)
+
+  await installPrometheusIfNotExists(context)
   if (argv.deployGrafana) {
     await installGrafanaIfNotExists()
   }

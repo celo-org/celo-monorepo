@@ -1,5 +1,7 @@
 import fs from 'fs'
-import { createNamespaceIfNotExists } from './cluster'
+import { PrometheusArgv } from 'src/cmds/deploy/initial/prometheus'
+import { getClusterConfigForContext, switchToContextCluster } from 'src/lib/context-utils'
+import { createNamespaceIfNotExists, switchToClusterFromEnv } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
@@ -56,9 +58,9 @@ export async function removeHelmRelease() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus() {
+export async function upgradePrometheus(clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
+  return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters(clusterConfig))
 }
 
 async function helmParameters(clusterConfig?: BaseClusterConfig) {
@@ -317,4 +319,13 @@ async function setupWorkloadIdentities(serviceAccountName: string, gcloudProject
     --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
     ${serviceAccountEmail}`
   )
+}
+
+export async function switchPrometheusContext(argv: PrometheusArgv) {
+  if (argv.context === undefined) {
+    await switchToClusterFromEnv()
+  } else {
+    await switchToContextCluster(argv.celoEnv, argv.context)
+    return getClusterConfigForContext(argv.context)
+  }
 }

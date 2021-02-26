@@ -1,7 +1,6 @@
 import { PrometheusArgv } from 'src/cmds/deploy/initial/prometheus'
-import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { addContextMiddleware, switchToContextCluster } from 'src/lib/context-utils'
-import { upgradeGrafana, upgradePrometheus } from 'src/lib/prometheus'
+import { addContextMiddleware } from 'src/lib/context-utils'
+import { switchPrometheusContext, upgradeGrafana, upgradePrometheus } from 'src/lib/prometheus'
 
 export const command = 'prometheus'
 
@@ -16,12 +15,8 @@ export const builder = (argv: PrometheusArgv) => {
 }
 
 export const handler = async (argv: PrometheusArgv) => {
-  if (argv.context === undefined) {
-    await switchToClusterFromEnv()
-  } else {
-    await switchToContextCluster(argv.celoEnv, argv.context)
-  }
-  await upgradePrometheus()
+  const context = await switchPrometheusContext(argv)
+  await upgradePrometheus(context)
   if (argv.deployGrafana) {
     await upgradeGrafana()
   }

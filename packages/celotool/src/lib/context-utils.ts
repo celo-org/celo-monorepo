@@ -166,6 +166,10 @@ export function getClusterManagerForContext(celoEnv: string, context: string) {
   return getClusterManager(cloudProvider, celoEnv, clusterConfig)
 }
 
+export function getClusterConfigForContext(context: string) {
+  const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
+  return clusterConfigGetterByCloudProvider[cloudProvider](context)
+}
 
 /**
  * yargs argv type for an command that requires a context
