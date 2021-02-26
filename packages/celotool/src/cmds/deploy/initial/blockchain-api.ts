@@ -1,6 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { AccountType, getAddressFromEnv } from 'src/lib/generate_utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'blockchain-api'
@@ -11,6 +12,7 @@ export const describe = 'command for upgrading blockchain-api'
 type BlockchainApiArgv = UpgradeArgv
 
 export const handler = async (argv: BlockchainApiArgv) => {
+  exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv()
   const newFaucetAddress = getAddressFromEnv(AccountType.VALIDATOR, 0) // We use the 0th validator as the faucet
   console.info(`updating blockchain-api yaml file for env ${argv.celoEnv}`)

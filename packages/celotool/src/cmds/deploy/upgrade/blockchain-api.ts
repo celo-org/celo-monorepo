@@ -1,3 +1,4 @@
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { handler as deployInitialBlockchainApiHandler } from '../../deploy/initial/blockchain-api'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
@@ -9,5 +10,6 @@ export const describe = 'command for upgrading blockchain-api'
 type BlockchainApiArgv = UpgradeArgv
 
 export const handler = async (argv: BlockchainApiArgv) => {
+  exitIfCelotoolHelmDryRun()
   await deployInitialBlockchainApiHandler(argv)
 }

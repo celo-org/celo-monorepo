@@ -1,5 +1,6 @@
 import { flow } from 'lodash'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import { addCurrencyPairMiddleware, getOracleDeployerForContext } from 'src/lib/oracle'
 import yargs from 'yargs'
@@ -19,6 +20,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleDestroyArgv) => {
+  exitIfCelotoolHelmDryRun()
   const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
   const deployer = getOracleDeployerForContext(
     argv.celoEnv,
