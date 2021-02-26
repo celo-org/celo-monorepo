@@ -54,7 +54,7 @@ async function installPrometheus(clusterConfig?: BaseClusterConfig) {
   )
 }
 
-export async function removeHelmRelease() {
+export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 

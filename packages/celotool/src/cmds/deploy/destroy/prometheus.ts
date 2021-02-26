@@ -1,29 +1,19 @@
-import { DestroyArgv } from 'src/cmds/deploy/destroy'
-import { switchToClusterFromEnv } from 'src/lib/cluster'
-import {
-  addOptionalContextMiddleware,
-  ContextArgv,
-  switchToContextCluster,
-} from 'src/lib/context-utils'
+import { PrometheusArgv } from 'src/cmds/deploy/initial/prometheus'
 import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
-import { removeGrafanaHelmRelease, removeHelmRelease } from 'src/lib/prometheus'
+import {
+  removeGrafanaHelmRelease,
+  removePrometheus,
+  switchPrometheusContext,
+} from 'src/lib/prometheus'
 
 export const command = 'prometheus'
 
-export const describe = 'destroy prometheus on a kubernetes cluster on GKE using Helm'
+export const describe = 'destroy prometheus chart release on a kubernetes cluster using Helm'
 
-type PrometheusDestroyArgv = DestroyArgv & ContextArgv
-
-export const builder = addOptionalContextMiddleware
-
-export const handler = async (argv: PrometheusDestroyArgv) => {
+export const handler = async (argv: PrometheusArgv) => {
   exitIfCelotoolHelmDryRun()
-  if (argv.context === undefined) {
-    await switchToClusterFromEnv()
-  } else {
-    await switchToContextCluster(argv.celoEnv, argv.context)
-  }
+  switchPrometheusContext(argv)
 
-  await removeHelmRelease()
+  await removePrometheus()
   await removeGrafanaHelmRelease()
 }
