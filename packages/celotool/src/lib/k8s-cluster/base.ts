@@ -33,7 +33,7 @@ export abstract class BaseClusterManager {
       if (!isCelotoolHelmDryRun()) {
         await this.setupCluster()
       } else {
-        console.log(`Skipping cluster setup due to --helmdryrun`)
+        console.info(`Skipping cluster setup due to --helmdryrun`)
       }
     }
   }

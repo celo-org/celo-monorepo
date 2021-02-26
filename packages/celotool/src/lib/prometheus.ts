@@ -147,7 +147,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
 async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string) {
   // First check if value already exist in helm release. If so we pass the same value 
   // and we avoid creating a new key for the service account
-  const gcloudServiceAccountKeyBase64 = getPrometheusGcloudServiceAccountKeyBase64FromHelm()
+  const gcloudServiceAccountKeyBase64 = await getPrometheusGcloudServiceAccountKeyBase64FromHelm()
   if (gcloudServiceAccountKeyBase64) {
     return gcloudServiceAccountKeyBase64
   } else {

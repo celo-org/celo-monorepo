@@ -1,4 +1,5 @@
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
@@ -24,7 +25,7 @@ export class AksClusterManager extends BaseClusterManager {
   }
 
   async getAndSwitchToClusterContext() {
-    const kubeconfig = process.env['KUBECONFIG'] ? `--file ${process.env['KUBECONFIG']}` : ''
+    const kubeconfig = fetchEnvOrFallback(envVar.KUBECONFIG, '') ? `--file ${fetchEnv(envVar.KUBECONFIG)}` : ''
     await execCmdWithExitOnFailure(
       `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing ${kubeconfig}`
     )
