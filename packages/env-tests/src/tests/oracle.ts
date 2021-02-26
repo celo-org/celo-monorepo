@@ -2,14 +2,14 @@ import { CeloContract } from '@celo/contractkit'
 import { describe, expect, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { DEFAULTTOKENSTOTEST } from '../monorepoRun'
+import { DEFAULT_TOKENS_TO_TEST } from '../monorepoRun'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
 export function runOracleTest(context: EnvTestContext) {
   describe('Oracle Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.Exchange, ONE.times(2), DEFAULTTOKENSTOTEST)
+      await fundAccount(context, TestAccounts.Exchange, ONE.times(2), DEFAULT_TOKENS_TO_TEST)
     })
 
     // TODO: Check if oracle account is authorized

@@ -9,7 +9,7 @@ import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
 
-export const DEFAULTTOKENSTOTEST = ['cUSD']
+export const DEFAULT_TOKENS_TO_TEST = ['cUSD']
 jest.setTimeout(120000)
 function runTests() {
   const envName = loadFromEnvFile()
@@ -23,7 +23,7 @@ function runTests() {
 
   const stableTokensToTest = process.env.STABLETOKENS
     ? process.env.STABLETOKENS.split(',')
-    : DEFAULTTOKENSTOTEST
+    : DEFAULT_TOKENS_TO_TEST
   if (stableTokensToTest.find((token) => !StableTokenToRegistryName[token]))
     throw new Error('Invalid token')
 

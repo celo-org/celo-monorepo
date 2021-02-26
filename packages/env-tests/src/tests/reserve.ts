@@ -2,14 +2,19 @@ import { CeloContract } from '@celo/contractkit'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { DEFAULTTOKENSTOTEST } from '../monorepoRun'
+import { DEFAULT_TOKENS_TO_TEST } from '../monorepoRun'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 export function runReserveTest(context: EnvTestContext) {
   describe('Reserve Test', () => {
     const logger = context.logger.child({ test: 'reserve' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.ReserveSpender, ONE.times(2), DEFAULTTOKENSTOTEST)
-      await fundAccount(context, TestAccounts.ReserveCustodian, ONE.times(2), DEFAULTTOKENSTOTEST)
+      await fundAccount(context, TestAccounts.ReserveSpender, ONE.times(2), DEFAULT_TOKENS_TO_TEST)
+      await fundAccount(
+        context,
+        TestAccounts.ReserveCustodian,
+        ONE.times(2),
+        DEFAULT_TOKENS_TO_TEST
+      )
     })
 
     // TODO: Check if reserve account is authorized
