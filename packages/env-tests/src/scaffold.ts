@@ -147,8 +147,8 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
 // It is required for cEUR testing until cEUR stabletoken wrapper is included in ContractKit.
 // Function is supposed to be deprecated as soon as cEUR stabletoken is wrapped.
 export async function initStableTokenFromRegistry(stableToken: string, kit: ContractKit) {
-  let stableTokenAddress = await kit.registry.addressFor(StableTokenToRegistryName[stableToken])
-  let stableTokenContract = newStableToken(kit.web3, stableTokenAddress)
+  const stableTokenAddress = await kit.registry.addressFor(StableTokenToRegistryName[stableToken])
+  const stableTokenContract = newStableToken(kit.web3, stableTokenAddress)
   return new StableTokenWrapper(kit, stableTokenContract)
 }
 
@@ -156,7 +156,7 @@ export async function initStableTokenFromRegistry(stableToken: string, kit: Cont
 // It is required for cEUR testing until cEUR exchange wrapper is included in ContractKit.
 // Function is supposed to be deprecated as soon as cEUR exchange is wrapped.
 export async function initExchangeFromRegistry(stableToken: string, kit: ContractKit) {
-  let exchangeAddress = await kit.registry.addressFor(ExchangeToRegistryName[stableToken])
-  let exchangeContract = newExchange(kit.web3, exchangeAddress)
+  const exchangeAddress = await kit.registry.addressFor(ExchangeToRegistryName[stableToken])
+  const exchangeContract = newExchange(kit.web3, exchangeAddress)
   return new ExchangeWrapper(kit, exchangeContract)
 }
