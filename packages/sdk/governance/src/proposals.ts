@@ -204,7 +204,21 @@ export class ProposalBuilder {
     this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
-  fromJsonTx = async (tx: ProposalTransactionJSON) => {
+  fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
+    // handle sending value to unregistered contracts
+    if (!RegisteredContracts.includes(tx.contract)) {
+      if (!isValidAddress(tx.contract)) {
+        throw new Error(
+          `Transaction to unregistered contract ${tx.contract} only supported by address`
+        )
+      } else if (tx.function === '' || tx.args !== []) {
+        throw new Error(
+          `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
+        )
+      }
+      return { input: '', to: tx.contract, value: tx.value }
+    }
+
     // Account for canonical registry addresses from current proposal
     let address = this.registryAdditions[tx.contract]
 

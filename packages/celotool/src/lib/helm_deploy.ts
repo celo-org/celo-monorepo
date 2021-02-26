@@ -742,6 +742,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
+    `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
     `--set geth.resources.requests.cpu=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
@@ -769,6 +770,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...gethMetricsOverrides,
     ...bootnodeOverwritePkey,
+    ...rollingUpdateHelmVariables(),
     ...(await helmIPParameters(celoEnv)),
   ]
 }
@@ -868,6 +870,13 @@ export function isCelotoolVerbose() {
 
 export function isCelotoolHelmDryRun() {
   return process.env.CELOTOOL_HELM_DRY_RUN === 'true'
+}
+
+export function exitIfCelotoolHelmDryRun() {
+  if (isCelotoolHelmDryRun()) {
+    console.error('Option --helmdryrun is not allowed for this command. Exiting.')
+    process.exit(1)
+  }
 }
 
 export async function removeGenericHelmChart(releaseName: string, namespace: string) {
@@ -1007,4 +1016,14 @@ export async function checkHelmVersion() {
     console.error(`Error checking local helm version. Minimum Helm version required ${requiredMinHelmVersion}`)
     process.exit(1)
   }
+}
+
+function rollingUpdateHelmVariables() {
+  return [
+    `--set updateStrategy.validators.rollingUpdate.partition=${fetchEnvOrFallback(envVar.VALIDATORS_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.secondaries.rollingUpdate.partition=${fetchEnvOrFallback(envVar.SECONDARIES_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.proxy.rollingUpdate.partition=${fetchEnvOrFallback(envVar.PROXY_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.tx_nodes.rollingUpdate.partition=${fetchEnvOrFallback(envVar.TX_NODES_ROLLING_UPDATE_PARTITION, "0")}`,
+    `--set updateStrategy.tx_nodes_private.rollingUpdate.partition=${fetchEnvOrFallback(envVar.TX_NODES_PRIVATE_ROLLING_UPDATE_PARTITION, "0")}`,
+  ]
 }
