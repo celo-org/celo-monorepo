@@ -1,6 +1,6 @@
 # Start
 
-The following examples and guides will serve as a guide to understand building on Celo for various platforms:
+The following examples and guides will help you start building on Celo.
 
 ## Backend / command line interface
 
