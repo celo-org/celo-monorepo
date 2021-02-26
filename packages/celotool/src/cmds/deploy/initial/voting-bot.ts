@@ -1,5 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { ensure0x } from 'src/lib/utils'
 import { installHelmChart, setupVotingBotAccounts } from 'src/lib/voting-bot'
 import yargs from 'yargs'
@@ -23,6 +24,8 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: VotingBotArgv) => {
   await switchToClusterFromEnv()
-  await setupVotingBotAccounts(argv.celoEnv)
+  if (!isCelotoolHelmDryRun()) {
+    await setupVotingBotAccounts(argv.celoEnv)
+  }
   await installHelmChart(argv.celoEnv, argv.excludedGroups)
 }
