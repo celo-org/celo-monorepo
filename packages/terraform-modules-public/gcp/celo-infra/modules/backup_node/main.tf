@@ -39,7 +39,7 @@ resource "google_compute_instance" "backup_node" {
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-10"
-      size = 12     # need a fair bit of space on / for dealing with the chaindata tarballs
+      size = 10
     }
   }
 
@@ -93,6 +93,6 @@ resource "google_compute_disk" "backup_node" {
   #type = "pd-ssd"
   type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 10
+  size                      = 20
   physical_block_size_bytes = 4096
 }

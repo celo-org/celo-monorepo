@@ -255,6 +255,7 @@ module "attestation-service" {
   validator_signer_account_addresses          = var.validator_signer_account_addresses
   validator_release_gold_addresses            = var.validator_release_gold_addresses
   celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.tx_node.internal_ip_addresses[0]}:8545"
+  #celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://localhost:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key
   nexmo_secret                                = var.attestation_service_nexmo_secret

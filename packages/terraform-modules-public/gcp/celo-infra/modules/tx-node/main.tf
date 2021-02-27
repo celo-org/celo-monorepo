@@ -24,19 +24,16 @@ resource "google_compute_address" "tx_node_internal" {
 }
 
 resource "google_compute_instance" "tx_node" {
-  #name         = "${local.name_prefix}-${count.index}-${random_id.tx_node[count.index].hex}"
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
 
   deletion_protection = false
-  #deletion_protection = true
 
   count = var.tx_node_count
 
   tags = ["${var.celo_env}-txnode"]
 
   allow_stopping_for_update = true
-  #allow_stopping_for_update = false   # You cannot stop an instance that uses a local SSD. Delete and recreate the instance
 
   boot_disk {
     initialize_params {
@@ -104,6 +101,6 @@ resource "google_compute_disk" "txnode" {
   #type = "pd-ssd"
   type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 10
+  size                      = 20
   physical_block_size_bytes = 4096
 }

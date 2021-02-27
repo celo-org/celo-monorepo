@@ -297,12 +297,6 @@
 
 16. Wait for new epoch
 
-    ***Note that as of Celo blockchain v1.2.2, the validator node will now come up in *replica* mode, meaning that it will not
-    validate blocks until instructed to do so by running 'istanbul.start()' from the geth js console.***
-
-    See the [Hotswap docs](https://docs.celo.org/validator-guide/node-upgrades#hotswapping-validator-nodes) for info on how to 
-    shift validating responsibility from one active (or failed) validator to another **without doing a key rotation**.
-
     Now sit back, pull up [TheCelo](http://www.thecelo.com/) and wait for the new epoch to roll around.  You can track your validator on the [PRL Block Map Site](https://cauldron.pretoriaresearchlab.io/rc1-block-map), and get a visual indication of when your new signer has taken over.
 
 17. Troubleshooting
