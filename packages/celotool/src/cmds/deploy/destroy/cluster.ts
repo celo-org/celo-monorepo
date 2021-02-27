@@ -1,6 +1,7 @@
 import { printReleases } from 'src/cmds/deploy/list'
 import { deleteCluster, getNonSystemHelmReleases, switchToClusterFromEnv } from 'src/lib/cluster'
 import { EnvTypes, envVar, fetchEnv } from 'src/lib/env-utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'cluster'
@@ -10,6 +11,7 @@ export const describe = 'deletes the cluster for the given environment'
 export const builder = {}
 
 export const handler = async (_argv: DestroyArgv) => {
+  exitIfCelotoolHelmDryRun()
   const envType = fetchEnv(envVar.ENV_TYPE)
   if (envType !== EnvTypes.DEVELOPMENT) {
     console.error('You can only delete dev clusters')

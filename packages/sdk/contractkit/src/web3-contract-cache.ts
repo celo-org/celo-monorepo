@@ -169,4 +169,8 @@ export class Web3ContractCache {
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!
   }
+
+  public invalidateContract<C extends keyof typeof ContractFactories>(contract: C) {
+    ;(this.cacheMap[contract] as any) = null
+  }
 }

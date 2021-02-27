@@ -162,6 +162,20 @@ const DefaultConfig = {
     oracles: [network.from],
     frozen: false,
   },
+  stableTokenEUR: {
+    decimals: 18,
+    goldPrice: 1.2,
+    tokenName: 'Celo Euro',
+    tokenSymbol: 'cEUR',
+    inflationRate: 1,
+    inflationPeriod: 1.5 * YEAR,
+    initialBalances: {
+      addresses: [network.from],
+      values: ['5000000000000000000000000'],
+    },
+    oracles: [network.from],
+    frozen: false,
+  },
   transferWhitelist: {
     addresses: [],
     registryIds: [],
@@ -185,6 +199,7 @@ const DefaultConfig = {
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
+    downtimeGracePeriod: 0,
 
     // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],

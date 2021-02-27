@@ -4,63 +4,56 @@ import {
   getReleaseName,
   installHelmChart,
 } from 'src/lib/blockscout'
-import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
   getServiceAccountName,
   grantRoles,
+  isCelotoolHelmDryRun,
 } from 'src/lib/helm_deploy'
 import { createServiceAccountIfNotExists } from 'src/lib/service-account-utils'
-import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'blockscout'
 
 export const describe = 'deploy the blockscout package'
 
-export const builder = (argv: yargs.Argv) => {
-  return argv.option('skipClusterSetup', {
-    type: 'boolean',
-    description: 'If you know that you can skip the cluster setup',
-    default: false,
-  })
-}
-
-type BlockscoutInitialArgv = InitialArgv & { skipClusterSetup: boolean }
-
-export const handler = async (argv: BlockscoutInitialArgv) => {
-  const createdCluster = await createClusterIfNotExists()
-  await switchToClusterFromEnv()
-
-  if (!argv.skipClusterSetup) {
-    await setupCluster(argv.celoEnv, createdCluster)
-  }
-
-  // Create cloud SQL account with 'Cloud SQL Client' permissions.
-  const cloudSqlServiceAccountName = getServiceAccountName('cloud-sql-for')
-  await createServiceAccountIfNotExists(cloudSqlServiceAccountName)
-
-  await grantRoles(cloudSqlServiceAccountName, 'roles/cloudsql.client')
-
-  await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName)
-
+export const handler = async (argv: InitialArgv) => {
   const instanceName = getInstanceName(argv.celoEnv)
   const helmReleaseName = getReleaseName(argv.celoEnv)
+  await switchToClusterFromEnv()
+  let blockscoutCredentials: string[] = [
+    'dummyUser',
+    'dummyPassword',
+    'dummy-project:region:instance',
+  ]
 
-  const [
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName,
-  ] = await createCloudSQLInstance(argv.celoEnv, instanceName)
+  if (!isCelotoolHelmDryRun()) {
+    // Create cloud SQL account with 'Cloud SQL Client' permissions.
+    const cloudSqlServiceAccountName = getServiceAccountName('cloud-sql-for')
+    await createServiceAccountIfNotExists(cloudSqlServiceAccountName)
+
+    await grantRoles(cloudSqlServiceAccountName, 'roles/cloudsql.client')
+
+    await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName)
+
+    blockscoutCredentials = await createCloudSQLInstance(argv.celoEnv, instanceName)
+  } else {
+    console.info(
+      `Skipping Cloud SQL Database creation and IAM setup. Please check if you can execute the skipped steps.`
+    )
+  }
 
   await installHelmChart(
     argv.celoEnv,
     helmReleaseName,
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName
+    blockscoutCredentials[0],
+    blockscoutCredentials[1],
+    blockscoutCredentials[2]
   )
 
-  await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
+  if (!isCelotoolHelmDryRun()) {
+    await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
+  }
 }
