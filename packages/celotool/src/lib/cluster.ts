@@ -10,7 +10,7 @@ import {
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
   installGCPSSDStorageClass,
-  isCelotoolHelmDryRun
+  isCelotoolHelmDryRun,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -23,7 +23,11 @@ const SYSTEM_HELM_RELEASES = [
 ]
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
 
-export async function switchToClusterFromEnv(celoEnv: string, checkOrPromptIfStagingOrProduction = true, skipClusterSetup = true) {
+export async function switchToClusterFromEnv(
+  celoEnv: string,
+  checkOrPromptIfStagingOrProduction = true,
+  skipClusterSetup = true
+) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
@@ -40,7 +44,6 @@ export async function switchToClusterFromEnv(celoEnv: string, checkOrPromptIfSta
     } else {
       console.info(`Skipping cluster setup due to --helmdryrun`)
     }
-
   }
 
   let currentCluster = null
