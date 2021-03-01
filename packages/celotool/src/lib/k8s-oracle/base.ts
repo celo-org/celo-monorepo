@@ -1,6 +1,15 @@
-import { getFornoUrl, getFornoWebSocketUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
+import {
+  getFornoUrl,
+  getFornoWebSocketUrl,
+  getFullNodeHttpRpcInternalUrl,
+  getFullNodeWebSocketRpcInternalUrl,
+} from 'src/lib/endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
-import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 
 const helmChartPath = '../helm-charts/oracle'
 
@@ -69,7 +78,12 @@ export abstract class BaseOracleDeployer {
       `--set oracle.replicas=${this.replicas}`,
       `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
-      `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
+      `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(
+        envVar.ORACLE_UNUSED_ORACLE_ADDRESSES,
+        ''
+      )
+        .split(',')
+        .join('\\,')}'`,
     ].concat(await this.oracleIdentityHelmParameters())
   }
 

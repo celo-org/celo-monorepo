@@ -20,12 +20,16 @@ export class AksClusterManager extends BaseClusterManager {
       console.info('No azure account subscription currently set')
     }
     if (currentTenantId === null || currentTenantId.trim() !== this.clusterConfig.tenantId) {
-      await execCmdWithExitOnFailure(`az account set --subscription ${this.clusterConfig.subscriptionId}`)
+      await execCmdWithExitOnFailure(
+        `az account set --subscription ${this.clusterConfig.subscriptionId}`
+      )
     }
   }
 
   async getAndSwitchToClusterContext() {
-    const kubeconfig = fetchEnvOrFallback(envVar.KUBECONFIG, '') ? `--file ${fetchEnv(envVar.KUBECONFIG)}` : ''
+    const kubeconfig = fetchEnvOrFallback(envVar.KUBECONFIG, '')
+      ? `--file ${fetchEnv(envVar.KUBECONFIG)}`
+      : ''
     await execCmdWithExitOnFailure(
       `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing ${kubeconfig}`
     )
