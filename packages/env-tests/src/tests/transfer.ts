@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals'
+import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
 import {
   fundAccountWithStableTokens,
@@ -42,6 +43,10 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
           .sendAndWaitForReceipt({ from: from.address })
 
         logger.debug({ stableToken: stableToken, receipt: receipt }, `Transferred ${stableToken}`)
+        const transaction = await context.kit.web3.eth.getTransaction(receipt.transactionHash)
+        const gasPrice = new BigNumber(transaction.gasPrice)
+        const gasUsed = new BigNumber(context.kit.web3.utils.toDecimal(receipt.gasUsed).toString())
+        const transactionFee = gasPrice.times(gasUsed)
 
         const toBalanceAfter = await stableTokenInstance.balanceOf(to.address)
         const fromBalanceAfter = await stableTokenInstance.balanceOf(from.address)
@@ -49,10 +54,15 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
           { stableToken: stableToken, balance: toBalanceAfter.toString(), account: to.address },
           `Get ${stableToken} Balance After`
         )
-
         expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
-        //check whether difference of balance of 'from' account before/after is greater than 1 (transfer amount + fee)
-        expect(fromBalanceBefore.minus(fromBalanceAfter).isGreaterThan(ONE)).toBeTruthy()
+        //check whether difference of balance of 'from' account before/after - transfer amount
+        //is equal to transaction fee
+        expect(
+          fromBalanceBefore
+            .minus(fromBalanceAfter)
+            .minus(ONE)
+            .isEqualTo(transactionFee)
+        ).toBeTruthy()
       })
     }
   })
