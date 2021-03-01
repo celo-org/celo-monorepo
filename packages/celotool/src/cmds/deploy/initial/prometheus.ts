@@ -1,21 +1,19 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
+import { switchToClusterFromEnvOrContext } from 'src/lib/cluster'
 import { addContextMiddleware, ContextArgv } from 'src/lib/context-utils'
-import {
-  installGrafanaIfNotExists,
-  installPrometheusIfNotExists,
-  switchPrometheusContext,
-} from 'src/lib/prometheus'
+import { installGrafanaIfNotExists, installPrometheusIfNotExists } from 'src/lib/prometheus'
 
 export const command = 'prometheus'
 
 export const describe = 'deploy prometheus to a kubernetes cluster on GKE using Helm'
 
-export type PrometheusArgv = InitialArgv &
+export type PrometheusInitialArgv = InitialArgv &
   ContextArgv & {
     deployGrafana: boolean
+    skipClusterSetup: boolean
   }
 
-export const builder = (argv: PrometheusArgv) => {
+export const builder = (argv: PrometheusInitialArgv) => {
   return addContextMiddleware(argv)
     .option('deploy-grafana', {
       type: 'boolean',
@@ -29,8 +27,8 @@ export const builder = (argv: PrometheusArgv) => {
     })
 }
 
-export const handler = async (argv: PrometheusArgv) => {
-  const context = await switchPrometheusContext(argv)
+export const handler = async (argv: PrometheusInitialArgv) => {
+  const context = await switchToClusterFromEnvOrContext(argv, argv.skipClusterSetup)
 
   await installPrometheusIfNotExists(context)
   if (argv.deployGrafana) {

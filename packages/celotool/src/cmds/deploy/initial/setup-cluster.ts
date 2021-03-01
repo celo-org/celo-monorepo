@@ -1,4 +1,5 @@
-import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { switchToClusterFromEnvOrContext } from 'src/lib/cluster'
+import { ContextArgv } from 'src/lib/context-utils'
 import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { InitialArgv } from '../initial'
 
@@ -6,10 +7,9 @@ export const command = 'setup-cluster'
 
 export const describe = 'Create K8s cluster and deploy common tools'
 
-export const handler = async (argv: InitialArgv) => {
-  exitIfCelotoolHelmDryRun()
-  const createdCluster = await createClusterIfNotExists()
-  await switchToClusterFromEnv(argv.celoEnv)
+export type SetupClusterInitialArgv = InitialArgv & ContextArgv
 
-  await setupCluster(argv.celoEnv, createdCluster)
+export const handler = async (argv: SetupClusterInitialArgv) => {
+  exitIfCelotoolHelmDryRun()
+  await switchToClusterFromEnvOrContext(argv, false)
 }

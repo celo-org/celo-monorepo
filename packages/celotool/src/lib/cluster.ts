@@ -1,5 +1,6 @@
 import sleep from 'sleep-promise'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
+import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   checkHelmVersion,
@@ -232,4 +233,14 @@ export function getPackageName(name: string) {
   }
 
   return prefix[1] === 'ethereum' ? 'testnet' : prefix[1]
+}
+
+export async function switchToClusterFromEnvOrContext(argv: any, skipClusterSetup = false) {
+  if (argv.context === undefined) {
+    // GCP top level cluster.
+    await switchToClusterFromEnv(argv.celoEnv, true, skipClusterSetup)
+  } else {
+    await switchToContextCluster(argv.celoEnv, argv.context, skipClusterSetup)
+    return getClusterConfigForContext(argv.context)
+  }
 }

@@ -1,8 +1,6 @@
 import fs from 'fs'
-import { PrometheusArgv } from '../cmds/deploy/initial/prometheus'
-import { createNamespaceIfNotExists, switchToClusterFromEnv } from './cluster'
+import { createNamespaceIfNotExists } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
-import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   installGenericHelmChart,
@@ -340,14 +338,4 @@ async function setupWorkloadIdentities(serviceAccountName: string, gcloudProject
     --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
     ${serviceAccountEmail}`
   )
-}
-
-export async function switchPrometheusContext(argv: PrometheusArgv, skipClusterSetup = false) {
-  if (argv.context === undefined) {
-    // GCP top level cluster.
-    await switchToClusterFromEnv(argv.celoEnv, true, skipClusterSetup)
-  } else {
-    await switchToContextCluster(argv.celoEnv, argv.context)
-    return getClusterConfigForContext(argv.context)
-  }
 }

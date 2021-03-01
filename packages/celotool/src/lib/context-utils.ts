@@ -148,7 +148,7 @@ export function getContextDynamicEnvVarValues<T>(
 /**
  * Reads the context and switches to the appropriate Azure or AWS Cluster
  */
-export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction: boolean = true) {
+export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction: boolean = true, skipClusterSetup: boolean = false) {
   if (!isValidContext(context)) {
     throw Error(`Invalid context, must be one of ${fetchEnv(envVar.CONTEXTS)}`)
   }
@@ -156,7 +156,7 @@ export async function switchToContextCluster(celoEnv: string, context: string, c
     await doCheckOrPromptIfStagingOrProduction()
   }
   const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
-  await clusterManager.switchToClusterContext()
+  await clusterManager.switchToClusterContext(skipClusterSetup)
   return clusterManager
 }
 
