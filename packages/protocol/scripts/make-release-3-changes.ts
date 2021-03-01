@@ -27,7 +27,9 @@ try {
   })
   const releaseProposal: ProposalTx[] = readJsonSync(argv.input_proposal)
   writeJsonSync(argv.output_proposal, makeRelease3Changes(releaseProposal), { spaces: 2 })
+  // tslint:disable-next-line: no-console
   console.log(`Modifications made sucessfully; written to ${argv.output_proposal}`)
 } catch (e) {
+  // tslint:disable-next-line: no-console
   console.error(`Something went wrong: ${e}`)
 }
