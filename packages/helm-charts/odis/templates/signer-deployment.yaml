@@ -23,8 +23,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - name: http
-              containerPort: 80
-              containerPort: 443
+              containerPort: 3000
           command:
             - bash
             - "-c"
@@ -32,7 +31,7 @@ spec:
               sleep 60; yarn start:docker
           env:
             - name: SERVER_PORT
-              value: "80"
+              value: "3000"
             - name: DB_TYPE
               value: "postgres"
             - name: DB_DATABASE

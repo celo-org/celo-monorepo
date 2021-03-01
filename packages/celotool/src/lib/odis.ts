@@ -121,12 +121,12 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
     `--set keystore.secretName=${keyVaultConfig.secretName}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
-    `--set publicHostname=${ODISSignerPublicHostname(clusterConfig.regionName, celoEnv, clusterConfig.clusterName)}`,
+    `--set publicHostname=${ODISSignerPublicHostname(clusterConfig.regionName, celoEnv)}`,
   ].concat(await ODISSignerKeyVaultIdentityHelmParameters(context, keyVaultConfig))
 }
 
-function ODISSignerPublicHostname(regionName: string, celoEnv: string, clusterName: string): string{
-  return regionName + '.odissigner.' + celoEnv + '.' + clusterName + '.org'
+function ODISSignerPublicHostname(regionName: string, celoEnv: string): string{
+  return regionName + '.odissigner.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
 }
 
 /**

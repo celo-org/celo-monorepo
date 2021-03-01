@@ -4,7 +4,6 @@ metadata:
   name: {{ include "name" . }}
   labels:
 {{ include "labels" . | indent 4 }}
-{{ include "odis-signer-component-label" . | nindent 4 }}
 spec:
   clusterIP: None
   selector:

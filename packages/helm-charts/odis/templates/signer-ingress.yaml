@@ -16,5 +16,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Release.Namespace }}-onboarding
+          serviceName: {{ include "name" . }}
           servicePort: 3000
