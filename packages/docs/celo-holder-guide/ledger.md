@@ -141,7 +141,7 @@ To use `celocli` with your Ledger, ensure the device is connected to your comput
 
 Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger. You may also append the `--ledgerConfirmAddress` flag, which will require that you manually verify on the Ledger the address from which the transaction is being sent.
 
-## Troubleshooting Celo CLI
+## Troubleshooting
 
 If you have issues connecting to the Ledger, try the following:
 
