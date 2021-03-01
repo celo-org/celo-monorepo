@@ -42,6 +42,7 @@ export async function displaySendTx<A>(
     }
   } catch (e) {
     cli.action.stop(`failed: ${e.message}`)
+    throw e
   }
 }
 
