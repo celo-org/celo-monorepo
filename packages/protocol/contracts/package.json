@@ -4,7 +4,7 @@
     "author": "cLabs",
     "license": "LGPL-3.0",
     "dependencies": {
-        "openzeppelin-solidity": "^2.5.0",
+        "openzeppelin-solidity": "2.5.0",
         "solidity-bytes-utils": "0.0.7"
     }
 }
