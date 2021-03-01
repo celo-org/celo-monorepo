@@ -21,7 +21,15 @@ export const ExchangeToRegistryName: Record<string, CeloContract> = {
   cEUR: 'ExchangeEUR' as CeloContract,
 }
 
-export async function fundAccount(
+export async function fundAccountWithcUSD(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber
+) {
+  await fundAccountWithStableTokens(context, account, value, ['cUSD'])
+}
+
+export async function fundAccountWithStableTokens(
   context: EnvTestContext,
   account: TestAccounts,
   value: BigNumber,

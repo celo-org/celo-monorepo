@@ -1,12 +1,23 @@
 import { describe, expect, test } from '@jest/globals'
 import { EnvTestContext } from '../context'
-import { fundAccount, getKey, initStableTokenFromRegistry, ONE, TestAccounts } from '../scaffold'
+import {
+  fundAccountWithStableTokens,
+  getKey,
+  initStableTokenFromRegistry,
+  ONE,
+  TestAccounts,
+} from '../scaffold'
 
 export function runTransfersTest(context: EnvTestContext, stableTokensToTest: string[]) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.TransferFrom, ONE.times(10), stableTokensToTest)
+      await fundAccountWithStableTokens(
+        context,
+        TestAccounts.TransferFrom,
+        ONE.times(10),
+        stableTokensToTest
+      )
     })
 
     for (const stableToken of stableTokensToTest) {

@@ -9,8 +9,10 @@ import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
 
-export const DEFAULT_TOKENS_TO_TEST = ['cUSD']
+const DEFAULT_TOKENS_TO_TEST = ['cUSD']
+
 jest.setTimeout(120000)
+
 function runTests() {
   const envName = loadFromEnvFile()
 
