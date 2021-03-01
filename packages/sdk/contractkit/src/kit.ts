@@ -14,19 +14,20 @@ import net from 'net'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloToken } from './base'
+import { CeloTokens, StableToken, EachCeloToken } from './celo-tokens'
 import { WrapperCache } from './contract-cache'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
-import { ExchangeConfig } from './wrappers/BaseExchange'
-import { StableTokenConfig } from './wrappers/BaseStableTokenWrapper'
 import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
+import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
 import { LockedGoldConfig } from './wrappers/LockedGold'
 import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
+import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
 
 /**
@@ -69,29 +70,9 @@ export interface NetworkConfig {
   blockchainParameters: BlockchainParametersConfig
 }
 
-enum CeloTokenSymbol {
-  CELO = 'CELO',
-  cUSD = 'cUSD',
-  cEUR = 'cEUR',
-}
-
-type AccountCeloTokenBalance = {
-  [key in keyof typeof CeloTokenSymbol]: BigNumber
-}
-
-interface AccountBalance extends AccountCeloTokenBalance {
+interface AccountBalance extends EachCeloToken<BigNumber> {
   lockedCELO: BigNumber
   pending: BigNumber
-}
-
-interface CeloTokenInfo {
-  contract: CeloToken
-  symbol: CeloTokenSymbol
-}
-
-interface CeloTokenBalanceInfo {
-  balance: BigNumber
-  symbol: CeloTokenSymbol
 }
 
 export class ContractKit {
@@ -101,11 +82,8 @@ export class ContractKit {
   readonly _web3Contracts: Web3ContractCache
   /** factory for core contract's kit wrappers  */
   readonly contracts: WrapperCache
-
-  /** Basic info for each supported Celo Token */
-  private readonly celoTokenInfos: {
-    [token in CeloTokenSymbol]: CeloTokenInfo
-  }
+  /** helper for interacting with CELO & stable tokens */
+  readonly celoTokens: CeloTokens
 
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   gasPriceSuggestionMultiplier = 5
@@ -114,20 +92,7 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
-    this.celoTokenInfos = {
-      CELO: {
-        contract: CeloContract.GoldToken,
-        symbol: CeloTokenSymbol.CELO,
-      },
-      cUSD: {
-        contract: CeloContract.StableToken,
-        symbol: CeloTokenSymbol.cUSD,
-      },
-      cEUR: {
-        contract: CeloContract.StableTokenEUR,
-        symbol: CeloTokenSymbol.cEUR,
-      },
-    }
+    this.celoTokens = new CeloTokens(this)
   }
 
   getWallet() {
@@ -144,50 +109,23 @@ export class ContractKit {
       // Just means that it's not an account
     }
 
-    const balanceInfos: CeloTokenBalanceInfo[] = await Promise.all(
-      Object.values(this.celoTokenInfos).map(async (info: CeloTokenInfo) => {
-        const token = await this.contracts.getContract(info.contract)
-        return {
-          symbol: info.symbol,
-          balance: await token.balanceOf(address),
-        }
-      })
-    )
-
-    const balancesPerToken = balanceInfos.reduce(
-      (
-        obj: {
-          [token in CeloTokenSymbol]?: BigNumber
-        },
-        balanceInfo: CeloTokenBalanceInfo
-      ) => ({
-        ...obj,
-        [balanceInfo.symbol]: balanceInfo.balance,
-      }),
-      {}
-    ) as {
-      [token in CeloTokenSymbol]: BigNumber
-    }
-
     return {
       lockedCELO: lockedBalance,
       pending,
-      ...balancesPerToken,
+      ...(await this.celoTokens.balancesOf(address)),
     }
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
-    const attestationFeeTokens: string[] = await Promise.all(
-      Object.values(this.celoTokenInfos).map((info: CeloTokenInfo) =>
-        this.registry.addressFor(info.contract)
-      )
+    const celoTokenAddresses = await this.celoTokens.forEachCeloToken((info) =>
+      this.registry.addressFor(info.contract)
     )
     // There can only be `10` unique parametrized types in Promise.all call, that is how
     // its typescript typing is setup. Thus, since we crossed threshold of 10
     // have to explicitly cast it to just any type and discard type information.
     const promises: Array<Promise<any>> = [
-      this.contracts.getExchange(),
-      this.contracts.getExchangeEUR(),
+      this.contracts.getExchange(StableToken.cUSD),
+      this.contracts.getExchange(StableToken.cEUR),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
@@ -195,8 +133,8 @@ export class ContractKit {
       this.contracts.getSortedOracles(),
       this.contracts.getGasPriceMinimum(),
       this.contracts.getReserve(),
-      this.contracts.getStableToken(),
-      this.contracts.getStableTokenEUR(),
+      this.contracts.getStableToken(StableToken.cUSD),
+      this.contracts.getStableToken(StableToken.cEUR),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
@@ -206,7 +144,7 @@ export class ContractKit {
       contracts[0].getConfig(),
       contracts[1].getConfig(),
       contracts[2].getConfig(),
-      contracts[3].getConfig(attestationFeeTokens),
+      contracts[3].getConfig(Object.values(celoTokenAddresses)),
       contracts[4].getConfig(),
       contracts[5].getConfig(),
       contracts[6].getConfig(),
@@ -237,14 +175,12 @@ export class ContractKit {
   }
 
   async getHumanReadableNetworkConfig() {
-    const attestationFeeTokens: string[] = await Promise.all(
-      Object.values(this.celoTokenInfos).map((info: CeloTokenInfo) =>
-        this.registry.addressFor(info.contract)
-      )
+    const celoTokenAddresses = await this.celoTokens.forEachCeloToken((info) =>
+      this.registry.addressFor(info.contract)
     )
     const promises: Array<Promise<any>> = [
-      this.contracts.getExchange(),
-      this.contracts.getExchangeEUR(),
+      this.contracts.getExchange(StableToken.cUSD),
+      this.contracts.getExchange(StableToken.cEUR),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
@@ -252,8 +188,8 @@ export class ContractKit {
       this.contracts.getSortedOracles(),
       this.contracts.getGasPriceMinimum(),
       this.contracts.getReserve(),
-      this.contracts.getStableToken(),
-      this.contracts.getStableTokenEUR(),
+      this.contracts.getStableToken(StableToken.cUSD),
+      this.contracts.getStableToken(StableToken.cEUR),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
@@ -263,7 +199,7 @@ export class ContractKit {
       contracts[0].getHumanReadableConfig(),
       contracts[1].getHumanReadableConfig(),
       contracts[2].getConfig(),
-      contracts[3].getHumanReadableConfig(attestationFeeTokens),
+      contracts[3].getHumanReadableConfig(Object.values(celoTokenAddresses)),
       contracts[4].getHumanReadableConfig(),
       contracts[5].getHumanReadableConfig(),
       contracts[6].getHumanReadableConfig(),

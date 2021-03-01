@@ -1,4 +1,5 @@
 import { CeloContract } from './base'
+import { StableToken } from './celo-tokens'
 import { ContractKit } from './kit'
 import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
@@ -9,7 +10,6 @@ import { ElectionWrapper } from './wrappers/Election'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
-import { ExchangeEURWrapper } from './wrappers/ExchangeEUR'
 import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -20,7 +20,6 @@ import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransaction
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
-import { StableTokenEURWrapper } from './wrappers/StableTokenEURWrapper'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
@@ -34,7 +33,7 @@ const WrapperFactories = {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
-  [CeloContract.ExchangeEUR]: ExchangeEURWrapper,
+  [CeloContract.ExchangeEUR]: ExchangeWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
@@ -49,7 +48,7 @@ const WrapperFactories = {
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
-  [CeloContract.StableTokenEUR]: StableTokenEURWrapper,
+  [CeloContract.StableTokenEUR]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
 }
 
@@ -66,7 +65,7 @@ interface WrapperCacheMap {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
-  [CeloContract.ExchangeEUR]?: ExchangeEURWrapper
+  [CeloContract.ExchangeEUR]?: ExchangeWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -81,7 +80,7 @@ interface WrapperCacheMap {
   [CeloContract.Reserve]?: ReserveWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
-  [CeloContract.StableTokenEUR]?: StableTokenEURWrapper
+  [CeloContract.StableTokenEUR]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
@@ -91,7 +90,6 @@ interface WrapperCacheMap {
  * Provides access to all contract wrappers for celo core contracts
  */
 export class WrapperCache {
-  // private wrapperCache: Map<CeloContract, any> = new Map()
   private wrapperCache: WrapperCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
@@ -120,11 +118,8 @@ export class WrapperCache {
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
-  getExchange() {
-    return this.getContract(CeloContract.Exchange)
-  }
-  getExchangeEUR() {
-    return this.getContract(CeloContract.ExchangeEUR)
+  getExchange(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getExchange(stableToken))
   }
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
@@ -162,11 +157,8 @@ export class WrapperCache {
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-  getStableToken() {
-    return this.getContract(CeloContract.StableToken)
-  }
-  getStableTokenEUR() {
-    return this.getContract(CeloContract.StableTokenEUR)
+  getStableToken(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getStableToken(stableToken))
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)

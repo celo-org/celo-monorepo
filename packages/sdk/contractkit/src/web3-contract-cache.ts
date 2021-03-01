@@ -1,5 +1,6 @@
 import debugFactory from 'debug'
 import { CeloContract, ProxyContracts } from './base'
+import { StableToken } from './celo-tokens'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -25,7 +26,6 @@ import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
-import { newStableTokenEur } from './generated/StableTokenEUR'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
@@ -57,7 +57,7 @@ export const ContractFactories = {
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
-  [CeloContract.StableTokenEUR]: newStableTokenEur,
+  [CeloContract.StableTokenEUR]: newStableToken,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
@@ -101,11 +101,8 @@ export class Web3ContractCache {
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
-  getExchange() {
-    return this.getContract(CeloContract.Exchange)
-  }
-  getExchangeEUR() {
-    return this.getContract(CeloContract.ExchangeEUR)
+  getExchange(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getExchange(stableToken))
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
@@ -146,11 +143,8 @@ export class Web3ContractCache {
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-  getStableToken() {
-    return this.getContract(CeloContract.StableToken)
-  }
-  getStableTokenEUR() {
-    return this.getContract(CeloContract.StableTokenEUR)
+  getStableToken(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getStableToken(stableToken))
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)
