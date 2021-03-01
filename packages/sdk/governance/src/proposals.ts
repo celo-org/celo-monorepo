@@ -85,7 +85,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
-    debug(`decoding tx ${tx}`)
+    debug(`decoding tx ${JSON.stringify(tx)}`)
     const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
