@@ -20,26 +20,28 @@ export enum OffchainErrorTypes {
   NoStorageProvider = 'NoStorageProvider',
 }
 
-class FetchError extends RootError<OffchainErrorTypes.FetchError> {
+export class FetchError extends RootError<OffchainErrorTypes.FetchError> {
   constructor(error: Error) {
     super(OffchainErrorTypes.FetchError)
     this.message = error.message
   }
 }
 
-class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
+export class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
   constructor() {
     super(OffchainErrorTypes.InvalidSignature)
   }
 }
 
-class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
+export class NoStorageRootProvidedData extends RootError<
+  OffchainErrorTypes.NoStorageRootProvidedData
+> {
   constructor() {
     super(OffchainErrorTypes.NoStorageRootProvidedData)
   }
 }
 
-class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
+export class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
   constructor() {
     super(OffchainErrorTypes.NoStorageProvider)
   }
@@ -51,7 +53,20 @@ export type OffchainErrors =
   | NoStorageRootProvidedData
   | NoStorageProvider
 
-export default class OffchainDataWrapper {
+export interface OffchainDataWrapper {
+  kit: ContractKit
+  signer: Address
+  self: Address
+  writeDataTo(data: Buffer, signature: Buffer, dataPath: string): Promise<OffchainErrors | void>
+  readDataFromAsResult<DataType>(
+    account: Address,
+    dataPath: string,
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
+  ): Promise<Result<Buffer, OffchainErrors>>
+}
+
+export class BasicDataWrapper implements OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
   signer: string
 

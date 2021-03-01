@@ -14,6 +14,9 @@
     "expo-contacts": "8.0.0",
     "libphonenumber-js": "^1.7.22"
   },
+  "devDependencies": {
+    "@types/react-native": "0.63.50"
+  },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": ["src/**/*", "lib/**/*"]
