@@ -23,6 +23,14 @@ interface ODISSignerDatabaseConfig {
   password: string
 }
 
+/**
+ * Information for the ODIS logging
+ */
+interface ODISSignerLoggingConfig {
+  level: string
+  format: string
+}
+
 /*
  * Prefix for the cluster's identity name
  */
@@ -46,8 +54,17 @@ const contextDatabaseConfigDynamicEnvVars: { [k in keyof ODISSignerDatabaseConfi
   password: DynamicEnvVar.ODIS_SIGNER_DB_PASSWORD,
 }
 
-function releaseName(celoEnv: string) {
-  return `${celoEnv}-odissigner`
+/**
+ * Env vars corresponding to each value for the logging for a particular context
+ */
+const contextLoggingConfigDynamicEnvVars: { [k in keyof ODISSignerLoggingConfig]: DynamicEnvVar } = {
+  level: DynamicEnvVar.ODIS_SIGNER_LOG_LEVEL,
+  format: DynamicEnvVar.ODIS_SIGNER_LOG_FORMAT
+}
+
+function releaseName(celoEnv: string, context: string) {
+  const contextK8sFriendly = context.toLowerCase().replace(/_/g, '-')
+  return `${celoEnv}-${contextK8sFriendly}-odissigner`
 }
 
 export async function installODISHelmChart(
@@ -56,7 +73,7 @@ export async function installODISHelmChart(
 ) {
   return installGenericHelmChart(
     celoEnv,
-    releaseName(celoEnv),
+    releaseName(celoEnv, context),
     helmChartPath,
     await helmParameters(celoEnv, context)
   )
@@ -68,14 +85,14 @@ export async function upgradeODISChart(
 ) {
   return upgradeGenericHelmChart(
     celoEnv,
-    releaseName(celoEnv),
+    releaseName(celoEnv, context),
     helmChartPath,
     await helmParameters(celoEnv, context)
   )
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
-  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
+  await removeGenericHelmChart(releaseName(celoEnv, context), celoEnv)
   const keyVaultConfig = getContextDynamicEnvVarValues(
     contextODISSignerKeyVaultConfigDynamicEnvVars,
     context
@@ -98,18 +115,19 @@ async function helmParameters(celoEnv: string, context: string) {
     context
   )
 
-  const vars = getContextDynamicEnvVarValues(
+  const loggingConfig = getContextDynamicEnvVarValues(
+    contextLoggingConfigDynamicEnvVars,
+    context,
     {
-      network: DynamicEnvVar.ODIS_NETWORK,
-    },
-    context
+	level: "trace",
+	format: "stackdriver"
+    }
   )
 
   const clusterConfig = getAksClusterConfig(context)
 
   return [
     `--set environment.name=${celoEnv}`,
-    `--set environment.network=${vars.network}`,
     `--set environment.cluster.name=${clusterConfig.clusterName}`,
     `--set environment.cluster.location=${clusterConfig.regionName}`,
     `--set image.repository=${fetchEnv(envVar.ODIS_SIGNER_DOCKER_IMAGE_REPOSITORY)}`,
@@ -121,12 +139,9 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
     `--set keystore.secretName=${keyVaultConfig.secretName}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
-    `--set publicHostname=${ODISSignerPublicHostname(clusterConfig.regionName, celoEnv)}`,
+    `--set log.level=${loggingConfig.level}`,
+    `--set log.format=${loggingConfig.format}`
   ].concat(await ODISSignerKeyVaultIdentityHelmParameters(context, keyVaultConfig))
-}
-
-function ODISSignerPublicHostname(regionName: string, celoEnv: string): string{
-  return regionName + '.odissigner.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
 }
 
 /**
