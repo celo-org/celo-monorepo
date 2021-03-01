@@ -8,7 +8,7 @@ import {
   generatePublicKey,
   getAddressFromEnv,
   privateKeyToAddress,
-  privateKeyToPublicKey
+  privateKeyToPublicKey,
 } from './generate_utils'
 import {
   applyTerraformModule,
@@ -19,14 +19,14 @@ import {
   showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
-  untaintTerraformModuleResource
+  untaintTerraformModuleResource,
 } from './terraform'
 import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
   getProxyName,
   uploadDataToGoogleStorage,
-  uploadTestnetInfoToGoogleStorage
+  uploadTestnetInfoToGoogleStorage,
 } from './testnet-utils'
 
 export interface ProxyIndex {
@@ -191,7 +191,11 @@ export async function destroy(celoEnv: string) {
   }
 }
 
-export async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+export async function destroyModule(
+  celoEnv: string,
+  terraformModule: string,
+  vars: TerraformVars = {}
+) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
   const envType = fetchEnv(envVar.ENV_TYPE)
