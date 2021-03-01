@@ -16,7 +16,7 @@ describe('Blockchain parameters tests', function(this: any) {
   let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethRunConfig = {
-    migrateTo: 20,
+    useMycelo: true,
     runPath: TMP_PATH,
     keepData: false,
     networkId: 1101,

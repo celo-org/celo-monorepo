@@ -6,11 +6,14 @@ import * as bip39 from 'bip39'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import fs from 'fs'
-import { range, repeat } from 'lodash'
+import { merge, range, repeat } from 'lodash'
+import { tmpdir } from 'os'
 import path from 'path'
 import * as rlp from 'rlp'
+import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import Web3 from 'web3'
+import { spawnCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -432,4 +435,72 @@ export const generateGenesis = ({
   }
 
   return JSON.stringify(genesis, null, 2)
+}
+
+// This function assumes that mycelo has already been built using 'make all'
+export const generateGenesisWithMigrations = async ({
+  gethRepoPath,
+  genesisConfig,
+  mnemonic,
+  numValidators,
+}: MyceloGenesisConfig): Promise<string> => {
+  const tmpDir = path.join(tmpdir(), `mycelo-genesis-${Date.now()}`)
+  fs.mkdirSync(tmpDir)
+  const envFile = path.join(tmpDir, 'env.json')
+  const configFile = path.join(tmpDir, 'genesis-config.json')
+  const myceloBinaryPath = path.join(gethRepoPath!, '/build/bin/mycelo')
+  await spawnCmdWithExitOnFailure(
+    myceloBinaryPath,
+    ['genesis-config', '--template', 'monorepo', '--mnemonic', mnemonic],
+    {
+      silent: true,
+      cwd: tmpDir,
+    }
+  )
+  const mcEnv = JSON.parse(fs.readFileSync(envFile).toString())
+  const mcConfig = JSON.parse(fs.readFileSync(configFile).toString())
+
+  // Customize and overwrite the env.json file
+  merge(mcEnv, {
+    chainId: genesisConfig.chainId,
+    accounts: {
+      validators: numValidators,
+    },
+  })
+  fs.writeFileSync(envFile, JSON.stringify(mcEnv, undefined, 2))
+
+  // Customize and overwrite the genesis-config.json file
+  if (genesisConfig.chainId) {
+    mcConfig.chainId = genesisConfig.chainId
+  }
+  if (genesisConfig.epoch) {
+    mcConfig.istanbul.epoch = genesisConfig.epoch
+  }
+  if (genesisConfig.lookbackwindow) {
+    mcConfig.istanbul.lookbackwindow = genesisConfig.lookbackwindow
+  }
+  if (genesisConfig.blockTime) {
+    mcConfig.istanbul.blockperiod = genesisConfig.blockTime
+  }
+  if (genesisConfig.requestTimeout) {
+    mcConfig.istanbul.requesttimeout = genesisConfig.requestTimeout
+  }
+  if (genesisConfig.churritoBlock !== undefined) {
+    mcConfig.hardforks.churritoBlock = genesisConfig.churritoBlock
+  }
+  if (genesisConfig.donutBlock !== undefined) {
+    mcConfig.hardforks.donutBlock = genesisConfig.donutBlock
+  }
+  if (genesisConfig.timestamp !== undefined) {
+    mcConfig.genesisTimestamp = genesisConfig.timestamp
+  }
+
+  // TODO: overrides for migrations
+
+  fs.writeFileSync(configFile, JSON.stringify(mcConfig, undefined, 2))
+
+  await spawnCmdWithExitOnFailure(myceloBinaryPath, ['genesis-from-config', tmpDir], {
+    silent: true,
+  })
+  return fs.readFileSync(path.join(tmpDir, 'genesis.json')).toString()
 }
