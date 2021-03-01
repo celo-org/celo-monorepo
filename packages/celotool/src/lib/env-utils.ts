@@ -254,9 +254,15 @@ export function isValidCeloEnv(celoEnv: string) {
   return new RegExp('^[a-z][a-z0-9]*$').test(celoEnv)
 }
 
-export function getDynamicEnvVarValue(dynamicEnvVar: DynamicEnvVar, templateValues: any, defaultValue?: string) {
+export function getDynamicEnvVarValue(
+  dynamicEnvVar: DynamicEnvVar,
+  templateValues: any,
+  defaultValue?: string
+) {
   const envVarName = getDynamicEnvVarName(dynamicEnvVar, templateValues)
-  return defaultValue !== undefined ? fetchEnvOrFallback(envVarName, defaultValue) : fetchEnv(envVarName)
+  return defaultValue !== undefined
+    ? fetchEnvOrFallback(envVarName, defaultValue)
+    : fetchEnv(envVarName)
 }
 
 /**
@@ -284,9 +290,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }
