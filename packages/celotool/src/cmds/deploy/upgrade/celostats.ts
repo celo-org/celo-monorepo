@@ -1,5 +1,5 @@
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/celostats'
-import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../upgrade'
 
@@ -20,7 +20,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: CelostatsArgv) => {
-  await createClusterIfNotExists()
   await switchToClusterFromEnv()
 
   if (argv.reset === true) {

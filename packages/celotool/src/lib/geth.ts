@@ -21,7 +21,7 @@ import {
   generateGenesis,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator
+  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -94,8 +94,8 @@ export const retrieveBootnodeIPAddress = async (namespace: string) => {
     return outputs.bootnode_ip_address.value
   } else {
     // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
-    const resourceName = namespace === 'baklava' ?
-     `${namespace}-bootnode-address` : `${namespace}-bootnode`
+    const resourceName =
+      namespace === 'baklava' ? `${namespace}-bootnode-address` : `${namespace}-bootnode`
     if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
       return retrieveIPAddress(resourceName)
     } else {
@@ -1211,7 +1211,7 @@ export async function connectBipartiteClique(
 // Add validator 0 as a peer of each other validator.
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   const validators = instances.filter(
-    (node) => ((node.validating && !node.isProxied) || node.isProxy)
+    (node) => (node.validating && !node.isProxied) || node.isProxy
   )
   // Determine which validators are isolated (i.e. currently just that they are not using a bootnode)
   const isolated = validators.filter((node) => !node.bootnodeEnode)
@@ -1248,7 +1248,7 @@ export async function migrateContracts(
       },
       blockchainParameters: {
         uptimeLookbackWindow: 3, // same as our default in `writeGenesis()`
-      },      
+      },
     },
     overrides
   )

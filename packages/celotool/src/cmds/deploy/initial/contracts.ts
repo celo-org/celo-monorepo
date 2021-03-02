@@ -10,6 +10,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { privateKeyToAddress } from 'src/lib/generate_utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { migrationOverrides, truffleOverrides, validatorKeys } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { uploadFileToGoogleStorage } from 'src/lib/testnet-utils'
@@ -85,6 +86,7 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
 }
 
 export const handler = async (argv: ContractsArgv) => {
+  exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv()
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)

@@ -8,6 +8,7 @@ import { randomBytes } from 'crypto'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import Web3 from 'web3'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
@@ -23,6 +24,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: EthstatsArgv) => {
+  exitIfCelotoolHelmDryRun()
   try {
     const kit = newKitFromWeb3(new Web3(getFornoUrl(argv.celoEnv)))
     const governance = await kit.contracts.getGovernance()

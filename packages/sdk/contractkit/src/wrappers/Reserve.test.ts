@@ -22,6 +22,16 @@ testWithGanache('Reserve Wrapper', (web3) => {
     reserveSpenderMultiSig = await kit.contracts.getMultiSig(multiSigAddress)
   })
 
+  test('can get reserve unfrozen balance ', async () => {
+    const balance = await reserve.getUnfrozenBalance()
+    expect(balance).toEqBigNumber('1e+26')
+  })
+
+  test('can get sum of reserve unfrozen balance + other reserve address balances', async () => {
+    const balanceWithOtherAddresses = await reserve.getUnfrozenReserveCeloBalance()
+    expect(balanceWithOtherAddresses).toEqBigNumber('3e+26')
+  })
+
   test('test is spender', async () => {
     const tx = await reserve.isSpender(reserveSpenderMultiSig.address)
     expect(tx).toBeTruthy()
