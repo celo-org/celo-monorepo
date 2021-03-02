@@ -21,9 +21,9 @@ export function getGenesisGoogleStorageUrl(celoEnv: string) {
 }
 
 export function getFornoUrl(celoEnv: string) {
-  return celoEnv === 'rc1' ?
-    `https://forno.celo.org` :
-    `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
+  return celoEnv === 'rc1'
+    ? `https://forno.celo.org`
+    : `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
 }
 
 export function getFornoWebSocketUrl(celoEnv: string) {
