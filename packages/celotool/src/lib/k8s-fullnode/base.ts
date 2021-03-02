@@ -6,7 +6,7 @@ import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart
+  upgradeGenericHelmChart,
 } from '../helm_deploy'
 import { scaleResource } from '../kubernetes'
 
@@ -66,10 +66,15 @@ export abstract class BaseFullNodeDeployer {
       this.kubeNamespace,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters(),
+      await this.helmParameters()
     )
 
-    await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, this._deploymentConfig.replicas)
+    await scaleResource(
+      this.celoEnv,
+      'StatefulSet',
+      `${this.celoEnv}-fullnodes`,
+      this._deploymentConfig.replicas
+    )
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       return this.getEnodes()
     }
@@ -84,10 +89,9 @@ export abstract class BaseFullNodeDeployer {
   async helmParameters() {
     let nodeKeys: string[] | undefined
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
-      nodeKeys = range(this._deploymentConfig.replicas)
-        .map((index: number) =>
-          this.getPrivateKey(index)
-        )
+      nodeKeys = range(this._deploymentConfig.replicas).map((index: number) =>
+        this.getPrivateKey(index)
+      )
     }
 
     const rpcApis = 'eth,net,rpc,web3'
@@ -99,40 +103,38 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.expose_rpc_externally=false`,
       `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
-      `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\\,')}'`,
+      `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\,')}'`,
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
       `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
-      `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
-      `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
+      `--set geth.use_gstorage_data=${fetchEnvOrFallback('USE_GSTORAGE_DATA', 'false')}`,
+      `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
       ...(await this.additionalHelmParameters()),
-      (nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '')
+      nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '',
     ]
   }
 
   async getEnodes() {
     return Promise.all(
-      range(this._deploymentConfig.replicas)
-        .map(async (index: number) => {
-          const publicKey = privateKeyToPublicKey(this.getPrivateKey(index))
-          const ip = await this.getFullNodeIP(index)
-          // Assumes 30303 is the port
-          return `enode://${publicKey}@${ip}:30303`
-        })
+      range(this._deploymentConfig.replicas).map(async (index: number) => {
+        const publicKey = privateKeyToPublicKey(this.getPrivateKey(index))
+        const ip = await this.getFullNodeIP(index)
+        // Assumes 30303 is the port
+        return `enode://${publicKey}@${ip}:30303`
+      })
     )
   }
 
   getPrivateKey(index: number) {
     if (!this._deploymentConfig.nodeKeyGenerationInfo) {
-      throw Error('The deployment config property nodeKeyGenerationInfo must be defined to get a full node private key')
+      throw Error(
+        'The deployment config property nodeKeyGenerationInfo must be defined to get a full node private key'
+      )
     }
     return generatePrivateKeyWithDerivations(
       this._deploymentConfig.nodeKeyGenerationInfo!.mnemonic,
-      [
-        this._deploymentConfig.nodeKeyGenerationInfo!.derivationIndex,
-        index
-      ]
+      [this._deploymentConfig.nodeKeyGenerationInfo!.derivationIndex, index]
     )
   }
 
