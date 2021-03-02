@@ -2,6 +2,7 @@ import { InitialArgv } from 'src/cmds/deploy/initial'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { installFullNodeChart } from 'src/lib/fullnodes'
 import { kubectlAnnotateKSA, linkSAForWorkloadIdentity } from 'src/lib/gcloud_utils'
+import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 
 export const command = 'fullnodes'
@@ -32,7 +33,13 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: FullNodeInitialArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
-  await linkSAForWorkloadIdentity(argv.celoEnv)
+  if (!isCelotoolHelmDryRun()) {
+    await linkSAForWorkloadIdentity(argv.celoEnv)
+  } else {
+    console.info(`Skipping Workload Identity Service account setup due to --helmdryrun.`)
+  }
   await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
-  await kubectlAnnotateKSA(argv.celoEnv)
+  if (!isCelotoolHelmDryRun()) {
+    await kubectlAnnotateKSA(argv.celoEnv)
+  }
 }

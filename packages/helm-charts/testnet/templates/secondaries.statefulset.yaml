@@ -31,7 +31,7 @@ spec:
           storage: {{ .Values.geth.diskSizeGB }}Gi
   podManagementPolicy: Parallel
   updateStrategy:
-    type: RollingUpdate
+{{ toYaml .Values.updateStrategy.secondaries | indent 4 }}
   replicas: {{ .Values.geth.secondaries }}
   serviceName: secondaries
   selector:

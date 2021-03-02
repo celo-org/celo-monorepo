@@ -103,6 +103,9 @@ metadata:
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
 spec:
+{{- $updateStrategy := index $.Values.updateStrategy $.component_label }}
+  updateStrategy:
+{{ toYaml $updateStrategy | indent 4 }}
   {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:

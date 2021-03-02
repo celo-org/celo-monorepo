@@ -15,7 +15,7 @@ import { installPrometheusIfNotExists } from './prometheus'
 import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
-  getProxyName
+  getProxyName,
 } from './testnet-utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
@@ -177,13 +177,14 @@ export async function installGCPSSDStorageClass() {
   )
   if (!storageClassExists) {
     const gcpSSDHelmChartPath = '../helm-charts/gcp-ssd'
-    await execCmdWithExitOnFailure(
-      `helm upgrade -i gcp-ssd ${gcpSSDHelmChartPath}`
-    )
+    await execCmdWithExitOnFailure(`helm upgrade -i gcp-ssd ${gcpSSDHelmChartPath}`)
   }
 }
 
-export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?: BaseClusterConfig) {
+export async function installCertManagerAndNginx(
+  celoEnv: string,
+  clusterConfig?: BaseClusterConfig
+) {
   const nginxChartVersion = '3.9.0'
   const nginxChartNamespace = 'default'
 
@@ -215,7 +216,11 @@ export async function installCertManagerAndNginx(celoEnv: string, clusterConfig?
   }
 }
 
-async function nginxHelmParameters(valueFilePath: string, celoEnv: string, clusterConfig?: BaseClusterConfig) {
+async function nginxHelmParameters(
+  valueFilePath: string,
+  celoEnv: string,
+  clusterConfig?: BaseClusterConfig
+) {
   const logFormat = `{"timestamp": "$time_iso8601", "requestID": "$req_id", "proxyUpstreamName":
   "$proxy_upstream_name", "proxyAlternativeUpstreamName": "$proxy_alternative_upstream_name","upstreamStatus":
   "$upstream_status", "upstreamAddr": "$upstream_addr","httpRequest":{"requestMethod":
@@ -264,12 +269,8 @@ export async function helmUpdateNginxRepo() {
   await execCmdWithExitOnFailure(
     `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
   )
-  await execCmdWithExitOnFailure(
-    `helm repo add stable https://charts.helm.sh/stable`
-  )
-  await execCmdWithExitOnFailure(
-    `helm repo update`
-  )
+  await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
+  await execCmdWithExitOnFailure(`helm repo update`)
 }
 
 export async function installCertManager() {
@@ -403,15 +404,18 @@ export async function deleteIPAddress(name: string, zone?: string) {
 
 export async function retrieveIPAddress(name: string, zone?: string) {
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses describe ${name} --region ${getKubernetesClusterRegion(zone)} --format="value(address)"`
+    `gcloud compute addresses describe ${name} --region ${getKubernetesClusterRegion(
+      zone
+    )} --format="value(address)"`
   )
   return address.replace(/\n*$/, '')
 }
 
-
 export async function retrieveIPAddresses(prefix: string, zone?: string) {
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses list --filter="name~'${prefix}-' AND name!~'${prefix}-private-' AND region:( ${getKubernetesClusterRegion(zone)} )" --format="value(name)"`
+    `gcloud compute addresses list --filter="name~'${prefix}-' AND name!~'${prefix}-private-' AND region:( ${getKubernetesClusterRegion(
+      zone
+    )} )" --format="value(name)"`
   )
   return address.split('\n')
 }
@@ -481,11 +485,7 @@ export async function upgradeStaticIPs(celoEnv: string) {
     }
 
     const newPrivateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-    await upgradeNodeTypeStaticIPs(
-      celoEnv,
-      'tx-nodes-private',
-      newPrivateTxNodeCount
-    )
+    await upgradeNodeTypeStaticIPs(celoEnv, 'tx-nodes-private', newPrivateTxNodeCount)
   }
 }
 
@@ -519,15 +519,11 @@ async function upgradeValidatorStaticIPs(
   }
 }
 
-async function upgradeNodeTypeStaticIPs(
-  celoEnv: string,
-  nodeType: string,
-  newNodeCount: number
-) {
+async function upgradeNodeTypeStaticIPs(celoEnv: string, nodeType: string, newNodeCount: number) {
   const existingAddresses = await retrieveIPAddresses(`${celoEnv}-${nodeType}`)
-  const desiredAddresses = range(0, newNodeCount).map(i => `${celoEnv}-${nodeType}-${i}`)
-  const addressesToCreate = desiredAddresses.filter(a => !existingAddresses.includes(a))
-  const addressesToDelete = existingAddresses.filter(a => !desiredAddresses.includes(a))
+  const desiredAddresses = range(0, newNodeCount).map((i) => `${celoEnv}-${nodeType}-${i}`)
+  const addressesToCreate = desiredAddresses.filter((a) => !existingAddresses.includes(a))
+  const addressesToDelete = existingAddresses.filter((a) => !desiredAddresses.includes(a))
 
   for (const address of addressesToCreate) {
     if (address) {
@@ -540,7 +536,6 @@ async function upgradeNodeTypeStaticIPs(
       await deleteIPAddress(address)
     }
   }
-
 }
 
 export async function pollForBootnodeLoadBalancer(celoEnv: string) {
@@ -616,7 +611,9 @@ export async function deletePersistentVolumeClaimsCustomLabels(
   label: string,
   value: string
 ) {
-  console.info(`Deleting persistent volume claims for labels ${label}=${value} in namespace ${namespace}`)
+  console.info(
+    `Deleting persistent volume claims for labels ${label}=${value} in namespace ${namespace}`
+  )
   try {
     const [output] = await execCmd(
       `kubectl delete pvc --selector='${label}=${value}' --namespace ${namespace}`
@@ -637,7 +634,9 @@ async function helmIPParameters(celoEnv: string) {
 
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
 
-  const txAddresses = await concurrentMap(5, range(numTxNodes), (i) => retrieveIPAddress(`${celoEnv}-tx-nodes-${i}`))
+  const txAddresses = await concurrentMap(5, range(numTxNodes), (i) =>
+    retrieveIPAddress(`${celoEnv}-tx-nodes-${i}`)
+  )
 
   // Tx-node IPs
   const txNodeIpParams = setHelmArray('geth.txNodesIPAddressArray', txAddresses)
@@ -706,33 +705,33 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
-  const gethMetricsOverrides = fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === "true"
-    ? [
-      `--set metrics="true"`,
-      `--set pprof.enabled="true"`,
-      `--set pprof.path="/debug/metrics/prometheus"`,
-      `--set pprof.port="6060"`,
-    ]
-    : [
-      `--set metrics="false"`,
-      `--set pprof.enabled="false"`,
-    ]
+  const gethMetricsOverrides =
+    fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === 'true'
+      ? [
+          `--set metrics="true"`,
+          `--set pprof.enabled="true"`,
+          `--set pprof.path="/debug/metrics/prometheus"`,
+          `--set pprof.port="6060"`,
+        ]
+      : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
 
-  const bootnodeOverwritePkey = fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== '' ?
-    [
-      `--set geth.overwriteBootnodePrivateKey="true"`,
-      `--set geth.bootnodePrivateKey="${fetchEnv(envVar.GETH_BOOTNODE_OVERWRITE_PKEY)}"`,
-    ]
-    : [
-      `--set geth.overwriteBootnodePrivateKey="false"`,
-    ]
+  const bootnodeOverwritePkey =
+    fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== ''
+      ? [
+          `--set geth.overwriteBootnodePrivateKey="true"`,
+          `--set geth.bootnodePrivateKey="${fetchEnv(envVar.GETH_BOOTNODE_OVERWRITE_PKEY)}"`,
+        ]
+      : [`--set geth.overwriteBootnodePrivateKey="false"`]
 
   const defaultDiskSize = fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')
-  const privateTxNodeDiskSize = fetchEnvOrFallback(envVar.PRIVATE_NODE_DISK_SIZE_GB, defaultDiskSize)
+  const privateTxNodeDiskSize = fetchEnvOrFallback(
+    envVar.PRIVATE_NODE_DISK_SIZE_GB,
+    defaultDiskSize
+  )
 
   return [
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
@@ -751,8 +750,8 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
     `--set geth.secondaries="${fetchEnvOrFallback('SECONDARIES', '0')}"`,
-    `--set geth.use_gstorage_data=${fetchEnvOrFallback("USE_GSTORAGE_DATA", "false")}`,
-    `--set geth.gstorage_data_bucket=${fetchEnvOrFallback("GSTORAGE_DATA_BUCKET", "")}`,
+    `--set geth.use_gstorage_data=${fetchEnvOrFallback('USE_GSTORAGE_DATA', 'false')}`,
+    `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
@@ -770,6 +769,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...gethMetricsOverrides,
     ...bootnodeOverwritePkey,
+    ...rollingUpdateHelmVariables(),
     ...(await helmIPParameters(celoEnv)),
   ]
 }
@@ -791,11 +791,7 @@ function buildHelmChartDependencies(chartDir: string) {
 
 async function installHelmDiffPlugin() {
   try {
-    await execCmd(
-      `helm diff version`,
-      {},
-      false
-    )
+    await execCmd(`helm diff version`, {}, false)
   } catch ([error]) {
     console.info(`Installing helm-diff plugin...`)
     await execCmdWithExitOnFailure(`helm plugin install https://github.com/databus23/helm-diff`)
@@ -804,7 +800,7 @@ async function installHelmDiffPlugin() {
 
 function valuesOverrideArg(chartDir: string, filename: string | undefined) {
   if (filename === undefined) {
-    return ""
+    return ''
   }
 
   return `-f ${chartDir}/${filename}`
@@ -823,7 +819,9 @@ export async function installGenericHelmChart(
   }
 
   if (isCelotoolHelmDryRun()) {
-    console.info(`This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${celoEnv} with parameters:`)
+    console.info(
+      `This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${celoEnv} with parameters:`
+    )
     console.info(parameters)
     if (valuesOverrideFile !== undefined) {
       console.info(`And with values override: ${valuesOverrideFile}`)
@@ -832,7 +830,9 @@ export async function installGenericHelmChart(
     console.info(`Installing helm release ${releaseName}`)
     const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
     await helmCommand(
-      `helm install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+      `helm install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+        ' '
+      )}`
     )
   }
 }
@@ -851,13 +851,17 @@ export async function upgradeGenericHelmChart(
     console.info(`Simulating the upgrade of helm release ${releaseName}`)
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`,
+      `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+        ' '
+      )}`,
       true
     )
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+        ' '
+      )}`
     )
     console.info(`Upgraded helm release ${releaseName} successful`)
   }
@@ -869,6 +873,13 @@ export function isCelotoolVerbose() {
 
 export function isCelotoolHelmDryRun() {
   return process.env.CELOTOOL_HELM_DRY_RUN === 'true'
+}
+
+export function exitIfCelotoolHelmDryRun() {
+  if (isCelotoolHelmDryRun()) {
+    console.error('Option --helmdryrun is not allowed for this command. Exiting.')
+    process.exit(1)
+  }
 }
 
 export async function removeGenericHelmChart(releaseName: string, namespace: string) {
@@ -935,7 +946,6 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
     await scaleProxies(celoEnv)
     await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
   }
-
 }
 
 // scaleProxies scales all proxy statefulsets to have `replicas` replicas.
@@ -1005,7 +1015,34 @@ export async function checkHelmVersion() {
   if (helmOK) {
     return true
   } else {
-    console.error(`Error checking local helm version. Minimum Helm version required ${requiredMinHelmVersion}`)
+    console.error(
+      `Error checking local helm version. Minimum Helm version required ${requiredMinHelmVersion}`
+    )
     process.exit(1)
   }
+}
+
+function rollingUpdateHelmVariables() {
+  return [
+    `--set updateStrategy.validators.rollingUpdate.partition=${fetchEnvOrFallback(
+      envVar.VALIDATORS_ROLLING_UPDATE_PARTITION,
+      '0'
+    )}`,
+    `--set updateStrategy.secondaries.rollingUpdate.partition=${fetchEnvOrFallback(
+      envVar.SECONDARIES_ROLLING_UPDATE_PARTITION,
+      '0'
+    )}`,
+    `--set updateStrategy.proxy.rollingUpdate.partition=${fetchEnvOrFallback(
+      envVar.PROXY_ROLLING_UPDATE_PARTITION,
+      '0'
+    )}`,
+    `--set updateStrategy.tx_nodes.rollingUpdate.partition=${fetchEnvOrFallback(
+      envVar.TX_NODES_ROLLING_UPDATE_PARTITION,
+      '0'
+    )}`,
+    `--set updateStrategy.tx_nodes_private.rollingUpdate.partition=${fetchEnvOrFallback(
+      envVar.TX_NODES_PRIVATE_ROLLING_UPDATE_PARTITION,
+      '0'
+    )}`,
+  ]
 }

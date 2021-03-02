@@ -1,4 +1,5 @@
 import { sleep } from '@celo/utils/lib/async'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 import { handler as contractsHandler } from '../initial/contracts'
@@ -37,6 +38,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: AllArgv) => {
+  exitIfCelotoolHelmDryRun()
   console.info('Deploy the testnet')
   await testnetHandler(argv)
   console.info('Deploy celostats')
