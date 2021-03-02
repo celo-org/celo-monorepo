@@ -189,7 +189,7 @@ const assertValidInitializationData = (
     const args = initializationData[contractName]
     const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
 
-    if (callData !== proposalTx.args[1]) {
+    if (callData.toLowerCase() !== proposalTx.args[1].toLowerCase()) {
       throw new Error(
         `Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
       )
