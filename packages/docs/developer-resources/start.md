@@ -2,7 +2,7 @@
 
 The following examples and guides will help you start building on Celo.
 
-## Backend / command line interface
+## Interacting with Smart Contracts and Celo Networks
 
 - [Sending CELO](walkthroughs/hellocelo.md)
 
@@ -16,7 +16,7 @@ The following examples and guides will help you start building on Celo.
 
   - Our second Deploy a Contract tutorial demonstrates how to deploy smart contracts with [Truffle](https://www.trufflesuite.com/truffle) and [Forno](forno/), a remote node service provider.
 
-## React Native
+## Mobile DApps
 
 - The [DappKit Truffle Box](walkthroughs/hello-mobile-dapp.md) walkthrough will help you create a simple mobile dApp using dAppKit and the React Native Expo framework. This application will allow connecting to your Valora account and sending transactions.
 
