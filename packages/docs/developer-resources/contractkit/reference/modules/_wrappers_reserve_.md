@@ -1,4 +1,4 @@
-# External module: "wrappers/Reserve"
+# Module: "wrappers/Reserve"
 
 ## Index
 

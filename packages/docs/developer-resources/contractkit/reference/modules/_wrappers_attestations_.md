@@ -1,9 +1,10 @@
-# External module: "wrappers/Attestations"
+# Module: "wrappers/Attestations"
 
 ## Index
 
 ### Enumerations
 
+* [AttestationServiceStatusState](../enums/_wrappers_attestations_.attestationservicestatusstate.md)
 * [AttestationState](../enums/_wrappers_attestations_.attestationstate.md)
 
 ### Classes
@@ -13,7 +14,7 @@
 ### Interfaces
 
 * [ActionableAttestation](../interfaces/_wrappers_attestations_.actionableattestation.md)
-* [AttesationServiceRevealRequest](../interfaces/_wrappers_attestations_.attesationservicerevealrequest.md)
+* [AttestationServiceStatusResponse](../interfaces/_wrappers_attestations_.attestationservicestatusresponse.md)
 * [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md)
 * [AttestationStateForIssuer](../interfaces/_wrappers_attestations_.attestationstateforissuer.md)
 * [AttestationsConfig](../interfaces/_wrappers_attestations_.attestationsconfig.md)
@@ -24,10 +25,30 @@
 
 * [IdentifierLookupResult](_wrappers_attestations_.md#identifierlookupresult)
 
+### Functions
+
+* [getSecurityCodePrefix](_wrappers_attestations_.md#getsecuritycodeprefix)
+
 ## Type aliases
 
 ###  IdentifierLookupResult
 
-Ƭ **IdentifierLookupResult**: *Record‹string, Record‹[Address](_base_.md#address), [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
+Ƭ **IdentifierLookupResult**: *Record‹string, Record‹Address, [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L76)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L80)*
+
+## Functions
+
+###  getSecurityCodePrefix
+
+▸ **getSecurityCodePrefix**(`issuerAddress`: Address): *string*
+
+*Defined in [contractkit/src/wrappers/Attestations.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L29)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`issuerAddress` | Address |
+
+**Returns:** *string*

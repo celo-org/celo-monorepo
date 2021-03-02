@@ -99,11 +99,23 @@ variable twilio_account_sid {
   type = string
 }
 
-variable twilio_blacklist {
+variable twilio_unsupported_regions {
   type = string
 }
 
 variable twilio_auth_token {
+  type = string
+}
+
+variable nexmo_api_key {
+  type = string
+}
+
+variable nexmo_api_secret {
+  type = string
+}
+
+variable nexmo_unsupported_regions {
   type = string
 }
 

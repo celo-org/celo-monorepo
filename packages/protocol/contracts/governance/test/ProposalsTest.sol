@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.13;
 
 import "../Proposals.sol";
 import "../../common/FixidityLib.sol";

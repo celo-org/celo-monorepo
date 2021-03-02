@@ -1,12 +1,11 @@
-import sleep from 'sleep-promise'
 import {
   builder as initialBuilder,
   LoadTestArgv,
   setArgvDefaults,
 } from 'src/cmds/deploy/initial/load-test'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { scaleResource } from 'src/lib/kubernetes'
-import { upgradeHelmChart } from 'src/lib/load-test'
+import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
+import { resetAndUpgrade, upgradeHelmChart } from 'src/lib/load-test'
 import yargs from 'yargs'
 
 export const command = 'load-test'
@@ -29,30 +28,9 @@ export const handler = async (argv: LoadTestUpgradeArgv) => {
   await switchToClusterFromEnv()
   setArgvDefaults(argv)
 
-  if (argv.reset === true) {
-    await resetAndUpgrade(argv)
+  if (argv.reset === true && !isCelotoolHelmDryRun()) {
+    await resetAndUpgrade(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
   } else {
-    await upgrade(argv)
+    await upgradeHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
   }
-}
-
-function upgrade(argv: LoadTestUpgradeArgv) {
-  return upgradeHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
-}
-
-// scales down all pods, upgrades, then scales back up
-async function resetAndUpgrade(argv: LoadTestUpgradeArgv) {
-  const loadTestStatefulSetName = `${argv.celoEnv}-load-test`
-
-  console.info('Scaling load-test StatefulSet down to 0...')
-  await scaleResource(argv.celoEnv, 'StatefulSet', loadTestStatefulSetName, 0)
-
-  await sleep(3000)
-
-  await upgrade(argv)
-
-  await sleep(3000)
-
-  console.info(`Scaling load-test StatefulSet back up to ${argv.replicas}...`)
-  await scaleResource(argv.celoEnv, 'StatefulSet', loadTestStatefulSetName, argv.replicas)
 }

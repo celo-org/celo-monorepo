@@ -35,13 +35,9 @@ export async function startGanache(
   datafile: string,
   opts: { verbose?: boolean; from_targz?: boolean } = {}
 ) {
-  const logFn = opts.verbose
-    ? // tslint:disable-next-line: no-console
-      (...args: any[]) => console.log(...args)
-    : () => {
-        /*nothing*/
-      }
-  const chainCopy: string = path.resolve(path.join(filePath, 'tmp/copychain'))
+  const chainCopyBase = process.env.GANACHE_CHAIN_DATA_PATH || path.resolve(filePath)
+  const chainCopy: string = path.resolve(path.join(chainCopyBase, 'tmp/copychain'))
+  console.log(chainCopy)
   console.log(filePath, datafile)
   const filenameWithPath: string = path.resolve(path.join(filePath, datafile))
 
@@ -59,13 +55,24 @@ export async function startGanache(
     fs.copySync(filenameWithPath, chainCopy)
   }
 
+  return launchServer(opts, chainCopy)
+}
+
+async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, chain?: string) {
+  const logFn = opts.verbose
+    ? // tslint:disable-next-line: no-console
+      (...args: any[]) => console.log(...args)
+    : () => {
+        /*nothing*/
+      }
+
   const server = ganache.server({
     default_balance_ether: 1000000,
     logger: {
       log: logFn,
     },
     network_id: 1101,
-    db_path: chainCopy,
+    db_path: chain,
     mnemonic: MNEMONIC,
     gasLimit: 20000000,
     allowUnlimitedContractSize: true,
@@ -118,7 +125,18 @@ export default function setup(
       ;(global as any).stopGanache = stopGanache
     })
     .catch((err) => {
-      console.error('Error starting ganache, Doing `yarn test:prepare` might help')
+      console.error('Error starting ganache, Doing `yarn test:reset` might help')
+      console.error(err)
+      process.exit(1)
+    })
+}
+
+export function emptySetup(opts: { verbose?: boolean; from_targz?: boolean } = {}) {
+  return launchServer(opts)
+    .then((stopGanache) => {
+      ;(global as any).stopGanache = stopGanache
+    })
+    .catch((err) => {
       console.error(err)
       process.exit(1)
     })

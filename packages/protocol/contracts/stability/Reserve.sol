@@ -1,7 +1,8 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
@@ -25,6 +26,7 @@ contract Reserve is
 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using Address for address payable; // prettier-ignore
 
   struct TobinTaxCache {
     uint128 numerator;
@@ -53,6 +55,9 @@ contract Reserve is
   uint256 public frozenReserveGoldStartDay;
   uint256 public frozenReserveGoldDays;
 
+  mapping(address => bool) public isExchangeSpender;
+  address[] public exchangeSpenderAddresses;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
@@ -65,6 +70,8 @@ contract Reserve is
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
   event TobinTaxSet(uint256 value);
   event TobinTaxReserveRatioSet(uint256 value);
+  event ExchangeSpenderAdded(address indexed exchangeSpender);
+  event ExchangeSpenderRemoved(address indexed exchangeSpender);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -76,7 +83,7 @@ contract Reserve is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -291,6 +298,7 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
     isSpender[spender] = true;
     emit SpenderAdded(spender);
   }
@@ -302,6 +310,54 @@ contract Reserve is
   function removeSpender(address spender) external onlyOwner {
     isSpender[spender] = false;
     emit SpenderRemoved(spender);
+  }
+
+  /**
+   * @notice Checks if an address is able to spend as an exchange.
+   * @param spender The address to be checked.
+   */
+  modifier isAllowedToSpendExchange(address spender) {
+    require(
+      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender),
+      "Address not allowed to spend"
+    );
+    _;
+  }
+
+  /**
+   * @notice Gives an address permission to spend Reserve without limit.
+   * @param spender The address that is allowed to spend Reserve funds.
+   */
+  function addExchangeSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
+    require(!isExchangeSpender[spender], "Address is already Exchange Spender");
+    isExchangeSpender[spender] = true;
+    exchangeSpenderAddresses.push(spender);
+    emit ExchangeSpenderAdded(spender);
+  }
+
+  /**
+   * @notice Takes away an address's permission to spend Reserve funds without limits.
+   * @param spender The address that is to be no longer allowed to spend Reserve funds.
+   */
+  function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
+    isExchangeSpender[spender] = false;
+    uint256 numAddresses = exchangeSpenderAddresses.length;
+    require(index < numAddresses, "Index is invalid");
+    require(spender == exchangeSpenderAddresses[index], "Index does not match spender");
+    uint256 newNumAddresses = numAddresses.sub(1);
+
+    if (index != newNumAddresses) {
+      exchangeSpenderAddresses[index] = exchangeSpenderAddresses[newNumAddresses];
+    }
+
+    exchangeSpenderAddresses[newNumAddresses] = address(0x0);
+    exchangeSpenderAddresses.length = newNumAddresses;
+    emit ExchangeSpenderRemoved(spender);
+  }
+
+  function getExchangeSpenders() public view returns (address[] memory) {
+    return exchangeSpenderAddresses;
   }
 
   /**
@@ -332,7 +388,7 @@ contract Reserve is
    */
   function _transferGold(address payable to, uint256 value) internal returns (bool) {
     require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
-    to.transfer(value);
+    to.sendValue(value);
     emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
@@ -345,7 +401,7 @@ contract Reserve is
    */
   function transferExchangeGold(address payable to, uint256 value)
     external
-    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    isAllowedToSpendExchange(msg.sender)
     returns (bool)
   {
     return _transferGold(to, value);

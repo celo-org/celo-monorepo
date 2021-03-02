@@ -3,13 +3,15 @@ import {
   SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Response } from 'express'
 import { getVersion } from '../config'
-import logger from './logger'
+import { Counters } from './metrics'
 
 export type ErrorType = ErrorMessage | WarningMessage
 
 export function respondWithError(
+  endpoint: string,
   res: Response,
   statusCode: number,
   error: ErrorType,
@@ -18,8 +20,6 @@ export function respondWithError(
   blockNumber: number = -1,
   signature?: string
 ) {
-  const loggerMethod = error in WarningMessage ? logger.warn : logger.error
-  loggerMethod('Responding with error', error)
   const response: SignMessageResponseFailure = {
     success: false,
     version: getVersion(),
@@ -29,5 +29,15 @@ export function respondWithError(
     blockNumber,
     signature,
   }
+
+  const logger: Logger = res.locals.logger
+
+  if (error in WarningMessage) {
+    logger.warn({ error, statusCode, response }, 'Responding with warning')
+  } else {
+    logger.error({ error, statusCode, response }, 'Responding with error')
+  }
+
+  Counters.responses.labels(endpoint, statusCode.toString()).inc()
   res.status(statusCode).json(response)
 }

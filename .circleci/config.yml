@@ -8,11 +8,14 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
+      # This is the last version that has openjdk 8
+      # On newer openjdk (11) we get the following error when running sdkmanager
+      # `Exception in thread "main" java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlSchema`
+      # See https://circleci.com/docs/2.0/testing-ios/#supported-xcode-versions
       xcode: '11.5.0'
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
       GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
@@ -31,8 +34,6 @@ e2e-defaults: &e2e-defaults
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 general:
   artifacts:
-    - 'mobile/coverage'
-    - 'web/coverage'
     - 'protocol/coverage'
 
 commands:
@@ -43,7 +44,7 @@ commands:
           command: |
             mkdir -p ~/.tmp/checksumfiles
             # Concatenate package.json so we can use them as a part of the cache key
-            find . -maxdepth 3 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/package.json
+            find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/package.json
             # Concatenate patches so we can use them as a part of the cache key
             find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/patches
       - restore_cache:
@@ -81,7 +82,7 @@ commands:
 
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
-            yarn install || yarn install
+            yarn install || yarn install || yarn install
       - run:
           name: Fail if someone forgot to commit "yarn.lock"
           command: |
@@ -93,10 +94,6 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
-      - run:
-          name: Fail if there are vulnerabilities in packages
-          command: |
-            /bin/bash -c 'yarn audit --groups dependencies --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -116,7 +113,7 @@ jobs:
   install_dependencies:
     <<: *defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
+    resource_class: large
     steps:
       - restore_cache:
           keys:
@@ -152,11 +149,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            # separate build to avoid ENOMEM in CI :(
-            yarn build --scope @celo/base
-            yarn build --scope @celo/utils
-            yarn build --scope @celo/protocol
-            yarn build --ignore @celo/protocol --ignore docs
+            yarn build --ignore docs
 
       - run:
           name: Check licenses
@@ -176,211 +169,9 @@ jobs:
           paths:
             - .
 
-  end-to-end-mobile-test-android:
-    <<: *android_config
-    resource_class: large
-    steps:
-      - checkout
-      - run: cd ~/app/
-
-      - run:
-          name: set ANDROID_SDK_ROOT
-          command: |
-            echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
-
-      - restore_cache:
-          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
-
-      - run:
-          name: install android tools
-          command: |
-            sh packages/mobile/scripts/install-android-tools.sh
-            echo 'export PATH=$ANDROID_SDK_ROOT/tools/bin:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_ROOT/tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_ROOT/platform-tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_ROOT/emulator:$PATH'  >> $BASH_ENV
-            source $BASH_ENV
-            sdkmanager --list
-
-      - save_cache:
-          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
-          paths:
-            - /Users/distiller/android-tools
-
-      - run:
-          name: Create Android Virtual Device (AVD)
-          command: |
-            avdmanager create avd --force --name Pixel_API_29_AOSP_x86_64 \
-              --package "system-images;android-29;default;x86_64" \
-              --device pixel
-            # Copy device configuarion, adv for some reason doesn't
-            mkdir -p ~/.android/avd/Pixel_API_29_AOSP_x86_64.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Pixel_API_29_AOSP_x86_64.avd/config.ini
-
-      - run:
-          name: Set up nodejs
-          command: |
-            echo `. ~/.bash_profile` # for some mreason just `source ~/.bash_profile` makes the build fail
-            # install nvm
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install wget
-            wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
-            echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
-            echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
-      - run: echo `. ~/.bash_profile`
-      - run: nvm install v10.16.3 && nvm use v10.16.3
-      - run:
-          name: install miscellaneous
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install tree coreutils
-
-      - yarn_install
-
-      - run:
-          # This has to be run after `yarn install` since it uses js dependencies
-          name: Check if the test should run
-          command: ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
-
-      - run:
-          name: Build mobile dependencies
-          command: |
-            set -euo pipefail
-            yarn build \
-              --scope @celo/mobile \
-              --include-filtered-dependencies
-
-      - restore_cache:
-          key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
-
-      # hack alert! the emulator complains about disk space and not sure how to increase it
-      - run:
-          name: Delete Simulators
-          command: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/
-
-      - run:
-          name: Check for emulator acceleration
-          command: emulator -accel-check
-
-      - run:
-          name: Run e2e tests
-          command: |
-            set -euo pipefail
-            cd packages/mobile
-            yarn run test:e2e:android
-
-      - store_artifacts:
-          path: packages/mobile/e2e/artifacts
-          destination: mobile/e2e/artifacts
-
-      - save_cache:
-          key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
-          paths:
-            - ~/app/packages/mobile/android/app/build/outputs/apk/
-            - ~/.gradle/
-
-  end-to-end-mobile-test-ios:
-    macos:
-      xcode: '11.3.1'
-    working_directory: ~/app_osx
-    steps:
-      - checkout
-      - run:
-          name: Configure environment variables
-          command: |
-            echo 'export PATH=/usr/local/opt/node@10/bin:$PATH' >> $BASH_ENV
-            source $BASH_ENV
-      - run:
-          name: Install needed tools
-          command: |
-            set -euo pipefail
-            export HOMEBREW_NO_AUTO_UPDATE=1
-            brew install node@10
-            brew tap wix/brew
-            brew install applesimutils
-            node -v
-      # Not using a workspace here as Node and Yarn versions
-      # differ between our macOS executor image and the Docker containers
-      - yarn_install
-      - run:
-          # This has to be run after `yarn install` since it uses js dependencies
-          name: Check if the test should run
-          command: ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
-      - run:
-          name: Build mobile dependencies
-          command: |
-            set -euo pipefail
-            yarn build \
-              --scope @celo/mobile \
-              --include-filtered-dependencies
-      - run:
-          name: Install bundle
-          command: |
-            set -euo pipefail
-            cd packages/mobile
-            bundle install
-      - run:
-          name: Fail if someone forgot to commit "Gemfile.lock"
-          command: |
-            set -euo pipefail
-            if [[ $(git status --porcelain) ]]; then
-              git --no-pager diff
-              echo "There are git differences after running bundle install"
-              exit 1
-            fi
-      - restore_cache:
-          name: Restore pods cache
-          keys:
-            # Using a single cache key here as we don't want partial cache restoration
-            # i.e. when Podfile/Podfile.lock change, we want to start fresh again
-            - pods-wallet-v1-{{ arch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
-      - run:
-          name: Install pods
-          command: |
-            set -euo pipefail
-            cd packages/mobile/ios
-            bundle exec pod install
-      - run:
-          name: Fail if someone forgot to commit "Podfile.lock"
-          command: |
-            set -euo pipefail
-            if [[ $(git status --porcelain) ]]; then
-              git --no-pager diff
-              echo "There are git differences after running pod install"
-              exit 1
-            fi
-      - save_cache:
-          name: Save pods cache
-          key: pods-wallet-v1-{{ arch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
-          paths:
-            - packages/mobile/ios/Pods
-      - restore_cache:
-          name: Restore built detox framework
-          keys:
-            - detox-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
-      - run:
-          name: Build detox framework
-          command: |
-            set -euo pipefail
-            cd packages/mobile
-            # Make sure the detox framework is present
-            yarn run detox build-framework-cache
-      - save_cache:
-          name: Save built detox framework
-          key: detox-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
-          paths:
-            - ~/Library/Detox/ios
-      - run:
-          name: Run e2e tests
-          command: |
-            set -euo pipefail
-            cd packages/mobile
-            # Create dummy Google services plist
-            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.dev.plist
-            yarn run test:e2e:ios
-      - store_artifacts:
-          path: packages/mobile/e2e/artifacts
-          destination: mobile/e2e/artifacts
-
   lint-checks:
     <<: *defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -389,8 +180,16 @@ jobs:
       - run: yarn run prettify:diff
       - run: yarn run lint
 
+  vulnerability-checks:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run: ./scripts/ci_check_vulnerabilities.sh
+
   general-test:
     <<: *defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -399,65 +198,83 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli run test
+            yarn run lerna \
+              --ignore @celo/contractkit \
+              --ignore @celo/protocol \
+              --ignore @celo/celotool \
+              --ignore @celo/celocli \
+              --ignore @celo/env-tests \
+              --ignore @celo/identity \
+              --ignore @celo/transactions-uri \
+              --ignore '@celo/wallet-*' \
+              run test
 
       - store_test_results:
           path: test-results
 
-      - store_artifacts:
-          path: packages/web/coverage
-          destination: web/coverage
-
-      - run:
-          name: copy
-          command: |
-            mkdir -p packages/web/web/coverage
-            cp -r packages/web/coverage packages/web/web/
-      - run:
-          name: Upload to CodeCov
-          command: yarn codecov -F web
-
-  mobile-test:
+  wallets-test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn run lerna --scope '@celo/wallet-*' run test
 
+  # Split from the original script. The original script was assuming not big changes in dependencies.
+  # As that's a possibility, we require to install the old and re-install the new one, and circle
+  # crashes on the second re-install.
+  # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
+  # other script
+  pre-protocol-test-release:
+    <<: *defaults
+    resource_class: large
+    environment:
+      RELEASE_TAG: celo-core-contracts-v2.rc0
+    steps:
+      - attach_workspace:
+          at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
-
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Ensure translations are not missing
+          name: Generate devchain of previous release
           command: |
-            cd packages/mobile
-            yarn --cwd packages/mobile test:verify-locales
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against $RELEASE_TAG"
+            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/.tmp/released_chain/*'
 
+  protocol-test-release:
+    <<: *defaults
+    resource_class: large
+    environment:
+      RELEASE_TAG: celo-core-contracts-v2.rc0
+    steps:
+      - attach_workspace:
+          at: ~/app
       - run:
-          name: jest tests
+          name: Check if the test should run
           command: |
-            mkdir -p test-results/jest
-            # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
-            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
-          environment:
-            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
-
-      - store_test_results:
-          path: test-results
-
-      - store_artifacts:
-          path: packages/mobile/coverage
-          destination: mobile/coverage
-
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: copy
+          name: Copy DevChain and Build generated from released tag
           command: |
-            mkdir -p packages/mobile/mobile/coverage
-            cp -r packages/mobile/coverage packages/mobile/mobile/
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+            (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
       - run:
-          name: Upload to CodeCov
-          command: yarn codecov -F mobile
+          name: Test against current release
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against $RELEASE_TAG"
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-common:
     <<: *defaults
@@ -469,20 +286,6 @@ jobs:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-      - run:
-          name: Check contract versions
-          command: |
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            git fetch --all
-            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
-            yarn --cwd packages/protocol check-versions -a $RELEASE_BRANCH -b $CIRCLE_BRANCH
-
-            LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only packages/protocol/contracts/common/linkedlists)
-            if [[ $LIBRARIES_CHANGED ]]; then
-              echo "Changing the linked list libraries is not currently supported."
-              exit 0
-            fi
       - run:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
@@ -603,19 +406,54 @@ jobs:
       - run:
           name: Generate DevChain
           command: |
-            (cd packages/contractkit && yarn test:reset)
+            (cd packages/sdk/contractkit && yarn test:reset)
       - run:
           name: Run Tests
-          command: yarn --cwd=packages/contractkit test
+          command: yarn --cwd=packages/sdk/contractkit test
+
+  # extrated to reuse the devchain generated by contractkit
+  identity-tests:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
       - run:
-          name: Fail if someone forgot to commit contractkit docs
+          name: Check if the test should run
           command: |
-            yarn --cwd=packages/contractkit docs
-            if [[ $(git status packages/docs/developer-resources/contractkit --porcelain) ]]; then
-              git --no-pager diff packages/docs/developer-resources/contractkit
-              echo "There are git differences after generating contractkit docs"
-              exit 1
-            fi
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/identity
+      # - run:
+      #     name: Copy DevChain generated by Contractkit
+      #     command: |
+      #       (cp -r packages/sdk/contractkit/.tmp packages/sdk/identity/.tmp)
+      - run:
+          name: Generate DevChain
+          command: |
+            (cd packages/sdk/identity && yarn test:reset)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/sdk/identity test
+
+  # extrated to reuse the devchain generated by contractkit
+  transactions-uri-tests:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/transactions-uri
+      # - run:
+      #     name: Copy DevChain generated by Contractkit
+      #     command: |
+      #       (cp -r packages/sdk/contractkit/.tmp packages/sdk/transactions-uri/.tmp)
+      - run:
+          name: Generate DevChain
+          command: |
+            (cd packages/sdk/transactions-uri && yarn test:reset)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/sdk/transactions-uri test
 
   cli-test:
     <<: *defaults
@@ -689,10 +527,10 @@ jobs:
           name: Install and test the npm package
           command: |
             set -euo pipefail
-            cd packages/base
+            cd packages/sdk/base
             yarn pack
             cd /tmp
-            npm install ~/app/packages/base/*.tgz
+            npm install ~/app/packages/sdk/base/*.tgz
 
   utils-test:
     <<: *defaults
@@ -707,13 +545,13 @@ jobs:
           name: Install and test the npm package
           command: |
             set -euo pipefail
-            cd packages/base
+            cd packages/sdk/base
             yarn pack
             cd ../utils
             yarn pack
             cd /tmp
-            npm install ~/app/packages/base/*.tgz
-            npm install ~/app/packages/utils/*.tgz
+            npm install ~/app/packages/sdk/base/*.tgz
+            npm install ~/app/packages/sdk/utils/*.tgz
 
   end-to-end-geth-transfer-test:
     <<: *e2e-defaults
@@ -787,6 +625,24 @@ jobs:
             cd packages/celotool
             ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
+  end-to-end-geth-replica-test:
+    <<: *e2e-defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            cd packages/celotool
+            ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
     resource_class: large
@@ -820,20 +676,6 @@ jobs:
             set -e
             cd packages/celotool
             ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-
-  web:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node10-gcloud
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/web
-      - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-      - run: cd packages/web && ./circle_deploy.sh
 
   test-typescript-npm-package-install:
     working_directory: ~/app
@@ -927,8 +769,8 @@ jobs:
             sudo apt-get update || sudo apt-get update
             sudo apt-get install -y software-properties-common
             sudo apt-get install python3-pip
-            pip3 install certora-cli==0.1.1
-            wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
+            pip3 install certora-cli
+            wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
             chmod +x solc-static-linux
             sudo mv solc-static-linux /usr/bin/solc
       - run:
@@ -963,6 +805,9 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
+      - vulnerability-checks:
+          requires:
+            - install_dependencies
       - general-test:
           requires:
             - install_dependencies
@@ -972,11 +817,22 @@ workflows:
       - contractkit-test:
           requires:
             - install_dependencies
-      - mobile-test:
+      - wallets-test:
+          requires:
+            - install_dependencies
+      - identity-tests:
+          requires:
+            - contractkit-test
+      - transactions-uri-tests:
+          requires:
+            - contractkit-test
+      - pre-protocol-test-release:
           requires:
             - lint-checks
-      - end-to-end-mobile-test-android
-      - end-to-end-mobile-test-ios
+      - protocol-test-release:
+          requires:
+            - lint-checks
+            - pre-protocol-test-release
       - protocol-test-common:
           requires:
             - lint-checks
@@ -1023,6 +879,10 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - end-to-end-geth-replica-test:
+          requires:
+            - lint-checks
+            - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
             - lint-checks
@@ -1036,8 +896,6 @@ workflows:
             - lint-checks
       - flakey-test-summary:
           requires:
-            - end-to-end-mobile-test-android
-            - end-to-end-mobile-test-ios
             - protocol-test-common
             - protocol-test-compatibility
             - protocol-test-governance-network
@@ -1045,11 +903,11 @@ workflows:
             - protocol-test-governance-voting
             - protocol-test-identity
             - protocol-test-stability
-            - mobile-test
             - end-to-end-geth-transfer-test
             - end-to-end-geth-blockchain-parameters-test
             - end-to-end-geth-slashing-test
             - end-to-end-geth-governance-test
+            - end-to-end-geth-replica-test
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - phone-number-privacy-test

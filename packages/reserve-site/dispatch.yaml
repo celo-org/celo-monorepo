@@ -1,6 +1,0 @@
-dispatch:
-  - url: "celoreserve.org"
-    service: production
-
-  - url: "dev.celoreserve.org"
-    service: default

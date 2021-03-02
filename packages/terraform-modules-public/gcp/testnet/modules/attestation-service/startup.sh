@@ -12,7 +12,8 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         #delaycompress
         compress
         postrotate
-                invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null
+                kill -HUP `pidof rsyslogd`
         endscript
 }
 
@@ -29,7 +30,8 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         #delaycompress
         compress
         postrotate
-                invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null
+                kill -HUP `pidof rsyslogd`
         endscript
 }
 
@@ -49,7 +51,8 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         #delaycompress
         sharedscripts
         postrotate
-                invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null
+                kill -HUP `pidof rsyslogd`
         endscript
 }
 EOF

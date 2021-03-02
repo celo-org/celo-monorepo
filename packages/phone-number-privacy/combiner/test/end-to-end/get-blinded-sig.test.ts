@@ -1,11 +1,11 @@
-import { OdisUtils } from '@celo/contractkit'
+import { OdisUtils } from '@celo/identity/lib/odis'
 import {
   AuthenticationMethod,
   ErrorMessages,
   SignMessageRequest,
-} from '@celo/contractkit/lib/identity/odis/query'
+} from '@celo/identity/lib/odis/query'
 import 'isomorphic-fetch'
-import { replenishQuota } from '../../../common/test/utils'
+import { replenishQuota } from '../../../common/src/test/utils'
 import {
   ACCOUNT_ADDRESS,
   ACCOUNT_ADDRESS_NO_QUOTA,
@@ -21,9 +21,14 @@ require('dotenv').config()
 
 export const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
-jest.setTimeout(15000)
+jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
+  beforeAll(() => {
+    console.log(process.env.ODIS_COMBINER_SERVICE_URL)
+    console.log(process.env.ODIS_SIGNER_SERVICE_URL)
+    console.log(process.env.ODIS_BLOCKCHAIN_PROVIDER)
+  })
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
       const body: SignMessageRequest = {
@@ -98,7 +103,7 @@ describe('Running against a deployed service', () => {
       for (let i = 0; i < 2; i++) {
         await expect(
           OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
-        ).resolves
+        ).resolves.toMatchObject({ success: true })
       }
     })
   })

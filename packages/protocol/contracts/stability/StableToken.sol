@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -19,6 +19,7 @@ import "../common/UsingPrecompiles.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   UsingRegistry,
@@ -27,8 +28,7 @@ contract StableToken is
   CalledByVm,
   IStableToken,
   IERC20,
-  ICeloToken,
-  ICeloVersionedContract
+  ICeloToken
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -67,8 +67,11 @@ contract StableToken is
 
   InflationState inflationState;
 
+  // for differentiating between corresponding fiat pairs
+  bytes32 exchangeRegistryId;
+
   /**
-   * @notice recomputes and updates inflation factor if more than `updatePeriod`
+   * @notice Recomputes and updates inflation factor if more than `updatePeriod`
    * has passed since last update.
    */
   modifier updateInflationFactor() {
@@ -90,7 +93,7 @@ contract StableToken is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -98,8 +101,11 @@ contract StableToken is
    * @param _symbol A short symbol identifying the token (e.g. "cUSD")
    * @param _decimals Tokens are divisible to this many decimal places.
    * @param registryAddress Address of the Registry contract.
-   * @param inflationRate weekly inflation rate.
-   * @param inflationFactorUpdatePeriod how often the inflation factor is updated.
+   * @param inflationRate Weekly inflation rate.
+   * @param inflationFactorUpdatePeriod How often the inflation factor is updated, in seconds.
+   * @param initialBalanceAddresses Array of addresses with an initial balance.
+   * @param initialBalanceValues Array of balance values corresponding to initialBalanceAddresses.
+   * @param exchangeIdentifier String identifier of exchange in registry (for specific fiat pairs)
    */
   function initialize(
     string calldata _name,
@@ -109,7 +115,8 @@ contract StableToken is
     uint256 inflationRate,
     uint256 inflationFactorUpdatePeriod,
     address[] calldata initialBalanceAddresses,
-    uint256[] calldata initialBalanceValues
+    uint256[] calldata initialBalanceValues,
+    string calldata exchangeIdentifier
   ) external initializer {
     require(inflationRate != 0, "Must provide a non-zero inflation rate");
     require(inflationFactorUpdatePeriod > 0, "inflationFactorUpdatePeriod must be > 0");
@@ -132,12 +139,13 @@ contract StableToken is
       _mint(initialBalanceAddresses[i], initialBalanceValues[i]);
     }
     setRegistry(registryAddress);
+    exchangeRegistryId = keccak256(abi.encodePacked(exchangeIdentifier));
   }
 
   /**
    * @notice Updates Inflation Parameters.
-   * @param rate new rate.
-   * @param updatePeriod how often inflationFactor is updated.
+   * @param rate New rate.
+   * @param updatePeriod How often inflationFactor is updated.
    */
   function setInflationParameters(uint256 rate, uint256 updatePeriod)
     external
@@ -214,7 +222,7 @@ contract StableToken is
    */
   function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
     require(
-      msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
+      msg.sender == registry.getAddressForOrDie(getExchangeRegistryId()) ||
         msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID),
       "Only the Exchange and Validators contracts are authorized to mint"
     );
@@ -263,7 +271,7 @@ contract StableToken is
    */
   function burn(uint256 value)
     external
-    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    onlyRegisteredContract(getExchangeRegistryId())
     updateInflationFactor
     returns (bool)
   {
@@ -382,6 +390,19 @@ contract StableToken is
   }
 
   /**
+   * @notice Returns the exchange id in the registry of the corresponding fiat pair exchange.
+   * @dev When this storage is uninitialized, it falls back to the default EXCHANGE_REGISTRY_ID.
+   * @return Registry id for the corresponding exchange.
+   */
+  function getExchangeRegistryId() public view returns (bytes32) {
+    if (exchangeRegistryId == bytes32(0)) {
+      return EXCHANGE_REGISTRY_ID;
+    } else {
+      return exchangeRegistryId;
+    }
+  }
+
+  /**
    * @notice Returns the value of a given number of units given the current inflation factor.
    * @param units The units to convert to value.
    * @return The value corresponding to `units` given the current inflation factor.
@@ -402,9 +423,10 @@ contract StableToken is
 
   /**
    * @notice Returns the units for a given value given the current inflation factor.
+   * @param inflationFactor The current inflation factor.
    * @param value The value to convert to units.
    * @return The units corresponding to `value` given the current inflation factor.
-   * @dev we assume any function calling this will have updated the inflation factor.
+   * @dev We assume any function calling this will have updated the inflation factor.
    */
   function _valueToUnits(FixidityLib.Fraction memory inflationFactor, uint256 value)
     private
@@ -416,8 +438,8 @@ contract StableToken is
 
   /**
    * @notice Computes the up-to-date inflation factor.
-   * @return current inflation factor.
-   * @return lastUpdated time when the returned inflation factor went into effect.
+   * @return Current inflation factor.
+   * @return Last time when the returned inflation factor was updated.
    */
   function getUpdatedInflationFactor() private view returns (FixidityLib.Fraction memory, uint256) {
     /* solhint-disable not-rely-on-time */

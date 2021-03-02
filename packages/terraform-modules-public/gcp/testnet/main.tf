@@ -259,9 +259,11 @@ module "attestation-service" {
   nexmo_key                                   = var.attestation_service_nexmo_key
   nexmo_secret                                = var.attestation_service_nexmo_secret
   nexmo_blacklist                             = var.attestation_service_nexmo_blacklist
+  nexmo_unsupported_regions                   = var.attestation_service_nexmo_unsupported_regions
   twilio_account_sid                          = var.attestation_service_twilio_account_sid
   twilio_messaging_service_sid                = var.attestation_service_twilio_messaging_service_sid
   twilio_auth_token                           = var.attestation_service_twilio_auth_token
   twilio_blacklist                            = var.attestation_service_twilio_blacklist
+  twilio_unsupported_regions                  = var.attestation_service_twilio_unsupported_regions
   service_account_scopes                      = var.service_account_scopes
 }

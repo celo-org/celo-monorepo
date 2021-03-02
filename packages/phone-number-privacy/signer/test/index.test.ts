@@ -1,8 +1,17 @@
-import { WarningMessage, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { authenticateUser } from '@celo/phone-number-privacy-common'
+import BigNumber from 'bignumber.js'
 import request from 'supertest'
+import { ErrorMessage, WarningMessage } from '../../common/src/interfaces/error-utils'
+import {
+  ContractRetrieval,
+  createMockAccounts,
+  createMockAttestation,
+  createMockContractKit,
+  createMockToken,
+  createMockWeb3,
+} from '../../common/src/test/utils'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
-import { authenticateUser } from '../src/common/identity'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
 import {
   getDidMatchmaking,
@@ -12,16 +21,22 @@ import {
 import { getRequestExists, storeRequest } from '../src/database/wrappers/request'
 import { getKeyProvider } from '../src/key-management/key-provider'
 import { createServer } from '../src/server'
-import { getRemainingQueryCount } from '../src/signing/query-quota'
-import { getBlockNumber } from '../src/web3/contracts'
+import { getRemainingQueryCount, getWalletAddress } from '../src/signing/query-quota'
+import { getBlockNumber, getContractKit } from '../src/web3/contracts'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
-jest.mock('../src/common/identity')
+jest.setTimeout(10000)
+
+jest.mock('@celo/phone-number-privacy-common', () => ({
+  ...jest.requireActual('@celo/phone-number-privacy-common'),
+  authenticateUser: jest.fn(),
+}))
 const mockAuthenticateUser = authenticateUser as jest.Mock
 
 jest.mock('../src/signing/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
+const mockGetWalletAddress = getWalletAddress as jest.Mock
 
 jest.mock('../src/key-management/key-provider')
 const mockGetKeyProvider = getKeyProvider as jest.Mock
@@ -40,12 +55,23 @@ const mockGetRequestExists = getRequestExists as jest.Mock
 
 jest.mock('../src/web3/contracts')
 const mockGetBlockNumber = getBlockNumber as jest.Mock
+const mockGetContractKit = getContractKit as jest.Mock
 
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   const app = createServer()
 
   beforeEach(() => {
-    mockAuthenticateUser.mockReturnValue(true)
+    const mockContractKit = createMockContractKit(
+      {
+        [ContractRetrieval.getAttestations]: createMockAttestation(3, 3),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
+      },
+      createMockWeb3(0)
+    )
+    mockGetContractKit.mockImplementation(() => mockContractKit)
+    mockAuthenticateUser.mockResolvedValue(true)
     mockGetKeyProvider.mockReturnValue({ getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY) })
     mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
     mockIncrementQueryCount.mockReturnValue(true)
@@ -53,6 +79,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     mockSetDidMatchmaking.mockImplementation()
     mockStoreRequest.mockReturnValue(true)
     mockGetRequestExists.mockReturnValue(false)
+    mockGetWalletAddress.mockResolvedValue('0x0')
   })
 
   describe('with valid input', () => {
@@ -69,8 +96,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     }
 
     it('provides signature', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
-      mockGetBlockNumber.mockReturnValue(10000)
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetBlockNumber.mockResolvedValue(10000)
       request(app)
         .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
@@ -89,7 +116,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         )
     })
     it('returns 403 on query count 0', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 10, totalQuota: 10 })
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 10, totalQuota: 10 })
       request(app)
         .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
@@ -106,7 +133,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .expect(200, done)
     })
     it('returns 500 on bls error', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })
@@ -117,7 +144,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .expect(500, done)
     })
     it('returns 200 with warning on replayed request', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockGetRequestExists.mockReturnValue(true)
       request(app)
         .post('/getBlindedMessagePartialSig')
@@ -138,7 +165,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         )
     })
     it('returns 200 with warning on failure to increment query count', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockIncrementQueryCount.mockReturnValue(false)
       request(app)
         .post('/getBlindedMessagePartialSig')
@@ -159,7 +186,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         )
     })
     it('returns 200 with warning on failure to store request', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockStoreRequest.mockReturnValue(false)
       request(app)
         .post('/getBlindedMessagePartialSig')

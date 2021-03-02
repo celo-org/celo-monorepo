@@ -1,5 +1,5 @@
-import { newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
 import { TransactionData } from '@celo/contractkit/lib/wrappers/MultiSig'
+import { newBlockExplorer } from '@celo/explorer/lib/block-explorer'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
@@ -9,7 +9,7 @@ export default class ShowMultiSig extends BaseCommand {
   static description = 'Shows information about multi-sig contract'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     tx: flags.integer({
       default: undefined,
       description: 'Show info for a transaction',
@@ -32,11 +32,11 @@ export default class ShowMultiSig extends BaseCommand {
       flags: { tx, all, raw },
     } = this.parse(ShowMultiSig)
     const multisig = await this.kit.contracts.getMultiSig(args.address)
-    const txs = await multisig.getTransactionCount()
+    const txs = await multisig.totalTransactionCount()
     const explorer = await newBlockExplorer(this.kit)
     const process = async (txdata: TransactionData) => {
       if (raw) return txdata
-      return { ...txdata, data: explorer.tryParseTxInput(txdata.destination, txdata.data) }
+      return { ...txdata, data: await explorer.tryParseTxInput(txdata.destination, txdata.data) }
     }
     const txinfo =
       tx !== undefined

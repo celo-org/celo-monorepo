@@ -1,24 +1,27 @@
 import {
+  authenticateUser,
   ErrorMessage,
   hasValidAccountParam,
   hasValidContractPhoneNumbersParam,
   hasValidPhoneNumberHash,
   hasValidUserPhoneNumberParam,
+  isVerified,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
-import { authenticateUser, isVerified } from '../common/identity'
-import logger from '../common/logger'
 import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
+import { getContractKit } from '../web3/contracts'
 
 interface GetContactMatchesRequest {
   account: string
   userPhoneNumber: string
   contactPhoneNumbers: string[]
   hashedPhoneNumber: string
+  sessionID?: string
 }
 
 interface ContactMatch {
@@ -30,35 +33,44 @@ export async function handleGetContactMatches(
   request: Request<{}, {}, GetContactMatchesRequest>,
   response: Response
 ) {
+  const logger: Logger = response.locals.logger
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
-    if (!(await authenticateUser(request))) {
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
+    if (!(await authenticateUser(request, getContractKit(), logger))) {
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
 
     const { account, userPhoneNumber, contactPhoneNumbers, hashedPhoneNumber } = request.body
 
-    if (!(await isVerified(account, hashedPhoneNumber))) {
-      respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
+    if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
+      respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
       return
     }
-    if (await getDidMatchmaking(account)) {
-      respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE)
+    if (await getDidMatchmaking(account, logger)) {
+      respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
       return
     }
     const matchedContacts: ContactMatch[] = (
-      await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
+      await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
     ).map((numberPair) => ({ phoneNumber: numberPair }))
-    await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
-    await setDidMatchmaking(account)
+    logger.info(
+      {
+        percentageOfContactsCoveredByMatchmaking:
+          matchedContacts.length / contactPhoneNumbers.length,
+      },
+      'measured percentage of contacts covered by matchmaking'
+    )
+    await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
+    await setDidMatchmaking(account, logger)
     response.json({ success: true, matchedContacts, version: VERSION })
-  } catch (e) {
-    logger.error('Failed to getContactMatches', e)
-    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
+  } catch (err) {
+    logger.error('Failed to getContactMatches')
+    logger.error(err)
+    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }
 

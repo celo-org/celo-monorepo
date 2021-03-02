@@ -1,5 +1,5 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import Logger from 'bunyan'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
 
@@ -12,7 +12,8 @@ function numberPairs() {
  */
 export async function getNumberPairContacts(
   userPhone: string,
-  contactPhones: string[]
+  contactPhones: string[],
+  logger: Logger
 ): Promise<string[]> {
   try {
     const contentPairs = await numberPairs()
@@ -23,8 +24,9 @@ export async function getNumberPairContacts(
     return contentPairs
       .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
       .filter((number) => contactPhonesSet.has(number))
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
     return []
   }
 }
@@ -34,7 +36,8 @@ export async function getNumberPairContacts(
  */
 export async function setNumberPairContacts(
   userPhone: string,
-  contactPhones: string[]
+  contactPhones: string[],
+  logger: Logger
 ): Promise<void> {
   const rows: any = []
   for (const contactPhone of contactPhones) {
@@ -43,10 +46,11 @@ export async function setNumberPairContacts(
   }
   try {
     await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
-  } catch (e) {
+  } catch (err) {
     // ignore duplicate insertion error (23505)
-    if (e.code !== '23505') {
-      logger.error(ErrorMessage.DATABASE_INSERT_FAILURE, e)
+    if (err.code !== '23505') {
+      logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
+      logger.error(err)
     }
   }
 }

@@ -12,7 +12,7 @@ spec:
   selector:
     component: validators
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-validators
@@ -31,7 +31,7 @@ spec:
           storage: {{ .Values.geth.diskSizeGB }}Gi
   podManagementPolicy: Parallel
   updateStrategy:
-    type: RollingUpdate
+{{ toYaml .Values.updateStrategy.validators | indent 4 }}
   replicas: {{ .Values.geth.validators }}
   serviceName: validators
   selector:
@@ -49,7 +49,7 @@ spec:
 {{- end }}
     spec:
       initContainers:
-{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: Always
@@ -90,7 +90,7 @@ spec:
           cat /root/.celo/bootnodeEnodeAddress
 
           [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
-          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo "enode://$(cat /root/.celo/bootnodeEnodeAddress)@$BOOTNODE_IP_ADDRESS:30301" > /root/.celo/bootnodeEnode
           echo -n "Generating Bootnode enode for the validator: "
           cat /root/.celo/bootnodeEnode
 
@@ -160,7 +160,7 @@ spec:
           ACCOUNT_ADDRESS=$(cat /root/.celo/address)
           RID=$(cat /root/.celo/replica_id)
 
-          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
@@ -171,11 +171,18 @@ spec:
           fi
 
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
-          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          if [ "$PROXY_COUNT" -gt 0 ]; then
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          else
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+          fi
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
+
+{{ include  "common.bootnode-flag-script" . | indent 10 }}
+
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
           {{- end }}
@@ -183,7 +190,9 @@ spec:
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
           exec geth \
-            --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
+            $BOOTNODE_FLAG \
+            --datadir /root/.celo \
+            --ipcpath=geth.ipc \
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
@@ -198,15 +207,11 @@ spec:
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
             --etherbase=${ACCOUNT_ADDRESS} \
-            --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
-            --istanbul.blockperiod={{ .Values.geth.blocktime }} \
-            --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
@@ -256,6 +261,7 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      terminationGracePeriodSeconds: 120 # 2 mins
       volumes:
       - name: data
         emptyDir: {}

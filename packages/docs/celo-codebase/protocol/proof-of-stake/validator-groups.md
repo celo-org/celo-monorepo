@@ -44,4 +44,4 @@ A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each va
 
 ## Metadata
 
-Both validators and validator groups can use [Accounts Metadata](../identity/metadata.md) to provide unverified metadata (such as name and organizational affiliation) as well as claims that can be verified off-chain for control of third-party accounts. All validators are encouraged to make a verifiable claim for [domain names](../../../operations-manual/validator-explorer.md).
+Both validators and validator groups can use [Accounts Metadata](../identity/metadata.md) to provide unverified metadata (such as name and organizational affiliation) as well as claims that can be verified off-chain for control of third-party accounts. All validators are encouraged to make a verifiable claim for [domain names](../../../validator-guide/validator-explorer.md).

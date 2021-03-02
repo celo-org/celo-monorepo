@@ -1,5 +1,15 @@
 import { exec, spawn, SpawnOptions } from 'child_process'
 
+export async function execCmdAndParseJson(
+  cmd: string,
+  execOptions: any = {},
+  rejectWithOutput = false,
+  pipeOutput = false
+) {
+  const [output] = await execCmd(cmd, execOptions, rejectWithOutput, pipeOutput)
+  return JSON.parse(output)
+}
+
 // Returns a Promise which resolves to [stdout, stderr] array
 export function execCmd(
   cmd: string,
@@ -70,11 +80,12 @@ export function spawnCmd(
 // Returns a Promise which resolves to [stdout, stderr] array
 export function execCmdWithExitOnFailure(
   cmd: string,
-  options: any = {}
+  options: any = {},
+  pipeOutput = false
 ): Promise<[string, string]> {
   return new Promise((resolve, reject) => {
     try {
-      resolve(execCmd(cmd, options))
+      resolve(execCmd(cmd, options, false, pipeOutput))
     } catch (error) {
       console.error(error)
       process.exit(1)

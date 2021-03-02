@@ -65,8 +65,8 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-org/celo-node"
-    tag        = "mainnet"
+    repository = "us.gcr.io/celo-org/geth"
+    tag        = "1.1.0"
   }
 }
 
@@ -169,7 +169,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-mainnet"
+    tag        = "attestation-service-1-0-3"
   }
 }
 
@@ -183,10 +183,12 @@ variable attestation_service_credentials {
     nexmo_key                    = ""
     nexmo_secret                 = ""
     nexmo_blacklist              = ""
+    nexmo_unsupported_regions    = ""
     twilio_account_sid           = "secret in terraform.tfvars"
     twilio_messaging_service_sid = "secret in terraform.tfvars"
     twilio_auth_token            = "secret in terraform.tfvars"
     twilio_blacklist             = ""
+    twilio_unsupported_regions   = ""
   }
 }
 
@@ -208,16 +210,6 @@ variable istanbul_request_timeout_ms {
   description = "The ethereum request timeout"
   type        = number
   default     = 10000
-}
-
-variable geth_exporter_docker_image {
-  description = "The geth exporter docker image"
-  type        = map(string)
-
-  default = {
-    repository = "us.gcr.io/celo-testnet/geth-exporter"
-    tag        = "ed7d21bd50592709173368cd697ef73c1774a261"
-  }
 }
 
 #not yet implemented.  intent is to only install the stackdriver agents and inject the log exclusions if 'true'
@@ -292,6 +284,7 @@ variable "stackdriver_logging_metrics" {
       filter      = "resource.type=gce_instance AND \"blocks\" AND \"Imported new chain segment\""
     }
 
+    # note that this log isn't firing anymore on successfully proposing a block (on 1.1.0) FIXME
     tf_eth_block_mined = {
       description = "Block mined"
       filter = "resource.type=gce_instance AND \"Successfully sealed new block\""

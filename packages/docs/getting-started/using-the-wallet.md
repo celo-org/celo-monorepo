@@ -14,7 +14,7 @@ If you already have an account \(and the corresponding seed phrase\), you can do
 
 ### Downloading the Celo Wallet
 
-To download the app on the Play Store, go [here](https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores). Note that you will need an account or an invitation code to use the wallet.
+To download the app on the Play Store, go [here](https://play.google.com/apps/testing/org.celo.mobile.alfajores). Note that you will need an account or an invitation code to use the wallet.
 
 ### Running the Celo Wallet Locally
 

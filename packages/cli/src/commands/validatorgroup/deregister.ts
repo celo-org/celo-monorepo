@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 
 export default class ValidatorGroupDeRegister extends BaseCommand {
   static description =
-    'Deregister a Validator Group. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator Group will become possible to unlock. Note that the Group must be empty (i.e. no members) before deregistering.'
+    'Deregister a Validator Group. Approximately 180 days after the validator group is empty, it will be possible to deregister it start unlocking the CELO. If you wish to deregister your validator group, you must first remove all members, then wait the required 180 days before running this command.'
 
   static flags = {
     ...BaseCommand.flags,

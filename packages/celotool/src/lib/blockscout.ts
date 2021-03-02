@@ -1,9 +1,16 @@
 import fs from 'fs'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
-import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
+import { getCurrentGcloudAccount } from './gcloud_utils'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from './helm_deploy'
 import { outputIncludes } from './utils'
 import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
+
+const helmChartPath = '../helm-charts/blockscout'
 
 export function getInstanceName(celoEnv: string) {
   const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
@@ -25,7 +32,7 @@ export async function installHelmChart(
   return installGenericHelmChart(
     celoEnv,
     releaseName,
-    '../helm-charts/blockscout',
+    helmChartPath,
     await helmParameters(
       celoEnv,
       blockscoutDBUsername,
@@ -35,8 +42,8 @@ export async function installHelmChart(
   )
 }
 
-export async function removeHelmRelease(helmReleaseName: string) {
-  await removeGenericHelmChart(helmReleaseName)
+export async function removeHelmRelease(helmReleaseName: string, celoEnv: string) {
+  await removeGenericHelmChart(helmReleaseName, celoEnv)
 }
 
 export async function upgradeHelmChart(
@@ -47,22 +54,14 @@ export async function upgradeHelmChart(
   blockscoutDBConnectionName: string
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
-  const params = (
-    await helmParameters(
-      celoEnv,
-      blockscoutDBUsername,
-      blockscoutDBPassword,
-      blockscoutDBConnectionName
-    )
-  ).join(' ')
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(
-      `helm upgrade --debug --dry-run ${helmReleaseName} ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
-    )
-  }
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${helmReleaseName} ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
+  const params = await helmParameters(
+    celoEnv,
+    blockscoutDBUsername,
+    blockscoutDBPassword,
+    blockscoutDBConnectionName
   )
+  await upgradeGenericHelmChart(celoEnv, helmReleaseName, helmChartPath, params)
+
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }
 
@@ -72,13 +71,15 @@ async function helmParameters(
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
+  const currentGcloudAccount = await getCurrentGcloudAccount()
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const useMetadataCrawler = fetchEnvOrFallback(
     envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY,
-    'false',
+    'false'
   )
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
+    `--set blockscout.deployment.account="${currentGcloudAccount}"`,
     `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
     `--set blockscout.image.tag=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
@@ -90,20 +91,27 @@ async function helmParameters(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
-    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
-    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
+    `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
   ]
   if (useMetadataCrawler !== 'false') {
     params.push(
-    `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
-    )}`,
-    `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
-    )}`,
-    `--set blockscout.metadata_crawler.schedule=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-    )}`,
+      `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
+      )}`,
+      `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
+      )}`,
+      `--set blockscout.metadata_crawler.schedule="${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+      )}"`,
+      `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+        envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+        ''
+      )}`,
+      `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
+        envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
+        celoEnv
+      )}`
     )
   }
   if (isVmBased()) {
@@ -111,11 +119,11 @@ async function helmParameters(
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   } else if (privateNodes > 0) {
-    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8546`)
+    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private-headless:8545`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private-headless:8546`)
   } else {
-    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
+    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-headless:8545`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-headless:8546`)
   }
   return params
 }
@@ -134,7 +142,15 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+    location ~ /admin/.* {
+      deny all;
+    }
+    location ~ /wobserver/.* {
+      deny all;
+    }
   labels:
     app: blockscout
     chart: blockscout
@@ -145,6 +161,14 @@ spec:
   - host: ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org
     http:
       paths:
+      - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        backend:
+          serviceName: ${ingressName}-web
+          servicePort: 4000
+      - path: /(graphql|graphiql|api)
+        backend:
+          serviceName: ${ingressName}-api
+          servicePort: 4000
       - backend:
           serviceName: ${ingressName}-web
           servicePort: 4000

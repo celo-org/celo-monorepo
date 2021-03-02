@@ -1,9 +1,11 @@
+import { flow } from 'lodash'
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import {
-  addOracleMiddleware,
-  OracleArgv,
-  switchToAzureContextCluster,
-  upgradeOracleChart,
+  addCurrencyPairMiddleware,
+  addUseFornoMiddleware,
+  getOracleDeployerForContext,
 } from 'src/lib/oracle'
 import yargs from 'yargs'
 
@@ -12,19 +14,23 @@ export const command = 'oracle'
 export const describe = 'upgrade the oracle(s) on an AKS cluster'
 
 type OracleUpgradeArgv = UpgradeArgv &
-  OracleArgv & {
+  ContextArgv & {
     useForno: boolean
+    currencyPair: CurrencyPair
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addOracleMiddleware(argv).option('useForno', {
-    description: 'Uses forno for RPCs from the oracle clients',
-    default: false,
-    type: 'boolean',
-  })
+  return flow([addContextMiddleware, addCurrencyPairMiddleware, addUseFornoMiddleware])(argv)
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
-  await switchToAzureContextCluster(argv.celoEnv, argv.context)
-  await upgradeOracleChart(argv.celoEnv, argv.context, argv.useForno)
+  const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
+  const deployer = getOracleDeployerForContext(
+    argv.celoEnv,
+    argv.context,
+    argv.currencyPair,
+    argv.useForno,
+    clusterManager
+  )
+  await deployer.upgradeChart()
 }

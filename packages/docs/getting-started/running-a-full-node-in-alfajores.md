@@ -2,6 +2,12 @@
 
 This section explains how to get a full node running on the [Alfajores Network](alfajores-testnet.md), using a Docker image that was built for this purpose.
 
+{% hint style="info" %}
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+
+You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
+{% endhint %}
+
 Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes [full node incentives](../celo-codebase/protocol/transactions/full-node-incentives.md).
 
 When a light client sends transactions, they may include a gateway fee to be paid to the node that gossips transactions to the other full nodes and validators.
@@ -27,8 +33,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for `Alfajores` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/celo-node:alfajores
-export NETWORK_ID=44787
+export CELO_IMAGE=us.gcr.io/celo-org/geth:alfajores
 ```
 
 ## Pull the Celo Docker image
@@ -72,26 +77,12 @@ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
 This environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile`
 {% endhint %}
 
-## Configure the node
-
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for Alfajores and uses it to initialize your nodes' data directory.
-
-```bash
-docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE --nousb init /celo/genesis.json
-```
-
-In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
-
-```bash
-export BOOTNODE_ENODES=$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)
-```
-
 ## Start the node
 
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --bootnodes $BOOTNODE_ENODES --nousb
+docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --nousb --alfajores --datadir /root/.celo
 ```
 
 You'll start seeing some output. After a few minutes, you should see lines that look like this. This means your node has started syncing with the network and is receiving blocks.

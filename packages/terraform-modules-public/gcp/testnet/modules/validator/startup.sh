@@ -356,7 +356,7 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
 # Load configuration to files
-echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
+#echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${validator_private_key}' > $DATA_DIR/pkey
@@ -378,7 +378,7 @@ docker run \
   -v $DATA_DIR:$DATA_DIR \
   --entrypoint /bin/sh \
   -i $GETH_NODE_DOCKER_IMAGE \
-  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
+  -c "geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
 
 cat <<EOF >/etc/systemd/system/geth.service
 [Unit]
@@ -417,8 +417,6 @@ ExecStart=/usr/bin/docker run \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\
       --ethstats=${validator_name}@${ethstats_host} \\
-      --istanbul.blockperiod=${block_time} \\
-      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \\
       --maxpeers=${max_peers} \\
       --nat=extip:${ip_address} \\
       --metrics \\
@@ -429,6 +427,7 @@ ExecStart=/usr/bin/docker run \\
       --proxy.proxyenodeurlpair=\\"$PROXY_URL\\" \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
+ExecStopPost=/usr/bin/docker rm -f %N
 
 [Install]
 WantedBy=default.target

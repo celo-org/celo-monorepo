@@ -1,4 +1,4 @@
-# External module: "wrappers/StableTokenWrapper"
+# Module: "wrappers/StableTokenWrapper"
 
 ## Index
 

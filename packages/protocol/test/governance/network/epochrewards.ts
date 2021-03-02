@@ -919,10 +919,6 @@ contract('EpochRewards', (accounts: string[]) => {
       await freezer.freeze(epochRewards.address)
     })
 
-    it('should make calculateTargetEpochRewards revert', async () => {
-      await assertRevert(epochRewards.calculateTargetEpochRewards())
-    })
-
     it('should make updateTargetVotingYield revert', async () => {
       await assertRevert(epochRewards.updateTargetVotingYield())
     })

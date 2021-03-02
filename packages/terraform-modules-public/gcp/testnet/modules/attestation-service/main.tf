@@ -1,6 +1,5 @@
 locals {
-  name_prefix = "${var.gcloud_project}-attestation-service"
-  #name_prefix = "${var.celo_env}-attestation-service"
+  name_prefix = "${var.gcloud_project}-attestation-svc"
 }
 
 resource "google_sql_database_instance" "master" {
@@ -39,7 +38,7 @@ resource "google_compute_instance" "attestation_service" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
   
-  deletion_protection = true
+  deletion_protection = false
 
   tags = ["${var.celo_env}-attestation-service"]
 
@@ -76,10 +75,12 @@ resource "google_compute_instance" "attestation_service" {
       nexmo_key : var.nexmo_key,
       nexmo_secret : var.nexmo_secret,
       nexmo_blacklist : var.nexmo_blacklist,
+      nexmo_unsupported_regions : var.nexmo_unsupported_regions,
       twilio_account_sid : var.twilio_account_sid,
       twilio_messaging_service_sid : var.twilio_messaging_service_sid,
       twilio_auth_token : var.twilio_auth_token,
       twilio_blacklist : var.twilio_blacklist,
+      twilio_unsupported_regions : var.twilio_unsupported_regions
     }
   )
 

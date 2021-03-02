@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -6,12 +7,11 @@ import {
   assertLogMatches,
   assertRevert,
   assertSameAddress,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { addressToPublicKey, Signature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,

@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -7,7 +8,6 @@ import {
   assertRevert,
   matchAny,
   mineToNextEpoch,
-  NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -1100,7 +1100,7 @@ contract('Governance', (accounts: string[]) => {
         const [proposalIds] = await governance.getQueue()
         assert.notInclude(
           proposalIds.map((x) => x.toNumber()),
-          proposalId
+          proposalId.toNumber()
         )
       })
 
@@ -1589,6 +1589,76 @@ contract('Governance', (accounts: string[]) => {
       await timeTravel(dequeueFrequency, web3)
       const otherProposalId = 2
       await assertRevert(governance.vote(otherProposalId, index, value))
+    })
+
+    describe('when voting on two proposals', () => {
+      const proposalId1 = 2
+      const proposalId2 = 3
+      const index1 = 1
+      const index2 = 2
+      beforeEach(async () => {
+        const newDequeueFrequency = 60
+        await governance.setDequeueFrequency(newDequeueFrequency)
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(newDequeueFrequency, web3)
+        await governance.approve(proposalId1, index1)
+        await governance.propose(
+          [transactionSuccess2.value],
+          [transactionSuccess2.destination],
+          // @ts-ignore bytes type
+          transactionSuccess2.data,
+          [transactionSuccess2.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(newDequeueFrequency, web3)
+        await governance.approve(proposalId2, index2)
+        await timeTravel(approvalStageDuration, web3)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+      })
+
+      it('should set mostRecentReferendumProposal to the youngest proposal voted on', async () => {
+        await governance.vote(proposalId2, index2, value)
+        await governance.vote(proposalId1, index1, value)
+        const mostRecent = await governance.getMostRecentReferendumProposal(accounts[0])
+        assert.equal(mostRecent.toNumber(), proposalId2)
+      })
+
+      it('should return true on `isVoting`', async () => {
+        await governance.vote(proposalId2, index2, value)
+        await governance.vote(proposalId1, index1, value)
+        const voting = await governance.isVoting(accounts[0])
+        assert.isTrue(voting)
+      })
+
+      describe('after the first proposal expires', () => {
+        beforeEach(async () => {
+          await governance.vote(proposalId2, index2, value)
+          await governance.vote(proposalId1, index1, value)
+          await timeTravel(referendumStageDuration - 10, web3)
+        })
+
+        it('should still return true on `isVoting`', async () => {
+          const voting = await governance.isVoting(accounts[0])
+          assert.isTrue(voting)
+        })
+
+        it('should no longer return true on `isVoting` after both expire', async () => {
+          await timeTravel(11, web3)
+          const voting = await governance.isVoting(accounts[0])
+          assert.isFalse(voting)
+        })
+      })
     })
 
     describe('when the account has already voted on this proposal', () => {

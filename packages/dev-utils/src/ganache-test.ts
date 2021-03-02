@@ -7,7 +7,7 @@ export const NetworkConfig = migrationOverride
 export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promise<O> {
   return new Promise<O>((resolve, reject) => {
     if (web3.currentProvider && typeof web3.currentProvider !== 'string') {
-      web3.currentProvider.send(
+      web3.currentProvider.send!(
         {
           id: new Date().getTime(),
           jsonrpc: '2.0',
@@ -95,7 +95,7 @@ export async function getContractFromEvent(
   let currBlock: any
   let contractAddress: any
   const target = web3.utils.sha3(eventSignature)
-  let found = false
+  let matchesFound = 0
   while (true) {
     currBlock = await web3.eth.getBlock(currBlockNumber)
     for (const tx of currBlock.transactions) {
@@ -105,9 +105,9 @@ export async function getContractFromEvent(
           if (log.topics) {
             for (const topic of log.topics) {
               if (topic === target) {
-                if (canValidate && !found) {
-                  found = true
-                } else {
+                matchesFound++
+                // only every match other bc of implementation initializations
+                if ((canValidate && matchesFound === 3) || (!canValidate && matchesFound === 1)) {
                   contractAddress = log.address
                 }
               }
