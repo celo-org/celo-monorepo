@@ -139,7 +139,7 @@ const DefaultConstitution = {
     addSpender: 0.9,
     removeSpender: 0.8,
     addExchangeSpender: 0.9,
-    removeSpender:  0.9,
+    removeExchangeSpender:  0.9,
   },
   SortedOracles: {
     default: 0.7,
