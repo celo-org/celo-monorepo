@@ -136,8 +136,8 @@ class CheckBuilder {
       this.withGovernance(async (governance) => {
         const match = (await governance.getProposalStage(proposalID)) === stage
         if (!match) {
-          const timeUntilStages = await governance.timeUntilStages(proposalID)
-          printValueMapRecursive({ timeUntilStages })
+          const schedule = await governance.proposalSchedule(proposalID)
+          printValueMapRecursive(schedule)
         }
         return match
       })
@@ -268,7 +268,8 @@ class CheckBuilder {
         const res =
           (await accounts.isAccount(this.signer!)) || (await accounts.isSigner(this.signer!))
         return res
-      })
+      }),
+      `${this.signer} is not a signer or registered as an account. Try authorizing as a signer or running account:register.`
     )
 
   isVoteSignerOrAccount = () =>

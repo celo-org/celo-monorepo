@@ -1,4 +1,4 @@
-import OffchainDataWrapper from '@celo/identity/lib/offchain-data-wrapper'
+import { BasicDataWrapper } from '@celo/identity/lib/offchain-data-wrapper'
 import {
   AwsStorageWriter,
   GitStorageWriter,
@@ -36,7 +36,7 @@ export abstract class OffchainDataCommand extends BaseCommand {
   }
 
   // @ts-ignore Can't encode that this is happening in init
-  offchainDataWrapper: OffchainDataWrapper
+  offchainDataWrapper: BasicDataWrapper
 
   async init() {
     await super.init()
@@ -46,7 +46,7 @@ export abstract class OffchainDataCommand extends BaseCommand {
     }: ParserOutput<any, any> = this.parse()
 
     const from = privateKeyToAddress(privateKey)
-    this.offchainDataWrapper = new OffchainDataWrapper(from, this.kit)
+    this.offchainDataWrapper = new BasicDataWrapper(from, this.kit)
 
     this.offchainDataWrapper.storageWriter =
       provider === StorageProviders.GCP

@@ -9,6 +9,15 @@ import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap, printValueMapRecursive } from '../../utils/cli'
 
 export default class Show extends BaseCommand {
+  static aliases = [
+    'governance:show',
+    'governance:showhotfix',
+    'governance:showaccount',
+    'governance:view',
+    'governance:viewhotfix',
+    'governance:viewaccount',
+  ]
+
   static description = 'Show information about a governance proposal, hotfix, or account.'
 
   static flags = {
@@ -66,9 +75,10 @@ export default class Show extends BaseCommand {
         .runChecks()
 
       const record = await governance.getProposalRecord(id)
+      const proposal = record.proposal
       if (!raw) {
         try {
-          const jsonproposal = await proposalToJSON(this.kit, record.proposal)
+          const jsonproposal = await proposalToJSON(this.kit, proposal)
           record.proposal = jsonproposal as any
 
           if (res.flags.jsonTransactions) {
@@ -82,22 +92,22 @@ export default class Show extends BaseCommand {
         }
       }
 
-      // Identify the transaction with the highest constitutional requirement.
-      const proposal = await governance.getProposal(id)
+      let requirements = {}
+      if (record.stage === 'Referendum' || record.stage === 'Execution') {
+        // Identify the transaction with the highest constitutional requirement.
+        const constitutionThreshold = await governance.getConstitution(proposal)
+        const support = await governance.getSupport(id)
+        requirements = {
+          constitutionThreshold,
+          ...support,
+        }
+      }
 
-      // Get the minimum participation and agreement required to pass a proposal.
-      const participationParams = await governance.getParticipationParameters()
-      const constitution = await governance.getConstitution(proposal)
-
+      const schedule = await governance.humanReadableProposalSchedule(id)
       printValueMapRecursive({
         ...record,
-        requirements: {
-          participation: participationParams.baseline,
-          agreement: constitution.times(100).toString() + '%',
-        },
-        isApproved: await governance.isApproved(id),
-        isProposalPassing: await governance.isProposalPassing(id),
-        timeUntilStages: await governance.humanReadableTimeUntilStages(id),
+        schedule,
+        requirements,
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer

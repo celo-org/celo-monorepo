@@ -1,4 +1,4 @@
-import OffchainDataWrapper from '@celo/identity/lib/offchain-data-wrapper'
+import { BasicDataWrapper } from '@celo/identity/lib/offchain-data-wrapper'
 import { PrivateNameAccessor, PublicNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
@@ -26,7 +26,7 @@ export default class OffchainRead extends BaseCommand {
       flags: { from, privateDEK },
     } = this.parse(OffchainRead)
 
-    const provider = new OffchainDataWrapper(from!, this.kit)
+    const provider = new BasicDataWrapper(from!, this.kit)
 
     if (privateDEK) {
       this.kit.addAccount(privateDEK)
