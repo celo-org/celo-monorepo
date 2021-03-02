@@ -51,10 +51,14 @@ export abstract class BaseClusterManager {
 
     // We expect the context to be the cluster name.
     if (currentContext === null || currentContext.trim() !== this.kubernetesContextName) {
-      const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
+      const [existingContextsStr] = await execCmdWithExitOnFailure(
+        'kubectl config get-contexts -o name'
+      )
       const existingContexts = existingContextsStr.trim().split('\n')
       if (existingContexts.includes(this.clusterConfig.clusterName)) {
-        await execCmdWithExitOnFailure(`kubectl config use-context ${this.clusterConfig.clusterName}`)
+        await execCmdWithExitOnFailure(
+          `kubectl config use-context ${this.clusterConfig.clusterName}`
+        )
       } else {
         // If we don't already have the context, context set up is not complete.
         // We would still need to retrieve credentials/contexts from the provider

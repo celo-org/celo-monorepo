@@ -16,7 +16,7 @@ import {
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
-  TEMPLATE
+  TEMPLATE,
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
@@ -338,10 +338,10 @@ export const generateGenesis = ({
   }
 
   if (typeof churritoBlock === 'number') {
-    genesis.config.churritoBlock = churritoBlock;
+    genesis.config.churritoBlock = churritoBlock
   }
   if (typeof donutBlock === 'number') {
-    genesis.config.donutBlock = donutBlock;
+    genesis.config.donutBlock = donutBlock
   }
 
   genesis.config.chainId = chainId

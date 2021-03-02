@@ -14,11 +14,7 @@ export class GCPClusterManager extends BaseClusterManager {
   }
 
   async getAndSwitchToClusterContext() {
-    const {
-      clusterName,
-      projectName,
-      zone
-    } = this.clusterConfig
+    const { clusterName, projectName, zone } = this.clusterConfig
     await execCmdWithExitOnFailure(
       `gcloud container clusters get-credentials ${clusterName} --project ${projectName} --zone ${zone}`
     )

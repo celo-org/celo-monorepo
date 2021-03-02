@@ -1,5 +1,10 @@
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
-import { installGenericHelmChart, removeGenericHelmChart, setHelmArray, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  setHelmArray,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
@@ -46,7 +51,10 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
-    ...setHelmArray('attestation_service.nexmo.applications', fetchEnvOrFallback(envVar.NEXMO_APPLICATIONS, '').split(',')),
+    ...setHelmArray(
+      'attestation_service.nexmo.applications',
+      fetchEnvOrFallback(envVar.NEXMO_APPLICATIONS, '').split(',')
+    ),
     `--set geth.validators="${fetchEnv(envVar.VALIDATORS)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set global.postgresql.postgresqlDatabase=AttestationService`,
