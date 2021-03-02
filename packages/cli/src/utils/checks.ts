@@ -136,8 +136,8 @@ class CheckBuilder {
       this.withGovernance(async (governance) => {
         const match = (await governance.getProposalStage(proposalID)) === stage
         if (!match) {
-          const timeUntilStages = await governance.timeUntilStages(proposalID)
-          printValueMapRecursive({ timeUntilStages })
+          const schedule = await governance.proposalSchedule(proposalID)
+          printValueMapRecursive(schedule)
         }
         return match
       })

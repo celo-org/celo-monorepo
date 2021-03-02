@@ -6,27 +6,24 @@ const NODE_PORT_MIN = 30000
 const NODE_PORT_MAX = 32767
 
 export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer {
-
   async additionalHelmParameters() {
     const existingNodePortSet = await this.getExistingNodePortSet()
     const newNodePortForEachFullNode = await this.getNodePortForEachFullNode()
     const newNodePortSet = new Set(newNodePortForEachFullNode)
     // Essentially existingNodePortSet - newNodePortForEachFullNode
     const nodePortsToRemove = new Set(
-      Array.from(existingNodePortSet).filter(existing => !newNodePortSet.has(existing))
+      Array.from(existingNodePortSet).filter((existing) => !newNodePortSet.has(existing))
     )
     // Ensure all the new node ports have ingress rules set
     await this.setIngressRulesTCPAndUDP(newNodePortForEachFullNode, true)
     // Remove any removed node port ingress rules
     await this.setIngressRulesTCPAndUDP(Array.from(nodePortsToRemove), false)
 
-    const nodePortPerFullNodeStrs = newNodePortForEachFullNode.map((nodePort: number, index: number) =>
-      `--set geth.service_node_port_per_full_node[${index}]=${nodePort}`
+    const nodePortPerFullNodeStrs = newNodePortForEachFullNode.map(
+      (nodePort: number, index: number) =>
+        `--set geth.service_node_port_per_full_node[${index}]=${nodePort}`
     )
-    return [
-      ...nodePortPerFullNodeStrs,
-      `--set geth.service_type=NodePort`,
-    ]
+    return [...nodePortPerFullNodeStrs, `--set geth.service_type=NodePort`]
   }
 
   async getNodePortForEachFullNode() {
@@ -47,7 +44,9 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
           return existingNodePort
         }
         if (existingNodePort !== NO_NODE_PORT && existingNodePort !== portsSpec.nodePort) {
-          throw Error(`Expected all nodePorts to be the same in service, got ${existingNodePort} !== ${portsSpec.nodePort}`)
+          throw Error(
+            `Expected all nodePorts to be the same in service, got ${existingNodePort} !== ${portsSpec.nodePort}`
+          )
         }
         return portsSpec.nodePort
       }, NO_NODE_PORT)
@@ -110,7 +109,10 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
    * Does so using a selector, and has no guarantees about the order of the services.
    */
   async getExistingFullNodeServices() {
-    const response = await getService(`--selector=component=celo-fullnode-protocol-traffic`, this.kubeNamespace)
+    const response = await getService(
+      `--selector=component=celo-fullnode-protocol-traffic`,
+      this.kubeNamespace
+    )
     return response.items
   }
 

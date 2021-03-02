@@ -124,6 +124,14 @@ const deployProxy = async (
   return proxy
 }
 
+const shouldDeployProxy = (report: ASTDetailedVersionedReport, contractName: string) => {
+  const hasStorageChanges = report.contracts[contractName].changes.storage.length > 0
+  const isNewContract = report.contracts[contractName].changes.major.find(
+    (change: any) => change.type === 'NewContract'
+  )
+  return hasStorageChanges || isNewContract
+}
+
 const deployCoreContract = async (
   contractName: string,
   instance: Truffle.Contract<Truffle.ContractInstance>,
@@ -142,9 +150,7 @@ const deployCoreContract = async (
     value: '0',
   }
 
-  // Deploy new versions of the proxy, if needed
-  const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
-  if (!shouldDeployProxy) {
+  if (!shouldDeployProxy(report, contractName)) {
     proposal.push(setImplementationTx)
   } else {
     const proxy = await deployProxy(contractName, addresses, isDryRun, from)
@@ -165,7 +171,16 @@ const deployCoreContract = async (
     )
     if (initializeAbi) {
       const args = initializationData[contractName]
-      const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+      let callData
+      try {
+        callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+      } catch (error) {
+        throw new Error(
+          `Tried to initialize new implementation of ${contractName} with args: ${JSON.stringify(
+            args
+          )}. Initialization ABI spec is: ${JSON.stringify(initializeAbi.inputs)}.`
+        )
+      }
       setImplementationTx.function = '_setAndInitializeImplementation'
       setImplementationTx.args.push(callData)
     }

@@ -1,36 +1,40 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
+
+const chartDir = '../helm-charts/transaction-metrics-exporter/'
+
+function releaseName(celoEnv: string, suffix: string) {
+  return `${celoEnv}-transaction-metrics-exporter-${suffix}`
+}
 
 export async function installHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  console.info(`Installing helm release ${celoEnv}-transaction-metrics-exporter-${suffix}`)
-  const params = await helmParameters(celoEnv)
-  await execCmdWithExitOnFailure(
-    `helm install ${celoEnv}-transaction-metrics-exporter-${suffix} ../helm-charts/transaction-metrics-exporter/ ${params.join(
-      ' '
-    )}
-  `
+  await installGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv, suffix),
+    chartDir,
+    await helmParameters(celoEnv)
   )
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  console.info(`Upgrading helm release ${celoEnv}-transaction-metrics-exporter`)
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  const params = await helmParameters(celoEnv)
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${celoEnv}-transaction-metrics-exporter-${suffix} ../helm-charts/transaction-metrics-exporter/ ${params.join(
-      ' '
-    )}`
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv, suffix),
+    chartDir,
+    await helmParameters(celoEnv)
   )
 }
 
 export async function removeHelmRelease(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  console.info(`Deleting helm chart ${celoEnv}-transaction-metrics-exporter-${suffix}`)
-  await execCmdWithExitOnFailure(
-    `helm uninstall --namespace ${celoEnv} ${celoEnv}-transaction-metrics-exporter-${suffix}`
-  )
+  await removeGenericHelmChart(releaseName(celoEnv, suffix), celoEnv)
 }
 
 async function helmParameters(celoEnv: string) {

@@ -1,4 +1,11 @@
-import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from '../azure'
+import {
+  assignRoleIdempotent,
+  createIdentityIdempotent,
+  deleteIdentity,
+  getAKSManagedServiceIdentityObjectId,
+  getAKSServicePrincipalObjectId,
+  getIdentity,
+} from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { AksClusterConfig } from '../k8s-cluster/aks'
 import { BaseOracleDeploymentConfig, OracleIdentity } from './base'
@@ -13,7 +20,7 @@ export interface AksHsmOracleIdentity extends OracleIdentity {
 }
 
 export interface AksHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig {
-  clusterConfig: AksClusterConfig,
+  clusterConfig: AksClusterConfig
   identities: AksHsmOracleIdentity[]
 }
 
@@ -35,7 +42,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
 
   async helmParameters() {
     return [
-      ...await super.helmParameters(),
+      ...(await super.helmParameters()),
       `--set kube.cloudProvider=azure`,
       `--set oracle.azureHsm.initTryCount=5`,
       `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
@@ -63,10 +70,11 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
    * appropriate permissions to use its HSM.
    * Idempotent.
    */
-  async createOracleAzureIdentityIdempotent(
-    oracleHsmIdentity: AksHsmOracleIdentity
-  ) {
-    const identity = await createIdentityIdempotent(this.clusterConfig, this.azureHsmIdentityName(oracleHsmIdentity))
+  async createOracleAzureIdentityIdempotent(oracleHsmIdentity: AksHsmOracleIdentity) {
+    const identity = await createIdentityIdempotent(
+      this.clusterConfig,
+      this.azureHsmIdentityName(oracleHsmIdentity)
+    )
     // We want to grant the identity for the cluster permission to manage the oracle identity.
     // Get the correct object ID depending on the cluster configuration, either
     // the service principal or the managed service identity.
@@ -77,7 +85,12 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
       assigneeObjectId = await getAKSManagedServiceIdentityObjectId(this.clusterConfig)
       assigneePrincipalType = 'MSI'
     }
-    await assignRoleIdempotent(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
+    await assignRoleIdempotent(
+      assigneeObjectId,
+      assigneePrincipalType,
+      identity.id,
+      'Managed Identity Operator'
+    )
     // Allow the oracle identity to access the correct key vault
     await this.setOracleKeyVaultPolicyIdempotent(oracleHsmIdentity, identity)
     return identity
@@ -95,25 +108,39 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
     const keyPermissions = ['get', 'list', 'sign']
     const keyVaultResourceGroup = oracleHsmIdentity.resourceGroup
     const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-      `az keyvault show --name ${oracleHsmIdentity.keyVaultName} -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
+      `az keyvault show --name ${
+        oracleHsmIdentity.keyVaultName
+      } -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${
+        azureIdentity.principalId
+      }' && sort(permissions.keys) == [${keyPermissions.map((perm) => `'${perm}'`).join(', ')}]]"`
     )
     const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
     if (keyVaultPolicies.length) {
-      console.info(`Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${oracleHsmIdentity.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+      console.info(
+        `Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${
+          oracleHsmIdentity.keyVaultName
+        } and identity objectId ${azureIdentity.principalId}`
+      )
       return
     }
-    console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${oracleHsmIdentity.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    console.info(
+      `Setting key permissions ${keyPermissions.join(' ')} for vault ${
+        oracleHsmIdentity.keyVaultName
+      } and identity objectId ${azureIdentity.principalId}`
+    )
     return execCmdWithExitOnFailure(
-      `az keyvault set-policy --name ${oracleHsmIdentity.keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${keyVaultResourceGroup}`
+      `az keyvault set-policy --name ${
+        oracleHsmIdentity.keyVaultName
+      } --key-permissions ${keyPermissions.join(' ')} --object-id ${
+        azureIdentity.principalId
+      } -g ${keyVaultResourceGroup}`
     )
   }
 
   /**
    * Deletes the key vault policy and the oracle's managed identity
    */
-  async deleteAzureHsmIdentity(
-    oracleHsmIdentity: AksHsmOracleIdentity
-  ) {
+  async deleteAzureHsmIdentity(oracleHsmIdentity: AksHsmOracleIdentity) {
     const identityName = this.azureHsmIdentityName(oracleHsmIdentity)
     console.info(`Deleting Azure identity ${identityName}`)
     await this.deleteOracleKeyVaultPolicy(oracleHsmIdentity)
@@ -124,10 +151,11 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
    * Deletes the key vault policy that allows an Azure managed identity to use
    * its HSM.
    */
-  async deleteOracleKeyVaultPolicy(
-    oracleHsmIdentity: AksHsmOracleIdentity
-  ) {
-    const azureIdentity = await getIdentity(this.clusterConfig, this.azureHsmIdentityName(oracleHsmIdentity))
+  async deleteOracleKeyVaultPolicy(oracleHsmIdentity: AksHsmOracleIdentity) {
+    const azureIdentity = await getIdentity(
+      this.clusterConfig,
+      this.azureHsmIdentityName(oracleHsmIdentity)
+    )
     return execCmdWithExitOnFailure(
       `az keyvault delete-policy --name ${oracleHsmIdentity.keyVaultName} --object-id ${azureIdentity.principalId} -g ${oracleHsmIdentity.resourceGroup}`
     )

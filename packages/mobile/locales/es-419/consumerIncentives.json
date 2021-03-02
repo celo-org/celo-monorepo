@@ -1,6 +1,0 @@
-{
-  "title": "Bienvenido a las recompensas de CELO",
-  "description": "¡Obtén recompensas mensuales por ahorrar cUSD en tu Cuenta de {{appName}}!",
-  "getCeloRewards": "<0>Obtén US${{reward}} en CELO</0> por mes con un saldo mínimo de <1>{{minBalance}} cUSD</1>",
-  "addCusd": "Añadir cUSD"
-}
