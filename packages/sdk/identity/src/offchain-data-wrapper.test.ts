@@ -14,7 +14,7 @@ import { ensureCompressed } from '@celo/utils/lib/ecdh'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { LocalWallet } from '@celo/wallet-local'
 import { randomBytes } from 'crypto'
-import OffchainDataWrapper, { OffchainErrorTypes } from './offchain-data-wrapper'
+import { BasicDataWrapper, OffchainDataWrapper, OffchainErrorTypes } from './offchain-data-wrapper'
 import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
 import { SchemaErrorTypes } from './offchain/accessors/errors'
 import { PrivateNameAccessor, PublicNameAccessor } from './offchain/accessors/name'
@@ -84,7 +84,7 @@ testWithGanache('Offchain Data', (web3) => {
 
     kit.connection.addAccount(privateKey)
 
-    const wrapper = new OffchainDataWrapper(address, kit)
+    const wrapper = new BasicDataWrapper(address, kit)
     wrapper.storageWriter = new MockStorageWriter(localStorageRoot, storageRoot, fetchMock)
 
     return { wrapper, privateKey, publicKey, address, storageRoot, localStorageRoot, kit }
@@ -149,7 +149,7 @@ testWithGanache('Offchain Data', (web3) => {
       404
     )
 
-    const wrapper = new OffchainDataWrapper(signer.address, kit)
+    const wrapper = new BasicDataWrapper(signer.address, kit)
     wrapper.storageWriter = new MockStorageWriter(
       writer.localStorageRoot,
       writer.storageRoot,
@@ -230,7 +230,7 @@ testWithGanache('Offchain Data', (web3) => {
     it('can re-encrypt data to more recipients', async () => {
       const nameAccessor = new PrivateNameAccessor(writer.wrapper)
       await nameAccessor.write(testPayload, [reader.address])
-      await nameAccessor.write(testPayload, [reader2.address])
+      await nameAccessor.allowAccess([reader2.address])
 
       const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
       const receivedName = await readerNameAccessor.readAsResult(writer.address)

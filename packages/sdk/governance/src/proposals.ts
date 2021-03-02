@@ -85,7 +85,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
-    debug(`decoding tx ${tx}`)
+    debug(`decoding tx ${JSON.stringify(tx)}`)
     const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
@@ -211,7 +211,7 @@ export class ProposalBuilder {
         throw new Error(
           `Transaction to unregistered contract ${tx.contract} only supported by address`
         )
-      } else if (tx.function === '' || tx.args !== []) {
+      } else if (tx.function !== '' || tx.args !== []) {
         throw new Error(
           `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
         )
