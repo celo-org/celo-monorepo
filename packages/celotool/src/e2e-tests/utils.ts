@@ -142,12 +142,12 @@ export async function killGeth() {
 
 export async function killInstance(instance: GethInstanceConfig) {
   if (instance.pid) {
-    await shutdownOrKill(instance.pid)
+    await signalProcess(instance.pid, 'KILL')
   }
 }
 
-export async function shutdownOrKill(identifier: string | number) {
-  await signalProcess(identifier, 'INT')
+export async function shutdownOrKill(identifier: string | number, signal: Signal = 'INT') {
+  await signalProcess(identifier, signal)
 
   // Poll for remaining processes for up to ~30s with exponential backoff.
   let processRemaining = true
