@@ -24,4 +24,4 @@ To get started with a Celo blockchain node on GCP, you'll need to navigate to th
 
 The cLabs GCP account is called `celo-testnet`, if you're new to Celo or GCP, ensure that the `Created by` column of the image you're launching matches `celo-testnet`.
 
-Please check the excellent [GCP documentation](https://cloud.google.com/compute/docs/images) on how to launch a compute instance from a public image.
+For more information please check the excellent [GCP documentation](https://cloud.google.com/compute/docs/images) on how to launch a compute instance from a public image.
