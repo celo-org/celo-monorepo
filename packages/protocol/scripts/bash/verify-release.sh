@@ -37,32 +37,9 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the network via the -n flag" && exit 1;
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal via the -p flag" && exit 1;
 
-BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
 git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' >> $LOG_FILE
-echo " - Checkout source code at $BRANCH"
-git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
-rm -rf build/contracts
-# TODO: Move to yarn build:sol after the next contract release.
-echo " - Build contract artifacts ..."
-yarn build >> $LOG_FILE
-rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-mv build/contracts $BUILD_DIR
-cp lib/registry-utils.ts $BUILD_DIR/
 
-echo " - Return to original git ref"
-# Move back to branch from which we started
-git checkout - >> $LOG_FILE
+source scripts/bash/release-lib.sh
+build_tag $BRANCH
 
-cp $BUILD_DIR/registry-utils.ts lib/
-
-# Hack since v1 did not yet expose celoRegistryAddress
-if ! cat lib/registry-utils.ts | grep -q "celoRegistryAddress"; then
-  echo "export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'" >> lib/registry-utils.ts
-fi
-
-echo " - Build verification script ..."
-yarn build >> $LOG_FILE
-echo " - Run verification script ..."
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal $PROPOSAL $FORNO $INITIALIZE_DATA
-
-git checkout lib/registry-utils.ts

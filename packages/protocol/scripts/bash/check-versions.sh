@@ -33,22 +33,10 @@ if [ ! -z "$REPORT" ]; then
   REPORT_FLAG="--output_file "$REPORT
 fi
 
-function build_tag() {
-  BRANCH="$1"
-
-  echo " - Checkout contracts source code at $BRANCH"
-  BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-  git checkout --no-overlay $BRANCH -- contracts 2>>$LOG_FILE >> $LOG_FILE
-
-  echo " - Build contract artifacts at $BUILD_DIR"
-  rm -rf build/contracts
-  yarn build:sol >> $LOG_FILE
-  rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-  mv build/contracts $BUILD_DIR
-}
-
 # fetch tags
 git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' >> $LOG_FILE
+
+source scripts/bash/release-lib.sh
 
 build_tag $OLD_BRANCH
 BUILD_DIR_1=$BUILD_DIR
