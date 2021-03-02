@@ -38,9 +38,9 @@ git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*
 
 source scripts/bash/release-lib.sh
 
-build_tag $OLD_BRANCH
+build_tag $OLD_BRANCH $LOG_FILE
 BUILD_DIR_1=$BUILD_DIR
-build_tag $NEW_BRANCH
+build_tag $NEW_BRANCH $LOG_FILE
 BUILD_DIR_2=$BUILD_DIR
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,

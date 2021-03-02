@@ -2,6 +2,7 @@
 
 function build_tag() {
   BRANCH="$1"
+  LOG_FILE="$2"
 
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
@@ -14,5 +15,5 @@ function build_tag() {
   mv build/contracts $BUILD_DIR
   mv build/contracts_tmp build/contracts
 
-  git checkout contracts 2>>$LOG_FILE >> $LOG_FILE
+  git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE
 }

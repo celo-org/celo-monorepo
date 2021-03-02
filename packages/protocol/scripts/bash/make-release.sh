@@ -41,7 +41,7 @@ done
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
 source scripts/bash/release-lib.sh
-build_tag $BRANCH
+build_tag $BRANCH "/dev/null"
 
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \

@@ -28,7 +28,7 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 source scripts/bash/release-lib.sh
-build_tag $BRANCH
+build_tag $BRANCH $LOG_FILE
 
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"

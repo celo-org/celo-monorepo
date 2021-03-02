@@ -30,6 +30,6 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
 source scripts/bash/release-lib.sh
-build_tag $BRANCH
+build_tag $BRANCH $LOG_FILE
 
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $FORNO
