@@ -206,7 +206,10 @@ export class ProposalBuilder {
 
   fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     // handle sending value to unregistered contracts
-    if (!RegisteredContracts.includes(tx.contract)) {
+    if (
+      !RegisteredContracts.includes(tx.contract.toString().replace('Proxy', '') as CeloContract) &&
+      !this.registryAdditions[tx.contract]
+    ) {
       if (!isValidAddress(tx.contract)) {
         throw new Error(
           `Transaction to unregistered contract ${tx.contract} only supported by address`
