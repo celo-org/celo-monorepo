@@ -312,6 +312,8 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const before = async () => {
     await initialize()
 
+    await killGeth()
+
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.
     for (const instance of gethConfig.instances) {
