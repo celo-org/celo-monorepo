@@ -67,9 +67,10 @@ export class CeloTokens {
   /**
    * Gets an address's balance for each celo token.
    * @param address the address to look up the balances for
-   * @return an object containing the address's balance for each celo token
+   * @return a promise resolving to an object containing the address's balance
+   *  for each celo token
    */
-  async balancesOf(address: string): Promise<EachCeloToken<BigNumber>> {
+  balancesOf(address: string): Promise<EachCeloToken<BigNumber>> {
     return this.forEachCeloToken(async (info: CeloTokenInfo) => {
       const wrapper = await this.kit.contracts.getContract(info.contract)
       return wrapper.balanceOf(address)
@@ -78,11 +79,21 @@ export class CeloTokens {
 
   /**
    * Gets the wrapper for each celo token.
-   * @return an object containing the wrapper for each celo token.
+   * @return an promise resolving to an object containing the wrapper for each celo token.
    */
-  async getCeloTokens(): Promise<EachCeloToken<CeloTokenWrapper>> {
+  getWrappers(): Promise<EachCeloToken<CeloTokenWrapper>> {
     return this.forEachCeloToken((info: CeloTokenInfo) =>
       this.kit.contracts.getContract(info.contract)
+    )
+  }
+
+  /**
+   * Gets the address for each celo token proxy contract.
+   * @return an promise resolving to an object containing the address for each celo token proxy.
+   */
+  getAddresses(): Promise<EachCeloToken<string>> {
+    return this.forEachCeloToken((info: CeloTokenInfo) =>
+      this.kit.registry.addressFor(info.contract)
     )
   }
 
@@ -120,7 +131,6 @@ export class CeloTokens {
    * @return A promise resolving to a StableTokenWrapper for token
    */
   getStableToken(token: StableToken) {
-    // return this.kit.contracts.getContract(stableTokenInfos[token].contract)
     return stableTokenInfos[token].contract
   }
 
@@ -130,7 +140,38 @@ export class CeloTokens {
    * @return A promise resolving to a ExchangeWrapper for token
    */
   getExchange(token: StableToken) {
-    // return this.kit.contracts.getContract(stableTokenInfos[token].exchangeContract)
     return stableTokenInfos[token].exchangeContract
+  }
+
+  /**
+   * Gets the address of the contract for the provided token.
+   * @param token the token to get the (proxy) contract address for
+   * @return A promise resolving to the address of the token's contract
+   */
+  getAddress(token: CeloToken) {
+    return this.kit.registry.addressFor(celoTokenInfos[token].contract)
+  }
+
+  /**
+   * Gets the address to use as the feeCurrency when paying for gas with the
+   *  provided token.
+   * @param token the token to get the feeCurrency address for
+   * @return If not CELO, the address of the token's contract. If CELO, undefined.
+   */
+  getFeeCurrencyAddress(token: CeloToken) {
+    if (token === Token.CELO) {
+      return undefined
+    }
+    return this.getAddress(token)
+  }
+
+  /**
+   * Returns if the provided token is a StableToken
+   * @param token the token
+   * @return if token is a StableToken
+   */
+  isStableToken(token: CeloToken) {
+    // We cast token as StableToken to make typescript happy
+    return Object.values(StableToken).includes(token as StableToken)
   }
 }
