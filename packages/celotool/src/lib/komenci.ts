@@ -8,6 +8,7 @@ import {
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { createKeyVaultIdentityIfNotExists, deleteAzureKeyVaultIdentity } from './azure'
+import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
@@ -120,7 +121,11 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   for (const identity of komenciConfig.identities) {
     // If the identity is using Azure HSM signing, clean it up too
     if (identity.azureHsmIdentity) {
-      await deleteAzureKeyVaultIdentity(context, identity.azureHsmIdentity.identityName, identity.azureHsmIdentity.keyVaultName)
+      await deleteAzureKeyVaultIdentity(
+        context,
+        identity.azureHsmIdentity.identityName,
+        identity.azureHsmIdentity.keyVaultName
+      )
     }
   }
 }
@@ -230,7 +235,14 @@ async function komenciIdentityHelmParameters(context: string, komenciConfig: Kom
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
     if (komenciIdentity.azureHsmIdentity) {
-      const azureIdentity = await createKeyVaultIdentityIfNotExists(context, komenciIdentity.azureHsmIdentity.identityName, komenciIdentity.azureHsmIdentity.keyVaultName, komenciIdentity.azureHsmIdentity.resourceGroup, ['get', 'list', 'sign'], null)
+      const azureIdentity = await createKeyVaultIdentityIfNotExists(
+        context,
+        komenciIdentity.azureHsmIdentity.identityName,
+        komenciIdentity.azureHsmIdentity.keyVaultName,
+        komenciIdentity.azureHsmIdentity.resourceGroup,
+        ['get', 'list', 'sign'],
+        null
+      )
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
