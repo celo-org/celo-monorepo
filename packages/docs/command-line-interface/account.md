@@ -394,7 +394,7 @@ EXAMPLES
 
 _See code: [src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
-## `celocli account:offchain-read ADDRESS`
+## `celocli account:offchain-read`
 
 DEV: Reads the name from offchain storage
 
@@ -402,28 +402,15 @@ DEV: Reads the name from offchain storage
 DEV: Reads the name from offchain storage
 
 USAGE
-  $ celocli account:offchain-read ADDRESS
+  $ celocli account:offchain-read
 
 OPTIONS
-  --bucket=bucket                                    If using a GCP or AWS storage
-                                                     bucket this parameter is required
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --name=name
+  --root=root
 
-  --directory=directory                              [default:
-                                                     /Users/alex/celo/celo-monorepo/pack
-                                                     ages/cli] To which directory data
-                                                     should be written
-
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Account Address
-
-  --privateDEK=privateDEK
-
-  --provider=(git|aws|gcp)                           If the CLI should attempt to push
-                                                     to the cloud
-
-EXAMPLES
-  offchain-read 0x...
-
-  offchain-read 0x... --from 0x... --privateKey 0x...
+EXAMPLE
+  offchain-read --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
 _See code: [src/commands/account/offchain-read.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-read.ts)_
@@ -439,27 +426,21 @@ USAGE
   $ celocli account:offchain-write
 
 OPTIONS
-  --bucket=bucket           If using a GCP or AWS storage bucket this parameter is
-                            required
+  --directory=directory                              (required) To which directory data
+                                                     should be written
 
-  --directory=directory     [default: /Users/alex/celo/celo-monorepo/packages/cli] To
-                            which directory data should be written
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address with which to
+                                                     sign
 
-  --encryptTo=encryptTo
+  --name=name                                        (required)
 
-  --name=name               (required)
-
-  --privateDEK=privateDEK
-
-  --privateKey=privateKey   (required)
-
-  --provider=(git|aws|gcp)  If the CLI should attempt to push to the cloud
+  --uploadWithGit                                    If the CLI should attempt to push
+                                                     changes to the origin via git
 
 EXAMPLES
-  offchain-write --name test-account --privateKey 0x...
+  offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
 
-  offchain-write --name test-account --privateKey 0x...  privateDEK 0x... --encryptTo
-  0x...
+  offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
 _See code: [src/commands/account/offchain-write.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-write.ts)_
