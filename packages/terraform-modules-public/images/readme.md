@@ -1,29 +1,33 @@
-### Celo Packer Images
+# Celo Blockchain Images
 
-Hashicorp Packer is a tool building machine images to ease deployment on various cloud platforms.
+Hashicorp Packer is a tool for building machine images to ease deployment on various cloud platforms.
 
-##### Prerequisites
+As cLabs we provide prebuilt full and lightest Celo blockchain machine images for popular cloud platforms using this Packer script, however anyone is free to use this as inspiration for generating their own.
 
-- Packer ([installing packer](https://learn.hashicorp.com/tutorials/packer/getting-started-install))
-- Cloud provider credentials for the provider you'd like to deploy on
+## Setup
 
-##### Usage
+To generate a machine image for a cloud provider you'll first need to [install Packer](https://learn.hashicorp.com/tutorials/packer/getting-started-install) and configure your credentials as specified.
 
-Running `packer build node.json` is the easiest way to get started. This will build images for Azure, AWS and GCP by default. One handy flag is `-only`, ie. `packer build -only=gcp,aws node.json` will only build images for GCP and AWS.
+## Building Images
 
-Supported variables include:
+A Makefile is provided for easy image generation, running `make alfajores` for example, will generate full and lightest nodes for each major cloud provider (AWS, GCP and Azure).
 
-- `region` (default: "eu-central-1")
-- `celo_image` (default: "us.gcr.io/celo-org/celo-node:mainnet")
-- `network_id` (default: "42220")
-- `sync_mode` (default: "full")
+For more fine grained control you can run Packer manually with `packer build node.json`. One handy flag to note is `-only`, ie. `packer build -only=gcp,aws node.json` will only build images for GCP and AWS.
 
-For example, to build a light node for Alfajores we could do:
+See the Makefile for precise examples of how you can generate machine images and pass through additional variables.
 
-```
-packer build \
-  -var 'celo_image=us.gcr.io/celo-org/celo-node:alfajores' \
-  -var 'network_id=44787' \
-  -var 'sync_mode=light' \
-  node.json
+## Making Images Public
+
+### AWS
+
+Navigate to the your AMIs tab in AWS (under the EC2 screen) and select the image before clicking `Actions` ->`Modify Image Permissions` -> `Public`.
+
+### GCP
+
+Making an image public to the world on GCP requires you to run the following command after you've correctly configured your `gcloud` access.
+
+```bash
+gcloud compute images add-iam-policy-binding <IMAGE_NAME>
+    --member='allAuthenticatedUsers' \
+    --role='roles/compute.imageUser'
 ```
