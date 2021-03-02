@@ -76,7 +76,7 @@ const deployImplementation = async (
   dryRun: boolean,
   from: string
 ) => {
-  const notTest = false
+  const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
@@ -85,7 +85,7 @@ const deployImplementation = async (
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : checkInheritanceDeep('InitializableV2', Contract, artifacts)
-    ? Contract.new(notTest)
+    ? Contract.new(testingDeployment)
     : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(

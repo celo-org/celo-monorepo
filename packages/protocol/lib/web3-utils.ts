@@ -253,12 +253,12 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
 ) {
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
-  const notTest = false
+  const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
     deployer.deploy(ContractProxy)
     if (checkInheritanceDeep('InitializableV2', Contract, artifacts)) {
-      deployer.deploy(Contract, notTest)
+      deployer.deploy(Contract, testingDeployment)
     } else {
       deployer.deploy(Contract)
     }
@@ -410,7 +410,7 @@ export function checkInheritanceDeep(baseContractName: string, derivativeContrac
     const importedContractArtifact = artifacts instanceof BuildArtifacts ? 
       artifacts.getArtifactByName(importedContractName) :
       artifacts.require(importedContractName)
-    imports.push(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))
+    imports.unshift(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))
   }
   return false
 }
