@@ -72,7 +72,7 @@ Decentralized application to help coordinate and improve the impact metric of no
 
 ### Celo Tools
 
-[Celo Tools](https://celotools.com/) is an accessible frontend to the [Celo CLI](../command-line-interface/introduction). Anyone and everyone participating in the Celo network should be able to stake and vote on governance proposals, Celo Tools provides this functionality for those without the know-how to access a command line.
+[Celo Tools](https://celotools.com/) is an accessible frontend to the [Celo CLI](../command-line-interface/introduction.md). Anyone and everyone participating in the Celo network should be able to stake and vote on governance proposals, Celo Tools provides this functionality for those without the know-how to access a command line.
 
 ### Savings Circle
 
