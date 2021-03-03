@@ -1,13 +1,12 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
-import { installGenericHelmChart, removeGenericHelmChart, setHelmArray } from 'src/lib/helm_deploy'
+import { installGenericHelmChart, removeGenericHelmChart, setHelmArray, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-service'
 
 export async function installHelmChart(celoEnv: string) {
-  return installGenericHelmChart(
+  await installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
@@ -20,17 +19,12 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
-
-  const upgradeCmdArgs = `${releaseName(celoEnv)} ${helmChartPath} --namespace ${celoEnv} ${(
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    helmChartPath,
     await helmParameters(celoEnv)
-  ).join(' ')}`
-
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)
-  }
-  await execCmdWithExitOnFailure(`helm upgrade ${upgradeCmdArgs}`)
-  console.info(`Helm release ${releaseName(celoEnv)} upgrade successful`)
+  )
 }
 
 async function helmParameters(celoEnv: string) {

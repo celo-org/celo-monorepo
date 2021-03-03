@@ -12,6 +12,9 @@
     "@celo/utils": "1.0.3-dev",
     "react-native": "^0.63.4"
   },
+  "devDependencies": {
+    "@types/react-native": "0.63.50"
+  },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
