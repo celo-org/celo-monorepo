@@ -111,7 +111,10 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.use_gstorage_data=${fetchEnvOrFallback('USE_GSTORAGE_DATA', 'false')}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
       // Disable by default block age check in fullnode readinessProbe except for production envs
-      `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE, `${isProduction()}`)}`,
+      `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
+        envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
+        `${isProduction()}`
+      )}`,
       ...(await this.additionalHelmParameters()),
       nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '',
     ]
