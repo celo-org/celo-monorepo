@@ -792,7 +792,7 @@ function buildHelmChartDependencies(chartDir: string) {
 async function installHelmDiffPlugin() {
   try {
     await execCmd(`helm diff version`, {}, false)
-  } catch ([error]) {
+  } catch (error) {
     console.info(`Installing helm-diff plugin...`)
     await execCmdWithExitOnFailure(`helm plugin install https://github.com/databus23/helm-diff`)
   }
