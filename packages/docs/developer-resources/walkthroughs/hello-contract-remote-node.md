@@ -197,10 +197,10 @@ In this section, you will deploy a contract using a simple Node.js script to sho
 You need to compile the `HelloWorld.sol` contract using \(if it isn't already\):
 
 ```javascript
-$ truffle compile
+truffle compile
 ```
 
-This command will generate a `HelloWorld.json` file in the `./build/contracts/` directory. `HelloWorld.json` contains a lot of data about the contract, compiler and low level details. Import this file into the deployment script with:
+This command will generate a `HelloWorld.json` file in the `./build/contracts/` directory. `HelloWorld.json` contains a lot of data about the contract, compiler and low level details. Import this file into the deployment script `celo_deploy.js` with:
 
 ```javascript
 const HelloWorld = require('./build/contracts/HelloWorld.json')
