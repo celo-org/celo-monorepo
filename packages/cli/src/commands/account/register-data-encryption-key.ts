@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -37,7 +38,7 @@ export default class RegisterDataEncryptionKey extends BaseCommand {
     const accounts = await this.kit.contracts.getAccounts()
     await displaySendTx(
       'RegisterDataEncryptionKey',
-      accounts.setAccountDataEncryptionKey(publicKey)
+      accounts.setAccountDataEncryptionKey(ensureLeading0x(publicKey))
     )
   }
 }
