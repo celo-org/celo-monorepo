@@ -1,4 +1,10 @@
-import { eqAddress, findAddressIndex, normalizeAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import {
+  eqAddress,
+  findAddressIndex,
+  normalizeAddress,
+  normalizeAddressWith0x,
+  NULL_ADDRESS,
+} from '@celo/base/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/base/lib/async'
 import { zeroRange, zip } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/connect'
@@ -511,7 +517,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const activeVoterVotes: Record<Address, BigNumber> = {}
     const voter = await this.getVoter(address, blockNumber)
     for (const vote of voter.votes) {
-      const group: string = normalizeAddress(vote.group)
+      const group: string = normalizeAddressWith0x(vote.group)
       activeVoterVotes[group] = vote.active
     }
     return concurrentValuesMap(
