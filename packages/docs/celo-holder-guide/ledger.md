@@ -18,22 +18,6 @@ Make sure to securely back up both the PIN and the recovery phrase (also known a
 
 Open the Ledger Live App on your computer and follow the instructions on the screen.
 
-Once in the app, click the settings gear icon (top right).
-
-![](https://storage.googleapis.com/celo-website/docs/ledger-settings.png)
-
-Click on the **Experimental features** menu.
-
-Turn on **Developer mode.**
-
-{% hint style="info" %}
-The Celo Ledger app has been approved by Ledger for inclusion in the developer store, and is undergoing additional review by the Ledger team before it is approved in the public store.
-{% endhint %}
-
-![](https://storage.googleapis.com/celo-website/docs/ledger-settings-dev-mode.png)
-
-Exit the Settings menu by clicking on **Manager** on the left hand side bar.
-
 Search for “Celo” in the app store.
 
 Click **Install** for the Celo app, this will install the Celo App Version 1.0.3 on your device.
@@ -96,7 +80,7 @@ celocli node:synced
 
 The output should display `true`. If it displays `false` you may need to wait a bit and try again.
 
-## Confirm Addresses
+## Confirm Addresses on Celo CLI
 
 The Ledger's current seed phrase determines the device's accounts. In the terminal on your computer, you can view the first account's address with the following command:
 
@@ -123,7 +107,7 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 **Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0'/0/index`, where `index >= 0`.  
 {% endhint %}
 
-## Performing a Test transaction
+## Performing a Test transaction on Celo CLI
 
 Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instructions.
 
@@ -169,3 +153,18 @@ If you have issues connecting to the Ledger, try the following:
 - Ensure that you are running the latest version of the Celo CLI.
 
 There have been reports of a possible [issue](https://github.com/celo-org/celo-ledger-spender-app/issues/13) that appears to affect developer store apps on the Ledger Nano X including the Celo Ledger App. This is believed to be fixed in version 1.0.3. In earlier versions, a user clicking through the `Pending Ledger review` notice too rapidly can cause the device to freeze. If this occurs, wait until the device's battery is depleted, then charge and power up again. Then use Ledger Live Manager to update the installed version of the Celo Ledger App.
+
+## Using Your Ledger with Celo Wallet app
+
+An alternative to using `celocli` is [celowallet.app](https://celowallet.app) which supports Ledger and provides a simple interface for transacting with Celo accounts.
+
+1. Load the [wallet app](https://celowallet.app) in a modern browser, Chrome is recommended.
+2. Click on `Use Existing Account` option.
+3. Click on the Ledger icon.
+4. Connect your Ledger Nano to your computer.
+5. Unlock your Ledger Nano with your PIN.
+6. Go to the Celo app on your Ledger Nano and open it.
+7. On `celowallet.app` website, click on `Import Account`. Make sure you are using the right Address Index. Index 0 means the first address on the list.
+8. There will be a popup in the web browser to approve the Ledger device, click on Nano in the popup and click `Connect`.
+9. Verify on your Ledger Nano that this is the address you want to use, then click the right button on the Ledger until you see `Approve` then click both buttons to approve.
+10. You are now using celowallet.app with your Ledger

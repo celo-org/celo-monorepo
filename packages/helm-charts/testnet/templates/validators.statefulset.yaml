@@ -31,7 +31,7 @@ spec:
           storage: {{ .Values.geth.diskSizeGB }}Gi
   podManagementPolicy: Parallel
   updateStrategy:
-    type: RollingUpdate
+{{ toYaml .Values.updateStrategy.validators | indent 4 }}
   replicas: {{ .Values.geth.validators }}
   serviceName: validators
   selector:
