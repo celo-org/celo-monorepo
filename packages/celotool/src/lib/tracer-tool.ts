@@ -1,5 +1,9 @@
 import { getEnodesAddresses } from 'src/lib/geth'
-import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { envVar, fetchEnv } from './env-utils'
 
 const chartDir = '../helm-charts/tracer-tool/'
@@ -9,11 +13,21 @@ function releaseName(celoEnv: string) {
 }
 
 export async function installHelmChart(celoEnv: string) {
-  await installGenericHelmChart(celoEnv, releaseName(celoEnv), chartDir, await helmParameters(celoEnv))
+  await installGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    chartDir,
+    await helmParameters(celoEnv)
+  )
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  await upgradeGenericHelmChart(celoEnv, releaseName(celoEnv), chartDir, await helmParameters(celoEnv))
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    chartDir,
+    await helmParameters(celoEnv)
+  )
 }
 
 export async function removeHelmRelease(celoEnv: string) {

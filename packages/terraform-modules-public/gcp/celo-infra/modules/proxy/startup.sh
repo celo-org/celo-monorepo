@@ -1,40 +1,15 @@
 #!/bin/bash
 
+
 # ---- Configure logrotate ----
 echo "Configuring logrotate" | logger
 cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/syslog
-{
-        rotate 3
-        daily
-        missingok
-        notifempty
-        delaycompress
-        compress
-        postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
-                kill -HUP `pidof rsyslogd`
-        endscript
-}
-
 /var/log/mail.info
 /var/log/mail.warn
 /var/log/mail.err
 /var/log/mail.log
 /var/log/daemon.log
-{
-        rotate 3
-        daily
-        missingok
-        notifempty
-        delaycompress
-        compress
-        postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
-                kill -HUP `pidof rsyslogd`
-        endscript
-}
-
 /var/log/kern.log
 /var/log/auth.log
 /var/log/user.log
@@ -44,14 +19,14 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/messages
 {
         rotate 3
-        weekly
+        daily
         missingok
         notifempty
-        compress
         delaycompress
+        compress
         sharedscripts
         postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null   # does not work on debian10
                 kill -HUP `pidof rsyslogd`
         endscript
 }
@@ -65,23 +40,12 @@ cat <<'EOF' > /etc/rsyslog.conf
 # For more information install rsyslog-doc and see
 # /usr/share/doc/rsyslog-doc/html/configuration/index.html
 
-
 #################
 #### MODULES ####
 #################
 
 module(load="imuxsock") # provides support for local system logging
 module(load="imklog")   # provides kernel logging support
-#module(load="immark")  # provides --MARK-- message capability
-
-# provides UDP syslog reception
-#module(load="imudp")
-#input(type="imudp" port="514")
-
-# provides TCP syslog reception
-#module(load="imtcp")
-#input(type="imtcp" port="514")
-
 
 ###########################
 #### GLOBAL DIRECTIVES ####
@@ -122,20 +86,8 @@ $IncludeConfig /etc/rsyslog.d/*.conf
 #
 auth,authpriv.*                 /var/log/auth.log
 *.*;auth,authpriv.none          -/var/log/syslog
-#cron.*                         /var/log/cron.log
-#daemon.*                        -/var/log/daemon.log
 kern.*                          -/var/log/kern.log
-lpr.*                           -/var/log/lpr.log
-mail.*                          -/var/log/mail.log
-user.*                          -/var/log/user.log
 
-#
-# Logging for the mail system.  Split it up so that
-# it is easy to write scripts to parse these files.
-#
-mail.info                       -/var/log/mail.info
-mail.warn                       -/var/log/mail.warn
-mail.err                        /var/log/mail.err
 
 #
 # Some "catch-all" log files.
@@ -153,48 +105,38 @@ mail.err                        /var/log/mail.err
 #
 *.emerg                         :omusrmsg:*
 EOF
+
 # ---- Restart rsyslogd
 echo "Restarting rsyslogd"
 systemctl restart rsyslog
-
-# ---- Create backup script
-echo "Creating chaindata backup script" | logger
-cat <<'EOF' > /root/backup.sh
-#!/bin/bash
-set -x
-systemctl stop geth.service
-sleep 5
-#note this will likely need to be upgraded to rsync, as the tar operation is slow on the persistent disk storage
-tar -C /root/.celo/celo -zcvf /root/chaindata.tgz chaindata
-gsutil cp /root/chaindata.tgz gs://${gcloud_project}-chaindata
-rm -f /root/chaindata.tgz
-sleep 3
-systemctl start geth.service
-EOF
-chmod u+x /root/backup.sh
 
 # ---- Create restore script
 echo "Creating chaindata restore script" | logger
 cat <<'EOF' > /root/restore.sh
 #!/bin/bash
 set -x
+
+# test to see if chaindata exists in bucket
 gsutil -q stat gs://${gcloud_project}-chaindata/chaindata.tgz
 if [ $? -eq 0 ]
 then
   #chaindata exists in bucket
-  echo "downloading chaindata from gs://${gcloud_project}-chaindata/chaindata.tgz"
-  gsutil cp gs://${gcloud_project}-chaindata/chaindata.tgz /root/chaindata.tgz
   mkdir -p /root/.celo/celo
+  mkdir -p /root/.celo/celo/restore
+  echo "downloading chaindata from gs://${gcloud_project}-chaindata/chaindata.tgz" | logger
+  gsutil cp gs://${gcloud_project}-chaindata/chaindata.tgz /root/.celo/celo/restore/chaindata.tgz
+  echo "stopping geth to untar chaindata" | logger
   systemctl stop geth.service
   sleep 3
-  tar zxvf /root/chaindata.tgz --directory /root/.celo/celo/
-  rm -rf /root/chaindata.tgz
+  echo "untarring chaindata" | logger
+  tar zxvf /root/.celo/celo/restore/chaindata.tgz --directory /root/.celo/celo
+  echo "removing chaindata tarball" | logger
+  rm -rf /root/.celo/celo/restore/chaindata.tgz
   sleep 3
+  echo "starting geth" | logger
   systemctl start geth.service
   else
-    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting warp restore"
-    echo "Starting geth"
-    systemctl start geth.service
+    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting warp restore" | logger
   fi
 EOF
 chmod u+x /root/restore.sh
@@ -204,22 +146,22 @@ echo "Creating rsync chaindata restore script" | logger
 cat <<'EOF' > /root/restore_rsync.sh
 #!/bin/bash
 set -x
-gsutil -q stat gs://${gcloud_project}-chaindata-rsync/chaindata/CURRENT
+
+# test to see if chaindata exists in the rsync chaindata bucket
+gsutil -q stat gs://${gcloud_project}-chaindata-rsync/CURRENT
 if [ $? -eq 0 ]
 then
   #chaindata exists in bucket
-  echo "stopping geth"
+  echo "stopping geth" | logger
   systemctl stop geth.service
-  echo "downloading chaindata via rsync from gs://${gcloud_project}-chaindata-rsync"
-  mkdir -p /root/.celo/celo
-  gsutil -m rsync -d -r gs://${gcloud_project}-chaindata-rsync /root/.celo/celo
-  echo "restart geth"
+  echo "downloading chaindata via rsync from gs://${gcloud_project}-chaindata-rsync" | logger
+  mkdir -p /root/.celo/celo/chaindata
+  gsutil -m rsync -d -r gs://${gcloud_project}-chaindata-rsync /root/.celo/celo/chaindata
+  echo "restarting geth" | logger
   sleep 3
   systemctl start geth.service
   else
-    echo "No chaindata found in bucket gs://${gcloud_project}-chaindata-rsync, aborting warp restore"
-    echo "Starting geth"
-    systemctl start geth.service
+    echo "No chaindata found in bucket gs://${gcloud_project}-chaindata-rsync, aborting warp restore" | logger
   fi
 EOF
 chmod u+x /root/restore_rsync.sh
@@ -227,7 +169,7 @@ chmod u+x /root/restore_rsync.sh
 # ---- Useful aliases ----
 echo "Configuring aliases" | logger
 echo "alias ll='ls -laF'" >> /etc/skel/.bashrc
-echo "alias ll='ls -laF'" >> /root/.profile
+echo "alias ll='ls -laF'" >> /root/.bashrc
 echo "alias gattach='docker exec -it geth geth attach'" >> /etc/skel/.bashrc
 
 # ---- Install Stackdriver Agent
@@ -323,7 +265,7 @@ cat <<'EOF' > '/etc/docker/daemon.json'
   "log-opts": {
     "max-size": "10m",
     "max-file": "3",
-    "mode": "non-blocking"  
+    "mode": "non-blocking" 
   }
 }
 EOF
@@ -335,19 +277,9 @@ systemctl restart docker
 
 echo "Configuring Geth" | logger
 
+DATA_DIR=/root/.celo
+
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
-
-ACCOUNT_ADDRESS=${validator_account_address}
-echo "Address: $ACCOUNT_ADDRESS"
-
-echo "Proxy enode address: ${proxy_enode}"
-echo "Proxy internal ip address: ${proxy_internal_ip}"
-echo "Proxy external ip address: ${proxy_external_ip}"
-PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30503"
-PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30303"
-
-PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
-echo "Proxy URL: $PROXY_URL"
 
 echo "Pulling geth..." | logger
 docker pull $GETH_NODE_DOCKER_IMAGE
@@ -356,16 +288,12 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
 # Load configuration to files
-#echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
+mkdir -p $DATA_DIR/account
+
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
-echo -n '${validator_private_key}' > $DATA_DIR/pkey
-echo -n '${validator_account_address}' > $DATA_DIR/address
-echo -n '${proxy_enode}' > $DATA_DIR/proxyEnodeAddress
-echo -n '$PROXY_URL' > $DATA_DIR/proxyURL
-echo -n '${validator_geth_account_secret}' > $DATA_DIR/account/accountSecret
-echo -n $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode
-echo -n $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode
+echo -n '${proxy_private_key}' > $DATA_DIR/pkey
+echo -h '${proxy_geth_account_secret}' > $DATA_DIR/account/accountSecret
 
 echo "Starting geth..." | logger
 # We need to override the entrypoint in the geth image (which is originally `geth`).
@@ -396,12 +324,11 @@ ExecStart=/usr/bin/docker run \\
   --entrypoint /bin/sh \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
-      --etherbase=$ACCOUNT_ADDRESS \\
-      --password=$DATA_DIR/account/accountSecret \\
-      --unlock=$ACCOUNT_ADDRESS \\
+      --etherbase ${proxy_address} \\
+      --unlock ${proxy_address} \\
+      --password $DATA_DIR/account/accountSecret \\
       --allow-insecure-unlock \\
       --nousb \\
-      --mine \\
       --rpc \\
       --rpcaddr 0.0.0.0 \\
       --rpcapi=eth,net,web3 \\
@@ -411,23 +338,26 @@ ExecStart=/usr/bin/docker run \\
       --wsaddr 0.0.0.0 \\
       --wsorigins=* \\
       --wsapi=eth,net,web3 \\
+      --nodekey=$DATA_DIR/pkey \\
       --networkid=${network_id} \\
       --syncmode=full \\
       --consoleformat=json \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\
-      --ethstats=${validator_name}@${ethstats_host} \\
+      --celostats=${proxy_name}@${ethstats_host} \\
+      --istanbul.blockperiod=${block_time} \\
+      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \\
       --maxpeers=${max_peers} \\
       --nat=extip:${ip_address} \\
       --metrics \\
       --pprof \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
-      --nodiscover \\
-      --proxy.proxied \\
-      --proxy.proxyenodeurlpair=\\"$PROXY_URL\\" \\
+      --proxy.proxy \\
+      --proxy.proxiedvalidatoraddress ${validator_account_address} \\
+      --proxy.internalendpoint :30503 \\
+      --light.serve 0 \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
-ExecStopPost=/usr/bin/docker rm -f %N
 
 [Install]
 WantedBy=default.target
