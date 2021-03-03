@@ -2,6 +2,7 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./CalledByVm.sol";
 import "./Freezable.sol";
@@ -12,7 +13,7 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 contract GoldToken is
   Initializable,
   CalledByVm,
-  Freezable,
+  Ownable,
   IERC20,
   ICeloToken,
   ICeloVersionedContract
