@@ -24,11 +24,6 @@ variable ethstats_host {
   description = "Ethstats url or IP address"
 }
 
-variable genesis_content_base64 {
-  type        = string
-  description = "Content of the genesis file encoded in base64"
-}
-
 variable geth_exporter_docker_image_repository {
   type        = string
   description = "Repository of the geth exporter docker image"
@@ -51,7 +46,7 @@ variable geth_node_docker_image_tag {
 
 variable geth_verbosity {
   type        = number
-  description = "Verbosity of the validator nodes"
+  description = "Verbosity of the proxy nodes"
 }
 
 variable in_memory_discovery_table {
@@ -71,7 +66,7 @@ variable network_id {
 
 variable network_name {
   type        = string
-  description = "Name of the GCP network the validator VM is in"
+  description = "Name of the GCP network the proxy VM is in"
 }
 
 variable tx_node_count {
@@ -81,37 +76,17 @@ variable tx_node_count {
 
 variable validator_count {
   type        = number
-  description = "Number of validators to create"
+  description = "Number of proxys to create"
+}
+
+variable proxy_private_keys {
+  type        = list(string)
+  description = "Array with the Proxy private keys"
 }
 
 variable validator_signer_account_addresses {
   type        = list(string)
-  description = "Array with the Validator account addresses"
-}
-
-variable validator_signer_private_keys {
-  type        = list(string)
-  description = "Array with the Validator account private keys"
-}
-
-variable validator_signer_account_passwords {
-  type        = list(string)
-  description = "Array with the Validator account passwords"
-}
-
-variable proxy_enodes {
-  type        = list(string)
-  description = "Array list with the proxy enode address (without enode://)"
-}
-
-variable proxy_internal_ips {
-  type        = list(string)
-  description = "Array list with the proxy internal addresses"
-}
-
-variable proxy_external_ips {
-  type        = list(string)
-  description = "Array list with the proxy external addresses"
+  description = "Array with the Validator etherbase account addresses"
 }
 
 variable reset_geth_data {
@@ -120,15 +95,26 @@ variable reset_geth_data {
   default     = true
 }
 
-variable validator_name {
+variable proxy_name {
   type        = string
-  description = "The validator Name for ethstats"
+  description = "The proxy Name for celostats"
 }
 
-variable validator_max_peers {
+variable proxy_addresses {
+  type        = list(string)
+  description = "The proxy address for celostats"
+}
+
+variable proxy_max_peers {
   type        = number
   description = "Max number of peers to connect with"
-  default     = 120
+  default     = 250
+  #note this does not behave as expected.  120 means we get 20 (unelected).
+}
+
+variable proxy_account_passwords {
+  type        = list(string)
+  description = "Array with the proxy account passwords"
 }
 
 variable "service_account_scopes" {

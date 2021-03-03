@@ -55,6 +55,8 @@
     source gcloud.env
     ```
 
+    ** If storing terraform (tfstate) on GCS, now is a good time to browse to that bucket and remove permissions to the tfstate bucket for 'viewers' and 'editors' of the proejct.  This will prevent an attacker who gets code execution on the proxy or validator or txnode or attestation service node from pulling the tfstate from gcs, which is important because the tfstate contains sensitive data such as signing keys ** 
+
 
 6. Update terraform.tfvars with the following critical and environment sensitive values:
 
@@ -381,6 +383,7 @@
       * POST /test_attestations
       * GET /get_attestations
       * POST /delivery_status_twilio
+      * GET /delivery_status_nexmo
       * GET /status
       * GET /healthz
       * GET /metrics
@@ -466,6 +469,13 @@
     celocli account:get-metadata $CELO_VALIDATOR_GROUP_RG_ADDRESS
     celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
     ```
+
+22. Verify validator and attestation performance
+    You can see how well your validator group is performing visually by looking at the [Mainnet Block Map](https://cauldron.pretoriaresearchlab.io/block-map) from [Pretoria Research Lab](https://cauldron.pretoriaresearchlab.io/).
+
+    Pretoria has also created an [Attestation Map](https://cauldron.pretoriaresearchlab.io/attestations).
+
+    The cLabs team also has a [firebase dashboard](https://metabase.celo-networks-dev.org/public/dashboard/b0a27650-1d62-4645-81d7-26ff7546ff0d?date_filter=past2weeks~&validator_address=0x474df04481f778b46Fc71204C72B6A8BE396F0FF) that allows you to visualize attestation performance, and also seeks to identify situations in which an attestation failed due to operator (rather than user) error.
 
 # Areas for improvement
 * move sshd to non standard port to reduce brute force noise
