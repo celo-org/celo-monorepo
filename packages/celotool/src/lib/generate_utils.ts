@@ -96,6 +96,8 @@ export const generateOraclePrivateKey = (
     // the derivation path for CELOUSD
     path = [AccountType.PRICE_ORACLE, index]
   } else {
+    // Deterministically convert the currency pair string to a path segment
+    // keccak(currencyPair) modulo 2^31
     const currencyDerivation = new BigNumber(Web3.utils.keccak256(currencyPair), 16).mod(2 ** 31).toNumber()
     path = [AccountType.PRICE_ORACLE, currencyDerivation, index]
   }
