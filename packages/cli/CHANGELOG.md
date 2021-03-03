@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.2--dev]**
+### **[1.1.1--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -15,6 +15,30 @@ Bug Fixes
 Other Changes
 - [one-line summary] - [link PR]
 ## Published
+
+### **[1.1.0]** -- 2021-02-16
+Features
+- Add plugins to CLI - [#5973](https://github.com/celo-org/celo-monorepo/pull/5973)
+- New CLI command `identity:get-attestations` to query attestations - [#5974](https://github.com/celo-org/celo-monorepo/pull/5974)
+
+Bug Fixes
+- `releasegold:show` should succeed w/o account registration - [#7092](https://github.com/celo-org/celo-monorepo/pull/7092)
+- Add check for signer or registered account in `releasegold:show` - [#7098](https://github.com/celo-org/celo-monorepo/pull/7098)
+
+Other Changes
+- Clarify Docs for `multisig:transfer` - [#6982](https://github.com/celo-org/celo-monorepo/pull/6982)
+
+### **[1.0.3]** -- 2021-01-25
+Bug Fixes
+- Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [#6671](https://github.com/celo-org/celo-monorepo/pull/6671)
+
+### **[1.0.2]** -- 2021-01-22
+Bug Fixes
+- Fixed Global Flag Parsing in CLI - [#6619](https://github.com/celo-org/celo-monorepo/pull/6619)
+
+Other Changes
+- Fix libraries versions (`shrinkwrap`) to avoid supply chain attacks - [#6575](https://github.com/celo-org/celo-monorepo/pull/6575)
+
 ### **[1.0.1]** -- 2021-01-20
 Features
 - Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)

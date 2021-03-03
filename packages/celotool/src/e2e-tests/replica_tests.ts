@@ -132,7 +132,7 @@ describe('replica swap tests', () => {
 
       await restart()
 
-      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].privateKey || '')
+      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].nodekey!)
       const replica: GethInstanceConfig = {
         name: 'validator0-replica0',
         replica: true,

@@ -28,6 +28,7 @@
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
+- [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
 
 ## Validator Guide
 
@@ -38,7 +39,9 @@
   - [Validator Signer Key Rotation](validator-guide/key-management/key-rotation.md)
 - [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
 - [Monitoring](validator-guide/monitoring.md)
+- [Devops Best Practices](validator-guide/devops-best-practices.md)
 - [Upgrading a Node](validator-guide/node-upgrades.md)
+- [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
 
