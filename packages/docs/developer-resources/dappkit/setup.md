@@ -36,6 +36,8 @@ npm install @celo/dappkit@0.0.9
 yarn add @celo/dappkit@0.0.9
 ```
 
+You will need node version `8.13.0` or higher.
+
 DAppKit's dependencies require a bit of adjustment to a vanilla Expo. The first are a lot of the Node.js modules that are expected. You can get those mostly by using the following modules
 
 ```bash
