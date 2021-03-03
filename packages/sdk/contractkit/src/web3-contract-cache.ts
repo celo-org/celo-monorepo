@@ -102,7 +102,7 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Escrow)
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getExchange(stableToken))
+    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
@@ -144,7 +144,7 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getStableToken(stableToken))
+    return this.getContract(this.kit.celoTokens.getStableTokenContract(stableToken))
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)

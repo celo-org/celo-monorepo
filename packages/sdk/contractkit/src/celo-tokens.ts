@@ -126,11 +126,21 @@ export class CeloTokens {
   }
 
   /**
+   * Gets the wrapper for a given celo token.
+   * @param token the token to get the appropriate wrapper for
+   * @return an promise resolving to the wrapper for the token
+   */
+  getWrapper(token: StableToken): Promise<StableTokenWrapper>
+  getWrapper(token: CeloToken): Promise<CeloTokenWrapper> {
+    return this.kit.contracts.getContract(celoTokenInfos[token].contract)
+  }
+
+  /**
    * Gets a StableTokenWrapper for the provided stable token
    * @param token the stable token to get StableTokenWrapper for
    * @return A promise resolving to a StableTokenWrapper for token
    */
-  getStableToken(token: StableToken) {
+  getStableTokenContract(token: StableToken) {
     return stableTokenInfos[token].contract
   }
 
@@ -139,7 +149,7 @@ export class CeloTokens {
    * @param token the stable token to get ExchangeWrapper for
    * @return A promise resolving to a ExchangeWrapper for token
    */
-  getExchange(token: StableToken) {
+  getExchangeContract(token: StableToken) {
     return stableTokenInfos[token].exchangeContract
   }
 

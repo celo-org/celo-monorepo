@@ -119,7 +119,7 @@ export class WrapperCache {
     return this.getContract(CeloContract.Escrow)
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getExchange(stableToken))
+    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
   }
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
@@ -158,7 +158,7 @@ export class WrapperCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getStableToken(stableToken))
+    return this.getContract(this.kit.celoTokens.getStableTokenContract(stableToken))
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
