@@ -22,7 +22,7 @@ export abstract class OffchainDataCommand extends BaseCommand {
     ...BaseCommand.flags,
     directory: flags.string({
       parse: parsePath,
-      default: process.cwd(),
+      default: '.',
       description: 'To which directory data should be written',
     }),
     provider: flags.enum({
