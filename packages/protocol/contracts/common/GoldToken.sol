@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./CalledByVm.sol";
+import "./Freezable.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
