@@ -1,6 +1,4 @@
-import {
-  AttestationsWrapper
-} from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
 import { PhoneNumberUtils } from '@celo/utils'
 import { sample } from 'lodash'
@@ -78,7 +76,6 @@ export async function createPhoneNumber(
     return usableNumber
   }
 }
-
 
 export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationError[]) {
   for (const possibleError of possibleErrors) {

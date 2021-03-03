@@ -112,6 +112,8 @@ export enum envVar {
   PRIVATE_TX_NODES = 'PRIVATE_TX_NODES',
   PROMETHEUS_GCE_SCRAPE_REGIONS = 'PROMETHEUS_GCE_SCRAPE_REGIONS',
   PROXIED_VALIDATORS = 'PROXIED_VALIDATORS',
+  SMS_PROVIDERS = 'SMS_PROVIDERS',
+  SMS_PROVIDERS_RANDOMIZED = 'SMS_PROVIDERS_RANDOMIZED',
   PROXY_ROLLING_UPDATE_PARTITION = 'PROXY_ROLLING_UPDATE_PARTITION',
   SECONDARIES_ROLLING_UPDATE_PARTITION = 'SECONDARIES_ROLLING_UPDATE_PARTITION',
   STACKDRIVER_MONITORING_DASHBOARD = 'STACKDRIVER_MONITORING_DASHBOARD',
@@ -119,6 +121,8 @@ export enum envVar {
   STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS = 'STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS',
   STACKDRIVER_NOTIFICATION_CHANNEL_PROTOCOL = 'STACKDRIVER_NOTIFICATION_CHANNEL_PROTOCOL',
   STATIC_IPS_FOR_GETH_NODES = 'STATIC_IPS_FOR_GETH_NODES',
+  TELEKOM_FROM = 'TELEKOM_FROM',
+  TELEKOM_API_KEY = 'TELEKOM_API_KEY',
   TESTNET_PROJECT_NAME = 'TESTNET_PROJECT_NAME',
   TIMESTAMP = 'TIMESTAMP',
   TRANSACTION_METRICS_EXPORTER_BLOCK_INTERVAL = 'TRANSACTION_METRICS_EXPORTER_BLOCK_INTERVAL',
@@ -254,9 +258,15 @@ export function isValidCeloEnv(celoEnv: string) {
   return new RegExp('^[a-z][a-z0-9]*$').test(celoEnv)
 }
 
-export function getDynamicEnvVarValue(dynamicEnvVar: DynamicEnvVar, templateValues: any, defaultValue?: string) {
+export function getDynamicEnvVarValue(
+  dynamicEnvVar: DynamicEnvVar,
+  templateValues: any,
+  defaultValue?: string
+) {
   const envVarName = getDynamicEnvVarName(dynamicEnvVar, templateValues)
-  return defaultValue !== undefined ? fetchEnvOrFallback(envVarName, defaultValue) : fetchEnv(envVarName)
+  return defaultValue !== undefined
+    ? fetchEnvOrFallback(envVarName, defaultValue)
+    : fetchEnv(envVarName)
 }
 
 /**
@@ -284,9 +294,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }

@@ -175,4 +175,9 @@ export class WrapperCache {
     }
     return this.wrapperCache[contract]!
   }
+
+  public invalidateContract<C extends ValidWrappers>(contract: C) {
+    this.kit._web3Contracts.invalidateContract(contract)
+    ;(this.wrapperCache[contract] as any) = null
+  }
 }
