@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import { CeloContract } from './base'
-import { CeloTokens, CeloTokenInfo, StableToken, Token } from './celo-tokens'
+import { CeloTokenInfo, CeloTokens, StableToken, Token } from './celo-tokens'
 import { ContractKit, newKitFromWeb3 } from './kit'
 
 describe('CeloTokens', () => {
