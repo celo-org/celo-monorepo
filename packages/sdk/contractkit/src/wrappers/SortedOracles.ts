@@ -4,6 +4,7 @@ import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { CeloContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
@@ -180,23 +181,15 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Updates an oracle value and the median.
    * @param value The amount of US Dollars equal to one CELO.
+   * @param oracleAddress The address to report as
+   * @param token The token to report for
    */
   async reportStableToken(
     value: BigNumber.Value,
-    oracleAddress: Address
+    oracleAddress: Address,
+    token: StableToken = StableToken.cUSD
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableToken, value, oracleAddress)
-  }
-
-  /**
-   * Updates an oracle value and the median.
-   * @param value The amount of Euros equal to one CELO.
-   */
-  async reportStableTokenEUR(
-    value: BigNumber.Value,
-    oracleAddress: Address
-  ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableTokenEUR, value, oracleAddress)
+    return this.report(this.kit.celoTokens.getContract(token), value, oracleAddress)
   }
 
   /**

@@ -144,7 +144,7 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getStableTokenContract(stableToken))
+    return this.getContract(this.kit.celoTokens.getContract(stableToken))
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)

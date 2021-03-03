@@ -136,18 +136,19 @@ export class CeloTokens {
   }
 
   /**
-   * Gets a StableTokenWrapper for the provided stable token
-   * @param token the stable token to get StableTokenWrapper for
-   * @return A promise resolving to a StableTokenWrapper for token
+   * Gets the contract for the provided token
+   * @param token the token to get the contract of
+   * @return The contract for the token
    */
-  getStableTokenContract(token: StableToken) {
-    return stableTokenInfos[token].contract
+  getContract(token: StableToken): StableTokenContract
+  getContract(token: CeloToken): CeloTokenContract {
+    return celoTokenInfos[token].contract
   }
 
   /**
-   * Gets an ExchangeWrapper for the provided stable token
-   * @param token the stable token to get ExchangeWrapper for
-   * @return A promise resolving to a ExchangeWrapper for token
+   * Gets the exchange contract for the provided stable token
+   * @param token the stable token to get exchange contract of
+   * @return The exchange contract for the token
    */
   getExchangeContract(token: StableToken) {
     return stableTokenInfos[token].exchangeContract

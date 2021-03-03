@@ -158,7 +158,7 @@ export class WrapperCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getStableTokenContract(stableToken))
+    return this.getContract(this.kit.celoTokens.getContract(stableToken))
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
