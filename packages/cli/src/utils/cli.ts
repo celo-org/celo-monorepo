@@ -20,24 +20,29 @@ export async function displaySendTx<A>(
   displayEventName?: string
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
-  const txResult = await txObj.send(tx)
+  try {
+    const txResult = await txObj.send(tx)
 
-  const txHash = await txResult.getHash()
+    const txHash = await txResult.getHash()
 
-  console.log(chalk`SendTransaction: {red.bold ${name}}`)
-  printValueMap({ txHash })
+    console.log(chalk`SendTransaction: {red.bold ${name}}`)
+    printValueMap({ txHash })
 
-  const txReceipt = await txResult.waitReceipt()
-  cli.action.stop()
+    const txReceipt = await txResult.waitReceipt()
+    cli.action.stop()
 
-  if (displayEventName && txReceipt.events) {
-    Object.entries(txReceipt.events)
-      .filter(([eventName]) => eventName === displayEventName)
-      .forEach(([eventName, log]) => {
-        const { params } = parseDecodedParams((log as EventLog).returnValues)
-        console.log(chalk.magenta.bold(`${eventName}:`))
-        printValueMap(params, chalk.magenta)
-      })
+    if (displayEventName && txReceipt.events) {
+      Object.entries(txReceipt.events)
+        .filter(([eventName]) => eventName === displayEventName)
+        .forEach(([eventName, log]) => {
+          const { params } = parseDecodedParams((log as EventLog).returnValues)
+          console.log(chalk.magenta.bold(`${eventName}:`))
+          printValueMap(params, chalk.magenta)
+        })
+    }
+  } catch (e) {
+    cli.action.stop(`failed: ${e.message}`)
+    throw e
   }
 }
 

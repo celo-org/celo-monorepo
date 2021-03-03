@@ -117,12 +117,11 @@ spec:
               fieldPath: metadata.name
 {{ include "common.env-var" (dict "name" "AGGREGATION_PERIOD" "dict" .Values.oracle.aggregation.trades "value_name" "periodMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "AGGREGATION_SCALING_RATE" "dict" .Values.oracle.aggregation.trades "value_name" "scalingRate" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "ALLOW_NOT_CGLD" "dict" .Values.oracle "value_name" "allowNotCGLD") | indent 8 }}
 {{ include "common.env-var" (dict "name" "API_REQUEST_TIMEOUT" "dict" .Values.oracle "value_name" "apiRequestTimeoutMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.oracle.azureHsm "value_name" "initTryCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
-{{ include "common.env-var" (dict "name" "BASE_CURRENCY" "dict" .Values.oracle "value_name" "baseCurrency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
+{{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
 {{ include "common.env-var" (dict "name" "DATA_FETCH_FREQUENCY" "dict" .Values.oracle.aggregation.trades "value_name" "dataFetchFrequency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
 {{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
@@ -138,14 +137,13 @@ spec:
 {{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.oracle "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.oracle "value_name" "privateKeyPath" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.oracle.metrics "value_name" "prometheusPort") | indent 8 }}
-{{ include "common.env-var" (dict "name" "QUOTE_CURRENCY" "dict" .Values.oracle "value_name" "quoteCurrency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_FREQUENCY" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredFrequencyMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredOffsetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_FREQUENCY_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeFrequencyOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "reportOffsetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_STRATEGY" "dict" .Values.oracle "value_name" "reportStrategy") | indent 8 }}
+{{ include "common.env-var" (dict "name" "REPORT_TARGET_OVERRIDE" "dict" .Values.oracle "value_name" "reportTargetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "TARGET_MAX_HEARTBEAT_PERIOD_MS" "dict" .Values.oracle.reporter.blockBased "value_name" "targetMaxHeartbeatPeriodMs" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "TOKEN" "dict" .Values.oracle "value_name" "token" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "UNUSED_ORACLE_ADDRESSES" "dict" .Values.oracle "value_name" "unusedOracleAddresses") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.oracle "value_name" "walletType") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WS_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "ws") | indent 8 }}
@@ -154,6 +152,7 @@ spec:
             command:
             - /celo-oracle/readinessProbe.sh
             - "{{ .Values.oracle.metrics.prometheusPort }}"
+            - "{{ .Values.oracle.currencyPair }}"
           initialDelaySeconds: 10
           periodSeconds: 5
         volumeMounts:
@@ -163,4 +162,4 @@ spec:
       volumes:
         - name: private-key-volume
           secret:
-            secretName: pkey-secret
+            secretName: {{ template "pkey-secret-name" . }}

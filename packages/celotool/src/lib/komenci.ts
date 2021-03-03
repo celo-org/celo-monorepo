@@ -1,10 +1,25 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
+import {
+  assignRoleIdempotent,
+  createIdentityIdempotent,
+  deleteIdentity,
+  getAKSManagedServiceIdentityObjectId,
+  getAKSServicePrincipalObjectId,
+  getIdentity,
+} from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
+import {
+  getFornoUrl,
+  getFullNodeHttpRpcInternalUrl,
+  getFullNodeWebSocketRpcInternalUrl,
+} from 'src/lib/endpoints'
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
-import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 
@@ -28,7 +43,7 @@ interface KomenciAzureHsmIdentity {
 interface KomenciIdentity {
   address: string
   // Used if generating komenci relayers from a mnemonic
-  privateKey?: string,
+  privateKey?: string
   // Used if using Azure HSM signing
   azureHsmIdentity?: KomenciAzureHsmIdentity
 }
@@ -58,34 +73,33 @@ interface KomenciDatabaseConfig {
 /**
  * Env vars corresponding to each value for the KomenciKeyVaultIdentityConfig for a particular context
  */
-const contextKomenciKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof KomenciKeyVaultIdentityConfig]: DynamicEnvVar } = {
+const contextKomenciKeyVaultIdentityConfigDynamicEnvVars: {
+  [k in keyof KomenciKeyVaultIdentityConfig]: DynamicEnvVar
+} = {
   addressAzureKeyVaults: DynamicEnvVar.KOMENCI_ADDRESS_AZURE_KEY_VAULTS,
 }
 
 /**
  * Env vars corresponding to each value for the KomenciMnemonicIdentityConfig for a particular context
  */
-const contextKomenciMnemonicIdentityConfigDynamicEnvVars: { [k in keyof KomenciMnemonicIdentityConfig]: DynamicEnvVar } = {
+const contextKomenciMnemonicIdentityConfigDynamicEnvVars: {
+  [k in keyof KomenciMnemonicIdentityConfig]: DynamicEnvVar
+} = {
   addressesFromMnemonicCount: DynamicEnvVar.KOMENCI_ADDRESSES_FROM_MNEMONIC_COUNT,
 }
-
 
 const contextDatabaseConfigDynamicEnvVars: { [k in keyof KomenciDatabaseConfig]: DynamicEnvVar } = {
   host: DynamicEnvVar.KOMENCI_DB_HOST,
   port: DynamicEnvVar.KOMENCI_DB_PORT,
   username: DynamicEnvVar.KOMENCI_DB_USERNAME,
-  passwordVaultName: DynamicEnvVar.KOMENCI_DB_PASSWORD_VAULT_NAME
+  passwordVaultName: DynamicEnvVar.KOMENCI_DB_PASSWORD_VAULT_NAME,
 }
 
 function releaseName(celoEnv: string) {
   return `${celoEnv}-komenci`
 }
 
-export async function installHelmChart(
-  celoEnv: string,
-  context: string,
-  useForno: boolean
-) {
+export async function installHelmChart(celoEnv: string, context: string, useForno: boolean) {
   // First install the komenci-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // komenci pods can reach the K8s API server to change their aad labels
@@ -99,11 +113,7 @@ export async function installHelmChart(
   )
 }
 
-export async function upgradeKomenciChart(
-  celoEnv: string,
-  context: string,
-  useFullNodes: boolean
-) {
+export async function upgradeKomenciChart(celoEnv: string, context: string, useFullNodes: boolean) {
   await upgradeKomenciRBACHelmChart(celoEnv, context)
   return upgradeGenericHelmChart(
     celoEnv,
@@ -143,10 +153,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const replicas = komenciConfig.identities.length
   const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, replicas)
 
-  const databaseConfig = getContextDynamicEnvVarValues(
-    contextDatabaseConfigDynamicEnvVars,
-    context
-  )
+  const databaseConfig = getContextDynamicEnvVarValues(contextDatabaseConfigDynamicEnvVars, context)
   const vars = getContextDynamicEnvVarValues(
     {
       network: DynamicEnvVar.KOMENCI_NETWORK,
@@ -160,9 +167,18 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     : getFullNodeHttpRpcInternalUrl(celoEnv)
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
-  const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
-  const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.appSecretsKeyVault, 'RECAPTCHA-SECRET-KEY')
-  const loggerCredentials = await getPasswordFromKeyVaultSecret(vars.appSecretsKeyVault, 'LOGGER-SERVICE-ACCOUNT')
+  const databasePassword = await getPasswordFromKeyVaultSecret(
+    databaseConfig.passwordVaultName,
+    'DB-PASSWORD'
+  )
+  const recaptchaToken = await getPasswordFromKeyVaultSecret(
+    vars.appSecretsKeyVault,
+    'RECAPTCHA-SECRET-KEY'
+  )
+  const loggerCredentials = await getPasswordFromKeyVaultSecret(
+    vars.appSecretsKeyVault,
+    'LOGGER-SERVICE-ACCOUNT'
+  )
   const clusterConfig = getAksClusterConfig(context)
 
   return [
@@ -179,25 +195,33 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set komenci.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set onboarding.recaptchaToken=${recaptchaToken}`,
     `--set onboarding.replicas=${replicas}`,
-    `--set onboarding.relayer.host=${celoEnv + "-relayer"}`,
+    `--set onboarding.relayer.host=${celoEnv + '-relayer'}`,
     `--set onboarding.db.host=${databaseConfig.host}`,
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
-    `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
+    `--set onboarding.publicUrl=${'https://' +
+      getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
-    `--set onboarding.ruleConfig.captcha.bypassToken=${fetchEnv(envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN)}`,
+    `--set onboarding.ruleConfig.captcha.bypassToken=${fetchEnv(
+      envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN
+    )}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
-    `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
+    `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(
+      envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES,
+      ''
+    )
+      .split(',')
+      .join('\\,')}'`,
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }
 
-function getPublicHostname(regionName: string, celoEnv: string): string{
+function getPublicHostname(regionName: string, celoEnv: string): string {
   return regionName + '.komenci.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
 }
 
@@ -205,10 +229,7 @@ function getPublicHostname(regionName: string, celoEnv: string): string{
  * Returns an array of helm command line parameters for the komenci relayer identities.
  * Supports both private key and Azure HSM signing.
  */
-async function komenciIdentityHelmParameters(
-  context: string,
-  komenciConfig: KomenciConfig
-) {
+async function komenciIdentityHelmParameters(context: string, komenciConfig: KomenciConfig) {
   const replicas = komenciConfig.identities.length
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
@@ -243,7 +264,10 @@ async function createKomenciAzureIdentityIfNotExists(
   komenciIdentity: KomenciIdentity
 ) {
   const clusterConfig = getAksClusterConfig(context)
-  const identity = await createIdentityIdempotent(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName!)
+  const identity = await createIdentityIdempotent(
+    clusterConfig,
+    komenciIdentity.azureHsmIdentity!.identityName!
+  )
   // We want to grant the identity for the cluster permission to manage the komenci identity.
   // Get the correct object ID depending on the cluster configuration, either
   // the service principal or the managed service identity.
@@ -256,7 +280,12 @@ async function createKomenciAzureIdentityIfNotExists(
     // assigneePrincipalType = 'MSI'
     assigneePrincipalType = 'ServicePrincipal'
   }
-  await assignRoleIdempotent(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
+  await assignRoleIdempotent(
+    assigneeObjectId,
+    assigneePrincipalType,
+    identity.id,
+    'Managed Identity Operator'
+  )
   // Allow the komenci identity to access the correct key vault
   await setKomenciKeyVaultPolicyIfNotSet(clusterConfig, komenciIdentity, identity)
   return identity
@@ -268,30 +297,43 @@ async function setKomenciKeyVaultPolicyIfNotSet(
   azureIdentity: any
 ) {
   const keyPermissions = ['get', 'list', 'sign']
-  const keyVaultResourceGroup = komenciIdentity.azureHsmIdentity!.resourceGroup ?
-    komenciIdentity.azureHsmIdentity!.resourceGroup :
-    clusterConfig.resourceGroup
+  const keyVaultResourceGroup = komenciIdentity.azureHsmIdentity!.resourceGroup
+    ? komenciIdentity.azureHsmIdentity!.resourceGroup
+    : clusterConfig.resourceGroup
   const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-    `az keyvault show --name ${komenciIdentity.azureHsmIdentity!.keyVaultName} -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
+    `az keyvault show --name ${
+      komenciIdentity.azureHsmIdentity!.keyVaultName
+    } -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${
+      azureIdentity.principalId
+    }' && sort(permissions.keys) == [${keyPermissions.map((perm) => `'${perm}'`).join(', ')}]]"`
   )
   const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
   if (keyVaultPolicies.length) {
-    console.info(`Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${komenciIdentity.azureHsmIdentity!.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    console.info(
+      `Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${
+        komenciIdentity.azureHsmIdentity!.keyVaultName
+      } and identity objectId ${azureIdentity.principalId}`
+    )
     return
   }
-  console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${komenciIdentity.azureHsmIdentity!.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+  console.info(
+    `Setting key permissions ${keyPermissions.join(' ')} for vault ${
+      komenciIdentity.azureHsmIdentity!.keyVaultName
+    } and identity objectId ${azureIdentity.principalId}`
+  )
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${komenciIdentity.azureHsmIdentity!.keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${keyVaultResourceGroup}`
+    `az keyvault set-policy --name ${
+      komenciIdentity.azureHsmIdentity!.keyVaultName
+    } --key-permissions ${keyPermissions.join(' ')} --object-id ${
+      azureIdentity.principalId
+    } -g ${keyVaultResourceGroup}`
   )
 }
 
 /**
  * deleteKomenciAzureIdentity deletes the key vault policy and the komenci's managed identity
  */
-async function deleteKomenciAzureIdentity(
-  context: string,
-  komenciIdentity: KomenciIdentity
-) {
+async function deleteKomenciAzureIdentity(context: string, komenciIdentity: KomenciIdentity) {
   const clusterConfig = getAksClusterConfig(context)
   await deleteKomenciKeyVaultPolicy(clusterConfig, komenciIdentity)
   return deleteIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)
@@ -301,9 +343,14 @@ async function deleteKomenciKeyVaultPolicy(
   clusterConfig: AksClusterConfig,
   komenciIdentity: KomenciIdentity
 ) {
-  const azureIdentity = await getIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)
+  const azureIdentity = await getIdentity(
+    clusterConfig,
+    komenciIdentity.azureHsmIdentity!.identityName
+  )
   return execCmdWithExitOnFailure(
-    `az keyvault delete-policy --name ${komenciIdentity.azureHsmIdentity!.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault delete-policy --name ${
+      komenciIdentity.azureHsmIdentity!.keyVaultName
+    } --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 
@@ -372,8 +419,8 @@ function getAzureHsmKomenciIdentities(addressAzureKeyVaults: string): KomenciIde
       azureHsmIdentity: {
         identityName: getKomenciAzureIdentityName(keyVaultName, address),
         keyVaultName,
-        resourceGroup
-      }
+        resourceGroup,
+      },
     })
   }
   return identities
@@ -383,14 +430,12 @@ function getAzureHsmKomenciIdentities(addressAzureKeyVaults: string): KomenciIde
  * Returns komenci identities with private keys and addresses generated from the mnemonic
  */
 function getMnemonicBasedKomenciIdentities(count: number): KomenciIdentity[] {
-  return getPrivateKeysFor(
-    AccountType.PRICE_ORACLE,
-    fetchEnv(envVar.MNEMONIC),
-    count
-  ).map((pkey) => ({
-    address: privateKeyToAddress(pkey),
-    privateKey: ensureLeading0x(pkey),
-  }))
+  return getPrivateKeysFor(AccountType.PRICE_ORACLE, fetchEnv(envVar.MNEMONIC), count).map(
+    (pkey) => ({
+      address: privateKeyToAddress(pkey),
+      privateKey: ensureLeading0x(pkey),
+    })
+  )
 }
 
 /**
@@ -429,11 +474,11 @@ function removeKomenciRBACHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(rbacReleaseName(celoEnv), celoEnv)
 }
 
-function rbacHelmParameters(celoEnv: string,  context: string) {
+function rbacHelmParameters(celoEnv: string, context: string) {
   const komenciConfig = getKomenciConfig(context)
   console.info(komenciConfig)
   const replicas = komenciConfig.identities.length
-  return [`--set environment.name=${celoEnv}`,  `--set relayer.replicas=${replicas}`,]
+  return [`--set environment.name=${celoEnv}`, `--set relayer.replicas=${replicas}`]
 }
 
 function rbacReleaseName(celoEnv: string) {
@@ -441,9 +486,11 @@ function rbacReleaseName(celoEnv: string) {
 }
 
 async function rbacServiceAccountSecretNames(celoEnv: string, replicas: number) {
-  const names = [...Array(replicas).keys()].map(i => `${rbacReleaseName(celoEnv)}-${i}`)
+  const names = [...Array(replicas).keys()].map((i) => `${rbacReleaseName(celoEnv)}-${i}`)
   const [tokenName] = await execCmdWithExitOnFailure(
-    `kubectl get serviceaccount --namespace=${celoEnv} ${names.join(' ')} -o=jsonpath="{.items[*].secrets[0]['name']}"`
+    `kubectl get serviceaccount --namespace=${celoEnv} ${names.join(
+      ' '
+    )} -o=jsonpath="{.items[*].secrets[0]['name']}"`
   )
   const tokenNames = tokenName.trim().split(' ')
   return tokenNames
