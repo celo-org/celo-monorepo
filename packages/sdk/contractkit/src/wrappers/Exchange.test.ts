@@ -1,6 +1,6 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { ContractKit, newKitFromWeb3 } from '../kit'
 import { StableToken } from '../celo-tokens'
+import { ContractKit, newKitFromWeb3 } from '../kit'
 import { ExchangeWrapper } from './Exchange'
 import { StableTokenWrapper } from './StableTokenWrapper'
 

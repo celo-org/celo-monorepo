@@ -1,8 +1,8 @@
 import { BigNumber } from 'bignumber.js'
-import { CeloContract, CeloTokenContract, StableTokenContract, ExchangeContract } from './base'
+import { CeloContract, CeloTokenContract, ExchangeContract, StableTokenContract } from './base'
 import { ContractKit } from './kit'
-import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 
 export enum StableToken {
   cUSD = 'cUSD',
