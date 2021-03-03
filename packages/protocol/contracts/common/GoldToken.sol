@@ -5,7 +5,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./CalledByVm.sol";
-import "./Freezable.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
@@ -131,11 +130,7 @@ contract GoldToken is
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(address from, address to, uint256 value)
-    external
-    onlyWhenNotFrozen
-    returns (bool)
-  {
+  function transferFrom(address from, address to, uint256 value) external returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
@@ -234,7 +229,7 @@ contract GoldToken is
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function _transfer(address to, uint256 value) internal onlyWhenNotFrozen returns (bool) {
+  function _transfer(address to, uint256 value) internal returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
