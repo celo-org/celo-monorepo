@@ -44,17 +44,20 @@ const isProxyRepointTransaction = (tx: ProposalTx) =>
   tx.contract.endsWith('Proxy') &&
   (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
 
-const isProxyRepointAndInitializeTransaction = (tx: ProposalTx) =>
+export const isProxyRepointAndInitializeTransaction = (tx: ProposalTx) =>
   tx.contract.endsWith('Proxy') && tx.function === '_setAndInitializeImplementation'
+
+export const isProxyRepointAndInitForIdTransaction = (tx: ProposalTx, registryId: string) =>
+  tx.contract === registryId && isProxyRepointAndInitializeTransaction(tx)
 
 const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
   tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
-const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
-  context.proposal.some((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract))
+const isImplementationChanged = (contract: string, proposal: ProposalTx[]): boolean =>
+  proposal.some((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract))
 
-const getProposedImplementationAddress = (contract: string, context: VerificationContext) =>
-  context.proposal.find((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract)).args[0]
+const getProposedImplementationAddress = (contract: string, proposal: ProposalTx[]) =>
+  proposal.find((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract)).args[0]
 
 // Checks if the given transaction is a repointing of the Registry entry for the
 // given registryId.
@@ -64,12 +67,11 @@ const isRegistryRepointTransaction = (tx: ProposalTx) =>
 const isRegistryRepointForIdTransaction = (tx: ProposalTx, registryId: string) =>
   isRegistryRepointTransaction(tx) && tx.args[0] === registryId
 
-const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  return context.proposal.some((tx) => isRegistryRepointForIdTransaction(tx, contract))
-}
+const isProxyChanged = (contract: string, proposal: ProposalTx[]): boolean =>
+  proposal.some((tx) => isRegistryRepointForIdTransaction(tx, contract))
 
-const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const relevantTx = context.proposal.find((tx) => isRegistryRepointForIdTransaction(tx, contract))
+export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]): string => {
+  const relevantTx = proposal.find((tx) => isRegistryRepointForIdTransaction(tx, contract))
   return relevantTx.args[1]
 }
 
@@ -91,8 +93,8 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   visited.add(contract)
 
   // check proxy deployment
-  if (isProxyChanged(contract, context)) {
-    const proxyAddress = getProposedProxyAddress(contract, context)
+  if (isProxyChanged(contract, context.proposal)) {
+    const proxyAddress = getProposedProxyAddress(contract, context.proposal)
     // ganache does not support eth_getProof
     if (
       context.network !== 'development' &&
@@ -115,8 +117,8 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
 
   let implementationAddress: string
-  if (isImplementationChanged(contract, context)) {
-    implementationAddress = getProposedImplementationAddress(contract, context)
+  if (isImplementationChanged(contract, context.proposal)) {
+    implementationAddress = getProposedImplementationAddress(contract, context.proposal)
   } else if (isLibrary(contract, context)) {
     implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
   } else {
@@ -187,7 +189,7 @@ const assertValidInitializationData = (
     const args = initializationData[contractName]
     const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
 
-    if (callData !== proposalTx.args[1]) {
+    if (callData.toLowerCase() !== proposalTx.args[1].toLowerCase()) {
       throw new Error(
         `Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
       )

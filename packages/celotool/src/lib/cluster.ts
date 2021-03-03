@@ -8,7 +8,7 @@ import {
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
-  installGCPSSDStorageClass
+  installGCPSSDStorageClass,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'

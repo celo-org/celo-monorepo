@@ -144,7 +144,7 @@ export function Encrypt(pubKeyTo: Buffer, plaintext: Buffer) {
   const px = ephemPrivKey.derive(
     ec.keyFromPublic(Buffer.concat([Buffer.from([0x04]), pubKeyTo])).getPublic()
   )
-  const hash = ConcatKDF(px.toBuffer(), 32)
+  const hash = ConcatKDF(px.toArrayLike(Buffer), 32)
   const encryptionKey = hash.slice(0, 16)
   const macKey = createHash('sha256')
     .update(hash.slice(16))

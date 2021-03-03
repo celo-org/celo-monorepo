@@ -1,4 +1,5 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { removeGrafanaHelmRelease, removeHelmRelease } from 'src/lib/prometheus'
 import yargs from 'yargs'
 
@@ -11,6 +12,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async () => {
+  exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv()
   await removeHelmRelease()
   await removeGrafanaHelmRelease()
