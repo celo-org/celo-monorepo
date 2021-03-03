@@ -1,9 +1,7 @@
 import { spawnSync } from 'child_process'
-import { promises } from 'fs'
+import * as fs from 'fs'
 import { join, parse } from 'path'
 import { resolvePath } from './utils'
-
-const { writeFile, mkdir } = promises
 
 export abstract class StorageWriter {
   abstract write(_data: Buffer, _dataPath: string): Promise<void>
@@ -19,8 +17,8 @@ export class LocalStorageWriter extends StorageWriter {
 
   protected async writeToFs(data: string | Buffer, dataPath: string): Promise<void> {
     const directory = parse(dataPath).dir
-    await mkdir(join(this.root, directory), { recursive: true })
-    await writeFile(join(this.root, dataPath), data)
+    await fs.promises.mkdir(join(this.root, directory), { recursive: true })
+    await fs.promises.writeFile(join(this.root, dataPath), data)
   }
 }
 
@@ -47,6 +45,22 @@ export class GoogleStorageWriter extends LocalStorageWriter {
   async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
     spawnSync('gsutil', ['cp', join(this.root, dataPath), `gs://${this.bucket}${dataPath}`], {
+      cwd: this.root,
+    })
+  }
+}
+
+export class AwsStorageWriter extends LocalStorageWriter {
+  private readonly bucket: string
+
+  constructor(readonly local: string, bucket: string) {
+    super(local)
+    this.bucket = bucket
+  }
+
+  async write(data: Buffer, dataPath: string): Promise<void> {
+    await this.writeToFs(data, dataPath)
+    spawnSync('aws', ['s3', 'cp', join(this.root, dataPath), `s3://${this.bucket}${dataPath}`], {
       cwd: this.root,
     })
   }

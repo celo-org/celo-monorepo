@@ -18,19 +18,19 @@ Both methods require authentication to the ODIS server, which can be performed b
 You may use the `EncryptionKeySigner` for your `AuthSigner` by passing in the raw private key:
 
 ```ts
-  const authSigner: AuthSigner = {
-    authenticationMethod: OdisUtils.Query.AuthenticationMethod.ENCRYPTION_KEY,
-    rawKey: privateDataKey,
-  }
+const authSigner: AuthSigner = {
+  authenticationMethod: OdisUtils.Query.AuthenticationMethod.ENCRYPTION_KEY,
+  rawKey: privateDataKey,
+}
 ```
 
 Alternatively, you may use the `WalletKeySigner` by passing in a contractkit instance with the account unlocked:
 
 ```ts
-  const authSigner: AuthSigner = {
-    authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
-    contractKit,
-  }
+const authSigner: AuthSigner = {
+  authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+  contractKit,
+}
 ```
 
 ## Service Context
@@ -39,24 +39,24 @@ The `ServiceContext` object provides the ODIS endpoint URL and the ODIS public k
 
 ```ts
 const serviceContext: ServiceContext = {
-    odisUrl,
-    odisPubKey,
-  }
+  odisUrl,
+  odisPubKey,
+}
 ```
 
 The ODIS endpoint URL for each environment can be found here:
-| Environment  | Key  |
+| Environment | Key |
 |---|---|
 | Alfajores Staging | https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net |
-| Alfajores  | https://us-central1-celo-phone-number-privacy.cloudfunctions.net |
-| Mainnet  |  https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net |
+| Alfajores | https://us-central1-celo-phone-number-privacy.cloudfunctions.net |
+| Mainnet | https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net |
 
 The ODIS public key for each environment can be found here:
-| Environment  | Key  |
+| Environment | Key |
 |---|---|
-|  Alfajores Staging | 7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA  |
-| Alfajores  |  kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA |
-| Mainnet  |  FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA |
+| Alfajores Staging | 7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA |
+| Alfajores | kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA |
+| Mainnet | FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA |
 
 ## Query phone number identifier
 
@@ -80,7 +80,7 @@ Now you're ready to get the phone number identifier. `OdisUtils.PhoneNumberIdent
 
 The response will be [an object](../identity/reference/interfaces/_odis_phone_number_identifier_.phonenumberhashdetails.md) with the original phone number, the on-chain identifier (phoneHash), and the phone number's pepper.
 
-You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/identity/privateHashing.ts).
+You can view an example of this call in [our mobile project here](https://github.com/celo-org/wallet/blob/master/packages/mobile/src/identity/privateHashing.ts).
 
 ## Matchmaking
 
@@ -88,4 +88,4 @@ Instead of querying for all the user's contact's peppers and consuming the user'
 
 The response will be a subset of the input `e164NumberContacts` that are matched by the matchmaking service.
 
-You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/identity/matchmaking.ts).
+You can view an example of this call in [our mobile project here](https://github.com/celo-org/wallet/blob/master/packages/mobile/src/identity/matchmaking.ts).

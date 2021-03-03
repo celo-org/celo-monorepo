@@ -66,12 +66,30 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     undefined,
     valueToBigNumber
   )
-  getTransactionCount = proxyCall(this.contract.methods.transactionCount, undefined, valueToInt)
+  totalTransactionCount = proxyCall(this.contract.methods.transactionCount, undefined, valueToInt)
+  getTransactionCount = proxyCall(this.contract.methods.getTransactionCount, undefined, valueToInt)
   replaceOwner: (owner: Address, newOwner: Address) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.replaceOwner,
     tupleParser(stringIdentity, stringIdentity)
   )
+
+  async getTransactionDataByContent(
+    destination: string,
+    txo: CeloTxObject<any>,
+    value: BigNumber.Value = 0
+  ) {
+    const data = stringToSolidityBytes(txo.encodeABI())
+    const transactionCount = await this.getTransactionCount(true, true)
+    // reverse order for recency
+    for (let transactionId = transactionCount - 1; transactionId >= 0; transactionId--) {
+      const tx = await this.getTransaction(transactionId)
+      if (tx.data === data && tx.destination === destination && tx.value === value) {
+        return tx
+      }
+    }
+    return undefined
+  }
 
   async getTransaction(i: number): Promise<TransactionData> {
     const { destination, value, data, executed } = await this.contract.methods
@@ -93,7 +111,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
   }
 
   async getTransactions(): Promise<TransactionData[]> {
-    const txcount = await this.getTransactionCount()
+    const txcount = await this.totalTransactionCount()
     const res: TransactionData[] = []
     for (let i = 0; i < txcount; i++) {
       res.push(await this.getTransaction(i))

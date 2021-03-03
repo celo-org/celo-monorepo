@@ -1,4 +1,5 @@
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { installPrometheusIfNotExists } from 'src/lib/prometheus'
 import { deploy } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
@@ -28,6 +29,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: VmTestnetArgv) => {
+  exitIfCelotoolHelmDryRun()
   // deploy VM testnet with Terraform
   await deploy(argv.celoEnv, !argv.skipSecretGeneration, argv.useExistingGenesis)
 
