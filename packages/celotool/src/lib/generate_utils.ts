@@ -90,19 +90,21 @@ export const generateOraclePrivateKey = (
   currencyPair: CurrencyPair,
   index: number
 ) => {
-  let path: number[]
+  let derivationPath: number[]
   if (currencyPair === 'CELOUSD') {
-    // For backwards compatibility we don't add currencyPair to 
+    // For backwards compatibility we don't add currencyPair to
     // the derivation path for CELOUSD
-    path = [AccountType.PRICE_ORACLE, index]
+    derivationPath = [AccountType.PRICE_ORACLE, index]
   } else {
     // Deterministically convert the currency pair string to a path segment
     // keccak(currencyPair) modulo 2^31
-    const currencyDerivation = new BigNumber(Web3.utils.keccak256(currencyPair), 16).mod(2 ** 31).toNumber()
-    path = [AccountType.PRICE_ORACLE, currencyDerivation, index]
+    const currencyDerivation = new BigNumber(Web3.utils.keccak256(currencyPair), 16)
+      .mod(2 ** 31)
+      .toNumber()
+    derivationPath = [AccountType.PRICE_ORACLE, currencyDerivation, index]
   }
 
-  return generatePrivateKeyWithDerivations(mnemonic, path)
+  return generatePrivateKeyWithDerivations(mnemonic, derivationPath)
 }
 
 export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
