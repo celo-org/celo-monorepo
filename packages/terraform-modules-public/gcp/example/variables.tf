@@ -16,9 +16,10 @@ variable replicas {
   type        = map(number)
 
   default = {
-    validator           = 1 # Also used for proxy
-    txnode              = 1
-    attestation_service = 1
+    validator           = 1 # Each validator will create a dedicated proxy that is exposed to the Internet
+    txnode              = 1 
+    backup_node         = 1 
+    attestation_service = 1 # Attestation service requires >= 1 txnode
   }
 }
 
@@ -30,6 +31,7 @@ variable instance_types {
     validator           = "n1-standard-2"   #use n1-standard-2 or better for production
     proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
+    backup_node         = "n1-standard-1"
     attestation_service = "n1-standard-1"
   }
 }
@@ -45,7 +47,7 @@ variable celo_env {
   description = "The celo network to connect with"
   type        = string
 
-  default = "rc1"
+  default = "mainnet"
 }
 
 variable network_id {
@@ -66,7 +68,7 @@ variable geth_node_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-org/geth"
-    tag        = "1.1.0"
+    tag        = "1.2.3"
   }
 }
 
@@ -169,7 +171,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-1-0-3"
+    tag        = "attestation-service-v1.2.0"
   }
 }
 
@@ -182,13 +184,13 @@ variable attestation_service_credentials {
     sms_providers                = "twilio"
     nexmo_key                    = ""
     nexmo_secret                 = ""
-    nexmo_blacklist              = ""
-    nexmo_unsupported_regions    = ""
+    nexmo_blacklist              = "CU,SY,KP,IR,SD"
+    nexmo_unsupported_regions    = "CU,SY,KP,IR,SD"
     twilio_account_sid           = "secret in terraform.tfvars"
     twilio_messaging_service_sid = "secret in terraform.tfvars"
     twilio_auth_token            = "secret in terraform.tfvars"
-    twilio_blacklist             = ""
-    twilio_unsupported_regions   = ""
+    twilio_blacklist             = "CU,SY,KP,IR,SD"
+    twilio_unsupported_regions   = "CU,SY,KP,IR,SD"
   }
 }
 
@@ -210,6 +212,16 @@ variable istanbul_request_timeout_ms {
   description = "The ethereum request timeout"
   type        = number
   default     = 10000
+}
+
+variable geth_exporter_docker_image {
+  description = "The geth exporter docker image"
+  type        = map(string)
+
+  default = {
+    repository = "us.gcr.io/celo-testnet/geth-exporter"
+    tag        = "ed7d21bd50592709173368cd697ef73c1774a261"
+  }
 }
 
 #not yet implemented.  intent is to only install the stackdriver agents and inject the log exclusions if 'true'

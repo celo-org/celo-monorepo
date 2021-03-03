@@ -1,4 +1,8 @@
-import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { BaseOracleDeployer } from './base'
 
@@ -45,8 +49,8 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   async helmParameters() {
     const kubeServiceAccountSecretNames = await this.rbacServiceAccountSecretNames()
     return [
-      ...await super.helmParameters(),
-      `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`
+      ...(await super.helmParameters()),
+      `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
     ]
   }
 
@@ -54,14 +58,16 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
     return [
       `--set environment.name=${this.celoEnv}`,
       `--set environment.currencyPair=${this.currencyPair}`,
-      `--set oracle.replicas=${this.replicas}`
+      `--set oracle.replicas=${this.replicas}`,
     ]
   }
 
   async rbacServiceAccountSecretNames() {
-    const names = [...Array(this.replicas).keys()].map(i => `${this.rbacReleaseName()}-${i}`)
+    const names = [...Array(this.replicas).keys()].map((i) => `${this.rbacReleaseName()}-${i}`)
     const [tokenName] = await execCmdWithExitOnFailure(
-      `kubectl get serviceaccount --namespace=${this.celoEnv} ${names.join(' ')} -o=jsonpath="{.items[*].secrets[0]['name']}"`
+      `kubectl get serviceaccount --namespace=${this.celoEnv} ${names.join(
+        ' '
+      )} -o=jsonpath="{.items[*].secrets[0]['name']}"`
     )
     const tokenNames = tokenName.trim().split(' ')
     return tokenNames

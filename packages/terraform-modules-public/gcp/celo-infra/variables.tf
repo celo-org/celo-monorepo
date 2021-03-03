@@ -27,6 +27,7 @@ variable instance_types {
     proxy               = "n1-standard-2"
     txnode              = "n1-standard-1"
     attestation_service = "n1-standard-1"
+    backup_node         = "n1-standard-1"
   }
 }
 
@@ -78,6 +79,11 @@ variable network_name {
 variable tx_node_count {
   type        = number
   description = "Number of tx-nodes to create"
+}
+
+variable backup_node_count {
+  type        = number
+  description = "Number of backup_nodes to create"
 }
 
 variable validator_count {

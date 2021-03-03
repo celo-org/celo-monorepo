@@ -9,29 +9,13 @@ locals {
   firewall_target_tags_validator           = ["${var.celo_env}-validator"]
   firewall_target_tags_proxy               = ["${var.celo_env}-proxy"]
   firewall_target_tags_attestation_service = ["${var.celo_env}-attestation-service"]
+  firewall_target_tags_backup_node         = ["${var.celo_env}-backup-node"]
 }
 
 # Dummy variable for network dependency
 variable network_depends_on {
   type    = any
   default = null
-}
-
-# Data resources
-data "http" "genesis" {
-  url = "https://storage.googleapis.com/genesis_blocks/${var.celo_env}"
-
-  request_headers = {
-    "Accept" = "application/json"
-  }
-}
-
-data "http" "bootnodes" {
-  url = "https://storage.googleapis.com/env_bootnodes/${var.celo_env}"
-
-  request_headers = {
-    "Accept" = "text/plain"
-  }
 }
 
 data "google_compute_network" "celo" {
@@ -54,7 +38,8 @@ resource "google_compute_firewall" "ssh_firewall" {
                   local.firewall_target_tags_txnode,
                   local.firewall_target_tags_validator,
                   local.firewall_target_tags_proxy,
-                  local.firewall_target_tags_attestation_service
+                  local.firewall_target_tags_attestation_service,
+                  local.firewall_target_tags_backup_node
                 )
 
   allow {
@@ -67,7 +52,7 @@ resource "google_compute_firewall" "geth_firewall" {
   name    = "${var.celo_env}-geth-firewall"
   network = var.network_name
 
-  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_proxy)
+  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_proxy, local.firewall_target_tags_backup_node)
 
   allow {
     protocol = "tcp"
@@ -97,7 +82,7 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
   name    = "${var.celo_env}-geth-metrics-firewall"
   network = var.network_name
 
-  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_validator, local.firewall_target_tags_proxy)
+  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_validator, local.firewall_target_tags_proxy, local.firewall_target_tags_backup_node)
 
   # allow all IPs internal to the VPC
   source_ranges = [data.google_compute_subnetwork.celo.ip_cidr_range]
@@ -156,7 +141,6 @@ module "tx_node" {
   gcloud_project                        = var.gcloud_project
   instance_type                         = var.instance_types["txnode"]
   ethstats_host                         = var.ethstats_host
-  genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
@@ -166,10 +150,29 @@ module "tx_node" {
   network_id                            = var.network_id
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
-  bootnodes_base64                      = base64encode(data.http.bootnodes.body)
   attestation_signer_addresses          = var.attestation_signer_addresses
   attestation_signer_private_keys       = var.attestation_signer_private_keys
   attestation_signer_account_passwords  = var.attestation_signer_account_passwords
+  service_account_scopes                = var.service_account_scopes
+}
+
+module "backup_node" {
+  source = "./modules/backup_node"
+  # variables
+  block_time                            = var.block_time
+  celo_env                              = var.celo_env
+  gcloud_project                        = var.gcloud_project
+  instance_type                         = var.instance_types["backup_node"]
+  ethstats_host                         = var.ethstats_host
+  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
+  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_node_docker_image_repository     = var.geth_node_docker_image_repository
+  geth_node_docker_image_tag            = var.geth_node_docker_image_tag
+  geth_verbosity                        = var.geth_verbosity
+  in_memory_discovery_table             = var.in_memory_discovery_table
+  network_id                            = var.network_id
+  network_name                          = var.network_name
+  backup_node_count                     = var.backup_node_count
   service_account_scopes                = var.service_account_scopes
 }
 
@@ -181,7 +184,6 @@ module "proxy" {
   gcloud_project                        = var.gcloud_project
   instance_type                         = var.instance_types["proxy"]
   ethstats_host                         = var.ethstats_host
-  genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
@@ -200,7 +202,6 @@ module "proxy" {
   proxy_private_keys                 = var.proxy_private_keys
   proxy_account_passwords            = var.proxy_account_passwords
   validator_signer_account_addresses = var.validator_signer_account_addresses
-  bootnodes_base64                   = base64encode(data.http.bootnodes.body)
   service_account_scopes                = var.service_account_scopes
 }
 
@@ -212,7 +213,6 @@ module "validator" {
   gcloud_project                        = var.gcloud_project
   instance_type                         = var.instance_types["validator"]
   ethstats_host                         = var.ethstats_host
-  genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
@@ -255,6 +255,7 @@ module "attestation-service" {
   validator_signer_account_addresses          = var.validator_signer_account_addresses
   validator_release_gold_addresses            = var.validator_release_gold_addresses
   celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.tx_node.internal_ip_addresses[0]}:8545"
+  #celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://localhost:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key
   nexmo_secret                                = var.attestation_service_nexmo_secret

@@ -1,40 +1,15 @@
 #!/bin/bash
 
+
 # ---- Configure logrotate ----
 echo "Configuring logrotate" | logger
 cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/syslog
-{
-        rotate 3
-        daily
-        missingok
-        notifempty
-        #delaycompress
-        compress
-        postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
-                kill -HUP `pidof rsyslogd`
-        endscript
-}
-
 /var/log/mail.info
 /var/log/mail.warn
 /var/log/mail.err
 /var/log/mail.log
 /var/log/daemon.log
-{
-        rotate 3
-        daily
-        missingok
-        notifempty
-        #delaycompress
-        compress
-        postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
-                kill -HUP `pidof rsyslogd`
-        endscript
-}
-
 /var/log/kern.log
 /var/log/auth.log
 /var/log/user.log
@@ -44,14 +19,14 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/messages
 {
         rotate 3
-        weekly
+        daily
         missingok
         notifempty
-        compress
         delaycompress
+        compress
         sharedscripts
         postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null   # does not work on debian10
                 kill -HUP `pidof rsyslogd`
         endscript
 }
@@ -65,23 +40,12 @@ cat <<'EOF' > /etc/rsyslog.conf
 # For more information install rsyslog-doc and see
 # /usr/share/doc/rsyslog-doc/html/configuration/index.html
 
-
 #################
 #### MODULES ####
 #################
 
 module(load="imuxsock") # provides support for local system logging
 module(load="imklog")   # provides kernel logging support
-#module(load="immark")  # provides --MARK-- message capability
-
-# provides UDP syslog reception
-#module(load="imudp")
-#input(type="imudp" port="514")
-
-# provides TCP syslog reception
-#module(load="imtcp")
-#input(type="imtcp" port="514")
-
 
 ###########################
 #### GLOBAL DIRECTIVES ####
@@ -122,20 +86,8 @@ $IncludeConfig /etc/rsyslog.d/*.conf
 #
 auth,authpriv.*                 /var/log/auth.log
 *.*;auth,authpriv.none          -/var/log/syslog
-#cron.*                         /var/log/cron.log
-#daemon.*                        -/var/log/daemon.log
 kern.*                          -/var/log/kern.log
-lpr.*                           -/var/log/lpr.log
-mail.*                          -/var/log/mail.log
-user.*                          -/var/log/user.log
 
-#
-# Logging for the mail system.  Split it up so that
-# it is easy to write scripts to parse these files.
-#
-mail.info                       -/var/log/mail.info
-mail.warn                       -/var/log/mail.warn
-mail.err                        /var/log/mail.err
 
 #
 # Some "catch-all" log files.
@@ -153,6 +105,7 @@ mail.err                        /var/log/mail.err
 #
 *.emerg                         :omusrmsg:*
 EOF
+
 # ---- Restart rsyslogd
 echo "Restarting rsyslogd"
 systemctl restart rsyslog
@@ -161,13 +114,19 @@ systemctl restart rsyslog
 echo "Creating chaindata backup script" | logger
 cat <<'EOF' > /root/backup.sh
 #!/bin/bash
+# This script stops geth, tars up the chaindata (with gzip compression), and copies it to GCS.
+# The 'chaindata' GCS bucket has versioning enabled, so if a corrupted tarball is uploaded, an older version can be selected for restore.
+# This takes quit some time, and takes quite a bit of local disk.
+# The rsync variant (below) is more efficient, but tarballs are more portable.
 set -x
+
+echo "Starting chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
-#note this will likely need to be upgraded to rsync, as the tar operation is slow on the persistent disk storage
-tar -C /root/.celo/celo -zcvf /root/chaindata.tgz chaindata
-gsutil cp /root/chaindata.tgz gs://${gcloud_project}-chaindata
-rm -f /root/chaindata.tgz
+tar -C /root/.celo/celo -zcvf /root/.celo/celo/chaindata.tgz chaindata
+gsutil cp /root/.celo/celo/chaindata.tgz gs://${gcloud_project}-chaindata
+rm -f /root/.celo/celo/chaindata.tgz
+echo "Chaindata backup completed" | logger
 sleep 3
 systemctl start geth.service
 EOF
@@ -177,10 +136,15 @@ chmod u+x /root/backup.sh
 echo "Creating rsync chaindata backup script" | logger
 cat <<'EOF' > /root/backup_rsync.sh
 #!/bin/bash
+# This script stops geth, and uses rsync to copy chaindata to GCS.
 set -x
+CELO_DIR="/root/.celo/celo"
+
+echo "Starting rsync chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
-gsutil -m rsync -d -r /root/.celo/celo gs://${gcloud_project}-chaindata-rsync
+gsutil -m rsync -d -r /root/.celo/celo/chaindata gs://${gcloud_project}-chaindata-rsync
+echo "rsync chaindata backup completed" | logger
 sleep 3
 systemctl start geth.service
 EOF
@@ -191,34 +155,39 @@ chmod u+x /root/backup_rsync.sh
 cat <<'EOF' > /root/backup.crontab
 # m h  dom mon dow   command
 # backup full tarball once a week at 00:57
-57 0 * * 0 /root/backup.sh > /dev/null 2>&1
+#57 0 * * 0 /root/backup.sh > /dev/null 2>&1
 # backup via rsync run every day at 00:17
-17 0 * * * /root/backup_rsync.sh > /dev/null 2>&1
+#17 0 * * * /root/backup_rsync.sh > /dev/null 2>&1
 EOF
-/usr/bin/crontab /root/backup.crontab
+#/usr/bin/crontab /root/backup.crontab
 
 # ---- Create restore script
 echo "Creating chaindata restore script" | logger
 cat <<'EOF' > /root/restore.sh
 #!/bin/bash
 set -x
+
+# test to see if chaindata exists in bucket
 gsutil -q stat gs://${gcloud_project}-chaindata/chaindata.tgz
 if [ $? -eq 0 ]
 then
   #chaindata exists in bucket
-  echo "downloading chaindata from gs://${gcloud_project}-chaindata/chaindata.tgz"
-  gsutil cp gs://${gcloud_project}-chaindata/chaindata.tgz /root/chaindata.tgz
   mkdir -p /root/.celo/celo
+  mkdir -p /root/.celo/celo/restore
+  echo "downloading chaindata from gs://${gcloud_project}-chaindata/chaindata.tgz" | logger
+  gsutil cp gs://${gcloud_project}-chaindata/chaindata.tgz /root/.celo/celo/restore/chaindata.tgz
+  echo "stopping geth to untar chaindata" | logger
   systemctl stop geth.service
   sleep 3
-  tar zxvf /root/chaindata.tgz --directory /root/.celo/celo/
-  rm -rf /root/chaindata.tgz
+  echo "untarring chaindata" | logger
+  tar zxvf /root/.celo/celo/restore/chaindata.tgz --directory /root/.celo/celo
+  echo "removing chaindata tarball" | logger
+  rm -rf /root/.celo/celo/restore/chaindata.tgz
   sleep 3
+  echo "starting geth" | logger
   systemctl start geth.service
   else
-    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting warp restore"
-    echo "Starting geth"
-    systemctl start geth.service
+    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting warp restore" | logger
   fi
 EOF
 chmod u+x /root/restore.sh
@@ -228,22 +197,22 @@ echo "Creating rsync chaindata restore script" | logger
 cat <<'EOF' > /root/restore_rsync.sh
 #!/bin/bash
 set -x
-gsutil -q stat gs://${gcloud_project}-chaindata-rsync/chaindata/CURRENT
+
+# test to see if chaindata exists in the rsync chaindata bucket
+gsutil -q stat gs://${gcloud_project}-chaindata-rsync/CURRENT
 if [ $? -eq 0 ]
 then
   #chaindata exists in bucket
-  echo "stopping geth"
+  echo "stopping geth" | logger
   systemctl stop geth.service
-  echo "downloading chaindata via rsync from gs://${gcloud_project}-chaindata-rsync"
-  mkdir -p /root/.celo/celo
-  gsutil -m rsync -d -r gs://${gcloud_project}-chaindata-rsync /root/.celo/celo
-  echo "restart geth"
+  echo "downloading chaindata via rsync from gs://${gcloud_project}-chaindata-rsync" | logger
+  mkdir -p /root/.celo/celo/chaindata
+  gsutil -m rsync -d -r gs://${gcloud_project}-chaindata-rsync /root/.celo/celo/chaindata
+  echo "restarting geth" | logger
   sleep 3
   systemctl start geth.service
   else
-    echo "No chaindata found in bucket gs://${gcloud_project}-chaindata-rsync, aborting warp restore"
-    echo "Starting geth"
-    systemctl start geth.service
+    echo "No chaindata found in bucket gs://${gcloud_project}-chaindata-rsync, aborting warp restore" | logger
   fi
 EOF
 chmod u+x /root/restore_rsync.sh
@@ -251,7 +220,7 @@ chmod u+x /root/restore_rsync.sh
 # ---- Useful aliases ----
 echo "Configuring aliases" | logger
 echo "alias ll='ls -laF'" >> /etc/skel/.bashrc
-echo "alias ll='ls -laF'" >> /root/.profile
+echo "alias ll='ls -laF'" >> /root/.bashrc
 echo "alias gattach='docker exec -it geth geth attach'" >> /etc/skel/.bashrc
 
 # ---- Install Stackdriver Agent
@@ -273,7 +242,7 @@ systemctl restart google-fluentd
 
 # ---- Setup swap
 echo "Setting up swapfile" | logger
-fallocate -l 1G /swapfile
+fallocate -l 2G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile
@@ -369,8 +338,7 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 # Load configuration to files
 mkdir -p $DATA_DIR/account
-#echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-#echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
+
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${attestation_signer_geth_account_secret}' > $DATA_DIR/account/accountSecret
@@ -396,8 +364,6 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-#--light.serve ${max_peers} \\
-#--light.maxpeers ${max_peers} \\
 Restart=always
 ExecStart=/usr/bin/docker run \\
   --rm \\
@@ -432,6 +398,7 @@ ExecStart=/usr/bin/docker run \\
       --metrics \\
       --pprof \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
+      --light.serve 0 \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
 
