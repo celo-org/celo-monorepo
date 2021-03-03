@@ -29,7 +29,7 @@ yarn add @celo/contractkit @celo-tools/use-contractkit bignumber.js
 
 Here's what we'll be using each of these packages for:
 
-- [@celo/contractkit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit) is a lightweight wrapper around the [Web3](https://web3js.readthedocs.io/) object you may alrady be familiar with. It contains typed interfaces for the core contracts (generated from the Contract ABIs) and helper functions to make common operations on Celo easier
+- [@celo/contractkit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit) is a lightweight wrapper around the [Web3](https://web3js.readthedocs.io/) object you may already be familiar with. It contains typed interfaces for the core contracts (generated from the Contract ABIs) and helper functions to make common operations on Celo easier
 - [@celo-tools/use-contractkit](https://github.com/celo-tools/use-contractkit) is a community provided library to ease establishing the connection with a user's wallet, whether that is a hardware, mobile, or web wallet. When developing with this library, your users can hold Celo via [Valora](https://valoraapp.com), a Ledger, Metamask and more
 - [bignumber.js](https://github.com/MikeMcl/bignumber.js/) is a library for expressing large numbers in JavaScript. When interacting with a blockchain we often need to handle arbitrary-precision decimal and non-decimal arithmetic.
 
