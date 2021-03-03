@@ -10,11 +10,11 @@
     "@celo/connect": "1.0.3-dev",
     "@celo/contractkit": "1.0.3-dev",
     "@celo/utils": "1.0.3-dev",
-    "expo": "^36.0.2",
-    "expo-contacts": "8.0.0",
-    "libphonenumber-js": "^1.7.22"
+    "react-native": "^0.63.4"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "files": ["src/**/*", "lib/**/*"]
+  "files": [
+    "lib/**/*"
+  ]
 }
