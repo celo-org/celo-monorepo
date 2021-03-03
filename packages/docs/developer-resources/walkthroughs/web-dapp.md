@@ -30,18 +30,18 @@ yarn add @celo/contractkit @celo-tools/use-contractkit bignumber.js
 Here's what we'll be using each of these packages for:
 
 - [@celo/contractkit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit) is a lightweight wrapper around the [Web3](https://web3js.readthedocs.io/) object you may alrady be familiar with. It contains typed interfaces for the core contracts (generated from the Contract ABIs) and helper functions to make common operations on Celo easier
-- [@celo-tools/use-contractkit](https://github.com/celo-tools/use-contractkit) is a community provided library to ease establishing the connection with a users wallet. When developing with this library, your users can hold Celo via Valora, a Ledger, Metamask and more
+- [@celo-tools/use-contractkit](https://github.com/celo-tools/use-contractkit) is a community provided library to ease establishing the connection with a user's wallet, whether that is a hardware, mobile, or web wallet. When developing with this library, your users can hold Celo via [Valora](https://valoraapp.com), a Ledger, Metamask and more
 - [bignumber.js](https://github.com/MikeMcl/bignumber.js/) is a library for expressing large numbers in JavaScript. When interacting with a blockchain we often need to handle arbitrary-precision decimal and non-decimal arithmetic.
 
 ## Developing the application
 
 After all our boilerplate has been setup, we're ready to start developing our application.
 
-### Connecting to the users wallet
+### Connecting to the user's wallet
 
 When a user wants to interact with your DApp we need to somehow allow them to connect their wallet. Interaction with on chain smart contracts is impossible without this step.
 
-Leveraging our previously added [@celo-tool/suse-contractkit](https://github.com/celo-tools/use-contractkit) library we can provide a button that prompts the user to connect their wallet.
+Leveraging our previously added [@celo-tools/use-contractkit](https://github.com/celo-tools/use-contractkit) library we can provide a button that prompts the user to connect their wallet.
 
 ```javascript
 import React from 'react'
@@ -68,7 +68,7 @@ Clicking this button will show the `use-contractkit` modal and allow the user to
 
 ### Accessing contracts
 
-After that we've connected to the users wallet we can show interesting information based on their address. In the context of a governance voting DApp it may make sense to show past proposals they've voted on. If we were creating a simple banking interface, we could imagine wanting to show transfers into and out of the users account.
+After that we've connected to the user's wallet we can show interesting information based on their address. In the context of a governance voting DApp it may make sense to show past proposals they've voted on. If we were creating a simple banking interface, we could imagine wanting to show transfers into and out of the users account.
 
 {% hint style="info" %}
 On the Celo blockchain, only queued and dequeued proposals are kept in the Governance state. That means to access old proposals we'd need to access an indexed history of the blockchain. This is out of scope for our tutorial however there's many resources online you can find that will help you accessing indexed blockchain state.
@@ -78,7 +78,7 @@ For a comprehensive look at how to interpret this on chain state, take a look at
 For the purposes of this tutorial, we'll only be looking at dequeued proposals, or proposals we can currently vote on.
 {% endhint %}
 
-Here's how it looks Using a combination of the `useEffect` and `useCallback` hooks to request and display all dequeued proposals from the blockchain.
+Here's how it looks using a combination of the `useEffect` and `useCallback` hooks to request and display all dequeued proposals from the blockchain.
 
 ```javascript
 import React, { useCallback, useEffect } from 'react'
@@ -191,7 +191,7 @@ return (
 
 ### Locking Celo (optional)
 
-A prerequisite to [voting on Celo governance proposals](celo-owner-guide/voting-governance.md) is having locked Celo to vote with. We won't cover the various flows for locking, unlocking and relocking Celo in this tutorial but you can check the implementation in [Celo Tools](https://github.com/alexbharley/celo-tools) or take inspiration from the following script:
+A prerequisite to [voting on Celo governance proposals](../../celo-holder-guide/voting-governance.md) is having locked Celo to vote with. We won't cover the various flows for locking, unlocking and relocking Celo in this tutorial but you can check the implementation in [Celo Tools](https://github.com/alexbharley/celo-tools) or take inspiration from the following script:
 
 ```javascript
 const lockValue = new BigNumber(res.flags.value)
@@ -283,7 +283,7 @@ Next.js [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#ge
 
 ### Showing numbers in wei vs. Celo
 
-Take this advice with a grain of salt as it really depends on how proficient your users are. At some point in most DApp users are going to need to deal with large numbers. It's up to you whether you display these in wei (1e18) or not.
+Take this advice with a grain of salt as it really depends on how familiar with cryptocurrencies and blockchain your users are. At some point in most DApp users are going to need to deal with large numbers. It's up to you whether you display these in wei (1e18) or not.
 
 The sweeping generalisation would be to allow entering values as decimals, but when confirming actions, show the value in wei to the user so they can verify if that's the value they'd expect.
 
