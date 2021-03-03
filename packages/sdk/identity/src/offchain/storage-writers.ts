@@ -50,6 +50,22 @@ export class GoogleStorageWriter extends LocalStorageWriter {
   }
 }
 
+export class AwsStorageWriter extends LocalStorageWriter {
+  private readonly bucket: string
+
+  constructor(readonly local: string, bucket: string) {
+    super(local)
+    this.bucket = bucket
+  }
+
+  async write(data: Buffer, dataPath: string): Promise<void> {
+    await this.writeToFs(data, dataPath)
+    spawnSync('aws', ['s3', 'cp', join(this.root, dataPath), `s3://${this.bucket}${dataPath}`], {
+      cwd: this.root,
+    })
+  }
+}
+
 export class MockStorageWriter extends LocalStorageWriter {
   constructor(readonly root: string, readonly mockedStorageRoot: string, readonly fetchMock: any) {
     super(root)

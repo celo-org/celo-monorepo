@@ -6,10 +6,22 @@ import { AccountType, getPrivateKeysFor, privateKeyToAddress } from './generate_
 import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterManager, CloudProvider } from './k8s-cluster/base'
-import { AksHsmOracleDeployer, AksHsmOracleDeploymentConfig, AksHsmOracleIdentity } from './k8s-oracle/aks-hsm'
-import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig, AwsHsmOracleIdentity } from './k8s-oracle/aws-hsm'
+import {
+  AksHsmOracleDeployer,
+  AksHsmOracleDeploymentConfig,
+  AksHsmOracleIdentity,
+} from './k8s-oracle/aks-hsm'
+import {
+  AwsHsmOracleDeployer,
+  AwsHsmOracleDeploymentConfig,
+  AwsHsmOracleIdentity,
+} from './k8s-oracle/aws-hsm'
 import { BaseOracleDeployer, CurrencyPair } from './k8s-oracle/base'
-import { PrivateKeyOracleDeployer, PrivateKeyOracleDeploymentConfig, PrivateKeyOracleIdentity } from './k8s-oracle/pkey'
+import {
+  PrivateKeyOracleDeployer,
+  PrivateKeyOracleDeploymentConfig,
+  PrivateKeyOracleIdentity,
+} from './k8s-oracle/pkey'
 
 /**
  * Maps each cloud provider to the correct function to get the appropriate
@@ -33,7 +45,13 @@ const hsmOracleDeployerGetterByCloudProvider: {
  * specify that the oracle addresses should be generated from the mnemonic,
  * then the cloud-provider agnostic deployer PrivateKeyOracleDeployer is used.
  */
-export function getOracleDeployerForContext(celoEnv: string, context: string, currencyPair: CurrencyPair, useForno: boolean, clusterManager: BaseClusterManager) {
+export function getOracleDeployerForContext(
+  celoEnv: string,
+  context: string,
+  currencyPair: CurrencyPair,
+  useForno: boolean,
+  clusterManager: BaseClusterManager
+) {
   // If the mnemonic-based oracle address env var has a value, we should be using
   // the private key oracle deployer
   const { addressesFromMnemonicCount } = getDynamicEnvVarValues(
@@ -48,7 +66,13 @@ export function getOracleDeployerForContext(celoEnv: string, context: string, cu
     const addressesFromMnemonicCountNum = parseInt(addressesFromMnemonicCount, 10)
     // This is a cloud-provider agnostic deployer because it doesn't rely
     // on cloud-specific HSMs
-    return getPrivateKeyOracleDeployer(celoEnv, context, currencyPair, useForno, addressesFromMnemonicCountNum)
+    return getPrivateKeyOracleDeployer(
+      celoEnv,
+      context,
+      currencyPair,
+      useForno,
+      addressesFromMnemonicCountNum
+    )
   }
   // If we've gotten this far, we should be using an HSM-based oracle deployer
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
@@ -56,7 +80,7 @@ export function getOracleDeployerForContext(celoEnv: string, context: string, cu
   if (getDeployer === undefined) {
     throw new Error(
       `Deployer not defined for CloudProvider: ${cloudProvider}. ` +
-      `Expecting one of: ${Object.keys(hsmOracleDeployerGetterByCloudProvider)}`
+        `Expecting one of: ${Object.keys(hsmOracleDeployerGetterByCloudProvider)}`
     )
   }
   return getDeployer(celoEnv, context, currencyPair, useForno, clusterManager)
@@ -69,7 +93,13 @@ export function getOracleDeployerForContext(celoEnv: string, context: string, cu
 /**
  * Gets an AksHsmOracleDeployer by looking at env var values
  */
-function getAksHsmOracleDeployer(celoEnv: string, context: string, currencyPair: CurrencyPair, useForno: boolean, clusterManager: BaseClusterManager) {
+function getAksHsmOracleDeployer(
+  celoEnv: string,
+  context: string,
+  currencyPair: CurrencyPair,
+  useForno: boolean,
+  clusterManager: BaseClusterManager
+) {
   const { addressKeyVaults } = getDynamicEnvVarValues(
     aksHsmOracleIdentityConfigDynamicEnvVars,
     { context, currencyPair },
@@ -78,7 +108,11 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
     }
   )
   const aksClusterConfig = clusterManager.clusterConfig as AksClusterConfig
-  const identities = getAksHsmOracleIdentities(addressKeyVaults, aksClusterConfig.resourceGroup, currencyPair)
+  const identities = getAksHsmOracleIdentities(
+    addressKeyVaults,
+    aksClusterConfig.resourceGroup,
+    currencyPair
+  )
   const deploymentConfig: AksHsmOracleDeploymentConfig = {
     context,
     clusterConfig: aksClusterConfig,
@@ -98,7 +132,7 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, currencyPair:
 export function getAksHsmOracleIdentities(
   addressAzureKeyVaults: string,
   defaultResourceGroup: string,
-  currencyPair: CurrencyPair,
+  currencyPair: CurrencyPair
 ): AksHsmOracleIdentity[] {
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
@@ -114,7 +148,7 @@ export function getAksHsmOracleIdentities(
       address,
       currencyPair,
       keyVaultName,
-      resourceGroup: resourceGroup || defaultResourceGroup
+      resourceGroup: resourceGroup || defaultResourceGroup,
     })
   }
   return identities
@@ -130,7 +164,9 @@ interface AksHsmOracleIdentityConfig {
 /**
  * Env vars corresponding to each value for the AksHsmOracleIdentityConfig for a particular context
  */
-const aksHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AksHsmOracleIdentityConfig]: DynamicEnvVar } = {
+const aksHsmOracleIdentityConfigDynamicEnvVars: {
+  [k in keyof AksHsmOracleIdentityConfig]: DynamicEnvVar
+} = {
   addressKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
 }
 
@@ -141,7 +177,13 @@ const aksHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AksHsmOracleIdenti
 /**
  * Gets an AwsHsmOracleDeployer by looking at env var values
  */
-function getAwsHsmOracleDeployer(celoEnv: string, context: string, currencyPair: CurrencyPair, useForno: boolean, clusterManager: BaseClusterManager) {
+function getAwsHsmOracleDeployer(
+  celoEnv: string,
+  context: string,
+  currencyPair: CurrencyPair,
+  useForno: boolean,
+  clusterManager: BaseClusterManager
+) {
   const { addressKeyAliases } = getDynamicEnvVarValues(
     awsHsmOracleIdentityConfigDynamicEnvVars,
     { context, currencyPair },
@@ -177,15 +219,13 @@ export function getAwsHsmOracleIdentities(
     const [address, keyAlias, region] = identityStr.split(':')
     // region can be undefined
     if (!address || !keyAlias) {
-      throw Error(
-        `Address or key alias is invalid. Address: ${address} Key Alias: ${keyAlias}`
-      )
+      throw Error(`Address or key alias is invalid. Address: ${address} Key Alias: ${keyAlias}`)
     }
     identities.push({
       address,
       currencyPair,
       keyAlias,
-      region
+      region,
     })
   }
   return identities
@@ -201,7 +241,9 @@ interface AwsHsmOracleIdentityConfig {
 /**
  * Env vars corresponding to each value for the AwsHsmOracleIdentityConfig for a particular context
  */
-const awsHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AwsHsmOracleIdentityConfig]: DynamicEnvVar } = {
+const awsHsmOracleIdentityConfigDynamicEnvVars: {
+  [k in keyof AwsHsmOracleIdentityConfig]: DynamicEnvVar
+} = {
   addressKeyAliases: DynamicEnvVar.ORACLE_ADDRESS_AWS_KEY_ALIASES,
 }
 
@@ -213,7 +255,13 @@ const awsHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AwsHsmOracleIdenti
  * Gets an AwsHsmOracleDeployer by looking at env var values and generating private keys
  * from the mnemonic
  */
-function getPrivateKeyOracleDeployer(celoEnv: string, context: string, currencyPair: CurrencyPair, useForno: boolean, count: number): PrivateKeyOracleDeployer {
+function getPrivateKeyOracleDeployer(
+  celoEnv: string,
+  context: string,
+  currencyPair: CurrencyPair,
+  useForno: boolean,
+  count: number
+): PrivateKeyOracleDeployer {
   const identities: PrivateKeyOracleIdentity[] = getPrivateKeysFor(
     AccountType.PRICE_ORACLE,
     fetchEnv(envVar.MNEMONIC),
@@ -221,13 +269,13 @@ function getPrivateKeyOracleDeployer(celoEnv: string, context: string, currencyP
   ).map((pkey) => ({
     address: privateKeyToAddress(pkey),
     currencyPair,
-    privateKey: ensureLeading0x(pkey)
+    privateKey: ensureLeading0x(pkey),
   }))
   const deploymentConfig: PrivateKeyOracleDeploymentConfig = {
     context,
     currencyPair,
     identities,
-    useForno
+    useForno,
   }
   return new PrivateKeyOracleDeployer(deploymentConfig, celoEnv)
 }
@@ -243,7 +291,9 @@ interface MnemonicBasedOracleIdentityConfig {
 /**
  * Env vars corresponding to each value for the MnemonicBasedOracleIdentityConfig for a particular context
  */
-const mnemonicBasedOracleIdentityConfigDynamicEnvVars: { [k in keyof MnemonicBasedOracleIdentityConfig]: DynamicEnvVar } = {
+const mnemonicBasedOracleIdentityConfigDynamicEnvVars: {
+  [k in keyof MnemonicBasedOracleIdentityConfig]: DynamicEnvVar
+} = {
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
 }
 

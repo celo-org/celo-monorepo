@@ -1,4 +1,8 @@
-import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-bot'
@@ -9,7 +13,12 @@ export async function installHelmChart(celoEnv: string) {
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  await upgradeGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, helmParameters(celoEnv))
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    helmChartPath,
+    helmParameters(celoEnv)
+  )
 }
 
 export async function removeHelmRelease(celoEnv: string) {

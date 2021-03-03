@@ -2,8 +2,10 @@
 
 This section explains how to get a full node running on the [Alfajores Network](alfajores-testnet.md), using a Docker image that was built for this purpose.
 
+If you'd prefer a one click, hosted setup for running a node on one of the major cloud providers (AWS and GCP), checkout our [hosted nodes](hosted-nodes.md) documentation.
+
 {% hint style="info" %}
-If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
+If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list](https://celo.activehosted.com/f/15).
 
 You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
 {% endhint %}
@@ -104,6 +106,7 @@ You will have fully synced with the network once you have pulled the latest bloc
 ## Command Line Interface
 
 Once the full node is running, it can serve the [Command Line Interface](../command-line-interface/introduction.md) tool `celocli`. For example:
+
 ```bash
 $ npm install -g @celo/celocli
 ...

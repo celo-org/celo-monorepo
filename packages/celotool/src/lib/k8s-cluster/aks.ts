@@ -18,7 +18,9 @@ export class AksClusterManager extends BaseClusterManager {
       console.info('No azure account subscription currently set')
     }
     if (currentTenantId === null || currentTenantId.trim() !== this.clusterConfig.tenantId) {
-      await execCmdWithExitOnFailure(`az account set --subscription ${this.clusterConfig.subscriptionId}`)
+      await execCmdWithExitOnFailure(
+        `az account set --subscription ${this.clusterConfig.subscriptionId}`
+      )
     }
   }
 
