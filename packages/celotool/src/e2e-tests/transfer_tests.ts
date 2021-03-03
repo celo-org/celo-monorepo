@@ -558,15 +558,15 @@ describe('Transfer tests', function(this: any) {
       it(`should increment the receiver's ${transferToken} balance by the transfer amount`, () =>
         assertEqualBN(balances.delta(toAddress, transferToken), TransferAmount))
 
-      if (kit.celoTokens.isStableToken(feeToken)) {
-        it('should have emitted transfer events for the fee token', () => {
+      it('should have emitted transfer events for the fee token if not using CELO', () => {
+        if (kit.celoTokens.isStableToken(feeToken)) {
           assert(
             txRes.events.find(
               (a) => eqAddress(a.to, governanceAddress) && eqAddress(a.from, fromAddress)
             )
           )
-        })
-      }
+        }
+      })
 
       if (transferToken === feeToken) {
         it(`should decrement the sender's ${transferToken} balance by the transfer amount plus fees`, () => {
