@@ -409,9 +409,9 @@ OPTIONS
                                                      bucket this parameter is required
 
   --directory=directory                              [default:
-                                                     /Users/alex/celo/celo-monorepo/pack
-                                                     ages/cli] To which directory data
-                                                     should be written
+                                                     /Users/medhakothari/celo/celo-monor
+                                                     epo/packages/cli] To which
+                                                     directory data should be written
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Account Address
 
@@ -442,7 +442,8 @@ OPTIONS
   --bucket=bucket           If using a GCP or AWS storage bucket this parameter is
                             required
 
-  --directory=directory     [default: /Users/alex/celo/celo-monorepo/packages/cli] To
+  --directory=directory     [default:
+                            /Users/medhakothari/celo/celo-monorepo/packages/cli] To
                             which directory data should be written
 
   --encryptTo=encryptTo
