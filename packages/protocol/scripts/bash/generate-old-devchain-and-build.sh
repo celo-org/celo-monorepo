@@ -27,8 +27,14 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
-source scripts/bash/release-lib.sh
-build_tag $BRANCH $LOG_FILE
+echo "- Checkout source code at $BRANCH"
+git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' 2>>$LOG_FILE >> $LOG_FILE
+git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
+
+echo "- Build contract artifacts"
+rm -rf build/contracts
+yarn install >> $LOG_FILE
+yarn build >> $LOG_FILE
 
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
