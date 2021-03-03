@@ -21,12 +21,12 @@ export type EachCeloToken<T> = {
   [key in CeloToken]: T
 }
 
-interface CeloTokenInfo {
+export interface CeloTokenInfo {
   contract: CeloTokenContract
   symbol: CeloToken
 }
 
-interface StableTokenInfo extends CeloTokenInfo {
+export interface StableTokenInfo extends CeloTokenInfo {
   contract: StableTokenContract
   exchangeContract: ExchangeContract
 }
@@ -104,12 +104,17 @@ export class CeloTokens {
    * @return an object containing the resolved value the call to fn for each
    *  celo token.
    */
-  async forEachCeloToken<T>(fn: (info: CeloTokenInfo) => Promise<T>): Promise<EachCeloToken<T>> {
+  async forEachCeloToken<T>(
+    fn: (info: CeloTokenInfo) => T | Promise<T>
+  ): Promise<EachCeloToken<T>> {
     const wrapperInfos = await Promise.all(
-      Object.values(celoTokenInfos).map(async (info: CeloTokenInfo) => ({
-        symbol: info.symbol,
-        data: await fn(info),
-      }))
+      Object.values(celoTokenInfos).map(async (info: CeloTokenInfo) => {
+        const fnResult = fn(info)
+        return {
+          symbol: info.symbol,
+          data: fnResult instanceof Promise ? await fnResult : fnResult,
+        }
+      })
     )
     return wrapperInfos.reduce(
       (
@@ -184,5 +189,13 @@ export class CeloTokens {
   isStableToken(token: CeloToken) {
     // We cast token as StableToken to make typescript happy
     return Object.values(StableToken).includes(token as StableToken)
+  }
+
+  isStableTokenContract(contract: CeloContract) {
+    const allStableTokenContracts = Object.values(StableToken).map(
+      (token) => stableTokenInfos[token].contract
+    )
+    // We cast token as StableTokenContract to make typescript happy
+    return allStableTokenContracts.includes(contract as StableTokenContract)
   }
 }

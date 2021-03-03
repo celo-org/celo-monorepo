@@ -371,7 +371,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * some regularly used arguments. The purpose of these tests is to verify that
    * those arguments are being set correctly.
    */
-  describe.only('#reportStableToken', () => {
+  describe('#reportStableToken', () => {
     it('calls report with the address for StableToken (cUSD) by default', async () => {
       const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress)
       await tx.sendAndWaitForReceipt()

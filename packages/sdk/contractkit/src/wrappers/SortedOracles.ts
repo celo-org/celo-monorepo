@@ -3,7 +3,7 @@ import { Address, CeloTransactionObject, toTransactionObject } from '@celo/conne
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { CeloContract } from '../base'
+import { CeloContract, StableTokenContract } from '../base'
 import { StableToken } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
@@ -48,7 +48,7 @@ export interface MedianRate {
   rate: BigNumber
 }
 
-export type ReportTarget = CeloContract.StableToken | Address
+export type ReportTarget = StableTokenContract | Address
 
 /**
  * Currency price oracle contract.
@@ -296,8 +296,8 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    if (target === CeloContract.StableToken || target === CeloContract.StableTokenEUR) {
-      return this.kit.registry.addressFor(target)
+    if (this.kit.celoTokens.isStableTokenContract(target as CeloContract)) {
+      return this.kit.registry.addressFor(target as StableTokenContract)
     } else if (isValidAddress(target)) {
       return target
     } else {

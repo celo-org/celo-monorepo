@@ -13,7 +13,7 @@ import { BigNumber } from 'bignumber.js'
 import net from 'net'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
-import { CeloContract, CeloToken } from './base'
+import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken, StableToken } from './celo-tokens'
 import { WrapperCache } from './contract-cache'
 import { Web3ContractCache } from './web3-contract-cache'
@@ -231,11 +231,13 @@ export class ContractKit {
 
   /**
    * Set CeloToken to use to pay for gas fees
-   * @param token CELO (GoldToken) or a supported StableToken
+   * @param tokenContract CELO (GoldToken) or a supported StableToken contract
    */
-  async setFeeCurrency(token: CeloToken): Promise<void> {
+  async setFeeCurrency(tokenContract: CeloTokenContract): Promise<void> {
     const address =
-      token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
+      tokenContract === CeloContract.GoldToken
+        ? undefined
+        : await this.registry.addressFor(tokenContract)
     if (address) {
       await this.updateGasPriceInConnectionLayer(address)
     }
