@@ -1,40 +1,15 @@
 #!/bin/bash
 
+
 # ---- Configure logrotate ----
 echo "Configuring logrotate" | logger
 cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/syslog
-{
-        rotate 3
-        daily
-        missingok
-        notifempty
-        #delaycompress
-        compress
-        postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
-                kill -HUP `pidof rsyslogd`
-        endscript
-}
-
 /var/log/mail.info
 /var/log/mail.warn
 /var/log/mail.err
 /var/log/mail.log
 /var/log/daemon.log
-{
-        rotate 3
-        daily
-        missingok
-        notifempty
-        #delaycompress
-        compress
-        postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
-                kill -HUP `pidof rsyslogd`
-        endscript
-}
-
 /var/log/kern.log
 /var/log/auth.log
 /var/log/user.log
@@ -44,14 +19,14 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/messages
 {
         rotate 3
-        weekly
+        daily
         missingok
         notifempty
+        delaycompress
         compress
-        #delaycompress
         sharedscripts
         postrotate
-                #invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null   # does not work on debian10
                 kill -HUP `pidof rsyslogd`
         endscript
 }
@@ -65,23 +40,12 @@ cat <<'EOF' > /etc/rsyslog.conf
 # For more information install rsyslog-doc and see
 # /usr/share/doc/rsyslog-doc/html/configuration/index.html
 
-
 #################
 #### MODULES ####
 #################
 
 module(load="imuxsock") # provides support for local system logging
 module(load="imklog")   # provides kernel logging support
-#module(load="immark")  # provides --MARK-- message capability
-
-# provides UDP syslog reception
-#module(load="imudp")
-#input(type="imudp" port="514")
-
-# provides TCP syslog reception
-#module(load="imtcp")
-#input(type="imtcp" port="514")
-
 
 ###########################
 #### GLOBAL DIRECTIVES ####
@@ -122,20 +86,7 @@ $IncludeConfig /etc/rsyslog.d/*.conf
 #
 auth,authpriv.*                 /var/log/auth.log
 *.*;auth,authpriv.none          -/var/log/syslog
-#cron.*                         /var/log/cron.log
-#daemon.*                        -/var/log/daemon.log
 kern.*                          -/var/log/kern.log
-lpr.*                           -/var/log/lpr.log
-mail.*                          -/var/log/mail.log
-user.*                          -/var/log/user.log
-
-#
-# Logging for the mail system.  Split it up so that
-# it is easy to write scripts to parse these files.
-#
-mail.info                       -/var/log/mail.info
-mail.warn                       -/var/log/mail.warn
-mail.err                        /var/log/mail.err
 
 #
 # Some "catch-all" log files.
@@ -153,13 +104,16 @@ mail.err                        /var/log/mail.err
 #
 *.emerg                         :omusrmsg:*
 EOF
+
 # ---- Restart rsyslogd
 echo "Restarting rsyslogd"
 systemctl restart rsyslog
+
 # ---- Useful aliases ----
 echo "Configuring aliases" | logger
 echo "alias ll='ls -laF'" >> /etc/skel/.bashrc
-echo "alias ll='ls -laF'" >> /root/.profile
+echo "alias ll='ls -laF'" >> /root/.bashrc
+echo "alias gattach='docker exec -it geth geth attach'" >> /etc/skel/.bashrc
 
 function save_variable {
   local var=$1
