@@ -18,6 +18,7 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
+  'ExchangeEURProxy',
   'ExchangeProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
@@ -30,6 +31,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
+  'StableTokenEURProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
 ]
@@ -66,9 +68,11 @@ export const CoreContracts = [
 
   // stability
   'Exchange',
+  'ExchangeEUR',
   'Reserve',
   'ReserveSpenderMultiSig',
   'StableToken',
+  'StableTokenEUR',
   'SortedOracles',
 ]
 
@@ -79,6 +83,9 @@ const OtherContracts = [
   'Initializable',
   'UsingRegistry',
 ]
+
+const Interfaces = ['ICeloToken', 'IERC20']
+
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
 // const TruffleTestContracts = ['Ownable'].concat(OtherContracts).concat(CoreContracts)
@@ -134,7 +141,7 @@ async function generateFilesForContractKit() {
   exec(`rm -rf ${CONTRACTKIT_GEN_DIR}`)
   const relativePath = path.relative(ROOT_DIR, CONTRACTKIT_GEN_DIR)
 
-  const contractKitContracts = CoreContracts.concat('Proxy')
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
 
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
