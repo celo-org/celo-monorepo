@@ -1,7 +1,7 @@
 FROM circleci/node:10
 MAINTAINER Connor McEwen <c@celo.org>
 
-RUN sudo apt-get install software-properties-common python-software-properties
+RUN sudo apt-get install software-properties-common
 RUN sudo add-apt-repository ppa:git-core/ppa
 RUN sudo apt-get update -y
 RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 git -y
