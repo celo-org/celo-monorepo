@@ -2,7 +2,7 @@
 
 Welcome to the DApp Gallery! Here are some featured examples to help you get started building on Celo.
 
-## [Celo Camp](https://www.celocamp.com/) Projects  
+## [Celo Camp](https://www.celocamp.com/) Projects
 
 ### Biscoint DollarSave
 
@@ -28,8 +28,8 @@ Welcome to the DApp Gallery! Here are some featured examples to help you get sta
 
 The [ReSource Network](http://www.resourcenetwork.co/) is building a resource-based mutual credit blockchain protocol. The initial version is deployed in CELO mainnet on address: [0x39049c02a56c3ecd046f6c2a9be0cffa2bc29c08](https://explorer.celo.org/address/0x39049c02a56c3ecd046f6c2a9be0cffa2bc29c08/transactions), [GitHub](https://github.com/ReSource-Network/Resource-Ethereum)
 
-### Pesabase  
-  
+### Pesabase
+
 An integration of a Celo Dollar (Stablecoin) and Mpesa, showing flows of payment between an Mpesa User and a Celo Blockchain wallet from anywhere in the world. Our aim with Pesabase is to provide African’s with a cheap and social option to remit and pay for goods and services. [Github](https://github.com/Kesholabs/celoBackend), [Android app](https://play.google.com/store/apps/details?id=com.pesabase.app)
 
 ### Wallet as a Service
@@ -61,6 +61,18 @@ At Dunia Payment, we are building an electronic wallet that will let people in S
 Decentralized application to help coordinate and improve the impact metric of non-profit organizations that work with migrants in Latin America. [GitHub](https://github.com/nestorbonilla/bienvenir)
 
 ## Additional DApps
+
+### Ubeswap
+
+[Ubeswap](https://ubeswap.org/) is a mobile-first DeFi exchange, a mobile compatible fork of Uniswap running on the Celo blockchain. Ubeswap is [open source on GitHub](https://github.com/ubeswap) and available on Safari for iOS and any browser on Android.
+
+### Celo Vote
+
+[Celovote](https://celovote.com/) automatically distributes your stake to preferred validator groups that have high estimated APY (annual percentage yield) and automatically rebalances votes if any of the voted groups fails to maintain high uptime. You retain full custody of your CELO and receive 100% of your rewards.
+
+### Celo Tools
+
+[Celo Tools](https://celotools.com/) is an accessible frontend to the [Celo CLI](../command-line-interface/introduction.md). Anyone and everyone participating in the Celo network should be able to stake and vote on governance proposals, Celo Tools provides this functionality for those without the know-how to access a command line.
 
 ### Savings Circle
 

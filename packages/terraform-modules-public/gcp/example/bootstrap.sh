@@ -70,7 +70,6 @@ echo "export TF_VAR_GCP_DEFAULT_SERVICE_ACCOUNT=\"$GCP_DEFAULT_SERVICE_ACCOUNT\"
 #plan is to use this from within TF to grant explicit access to a logs bucket rather than use a broad storage.rw scope
 
 echo "Creating a bucket for storing remote TFSTATE"
-echo "Note that this bucket is created but is not enabled for Terraform state by default due to security concerns"
 #note namespace on gcp cloud storage buckets is global, so this must be unique
 TF_STATE_BUCKET=${TF_VAR_project}-tfstate
 gsutil mb -p ${TF_VAR_project} gs://${TF_STATE_BUCKET}
@@ -109,22 +108,20 @@ cat > iam.txt << EOF
 }
 EOF
 
-#### enable this if you want to use the GCS bucket for Terraform state.
-# This is helpful if multiple people will be using terraform to manage the infrastructure
-# Note that if this is enabled, you will need to manually restrict permissions to the TF_STATE_BUCKET to ensure that
-# Unprivileged nodes (eg proxy, txnode, attestation) cannot use their default service account to read the Terraform state
-# this is important because the Terraform state includes your private keys, etc.
 
-#cat > backend.tf << EOF
-#terraform {
-# backend "gcs" {
-#   bucket  = "${TF_STATE_BUCKET}"
-#   prefix  = "terraform/state"
-# }
-#}
-#EOF
+cat > backend.tf << EOF
+terraform {
+ backend "gcs" {
+   bucket  = "${TF_STATE_BUCKET}"
+   prefix  = "terraform/state"
+ }
+}
+EOF
 
 echo "Initializing terraform"
 terraform init
+
+echo "Don't forget to 'source gcloud.env' before using Terraform!"
+echo "A dynamically named service account was created that Terraform needs to know about"
 
 
