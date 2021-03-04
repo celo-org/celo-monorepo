@@ -13,17 +13,17 @@ export enum Token {
   CELO = 'CELO',
 }
 
-export type CeloToken = StableToken | Token
+export type CeloTokenType = StableToken | Token
 
 type CeloTokenWrapper = GoldTokenWrapper | StableTokenWrapper
 
 export type EachCeloToken<T> = {
-  [key in CeloToken]: T
+  [key in CeloTokenType]: T
 }
 
 export interface CeloTokenInfo {
   contract: CeloTokenContract
-  symbol: CeloToken
+  symbol: CeloTokenType
 }
 
 export interface StableTokenInfo extends CeloTokenInfo {
@@ -49,7 +49,7 @@ const stableTokenInfos: {
 
 /** Basic info for each supported celo token, including stable tokens */
 const celoTokenInfos: {
-  [key in CeloToken]: CeloTokenInfo
+  [key in CeloTokenType]: CeloTokenInfo
 } = {
   [Token.CELO]: {
     contract: CeloContract.GoldToken,
@@ -119,7 +119,7 @@ export class CeloTokens {
     return wrapperInfos.reduce(
       (
         obj: {
-          [key in CeloToken]?: T
+          [key in CeloTokenType]?: T
         },
         wrapperInfo
       ) => ({
@@ -136,7 +136,7 @@ export class CeloTokens {
    * @return an promise resolving to the wrapper for the token
    */
   getWrapper(token: StableToken): Promise<StableTokenWrapper>
-  getWrapper(token: CeloToken): Promise<CeloTokenWrapper> {
+  getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper> {
     return this.kit.contracts.getContract(celoTokenInfos[token].contract)
   }
 
@@ -146,7 +146,7 @@ export class CeloTokens {
    * @return The contract for the token
    */
   getContract(token: StableToken): StableTokenContract
-  getContract(token: CeloToken): CeloTokenContract {
+  getContract(token: CeloTokenType): CeloTokenContract {
     return celoTokenInfos[token].contract
   }
 
@@ -164,7 +164,7 @@ export class CeloTokens {
    * @param token the token to get the (proxy) contract address for
    * @return A promise resolving to the address of the token's contract
    */
-  getAddress(token: CeloToken) {
+  getAddress(token: CeloTokenType) {
     return this.kit.registry.addressFor(celoTokenInfos[token].contract)
   }
 
@@ -174,7 +174,7 @@ export class CeloTokens {
    * @param token the token to get the feeCurrency address for
    * @return If not CELO, the address of the token's contract. If CELO, undefined.
    */
-  getFeeCurrencyAddress(token: CeloToken) {
+  getFeeCurrencyAddress(token: CeloTokenType) {
     if (token === Token.CELO) {
       return undefined
     }
@@ -186,7 +186,7 @@ export class CeloTokens {
    * @param token the token
    * @return if token is a StableToken
    */
-  isStableToken(token: CeloToken) {
+  isStableToken(token: CeloTokenType) {
     // We cast token as StableToken to make typescript happy
     return Object.values(StableToken).includes(token as StableToken)
   }

@@ -6,7 +6,7 @@ export {
   CeloTokenContract,
   RegisteredContracts,
 } from './base'
-export { CeloTokens, StableToken, Token } from './celo-tokens'
+export { CeloTokens, CeloTokenType, StableToken, Token } from './celo-tokens'
 export { IdentityMetadataWrapper } from './identity'
 export * from './kit'
 export * from './proxy'

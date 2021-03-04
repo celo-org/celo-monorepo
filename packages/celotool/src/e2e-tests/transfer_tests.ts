@@ -1,7 +1,7 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 import { CeloTxPending, CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { CeloToken, EachCeloToken, StableToken, Token } from '@celo/contractkit/lib/celo-tokens'
+import { CeloTokenType, EachCeloToken, StableToken, Token } from '@celo/contractkit/lib/celo-tokens'
 import { eqAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -75,14 +75,14 @@ class InflationManager {
   }
 }
 
-const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
+const freeze = async (validatorUri: string, validatorAddress: string, token: CeloTokenType) => {
   const kit = newKitFromWeb3(new Web3(validatorUri))
   const tokenAddress = await kit.celoTokens.getAddress(token)
   const freezer = await kit.contracts.getFreezer()
   await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
-const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
+const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloTokenType) => {
   const kit = newKitFromWeb3(new Web3(validatorUri))
   const tokenAddress = await kit.celoTokens.getAddress(token)
   const freezer = await kit.contracts.getFreezer()
@@ -134,13 +134,13 @@ const stableTokenTransferGasCost = 23653
 interface BalanceWatcher {
   update(): Promise<void>
 
-  delta(address: string, token: CeloToken): BigNumber
+  delta(address: string, token: CeloTokenType): BigNumber
 
-  current(address: string, token: CeloToken): BigNumber
+  current(address: string, token: CeloTokenType): BigNumber
 
-  initial(address: string, token: CeloToken): BigNumber
+  initial(address: string, token: CeloTokenType): BigNumber
 
-  debugPrint(address: string, token: CeloToken): void
+  debugPrint(address: string, token: CeloTokenType): void
 }
 
 async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<BalanceWatcher> {
@@ -160,16 +160,16 @@ async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<
     async update() {
       current = await fetch()
     },
-    delta(address: string, token: CeloToken) {
+    delta(address: string, token: CeloTokenType) {
       return current[address][token].minus(initial[address][token])
     },
-    current(address: string, token: CeloToken) {
+    current(address: string, token: CeloTokenType) {
       return current[address][token]
     },
-    initial(address: string, token: CeloToken) {
+    initial(address: string, token: CeloTokenType) {
       return initial[address][token]
     },
-    debugPrint(address: string, token: CeloToken) {
+    debugPrint(address: string, token: CeloTokenType) {
       // tslint:disable-next-line: no-console
       console.log({
         initial: initial[address][token].toString(),
@@ -475,7 +475,7 @@ describe('Transfer tests', function(this: any) {
     gas,
     expectedError,
   }: {
-    feeToken: CeloToken
+    feeToken: CeloTokenType
     gas: number
     expectedError: string
   }) {
@@ -503,8 +503,8 @@ describe('Transfer tests', function(this: any) {
     fromAddress = FromAddress,
     toAddress = ToAddress,
   }: {
-    transferToken: CeloToken
-    feeToken: CeloToken
+    transferToken: CeloTokenType
+    feeToken: CeloTokenType
     expectedGas: number
     expectSuccess?: boolean
     txOptions?: {
