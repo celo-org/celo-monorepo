@@ -32,22 +32,28 @@ export function parseURLOnRender() {
   }
 }
 
-async function waitForResponse() {
-  while (true) {
+async function waitForResponse(timeout: number) {
+  // In milliseconds
+  const pollInterval = 100
+  const endTime = Date.now() + timeout
+
+  while (Date.now() < endTime) {
     const value = localStorage.getItem(localStorageKey)
     if (value) {
       localStorage.removeItem(localStorageKey)
       return value
     }
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, pollInterval))
   }
+  throw new Error('Timeout waiting for Valora response')
 }
 
 async function waitDecorator(
   requestId: string,
-  checkCallback: (requestId: string, dappKitResponse: any) => boolean
+  checkCallback: (requestId: string, dappKitResponse: any) => boolean,
+  timeout: number = 15000
 ): Promise<any> {
-  const url = await waitForResponse()
+  const url = await waitForResponse(timeout)
   const dappKitResponse = parseDappkitResponseDeeplink(url)
   if (checkCallback(requestId, dappKitResponse)) {
     return dappKitResponse
