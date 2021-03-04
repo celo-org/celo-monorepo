@@ -1,4 +1,6 @@
 import { isValidAddress, trimLeading0x } from '@celo/utils/lib/address'
+import isBase64 from 'is-base64'
+import { GetBlindedMessageSigRequest } from '../interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT, REQUEST_EXPIRY_WINDOW_MS } from './constants'
 
 export function hasValidAccountParam(requestBody: any): boolean {
@@ -17,8 +19,12 @@ export function isBodyReasonablySized(requestBody: any): boolean {
   return JSON.stringify(requestBody).length <= REASONABLE_BODY_CHAR_LIMIT
 }
 
-export function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return !!requestBody.blindedQueryPhoneNumber
+export function hasValidQueryPhoneNumberParam(requestBody: GetBlindedMessageSigRequest): boolean {
+  return (
+    !!requestBody.blindedQueryPhoneNumber &&
+    requestBody.blindedQueryPhoneNumber.length === 64 &&
+    isBase64(requestBody.blindedQueryPhoneNumber)
+  )
 }
 
 export function hasValidPhoneNumberHash(requestBody: any): boolean {
