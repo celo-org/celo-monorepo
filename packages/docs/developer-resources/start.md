@@ -18,13 +18,13 @@ The following examples and guides will help you start building on Celo.
 
 ## Mobile DApps
 
-- The [DappKit Truffle Box](walkthroughs/hello-mobile-dapp.md) walkthrough will help you create a simple mobile dApp using dAppKit and the React Native Expo framework. This application will allow connecting to your Valora account and sending transactions.
+- [DappKit Truffle Box](walkthroughs/hello-mobile-dapp.md)
+  - The [DappKit Truffle Box](walkthroughs/hello-mobile-dapp.md) walkthrough will help you create a simple mobile dApp using dAppKit and the React Native Expo framework. This application will allow connecting to your Valora account and sending transactions.
 
-<!--
+## Web DApps
 
-## Web
+<!-- - [DappKit web example with expo] -->
+<!-- - [DappKit web example without expo] -->
 
-- [DappKit web example with expo]
-- [DappKit web example without expo]
-- [use-contractkit example]
--->
+- [Interact with Celo core contracts](walkthroughs/web-dapp.md)
+  - This React based tutorial will walk you through creating a basic Governance voting DApp. Topics covered include ContractKit usage, connecting to a users wallet and some best practices for general DApp development
