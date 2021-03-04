@@ -1,7 +1,6 @@
 import {
   eqAddress,
   findAddressIndex,
-  normalizeAddress,
   normalizeAddressWith0x,
   NULL_ADDRESS,
 } from '@celo/base/lib/address'
@@ -493,11 +492,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       (await this.getVoterShare(address, await this.kit.getLastBlockNumberForEpoch(epochNumber)))
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
     const voterRewards = groupVoterRewards.filter(
-      (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoteShare
+      (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
     )
     return voterRewards.map(
       (e: GroupVoterReward): VoterReward => {
-        const group = normalizeAddress(e.group.address)
+        const group = normalizeAddressWith0x(e.group.address)
         return {
           address,
           addressPayment: e.groupVoterPayment.times(activeVoteShare[group]),
