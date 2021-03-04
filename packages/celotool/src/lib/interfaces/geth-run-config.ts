@@ -1,5 +1,6 @@
 import { GenesisConfig } from './genesis-config'
 import { GethInstanceConfig } from './geth-instance-config'
+import { GethRepository } from './geth-repository'
 
 export interface GethRunConfig {
   // migration
@@ -7,8 +8,6 @@ export interface GethRunConfig {
   migrateTo?: number
   migrationOverrides?: any
   keepData?: boolean
-  // ??
-  useBootnode?: boolean
   // genesis config
   genesisConfig?: GenesisConfig
   // network
@@ -17,7 +16,7 @@ export interface GethRunConfig {
   // where to run
   runPath: string
   verbosity?: number
-  gethRepoPath?: string
+  repository?: GethRepository
   // running instances
   instances: GethInstanceConfig[]
 }

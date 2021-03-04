@@ -7,10 +7,7 @@ import { AksClusterConfig } from './k8s-cluster/aks'
  * getIdentity gets basic info on an existing identity. If the identity doesn't
  * exist, undefined is returned
  */
-export async function getIdentity(
-  clusterConfig: AksClusterConfig,
-  identityName: string
-) {
+export async function getIdentity(clusterConfig: AksClusterConfig, identityName: string) {
   const [matchingIdentitiesStr] = await execCmdWithExitOnFailure(
     `az identity list -g ${clusterConfig.resourceGroup} --query "[?name == '${identityName}']" -o json`
   )
@@ -30,7 +27,9 @@ export async function createIdentityIdempotent(
 ) {
   const identity = await getIdentity(clusterConfig, identityName)
   if (identity) {
-    console.info(`Skipping identity creation, ${identityName} in resource group ${clusterConfig.resourceGroup} already exists`)
+    console.info(
+      `Skipping identity creation, ${identityName} in resource group ${clusterConfig.resourceGroup} already exists`
+    )
     return identity
   }
   console.info(`Creating identity ${identityName} in resource group ${clusterConfig.resourceGroup}`)
@@ -61,12 +60,21 @@ async function roleIsAssigned(assignee: string, scope: string, role: string) {
   return parseInt(matchingAssignedRoles.trim(), 10) > 0
 }
 
-export async function assignRoleIdempotent(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
+export async function assignRoleIdempotent(
+  assigneeObjectId: string,
+  assigneePrincipalType: string,
+  scope: string,
+  role: string
+) {
   if (await roleIsAssigned(assigneeObjectId, scope, role)) {
-    console.info(`Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`)
+    console.info(
+      `Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`
+    )
     return
   }
-  console.info(`Assigning role ${role} to ${assigneeObjectId} type ${assigneePrincipalType} for scope ${scope}`)
+  console.info(
+    `Assigning role ${role} to ${assigneeObjectId} type ${assigneePrincipalType} for scope ${scope}`
+  )
   await retryCmd(
     () =>
       execCmdWithExitOnFailure(
