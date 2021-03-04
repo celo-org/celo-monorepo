@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   ErrorMessage,
+  GetContactMatchesRequest,
   hasValidAccountParam,
   hasValidContractPhoneNumbersParam,
   hasValidPhoneNumberHash,
@@ -15,14 +16,6 @@ import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { getContractKit } from '../web3/contracts'
-
-interface GetContactMatchesRequest {
-  account: string
-  userPhoneNumber: string
-  contactPhoneNumbers: string[]
-  hashedPhoneNumber: string
-  sessionID?: string
-}
 
 interface ContactMatch {
   phoneNumber: string

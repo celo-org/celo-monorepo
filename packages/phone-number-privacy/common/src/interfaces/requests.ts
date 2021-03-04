@@ -5,3 +5,11 @@ export interface GetBlindedMessageSigRequest {
   timestamp?: number
   sessionID?: string
 }
+
+export interface GetContactMatchesRequest {
+  account: string
+  userPhoneNumber: string
+  contactPhoneNumbers: string[]
+  hashedPhoneNumber: string
+  sessionID?: string
+}
