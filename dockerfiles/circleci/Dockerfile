@@ -1,8 +1,10 @@
 FROM circleci/node:10
 MAINTAINER Connor McEwen <c@celo.org>
 
+RUN sudo apt-get install software-properties-common python-software-properties
+RUN sudo add-apt-repository ppa:git-core/ppa
 RUN sudo apt-get update -y
-RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 git -y
 
 # Install Kubernetes, as per https://kubernetes.io/docs/tasks/tools/install-kubectl/
 RUN sudo apt-get install -y apt-transport-https && \
