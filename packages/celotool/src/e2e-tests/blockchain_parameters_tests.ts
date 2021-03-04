@@ -79,14 +79,16 @@ describe('Blockchain parameters tests', function(this: any) {
     it('changing the block gas limit', async () => {
       this.timeout(0)
       await parameters.setBlockGasLimit(23000000).send({ from: validatorAddress })
-      await sleep(5)
+      await sleep(2)
       const res = await parameters.getBlockGasLimit()
       assert.equal(0, res.comparedTo(23000000))
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
       await setMinimumClientVersion(1, 9, 99)
-      await sleep(120, true)
+      // The client checks every 60 seconds and then waits 10 seconds before quitting, so we
+      // may have to wait a little over 70 seconds
+      await sleep(75, true)
       try {
         // It should have exited by now, call RPC to trigger error
         await kit.connection.getBlockNumber()
