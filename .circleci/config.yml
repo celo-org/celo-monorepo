@@ -21,7 +21,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: gcr.io/$GOOGLE_PROJECT_ID/circleci:updated-git
+    - image: gcr.io/$GOOGLE_PROJECT_ID/circleci
       auth:
         username: _json_key
         password: $GCLOUD_SERVICE_KEY
