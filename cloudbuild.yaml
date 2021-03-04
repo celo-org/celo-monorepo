@@ -17,7 +17,7 @@ steps:
   args: [
     "--dockerfile=dockerfiles/circleci/Dockerfile",
     "--cache=true",
-    "--destination=gcr.io/$PROJECT_ID/celo-monorepo:circleci-$COMMIT_SHA"
+    "--destination=gcr.io/$PROJECT_ID/circleci:$COMMIT_SHA"
   ]
   waitFor: ['-']
 
