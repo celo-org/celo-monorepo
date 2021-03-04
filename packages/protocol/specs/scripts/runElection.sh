@@ -1,12 +1,12 @@
+#!/bin/bash
+echo "Optional: Pass argument in the form of --settings ..."
 certoraRun specs/harnesses/RegistryHarness.sol:RegistryHarness \
     specs/harnesses/ElectionHarness.sol:ElectionHarness \
     specs/harnesses/LockedGoldHarness.sol \
     specs/harnesses/GoldTokenHarness.sol \
     contracts/common/Accounts.sol \
-    --link ElectionHarness:lockedGold=LockedGoldHarness \
-    --link ElectionHarness:accounts=Accounts \
+    --link ElectionHarness:lockedGold=LockedGoldHarness ElectionHarness:accounts=Accounts \
     --verify ElectionHarness:specs/election.spec \
     --settings -assumeUnwindCond \
     --solc solc5.17 \
-    --path $PWD/contracts \
-    --cloud --msg "$1"
+    --path $PWD/contracts $1

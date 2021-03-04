@@ -50,7 +50,7 @@ rule distributivityState(uint256 x, uint256 y) {
 	env eOp2;
 	require(e.msg.sender != currentContract);
 	require(eOp2.msg.sender == e.msg.sender);
-	require (Op2.block.timestamp == e.block.timestamp);
+	require (eOp2.block.timestamp == e.block.timestamp);
 	
 	storage init = lastStorage;	
 	sinvoke withdraw(e, x);
