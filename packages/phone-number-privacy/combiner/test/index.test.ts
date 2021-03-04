@@ -7,6 +7,7 @@ import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSig, getContactMatches } from '../src/index'
+import { BLINDED_PHONE_NUMBER } from './end-to-end/resources'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
@@ -23,7 +24,7 @@ BLSCryptographyClient.prototype.combinePartialBlindedSignatures = mockComputeBli
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 const mockSufficientVerifiedSigs = jest.fn()
 BLSCryptographyClient.prototype.hasSufficientVerifiedSignatures = mockSufficientVerifiedSigs
-mockSufficientVerifiedSigs.mockResolvedValue(true)
+mockSufficientVerifiedSigs.mockReturnValue(true)
 
 jest.mock('../src/database/wrappers/account')
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
@@ -54,8 +55,8 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
   })
 
-  describe('with valid input', () => {
-    const blindedQueryPhoneNumber = '+5555555555'
+  describe.only('with valid input', () => {
+    const blindedQueryPhoneNumber = BLINDED_PHONE_NUMBER
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
     const mockHeader = 'fdsfdsfs'
@@ -74,40 +75,60 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
       },
     }
 
-    it('provides signature', async () => {
-      const res = {
-        json(body: any) {
-          expect(body.success).toEqual(true)
-          expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
-          expect(body.version).toEqual(VERSION)
-        },
-        status(status: any) {
+    const validResponseExpected = (done: any) => ({
+      json(body: any) {
+        expect(body.success).toEqual(true)
+        expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
+        expect(body.version).toEqual(VERSION)
+        done()
+      },
+      status(status: any) {
+        try {
           expect(status).toEqual(200)
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+          done()
+        } catch (e) {
+          done(e)
+        }
+        return {
+          json() {
+            return {}
+          },
+        }
+      },
     })
-    it('returns 500 on bls error', async () => {
-      mockComputeBlindedSignature.mockImplementation(() => {
+
+    const invalidResponseExpected = (done: any) => ({
+      status(status: any) {
+        try {
+          expect(status).toEqual(500)
+          done()
+        } catch (e) {
+          done(e)
+        }
+        return {
+          json() {
+            return {}
+          },
+        }
+      },
+    })
+
+    it('provides signature', (done) => {
+      // @ts-ignore
+      getBlindedMessageSig(req, validResponseExpected(done))
+    })
+
+    it('returns 500 on bls error', (done) => {
+      mockSufficientVerifiedSigs.mockReturnValue(false)
+      mockComputeBlindedSignature.mockImplementationOnce(() => {
         throw Error()
       })
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(500)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
+
       // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+      getBlindedMessageSig(req, invalidResponseExpected(done))
     })
   })
+
   describe('with invalid input', () => {
     it('invalid address returns 400', () => {
       const blindedQueryPhoneNumber = '+5555555555'
