@@ -32,7 +32,7 @@
 
 ▸ **blocksToDurationString**(`input`: BigNumber.Value): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:125](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L125)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L125)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **bufferToSolidityBytes**(`input`: Buffer): *SolidityBytes*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:135](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L135)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L135)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **fixidityValueToBigNumber**(`input`: BigNumber.Value): *BigNumber‹›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:63](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L63)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L63)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **identity**<**A**>(`a`: A): *A*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:150](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L150)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L150)*
 
 Identity Parser
 
@@ -102,7 +102,7 @@ ___
 
 ▸ **proxyCall**<**InputArgs**, **ParsedInputArgs**, **PreParsedOutput**, **Output**>(`methodFn`: Method‹ParsedInputArgs, PreParsedOutput›, `parseInputArgs`: function, `parseOutput`: function): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:219](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L219)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:219](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L219)*
 
 Creates a proxy to call a web3 native contract method.
 
@@ -164,7 +164,7 @@ Name | Type |
 
 ▸ **proxyCall**<**InputArgs**, **PreParsedOutput**, **Output**>(`methodFn`: Method‹InputArgs, PreParsedOutput›, `x`: undefined, `parseOutput`: function): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:229](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L229)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:229](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L229)*
 
 **Type parameters:**
 
@@ -202,7 +202,7 @@ Name | Type |
 
 ▸ **proxyCall**<**InputArgs**, **ParsedInputArgs**, **Output**>(`methodFn`: Method‹ParsedInputArgs, Output›, `parseInputArgs`: function): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:234](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L234)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L234)*
 
 **Type parameters:**
 
@@ -238,7 +238,7 @@ Name | Type |
 
 ▸ **proxyCall**<**InputArgs**, **Output**>(`methodFn`: Method‹InputArgs, Output›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:238](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L238)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L238)*
 
 **Type parameters:**
 
@@ -268,7 +268,7 @@ ___
 
 ▸ **proxySend**<**InputArgs**, **ParsedInputArgs**, **Output**>(`kit`: [ContractKit](../classes/_kit_.contractkit.md), ...`sendArgs`: ProxySendArgs‹InputArgs, ParsedInputArgs, Output›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:299](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L299)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:299](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L299)*
 
 Creates a proxy to send a tx on a web3 native contract method.
 
@@ -307,7 +307,7 @@ ___
 
 ▸ **secondsToDurationString**(`durationSeconds`: BigNumber.Value, `outputUnits`: TimeUnit[]): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:96](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L96)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L96)*
 
 **Parameters:**
 
@@ -324,7 +324,7 @@ ___
 
 ▸ **solidityBytesToString**(`input`: SolidityBytes): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:136](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L136)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L136)*
 
 **Parameters:**
 
@@ -340,7 +340,7 @@ ___
 
 ▸ **stringIdentity**(`x`: string): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:151](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L151)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:151](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L151)*
 
 **Parameters:**
 
@@ -356,7 +356,7 @@ ___
 
 ▸ **stringToSolidityBytes**(`input`: string): *SolidityBytes*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:134](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L134)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L134)*
 
 **Parameters:**
 
@@ -372,7 +372,7 @@ ___
 
 ▸ **tupleParser**<**A0**, **B0**>(`parser0`: Parser‹A0, B0›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:157](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L157)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L157)*
 
 Tuple parser
 Useful to map different input arguments
@@ -401,7 +401,7 @@ Name | Type |
 
 ▸ **tupleParser**<**A0**, **B0**, **A1**, **B1**>(`parser0`: Parser‹A0, B0›, `parser1`: Parser‹A1, B1›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:158](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L158)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:158](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L158)*
 
 **Type parameters:**
 
@@ -432,7 +432,7 @@ Name | Type |
 
 ▸ **tupleParser**<**A0**, **B0**, **A1**, **B1**, **A2**, **B2**>(`parser0`: Parser‹A0, B0›, `parser1`: Parser‹A1, B1›, `parser2`: Parser‹A2, B2›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:162](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L162)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:162](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L162)*
 
 **Type parameters:**
 
@@ -468,7 +468,7 @@ Name | Type |
 
 ▸ **tupleParser**<**A0**, **B0**, **A1**, **B1**, **A2**, **B2**, **A3**, **B3**>(`parser0`: Parser‹A0, B0›, `parser1`: Parser‹A1, B1›, `parser2`: Parser‹A2, B2›, `parser3`: Parser‹A3, B3›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:167](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L167)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L167)*
 
 **Type parameters:**
 
@@ -513,7 +513,7 @@ ___
 
 ▸ **unixSecondsTimestampToDateString**(`input`: BigNumber.Value): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:128](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L128)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L128)*
 
 **Parameters:**
 
@@ -529,7 +529,7 @@ ___
 
 ▸ **valueToBigNumber**(`input`: BigNumber.Value): *BigNumber‹›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
 
 **Parameters:**
 
@@ -545,7 +545,7 @@ ___
 
 ▸ **valueToFixidityString**(`input`: BigNumber.Value): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:67](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L67)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L67)*
 
 **Parameters:**
 
@@ -561,7 +561,7 @@ ___
 
 ▸ **valueToFrac**(`numerator`: BigNumber.Value, `denominator`: BigNumber.Value): *BigNumber‹›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:75](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L75)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L75)*
 
 **Parameters:**
 
@@ -578,7 +578,7 @@ ___
 
 ▸ **valueToInt**(`input`: BigNumber.Value): *number*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:70](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L70)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L70)*
 
 **Parameters:**
 
@@ -594,7 +594,7 @@ ___
 
 ▸ **valueToString**(`input`: BigNumber.Value): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:65](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L65)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L65)*
 
 **Parameters:**
 

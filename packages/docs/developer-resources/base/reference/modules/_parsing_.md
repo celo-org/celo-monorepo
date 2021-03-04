@@ -13,7 +13,7 @@
 
 ▸ **parseSolidityStringArray**(`stringLengths`: number[], `data`: string): *string[]*
 
-*Defined in [packages/sdk/base/src/parsing.ts:17](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/parsing.ts#L17)*
+*Defined in [packages/sdk/base/src/parsing.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/parsing.ts#L17)*
 
 Parses an "array of strings" that is returned from a Solidity function
 
@@ -32,7 +32,7 @@ ___
 
 ▸ **stringToBoolean**(`inputString`: string): *boolean*
 
-*Defined in [packages/sdk/base/src/parsing.ts:1](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/parsing.ts#L1)*
+*Defined in [packages/sdk/base/src/parsing.ts:1](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/parsing.ts#L1)*
 
 **Parameters:**
 

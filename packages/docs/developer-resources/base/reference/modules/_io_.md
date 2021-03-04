@@ -18,7 +18,7 @@
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
 )
 
-*Defined in [packages/sdk/base/src/io.ts:2](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/io.ts#L2)*
+*Defined in [packages/sdk/base/src/io.ts:2](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/io.ts#L2)*
 
 ## Functions
 
@@ -26,7 +26,7 @@
 
 ▸ **isValidUrl**(`url`: string): *boolean*
 
-*Defined in [packages/sdk/base/src/io.ts:6](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/io.ts#L6)*
+*Defined in [packages/sdk/base/src/io.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/io.ts#L6)*
 
 **Parameters:**
 

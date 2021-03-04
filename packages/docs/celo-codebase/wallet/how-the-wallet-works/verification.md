@@ -10,11 +10,8 @@ During the final step of new user onboarding in the Celo Wallet, a user complete
 
 When verification is in progress, the celo wallet sends a request for three SMS attestations. The process of selecting the senders of each of these three messages is detailed in the [Lightweight Identity](../../protocol/identity/) documentation.
 
-The general user flow for the celo wallet is depicted below.
-![](https://storage.googleapis.com/celo-website/Verification%20Flow.jpg)
+The following diagrams depict the user flows for the celo wallet:
 
-A more detailed flow of the phone number hash construction and the code input response are depicted below.
-
-![](https://storage.googleapis.com/celo-website/Get%20Phone%20Number%20Hash%20Details%20Flow.jpg)
-
-![](https://storage.googleapis.com/celo-website/Wait%20SMS%20and%20Complete%20Attestation%20Flow%20(1).jpg)
+- [General Verification Flow](https://storage.googleapis.com/celo-website/Verification%20Flow.jpg)
+- [Detailed Phone Number Hash Flow](https://storage.googleapis.com/celo-website/Get%20Phone%20Number%20Hash%20Details%20Flow.jpg)
+- [Detailed Flow for Receiving SMS Input and Compeleting Verification](https://storage.googleapis.com/celo-website/Wait%20SMS%20and%20Complete%20Attestation%20Flow%20(1).jpg)

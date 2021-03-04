@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
+import { connectBipartiteClique, connectPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import {
@@ -117,41 +117,49 @@ async function calculateUptime(
   epochSize: number,
   lookbackWindow: number
 ): Promise<BigNumber[]> {
-  // The parentAggregateSeal is not counted for the first or last blocks of the epoch
-  const blocks = await concurrentMap(10, [...Array(epochSize - 2).keys()], (i) =>
-    kit.connection.getBlock(lastBlockNumberOfEpoch - epochSize + 2 + i)
+  const firstBlockNumberOfEpoch = lastBlockNumberOfEpoch - epochSize + 1
+
+  const monitoringWindow: [number, number] = [
+    firstBlockNumberOfEpoch + lookbackWindow - 1, // last block of first lookbackWindow
+    lastBlockNumberOfEpoch - 2, // we ignore last 2 block fo epoch
+  ]
+  const monitoringWindowSize = monitoringWindow[1] - monitoringWindow[0] + 1
+
+  // we need to obtain monitoring window blocks shifted by 1, since
+  // we are interested in parentAggregatedSeal that lives on the next block
+  const blocks = await concurrentMap(10, [...Array(monitoringWindowSize).keys()], (i) =>
+    kit.connection.getBlock(monitoringWindow[0] + 1 + i)
   )
   const lastSignedBlock: number[] = new Array(validatorSetSize).fill(0)
-  const tally: number[] = new Array(validatorSetSize).fill(0)
+  const upBlocks: number[] = new Array(validatorSetSize).fill(0)
 
   // Follows updateUptime() in core/blockchain.go
-  let windowBlocks = 1
   for (const block of blocks) {
+    const blockNumber = block.number - 1 // we are actually monitoring prev block signatures
     const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
+
+    const isMonitoredBlock =
+      blockNumber >= monitoringWindow[0] && blockNumber <= monitoringWindow[1]
+
+    const currentLookbackWindow: [number, number] = [blockNumber - lookbackWindow + 1, blockNumber]
 
     for (let signerIndex = 0; signerIndex < validatorSetSize; signerIndex++) {
       if (bitIsSet(bitmap, signerIndex)) {
-        lastSignedBlock[signerIndex] = block.number - 1
+        lastSignedBlock[signerIndex] = blockNumber
       }
-      if (windowBlocks < lookbackWindow) {
-        continue
-      }
-      const signedBlockWindowLastBlockNum = block.number - 1
-      const signedBlockWindowFirstBlockNum = signedBlockWindowLastBlockNum - (lookbackWindow - 1)
-      if (
-        signedBlockWindowFirstBlockNum <= lastSignedBlock[signerIndex] &&
-        lastSignedBlock[signerIndex] <= signedBlockWindowLastBlockNum
-      ) {
-        tally[signerIndex]++
-      }
-    }
 
-    if (windowBlocks < lookbackWindow) {
-      windowBlocks++
+      const lastSignedWithinLookbackwindow =
+        lastSignedBlock[signerIndex] >= currentLookbackWindow[0] &&
+        lastSignedBlock[signerIndex] <= currentLookbackWindow[1]
+
+      if (isMonitoredBlock && lastSignedWithinLookbackwindow) {
+        upBlocks[signerIndex]++
+      }
     }
   }
-  const denominator = epochSize - lookbackWindow - 1
-  return tally.map((signerTally) => new BigNumber(signerTally / denominator))
+
+  const maxPotentialUpBlocks = monitoringWindowSize
+  return upBlocks.map((x) => new BigNumber(x / maxPotentialUpBlocks))
 }
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
@@ -163,6 +171,10 @@ describe('governance tests', () => {
     migrateTo: 25,
     networkId: 1101,
     network: 'local',
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       // Validators 0 and 1 are swapped in and out of the group.
       {
@@ -286,9 +298,8 @@ describe('governance tests', () => {
     return decryptedKeystore.privateKey
   }
 
-  const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
-    return blockNumber % epochSize === 0
-  }
+  const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) =>
+    blockNumber % epochSize === 0
 
   const assertBalanceChanged = async (
     address: string,
@@ -336,18 +347,16 @@ describe('governance tests', () => {
     }
   }
 
-  const assertTargetVotingYieldUnchanged = async (blockNumber: number) => {
-    await assertTargetVotingYieldChanged(blockNumber, new BigNumber(0))
-  }
+  const assertTargetVotingYieldUnchanged = (blockNumber: number) =>
+    assertTargetVotingYieldChanged(blockNumber, new BigNumber(0))
 
   const getLastEpochBlock = (blockNumber: number, epoch: number) => {
     const epochNumber = Math.floor((blockNumber - 1) / epoch)
     return epochNumber * epoch
   }
 
-  const assertGoldTokenTotalSupplyUnchanged = async (blockNumber: number) => {
-    await assertGoldTokenTotalSupplyChanged(blockNumber, new BigNumber(0))
-  }
+  const assertGoldTokenTotalSupplyUnchanged = (blockNumber: number) =>
+    assertGoldTokenTotalSupplyChanged(blockNumber, new BigNumber(0))
 
   const assertGoldTokenTotalSupplyChanged = async (blockNumber: number, expected: BigNumber) => {
     const currentSupply = new BigNumber(await goldToken.methods.totalSupply().call({}, blockNumber))
@@ -564,7 +573,7 @@ describe('governance tests', () => {
           expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber)
           expectUnchangedScores = validatorAccounts.filter((x) => !expectChangedScores.includes(x))
           electedValidators = await getValidatorSetAccountsAtBlock(blockNumber)
-          uptime = await calculateUptime(kit, electedValidators.length, blockNumber, epoch, 2)
+          uptime = await calculateUptime(kit, electedValidators.length, blockNumber, epoch, 3)
         } else {
           expectUnchangedScores = validatorAccounts
           expectChangedScores = []
@@ -909,10 +918,9 @@ describe('governance tests', () => {
 
       await connectPeers([...gethConfig.instances, validatorGroup], verbose)
 
+      console.log('wait for validatorGroup to finish syncing')
       await waitToFinishInstanceSyncing(validatorGroup)
 
-      // Connect the validating nodes to the non-validating nodes, to test that announce messages
-      // are properly gossiped.
       const additionalValidatingNodes: GethInstanceConfig[] = [
         {
           name: 'validator2KeyRotation0',
@@ -923,6 +931,7 @@ describe('governance tests', () => {
           wsport: 8559,
           rpcport: 9559,
           privateKey: rotation0PrivateKey.slice(2),
+          minerValidator: privateKeyToAddress(rotation0PrivateKey.slice(2)),
         },
         {
           name: 'validator2KeyRotation1',
@@ -933,6 +942,7 @@ describe('governance tests', () => {
           wsport: 8561,
           rpcport: 9561,
           privateKey: rotation1PrivateKey.slice(2),
+          minerValidator: privateKeyToAddress(rotation1PrivateKey.slice(2)),
         },
       ]
 
@@ -942,8 +952,10 @@ describe('governance tests', () => {
         )
       )
 
-      await connectValidatorPeers([...gethConfig.instances, ...additionalValidatingNodes])
+      // Connect the validating nodes to the non-validating nodes, to test that announce messages are properly gossiped.
+      await connectBipartiteClique(gethConfig.instances, additionalValidatingNodes, verbose)
 
+      console.log('wait for new validators to sync')
       await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
 
       validatorAccounts = await getValidatorGroupMembers()
@@ -951,6 +963,7 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
+      console.log('wait for end of epoch')
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
 
@@ -1020,13 +1033,19 @@ describe('governance tests', () => {
       assert.equal(errorWhileChangingValidatorSet, '')
     })
 
-    it('key rotation should have worked', async () => {
+    it('validator 0 should have signed at least one block', async () => {
       const rotation0MinedBlock = miners.some((a) => eqAddress(a, rotation0Address))
-      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
-      if (!rotation0MinedBlock || !rotation1MinedBlock) {
+      if (!rotation0MinedBlock) {
         console.log(rotation0Address, rotation1Address, miners)
       }
       assert.isTrue(rotation0MinedBlock)
+    })
+
+    it('validator 1 should have signed at least one block', async () => {
+      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
+      if (!rotation1MinedBlock) {
+        console.log(rotation0Address, rotation1Address, miners)
+      }
       assert.isTrue(rotation1MinedBlock)
     })
   })

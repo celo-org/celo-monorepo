@@ -19,7 +19,7 @@
 
 • **logger**? : *[Logger](../modules/_logger_.md#logger)*
 
-*Defined in [packages/sdk/base/src/task.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L20)*
+*Defined in [packages/sdk/base/src/task.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L20)*
 
 Logger function
 
@@ -29,6 +29,6 @@ ___
 
 • **name**: *string*
 
-*Defined in [packages/sdk/base/src/task.ts:18](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L18)*
+*Defined in [packages/sdk/base/src/task.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L18)*
 
 Name for the task. To be used in logging messages

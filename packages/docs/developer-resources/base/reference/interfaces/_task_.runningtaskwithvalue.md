@@ -26,7 +26,7 @@
 
 *Inherited from [RunningTask](_task_.runningtask.md).[isRunning](_task_.runningtask.md#isrunning)*
 
-*Defined in [packages/sdk/base/src/task.ts:13](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L13)*
+*Defined in [packages/sdk/base/src/task.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L13)*
 
 Indicates wether the task is running
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **onValue**(): *Promise‹A›*
 
-*Defined in [packages/sdk/base/src/task.ts:116](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L116)*
+*Defined in [packages/sdk/base/src/task.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L116)*
 
 **Returns:** *Promise‹A›*
 
@@ -50,7 +50,7 @@ ___
 
 *Inherited from [RunningTask](_task_.runningtask.md).[stop](_task_.runningtask.md#stop)*
 
-*Defined in [packages/sdk/base/src/task.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L11)*
+*Defined in [packages/sdk/base/src/task.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L11)*
 
 Flag task to be stopped. Might not be inmediate
 

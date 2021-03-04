@@ -1,8 +1,10 @@
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
+import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { CeloContract, CeloToken } from '../base'
+import { CeloContract, StableTokenContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
@@ -46,53 +48,56 @@ export interface MedianRate {
   rate: BigNumber
 }
 
+export type ReportTarget = StableTokenContract | Address
+
 /**
  * Currency price oracle contract.
  */
 export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
-   * Gets the number of rates that have been reported for the given token
-   * @param token The CeloToken token for which the CELO exchange rate is being reported.
+   * Gets the number of rates that have been reported for the given target
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @return The number of reported oracle rates for `token`.
    */
-  async numRates(token: CeloToken): Promise<number> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const response = await this.contract.methods.numRates(tokenAddress).call()
+  async numRates(target: ReportTarget): Promise<number> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    const response = await this.contract.methods.numRates(identifier).call()
     return valueToInt(response)
   }
 
   /**
-   * Returns the median rate for the given token
-   * @param token The CeloToken token for which the CELO exchange rate is being reported.
+   * Returns the median rate for the given target
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @return The median exchange rate for `token`, expressed as:
    *   amount of that token / equivalent amount in CELO
    */
-  async medianRate(token: CeloToken): Promise<MedianRate> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const response = await this.contract.methods.medianRate(tokenAddress).call()
+  async medianRate(target: ReportTarget): Promise<MedianRate> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    const response = await this.contract.methods.medianRate(identifier).call()
     return {
       rate: valueToFrac(response[0], response[1]),
     }
   }
 
   /**
-   * Checks if the given address is whitelisted as an oracle for the token
-   * @param token The CeloToken token
+   * Checks if the given address is whitelisted as an oracle for the target
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @param oracle The address that we're checking the oracle status of
    * @returns boolean describing whether this account is an oracle
    */
-  async isOracle(token: CeloToken, oracle: Address): Promise<boolean> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    return this.contract.methods.isOracle(tokenAddress, oracle).call()
+  async isOracle(target: ReportTarget, oracle: Address): Promise<boolean> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    return this.contract.methods.isOracle(identifier, oracle).call()
   }
 
   /**
-   * Returns the list of whitelisted oracles for a given token.
+   * Returns the list of whitelisted oracles for a given target
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @returns The list of whitelisted oracles for a given token.
    */
-  async getOracles(token: CeloToken): Promise<Address[]> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    return this.contract.methods.getOracles(tokenAddress).call()
+  async getOracles(target: ReportTarget): Promise<Address[]> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    return this.contract.methods.getOracles(identifier).call()
   }
 
   /**
@@ -106,69 +111,69 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   )
 
   /**
-   * Returns the expiry for the token if exists, if not the default.
-   * @param token The address of the token.
+   * Returns the expiry for the target if exists, if not the default.
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @return The report expiry in seconds.
    */
-  async getTokenReportExpirySeconds(token: CeloToken): Promise<BigNumber> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const response = await this.contract.methods.getTokenReportExpirySeconds(tokenAddress).call()
+  async getTokenReportExpirySeconds(target: ReportTarget): Promise<BigNumber> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    const response = await this.contract.methods.getTokenReportExpirySeconds(identifier).call()
     return valueToBigNumber(response)
   }
 
   /**
-   * Checks if the oldest report for a given token is expired
-   * @param token The token for which to check reports
+   * Checks if the oldest report for a given target is expired
+   * @param target The ReportTarget, either CeloToken or currency pair
    */
-  async isOldestReportExpired(token: CeloToken): Promise<[boolean, Address]> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const response = await this.contract.methods.isOldestReportExpired(tokenAddress).call()
+  async isOldestReportExpired(target: ReportTarget): Promise<[boolean, Address]> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    const response = await this.contract.methods.isOldestReportExpired(identifier).call()
     return response as [boolean, Address]
   }
 
   /**
    * Removes expired reports, if any exist
-   * @param token The token to remove reports for
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @param numReports The upper-limit of reports to remove. For example, if there
    * are 2 expired reports, and this param is 5, it will only remove the 2 that
    * are expired.
    */
   async removeExpiredReports(
-    token: CeloToken,
+    target: ReportTarget,
     numReports?: number
   ): Promise<CeloTransactionObject<void>> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
+    const identifier = await this.toCurrencyPairIdentifier(target)
     if (!numReports) {
-      numReports = (await this.getReports(token)).length - 1
+      numReports = (await this.getReports(target)).length - 1
     }
     return toTransactionObject(
       this.kit.connection,
-      this.contract.methods.removeExpiredReports(tokenAddress, numReports)
+      this.contract.methods.removeExpiredReports(identifier, numReports)
     )
   }
 
   /**
    * Updates an oracle value and the median.
-   * @param token The token for which the CELO exchange rate is being reported.
+   * @param target The ReportTarget, either CeloToken or currency pair
    * @param value The amount of `token` equal to one CELO.
    */
   async report(
-    token: CeloToken,
+    target: ReportTarget,
     value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
+    const identifier = await this.toCurrencyPairIdentifier(target)
     const fixedValue = toFixed(valueToBigNumber(value))
 
     const { lesserKey, greaterKey } = await this.findLesserAndGreaterKeys(
-      token,
+      target,
       valueToBigNumber(value),
       oracleAddress
     )
 
     return toTransactionObject(
       this.kit.connection,
-      this.contract.methods.report(tokenAddress, fixedValue.toFixed(), lesserKey, greaterKey),
+      this.contract.methods.report(identifier, fixedValue.toFixed(), lesserKey, greaterKey),
       { from: oracleAddress }
     )
   }
@@ -176,12 +181,15 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Updates an oracle value and the median.
    * @param value The amount of US Dollars equal to one CELO.
+   * @param oracleAddress The address to report as
+   * @param token The token to report for
    */
   async reportStableToken(
     value: BigNumber.Value,
-    oracleAddress: Address
+    oracleAddress: Address,
+    token: StableToken = StableToken.cUSD
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableToken, value, oracleAddress)
+    return this.report(this.kit.celoTokens.getContract(token), value, oracleAddress)
   }
 
   /**
@@ -212,13 +220,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Gets all elements from the doubly linked list.
-   * @param token The CeloToken representing the token for which the Celo
-   *   Gold exchange rate is being reported. Example: CeloContract.StableToken
+   * @param target The ReportTarget, either CeloToken or currency pair in question
    * @return An unpacked list of elements from largest to smallest.
    */
-  async getRates(token: CeloToken): Promise<OracleRate[]> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const response = await this.contract.methods.getRates(tokenAddress).call()
+  async getRates(target: ReportTarget): Promise<OracleRate[]> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    const response = await this.contract.methods.getRates(identifier).call()
     const rates: OracleRate[] = []
     for (let i = 0; i < response[0].length; i++) {
       const medRelIndex = parseInt(response[2][i], 10)
@@ -233,13 +240,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Gets all elements from the doubly linked list.
-   * @param token The CeloToken representing the token for which the Celo
-   *   Gold exchange rate is being reported. Example: CeloContract.StableToken
+   * @param target The ReportTarget, either CeloToken or currency pair in question
    * @return An unpacked list of elements from largest to smallest.
    */
-  async getTimestamps(token: CeloToken): Promise<OracleTimestamp[]> {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const response = await this.contract.methods.getTimestamps(tokenAddress).call()
+  async getTimestamps(target: ReportTarget): Promise<OracleTimestamp[]> {
+    const identifier = await this.toCurrencyPairIdentifier(target)
+    const response = await this.contract.methods.getTimestamps(identifier).call()
     const timestamps: OracleTimestamp[] = []
     for (let i = 0; i < response[0].length; i++) {
       const medRelIndex = parseInt(response[2][i], 10)
@@ -252,8 +258,11 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     return timestamps
   }
 
-  async getReports(token: CeloToken): Promise<OracleReport[]> {
-    const [rates, timestamps] = await Promise.all([this.getRates(token), this.getTimestamps(token)])
+  async getReports(target: ReportTarget): Promise<OracleReport[]> {
+    const [rates, timestamps] = await Promise.all([
+      this.getRates(target),
+      this.getTimestamps(target),
+    ])
     const reports: OracleReport[] = []
     for (const rate of rates) {
       const match = timestamps.filter((t: OracleTimestamp) => eqAddress(t.address, rate.address))
@@ -263,11 +272,11 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async findLesserAndGreaterKeys(
-    token: CeloToken,
+    target: ReportTarget,
     value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<{ lesserKey: Address; greaterKey: Address }> {
-    const currentRates: OracleRate[] = await this.getRates(token)
+    const currentRates: OracleRate[] = await this.getRates(target)
     let greaterKey = NULL_ADDRESS
     let lesserKey = NULL_ADDRESS
 
@@ -284,5 +293,17 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     }
 
     return { lesserKey, greaterKey }
+  }
+
+  private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
+    if (this.kit.celoTokens.isStableTokenContract(target as CeloContract)) {
+      return this.kit.registry.addressFor(target as StableTokenContract)
+    } else if (isValidAddress(target)) {
+      return target
+    } else {
+      throw new Error(
+        `${target} is neither CeloContract.StableToken, CeloContract.StableTokenEUR or a valid Address`
+      )
+    }
   }
 }

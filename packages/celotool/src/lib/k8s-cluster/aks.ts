@@ -18,7 +18,9 @@ export class AksClusterManager extends BaseClusterManager {
       console.info('No azure account subscription currently set')
     }
     if (currentTenantId === null || currentTenantId.trim() !== this.clusterConfig.tenantId) {
-      await execCmdWithExitOnFailure(`az account set --subscription ${this.clusterConfig.subscriptionId}`)
+      await execCmdWithExitOnFailure(
+        `az account set --subscription ${this.clusterConfig.subscriptionId}`
+      )
     }
   }
 
@@ -39,7 +41,7 @@ export class AksClusterManager extends BaseClusterManager {
     // Until we upgrade to helm v3, we rely on our own helm chart adapted from:
     // https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment-rbac.yaml
     const aadPodIdentityExists = await outputIncludes(
-      `helm list -A`,
+      `helm list -n default`,
       `aad-pod-identity`,
       `aad-pod-identity exists, skipping install`
     )
@@ -50,7 +52,7 @@ export class AksClusterManager extends BaseClusterManager {
       )
       console.info('Installing aad-pod-identity')
       await execCmdWithExitOnFailure(
-        `helm install aad-pod-identity aad-pod-identity/aad-pod-identity`
+        `helm install aad-pod-identity aad-pod-identity/aad-pod-identity -n default`
       )
     }
   }

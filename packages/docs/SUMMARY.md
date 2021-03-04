@@ -16,6 +16,7 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Hosted nodes](getting-started/hosted-nodes.md)
 - [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
@@ -28,6 +29,7 @@
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
+- [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
 
 ## Validator Guide
 
@@ -38,7 +40,9 @@
   - [Validator Signer Key Rotation](validator-guide/key-management/key-rotation.md)
 - [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
 - [Monitoring](validator-guide/monitoring.md)
+- [Devops Best Practices](validator-guide/devops-best-practices.md)
 - [Upgrading a Node](validator-guide/node-upgrades.md)
+- [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
 
@@ -46,11 +50,12 @@
 
 - [Overview](developer-resources/overview.md)
 - [Code Examples](developer-resources/start.md)
-  - [Sending CELO](developer-resources/walkthroughs/hellocelo.md)
+  - [Sending CELO & cUSD](developer-resources/walkthroughs/hellocelo.md)
   - [Deploy a Contract (local node)](developer-resources/walkthroughs/hellocontracts.md)
-  - [Deploy a Contract (Forno)](developer-resources/walkthroughs/hello-contract-remote-node.md)
+  - [Deploy and Interact with Contracts (Remotely)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
+  - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
   <!-- - [The Celo Protocol]()
     - [Architecture]()
@@ -72,6 +77,7 @@
   - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
   - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
   - [Querying on-chain identifiers with ODIS](developer-resources/contractkit/odis.md)
+  - [Migrating to ContractKit v1.0](developer-resources/contractkit/migrating-to-contractkit-v1.md)
     <!-- - [Example of querying (web3, kit)]()
     - [Example of sending tx (kit)]() -->
   <!-- - [Using Truffle]()
@@ -706,6 +712,7 @@
       - [packages/sdk/utils/src/solidity](developer-resources/utils/reference/modules/_packages_sdk_utils_src_solidity_.md)
       - [packages/sdk/utils/src/string](developer-resources/utils/reference/modules/_packages_sdk_utils_src_string_.md)
       - [packages/sdk/utils/src/task](developer-resources/utils/reference/modules/_packages_sdk_utils_src_task_.md)
+      - [packages/sdk/utils/src/typed-data-constructors](developer-resources/utils/reference/modules/_packages_sdk_utils_src_typed_data_constructors_.md)
     - [Classes]()
       - [F](developer-resources/utils/reference/classes/_node_modules_bls12377js_src_f_.f.md)
       - [F2](developer-resources/utils/reference/classes/_node_modules_bls12377js_src_f2_.f2.md)
@@ -935,7 +942,7 @@
 - [Release Process](community/release-process/README.md)
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
-  - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
+  - [Celocli and ContractKit](community/release-process/base-cli-contractkit-dappkit-utils.md)
   - [Attestation Service](community/release-process/attestation-service.md)
 
 ## Important Information

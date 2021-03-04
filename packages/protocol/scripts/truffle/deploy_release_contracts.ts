@@ -1,12 +1,17 @@
-import { retryTx } from '@celo/protocol/lib/proxy-utils'
-import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
-import { Address, isValidAddress } from '@celo/utils/src/address'
+import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+import {
+  _setInitialProxyImplementation,
+  checkFunctionArgsLength,
+  retryTx,
+} from '@celo/protocol/lib/web3-utils'
+import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs from 'fs'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
+  ReleaseGoldInstance,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
@@ -86,7 +91,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     config.initialDistributionRatio,
     config.canValidate,
     config.canVote,
-    '0x000000000000000000000000000000000000ce10',
+    celoRegistryAddress,
   ]
 
   const bytecode = await web3.eth.getCode(config.beneficiary)
@@ -162,11 +167,22 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       from: fromAddress,
     },
   ])
+  const initializerAbiRG = checkAndReturnInitializationAbi(ReleaseGold, 'ReleaseGold')
+  const transferImplOwnershipAbiRG = checkAndReturnTransferOwnershipAbi(ReleaseGold, 'ReleaseGold')
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
 
+  console.info('Initializing ReleaseGold...')
+  await initializeRGImplementation(
+    releaseGoldInstance,
+    fromAddress,
+    initializerAbiRG,
+    transferImplOwnershipAbiRG
+  )
+
+  console.info('Initializing ReleaseGoldProxy...')
   let releaseGoldTxHash
   try {
     releaseGoldTxHash = await _setInitialProxyImplementation(
@@ -225,6 +241,75 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   // Must write to file after every grant to avoid losing info on crash.
   fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
   fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
+}
+
+async function initializeRGImplementation(
+  releaseGoldInstance: any,
+  from: string,
+  initializerAbiRG: string,
+  transferImplOwnershipAbiRG: string
+) {
+  // We need to fund the RG implementation instance in order to initialize it.
+  console.info('Funding ReleaseGold implementation so it can be initialized...')
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from,
+      to: releaseGoldInstance.address,
+      value: 1,
+    },
+  ])
+  // Initialize and lock ownership of RG implementation
+  const implementationInitArgs = [
+    Math.round(new Date().getTime() / 1000),
+    0,
+    1,
+    1,
+    1,
+    false, // should not be revokable
+    '0x0000000000000000000000000000000000000001',
+    NULL_ADDRESS,
+    NULL_ADDRESS,
+    true, // subjectToLiquidityProivision
+    0,
+    false, // canValidate
+    false, // canVote
+    '0x0000000000000000000000000000000000000001',
+  ]
+  const implementationTransferOwnershipArgs = ['0x0000000000000000000000000000000000000001']
+  checkFunctionArgsLength(implementationInitArgs, initializerAbiRG)
+  checkFunctionArgsLength(implementationTransferOwnershipArgs, transferImplOwnershipAbiRG)
+  const implInitCallData = web3.eth.abi.encodeFunctionCall(initializerAbiRG, implementationInitArgs)
+  const transferImplOwnershipCallData = web3.eth.abi.encodeFunctionCall(
+    transferImplOwnershipAbiRG,
+    implementationTransferOwnershipArgs
+  )
+  console.info('Sending initialize tx...')
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from,
+      to: releaseGoldInstance.address,
+      data: implInitCallData,
+      gas: 3000000,
+    },
+  ])
+  console.info('Returned from initialization tx')
+  if (!(await (releaseGoldInstance as ReleaseGoldInstance).initialized())) {
+    console.error(
+      `Failed to initialize ReleaseGold implementation at address ${releaseGoldInstance.address}`
+    )
+  }
+  console.info('ReleaseGold implementation has been successfully initialized!')
+
+  console.info(
+    'Transferring ownsership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
+  )
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from,
+      to: releaseGoldInstance.address,
+      data: transferImplOwnershipCallData,
+    },
+  ])
 }
 
 async function checkBalance(config: ReleaseGoldConfig) {
@@ -663,4 +748,28 @@ module.exports = async (callback: (error?: any) => number) => {
   } catch (error) {
     callback(error)
   }
+}
+
+function checkAndReturnInitializationAbi(Contract: any, name: string) {
+  const initializerAbi: string = Contract.abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+  )
+  if (!initializerAbi) {
+    throw new Error(
+      `Attempting to deploy implementation contract ${name} that does not have an initialize() function. Abort.`
+    )
+  }
+  return initializerAbi
+}
+
+function checkAndReturnTransferOwnershipAbi(Contract: any, name: string) {
+  const transferImplOwnershipAbi: string = Contract.abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
+  )
+  if (!transferImplOwnershipAbi) {
+    throw new Error(
+      `Attempting to deploy implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
+    )
+  }
+  return transferImplOwnershipAbi
 }

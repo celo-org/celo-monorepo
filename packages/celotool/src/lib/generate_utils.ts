@@ -1,5 +1,6 @@
 // @ts-ignore
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import BigNumber from 'bignumber.js'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import * as bls12377js from 'bls12377js'
@@ -8,6 +9,7 @@ import fs from 'fs'
 import { range, repeat } from 'lodash'
 import path from 'path'
 import * as rlp from 'rlp'
+import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
@@ -16,7 +18,7 @@ import {
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
-  TEMPLATE
+  TEMPLATE,
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
@@ -83,6 +85,28 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   return generatePrivateKeyWithDerivations(mnemonic, [accountType, index])
 }
 
+export const generateOraclePrivateKey = (
+  mnemonic: string,
+  currencyPair: CurrencyPair,
+  index: number
+) => {
+  let derivationPath: number[]
+  if (currencyPair === 'CELOUSD') {
+    // For backwards compatibility we don't add currencyPair to
+    // the derivation path for CELOUSD
+    derivationPath = [AccountType.PRICE_ORACLE, index]
+  } else {
+    // Deterministically convert the currency pair string to a path segment
+    // keccak(currencyPair) modulo 2^31
+    const currencyDerivation = new BigNumber(Web3.utils.keccak256(currencyPair), 16)
+      .mod(2 ** 31)
+      .toNumber()
+    derivationPath = [AccountType.PRICE_ORACLE, currencyDerivation, index]
+  }
+
+  return generatePrivateKeyWithDerivations(mnemonic, derivationPath)
+}
+
 export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
@@ -126,6 +150,9 @@ const votingBotBalance = () =>
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
+
+export const getOraclePrivateKeysFor = (currencyPair: CurrencyPair, mnemonic: string, n: number) =>
+  range(0, n).map((i) => generateOraclePrivateKey(mnemonic, currencyPair, i))
 
 export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getPrivateKeysFor(accountType, mnemonic, n).map(privateKeyToAddress)
@@ -197,6 +224,15 @@ export const getFaucetedAccounts = (mnemonic: string) => {
   return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts, ...votingBotAccounts]
 }
 
+const hardForkActivationBlock = (key: string) => {
+  const value = fetchEnvOrFallback(key, '')
+  if (value === '') {
+    return undefined
+  } else {
+    return parseInt(value, 10)
+  }
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
@@ -243,6 +279,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     })
   )
 
+  // Celo hard fork activation blocks.  Default is undefined, which means not activated.
+  const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
+  const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
+
   // network start timestamp
   const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
 
@@ -257,6 +297,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     requestTimeout,
     enablePetersburg,
     timestamp,
+    churritoBlock,
+    donutBlock,
   })
 }
 
@@ -313,11 +355,20 @@ export const generateGenesis = ({
   requestTimeout,
   enablePetersburg = true,
   timestamp = 0,
+  churritoBlock,
+  donutBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
     genesis.config = GETH_CONFIG_OLD
+  }
+
+  if (typeof churritoBlock === 'number') {
+    genesis.config.churritoBlock = churritoBlock
+  }
+  if (typeof donutBlock === 'number') {
+    genesis.config.donutBlock = donutBlock
   }
 
   genesis.config.chainId = chainId

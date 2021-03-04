@@ -21,16 +21,20 @@ export function getGenesisGoogleStorageUrl(celoEnv: string) {
 }
 
 export function getFornoUrl(celoEnv: string) {
-  return celoEnv === 'rc1' ?
-    `https://forno.celo.org` :
-    `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
+  return celoEnv === 'rc1'
+    ? `https://forno.celo.org`
+    : `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
 }
 
 export function getFornoWebSocketUrl(celoEnv: string) {
-  if (celoEnv !== 'rc1') {
-    throw Error(`Websockets not supported for ${celoEnv} forno`)
+  switch (celoEnv) {
+    case 'rc1':
+      return 'wss://forno.celo.org/ws'
+    case 'alfajores':
+      return 'wss://alfajores-forno.celo-testnet.org/ws'
+    default:
+      throw Error(`Websockets not supported for ${celoEnv} forno`)
   }
-  return 'wss://forno.celo.org/ws'
 }
 
 export function getFullNodeHttpRpcInternalUrl(celoEnv: string) {

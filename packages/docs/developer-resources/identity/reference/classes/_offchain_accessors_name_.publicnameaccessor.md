@@ -36,7 +36,7 @@
 
 *Overrides [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[constructor](_offchain_accessors_simple_.publicsimpleaccessor.md#constructor)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:11](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L11)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L11)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ Name | Type |
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[dataPath](_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-datapath)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:21](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L21)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L21)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[read](_offchain_accessors_simple_.publicsimpleaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:61](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L61)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L61)*
 
 #### Type declaration:
 
@@ -86,7 +86,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[type](_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-type)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L20)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L20)*
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 *Overrides [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[wrapper](_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-wrapper)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:12](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L12)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/name.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/name.ts#L12)*
 
 ## Methods
 
@@ -106,7 +106,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[readAsResult](_offchain_accessors_simple_.publicsimpleaccessor.md#readasresult)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:46](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L46)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L46)*
 
 **Parameters:**
 
@@ -124,7 +124,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[write](_offchain_accessors_simple_.publicsimpleaccessor.md#write)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:30](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L30)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L30)*
 
 **Parameters:**
 
