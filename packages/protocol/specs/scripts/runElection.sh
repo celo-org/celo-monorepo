@@ -8,5 +8,4 @@ certoraRun specs/harnesses/RegistryHarness.sol:RegistryHarness \
     --link ElectionHarness:lockedGold=LockedGoldHarness ElectionHarness:accounts=Accounts \
     --verify ElectionHarness:specs/election.spec \
     --settings -assumeUnwindCond \
-    --solc solc5.17 \
     --path $PWD/contracts $1
