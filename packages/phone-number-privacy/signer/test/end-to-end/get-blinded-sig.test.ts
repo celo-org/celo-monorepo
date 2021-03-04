@@ -1,12 +1,16 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { rootLogger as logger, TestUtils } from '@celo/phone-number-privacy-common'
+import {
+  GetQuotaResponse,
+  rootLogger as logger,
+  TestUtils,
+} from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import config from '../../src/config'
-import { GetQuotaResponse, getWalletAddress } from '../../src/signing/query-quota'
+import { getWalletAddress } from '../../src/signing/query-quota'
 
 require('dotenv').config()
 
@@ -24,8 +28,8 @@ const PRIVATE_KEY3 = '0x1234567890abcdef1234567890abcdef1234567890abcdef12345678
 const ACCOUNT_ADDRESS3 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY3))
 const PHONE_NUMBER = '+15555555555'
 const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
-const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
-const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
+const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
+export const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 const DEFAULT_FORNO_URL = config.blockchain.provider
 
 const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
@@ -48,8 +52,7 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(400)
     })
 
-    xit('With invalid blindedQueryPhoneNumber', async () => {
-      // TODO: update input-validation.ts to detect invalid blindedQueryPhoneNumber
+    it('With invalid blindedQueryPhoneNumber', async () => {
       const response = await postToSignMessage('invalid', ACCOUNT_ADDRESS1, Date.now())
       expect(response.status).toBe(400)
     })
