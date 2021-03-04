@@ -3,10 +3,11 @@ import {
   ErrorMessage,
   GetContactMatchesRequest,
   hasValidAccountParam,
-  hasValidContractPhoneNumbersParam,
-  hasValidPhoneNumberHash,
+  hasValidContactPhoneNumbersParam,
   hasValidUserPhoneNumberParam,
+  isBodyReasonablySized,
   isVerified,
+  phoneNumberHashIsValidIfExists,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -71,9 +72,9 @@ function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): b
   return (
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
-    hasValidContractPhoneNumbersParam(requestBody) &&
-    hasValidPhoneNumberHash(requestBody)
-    // TODO find way to check content body size without RE-JSONifying it
-    // isBodyReasonablySized(requestBody)
+    hasValidContactPhoneNumbersParam(requestBody) &&
+    !!requestBody.hashedPhoneNumber &&
+    phoneNumberHashIsValidIfExists(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
 }

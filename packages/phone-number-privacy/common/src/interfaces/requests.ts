@@ -13,3 +13,9 @@ export interface GetContactMatchesRequest {
   hashedPhoneNumber: string
   sessionID?: string
 }
+
+export interface GetQuotaRequest {
+  account: string
+  hashedPhoneNumber?: string
+  sessionID?: string
+}

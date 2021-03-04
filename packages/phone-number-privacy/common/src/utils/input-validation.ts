@@ -1,7 +1,11 @@
 import { isValidAddress, trimLeading0x } from '@celo/utils/lib/address'
 import isBase64 from 'is-base64'
 import { isValidPhoneNumber } from 'libphonenumber-js'
-import { GetBlindedMessageSigRequest, GetContactMatchesRequest } from '../interfaces'
+import {
+  GetBlindedMessageSigRequest,
+  GetContactMatchesRequest,
+  GetQuotaRequest,
+} from '../interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT, REQUEST_EXPIRY_WINDOW_MS } from './constants'
 
 export function hasValidAccountParam(requestBody: any): boolean {
@@ -14,7 +18,7 @@ export function hasValidUserPhoneNumberParam(requestBody: GetContactMatchesReque
 
 export function hasValidContactPhoneNumbersParam(requestBody: GetContactMatchesRequest): boolean {
   return (
-    requestBody.contactPhoneNumbers &&
+    !!requestBody.contactPhoneNumbers &&
     Array.isArray(requestBody.contactPhoneNumbers) &&
     requestBody.contactPhoneNumbers.every((contact) => isValidPhoneNumber(contact))
   )
@@ -32,10 +36,6 @@ export function hasValidQueryPhoneNumberParam(requestBody: GetBlindedMessageSigR
   )
 }
 
-export function hasValidPhoneNumberHash(requestBody: any): boolean {
-  return requestBody.hashedPhoneNumber && isByte32(requestBody.hashedPhoneNumber)
-}
-
 export function hasValidTimestamp(requestBody: any): boolean {
   // TODO(Alec): make timestamp required
   return (
@@ -45,7 +45,7 @@ export function hasValidTimestamp(requestBody: any): boolean {
   )
 }
 
-export function phoneNumberHashIsValidIfExists(requestBody: any): boolean {
+export function phoneNumberHashIsValidIfExists(requestBody: GetQuotaRequest): boolean {
   return !requestBody.hashedPhoneNumber || isByte32(requestBody.hashedPhoneNumber)
 }
 
