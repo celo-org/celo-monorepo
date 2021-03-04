@@ -109,12 +109,18 @@ function compile() {
   exec(`yarn run --silent truffle compile --build_directory=${BUILD_DIR}`)
 
   for (const contractName of ImplContracts) {
-    const fileStr = getArtifact(contractName)
-    if (hasEmptyBytecode(fileStr)) {
+    try {
+      const fileStr = getArtifact(contractName)
+      if (hasEmptyBytecode(fileStr)) {
+        console.error(
+          `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
+        )
+        process.exit(1)
+      }
+    } catch (e) {
       console.error(
-        `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
+        `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
-      process.exit(1)
     }
   }
 }
