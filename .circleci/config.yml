@@ -21,7 +21,10 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: gcr.io/celo-testnet/circleci:latest
+    - image: gcr.io/$GOOGLE_PROJECT_ID/circleci
+      auth:
+        username: _json_key
+        password: $GCLOUD_SERVICE_KEY
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
