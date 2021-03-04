@@ -1,5 +1,5 @@
 import { isVerified } from '@celo/phone-number-privacy-common'
-import { Response } from 'node-fetch'
+import { Request, Response } from 'firebase-functions'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
@@ -49,73 +49,68 @@ const defaultResponseJson = JSON.stringify({
   signature: 'string',
 })
 
+const validRequest = {
+  blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
+  hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
+  account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
+  timestamp: Date.now(),
+}
+const mockHeaders = { authorization: 'fdsfdsfs' }
+
+const invalidResponseExpected = (done: any, code: number) =>
+  ({
+    status(status: any) {
+      try {
+        expect(status).toEqual(code)
+        done()
+      } catch (e) {
+        done(e)
+      }
+      return {
+        json() {
+          return {}
+        },
+      }
+    },
+  } as Response)
+
 describe(`POST /getBlindedMessageSig endpoint`, () => {
   beforeEach(() => {
     fetchMock.mockClear()
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
   })
 
-  describe.only('with valid input', () => {
-    const blindedQueryPhoneNumber = BLINDED_PHONE_NUMBER
-    const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-    const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-    const mockHeader = 'fdsfdsfs'
-    const timestamp = Date.now()
-
-    const mockRequestData = {
-      blindedQueryPhoneNumber,
-      hashedPhoneNumber,
-      account,
-      timestamp,
-    }
+  describe('with valid input', () => {
     const req = {
-      body: mockRequestData,
-      headers: {
-        authorization: mockHeader,
-      },
-    }
+      body: validRequest,
+      headers: mockHeaders,
+    } as Request
 
-    const validResponseExpected = (done: any) => ({
-      json(body: any) {
-        expect(body.success).toEqual(true)
-        expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
-        expect(body.version).toEqual(VERSION)
-        done()
-      },
-      status(status: any) {
-        try {
-          expect(status).toEqual(200)
+    const validResponseExpected = (done: any, code: number) =>
+      ({
+        json(body: any) {
+          expect(body.success).toEqual(true)
+          expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
+          expect(body.version).toEqual(VERSION)
           done()
-        } catch (e) {
-          done(e)
-        }
-        return {
-          json() {
-            return {}
-          },
-        }
-      },
-    })
-
-    const invalidResponseExpected = (done: any) => ({
-      status(status: any) {
-        try {
-          expect(status).toEqual(500)
-          done()
-        } catch (e) {
-          done(e)
-        }
-        return {
-          json() {
-            return {}
-          },
-        }
-      },
-    })
+        },
+        status(status: any) {
+          try {
+            expect(status).toEqual(code)
+            done()
+          } catch (e) {
+            done(e)
+          }
+          return {
+            json() {
+              return {}
+            },
+          }
+        },
+      } as Response)
 
     it('provides signature', (done) => {
-      // @ts-ignore
-      getBlindedMessageSig(req, validResponseExpected(done))
+      getBlindedMessageSig(req, validResponseExpected(done, 200))
     })
 
     it('returns 500 on bls error', (done) => {
@@ -124,95 +119,54 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
         throw Error()
       })
 
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedMessageSig(req, invalidResponseExpected(done))
+      getBlindedMessageSig(req, invalidResponseExpected(done, 500))
     })
   })
 
   describe('with invalid input', () => {
-    it('invalid address returns 400', () => {
-      const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-      const account = 'd31509C31d654056A45185ECb6'
-      const timestamp = Date.now()
-
-      const mockRequestData = {
-        blindedQueryPhoneNumber,
-        hashedPhoneNumber,
-        account,
-        timestamp,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedMessageSig(req, res)
-    })
-    it('invalid hashedPhoneNumber returns 400', async () => {
-      const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '+1234567890'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-      const mockHeader = 'fdsfdsfs'
-      const timestamp = Date.now()
-
-      const mockRequestData = {
-        blindedQueryPhoneNumber,
-        hashedPhoneNumber,
-        account,
-        timestamp,
-      }
+    it('invalid address returns 400', (done) => {
       const req = {
-        body: mockRequestData,
-        headers: {
-          authorization: mockHeader,
+        body: {
+          ...validRequest,
+          account: 'd31509C31d654056A45185ECb6',
         },
-      }
+        headers: mockHeaders,
+      } as Request
 
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
     })
-    it('expired timestamp returns 400', async () => {
-      const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-      const mockHeader = 'fdsfdsfs'
-      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW_MS
-
-      const mockRequestData = {
-        blindedQueryPhoneNumber,
-        hashedPhoneNumber,
-        account,
-        timestamp,
-      }
+    it('invalid hashedPhoneNumber returns 400', (done) => {
       const req = {
-        body: mockRequestData,
-        headers: {
-          authorization: mockHeader,
+        body: {
+          ...validRequest,
+          hashedPhoneNumber: '+1234567890',
         },
-      }
+        headers: mockHeaders,
+      } as Request
 
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
+    })
+    it('expired timestamp returns 400', (done) => {
+      const req = {
+        body: {
+          ...validRequest,
+          timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+        headers: mockHeaders,
+      } as Request
+
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
+    })
+    it('invalid blinded phone number returns 400', (done) => {
+      const req = {
+        body: {
+          ...validRequest,
+          blindedQueryPhoneNumber: '+1234567890',
+        },
+        headers: mockHeaders,
+      } as Request
+
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
     })
   })
 })
