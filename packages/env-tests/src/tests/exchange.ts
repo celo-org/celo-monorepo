@@ -3,7 +3,7 @@ import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
 import {
-  fundAccountWithStableTokens,
+  fundAccountWithStableToken,
   getKey,
   initExchangeFromRegistry,
   initStableTokenFromRegistry,
@@ -14,17 +14,10 @@ import {
 export function runExchangeTest(context: EnvTestContext, stableTokensToTest: string[]) {
   describe('Exchange Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
-    beforeAll(async () => {
-      await fundAccountWithStableTokens(
-        context,
-        TestAccounts.Exchange,
-        ONE.times(10),
-        stableTokensToTest
-      )
-    })
 
     for (const stableToken of stableTokensToTest) {
       test(`exchange ${stableToken} for CELO`, async () => {
+        await fundAccountWithStableToken(context, TestAccounts.Exchange, ONE.times(10), stableToken)
         const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
         const from = await getKey(context.mnemonic, TestAccounts.Exchange)

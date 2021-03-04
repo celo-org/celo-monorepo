@@ -26,14 +26,14 @@ export async function fundAccountWithcUSD(
   account: TestAccounts,
   value: BigNumber
 ) {
-  await fundAccountWithStableTokens(context, account, value, ['cUSD'])
+  await fundAccountWithStableToken(context, account, value, 'cUSD')
 }
 
-export async function fundAccountWithStableTokens(
+export async function fundAccountWithStableToken(
   context: EnvTestContext,
   account: TestAccounts,
   value: BigNumber,
-  stableTokensToFund: string[]
+  stableToken: string
 ) {
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   const recipient = await getKey(context.mnemonic, account)
@@ -45,27 +45,25 @@ export async function fundAccountWithStableTokens(
   })
   context.kit.connection.addAccount(root.privateKey)
 
-  for (const stableToken of stableTokensToFund) {
-    const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+  const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
-    const rootBalance = await stableTokenInstance.balanceOf(root.address)
-    if (rootBalance.lte(value)) {
-      logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
-      throw new Error(
-        `Root account ${root.address}'s ${stableToken} balance (${rootBalance.toPrecision(
-          4
-        )}) is not enough for transferring ${value.toPrecision(4)}`
-      )
-    }
-    const receipt = await stableTokenInstance
-      .transfer(recipient.address, value.toString())
-      .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
-
-    logger.debug(
-      { stableToken: stableToken, receipt: receipt },
-      `funded test account with ${stableToken}`
+  const rootBalance = await stableTokenInstance.balanceOf(root.address)
+  if (rootBalance.lte(value)) {
+    logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
+    throw new Error(
+      `Root account ${root.address}'s ${stableToken} balance (${rootBalance.toPrecision(
+        4
+      )}) is not enough for transferring ${value.toPrecision(4)}`
     )
   }
+  const receipt = await stableTokenInstance
+    .transfer(recipient.address, value.toString())
+    .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
+
+  logger.debug(
+    { stableToken: stableToken, receipt: receipt },
+    `funded test account with ${stableToken}`
+  )
 }
 
 export async function getKey(mnemonic: string, account: TestAccounts) {
@@ -137,12 +135,14 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
             feeCurrency: stableTokenInstance.address,
             from: account.address,
           })
+        const balanceAfter = await stableTokenInstance.balanceOf(account.address)
         context.logger.debug(
           {
             index,
             stableToken: stableToken,
-            value: balance.toString(),
+            balanceBefore: balance.toString(),
             address: account.address,
+            BalanceAfter: balanceAfter.toString(),
           },
           `cleared ${stableToken}`
         )

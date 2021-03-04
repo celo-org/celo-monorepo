@@ -2,7 +2,7 @@ import { describe, expect, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
 import {
-  fundAccountWithStableTokens,
+  fundAccountWithStableToken,
   getKey,
   initStableTokenFromRegistry,
   ONE,
@@ -12,17 +12,15 @@ import {
 export function runTransfersTest(context: EnvTestContext, stableTokensToTest: string[]) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
-    beforeAll(async () => {
-      await fundAccountWithStableTokens(
-        context,
-        TestAccounts.TransferFrom,
-        ONE.times(10),
-        stableTokensToTest
-      )
-    })
 
     for (const stableToken of stableTokensToTest) {
       test(`transfer ${stableToken}`, async () => {
+        await fundAccountWithStableToken(
+          context,
+          TestAccounts.TransferFrom,
+          ONE.times(10),
+          stableToken
+        )
         const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
         const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
