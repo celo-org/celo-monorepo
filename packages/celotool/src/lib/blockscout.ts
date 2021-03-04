@@ -2,7 +2,11 @@ import fs from 'fs'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { getCurrentGcloudAccount } from './gcloud_utils'
-import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from './helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from './helm_deploy'
 import { outputIncludes } from './utils'
 import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
@@ -50,13 +54,11 @@ export async function upgradeHelmChart(
   blockscoutDBConnectionName: string
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
-  const params = (
-    await helmParameters(
-      celoEnv,
-      blockscoutDBUsername,
-      blockscoutDBPassword,
-      blockscoutDBConnectionName
-    )
+  const params = await helmParameters(
+    celoEnv,
+    blockscoutDBUsername,
+    blockscoutDBPassword,
+    blockscoutDBConnectionName
   )
   await upgradeGenericHelmChart(celoEnv, helmReleaseName, helmChartPath, params)
 
@@ -73,7 +75,7 @@ async function helmParameters(
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const useMetadataCrawler = fetchEnvOrFallback(
     envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY,
-    'false',
+    'false'
   )
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
@@ -93,23 +95,23 @@ async function helmParameters(
   ]
   if (useMetadataCrawler !== 'false') {
     params.push(
-    `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
-    )}`,
-    `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
-    )}`,
-    `--set blockscout.metadata_crawler.schedule="${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-    )}"`,
-    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
-      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
-      ''
-    )}`,
-    `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
-      envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
-      celoEnv
-    )}`,
+      `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
+      )}`,
+      `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
+      )}`,
+      `--set blockscout.metadata_crawler.schedule="${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+      )}"`,
+      `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+        envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+        ''
+      )}`,
+      `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
+        envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
+        celoEnv
+      )}`
     )
   }
   if (isVmBased()) {
