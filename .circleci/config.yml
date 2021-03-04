@@ -21,7 +21,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: gcr.io/celo-testnet/circleci
+    - image: gcr.io/celo-testnet/circleci:latest
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
