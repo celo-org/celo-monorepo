@@ -53,7 +53,7 @@ ___
 
 ▸ **getInitializeAbiOfImplementation**(`proxyContractName`: keyof typeof initializeAbiMap): *AbiItem*
 
-*Defined in [contractkit/src/proxy.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/proxy.ts#L123)*
+*Defined in [contractkit/src/proxy.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/proxy.ts#L125)*
 
 **Parameters:**
 
@@ -69,7 +69,7 @@ ___
 
 ▸ **setImplementationOnProxy**(`address`: string, `web3`: Web3): *any*
 
-*Defined in [contractkit/src/proxy.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/proxy.ts#L133)*
+*Defined in [contractkit/src/proxy.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/proxy.ts#L135)*
 
 **Parameters:**
 

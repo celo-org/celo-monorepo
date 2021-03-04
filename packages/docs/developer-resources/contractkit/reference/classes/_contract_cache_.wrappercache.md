@@ -41,6 +41,7 @@ Provides access to all contract wrappers for celo core contracts
 * [getSortedOracles](_contract_cache_.wrappercache.md#getsortedoracles)
 * [getStableToken](_contract_cache_.wrappercache.md#getstabletoken)
 * [getValidators](_contract_cache_.wrappercache.md#getvalidators)
+* [invalidateContract](_contract_cache_.wrappercache.md#invalidatecontract)
 
 ## Constructors
 
@@ -306,3 +307,23 @@ ___
 *Defined in [contractkit/src/contract-cache.ts:159](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L159)*
 
 **Returns:** *Promise‹[ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)‹››*
+
+___
+
+###  invalidateContract
+
+▸ **invalidateContract**<**C**>(`contract`: C): *void*
+
+*Defined in [contractkit/src/contract-cache.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L175)*
+
+**Type parameters:**
+
+▪ **C**: *[ValidWrappers](../modules/_contract_cache_.md#validwrappers)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`contract` | C |
+
+**Returns:** *void*
