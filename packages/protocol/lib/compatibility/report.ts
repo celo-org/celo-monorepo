@@ -180,20 +180,17 @@ export class ASTVersionedReport {
 }
 
 /**
- * A report holding {@link ASTVersionedReport} for all global changes,
- * plus the detailed {@link ASTVersionedReport} for each contract.
+ * A report holding detailed {@link ASTVersionedReport} for each contract and library.
  */
 export class ASTDetailedVersionedReport {
 
   static create = (fullReports: ASTReports, artifacts: BuildArtifacts, categorizer: Categorizer): ASTDetailedVersionedReport => {
     const changes = CategorizedChanges.fromReports(fullReports, categorizer)
-    const global = ASTVersionedReport.create(changes)
     const reportIndex: ASTVersionedReportIndex = ASTVersionedReport.createByContract(changes, artifacts)
-    return new ASTDetailedVersionedReport(global, reportIndex.contracts, reportIndex.libraries)
+    return new ASTDetailedVersionedReport(reportIndex.contracts, reportIndex.libraries)
   }
 
   constructor(
-    public readonly global: ASTVersionedReport,
     public readonly contracts: ContractReports,
     public readonly libraries: ContractReports
   ) {}
