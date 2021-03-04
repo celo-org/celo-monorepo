@@ -1435,14 +1435,12 @@
     elliptic "6.5.3"
     web3 "1.3.0"
 
-"@celo/typechain-target-web3-v1-celo@0.1.0-beta3":
-  version "0.1.0-beta3"
-  resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.1.0-beta3.tgz#3c55113f6dd41b03270be3ababd8b73deb081cf0"
-  integrity sha512-9eIKc7D+wMS3hmocTWk6RZsy7rH69XmI7T8zp2K9F8fRHF1eVyQp9t1+nOcFX6ZClbe1zFaHHZ//0AiB8UcHLw==
+"@celo/typechain-target-web3-v1-celo@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
+  integrity sha512-zqpSoCCYymx1XLAeYtUhZqTYF069kwFQ6ugQQXja9lPfevGAdgEqTYzAXTVMAATHx4B3QZM2Hnx0+RKDD9188g==
   dependencies:
-    elliptic "~6.5.3"
     lodash "~4.17.19"
-    minimist "~0.2.1"
     typechain "2.0.0"
 
 "@celo/utils@0.1.8":
@@ -10066,7 +10064,7 @@ electron-to-chromium@^1.3.47, electron-to-chromium@^1.3.488:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.529.tgz#a7eed559bc848a7c8d95026be7d8929e3f9af169"
   integrity sha512-n3sriLldqNyjBlosbnPftjCY+m1dVOY307I1Y0HaHAqDGe3hRvK7ksJwWd+qs599ybR4jobCo1+7zXM9GyNMSA==
 
-elliptic@6.3.3, elliptic@6.5.2, elliptic@6.5.3, elliptic@^6.4.0, elliptic@^6.4.1, elliptic@^6.5.2, elliptic@^6.5.3, elliptic@~6.5.3:
+elliptic@6.3.3, elliptic@6.5.2, elliptic@6.5.3, elliptic@^6.4.0, elliptic@^6.4.1, elliptic@^6.5.2, elliptic@^6.5.3:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.3.tgz#cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6"
   integrity sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==
@@ -18209,7 +18207,7 @@ minimist-options@^3.0.1:
     arrify "^1.0.1"
     is-plain-obj "^1.1.0"
 
-minimist@0.0.5, minimist@0.0.8, minimist@^1.1.0, minimist@^1.1.1, minimist@^1.1.3, minimist@^1.2.0, minimist@^1.2.5, minimist@~0.0.1, minimist@~0.2.1, minimist@~1.2.0:
+minimist@0.0.5, minimist@0.0.8, minimist@^1.1.0, minimist@^1.1.1, minimist@^1.1.3, minimist@^1.2.0, minimist@^1.2.5, minimist@~0.0.1, minimist@~1.2.0:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
