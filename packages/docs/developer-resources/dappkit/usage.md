@@ -12,7 +12,7 @@ DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All
 
 ## Requesting Account Address
 
-One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant informtion to them. It can be done as simply as:
+One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant information to them. It can be done as simply as:
 
 ```javascript
 import { requestAccountAddress, waitForAccountAuth } from '@celo/dappkit'
