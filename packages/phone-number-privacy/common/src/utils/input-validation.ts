@@ -18,8 +18,8 @@ export function hasValidUserPhoneNumberParam(requestBody: GetContactMatchesReque
 
 export function hasValidContactPhoneNumbersParam(requestBody: GetContactMatchesRequest): boolean {
   return (
-    !!requestBody.contactPhoneNumbers &&
     Array.isArray(requestBody.contactPhoneNumbers) &&
+    requestBody.contactPhoneNumbers.length > 0 &&
     requestBody.contactPhoneNumbers.every((contact) => isValidPhoneNumber(contact))
   )
 }
