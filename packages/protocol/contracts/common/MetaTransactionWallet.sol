@@ -26,8 +26,11 @@ contract MetaTransactionWallet is
   );
   uint256 public nonce;
   address public signer;
+  address public guardian;
 
   event SignerSet(address indexed signer);
+  event GuardianSet(address indexed guardian);
+  event WalletRecovered(address indexed newSigner);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event Deposit(address indexed sender, uint256 value);
   event TransactionExecution(
@@ -44,6 +47,14 @@ contract MetaTransactionWallet is
     bytes returnData
   );
 
+  // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they will
+  // revert.
+  modifier onlyGuardian() {
+    require(guardian != address(0), "Guardian is not set");
+    require(guardian == msg.sender, "Caller is not the guardian");
+    _;
+  }
+
   /**
    * @dev Fallback function allows to deposit ether.
    */
@@ -56,7 +67,7 @@ contract MetaTransactionWallet is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 1);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -79,6 +90,23 @@ contract MetaTransactionWallet is
    */
   function setSigner(address _signer) external onlyOwner {
     _setSigner(_signer);
+  }
+
+  /**
+   * @notice Sets the wallet's guardian address.
+   * @param _guardian The address authorized to change the wallet's signer
+   */
+  function setGuardian(address _guardian) external onlyOwner {
+    _setGuardian(_guardian);
+  }
+
+  /**
+   * @notice Changes the wallet's signer
+   * @param newSigner The new signer address
+   */
+  function recoverWallet(address newSigner) external onlyGuardian {
+    _setSigner(newSigner);
+    emit WalletRecovered(newSigner);
   }
 
   /**
@@ -280,5 +308,10 @@ contract MetaTransactionWallet is
     require(_signer != address(0), "cannot assign zero address as signer");
     signer = _signer;
     emit SignerSet(signer);
+  }
+
+  function _setGuardian(address _guardian) internal {
+    guardian = _guardian;
+    emit GuardianSet(guardian);
   }
 }

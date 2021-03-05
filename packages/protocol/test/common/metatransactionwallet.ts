@@ -216,6 +216,70 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
+  describe('#setGuardian()', () => {
+    const guardian = accounts[4]
+
+    describe('when called by the wallet contract', () => {
+      let res
+      beforeEach(async () => {
+        // @ts-ignore
+        const data = wallet.contract.methods.setGuardian(guardian).encodeABI()
+        res = await executeOnSelf(data)
+      })
+      it('should set a new signer', async () => {
+        assert.equal(await wallet.guardian(), guardian)
+      })
+      it('should emit the GuardianSet event', async () => {
+        assertLogMatches2(res.logs[0], {
+          event: 'GuardianSet',
+          args: {
+            guardian: guardian,
+          },
+        })
+      })
+    })
+  })
+
+  describe('#recoverWallet()', () => {
+    const newSigner = accounts[3]
+    const guardian = accounts[4]
+    const nonGuardian = accounts[5]
+
+    describe('When the guardian is set', async () => {
+      let res
+      beforeEach(async () => {
+        // @ts-ignore
+        const data = wallet.contract.methods.setGuardian(guardian).encodeABI()
+        await executeOnSelf(data)
+      })
+
+      it('guardian should be able to recover wallet', async () => {
+        assert.notEqual(await wallet.signer(), newSigner)
+        res = await wallet.recoverWallet(newSigner, { from: guardian })
+        assert.equal(await wallet.signer(), newSigner)
+      })
+
+      it('should emit the SignerSet event', async () => {
+        assertLogMatches2(res.logs[0], {
+          event: 'WalleteRecovered',
+          args: {
+            signer: newSigner,
+          },
+        })
+      })
+
+      it('non guardian should not be able to recover wallet', async () => {
+        await assertRevert(wallet.recoverWallet(newSigner, { from: nonGuardian }))
+      })
+    })
+
+    describe('when the guardian is not set', () => {
+      it('should not be able to recover wallet', async () => {
+        await assertRevert(wallet.recoverWallet(newSigner, { from: guardian }))
+      })
+    })
+  })
+
   describe('#executeTransaction()', () => {
     describe('when the destination is a contract', () => {
       let res: any
