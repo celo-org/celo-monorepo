@@ -1,29 +1,41 @@
 import { BasicDataWrapper } from '@celo/identity/lib/offchain-data-wrapper'
-import { PublicNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
+import { PrivateNameAccessor, PublicNameAccessor } from '@celo/identity/lib/offchain/accessors/name'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
-import { Flags } from '../../utils/command'
+import { Args, Flags } from '../../utils/command'
+import { OffchainDataCommand } from '../../utils/off-chain-data'
 
 export default class OffchainRead extends BaseCommand {
   static description = 'DEV: Reads the name from offchain storage'
 
   static flags = {
-    ...BaseCommand.flags,
-    name: flags.string(),
-    from: Flags.address({ required: true }),
-    root: flags.string(),
+    ...OffchainDataCommand.flags,
+
+    // private accessor parameters
+    from: Flags.address({ required: false }),
+    privateDEK: flags.string({ required: false }),
   }
 
-  static args = []
+  static args = [Args.address('address')]
 
-  static examples = ['offchain-read --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
+  static examples = ['offchain-read 0x...', 'offchain-read 0x... --from 0x... --privateKey 0x...']
 
   async run() {
-    const res = this.parse(OffchainRead)
-    this.kit.defaultAccount = res.flags.from
-    const provider = new BasicDataWrapper(res.flags.from, this.kit)
-    const nameApplication = new PublicNameAccessor(provider)
-    const data = await nameApplication.read(res.flags.from)
+    const {
+      args: { address },
+      flags: { from, privateDEK },
+    } = this.parse(OffchainRead)
+
+    const provider = new BasicDataWrapper(from!, this.kit)
+
+    if (privateDEK) {
+      this.kit.addAccount(privateDEK)
+    }
+
+    const nameApplication = privateDEK
+      ? new PrivateNameAccessor(provider)
+      : new PublicNameAccessor(provider)
+    const data = await nameApplication.read(address)
     console.log(data)
   }
 }
