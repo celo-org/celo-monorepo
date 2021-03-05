@@ -5,7 +5,7 @@ import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart
+  upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
 import { scaleResource } from 'src/lib/kubernetes'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
@@ -23,12 +23,7 @@ export async function installHelmChart(
   replicas: number
 ) {
   const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    chartDir,
-    params
-  )
+  return installGenericHelmChart(celoEnv, releaseName(celoEnv), chartDir, params)
 }
 
 export async function upgradeHelmChart(
@@ -38,19 +33,16 @@ export async function upgradeHelmChart(
   replicas: number
 ) {
   const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    chartDir,
-    params
-  )
+  await upgradeGenericHelmChart(celoEnv, releaseName(celoEnv), chartDir, params)
 }
 
 // scales down all pods, upgrades, then scales back up
-export async function resetAndUpgrade(celoEnv: string,
+export async function resetAndUpgrade(
+  celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number) {
+  replicas: number
+) {
   const loadTestStatefulSetName = `${celoEnv}-load-test`
 
   console.info('Scaling load-test StatefulSet down to 0...')
@@ -65,7 +57,6 @@ export async function resetAndUpgrade(celoEnv: string,
   console.info(`Scaling load-test StatefulSet back up to ${replicas}...`)
   await scaleResource(celoEnv, 'StatefulSet', loadTestStatefulSetName, replicas)
 }
-
 
 export async function removeHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(`${celoEnv}-load-test`, celoEnv)

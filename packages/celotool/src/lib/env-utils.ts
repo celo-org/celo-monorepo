@@ -63,6 +63,7 @@ export enum envVar {
   FORNO_DOMAINS = 'FORNO_DOMAINS',
   FORNO_FULL_NODE_CONTEXTS = 'FORNO_FULL_NODE_CONTEXTS',
   FORNO_VPC_NETWORK_NAME = 'FORNO_VPC_NETWORK_NAME',
+  FULL_NODE_READINESS_CHECK_BLOCK_AGE = 'FULL_NODE_READINESS_CHECK_BLOCK_AGE',
   GENESIS_ACCOUNTS = 'GENESIS_ACCOUNTS',
   GETH_ACCOUNT_SECRET = 'GETH_ACCOUNT_SECRET',
   GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY = 'GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY',
@@ -115,6 +116,8 @@ export enum envVar {
   PROMETHEUS_REMOTE_WRITE_URL = 'PROMETHEUS_REMOTE_WRITE_URL',
   PROMETHEUS_REMOTE_WRITE_USERNAME = 'PROMETHEUS_REMOTE_WRITE_USERNAME',
   PROXIED_VALIDATORS = 'PROXIED_VALIDATORS',
+  SMS_PROVIDERS = 'SMS_PROVIDERS',
+  SMS_PROVIDERS_RANDOMIZED = 'SMS_PROVIDERS_RANDOMIZED',
   PROXY_ROLLING_UPDATE_PARTITION = 'PROXY_ROLLING_UPDATE_PARTITION',
   SECONDARIES_ROLLING_UPDATE_PARTITION = 'SECONDARIES_ROLLING_UPDATE_PARTITION',
   STACKDRIVER_MONITORING_DASHBOARD = 'STACKDRIVER_MONITORING_DASHBOARD',
@@ -122,6 +125,8 @@ export enum envVar {
   STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS = 'STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS',
   STACKDRIVER_NOTIFICATION_CHANNEL_PROTOCOL = 'STACKDRIVER_NOTIFICATION_CHANNEL_PROTOCOL',
   STATIC_IPS_FOR_GETH_NODES = 'STATIC_IPS_FOR_GETH_NODES',
+  TELEKOM_FROM = 'TELEKOM_FROM',
+  TELEKOM_API_KEY = 'TELEKOM_API_KEY',
   TESTNET_PROJECT_NAME = 'TESTNET_PROJECT_NAME',
   TIMESTAMP = 'TIMESTAMP',
   TRANSACTION_METRICS_EXPORTER_BLOCK_INTERVAL = 'TRANSACTION_METRICS_EXPORTER_BLOCK_INTERVAL',
@@ -257,9 +262,15 @@ export function isValidCeloEnv(celoEnv: string) {
   return new RegExp('^[a-z][a-z0-9]*$').test(celoEnv)
 }
 
-export function getDynamicEnvVarValue(dynamicEnvVar: DynamicEnvVar, templateValues: any, defaultValue?: string) {
+export function getDynamicEnvVarValue(
+  dynamicEnvVar: DynamicEnvVar,
+  templateValues: any,
+  defaultValue?: string
+) {
   const envVarName = getDynamicEnvVarName(dynamicEnvVar, templateValues)
-  return defaultValue !== undefined ? fetchEnvOrFallback(envVarName, defaultValue) : fetchEnv(envVarName)
+  return defaultValue !== undefined
+    ? fetchEnvOrFallback(envVarName, defaultValue)
+    : fetchEnv(envVarName)
 }
 
 /**
@@ -287,9 +298,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }
