@@ -20,7 +20,7 @@ export enum Endpoints {
 export function createServer() {
   logger.info('Creating express server')
   const app = express()
-  app.use(express.json(), loggerMiddleware)
+  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
 
   app.get(Endpoints.STATUS, (_req, res) => {
     res.status(200).json({

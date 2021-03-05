@@ -3,6 +3,7 @@ import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import SortedOraclesABI from '@celo/protocol/build/contracts/SortedOracles.json'
 import { CeloContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
 
@@ -371,10 +372,20 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * those arguments are being set correctly.
    */
   describe('#reportStableToken', () => {
-    it('calls report with the address for StableToken', async () => {
+    it('calls report with the address for StableToken (cUSD) by default', async () => {
       const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress)
       await tx.sendAndWaitForReceipt()
       expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
+    })
+
+    describe('calls report with the address for the provided StableToken', () => {
+      for (const token of Object.values(StableToken)) {
+        it(`calls report with token ${token}`, async () => {
+          const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress, token)
+          await tx.sendAndWaitForReceipt()
+          expect(tx.txo.arguments[0]).toEqual(await kit.celoTokens.getAddress(token))
+        })
+      }
     })
   })
 

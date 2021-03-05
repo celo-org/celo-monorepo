@@ -8,6 +8,7 @@ export enum CeloContract {
   EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
+  ExchangeEUR = 'ExchangeEUR',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -22,13 +23,23 @@ export enum CeloContract {
   Reserve = 'Reserve',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
+  StableTokenEUR = 'StableTokenEUR',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 
 export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
-export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
+export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
+
+export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
+
+export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
+/**
+ * Deprecated alias for CeloTokenContract.
+ * @deprecated Use CeloTokenContract instead
+ */
+export type CeloToken = CeloTokenContract
 
 export const AllContracts = Object.keys(CeloContract) as CeloContract[]
 const AuxiliaryContracts = [
