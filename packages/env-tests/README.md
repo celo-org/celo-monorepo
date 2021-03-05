@@ -1,4 +1,4 @@
-# Eng-tests
+# Env-tests
 
 The `env-tests` package is a set of tests that is designed to be run against CELO blockchains and assert that various platform interactions work as intended. It currently has tests for the following:
 

@@ -97,16 +97,16 @@ contract('Validators', (accounts: string[]) => {
     adjustmentSpeed: toFixed(0.25),
   }
 
-  const grace = new BigNumber(0.00625)
   const one = new BigNumber(1)
   const max1 = (num: BigNumber) => (num.gt(one) ? one : num)
-  const calculateScore = (uptime: BigNumber) =>
-    max1(uptime.plus(grace)).pow(validatorScoreParameters.exponent)
+  const calculateScore = (uptime: BigNumber, gracePeriod: BigNumber) =>
+    max1(uptime.plus(gracePeriod)).pow(validatorScoreParameters.exponent)
 
   const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
   const commissionUpdateDelay = new BigNumber(3)
+  const downtimeGracePeriod = new BigNumber(0)
 
   // A random 64 byte hex string.
   const blsPublicKey =
@@ -140,7 +140,8 @@ contract('Validators', (accounts: string[]) => {
       membershipHistoryLength,
       slashingMultiplierResetPeriod,
       maxGroupSize,
-      commissionUpdateDelay
+      commissionUpdateDelay,
+      downtimeGracePeriod
     )
   })
 
@@ -210,6 +211,11 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(actualCommissionUpdateDelay, commissionUpdateDelay)
     })
 
+    it('should have set the downtime grace period', async () => {
+      const actualDowntimeGracePeriod = await validators.downtimeGracePeriod()
+      assertEqualBN(actualDowntimeGracePeriod, downtimeGracePeriod)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         validators.initialize(
@@ -223,7 +229,8 @@ contract('Validators', (accounts: string[]) => {
           membershipHistoryLength,
           slashingMultiplierResetPeriod,
           maxGroupSize,
-          commissionUpdateDelay
+          commissionUpdateDelay,
+          downtimeGracePeriod
         )
       )
     })
@@ -1888,14 +1895,15 @@ contract('Validators', (accounts: string[]) => {
       it('should calculate the score correctly', async () => {
         // Compare expected and actual to 8 decimal places.
         const uptime = new BigNumber(0.99)
+        const grace = await validators.downtimeGracePeriod()
         assertEqualDpBN(
           fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
-          calculateScore(uptime),
+          calculateScore(uptime, grace),
           8
         )
         assertEqualDpBN(
           fromFixed(await validators.calculateEpochScore(new BigNumber(0))),
-          calculateScore(new BigNumber(0)),
+          calculateScore(new BigNumber(0), grace),
           8
         )
 
@@ -1913,12 +1921,14 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#calculateGroupEpochScore', () => {
     describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const testGroupUptimeCalculation = (_uptimes) => {
+      const testGroupUptimeCalculation = async (_uptimes) => {
+        const gracePeriod = await validators.downtimeGracePeriod()
         const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
-          .map((uptime) => calculateScore(uptime))
+          .map((uptime) => calculateScore(uptime, gracePeriod))
           .reduce((sum, n) => sum.plus(n))
           .div(_uptimes.length)
+
         it('should calculate the group score correctly', async () => {
           assertEqualDpBN(
             fromFixed(await validators.calculateGroupEpochScore(_uptimes.map(toFixed))),
@@ -1931,17 +1941,17 @@ contract('Validators', (accounts: string[]) => {
       // 5 random uptimes between zero and one.
       const uptimes = [0.969, 0.485, 0.456, 0.744, 0.257]
       for (const count of [1, 3, 5]) {
-        describe(`when there are ${count} validators in the group`, () => {
-          testGroupUptimeCalculation(uptimes.slice(0, count))
+        it(`when there are ${count} validators in the group`, async () => {
+          await testGroupUptimeCalculation(uptimes.slice(0, count))
         })
       }
 
-      describe('when only zeros are provided', () => {
-        testGroupUptimeCalculation([0, 0, 0, 0])
+      it('when only zeros are provided', async () => {
+        await testGroupUptimeCalculation([0, 0, 0, 0])
       })
 
-      describe('when there are zeros in the uptimes', () => {
-        testGroupUptimeCalculation([0.75, 0, 0.95])
+      it('when there are zeros in the uptimes', async () => {
+        await testGroupUptimeCalculation([0.75, 0, 0.95])
       })
 
       describe('when there are more than maxGroupSize uptimes', () => {
@@ -1968,16 +1978,22 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#updateValidatorScoreFromSigner', () => {
     const validator = accounts[0]
+    let grace: BigNumber
+
     beforeEach(async () => {
       await registerValidator(validator)
+      grace = await validators.downtimeGracePeriod()
     })
 
     describe('when 0 <= uptime <= 1.0', () => {
       const uptime = new BigNumber(0.99)
-      // @ts-ignore
-      const epochScore = calculateScore(uptime)
-      const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
+
+      let epochScore: BigNumber
+      let adjustmentSpeed: BigNumber
+
       beforeEach(async () => {
+        epochScore = calculateScore(uptime, grace)
+        adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
         await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
       })
 
@@ -2205,17 +2221,24 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the validator score is non-zero', () => {
       let ret: BigNumber
-      const uptime = new BigNumber(0.99)
-      const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
-      // @ts-ignore
-      const expectedScore = adjustmentSpeed.times(calculateScore(uptime))
-      const expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
-      const expectedGroupPayment = expectedTotalPayment
-        .times(fromFixed(commission))
-        .dp(0, BigNumber.ROUND_FLOOR)
-      const expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
+      let expectedScore: BigNumber
+      let expectedTotalPayment: BigNumber
+      let expectedGroupPayment: BigNumber
+      let expectedValidatorPayment: BigNumber
 
       beforeEach(async () => {
+        const uptime = new BigNumber(0.99)
+        const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
+
+        expectedScore = adjustmentSpeed.times(
+          calculateScore(new BigNumber(0.99), await validators.downtimeGracePeriod())
+        )
+        expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
+        expectedGroupPayment = expectedTotalPayment
+          .times(fromFixed(commission))
+          .dp(0, BigNumber.ROUND_FLOOR)
+        expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
+
         await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
       })
 
@@ -2239,21 +2262,25 @@ contract('Validators', (accounts: string[]) => {
       })
 
       describe('when slashing multiplier is halved', () => {
-        const halfExpectedTotalPayment = expectedScore
-          .times(maxPayment)
-          .div(2)
-          .dp(0, BigNumber.ROUND_FLOOR)
-        const halfExpectedGroupPayment = halfExpectedTotalPayment
-          .times(fromFixed(commission))
-          .dp(0, BigNumber.ROUND_FLOOR)
-        const halfExpectedValidatorPayment = halfExpectedTotalPayment.minus(
-          halfExpectedGroupPayment
-        )
+        let halfExpectedTotalPayment: BigNumber
+        let halfExpectedGroupPayment: BigNumber
+        let halfExpectedValidatorPayment: BigNumber
+
         beforeEach(async () => {
+          halfExpectedTotalPayment = expectedScore
+            .times(maxPayment)
+            .div(2)
+            .dp(0, BigNumber.ROUND_FLOOR)
+          halfExpectedGroupPayment = halfExpectedTotalPayment
+            .times(fromFixed(commission))
+            .dp(0, BigNumber.ROUND_FLOOR)
+          halfExpectedValidatorPayment = halfExpectedTotalPayment.minus(halfExpectedGroupPayment)
+
           await validators.halveSlashingMultiplier(group, { from: accounts[2] })
           ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
           await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
         })
+
         it('should pay the validator only half', async () => {
           assertEqualBN(await mockStableToken.balanceOf(validator), halfExpectedValidatorPayment)
         })

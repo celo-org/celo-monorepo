@@ -36,11 +36,14 @@ export enum ProposalStage {
   Expiration = 'Expiration',
 }
 
-export interface ProposalStageDurations {
-  [ProposalStage.Approval]: BigNumber // seconds
-  [ProposalStage.Referendum]: BigNumber // seconds
-  [ProposalStage.Execution]: BigNumber // seconds
+type StageDurations<V> = {
+  [Stage in ProposalStage]: V
 }
+
+type DequeuedStageDurations = Pick<
+  StageDurations<BigNumber>,
+  ProposalStage.Approval | ProposalStage.Referendum | ProposalStage.Execution
+>
 
 export interface ParticipationParameters {
   baseline: BigNumber
@@ -54,7 +57,7 @@ export interface GovernanceConfig {
   dequeueFrequency: BigNumber // seconds
   minDeposit: BigNumber
   queueExpiry: BigNumber
-  stageDurations: ProposalStageDurations
+  stageDurations: DequeuedStageDurations
   participationParameters: ParticipationParameters
 }
 
@@ -81,13 +84,21 @@ export const proposalToParams = (proposal: Proposal, descriptionURL: string): Pr
   ]
 }
 
+interface ApprovalStatus {
+  completion: string
+  confirmations: string[]
+  approvers: string[]
+}
+
 export interface ProposalRecord {
-  stage: ProposalStage
   metadata: ProposalMetadata
-  upvotes: BigNumber
-  votes: Votes
   proposal: Proposal
-  passing: boolean
+  stage: ProposalStage
+  approved: boolean
+  passed: boolean
+  upvotes?: BigNumber
+  approvals?: ApprovalStatus
+  votes?: Votes
 }
 
 export interface UpvoteRecord {
@@ -103,9 +114,9 @@ export enum VoteValue {
 }
 
 export interface Votes {
-  [VoteValue.Yes]: BigNumber
-  [VoteValue.No]: BigNumber
   [VoteValue.Abstain]: BigNumber
+  [VoteValue.No]: BigNumber
+  [VoteValue.Yes]: BigNumber
 }
 
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
@@ -171,7 +182,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Query durations of different stages in proposal lifecycle.
    * @returns Durations for approval, referendum and execution stages in seconds.
    */
-  async stageDurations(): Promise<ProposalStageDurations> {
+  async stageDurations(): Promise<DequeuedStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
       [ProposalStage.Approval]: valueToBigNumber(res[0]),
@@ -216,6 +227,25 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       baselineFloor: fromFixed(new BigNumber(res[1])),
       baselineUpdateFactor: fromFixed(new BigNumber(res[2])),
       baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
+    }
+  }
+
+  // simulates proposal.getSupportWithQuorumPadding
+  async getSupport(proposalID: BigNumber.Value) {
+    const participation = await this.getParticipationParameters()
+    const quorum = participation.baseline.times(participation.baselineQuorumFactor)
+    const votes = await this.getVotes(proposalID)
+    const total = votes.Yes.plus(votes.No).plus(votes.Abstain)
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    // NOTE: this networkWeight is not as governance calculates it,
+    // but we don't have access to proposal.networkWeight
+    const networkWeight = await lockedGold.getTotalLockedGold()
+    const required = networkWeight.times(quorum)
+    const support = votes.Yes.div(votes.Yes.plus(votes.No))
+    return {
+      support,
+      required,
+      total,
     }
   }
 
@@ -351,29 +381,60 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   getApprover = proxyCall(this.contract.methods.approver)
 
-  getProposalStage = proxyCall(
-    this.contract.methods.getProposalStage,
-    tupleParser(valueToString),
-    (res) => Object.keys(ProposalStage)[valueToInt(res)] as ProposalStage
-  )
+  /**
+   * Returns the approver multisig contract for proposals and hotfixes.
+   */
+  getApproverMultisig = () =>
+    this.getApprover().then((address) => this.kit.contracts.getMultiSig(address))
 
-  async timeUntilStages(proposalID: BigNumber.Value) {
-    const meta = await this.getProposalMetadata(proposalID)
-    const now = Math.round(new Date().getTime() / 1000)
-    const durations = await this.stageDurations()
-    const referendum = meta.timestamp.plus(durations.Approval).minus(now)
-    const execution = referendum.plus(durations.Referendum)
-    const expiration = execution.plus(durations.Execution)
-    return { referendum, execution, expiration }
+  async getProposalStage(proposalID: BigNumber.Value): Promise<ProposalStage> {
+    // NOTE: `methods.getProposalStage` is broken for case where proposal is queued and expired
+    // can be reverted once https://github.com/celo-org/celo-monorepo/pull/6502 is released
+    const queue = await this.getQueue()
+    const existsInQueue = queue.find((u) => u.proposalID === proposalID) !== undefined
+    if (existsInQueue) {
+      const expired = await this.isQueuedProposalExpired(proposalID)
+      return expired ? ProposalStage.Expiration : ProposalStage.Queued
+    }
+
+    const res = await this.contract.methods.getProposalStage(valueToString(proposalID)).call()
+    return Object.keys(ProposalStage)[valueToInt(res)] as ProposalStage
   }
 
-  async humanReadableTimeUntilStages(propoaslID: BigNumber.Value) {
-    const time = await this.timeUntilStages(propoaslID)
-    return {
-      referendum: secondsToDurationString(time.referendum),
-      execution: secondsToDurationString(time.execution),
-      expiration: secondsToDurationString(time.expiration),
+  async proposalSchedule(proposalID: BigNumber.Value): Promise<Partial<StageDurations<BigNumber>>> {
+    const meta = await this.getProposalMetadata(proposalID)
+    const stage = await this.getProposalStage(proposalID)
+
+    if (stage === ProposalStage.Queued) {
+      const queueExpiry = await this.queueExpiry()
+      const queueExpiration = meta.timestamp.plus(queueExpiry)
+      return {
+        [ProposalStage.Queued]: meta.timestamp,
+        [ProposalStage.Expiration]: queueExpiration,
+      }
     }
+
+    const durations = await this.stageDurations()
+    const referendum = meta.timestamp.plus(durations.Approval)
+    const execution = referendum.plus(durations.Referendum)
+    const expiration = execution.plus(durations.Execution)
+
+    return {
+      [ProposalStage.Approval]: meta.timestamp,
+      [ProposalStage.Referendum]: referendum,
+      [ProposalStage.Execution]: execution,
+      [ProposalStage.Expiration]: expiration,
+    }
+  }
+
+  async humanReadableProposalSchedule(proposalID: BigNumber.Value) {
+    const schedule = await this.proposalSchedule(proposalID)
+
+    const dates: Partial<StageDurations<string>> = {}
+    for (const stage of Object.keys(schedule) as Array<keyof StageDurations<any>>) {
+      dates[stage] = unixSecondsTimestampToDateString(schedule[stage]!)
+    }
+    return dates
   }
 
   /**
@@ -386,6 +447,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return concurrentMap(4, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 
+  async getApprovalStatus(proposalID: BigNumber.Value): Promise<ApprovalStatus> {
+    const multisig = await this.getApproverMultisig()
+    const approveTx = await this.approve(proposalID)
+    const confirmations = (await multisig.getTransactionDataByContent(this.address, approveTx.txo))!
+      .confirmations
+    const approvers = await multisig.getOwners()
+    return {
+      completion: `${confirmations.length} / ${approvers.length}`,
+      confirmations,
+      approvers,
+    }
+  }
+
   /**
    * Returns the stage, metadata, upvotes, votes, and transactions associated with a given proposal.
    * @param proposalID Governance proposal UUID
@@ -394,24 +468,27 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const metadata = await this.getProposalMetadata(proposalID)
     const proposal = await this.getProposal(proposalID)
     const stage = await this.getProposalStage(proposalID)
-    const passing = await this.isProposalPassing(proposalID)
 
-    let upvotes = ZERO_BN
-    let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
-    if (stage === ProposalStage.Queued) {
-      upvotes = await this.getUpvotes(proposalID)
-    } else if (stage !== ProposalStage.Expiration) {
-      votes = await this.getVotes(proposalID)
-    }
-
-    return {
+    const record: ProposalRecord = {
       proposal,
       metadata,
       stage,
-      upvotes,
-      votes,
-      passing,
+      passed: false,
+      approved: false,
     }
+
+    if (stage === ProposalStage.Queued) {
+      record.upvotes = await this.getUpvotes(proposalID)
+    } else if (stage === ProposalStage.Approval) {
+      record.approved = await this.isApproved(proposalID)
+      record.approvals = await this.getApprovalStatus(proposalID)
+    } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
+      record.approved = true
+      record.passed = await this.isProposalPassing(proposalID)
+      record.votes = await this.getVotes(proposalID)
+    }
+
+    return record
   }
 
   /**
