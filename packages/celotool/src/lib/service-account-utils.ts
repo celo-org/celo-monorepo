@@ -9,7 +9,7 @@ export async function createServiceAccountIfNotExists(name: string) {
   const serviceAccountExists = await outputIncludes(
     `gcloud iam service-accounts list`,
     name,
-    `Service account ${name} exists, skipping creation`
+    `GCP Service account ${name} exists, skipping creation`
   )
   if (!serviceAccountExists) {
     await execCmdWithExitOnFailure(

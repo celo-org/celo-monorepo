@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
@@ -95,6 +95,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     '__name__!~"workqueue_.+"',
     '__name__!~"nginx_.+"'
   ]
+
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -110,6 +111,20 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
   ]
+  
+  if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
+    params.push(
+      `--set remote_write[0].url=${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}`,
+      `--set remote_write[0].basic_auth.username=${fetchEnv(
+        envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
+      )}`,
+      `--set remote_write[0].basic_auth.password=${fetchEnv(
+        envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
+      )}`,
+      `--set enable_alerts="${isProduction()}"`
+    )
+  }
+
   if ((clusterConfig) && (clusterConfig.cloudProvider) !== CloudProvider.GCP ) {
     const clusterName = clusterConfig.clusterName
     const cloudProvider = getCloudProviderPrefix(clusterConfig)
