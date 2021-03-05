@@ -65,7 +65,6 @@ async function waitDecorator(
   if (checkCallback(requestId, dappKitResponse)) {
     return dappKitResponse
   }
-  console.log('Unable to parse url', url)
   throw new Error('Unable to parse Valora response')
 }
 
