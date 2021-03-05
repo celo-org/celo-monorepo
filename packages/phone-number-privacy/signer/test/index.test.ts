@@ -10,6 +10,7 @@ import {
   createMockToken,
   createMockWeb3,
 } from '../../common/src/test/utils'
+import { BLINDED_PHONE_NUMBER } from '../../common/src/test/values'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
@@ -23,7 +24,6 @@ import { getKeyProvider } from '../src/key-management/key-provider'
 import { createServer } from '../src/server'
 import { getRemainingQueryCount, getWalletAddress } from '../src/signing/query-quota'
 import { getBlockNumber, getContractKit } from '../src/web3/contracts'
-import { BLINDED_PHONE_NUMBER } from './end-to-end/get-blinded-sig.test'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
