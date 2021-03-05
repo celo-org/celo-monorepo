@@ -111,9 +111,9 @@ this.setState({ cUSDBalance, isLoadingBalance: false })
 
 Originally, DAppKit was designed for mobile apps in mind and did not work out-of-the-box for web DApps running in the browser of a mobile device. DAppKit-web includes workarounds for some of the typical issues that arose for folks using DAppKit to integrate their web DApps with Valora.
 
-DAppkit uses React's `Linking` library to listen for URL changes (i.e. on return to the DApp from Valora) and then receive and parse the requested information; this causes redirection to new tabs on web browsers, however, which means that the information requested via DAppkit does not make it back to the session. To get around this, DAppkit-web uses the web browser's `localStorage` to store this returned URL, which can then be accessed by the new tabs.
+DAppkit uses React Native's `Linking` library to listen for URL changes (i.e. on return to the DApp from Valora) so it can receive and parse the requested information; this causes redirection to new tabs on web browsers, however, which means that the information requested via DAppkit does not make it back to the original session. To get around this, DAppkit-web uses the web browser's `localStorage` to store this returned URL, which can then be accessed by the old tab.
 
-DAppKit-web includes the main functionality from DAppKit, so all that is required is to import from `@celo/dappkit/lib/web` instead of from `@celo/dappkit`. The usage of DAppkit-web is the same as above, but calling the functions `waitForAccountAuth` and `waitForSignedTxs` should be surrounded with a `try...catch`, since these functions can return a timeout error.
+DAppKit-web includes the main functionality from DAppKit, so all that is required is to import from `@celo/dappkit/lib/web` instead of from `@celo/dappkit`. The usage of DAppkit-web is the same as above, but calling the functions `waitForAccountAuth` and `waitForSignedTxs` should be surrounded with a `try...catch`, since these functions can throw a timeout error.
 
 This should look something like the following:
 
