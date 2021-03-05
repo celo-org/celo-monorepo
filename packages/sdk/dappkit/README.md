@@ -125,7 +125,7 @@ this.setState({ cUSDBalance, isLoadingBalance: false });
 ## ContractKit example
 
 Let's make a common use example. What about exchanging some cUSD to CELO, and
-then Lock that CELO to be able to vote a validator group?
+then Locking that CELO to be able to vote for a validator group?
 Let's do that
 
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/cf35c82d7650e7b6bc7208ece32440d3a32d9cc5))
@@ -136,10 +136,10 @@ import {
   waitForSignedTxs
 } from "@celo/dappkit";
 
-// Let's assume that the address has funds enough in cUSD to pay the
-// transactions fees of all the transactions and enough to buy 10 CELOs
-// AND it's already a registered Account (otherwise it will require to call
-// the `createAccount` method from the Accounts contract)
+// Let's assume that the address has enough cUSD to pay the
+// transaction fees of all the transactions and enough to buy 10 CELO
+// AND it's already a registered Account (otherwise it will require a call
+// to the `createAccount` method from the Accounts contract)
 
 // We will be using the following contracts:
 const stableToken = await kit.contracts.getStableToken();
@@ -161,20 +161,20 @@ const txObjectIncAllow = stableToken.increaseAllowance(
   oneHundredCUSD
 ).txo;
 
-// Then we will call the exchange contract. Trying to buy 10 CELOs, with a 
-// max price of 100 cUSD (it could use less than that)
+// Then we will call the Exchange contract, and attempt to buy 10 CELO with a 
+// max price of 100 cUSD (it could use less than that).
 const txObjectExchange = exchange.buy(
   tenCelo,
   oneHundredCUSD,
   true
 ).txo;
 
-// Then we will call the lockGold contract to lock our CELO
+// Then we will call the lockedGold contract to lock our CELO
 // (Remember that the address should be a registered Account)
-// The amount to be locked will be the parameter `value` later
+// Later, the amount to be locked will be the parameter `value`.
 const txObjectLock = lockedGold.lock().txo;
 
-// Then we use the 10 CELO to vote an specific validator group address
+// Then we use the 10 CELO to vote for a specific validator group address.
 const validatorGroupAddress = "VALIDATOR_GROUP_ADDRESS";
 const txObjectVote = await election.vote(
   validatorGroupAddress, 
@@ -246,7 +246,7 @@ const receipt = await tx3.waitReceipt();
 const voteInfo = await election.getVoter(this.state.address);
 
 // REMEMBER that after voting the next epoch you HAVE TO ACTIVATE those votes
-// using the election contract, the `activate` method
+// using the `activate` method in the election contract.
 
 this.setState({ voteInfo, isVoting: false });
 ```
