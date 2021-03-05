@@ -99,7 +99,7 @@ node helloCelo.js
 ```
 
 {% hint style="info" %}
-You may notice that we convert the balance to a string before we print it. This is because the `balanceOf()` function returns a [BigNumber](https://github.com/MikeMcl/bignumber.js/). Javascript does not have floating point numbers, so it is common to convert integers to large numbers before doing arithmetic. So 1 CELO = 10\*\*18 base units of CELO. The `balanceOf()` function returns the account balance in these base units. Converting the BigNumber to a string converts the BigNumber object into a more legible string.
+Note that the `balanceOf()` function returns objects with type [BigNumber](https://github.com/MikeMcl/bignumber.js/) because balances are represented in Celo as a 256 bit unsigned integer, and JavaScript's number type cannot safely handle numbers of that size. Note also that the balance values are reported in units of CELO Wei, where one CELO = 10\*\*18 CELO Wei.
 {% endhint %}
 
 Reading all account balances is a powerful feature of blockchains. Next, let's see how we can send value to each other on the testnet.
@@ -228,7 +228,12 @@ Run `$ node helloCelo.js` again to send the transactions and see the printed out
 
 The above instructions apply to building NodeJS applications. If you want to build an integration with a web application, you can still use the ContractKit by following slightly modified instructions.
 
-You will need to have the following `npm` libraries installed: `web3`, `@celo/contractkit`, `@celo/wallet-ledger`, `@ledgerhq/hw-app-eth`, `@ledgerhq/hw-transport-u2f` and `@ledgerhq/hw-transport-webusb`.
+The following code examples are typescript so should be stored in a `.tsc` file, you will also need to install typescript and then compile your typescript to javascript with `npx tsc` before you can run the code with node.
+
+```
+npm install --save-dev typescript
+npm install web3 @celo/contractkit @celo/wallet-ledger @ledgerhq/hw-app-eth @ledgerhq/hw-transport-u2f @ledgerhq/hw-transport-webusb
+```
 
 Then, you can create a new instance of the ContractKit with the following code:
 

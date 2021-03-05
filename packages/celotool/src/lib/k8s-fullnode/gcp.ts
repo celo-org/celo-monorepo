@@ -5,8 +5,8 @@ import { GCPClusterConfig } from '../k8s-cluster/gcp'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
 export interface GCPFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
-  clusterConfig: GCPClusterConfig,
-  createNEG: boolean,
+  clusterConfig: GCPClusterConfig
+  createNEG: boolean
 }
 
 export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
@@ -16,32 +16,25 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
       `--set gcp=true`,
       `--set storage.storageClass=ssd`,
       `--set geth.public_ip_per_node='{${staticIps}}'`,
-      `--set geth.create_network_endpoint_group=${this.deploymentConfig.createNEG}`
+      `--set geth.create_network_endpoint_group=${this.deploymentConfig.createNEG}`,
     ]
   }
 
   async allocateStaticIPs() {
     const allocateIPPromises = range(this.deploymentConfig.replicas).map((index: number) =>
-      registerIPAddress(
-        this.getIPAddressName(index),
-        this.deploymentConfig.clusterConfig.zone
-      )
+      registerIPAddress(this.getIPAddressName(index), this.deploymentConfig.clusterConfig.zone)
     )
     await Promise.all([
       ...allocateIPPromises,
       this.deallocateIPsWithNames(await this.ipAddressNamesToDeallocate()),
     ])
     return Promise.all(
-      range(this.deploymentConfig.replicas).
-        map((index: number) => this.getFullNodeIP(index))
+      range(this.deploymentConfig.replicas).map((index: number) => this.getFullNodeIP(index))
     )
   }
 
   async getFullNodeIP(index: number): Promise<string> {
-    return retrieveIPAddress(
-      this.getIPAddressName(index),
-      this.deploymentConfig.clusterConfig.zone
-    )
+    return retrieveIPAddress(this.getIPAddressName(index), this.deploymentConfig.clusterConfig.zone)
   }
 
   async ipAddressNamesToDeallocate(intendedReplicas: number = this.deploymentConfig.replicas) {

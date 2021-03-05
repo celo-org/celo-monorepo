@@ -3,6 +3,7 @@
   "version": "1.0.3-dev",
   "scripts": {
     "build": "tsc",
+    "clean": "tsc -b . --clean",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
@@ -12,6 +13,9 @@
     "expo": "^36.0.2",
     "expo-contacts": "8.0.0",
     "libphonenumber-js": "^1.7.22"
+  },
+  "devDependencies": {
+    "@types/react-native": "0.63.50"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

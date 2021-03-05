@@ -133,16 +133,14 @@ describe('sync tests', function(this: any) {
     })
   }
   describe(`when a validator's data directory is deleted`, () => {
-    let web3: any
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
-      web3 = new Web3('http://localhost:8545')
       await hooks.restart()
     })
 
     it('should continue to block produce', async function(this: any) {
       this.timeout(0)
-      const instance: GethInstanceConfig = gethConfig.instances[0]
+      const instance: GethInstanceConfig = gethConfig.instances[1]
       await killInstance(instance)
       // copy instance
       const additionalInstance = { ...instance }
@@ -155,6 +153,7 @@ describe('sync tests', function(this: any) {
         3
       )
 
+      const web3 = new Web3(`http://localhost:${additionalInstance.rpcport}`)
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 1; i < 500; i++) {
