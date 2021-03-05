@@ -26,11 +26,11 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
         context.kit.connection.defaultFeeCurrency = stableTokenInstance.address
         const goldToken = await context.kit.contracts.getGoldToken()
 
-        let exchange = await initExchangeFromRegistry(stableToken, context.kit)
+        const exchange = await initExchangeFromRegistry(stableToken, context.kit)
         const previousGoldBalance = await goldToken.balanceOf(from.address)
         const goldAmount = await exchange.getBuyTokenAmount(ONE, false)
         logger.debug(
-          { rate: goldAmount.toString(), stableToken: stableToken },
+          { rate: goldAmount.toString(), stabletoken: stableToken },
           `quote selling ${stableToken}`
         )
 
@@ -49,7 +49,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
           .send()
         await sellTx.getHash()
         const receipt = await sellTx.waitReceipt()
-        logger.debug({ stableToken: stableToken, receipt: receipt }, `Sold ${stableToken}`)
+        logger.debug({ stabletoken: stableToken, receipt }, `Sold ${stableToken}`)
 
         // Sell more to receive at least 1 cUSD / cEUR back
         const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(
@@ -60,7 +60,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
           {
             goldAmount: goldAmount.toString(),
             goldAmountToSell: goldAmountToSell.toString(),
-            stableToken: stableToken,
+            stabletoken: stableToken,
           },
           'Loss to exchange'
         )
@@ -81,7 +81,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
           .send()
         const sellGoldReceipt = await sellGoldTx.waitReceipt()
 
-        logger.debug({ stableToken: stableToken, receipt: sellGoldReceipt }, 'Sold CELO')
+        logger.debug({ stabletoken: stableToken, receipt: sellGoldReceipt }, 'Sold CELO')
       })
     }
   })

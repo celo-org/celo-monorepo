@@ -60,10 +60,7 @@ export async function fundAccountWithStableToken(
     .transfer(recipient.address, value.toString())
     .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
 
-  logger.debug(
-    { stableToken: stableToken, receipt: receipt },
-    `funded test account with ${stableToken}`
-  )
+  logger.debug({ stabletoken: stableToken, receipt }, `funded test account with ${stableToken}`)
 }
 
 export async function getKey(mnemonic: string, account: TestAccounts) {
@@ -139,7 +136,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
         context.logger.debug(
           {
             index,
-            stableToken: stableToken,
+            stabletoken: stableToken,
             balanceBefore: balance.toString(),
             address: account.address,
             BalanceAfter: balanceAfter.toString(),

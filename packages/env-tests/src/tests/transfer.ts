@@ -32,7 +32,7 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
         const toBalanceBefore = await stableTokenInstance.balanceOf(to.address)
         const fromBalanceBefore = await stableTokenInstance.balanceOf(from.address)
         logger.debug(
-          { stableToken: stableToken, balance: toBalanceBefore.toString(), account: to.address },
+          { stabletoken: stableToken, balance: toBalanceBefore.toString(), account: to.address },
           `Get ${stableToken} Balance Before`
         )
 
@@ -40,7 +40,7 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
           .transfer(to.address, ONE.toString())
           .sendAndWaitForReceipt({ from: from.address })
 
-        logger.debug({ stableToken: stableToken, receipt: receipt }, `Transferred ${stableToken}`)
+        logger.debug({ stabletoken: stableToken, receipt }, `Transferred ${stableToken}`)
         const transaction = await context.kit.web3.eth.getTransaction(receipt.transactionHash)
         const gasPrice = new BigNumber(transaction.gasPrice)
         const gasUsed = new BigNumber(context.kit.web3.utils.toDecimal(receipt.gasUsed).toString())
@@ -49,12 +49,12 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
         const toBalanceAfter = await stableTokenInstance.balanceOf(to.address)
         const fromBalanceAfter = await stableTokenInstance.balanceOf(from.address)
         logger.debug(
-          { stableToken: stableToken, balance: toBalanceAfter.toString(), account: to.address },
+          { stabletoken: stableToken, balance: toBalanceAfter.toString(), account: to.address },
           `Get ${stableToken} Balance After`
         )
         expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
-        //check whether difference of balance of 'from' account before/after - transfer amount
-        //is equal to transaction fee
+        // check whether difference of balance of 'from' account before/after - transfer amount
+        // is equal to transaction fee
         expect(
           fromBalanceBefore
             .minus(fromBalanceAfter)

@@ -26,9 +26,9 @@ function runTests() {
   const stableTokensToTest = process.env.STABLETOKENS
     ? process.env.STABLETOKENS.split(',')
     : DEFAULT_TOKENS_TO_TEST
-  if (stableTokensToTest.find((token) => !StableTokenToRegistryName[token]))
+  if (stableTokensToTest.find((token) => !StableTokenToRegistryName[token])) {
     throw new Error('Invalid token')
-
+  }
   describe('Run tests in context of monorepo', () => {
     const context = {
       kit,
