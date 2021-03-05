@@ -49,7 +49,6 @@ a contract wrapper
 * [getStableToken](_web3_contract_cache_.web3contractcache.md#getstabletoken)
 * [getTransferWhitelist](_web3_contract_cache_.web3contractcache.md#gettransferwhitelist)
 * [getValidators](_web3_contract_cache_.web3contractcache.md#getvalidators)
-* [invalidateContract](_web3_contract_cache_.web3contractcache.md#invalidatecontract)
 
 ## Constructors
 
@@ -365,23 +364,3 @@ ___
 *Defined in [contractkit/src/web3-contract-cache.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L148)*
 
 **Returns:** *Promise‹Validators‹››*
-
-___
-
-###  invalidateContract
-
-▸ **invalidateContract**<**C**>(`contract`: C): *void*
-
-*Defined in [contractkit/src/web3-contract-cache.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L173)*
-
-**Type parameters:**
-
-▪ **C**: *keyof typeof ContractFactories*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`contract` | C |
-
-**Returns:** *void*
