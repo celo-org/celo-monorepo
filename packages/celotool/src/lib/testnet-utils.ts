@@ -66,13 +66,7 @@ export async function uploadTestnetStaticNodesToGoogleStorage(networkName: strin
 export async function uploadStaticNodesToGoogleStorage(fileName: string, enodes: string[]) {
   const json = JSON.stringify(enodes)
   console.debug(`${fileName} static nodes are ${json}\n`)
-  await uploadDataToGoogleStorage(
-    json,
-    staticNodesBucketName,
-    fileName,
-    true,
-    'application/json'
-  )
+  await uploadDataToGoogleStorage(json, staticNodesBucketName, fileName, true, 'application/json')
 }
 
 export async function uploadBootnodeToGoogleStorage(networkName: string) {
