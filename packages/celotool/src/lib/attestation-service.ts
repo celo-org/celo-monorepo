@@ -51,6 +51,14 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
+    `--set attestation_service.telekom.apiKey="${fetchEnv(envVar.TELEKOM_API_KEY)}"`,
+    `--set attestation_service.telekom.from="${fetchEnv(envVar.TELEKOM_FROM)}"`,
+    `--set attestation_service.sms_providers="${fetchEnv(envVar.SMS_PROVIDERS)
+      .split(',')
+      .join('\\,')}"`,
+    `--set attestation_service.sms_providers_randomized="${fetchEnv(
+      envVar.SMS_PROVIDERS_RANDOMIZED
+    )}"`,
     ...setHelmArray(
       'attestation_service.nexmo.applications',
       fetchEnvOrFallback(envVar.NEXMO_APPLICATIONS, '').split(',')
