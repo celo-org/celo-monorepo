@@ -203,9 +203,11 @@ export async function installCertManagerAndNginx(
   const nginxChartVersion = '3.9.0'
   const nginxChartNamespace = 'default'
 
-  // Cert Manager is the newer version of lego
+  // Check if cert-manager is installed in any namespace
+  // because cert-manager crds are global and cannot live
+  // different crds version in the same cluster
   const certManagerExists = await outputIncludes(
-    `helm list -n cert-manager`,
+    `helm list -A`,
     `cert-manager-cluster-issuers`,
     `cert-manager-cluster-issuers exists, skipping install`
   )
