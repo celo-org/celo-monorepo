@@ -15,3 +15,10 @@ export interface SignMessageResponseFailure extends SignMessageResponse {
 export interface SignMessageResponseSuccess extends SignMessageResponse {
   success: true
 }
+
+export interface GetQuotaResponse {
+  success: boolean
+  version: string
+  performedQueryCount: number
+  totalQuota: number
+}

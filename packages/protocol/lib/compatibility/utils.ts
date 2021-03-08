@@ -40,7 +40,7 @@ export class ASTBackwardReport {
     const fullReports = new ASTReports(code, storage, libraryLinking).excluding(exclude)
 
     logFunction("Generating backward report...")
-    const versionedReport = ASTDetailedVersionedReport.create(fullReports, categorizer)
+    const versionedReport = ASTDetailedVersionedReport.create(fullReports, newArtifacts, categorizer)
     logFunction("Done\n")
 
     return new ASTBackwardReport(
