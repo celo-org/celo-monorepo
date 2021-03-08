@@ -28,8 +28,6 @@ export enum CeloContract {
   Validators = 'Validators',
 }
 
-export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
-
 export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
 
 export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
@@ -48,3 +46,10 @@ const AuxiliaryContracts = [
   CeloContract.MetaTransactionWallet,
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
+
+export const stripProxy = (contract: CeloContract) => contract.replace('Proxy', '') as CeloContract
+
+export const suffixProxy = (contract: CeloContract) =>
+  contract.endsWith('Proxy') ? contract : (`${contract}Proxy` as CeloContract)
+
+export const ProxyContracts = AllContracts.map((c) => suffixProxy(c))
