@@ -57,8 +57,8 @@ export class BlockExplorer {
     )
   }
 
-  async updateContractDetailsMapping(name: string, address: string) {
-    const cd = await getContractDetailsFromContract(this.kit, name as CeloContract, address)
+  async updateContractDetailsMapping(name: CeloContract, address: string) {
+    const cd = await getContractDetailsFromContract(this.kit, name, address)
     this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
   }
 

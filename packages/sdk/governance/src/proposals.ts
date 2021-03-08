@@ -9,7 +9,7 @@ import {
   parseDecodedParams,
 } from '@celo/connect'
 import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
-import { stripProxy } from '@celo/contractkit/lib/base'
+import { stripProxy, suffixProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 // tslint:disable: ordered-imports
 import {
@@ -68,6 +68,16 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const registryRepointArgs = (tx: ProposalTransactionJSON) => {
+  if (!isRegistryRepoint(tx)) {
+    throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
+  }
+  return {
+    name: tx.args[0] as CeloContract,
+    address: tx.args[1] as string,
+  }
+}
+
 const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
   tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
 
@@ -101,12 +111,12 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     }
 
     if (isRegistryRepoint(jsonTx)) {
-      const [name, address] = jsonTx.args
-      await blockExplorer.updateContractDetailsMapping(name, address)
+      const args = registryRepointArgs(jsonTx)
+      await blockExplorer.updateContractDetailsMapping(stripProxy(args.name), args.address)
     } else if (isProxySetFunction(jsonTx)) {
-      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+      jsonTx.contract = suffixProxy(jsonTx.contract)
     } else if (isProxySetAndInitFunction(jsonTx)) {
-      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+      jsonTx.contract = suffixProxy(jsonTx.contract)
 
       // Transform delegate call initialize args into a readable params map
       const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
@@ -236,7 +246,8 @@ export class ProposalBuilder {
 
     if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
-      this.setRegistryAddition(tx.args[0], tx.args[1])
+      const args = registryRepointArgs(tx)
+      this.setRegistryAddition(args.name, args.address)
     } else if (
       tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
       Array.isArray(tx.args[1])
