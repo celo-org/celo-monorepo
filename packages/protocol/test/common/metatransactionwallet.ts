@@ -260,10 +260,10 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       })
 
       it('should emit the SignerSet event', async () => {
-        assertLogMatches2(res.logs[0], {
-          event: 'WalleteRecovered',
+        assertLogMatches2(res.logs[1], {
+          event: 'WalletRecovered',
           args: {
-            signer: newSigner,
+            newSigner: newSigner,
           },
         })
       })
