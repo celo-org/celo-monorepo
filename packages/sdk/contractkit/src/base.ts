@@ -30,6 +30,8 @@ export enum CeloContract {
 
 export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
+export const stripProxy = (contract: CeloContract) => contract.replace('Proxy', '') as CeloContract
+
 export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
 
 export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR

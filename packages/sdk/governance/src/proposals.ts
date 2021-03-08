@@ -9,6 +9,7 @@ import {
   parseDecodedParams,
 } from '@celo/connect'
 import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
+import { stripProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 // tslint:disable: ordered-imports
 import {
@@ -204,12 +205,19 @@ export class ProposalBuilder {
     this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
+  setRegistryAddition = (contract: CeloContract, address: string) =>
+    (this.registryAdditions[stripProxy(contract)] = address)
+
+  getRegistryAddition = (contract: CeloContract): string | undefined =>
+    this.registryAdditions[stripProxy(contract)]
+
+  isRegistered = (contract: CeloContract) =>
+    RegisteredContracts.includes(stripProxy(contract)) ||
+    this.getRegistryAddition(contract) !== undefined
+
   fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     // handle sending value to unregistered contracts
-    if (
-      !RegisteredContracts.includes(tx.contract.toString().replace('Proxy', '') as CeloContract) &&
-      !this.registryAdditions[tx.contract]
-    ) {
+    if (!this.isRegistered(tx.contract)) {
       if (!isValidAddress(tx.contract)) {
         throw new Error(
           `Transaction to unregistered contract ${tx.contract} only supported by address`
@@ -223,16 +231,12 @@ export class ProposalBuilder {
     }
 
     // Account for canonical registry addresses from current proposal
-    let address = this.registryAdditions[tx.contract]
-
-    if (!address) {
-      address = await this.kit.registry.addressFor(tx.contract)
-    }
+    const address =
+      this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
 
     if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
-      this.registryAdditions[tx.args[0]] = tx.args[1]
-      this.registryAdditions[tx.args[0] + 'Proxy'] = tx.args[1]
+      this.setRegistryAddition(tx.args[0], tx.args[1])
     } else if (
       tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
       Array.isArray(tx.args[1])
