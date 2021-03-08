@@ -500,9 +500,15 @@ export const generateGenesisWithMigrations = async ({
   fs.writeFileSync(configFile, JSON.stringify(mcConfig, undefined, 2))
 
   // Generate the genesis file, and return its contents
-  await spawnCmdWithExitOnFailure(myceloBinaryPath, ['genesis-from-config', tmpDir], {
-    silent: true,
-  })
+  const contractsBuildPath = path.resolve(monorepoRoot, 'packages/protocol/build/contracts/')
+  await spawnCmdWithExitOnFailure(
+    myceloBinaryPath,
+    ['genesis-from-config', tmpDir, '--buildpath', contractsBuildPath],
+    {
+      silent: true,
+      cwd: tmpDir,
+    }
+  )
   const genesis = fs.readFileSync(path.join(tmpDir, 'genesis.json')).toString()
   // Clean up the tmp dir as it's no longer needed
   await spawnCmd('rm', ['-rf', tmpDir], { silent: true })
