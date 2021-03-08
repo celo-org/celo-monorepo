@@ -47,8 +47,8 @@ contract MetaTransactionWallet is
     bytes returnData
   );
 
-  // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they will
-  // revert.
+  // onlyGuardian functions can only be called when the guardian is not the zero address and
+  // the caller is the guardian.
   modifier onlyGuardian() {
     require(guardian != address(0), "Guardian is not set");
     require(guardian == msg.sender, "Caller is not the guardian");
