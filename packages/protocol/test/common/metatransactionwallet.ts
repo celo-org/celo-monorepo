@@ -233,7 +233,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         assertLogMatches2(res.logs[0], {
           event: 'GuardianSet',
           args: {
-            guardian: guardian,
+            guardian,
           },
         })
       })
@@ -263,7 +263,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         assertLogMatches2(res.logs[1], {
           event: 'WalletRecovered',
           args: {
-            newSigner: newSigner,
+            newSigner,
           },
         })
       })
