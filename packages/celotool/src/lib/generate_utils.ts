@@ -13,7 +13,7 @@ import * as rlp from 'rlp'
 import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import Web3 from 'web3'
-import { spawnCmdWithExitOnFailure } from './cmd-utils'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -499,8 +499,12 @@ export const generateGenesisWithMigrations = async ({
 
   fs.writeFileSync(configFile, JSON.stringify(mcConfig, undefined, 2))
 
+  // Generate the genesis file, and return its contents
   await spawnCmdWithExitOnFailure(myceloBinaryPath, ['genesis-from-config', tmpDir], {
     silent: true,
   })
-  return fs.readFileSync(path.join(tmpDir, 'genesis.json')).toString()
+  const genesis = fs.readFileSync(path.join(tmpDir, 'genesis.json')).toString()
+  // Clean up the tmp dir as it's no longer needed
+  await spawnCmd('rm', ['-rf', tmpDir], { silent: true })
+  return genesis
 }
