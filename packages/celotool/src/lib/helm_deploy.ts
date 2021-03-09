@@ -705,6 +705,9 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
+
   const gethMetricsOverrides =
     fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === 'true'
       ? [
@@ -714,10 +717,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
           `--set pprof.port="6060"`,
         ]
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
-
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
 
   const bootnodeOverwritePkey =
     fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== ''
@@ -734,12 +733,12 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   )
 
   return [
+    `-f ${valueFilePath}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
@@ -1060,6 +1059,7 @@ export async function saveHelmValuesFile(
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
+
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
 
   const valueFileContent = `
