@@ -77,7 +77,7 @@ const celoToken = await kit.contracts.getGoldToken()
 // get the cUSD contract
 const stableToken = await kit.contracts.getStableToken()
 
-const celoBalance = await goldToken.balanceOf(someAddress)
+const celoBalance = await celoToken.balanceOf(someAddress)
 const cusdBalance = await stableToken.balanceOf(someAddress)
 ```
 
