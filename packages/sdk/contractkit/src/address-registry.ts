@@ -1,7 +1,7 @@
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import { zip } from '@celo/base/lib/collections'
 import debugFactory from 'debug'
-import { CeloContract, RegisteredContracts } from './base'
+import { CeloContract, RegisteredContracts, stripProxy } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
 
@@ -27,9 +27,8 @@ export class AddressRegistry {
    */
   async addressFor(contract: CeloContract): Promise<Address> {
     if (!this.cache.has(contract)) {
-      const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const address = await this.registry.methods.getAddressForString(proxyStrippedContract).call()
+      const address = await this.registry.methods.getAddressForString(stripProxy(contract)).call()
 
       debug('Fetched address %s', address)
       if (!address || address === NULL_ADDRESS) {
