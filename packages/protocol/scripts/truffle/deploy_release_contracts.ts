@@ -1,5 +1,5 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { retryTx, _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
+import { _setInitialProxyImplementation, retryTx } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
