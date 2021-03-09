@@ -12,7 +12,7 @@ import {
   SignTxResponseSuccess,
   TxToSignParam,
 } from '@celo/utils'
-import { Linking } from 'expo'
+import { Linking } from 'react-native'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -34,48 +34,6 @@ export function listenToAccount(callback: (account: string) => void) {
   })
 }
 
-export function waitForAccountAuth(requestId: string): Promise<AccountAuthResponseSuccess> {
-  return new Promise((resolve, reject) => {
-    const handler = ({ url }: { url: string }) => {
-      try {
-        const dappKitResponse = parseDappkitResponseDeeplink(url)
-        if (
-          requestId === dappKitResponse.requestId &&
-          dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
-          dappKitResponse.status === DappKitResponseStatus.SUCCESS
-        ) {
-          Linking.removeEventListener('url', handler)
-          resolve(dappKitResponse)
-        }
-      } catch (error) {
-        reject(error)
-      }
-    }
-    Linking.addEventListener('url', handler)
-  })
-}
-
-export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
-  return new Promise((resolve, reject) => {
-    const handler = ({ url }: { url: string }) => {
-      try {
-        const dappKitResponse = parseDappkitResponseDeeplink(url)
-        if (
-          requestId === dappKitResponse.requestId &&
-          dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
-          dappKitResponse.status === DappKitResponseStatus.SUCCESS
-        ) {
-          Linking.removeEventListener('url', handler)
-          resolve(dappKitResponse)
-        }
-      } catch (error) {
-        reject(error)
-      }
-    }
-    Linking.addEventListener('url', handler)
-  })
-}
-
 export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
@@ -88,6 +46,50 @@ export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
       }
     } catch (error) {}
   })
+}
+
+function waitDecorator(
+  requestId: string,
+  checkCallback: (requestId: string, dappKitResponse: any) => boolean
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const handler = ({ url }: { url: string }) => {
+      try {
+        const dappKitResponse = parseDappkitResponseDeeplink(url)
+        if (checkCallback(requestId, dappKitResponse)) {
+          Linking.removeEventListener('url', handler)
+          resolve(dappKitResponse)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    }
+    Linking.addEventListener('url', handler)
+  })
+}
+
+export function checkAccountAuth(requestId: string, dappKitResponse: any): boolean {
+  return (
+    requestId === dappKitResponse.requestId &&
+    dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
+    dappKitResponse.status === DappKitResponseStatus.SUCCESS
+  )
+}
+
+export function checkSignedTxs(requestId: string, dappKitResponse: any): boolean {
+  return (
+    requestId === dappKitResponse.requestId &&
+    dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
+    dappKitResponse.status === DappKitResponseStatus.SUCCESS
+  )
+}
+
+export function waitForAccountAuth(requestId: string): Promise<AccountAuthResponseSuccess> {
+  return waitDecorator(requestId, checkAccountAuth)
+}
+
+export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
+  return waitDecorator(requestId, checkSignedTxs)
 }
 
 export function requestAccountAddress(meta: DappKitRequestMeta) {
