@@ -2,6 +2,8 @@
 
 This section explains how to get a full node running on the [Mainnet Network](mainnet.md), using a Docker image that was built for this purpose.
 
+If you'd prefer a one click, hosted setup for running a node on one of the major cloud providers (AWS and GCP), checkout our [hosted nodes](hosted-nodes.md) documentation.
+
 {% hint style="info" %}
 If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
 
@@ -77,7 +79,6 @@ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
 This environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile`
 {% endhint %}
 
-
 ## Start the node
 
 This command specifies the settings needed to run the node, and gets it started.
@@ -105,6 +106,7 @@ You will have fully synced with the network once you have pulled the latest bloc
 ## Command Line Interface
 
 Once the full node is running, it can serve the [Command Line Interface](../command-line-interface/introduction.md) tool `celocli`. For example:
+
 ```bash
 $ npm install -g @celo/celocli
 ...

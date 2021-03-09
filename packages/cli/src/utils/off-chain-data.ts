@@ -1,25 +1,37 @@
 import { BasicDataWrapper } from '@celo/identity/lib/offchain-data-wrapper'
-import { GitStorageWriter, LocalStorageWriter } from '@celo/identity/lib/offchain/storage-writers'
+import {
+  AwsStorageWriter,
+  GitStorageWriter,
+  GoogleStorageWriter,
+  LocalStorageWriter,
+} from '@celo/identity/lib/offchain/storage-writers'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'
-import { Flags, parsePath } from './command'
+import { parsePath } from './command'
+
+export enum StorageProviders {
+  AWS = 'aws',
+  GCP = 'gcp',
+  git = 'git',
+}
 
 export abstract class OffchainDataCommand extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({
-      required: true,
-      description: 'Address with which to sign',
-    }),
     directory: flags.string({
       parse: parsePath,
-      required: true,
+      default: '.',
       description: 'To which directory data should be written',
     }),
-    uploadWithGit: flags.boolean({
-      default: false,
-      description: 'If the CLI should attempt to push changes to the origin via git',
+    provider: flags.enum({
+      options: ['git', 'aws', 'gcp'],
+      description: 'If the CLI should attempt to push to the cloud',
+    }),
+    bucket: flags.string({
+      dependsOn: ['provider'],
+      description: 'If using a GCP or AWS storage bucket this parameter is required',
     }),
   }
 
@@ -27,11 +39,22 @@ export abstract class OffchainDataCommand extends BaseCommand {
   offchainDataWrapper: BasicDataWrapper
 
   async init() {
-    const res: ParserOutput<any, any> = this.parse()
-    this.offchainDataWrapper = new BasicDataWrapper(res.flags.from, this.kit)
+    await super.init()
 
-    this.offchainDataWrapper.storageWriter = res.flags.uploadWithGit
-      ? new GitStorageWriter(res.flags.directory)
-      : new LocalStorageWriter(res.flags.directory)
+    const {
+      flags: { provider, directory, bucket, privateKey },
+    }: ParserOutput<any, any> = this.parse()
+
+    const from = privateKeyToAddress(privateKey)
+    this.offchainDataWrapper = new BasicDataWrapper(from, this.kit)
+
+    this.offchainDataWrapper.storageWriter =
+      provider === StorageProviders.GCP
+        ? new GoogleStorageWriter(directory, bucket)
+        : provider === StorageProviders.AWS
+        ? new AwsStorageWriter(directory, bucket)
+        : provider === StorageProviders.git
+        ? new GitStorageWriter(directory)
+        : new LocalStorageWriter(directory)
   }
 }

@@ -92,6 +92,7 @@ geth:
   light:
     maxpeers: 1000
     serve: 90
+  fullnodeCheckBlockAge: true
 
 genesis:
   networkId: 31418
