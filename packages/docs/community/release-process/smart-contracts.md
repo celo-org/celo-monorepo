@@ -34,6 +34,7 @@ Whenever Celo Core Contracts need to be re-initialized, their initialization arg
 Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut). Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo.
 
 #### When a new release branch is cut:
+
 1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
 2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`.
 3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
@@ -41,13 +42,14 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`.
 
 #### During the release proposal stage:
+
 1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
 2. When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
 
 #### After a completed release process:
+
 1. The release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
 2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.mainnet`
-
 
 ## Release Process
 
@@ -60,12 +62,20 @@ For these to run, you may need to follow the [setup instructions](https://github
 Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
 
 Typical script options:
+
 - By default, the scripts expect a celo-blockchain RPC at port 8545 locally. With `-f` you can specify the scripts to use a hosted forno node
 - By default, scripts will output verbose logs under `/tmp/celo-${script-name}.log`. You can change the location of the log output with `-l file.log`
+
+### View the tagged releases for each network
+
+```bash
+yarn view-tags
+```
 
 ### Verify the previous Release on the Network
 
 `verify-deployed` is a script that allows you to assess whether the bytecode on the given network matches the source code of a particular commit. It will run through the Celo Core Contracts and verify that the contracts' bytecodes as specified in the `Registry` match. Here, we will want to sanity-check that our network is running the previous release's audited commit.
+
 ```bash
 # Run from `packages/protocol` in the celo-monorepo
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
@@ -87,6 +97,7 @@ Specifically, it compiles the latest and candidate releases and compares smart c
 Finally, it checks release candidate smart contract version numbers and requires that they have been updated appropriately since the latest release by following semantic versioning as defined in the [Versioning section](#Versioning) above.
 
 The following exceptions apply:
+
 - If the STORAGE version has changed, does not perform backwards compatibility checks
 - If the MAJOR version has changed, checks storage layout compatibility but not ABI compatibility
 
@@ -175,39 +186,39 @@ All changes since the last release should be covered by unit tests. Unit test co
 After a successful release execution on a testnet, the resulting network state should be spot-checked to ensure that no regressions have been caused by the release. Flows to test include:
 
 - Do a cUSD and CELO transfer
-    ```bash
-    celocli transfer:dollars --from <addr> --value <number> --to <addr>
-    celocli transfer:celo --from <addr> --value <number> --to <addr>
-    ```
+  ```bash
+  celocli transfer:dollars --from <addr> --value <number> --to <addr>
+  celocli transfer:celo --from <addr> --value <number> --to <addr>
+  ```
 - Register a Celo account
-    ```bash
-    celocli account:register --from <addr> --name <test-name>
-    ```
+  ```bash
+  celocli account:register --from <addr> --name <test-name>
+  ```
 - Report an Oracle rate
-    ```bash
-    celocli oracle:report --from <addr> --value <num>
-    ```
+  ```bash
+  celocli oracle:report --from <addr> --value <num>
+  ```
 - Do a CP-DOTO exchange
-    ```bash
-    celocli exchange:celo --value <number> --from <addr>
-    celocli exchange:dollars --value <number> --from <addr>
-    ```
+  ```bash
+  celocli exchange:celo --value <number> --from <addr>
+  celocli exchange:dollars --value <number> --from <addr>
+  ```
 - Complete a round of attestation
 - Redeem from Escrow
 - Register a Vaildator
-    ```bash
-    celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
-    ```
+  ```bash
+  celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
+  ```
 - Vote for a Validator
 - Run a mock election
-    ```bash
-    celocli election:run
-    ```
+  ```bash
+  celocli election:run
+  ```
 - Get a valildator slashed for downtime and ejected from the validator set
 - Propose a governance proposal and get it executed
-    ```bash
-    celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
-    ```
+  ```bash
+  celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
+  ```
 
 ### Automated environment tests
 

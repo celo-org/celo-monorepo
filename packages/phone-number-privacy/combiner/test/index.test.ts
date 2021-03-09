@@ -1,5 +1,5 @@
 import { isVerified } from '@celo/phone-number-privacy-common'
-import { Response } from 'node-fetch'
+import { Request, Response } from 'firebase-functions'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
@@ -7,6 +7,7 @@ import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSig, getContactMatches } from '../src/index'
+import { BLINDED_PHONE_NUMBER } from './end-to-end/resources'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
@@ -23,7 +24,7 @@ BLSCryptographyClient.prototype.combinePartialBlindedSignatures = mockComputeBli
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 const mockSufficientVerifiedSigs = jest.fn()
 BLSCryptographyClient.prototype.hasSufficientVerifiedSignatures = mockSufficientVerifiedSigs
-mockSufficientVerifiedSigs.mockResolvedValue(true)
+mockSufficientVerifiedSigs.mockReturnValue(true)
 
 jest.mock('../src/database/wrappers/account')
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
@@ -48,310 +49,261 @@ const defaultResponseJson = JSON.stringify({
   signature: 'string',
 })
 
+const mockHeaders = { authorization: 'fdsfdsfs' }
+
+const invalidResponseExpected = (done: any, code: number) =>
+  ({
+    status(status: any) {
+      try {
+        expect(status).toEqual(code)
+        done()
+      } catch (e) {
+        done(e)
+      }
+      return {
+        json() {
+          return {}
+        },
+      }
+    },
+  } as Response)
+
 describe(`POST /getBlindedMessageSig endpoint`, () => {
+  const validRequest = {
+    blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
+    hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
+    account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
+    timestamp: Date.now(),
+  }
+
   beforeEach(() => {
     fetchMock.mockClear()
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
   })
 
   describe('with valid input', () => {
-    const blindedQueryPhoneNumber = '+5555555555'
-    const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-    const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-    const mockHeader = 'fdsfdsfs'
-    const timestamp = Date.now()
-
-    const mockRequestData = {
-      blindedQueryPhoneNumber,
-      hashedPhoneNumber,
-      account,
-      timestamp,
-    }
     const req = {
-      body: mockRequestData,
-      headers: {
-        authorization: mockHeader,
-      },
-    }
+      body: validRequest,
+      headers: mockHeaders,
+    } as Request
 
-    it('provides signature', async () => {
-      const res = {
+    const validResponseExpected = (done: any, code: number) =>
+      ({
         json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
           expect(body.version).toEqual(VERSION)
+          done()
         },
         status(status: any) {
-          expect(status).toEqual(200)
+          try {
+            expect(status).toEqual(code)
+            done()
+          } catch (e) {
+            done(e)
+          }
           return {
             json() {
               return {}
             },
           }
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+      } as Response)
+
+    it('provides signature', (done) => {
+      getBlindedMessageSig(req, validResponseExpected(done, 200))
     })
-    it('returns 500 on bls error', async () => {
-      mockComputeBlindedSignature.mockImplementation(() => {
+
+    it('returns 500 on bls error', (done) => {
+      mockSufficientVerifiedSigs.mockReturnValue(false)
+      mockComputeBlindedSignature.mockImplementationOnce(() => {
         throw Error()
       })
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(500)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+
+      getBlindedMessageSig(req, invalidResponseExpected(done, 500))
     })
   })
+
   describe('with invalid input', () => {
-    it('invalid address returns 400', () => {
-      const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-      const account = 'd31509C31d654056A45185ECb6'
-      const timestamp = Date.now()
-
-      const mockRequestData = {
-        blindedQueryPhoneNumber,
-        hashedPhoneNumber,
-        account,
-        timestamp,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedMessageSig(req, res)
-    })
-    it('invalid hashedPhoneNumber returns 400', async () => {
-      const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '+1234567890'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-      const mockHeader = 'fdsfdsfs'
-      const timestamp = Date.now()
-
-      const mockRequestData = {
-        blindedQueryPhoneNumber,
-        hashedPhoneNumber,
-        account,
-        timestamp,
-      }
+    it('invalid address returns 400', (done) => {
       const req = {
-        body: mockRequestData,
-        headers: {
-          authorization: mockHeader,
+        body: {
+          ...validRequest,
+          account: 'd31509C31d654056A45185ECb6',
         },
-      }
+        headers: mockHeaders,
+      } as Request
 
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
     })
-    it('expired timestamp returns 400', async () => {
-      const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-      const mockHeader = 'fdsfdsfs'
-      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW_MS
-
-      const mockRequestData = {
-        blindedQueryPhoneNumber,
-        hashedPhoneNumber,
-        account,
-        timestamp,
-      }
+    it('invalid hashedPhoneNumber returns 400', (done) => {
       const req = {
-        body: mockRequestData,
-        headers: {
-          authorization: mockHeader,
+        body: {
+          ...validRequest,
+          hashedPhoneNumber: '+1234567890',
         },
-      }
+        headers: mockHeaders,
+      } as Request
 
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
+    })
+    it('expired timestamp returns 400', (done) => {
+      const req = {
+        body: {
+          ...validRequest,
+          timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getBlindedMessageSig(req, res)
+        headers: mockHeaders,
+      } as Request
+
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
+    })
+    it('invalid blinded phone number returns 400', (done) => {
+      const req = {
+        body: {
+          ...validRequest,
+          blindedQueryPhoneNumber: '+1234567890',
+        },
+        headers: mockHeaders,
+      } as Request
+
+      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
     })
   })
 })
 
 describe(`POST /getContactMatches endpoint`, () => {
-  describe('with valid input', () => {
-    const userPhoneNumber = '5555555555'
-    const contactPhoneNumber1 = '1234567890'
-    const contactPhoneNumbers = [contactPhoneNumber1]
-    const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-    const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-    const mockHeader = 'fdsfdsfs'
+  const validInput = {
+    userPhoneNumber: '+14155550123',
+    contactPhoneNumbers: ['+14155550123'],
+    account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
+    hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
+  }
 
-    const mockRequestData = {
-      userPhoneNumber,
-      contactPhoneNumbers,
-      account,
-      hashedPhoneNumber,
-    }
+  describe('with valid input', () => {
     const req = {
-      body: mockRequestData,
-      headers: {
-        authorization: mockHeader,
-      },
-    }
-    it('provides matches', async () => {
-      mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
+      body: validInput,
+      headers: mockHeaders,
+    } as Request
+
+    it('provides matches', (done) => {
+      mockGetNumberPairContacts.mockReturnValue(validInput.contactPhoneNumbers)
       mockIsVerified.mockReturnValue(true)
-      const expected = [{ phoneNumber: contactPhoneNumber1 }]
       const res = {
         json(body: any) {
-          expect(body.success).toEqual(true)
-          expect(body.matchedContacts).toEqual(expected)
+          try {
+            expect(body.success).toEqual(true)
+            expect(body.matchedContacts).toEqual([
+              { phoneNumber: validInput.contactPhoneNumbers[0] },
+            ])
+            done()
+          } catch (e) {
+            done(e)
+          }
         },
         status(status: any) {
-          expect(status).toEqual(200)
+          try {
+            expect(status).toEqual(200)
+            done()
+          } catch (e) {
+            done(e)
+          }
           return {
             json() {
               return {}
             },
           }
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getContactMatches(req, res)
+      } as Response
+
+      getContactMatches(req, res)
     })
-    it('provides matches empty array', async () => {
+
+    it('provides matches empty array', (done) => {
       mockGetNumberPairContacts.mockReturnValue([])
       mockIsVerified.mockReturnValue(true)
       const res = {
         json(body: any) {
-          expect(body.success).toEqual(true)
-          expect(body.matchedContacts).toEqual([])
+          try {
+            expect(body.success).toEqual(true)
+            expect(body.matchedContacts).toEqual([])
+            done()
+          } catch (e) {
+            done(e)
+          }
         },
         status(status: any) {
-          expect(status).toEqual(200)
+          try {
+            expect(status).toEqual(200)
+            done()
+          } catch (e) {
+            done(e)
+          }
           return {
             json() {
               return {}
             },
           }
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getContactMatches(req, res)
+      } as Response
+
+      getContactMatches(req, res)
     })
-    it('rejects more than one attempt to matchmake with 403', async () => {
+
+    it('rejects more than one attempt to matchmake with 403', (done) => {
       mockGetDidMatchmaking.mockReturnValue(true)
       mockIsVerified.mockReturnValue(true)
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(403)
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getContactMatches(req, res)
+      getContactMatches(req, invalidResponseExpected(done, 403))
     })
   })
+
   describe('with invalid input', () => {
-    it('missing user number returns 400', async () => {
-      const contactPhoneNumbers = ['1234567890']
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
-
-      const mockRequestData = {
-        contactPhoneNumbers,
-        account,
-        hashedPhoneNumber,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(400)
-          return {
-            json() {
-              return {}
-            },
-          }
+    it('missing user number returns 400', (done) => {
+      const req = {
+        body: {
+          ...validInput,
+          userPhoneNumber: undefined,
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getContactMatches(req, res)
+        headers: mockHeaders,
+      } as Request
+
+      getContactMatches(req, invalidResponseExpected(done, 400))
     })
-    it('invalid account returns 400', async () => {
-      const contactPhoneNumbers = ['1234567890']
-      const userPhoneNumber = '5555555555'
-      const account = 'garbage'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
 
-      const mockRequestData = {
-        contactPhoneNumbers,
-        userPhoneNumber,
-        account,
-        hashedPhoneNumber,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(400)
-          return {
-            json() {
-              return {}
-            },
-          }
+    it('invalid account returns 400', (done) => {
+      const req = {
+        body: {
+          ...validInput,
+          account: 'garbage',
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getContactMatches(req, res)
+        headers: mockHeaders,
+      } as Request
+
+      getContactMatches(req, invalidResponseExpected(done, 400))
     })
-    it('missing contact phone numbers returns 400', async () => {
-      const userPhoneNumber = '5555555555'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
 
-      const mockRequestData = {
-        userPhoneNumber,
-        account,
-        hashedPhoneNumber,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(400)
-          return {
-            json() {
-              return {}
-            },
-          }
+    it('missing contact phone numbers returns 400', (done) => {
+      const req = {
+        body: {
+          ...validInput,
+          contactPhoneNumbers: undefined,
         },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getContactMatches(req, res)
+        headers: mockHeaders,
+      } as Request
+
+      getContactMatches(req, invalidResponseExpected(done, 400))
+    })
+
+    it('empty contact phone numbers returns 400', (done) => {
+      const req = {
+        body: {
+          ...validInput,
+          contactPhoneNumbers: [],
+        },
+        headers: mockHeaders,
+      } as Request
+
+      getContactMatches(req, invalidResponseExpected(done, 400))
     })
   })
 })

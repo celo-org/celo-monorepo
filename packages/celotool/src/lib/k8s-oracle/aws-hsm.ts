@@ -7,10 +7,10 @@ import {
   detachPolicyIdempotent,
   getEKSNodeInstanceGroupRoleArn,
   getKeyArnFromAlias,
-  getPolicyArn
+  getPolicyArn,
 } from '../aws'
-import { AwsClusterConfig } from "../k8s-cluster/aws"
-import { BaseOracleDeploymentConfig, OracleIdentity } from "./base"
+import { AwsClusterConfig } from '../k8s-cluster/aws'
+import { BaseOracleDeploymentConfig, OracleIdentity } from './base'
 import { RbacOracleDeployer } from './rbac'
 
 /**
@@ -22,7 +22,7 @@ export interface AwsHsmOracleIdentity extends OracleIdentity {
 }
 
 export interface AwsHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig {
-  identities: AwsHsmOracleIdentity[],
+  identities: AwsHsmOracleIdentity[]
   clusterConfig: AwsClusterConfig
 }
 
@@ -44,9 +44,9 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
 
   async helmParameters() {
     return [
-      ...await super.helmParameters(),
+      ...(await super.helmParameters()),
       `--set kube.cloudProvider=aws`,
-      `--set oracle.walletType=AWS_HSM`
+      `--set oracle.walletType=AWS_HSM`,
     ]
   }
 
@@ -56,9 +56,7 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
       const identity = this.deploymentConfig.identities[i]
       const prefix = `--set oracle.identities[${i}]`
       const awsRoleArn = await this.createAwsHsmRoleIdempotent(identity)
-      params = params.concat([
-        `${prefix}.aws.roleArn=${awsRoleArn}`,
-      ])
+      params = params.concat([`${prefix}.aws.roleArn=${awsRoleArn}`])
     }
     return params
   }
@@ -70,7 +68,9 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
    */
   async createAwsHsmRoleIdempotent(identity: AwsHsmOracleIdentity) {
     // The role that each node (ie VM) uses
-    const nodeInstanceGroupRoleArn = await getEKSNodeInstanceGroupRoleArn(this.deploymentConfig.clusterConfig.clusterName)
+    const nodeInstanceGroupRoleArn = await getEKSNodeInstanceGroupRoleArn(
+      this.deploymentConfig.clusterConfig.clusterName
+    )
     // This is a "trust relationship" that allows the node instance group role
     // to assume this role (via kube2iam).
     const rolePolicy = {
@@ -80,11 +80,11 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
           Sid: '',
           Effect: 'Allow',
           Principal: {
-            AWS: nodeInstanceGroupRoleArn
+            AWS: nodeInstanceGroupRoleArn,
           },
-          Action: 'sts:AssumeRole'
-        }
-      ]
+          Action: 'sts:AssumeRole',
+        },
+      ],
     }
     const roleName = this.awsHsmRoleName(identity)
     const roleArn = await createRoleIdempotent(roleName, JSON.stringify(rolePolicy))
@@ -106,20 +106,16 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
         {
           Sid: 'VisualEditor0',
           Effect: 'Allow',
-          Action: [
-            'kms:GetPublicKey',
-            'kms:DescribeKey',
-            'kms:Sign'
-          ],
-          Resource: keyArn
+          Action: ['kms:GetPublicKey', 'kms:DescribeKey', 'kms:Sign'],
+          Resource: keyArn,
         },
         {
           Sid: 'VisualEditor1',
           Effect: 'Allow',
           Action: 'kms:ListKeys',
-          Resource: '*'
-        }
-      ]
+          Resource: '*',
+        },
+      ],
     }
     return createPolicyIdempotent(policyName, JSON.stringify(policy))
   }

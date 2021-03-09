@@ -23,15 +23,11 @@ export async function getKeyArnFromAlias(alias: string, region: string) {
 }
 
 export function deleteRole(roleName: string) {
-  return execCmd(
-    `aws iam delete-role --role-name ${roleName}`
-  )
+  return execCmd(`aws iam delete-role --role-name ${roleName}`)
 }
 
 export function detachPolicyIdempotent(roleName: string, policyArn: string) {
-  return execCmd(
-    `aws iam detach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`
-  )
+  return execCmd(`aws iam detach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`)
 }
 
 /**
@@ -45,9 +41,7 @@ export async function deletePolicy(policyArn: string) {
       .filter((version: any) => !version.IsDefaultVersion) // cannot delete the default version
       .map((version: any) => deletePolicyVersion(policyArn, version.VersionId))
   )
-  return execCmd(
-    `aws iam delete-policy --policy-arn ${policyArn}`
-  )
+  return execCmd(`aws iam delete-policy --policy-arn ${policyArn}`)
 }
 
 function deletePolicyVersion(policyArn: string, versionId: string) {
@@ -104,9 +98,7 @@ export async function getEKSNodeInstanceGroupRoleArn(clusterName: string) {
 }
 
 export function attachPolicyIdempotent(roleName: string, policyArn: string) {
-  return execCmd(
-    `aws iam attach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`
-  )
+  return execCmd(`aws iam attach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`)
 }
 
 export async function createRoleIdempotent(roleName: string, policyDocumentJson: string) {
@@ -153,7 +145,12 @@ export function getClusterSharedNodeSecurityGroup(clusterConfig: AwsClusterConfi
  * For a given security group, authorizes ingress traffic on a provided port
  * for a given protocol and CIDR range.
  */
-export function authorizeSecurityGroupIngress(groupID: string, port: number, protocol: string, cidrRange: string) {
+export function authorizeSecurityGroupIngress(
+  groupID: string,
+  port: number,
+  protocol: string,
+  cidrRange: string
+) {
   return execCmd(
     `aws ec2 authorize-security-group-ingress --group-id ${groupID} --ip-permissions IpProtocol=${protocol},FromPort=${port},ToPort=${port},IpRanges='[{CidrIp=${cidrRange}}]'`
   )
@@ -163,7 +160,12 @@ export function authorizeSecurityGroupIngress(groupID: string, port: number, pro
  * For a given security group, revokes authorized ingress traffic on a provided port
  * for a given protocol and CIDR range.
  */
-export function revokeSecurityGroupIngress(groupID: string, port: number, protocol: string, cidrRange: string) {
+export function revokeSecurityGroupIngress(
+  groupID: string,
+  port: number,
+  protocol: string,
+  cidrRange: string
+) {
   return execCmd(
     `aws ec2 revoke-security-group-ingress --group-id ${groupID} --ip-permissions IpProtocol=${protocol},FromPort=${port},ToPort=${port},IpRanges='[{CidrIp=${cidrRange}}]'`
   )
