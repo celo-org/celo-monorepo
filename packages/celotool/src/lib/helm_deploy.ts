@@ -8,7 +8,7 @@ import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { retrieveBootnodeIPAddress } from './geth'
+import { getEnodesWithExternalIPAddresses, retrieveBootnodeIPAddress } from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -1050,4 +1050,23 @@ function rollingUpdateHelmVariables() {
       '0'
     )}`,
   ]
+}
+
+export async function saveHelmValuesFile(
+  celoEnv: string,
+  valueFilePath: string,
+  useExistingGenesis: boolean
+) {
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
+
+  const valueFileContent = `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+staticnodes:
+  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }

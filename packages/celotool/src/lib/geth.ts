@@ -221,6 +221,13 @@ const validateGethRPC = async (
   handleError: HandleErrorCallback
 ) => {
   const transaction = await kit.connection.getTransaction(txHash)
+  handleError(!transaction || !transaction.from, {
+    location: '[GethRPC]',
+    error: `Contractkit did not return a valid transaction`,
+  })
+  if (transaction == null) {
+    return
+  }
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -494,11 +501,13 @@ export const simulateClient = async (
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
-  index: number
+  index: number,
+  web3Provider: string = 'http://localhost:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
-  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+  const kit = newKitFromWeb3(new Web3(web3Provider))
   kit.defaultAccount = senderAddress
+  const gasPriceFixed = 101000000
 
   const baseLogMessage: any = {
     loadTestID: index,
@@ -519,25 +528,47 @@ export const simulateClient = async (
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
 
-    let feeCurrency
-    if (!feeCurrencyGold) {
-      try {
-        feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-      } catch (error) {
-        tracerLog({
-          tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
-      }
+    let feeCurrency, gasPrice, txOptions
+    try {
+      feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
+    } catch (error) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
     }
-    baseLogMessage.feeCurrency = feeCurrency || ''
+
+    feeCurrency = feeCurrency || ''
+    baseLogMessage.feeCurrency = feeCurrency
+
+    try {
+      if (!feeCurrencyGold) {
+        const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+        gasPrice = new BigNumber(await gasPriceMinimum.getGasPriceMinimum(feeCurrency)).times(1)
+        gasPrice = gasPriceFixed // TODO
+        txOptions = {
+          // gas: 70000,
+          gasPrice: gasPrice.toString(),
+          feeCurrency,
+        }
+      } else {
+        gasPrice = gasPriceFixed // TODO
+        txOptions = {
+          gasPrice: gasPrice.toString(),
+        }
+      }
+    } catch (error) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
+    }
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
-      feeCurrency,
-    })
+    await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
         await onLoadTestTxResult(
           kit,
@@ -550,14 +581,16 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        console.error('Load test transaction failed with error:', JSON.stringify(error))
+        console.error('Load test transaction failed with error:', error)
         tracerLog({
           tag: LOG_TAG_TRANSACTION_ERROR,
           error: error.toString(),
           ...baseLogMessage,
         })
       })
-    await sleep(txPeriodMs)
+    if (sendTransactionTime + txPeriodMs > Date.now()) {
+      await sleep(sendTransactionTime + txPeriodMs - Date.now())
+    }
   }
 }
 
@@ -1080,7 +1113,7 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote   genesis to ${genesisPath}`)
+    console.log(`wrote genesis to ${genesisPath}`)
   }
 }
 
