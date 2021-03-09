@@ -451,7 +451,15 @@ export const generateGenesisWithMigrations = async ({
   const myceloBinaryPath = path.join(gethRepoPath!, '/build/bin/mycelo')
   await spawnCmdWithExitOnFailure(
     myceloBinaryPath,
-    ['genesis-config', '--template', 'monorepo', '--mnemonic', mnemonic],
+    [
+      'genesis-config',
+      '--template',
+      'monorepo',
+      '--mnemonic',
+      mnemonic,
+      '--validators',
+      numValidators.toString(),
+    ],
     {
       silent: true,
       cwd: tmpDir,
