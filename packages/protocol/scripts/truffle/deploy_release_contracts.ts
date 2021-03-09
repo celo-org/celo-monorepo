@@ -1,5 +1,5 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { _setInitialProxyImplementation, retryTx } from '@celo/protocol/lib/web3-utils'
+import { retryTx, _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -165,7 +165,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
-  const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
+  const releaseGoldInstance = await retryTx(ReleaseGold.new, [false, { from: fromAddress }])
 
   console.info('Initializing ReleaseGoldProxy...')
   let releaseGoldTxHash
