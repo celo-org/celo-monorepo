@@ -1,18 +1,18 @@
 # Usage
 
-This page walks you through the main functionalities of DAppKit. You can also find the result of this walkthrough on the [expo base template](https://github.com/celo-org/dappkit-base) on branch [`dappkit-usage`](https://github.com/celo-org/dappkit-base/tree/dappkit-usage).
+This page walks you through the main functionalities of DAppKit and provides small code snippets. We recommend checkout out the [Celo Truffle Box](https://github.com/critesjosh/celo-dappkit) tutorial for a step-by-step guide on creating a mobile DApp using Expo.
+
+## Overview
 
 DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the following meta payload:
 
-- `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request
+- `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request.
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
-- `callback` The deeplink that the Celo Wallet will use to redirect the user back to the DApp with the appropriate payload. If you want the user to be directed to a particular page in your DApp. With Expo, it's as simple as `Linking.makeUrl('/my/path')`
+- `callback` The deeplink that the Celo Wallet will use to redirect the user back to the DApp with the appropriate payload. If using Expo, it's as simple as `Linking.makeUrl('/my/path')`.
 
 ## Requesting Account Address
 
-One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant informtion to them. It can be done as simply as:
-
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/7d04983f0875eac7a1e44963a97b5ecd81a0d1d0))
+One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant information to them. It can be done as simply as:
 
 ```javascript
 import { requestAccountAddress, waitForAccountAuth } from '@celo/dappkit'
@@ -37,8 +37,6 @@ login = async () => {
 
 Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to fetch a users balance
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/3be9f5c506788bcc1c22c4e8e02fac62c0821ee9))
-
 ```javascript
   const address = dappkitResponse.address
   this.setState({ address, phoneNumber: dappkitResponse.phoneNumber, isLoadingBalance: true })
@@ -57,8 +55,6 @@ Once you have the account address, you can make calls against your own smart con
 ## Signing Transactions
 
 Let's go from accessing account information to submitting transactions. To alter state on the blockchain, you need to make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
-
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/e3a1c00f2b8a6f6f6891c515a131ff66b55cb563))
 
 ```javascript
 import { toTxResult } from '@celo/connect'
@@ -109,5 +105,45 @@ const cUSDBalance = this.convertToContractDecimals(
 );
 
 this.setState({ cUSDBalance, isLoadingBalance: false })
-})
 ```
+
+## DAppKit vs. DAppKit-web
+
+Originally, DAppKit was designed for mobile apps in mind and did not work out-of-the-box for web DApps running in the browser of a mobile device. DAppKit-web includes workarounds for some of the typical issues that arose for folks using DAppKit to integrate their web DApps with Valora.
+
+DAppkit uses React Native's `Linking` library to listen for URL changes (i.e. on return to the DApp from Valora) so it can receive and parse the requested information; this causes redirection to new tabs on web browsers, however, which means that the information requested via DAppkit does not make it back to the original session. To get around this, DAppkit-web uses the web browser's `localStorage` to store this returned URL, which can then be accessed by the old tab.
+
+DAppKit-web includes the main functionality from DAppKit, so all that is required is to import from `@celo/dappkit/lib/web` instead of from `@celo/dappkit`. The usage of DAppkit-web is the same as above, but calling the functions `waitForAccountAuth` and `waitForSignedTxs` should be surrounded with a `try...catch`, since these functions can throw a timeout error.
+
+This should look something like the following:
+
+```js
+try {
+  const dappkitResponse = await waitForAccountAuth(requestId)
+  // Handle successful login
+} catch (error) {
+  // Catch and handle possible timeout errors
+}
+
+...
+
+let tx;
+try {
+  const dappkitResponse = await waitForSignedTxs(requestId)
+  tx = dappkitResponse.rawTxs[0]
+} catch (error) {
+  // Catch and handle possible timeout errors
+  return
+}
+// Send transaction via ContractKit or web3 directly
+
+```
+
+An example dummy web DApp can be found [here](https://github.com/celo-org/dappkit-web-starter). This is a very simple one-page app that demonstrates the flow above: requesting the user's account address in the Celo Wallet, creating a transaction object, allowing the user to sign this transaction in the Celo Wallet, and then submitting the transaction to the chain via ContractKit. It is a simplified, web-specific version based off of the [Celo Truffle Box](https://github.com/critesjosh/celo-dappkit) tutorial, which should be completed prior to using the dummy web DApp.
+
+### Known Issues
+
+DAppKit's web functionality should be regarded as a beta solution and the following are known issues:
+
+- Safari on iOS: if the web DApp is open in a tab that is not the most recently opened tab (bottom tab when viewing all open tabs), the user will return to the following tab after completing authentication or signing the transaction in Valora. The information is properly populated in the original web DApp's tab.
+- Chrome on iOS: on returning to the web DApp from Valora, a second tab is opened which must be manually closed. The information is properly populated in the original web DApp's tab.
