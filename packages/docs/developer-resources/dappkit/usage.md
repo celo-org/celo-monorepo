@@ -1,10 +1,10 @@
 # Usage
 
-This page walks you through the main functionalities of DAppKit and provides small code snippets. We recommend checkout out the [Celo Truffle Box](https://github.com/critesjosh/celo-dappkit) tutorial for a step-by-step guide on creating a mobile DApp using Expo.
+This page walks you through the main functionalities of DAppKit and provides small code snippets. We recommend checking out the [Celo Truffle Box](https://github.com/critesjosh/celo-dappkit) tutorial for a step-by-step guide on creating a mobile DApp using Expo.
 
 ## Overview
 
-DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the following meta payload:
+DAppKit uses [deeplinks](https://en.wikipedia.org/wiki/Mobile_deep_linking) to communicate between your DApp and the [Celo Developer Wallet](https://celo.org/developers/wallet) (for testing) and [Valora](https://valoraapp.com/) (for production). All "requests" that your DApp makes to the Wallet needs to contain the following meta payload:
 
 - `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request.
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
@@ -35,8 +35,16 @@ login = async () => {
 }
 ```
 
-Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to fetch a users balance
+Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to interact with Celo Core Contracts to do actions like fetch a user's balance.
 
+First import ContractKit:
+
+```javascript
+// Add ContractKit to your file
+ import { newKit } from '@celo/contractkit'
+```
+
+Then add the following to your `login` method to instantiate an instance of ContractKit and use it to fetch a user's balance:
 ```javascript
   const address = dappkitResponse.address
   this.setState({ address, phoneNumber: dappkitResponse.phoneNumber, isLoadingBalance: true })
@@ -61,19 +69,19 @@ import { toTxResult } from '@celo/connect'
 import {
   requestTxSig,
   waitForSignedTxs
-} from "@celo/dappkit";
+} from '@celo/dappkit'
 
 // Create the transaction object
-const stableToken = await kit.contracts.getStableToken();
-const decimals = await stableToken.decimals();
+const stableToken = await kit.contracts.getStableToken()
+const decimals = await stableToken.decimals()
 const txObject = stableToken.transfer(
   address,
   new BigNumber(10).pow(parseInt(decimals, 10)).toString()
-).txo;
+).txo
 
-const requestId = "transfer";
-const dappName = "My DappName";
-const callback = Linking.makeUrl("/my/path");
+const requestId = 'transfer'
+const dappName = 'My DappName'
+const callback = Linking.makeUrl('/my/path')
 
 // Request the TX signature from DAppKit
 requestTxSig(
@@ -87,10 +95,10 @@ requestTxSig(
     }
   ],
   { requestId, dappName, callback }
-);
+)
 
-const dappkitResponse = await waitForSignedTxs(requestId);
-const tx = dappkitResponse.rawTxs[0];
+const dappkitResponse = await waitForSignedTxs(requestId)
+const tx = dappkitResponse.rawTxs[0]
 
 // Send the signed transaction via web3
 await toTxResult(kit.web3.eth.sendSignedTransaction(tx)).waitReceipt()
@@ -98,11 +106,11 @@ await toTxResult(kit.web3.eth.sendSignedTransaction(tx)).waitReceipt()
 const [cUSDBalanceBig, cUSDDecimals] = await Promise.all([
   stableToken.balanceOf(this.state.address),
   stableToken.decimals()
-]);
+])
 const cUSDBalance = this.convertToContractDecimals(
   cUSDBalanceBig,
   cUSDDecimals
-);
+)
 
 this.setState({ cUSDBalance, isLoadingBalance: false })
 ```
@@ -111,7 +119,7 @@ this.setState({ cUSDBalance, isLoadingBalance: false })
 
 Originally, DAppKit was designed for mobile apps in mind and did not work out-of-the-box for web DApps running in the browser of a mobile device. DAppKit-web includes workarounds for some of the typical issues that arose for folks using DAppKit to integrate their web DApps with Valora.
 
-DAppkit uses React Native's `Linking` library to listen for URL changes (i.e. on return to the DApp from Valora) so it can receive and parse the requested information; this causes redirection to new tabs on web browsers, however, which means that the information requested via DAppkit does not make it back to the original session. To get around this, DAppkit-web uses the web browser's `localStorage` to store this returned URL, which can then be accessed by the old tab.
+DAppKit uses React Native's `Linking` library to listen for URL changes (i.e. on return to the DApp from Valora) so it can receive and parse the requested information; this causes redirection to new tabs on web browsers, however, which means that the information requested via DAppkit does not make it back to the original session. To get around this, DAppkit-web uses the web browser's `localStorage` to store this returned URL, which can then be accessed by the old tab.
 
 DAppKit-web includes the main functionality from DAppKit, so all that is required is to import from `@celo/dappkit/lib/web` instead of from `@celo/dappkit`. The usage of DAppkit-web is the same as above, but calling the functions `waitForAccountAuth` and `waitForSignedTxs` should be surrounded with a `try...catch`, since these functions can throw a timeout error.
 
