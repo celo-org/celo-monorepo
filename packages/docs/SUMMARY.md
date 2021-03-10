@@ -46,6 +46,7 @@
 - [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
+- [Celo Signal](validator-guide/celo-signal.md)
 
 ## Developer Guide
 
