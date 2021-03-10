@@ -5,7 +5,7 @@ import fs from 'fs'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import readLastLines from 'read-last-lines'
 import Web3 from 'web3'
-import { spawnCmd } from '../lib/cmd-utils'
+import { spawnCmd, spawnCmdWithExitOnFailure } from '../lib/cmd-utils'
 import {
   AccountType,
   getPrivateKeysFor,
@@ -15,6 +15,7 @@ import {
 } from '../lib/generate_utils'
 import {
   buildGeth,
+  buildGethAll,
   checkoutGethRepo,
   connectPeers,
   connectValidatorPeers,
@@ -27,6 +28,7 @@ import {
   snapshotDatadir,
   startGeth,
   writeGenesis,
+  writeGenesisWithMigrations,
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRepository } from '../lib/interfaces/geth-repository'
@@ -227,7 +229,11 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       await checkoutGethRepo(repo.branch || 'master', repo.path)
     }
 
-    await buildGeth(repo.path)
+    if (gethConfig.useMycelo) {
+      await buildGethAll(repo.path)
+    } else {
+      await buildGeth(repo.path)
+    }
 
     if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
       await resetDataDir(gethConfig.runPath, verbose)
@@ -238,7 +244,17 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
-    await writeGenesis(gethConfig, validators, verbose)
+    if (gethConfig.useMycelo) {
+      // Compile the contracts first because mycelo assumes they are compiled already, unless told not to
+      if (!gethConfig.myceloSkipCompilingContracts) {
+        await spawnCmdWithExitOnFailure('yarn', ['truffle', 'compile'], {
+          cwd: `${MonorepoRoot}/packages/protocol`,
+        })
+      }
+      await writeGenesisWithMigrations(gethConfig, repo.path, mnemonic, validators.length, verbose)
+    } else {
+      await writeGenesis(gethConfig, validators, verbose)
+    }
 
     let validatorIndex = 0
     let proxyIndex = 0
@@ -293,7 +309,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     // Directly connect validator peers that are not using a bootnode or proxy.
     await connectValidatorPeers(gethConfig.instances)
 
-    if (gethConfig.migrate || gethConfig.migrateTo) {
+    if (!gethConfig.useMycelo && (gethConfig.migrate || gethConfig.migrateTo)) {
       await Promise.all(
         gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
       )

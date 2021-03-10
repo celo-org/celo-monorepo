@@ -159,8 +159,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     valueToBigNumber
   )
   /**
-   * Query proposal dequeue frequency.
-   * @returns Current proposal dequeue frequency in seconds.
+   * Query time of last proposal dequeue
+   * @returns Time of last dequeue
    */
   lastDequeue = proxyCall(this.contract.methods.lastDequeue, undefined, valueToBigNumber)
   /**
