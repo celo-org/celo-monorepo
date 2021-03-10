@@ -71,11 +71,11 @@ yarn run update-contracts --testnets=my_testnet,my_other_testnet
 
 ### Snapshot Testing
 
-We use Jest snapshot testing to assert that no intentional changes to the component tree have been made without explicit developer intention. See an example at [`src/components/CodeRow.test.tsx`](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/components/CodeRow.test.tsx). If your snapshot is expected to deviate, you can update the snapshot with the `--updateSnapshot` flag when running the test.
+We use Jest snapshot testing to assert that no intentional changes to the component tree have been made without explicit developer intention. See an example at [`src/components/CodeRow.test.tsx`](https://github.com/celo-org/wallet/blob/master/packages/mobile/src/components/CodeRow.test.tsx). If your snapshot is expected to deviate, you can update the snapshot with the `--updateSnapshot` flag when running the test.
 
 ### Shallow rendering testing
 
-We use Enzyme as an additional testing tool. It allows for shallow rendering, which reduces running time and the amount of stubbing you have to do by only rendering the immediate children \(and not the grandchildren etc.\) Further, you can interact with the rendered tree to assert proper reactions to user interaction and input. See an example at [`src/components/CodeRow.test.tsx`](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/components/CodeRow.test.tsx) or read more about the [docs](https://airbnb.io/enzyme/docs/guides/react-native.html)
+We use Enzyme as an additional testing tool. It allows for shallow rendering, which reduces running time and the amount of stubbing you have to do by only rendering the immediate children \(and not the grandchildren etc.\) Further, you can interact with the rendered tree to assert proper reactions to user interaction and input. See an example at [`src/components/CodeRow.test.tsx`](https://github.com/celo-org/wallet/blob/master/packages/mobile/src/components/CodeRow.test.tsx) or read more about the [docs](https://airbnb.io/enzyme/docs/guides/react-native.html)
 
 ### E2E testing
 
@@ -96,7 +96,7 @@ Next, the VM snapshot settings should be modified:
 2.  It's a known [detox issue](https://github.com/wix/Detox/issues/1255) that test will fail if a emulator is renamed.
 3.  Make sure the emulator is not running before runing the tests.
 
-For information on how to run and extend the e2e tests, refer to the [e2e readme](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/e2e/README.md).
+For information on how to run and extend the e2e tests, refer to the [e2e readme](https://github.com/celo-org/wallet/blob/master/packages/mobile/e2e/README.md).
 
 ### Generating GraphQL Types
 

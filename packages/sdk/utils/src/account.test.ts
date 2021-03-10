@@ -1,3 +1,5 @@
+import { MnemonicLanguages } from '@celo/base/lib/account'
+import * as bip39 from 'bip39'
 import {
   formatNonAccentedCharacters,
   generateKeys,
@@ -9,12 +11,12 @@ import {
 describe('Mnemonic validation', () => {
   it('should generate 24 word mnemonic', async () => {
     const mnemonic: string = await generateMnemonic()
-    expect(mnemonic.split(' ').length).toEqual(24)
+    expect(mnemonic.split(/\s+/g).length).toEqual(24)
   })
 
   it('should generate 12 word mnemonic', async () => {
     const mnemonic: string = await generateMnemonic(MnemonicStrength.s128_12words)
-    expect(mnemonic.split(' ').length).toEqual(12)
+    expect(mnemonic.split(/\s+/g).length).toEqual(12)
   })
 
   it('should generate an expected private key for a mnemonic', async () => {
@@ -31,8 +33,6 @@ describe('Mnemonic validation', () => {
       'love regular blood road latin uncle shuffle hill aerobic cushion robust million elder gather clip unique pupil escape frost myth glove gadget pitch february',
       'gasp eyebrow sibling dash armed guess excuse ball whip thunder insane pause lizard excuse air catalog tail control raise test dutch permit magic under',
     ]
-    const spanishMnemonic =
-      'avance colmo poema momia cofre pata res verso secta cinco tubería yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín'
     const expectedPrivateKeys = [
       {
         derivation0: {
@@ -213,7 +213,6 @@ describe('Mnemonic validation', () => {
       const password = await generateKeys(mnemonics[i], 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys[i])
     }
-    expect(validateMnemonic(spanishMnemonic)).toBeTruthy()
   })
 
   it('should generate the same keys for a mnemonic with and without accents', async () => {
@@ -249,5 +248,37 @@ describe('Mnemonic validation', () => {
       const password = await generateKeys(mnemonic, 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys)
     }
+  })
+
+  describe.each`
+    lang                                                        | langMnemonic
+    ${MnemonicLanguages[MnemonicLanguages.chinese_simplified]}  | ${'唐 即 驶 橡 钙 六 码 卸 擦 批 培 拒 磨 励 累 栏 砍 霞 弃 卫 中 空 罩 尘'}
+    ${MnemonicLanguages[MnemonicLanguages.chinese_traditional]} | ${'微 款 輩 除 雕 將 鑽 蕭 奇 波 掃 齒 弱 誣 氫 兩 證 漸 堡 亦 攝 了 坯 材'}
+    ${MnemonicLanguages[MnemonicLanguages.english]}             | ${'grid dove lift rib rose grit comfort delay moon crumble sell adapt rule food pull loan puppy okay palace predict grass hint repair napkin'}
+    ${MnemonicLanguages[MnemonicLanguages.french]}              | ${'texte succès lexique frégate sévir oiseau lanceur souvenir mythique onirique pélican opérer foulure enfouir maintien vexer relief aérer citerne ligoter arbitre gomme sénateur dénouer'}
+    ${MnemonicLanguages[MnemonicLanguages.italian]}             | ${'leone sinistro nicchia mole tromba celebre parcella pillola golf voga ostacolo relazione peso unificato tristezza brezza merenda trasloco pinolo persuaso querela pomice onere premere'}
+    ${MnemonicLanguages[MnemonicLanguages.japanese]}            | ${'へきが　けねん　したうけ　せんさい　けいさつ　めんきょ　せりふ　ひびく　せあぶら　たいむ　そこう　うさぎ　つながる　はんろん　むいか　せはば　すべる　りりく　はいれつ　たいる　りかい　さたん　はっかく　ひしょ'}
+    ${MnemonicLanguages[MnemonicLanguages.korean]}              | ${'보장 검사 장기간 문득 먼저 현지 쇼핑 재정 예금 녹화 연세 도덕 정말 불빛 사생활 재능 활동 불빛 경험 소형 고등학생 철저히 공원 증세'}
+    ${MnemonicLanguages[MnemonicLanguages.spanish]}             | ${'cordón soplar santo teoría arpa ducha secreto margen brisa anciano maldad colgar atún catre votar órgano bebida ecuador rabia maduro tubo faja avaro vivero'}
+    ${MnemonicLanguages[MnemonicLanguages.portuguese]}          | ${'cheiro lealdade duplo oposto vereador acessar lanche regra prefeito apego ratazana piedade alarme marmita subsolo brochura honrado viajar magnata canoa sarjeta terno cimento prezar'}
+  `('mnemonic in $lang', ({ lang, langMnemonic }) => {
+    it(`should generate a valid mnemonic`, async () => {
+      const mnemonic = await generateMnemonic(
+        undefined,
+        (MnemonicLanguages[lang] as unknown) as MnemonicLanguages
+      )
+      expect(mnemonic.split(/\s+/g).length).toEqual(24)
+      // This validates against all languages
+      expect(validateMnemonic(mnemonic)).toBeTruthy()
+      // This validates using a specific wordlist
+      expect(bip39.validateMnemonic(mnemonic, bip39.wordlists[lang])).toBeTruthy()
+    })
+
+    it(`should validate a mnemonic`, () => {
+      // This validates against all languages
+      expect(validateMnemonic(langMnemonic)).toBeTruthy()
+      // This validates using a specific wordlist
+      expect(bip39.validateMnemonic(langMnemonic, bip39.wordlists[lang])).toBeTruthy()
+    })
   })
 })

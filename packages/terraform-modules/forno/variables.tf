@@ -9,9 +9,9 @@ variable celo_env {
 }
 
 variable context_info_http {
-  type        = map(
+  type = map(
     object({
-      zone = string
+      zone                                    = string
       rpc_service_network_endpoint_group_name = string
     })
   )
@@ -19,9 +19,9 @@ variable context_info_http {
 }
 
 variable context_info_ws {
-  type        = map(
+  type = map(
     object({
-      zone = string
+      zone                                    = string
       rpc_service_network_endpoint_group_name = string
     })
   )

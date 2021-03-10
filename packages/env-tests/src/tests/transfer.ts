@@ -1,47 +1,67 @@
 import { describe, expect, test } from '@jest/globals'
+import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
+import {
+  fundAccountWithStableToken,
+  getKey,
+  initStableTokenFromRegistry,
+  ONE,
+  TestAccounts,
+} from '../scaffold'
 
-export function runTransfercUSDTest(context: EnvTestContext) {
+export function runTransfersTest(context: EnvTestContext, stableTokensToTest: string[]) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
-    beforeAll(async () => {
-      await fundAccount(context, TestAccounts.TransferFrom, ONE.times(10))
-    })
 
-    test('transfer cUSD', async () => {
-      const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
-      const to = await getKey(context.mnemonic, TestAccounts.TransferTo)
-      context.kit.connection.addAccount(from.privateKey)
-      context.kit.connection.addAccount(to.privateKey)
-      const stableToken = await context.kit.contracts.getStableToken()
-      context.kit.connection.defaultFeeCurrency = stableToken.address
+    for (const stableToken of stableTokensToTest) {
+      test(`transfer ${stableToken}`, async () => {
+        await fundAccountWithStableToken(
+          context,
+          TestAccounts.TransferFrom,
+          ONE.times(10),
+          stableToken
+        )
+        const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
-      const toBalanceBefore = await stableToken.balanceOf(to.address)
-      logger.debug(
-        {
-          balance: toBalanceBefore.toString(),
-          account: to.address,
-        },
-        'Get Balance Before'
-      )
+        const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
+        const to = await getKey(context.mnemonic, TestAccounts.TransferTo)
+        context.kit.connection.addAccount(from.privateKey)
+        context.kit.connection.addAccount(to.privateKey)
+        context.kit.connection.defaultFeeCurrency = stableTokenInstance.address
 
-      const receipt = await stableToken
-        .transfer(to.address, ONE.toString())
-        .sendAndWaitForReceipt({ from: from.address })
+        const toBalanceBefore = await stableTokenInstance.balanceOf(to.address)
+        const fromBalanceBefore = await stableTokenInstance.balanceOf(from.address)
+        logger.debug(
+          { stabletoken: stableToken, balance: toBalanceBefore.toString(), account: to.address },
+          `Get ${stableToken} Balance Before`
+        )
 
-      logger.debug({ receipt }, 'Transferred')
+        const receipt = await stableTokenInstance
+          .transfer(to.address, ONE.toString())
+          .sendAndWaitForReceipt({ from: from.address })
 
-      const toBalanceAfter = await stableToken.balanceOf(to.address)
-      logger.debug(
-        {
-          balance: toBalanceAfter.toString(),
-          account: to.address,
-        },
-        'Get Balance After'
-      )
+        logger.debug({ stabletoken: stableToken, receipt }, `Transferred ${stableToken}`)
+        const transaction = await context.kit.web3.eth.getTransaction(receipt.transactionHash)
+        const gasPrice = new BigNumber(transaction.gasPrice)
+        const gasUsed = new BigNumber(context.kit.web3.utils.toDecimal(receipt.gasUsed).toString())
+        const transactionFee = gasPrice.times(gasUsed)
 
-      expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
-    })
+        const toBalanceAfter = await stableTokenInstance.balanceOf(to.address)
+        const fromBalanceAfter = await stableTokenInstance.balanceOf(from.address)
+        logger.debug(
+          { stabletoken: stableToken, balance: toBalanceAfter.toString(), account: to.address },
+          `Get ${stableToken} Balance After`
+        )
+        expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
+        // check whether difference of balance of 'from' account before/after - transfer amount
+        // is equal to transaction fee
+        expect(
+          fromBalanceBefore
+            .minus(fromBalanceAfter)
+            .minus(ONE)
+            .isEqualTo(transactionFee)
+        ).toBeTruthy()
+      })
+    }
   })
 }
