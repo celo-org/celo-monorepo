@@ -55,7 +55,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   )
 
   /**
-   * @alias {getReserveGoldBalance}
+   * @alias {getReserveCeloBalance}
    */
   getReserveGoldBalance = proxyCall(
     this.contract.methods.getReserveGoldBalance,

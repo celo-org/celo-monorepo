@@ -79,6 +79,9 @@ const OtherContracts = [
   'Initializable',
   'UsingRegistry',
 ]
+
+const Interfaces = ['ICeloToken', 'IERC20']
+
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
 // const TruffleTestContracts = ['Ownable'].concat(OtherContracts).concat(CoreContracts)
@@ -102,12 +105,18 @@ function compile() {
   exec(`yarn run --silent truffle compile --build_directory=${BUILD_DIR}`)
 
   for (const contractName of ImplContracts) {
-    const fileStr = getArtifact(contractName)
-    if (hasEmptyBytecode(fileStr)) {
+    try {
+      const fileStr = getArtifact(contractName)
+      if (hasEmptyBytecode(fileStr)) {
+        console.error(
+          `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
+        )
+        process.exit(1)
+      }
+    } catch (e) {
       console.error(
-        `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
+        `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
-      process.exit(1)
     }
   }
 }
@@ -128,7 +137,7 @@ async function generateFilesForContractKit() {
   exec(`rm -rf ${CONTRACTKIT_GEN_DIR}`)
   const relativePath = path.relative(ROOT_DIR, CONTRACTKIT_GEN_DIR)
 
-  const contractKitContracts = CoreContracts.concat('Proxy')
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
 
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 

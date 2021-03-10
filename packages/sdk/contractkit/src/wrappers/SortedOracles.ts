@@ -3,7 +3,8 @@ import { Address, CeloTransactionObject, toTransactionObject } from '@celo/conne
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { CeloContract } from '../base'
+import { CeloContract, StableTokenContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
@@ -47,7 +48,7 @@ export interface MedianRate {
   rate: BigNumber
 }
 
-export type ReportTarget = CeloContract.StableToken | Address
+export type ReportTarget = StableTokenContract | Address
 
 /**
  * Currency price oracle contract.
@@ -180,12 +181,15 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Updates an oracle value and the median.
    * @param value The amount of US Dollars equal to one CELO.
+   * @param oracleAddress The address to report as
+   * @param token The token to report for
    */
   async reportStableToken(
     value: BigNumber.Value,
-    oracleAddress: Address
+    oracleAddress: Address,
+    token: StableToken = StableToken.cUSD
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableToken, value, oracleAddress)
+    return this.report(this.kit.celoTokens.getContract(token), value, oracleAddress)
   }
 
   /**
@@ -292,12 +296,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    if (target === CeloContract.StableToken) {
-      return this.kit.registry.addressFor(target)
+    if (this.kit.celoTokens.isStableTokenContract(target as CeloContract)) {
+      return this.kit.registry.addressFor(target as StableTokenContract)
     } else if (isValidAddress(target)) {
       return target
     } else {
-      throw new Error(`${target} is neither CeloContract.StableToken or a valid Address`)
+      throw new Error(`${target} is neither a StableToken or a valid Address`)
     }
   }
 }

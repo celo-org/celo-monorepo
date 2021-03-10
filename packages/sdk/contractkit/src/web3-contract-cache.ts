@@ -1,5 +1,6 @@
 import debugFactory from 'debug'
 import { CeloContract, ProxyContracts } from './base'
+import { StableToken } from './celo-tokens'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -97,8 +98,8 @@ export class Web3ContractCache {
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
-  getExchange() {
-    return this.getContract(CeloContract.Exchange)
+  getExchange(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
@@ -139,8 +140,8 @@ export class Web3ContractCache {
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-  getStableToken() {
-    return this.getContract(CeloContract.StableToken)
+  getStableToken(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getContract(stableToken))
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)
