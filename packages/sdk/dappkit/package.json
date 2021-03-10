@@ -4,7 +4,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "tsc -b . --clean",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@celo/connect": "1.0.3-dev",
@@ -13,7 +14,9 @@
     "react-native": "^0.63.4"
   },
   "devDependencies": {
-    "@types/react-native": "0.63.50"
+    "@types/react-native": "0.63.50",
+    "babel-core": "7.0.0-bridge.0",
+    "metro-react-native-babel-preset": "^0.59.0"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
