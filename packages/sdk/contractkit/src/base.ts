@@ -8,7 +8,6 @@ export enum CeloContract {
   EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
-  ExchangeEUR = 'ExchangeEUR',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -23,16 +22,13 @@ export enum CeloContract {
   Reserve = 'Reserve',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
-  StableTokenEUR = 'StableTokenEUR',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 
-export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
+export type StableTokenContract = CeloContract.StableToken
 
-export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
-
-export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
+export type ExchangeContract = CeloContract.Exchange
 
 export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
 /**
@@ -48,3 +44,10 @@ const AuxiliaryContracts = [
   CeloContract.MetaTransactionWallet,
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
+
+export const stripProxy = (contract: CeloContract) => contract.replace('Proxy', '') as CeloContract
+
+export const suffixProxy = (contract: CeloContract) =>
+  contract.endsWith('Proxy') ? contract : (`${contract}Proxy` as CeloContract)
+
+export const ProxyContracts = AllContracts.map((c) => suffixProxy(c))

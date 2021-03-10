@@ -56,7 +56,6 @@ export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWal
 export interface NetworkConfig {
   election: ElectionConfig
   exchange: ExchangeConfig
-  exchangeEUR: ExchangeConfig
   attestations: AttestationsConfig
   governance: GovernanceConfig
   lockedGold: LockedGoldConfig
@@ -64,7 +63,6 @@ export interface NetworkConfig {
   gasPriceMinimum: GasPriceMinimumConfig
   reserve: ReserveConfig
   stableToken: StableTokenConfig
-  stableTokenEUR: StableTokenConfig
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
   blockchainParameters: BlockchainParametersConfig
@@ -125,7 +123,6 @@ export class ContractKit {
     // have to explicitly cast it to just any type and discard type information.
     const promises: Array<Promise<any>> = [
       this.contracts.getExchange(StableToken.cUSD),
-      this.contracts.getExchange(StableToken.cEUR),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
@@ -134,7 +131,6 @@ export class ContractKit {
       this.contracts.getGasPriceMinimum(),
       this.contracts.getReserve(),
       this.contracts.getStableToken(StableToken.cUSD),
-      this.contracts.getStableToken(StableToken.cEUR),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
@@ -143,8 +139,8 @@ export class ContractKit {
     const res = await Promise.all([
       contracts[0].getConfig(),
       contracts[1].getConfig(),
-      contracts[2].getConfig(),
-      contracts[3].getConfig(Object.values(celoTokenAddresses)),
+      contracts[2].getConfig(Object.values(celoTokenAddresses)),
+      contracts[3].getConfig(),
       contracts[4].getConfig(),
       contracts[5].getConfig(),
       contracts[6].getConfig(),
@@ -153,24 +149,20 @@ export class ContractKit {
       contracts[9].getConfig(),
       contracts[10].getConfig(),
       contracts[11].getConfig(),
-      contracts[12].getConfig(),
-      contracts[13].getConfig(),
     ])
     return {
       exchange: res[0],
-      exchangeEUR: res[1],
-      election: res[2],
-      attestations: res[3],
-      governance: res[4],
-      lockedGold: res[5],
-      sortedOracles: res[6],
-      gasPriceMinimum: res[7],
-      reserve: res[8],
-      stableToken: res[9],
-      stableTokenEUR: res[10],
-      validators: res[11],
-      downtimeSlasher: res[12],
-      blockchainParameters: res[13],
+      election: res[1],
+      attestations: res[2],
+      governance: res[3],
+      lockedGold: res[4],
+      sortedOracles: res[5],
+      gasPriceMinimum: res[6],
+      reserve: res[7],
+      stableToken: res[8],
+      validators: res[9],
+      downtimeSlasher: res[10],
+      blockchainParameters: res[11],
     }
   }
 
@@ -180,7 +172,6 @@ export class ContractKit {
     )
     const promises: Array<Promise<any>> = [
       this.contracts.getExchange(StableToken.cUSD),
-      this.contracts.getExchange(StableToken.cEUR),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
@@ -189,7 +180,6 @@ export class ContractKit {
       this.contracts.getGasPriceMinimum(),
       this.contracts.getReserve(),
       this.contracts.getStableToken(StableToken.cUSD),
-      this.contracts.getStableToken(StableToken.cEUR),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
@@ -197,35 +187,31 @@ export class ContractKit {
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
       contracts[0].getHumanReadableConfig(),
-      contracts[1].getHumanReadableConfig(),
-      contracts[2].getConfig(),
-      contracts[3].getHumanReadableConfig(Object.values(celoTokenAddresses)),
+      contracts[1].getConfig(),
+      contracts[2].getHumanReadableConfig(Object.values(celoTokenAddresses)),
+      contracts[3].getHumanReadableConfig(),
       contracts[4].getHumanReadableConfig(),
       contracts[5].getHumanReadableConfig(),
-      contracts[6].getHumanReadableConfig(),
+      contracts[6].getConfig(),
       contracts[7].getConfig(),
-      contracts[8].getConfig(),
+      contracts[8].getHumanReadableConfig(),
       contracts[9].getHumanReadableConfig(),
       contracts[10].getHumanReadableConfig(),
-      contracts[11].getHumanReadableConfig(),
-      contracts[12].getHumanReadableConfig(),
-      contracts[13].getConfig(),
+      contracts[11].getConfig(),
     ])
     return {
       exchange: res[0],
-      exchangeEUR: res[1],
-      election: res[2],
-      attestations: res[3],
-      governance: res[4],
-      lockedGold: res[5],
-      sortedOracles: res[6],
-      gasPriceMinimum: res[7],
-      reserve: res[8],
-      stableToken: res[9],
-      stableTokenEUR: res[10],
-      validators: res[11],
-      downtimeSlasher: res[12],
-      blockchainParameters: res[13],
+      election: res[1],
+      attestations: res[2],
+      governance: res[3],
+      lockedGold: res[4],
+      sortedOracles: res[5],
+      gasPriceMinimum: res[6],
+      reserve: res[7],
+      stableToken: res[8],
+      validators: res[9],
+      downtimeSlasher: res[10],
+      blockchainParameters: res[11],
     }
   }
 
