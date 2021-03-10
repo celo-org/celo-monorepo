@@ -89,7 +89,7 @@ Cohort 7 application deadline: **April 10, 2021 at 23:59 UTC**
 Anticipated vote date for selected applicants in Cohort 7: **May 1, 2021**
 
 {% hint style="info" %}
-Note: Anticipated vote date for new cohort is a best-guess estimate given the requirements and coordination when it comes to voting new applicants, as well as potential delays when it comes to KYC process on new applicants. 
+Note: The anticipated vote date for new cohorts is a best-guess estimate given the requirements and coordination when it comes to voting for new applicants. 
 {% endhint %}
 
 
