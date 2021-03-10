@@ -106,20 +106,22 @@ export class BlockExplorer {
     }
   }
 
-  async tryParseTxInput(address: string, input: string): Promise<null | CallDetails> {
+  getContractAbi = (address: string, callSignature: string) => {
     const contractMapping = this.addressMapping.get(address)
-    if (contractMapping == null) {
-      return null
+    return {
+      contract: contractMapping?.details.name,
+      abi: contractMapping?.fnMapping.get(callSignature),
     }
+  }
 
+  async tryParseTxInput(address: string, input: string): Promise<null | CallDetails> {
     const callSignature = input.slice(0, 10)
-    const encodedParameters = input.slice(10)
-
-    const matchedAbi = contractMapping.fnMapping.get(callSignature)
-    if (matchedAbi == null) {
+    const { contract: contractName, abi: matchedAbi } = this.getContractAbi(address, callSignature)
+    if (!contractName || !matchedAbi) {
       return null
     }
 
+    const encodedParameters = input.slice(10)
     const { args, params } = parseDecodedParams(
       this.kit.connection.getAbiCoder().decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
@@ -141,7 +143,7 @@ export class BlockExplorer {
       })
 
     return {
-      contract: contractMapping.details.name,
+      contract: contractName,
       function: matchedAbi.name!,
       paramMap: params,
       argList: args,

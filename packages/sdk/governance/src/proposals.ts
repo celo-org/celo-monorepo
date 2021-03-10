@@ -1,4 +1,5 @@
 import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import {
   ABIDefinition,
   CeloTransactionObject,
@@ -68,6 +69,9 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const isGovernanceConstitution = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Governance' && tx.function === 'setConstitution'
+
 const registryRepointArgs = (tx: ProposalTransactionJSON) => {
   if (!isRegistryRepoint(tx)) {
     throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
@@ -129,6 +133,19 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
         kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
       )
       jsonTx.params![`initialize@${initSig}`] = initParams
+    } else if (isGovernanceConstitution(jsonTx)) {
+      const [address, functionId, threshold] = jsonTx.args
+      const { contract, abi } = blockExplorer.getContractAbi(address, functionId)
+      if (!contract || !abi) {
+        throw new Error(
+          `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
+        )
+      }
+      jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
+        contract,
+        method: abi.name,
+        threshold: fromFixed(new BigNumber(threshold)),
+      }
     }
 
     proposalJson.push(jsonTx)

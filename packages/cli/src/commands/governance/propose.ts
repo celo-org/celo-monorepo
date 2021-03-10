@@ -15,12 +15,12 @@ export default class Propose extends BaseCommand {
       required: true,
       description: 'Path to json transactions',
     }),
-    deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
-    from: Flags.address({ required: true, description: "Proposer's address" }),
-    descriptionURL: flags.string({
-      required: true,
-      description: 'A URL where further information about the proposal can be viewed',
-    }),
+    // deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
+    // from: Flags.address({ required: true, description: "Proposer's address" }),
+    // descriptionURL: flags.string({
+    //   required: true,
+    //   description: 'A URL where further information about the proposal can be viewed',
+    // }),
   }
 
   static examples = [
@@ -29,14 +29,14 @@ export default class Propose extends BaseCommand {
 
   async run() {
     const res = this.parse(Propose)
-    const account = res.flags.from
-    const deposit = new BigNumber(res.flags.deposit)
-    this.kit.defaultAccount = account
+    // const account = res.flags.from
+    // const deposit = new BigNumber(res.flags.deposit)
+    // this.kit.defaultAccount = account
 
-    await newCheckBuilder(this, account)
-      .hasEnoughCelo(account, deposit)
-      .exceedsProposalMinDeposit(deposit)
-      .runChecks()
+    // await newCheckBuilder(this, account)
+    //   .hasEnoughCelo(account, deposit)
+    //   .exceedsProposalMinDeposit(deposit)
+    //   .runChecks()
 
     const builder = new ProposalBuilder(this.kit)
 
@@ -54,12 +54,12 @@ export default class Propose extends BaseCommand {
     const proposal = await builder.build()
     printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
-    const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx(
-      'proposeTx',
-      governance.propose(proposal, res.flags.descriptionURL),
-      { value: deposit.toString() },
-      'ProposalQueued'
-    )
+    // const governance = await this.kit.contracts.getGovernance()
+    // await displaySendTx(
+    //   'proposeTx',
+    //   governance.propose(proposal, res.flags.descriptionURL),
+    //   { value: deposit.toString() },
+    //   'ProposalQueued'
+    // )
   }
 }
