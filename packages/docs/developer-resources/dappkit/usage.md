@@ -117,10 +117,10 @@ const cUSDBalance = this.convertToContractDecimals(
 this.setState({ cUSDBalance, isLoadingBalance: false });
 ```
 
-## Example use case with ContractKit
+## Example: Exchanging cUSD and Locking CELO
 
-Here's an example of how to go about **exchanging some cUSD to CELO, and
-then Locking that CELO to be able to vote for a validator group**.
+Here's an example of how to go about exchanging some cUSD to CELO, and
+then Locking that CELO to be able to vote for a validator group.
 
 ```javascript
 import {
