@@ -165,7 +165,6 @@ export async function waitForStaticIPDetachment(name: string, resourceGroup: str
   throw Error(`Too many tries waiting for static IP association ID removal`)
 }
 
-
 /**
  * This creates an Azure identity to access a key vault
  */
@@ -191,9 +190,21 @@ export async function createKeyVaultIdentityIfNotExists(
     // assigneePrincipalType = 'MSI'
     assigneePrincipalType = 'ServicePrincipal'
   }
-  await assignRoleIdempotent(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
+  await assignRoleIdempotent(
+    assigneeObjectId,
+    assigneePrincipalType,
+    identity.id,
+    'Managed Identity Operator'
+  )
   // Allow the odis signer identity to access the correct key vault
-  await setKeyVaultPolicyIfNotSet(clusterConfig, keyVaultName, keyVaultResourceGroup, identity, keyPermissions, secretPermissions)
+  await setKeyVaultPolicyIfNotSet(
+    clusterConfig,
+    keyVaultName,
+    keyVaultResourceGroup,
+    identity,
+    keyPermissions,
+    secretPermissions
+  )
   return identity
 }
 
@@ -205,38 +216,62 @@ async function setKeyVaultPolicyIfNotSet(
   keyPermissions: string[] | null,
   secretPermissions: string[] | null
 ) {
-  const kvResourceGroup = keyVaultResourceGroup ? keyVaultResourceGroup : clusterConfig.resourceGroup
+  const kvResourceGroup = keyVaultResourceGroup
+    ? keyVaultResourceGroup
+    : clusterConfig.resourceGroup
 
   const queryFilters = [`?objectId == '${azureIdentity.principalId}'`]
   if (keyPermissions) {
-     queryFilters.push(`sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]`)
+    queryFilters.push(
+      `sort(permissions.keys) == [${keyPermissions.map((perm) => `'${perm}'`).join(', ')}]`
+    )
   }
   if (secretPermissions) {
-    queryFilters.push(`sort(permissions.secrets) == [${secretPermissions.map(perm => `'${perm}'`).join(', ')}]`)
+    queryFilters.push(
+      `sort(permissions.secrets) == [${secretPermissions.map((perm) => `'${perm}'`).join(', ')}]`
+    )
   }
 
   const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-    `az keyvault show --name ${keyVaultName} -g ${kvResourceGroup} --query "properties.accessPolicies[${queryFilters.join(" && ")}]"`
+    `az keyvault show --name ${keyVaultName} -g ${kvResourceGroup} --query "properties.accessPolicies[${queryFilters.join(
+      ' && '
+    )}]"`
   )
   const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
   if (keyVaultPolicies.length) {
-    const keyPermStr = keyPermissions ? `key permissions: ${keyPermissions.join(' ')}` : ""
-    const secretPermStr = secretPermissions ? `secret permissions: ${secretPermissions.join(' ')}` : ""
-    console.info(`Skipping setting policy {${keyPermStr}, ${secretPermStr}}. Already set for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    const keyPermStr = keyPermissions ? `key permissions: ${keyPermissions.join(' ')}` : ''
+    const secretPermStr = secretPermissions
+      ? `secret permissions: ${secretPermissions.join(' ')}`
+      : ''
+    console.info(
+      `Skipping setting policy {${keyPermStr}, ${secretPermStr}}. Already set for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`
+    )
     return
   }
 
   if (keyPermissions) {
-    console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    console.info(
+      `Setting key permissions ${keyPermissions.join(
+        ' '
+      )} for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`
+    )
     return execCmdWithExitOnFailure(
-      `az keyvault set-policy --name ${keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${kvResourceGroup}`
+      `az keyvault set-policy --name ${keyVaultName} --key-permissions ${keyPermissions.join(
+        ' '
+      )} --object-id ${azureIdentity.principalId} -g ${kvResourceGroup}`
     )
   }
 
   if (secretPermissions) {
-    console.info(`Setting secret permissions ${secretPermissions.join(' ')} for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    console.info(
+      `Setting secret permissions ${secretPermissions.join(
+        ' '
+      )} for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`
+    )
     return execCmdWithExitOnFailure(
-      `az keyvault set-policy --name ${keyVaultName} --secret-permissions ${secretPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${kvResourceGroup}`
+      `az keyvault set-policy --name ${keyVaultName} --secret-permissions ${secretPermissions.join(
+        ' '
+      )} --object-id ${azureIdentity.principalId} -g ${kvResourceGroup}`
     )
   }
 }
@@ -268,7 +303,11 @@ async function deleteKeyVaultPolicy(
 /**
  * @return the intended name of an azure identity given a key vault name
  */
-export function getAzureKeyVaultIdentityName(context: string, prefix: string, keyVaultName: string) {
+export function getAzureKeyVaultIdentityName(
+  context: string,
+  prefix: string,
+  keyVaultName: string
+) {
   // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
   const maxIdentityNameLength = 128
   return `${prefix}-${keyVaultName}-${context}`.substring(0, maxIdentityNameLength)
