@@ -77,16 +77,21 @@ Make sure to complete all prerequisites before applying.
 {% endhint %}
 
 {% hint style="info" %}
-Note: Application for Cohort 6 is now closed.
+Note: Application for Cohort 7 is now open.
 {% endhint %}
 
 
-[APPLY FOR FOUNDATION VOTES HERE](https://forum.celo.org/t/foundation-voting-cohort-6-applications-are-open/693)
+[APPLY FOR FOUNDATION VOTES HERE](https://forum.celo.org/t/cohort-7-application-of-foundation-voting-program-is-now-open/829)
 
 ### Timings
-Cohort 5 application deadline: **Oct 9, 2020 at 23:59 UTC**
+Cohort 7 application deadline: **April 10, 2021 at 23:59 UTC**
 
-Anticipated vote date for selected applicants in Cohort 5: **Nov 2, 2020**
+Anticipated vote date for selected applicants in Cohort 7: **May 1, 2021**
+
+{% hint style="info" %}
+Note: Anticipated vote date for new cohort is a best-guess estimate given the requirements and coordination when it comes to voting new applicants, as well as potential delays when it comes to KYC process on new applicants. 
+{% endhint %}
+
 
 
 ### Application Prerequisites
@@ -121,7 +126,7 @@ Past Foundation votes recipients:
 * **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 -- votes will expire on Nov 1, 2020
 
 Currently receiving Foundation votes: 
-* **Cohort 3:** [6 validator groups](https://docs.google.com/spreadsheets/d/1OkWnr6EOeFn4pIv0zxmXFNtHLmKWf_qCJOJ4iacov-A/edit?usp=sharing) -- votes will expire on Feb 1, 2021
+* **Cohort 3:** [6 validator groups](https://docs.google.com/spreadsheets/d/1OkWnr6EOeFn4pIv0zxmXFNtHLmKWf_qCJOJ4iacov-A/edit?usp=sharing) -- votes will expire on Feb 1, 2021 (Note: This will transition to Cohort 6 as soon as they're voted in)
 * **Cohort 4:** [22 validator groups](https://docs.google.com/spreadsheets/d/1bp2nJUxqhWner-uOffBohKQc3N93e--eMpP7XOBrbGI/edit?usp=sharing) -- votes will expire on May 1, 2021
 * **Cohort 5:** [25 validator groups](https://docs.google.com/spreadsheets/d/1n2lwFsAsFaohng4Bo_FEWcoXzZl5CrLFxA6EK0nuFSA/edit#gid=0) -- votes will expire on Aug 1, 2021 
 
