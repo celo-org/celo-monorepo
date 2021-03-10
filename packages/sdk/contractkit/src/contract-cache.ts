@@ -33,7 +33,6 @@ const WrapperFactories = {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
-  [CeloContract.ExchangeEUR]: ExchangeWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
@@ -48,7 +47,6 @@ const WrapperFactories = {
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
-  [CeloContract.StableTokenEUR]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
 }
 
@@ -65,7 +63,6 @@ interface WrapperCacheMap {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
-  [CeloContract.ExchangeEUR]?: ExchangeWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -80,7 +77,6 @@ interface WrapperCacheMap {
   [CeloContract.Reserve]?: ReserveWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
-  [CeloContract.StableTokenEUR]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
