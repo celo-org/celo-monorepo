@@ -126,9 +126,10 @@ Past Foundation votes recipients:
 * **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 -- votes will expire on Nov 1, 2020
 
 Currently receiving Foundation votes: 
-* **Cohort 3:** [6 validator groups](https://docs.google.com/spreadsheets/d/1OkWnr6EOeFn4pIv0zxmXFNtHLmKWf_qCJOJ4iacov-A/edit?usp=sharing) -- votes will expire on Feb 1, 2021 (Note: This will transition to Cohort 6 as soon as they're voted in)
+* **Cohort 3:** [6 validator groups](https://docs.google.com/spreadsheets/d/1OkWnr6EOeFn4pIv0zxmXFNtHLmKWf_qCJOJ4iacov-A/edit?usp=sharing) -- votes will expire on Feb 1, 2021
 * **Cohort 4:** [22 validator groups](https://docs.google.com/spreadsheets/d/1bp2nJUxqhWner-uOffBohKQc3N93e--eMpP7XOBrbGI/edit?usp=sharing) -- votes will expire on May 1, 2021
 * **Cohort 5:** [25 validator groups](https://docs.google.com/spreadsheets/d/1n2lwFsAsFaohng4Bo_FEWcoXzZl5CrLFxA6EK0nuFSA/edit#gid=0) -- votes will expire on Aug 1, 2021 
+* **Cohort 6:** TBA Soon
 
 {% hint style="info" %}
 If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list here](https://celo.activehosted.com/f/15).
