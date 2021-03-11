@@ -35,7 +35,7 @@ export const handler = async (argv: VmTestnetArgv) => {
 
   // set up Kubernetes cluster that will have prometheus to stackdriver statefulset
   const createdCluster = await createClusterIfNotExists()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await setupCluster(argv.celoEnv, createdCluster)
   await installPrometheusIfNotExists()
 }

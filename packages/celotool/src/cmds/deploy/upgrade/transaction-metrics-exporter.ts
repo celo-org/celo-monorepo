@@ -9,6 +9,6 @@ export const describe = 'upgrade the transaction metrics exporter deploy'
 export const builder = {}
 
 export const handler = async (argv: UpgradeArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await upgradeHelmChart(argv.celoEnv)
 }
