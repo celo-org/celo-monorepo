@@ -6,7 +6,8 @@ function build_tag() {
 
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-  git checkout --no-overlay $BRANCH -- contracts 2>>$LOG_FILE >> $LOG_FILE
+  rm -r contracts
+  git checkout $BRANCH -- contracts 2>>$LOG_FILE >> $LOG_FILE
 
   [ -d "build/contracts" ] && mv build/contracts build/contracts_tmp
   if [ ! -d $BUILD_DIR ]; then
@@ -19,5 +20,6 @@ function build_tag() {
   fi
   [ -d "build/contracts_tmp" ] && mv build/contracts_tmp build/contracts
 
+  rm -r contracts
   git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE
 }
