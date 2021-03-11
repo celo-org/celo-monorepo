@@ -1,1 +1,1 @@
-imagePullPolicy: IfNotPresent
+imagePullPolicy: Always
