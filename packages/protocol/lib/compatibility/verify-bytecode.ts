@@ -1,5 +1,5 @@
 // tslint:disable: no-console
-import { ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
+import { ensureLeading0x } from '@celo/base/lib/address'
 import {
   LibraryAddresses,
   LibraryPositions,
@@ -114,7 +114,6 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   // check implementation deployment
   const sourceBytecode = getSourceBytecode(contract, context)
-  console.log('sourceBytecode', sourceBytecode.slice(0, 50))
   const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
 
   let implementationAddress: string
@@ -124,10 +123,6 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
-    if (proxyAddress === NULL_ADDRESS) {
-      console.error(`WARNING: ${contract} not found in registry, skipping verification`)
-      return
-    }
     const proxy = await context.Proxy.at(proxyAddress) // necessary await
     implementationAddress = await proxy._getImplementation()
   }
@@ -232,7 +227,11 @@ export const verifyBytecodes = async (
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
 
-  const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
+  const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
+
+  const queue = contracts.filter(
+    (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
+  )
   const visited: Set<string> = new Set(queue)
 
   // truffle web3 version does not have getProof
