@@ -25,7 +25,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: WeeklyFaucetArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   console.log(`Fauceting phone numbers in ${argv.file} on ${argv.celoEnv}`)
   const cb = async () => {
