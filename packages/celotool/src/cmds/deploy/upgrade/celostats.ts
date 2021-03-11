@@ -20,7 +20,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: CelostatsArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   if (argv.reset === true) {
     await removeHelmRelease(argv.celoEnv)

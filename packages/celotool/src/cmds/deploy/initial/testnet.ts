@@ -37,7 +37,7 @@ export const handler = async (argv: TestnetInitialArgv) => {
   failIfVmBased()
 
   const createdCluster = await createClusterIfNotExists()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   if (!argv.skipClusterSetup) {
     await setupCluster(argv.celoEnv, createdCluster)
