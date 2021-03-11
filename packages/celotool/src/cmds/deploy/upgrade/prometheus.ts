@@ -5,7 +5,7 @@ import { upgradeGrafana, upgradePrometheus } from 'src/lib/prometheus'
 
 export const command = 'prometheus'
 
-export const describe = 'upgrade prometheus to a kubernetes cluster on GKE using Helm'
+export const describe = 'upgrade prometheus to a kubernetes cluster using Helm'
 
 export type PrometheusUpgradeArgv = UpgradeArgv &
   ContextArgv & {

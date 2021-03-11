@@ -5,7 +5,7 @@ import { installGrafanaIfNotExists, installPrometheusIfNotExists } from 'src/lib
 
 export const command = 'prometheus'
 
-export const describe = 'deploy prometheus to a kubernetes cluster on GKE using Helm'
+export const describe = 'deploy prometheus to a kubernetes cluster using Helm'
 
 export type PrometheusInitialArgv = InitialArgv &
   ContextArgv & {

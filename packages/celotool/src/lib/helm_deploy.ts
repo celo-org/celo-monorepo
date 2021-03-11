@@ -206,14 +206,16 @@ export async function installCertManagerAndNginx(
   // Check if cert-manager is installed in any namespace
   // because cert-manager crds are global and cannot live
   // different crds version in the same cluster
-  const certManagerExists = await outputIncludes(
-    `helm list -A`,
-    `cert-manager-cluster-issuers`,
-    `cert-manager-cluster-issuers exists, skipping install`
-  )
-  if (!certManagerExists) {
+  const certManagerExists =
+    (await outputIncludes(`helm list -n default`, `cert-manager-cluster-issuers`)) ||
+    (await outputIncludes(`helm list -n cert-manager`, `cert-manager-cluster-issuers`))
+
+  if (certManagerExists) {
+    console.info('cert-manager-cluster-issuers exists, skipping install')
+  } else {
     await installCertManager()
   }
+
   const nginxIngressReleaseExists = await outputIncludes(
     `helm list -n default`,
     `nginx-ingress-release`,
