@@ -43,7 +43,7 @@ function getEnvMnemonic(env: string): string {
 
 export const handler = async (argv: UpgradeFaucetArgs) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   console.info(`Upgrading faucet for network ${argv.celoEnv} on project ${argv.firebaseProject}`)
 
   try {
