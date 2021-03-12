@@ -1,6 +1,6 @@
 {
-  "oldArtifactsFolder": "/Users/yorhodes/celo/celo-monorepo/packages/protocol/build/celo-core-contracts-v1.baklava/contracts",
-  "newArtifactsFolder": "/Users/yorhodes/celo/celo-monorepo/packages/protocol/build/celo-core-contracts-v2.baklava/contracts",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.baklava/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocolbuild/celo-core-contracts-v2.baklava/contracts",
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles/",
   "report": {
     "contracts": {
