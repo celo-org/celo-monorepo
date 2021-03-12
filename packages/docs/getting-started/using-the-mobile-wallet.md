@@ -4,7 +4,7 @@ One easy way to experiment with the Alfajores Testnet is to install the Celo Mob
 
 ### Getting Started
 
-Since verifying your phone number costs gas, you have to be invited to the platform to have the funds to pay for the verification process. To do so, please visit [celo.org/build/wallet](https://celo.org/build/wallet) and enter your phone number to be messaged an invitation code. Please note that the Celo Wallet is presently only available for Android, with iOS coming soon.
+Since verifying your phone number costs gas, you have to be invited to the platform to have the funds to pay for the verification process. To do so, please visit [celo.org/build/wallet](https://celo.org/build/wallet) and enter your phone number to be messaged an invitation code.
 
 If you already have an account \(and the corresponding seed phrase\), you can download the Celo wallet from the [play store](https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores) and follow instructions in the app to import your wallet using the seed phrase.
 

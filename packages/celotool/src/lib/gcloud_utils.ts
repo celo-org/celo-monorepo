@@ -44,44 +44,60 @@ export async function ensureAuthenticatedGcloudAccount() {
 }
 
 export async function linkSAForWorkloadIdentity(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false").toLowerCase() === "true") {
+  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
     await execCmd(
-      `gcloud iam service-accounts add-iam-policy-binding --project ${fetchEnv(envVar.TESTNET_PROJECT_NAME)} \
+      `gcloud iam service-accounts add-iam-policy-binding --project ${fetchEnv(
+        envVar.TESTNET_PROJECT_NAME
+      )} \
         --role roles/iam.workloadIdentityUser \
-        --member "serviceAccount:${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.svc.id.goog[${celoEnv}/gcloud-storage-access]" chaindata-download@${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.iam.gserviceaccount.com`
+        --member "serviceAccount:${fetchEnv(
+          envVar.TESTNET_PROJECT_NAME
+        )}.svc.id.goog[${celoEnv}/gcloud-storage-access]" chaindata-download@${fetchEnv(
+        envVar.TESTNET_PROJECT_NAME
+      )}.iam.gserviceaccount.com`
     )
   }
 }
 
 export async function delinkSAForWorkloadIdentity(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false").toLowerCase() === "true") {
+  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
     await execCmd(
-      `gcloud iam service-accounts remove-iam-policy-binding --project ${fetchEnv(envVar.TESTNET_PROJECT_NAME)} \
+      `gcloud iam service-accounts remove-iam-policy-binding --project ${fetchEnv(
+        envVar.TESTNET_PROJECT_NAME
+      )} \
         --role roles/iam.workloadIdentityUser \
-        --member "serviceAccount:${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.svc.id.goog[${celoEnv}/gcloud-storage-access]" chaindata-download@${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.iam.gserviceaccount.com`
+        --member "serviceAccount:${fetchEnv(
+          envVar.TESTNET_PROJECT_NAME
+        )}.svc.id.goog[${celoEnv}/gcloud-storage-access]" chaindata-download@${fetchEnv(
+        envVar.TESTNET_PROJECT_NAME
+      )}.iam.gserviceaccount.com`
     )
   }
 }
 
 export async function kubectlAnnotateKSA(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false").toLowerCase() === "true") {
+  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
     await execCmd(
       `kubectl annotate serviceaccount \
         --namespace ${celoEnv} \
         gcloud-storage-access \
         --overwrite \
-        iam.gke.io/gcp-service-account=chaindata-download@${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.iam.gserviceaccount.com`
+        iam.gke.io/gcp-service-account=chaindata-download@${fetchEnv(
+          envVar.TESTNET_PROJECT_NAME
+        )}.iam.gserviceaccount.com`
     )
   }
 }
 
 export async function removeKubectlAnnotateKSA(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false").toLowerCase() === "true") {
+  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
     await execCmd(
       `kubectl annotate serviceaccount \
         --namespace ${celoEnv} \
         gcloud-storage-access \
-        iam.gke.io/gcp-service-account=chaindata-download@${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.iam.gserviceaccount.com-`
+        iam.gke.io/gcp-service-account=chaindata-download@${fetchEnv(
+          envVar.TESTNET_PROJECT_NAME
+        )}.iam.gserviceaccount.com-`
     )
   }
 }

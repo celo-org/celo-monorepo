@@ -18,7 +18,7 @@ Other Changes
 
 ## Published
 
-### **[1.0.2-beta]** -- 2021-02-03
+### **[1.0.2]** -- 2021-02-16
 Features
 - Show owner in `releasegold:show` - [#6608](https://github.com/celo-org/celo-monorepo/pull/6608)
 - Metadata HTTPS Monitoring in `identity:current-attestation-services` - [#6806](https://github.com/celo-org/celo-monorepo/pull/6806)
@@ -27,9 +27,14 @@ Features
 Bug Fixes
 - Fix 8 digit codes for mainnet - [#6663](https://github.com/celo-org/celo-monorepo/pull/6663)
 - Fix Azure HSM Wallet PublicKey to Address conversion - [#6829](https://github.com/celo-org/celo-monorepo/pull/6829)
+- Shouldn't import from src folder in peer package - [#7073](https://github.com/celo-org/celo-monorepo/pull/7073)
+- Fix wallets-test [#7094](https://github.com/celo-org/celo-monorepo/pull/7094)
 
 Other Changes
 - Small Docs Fixes related to CK1 release - [#6576](https://github.com/celo-org/celo-monorepo/pull/6576)
+- Simplify SortedOracles API by allowing consumers to report to arbitrary Addresses - [#6898](https://github.com/celo-org/celo-monorepo/pull/6898)
+- Updated DappKit README.md - [#6957](https://github.com/celo-org/celo-monorepo/pull/6957)
+
 
 ### **[1.0.1]** -- 2021-01-20
 Features

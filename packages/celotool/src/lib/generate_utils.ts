@@ -1,14 +1,19 @@
 // @ts-ignore
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import BigNumber from 'bignumber.js'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import fs from 'fs'
-import { range, repeat } from 'lodash'
+import { merge, range, repeat } from 'lodash'
+import { tmpdir } from 'os'
 import path from 'path'
 import * as rlp from 'rlp'
+import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
+import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import Web3 from 'web3'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -16,7 +21,7 @@ import {
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
-  TEMPLATE
+  TEMPLATE,
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
@@ -83,6 +88,28 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   return generatePrivateKeyWithDerivations(mnemonic, [accountType, index])
 }
 
+export const generateOraclePrivateKey = (
+  mnemonic: string,
+  currencyPair: CurrencyPair,
+  index: number
+) => {
+  let derivationPath: number[]
+  if (currencyPair === 'CELOUSD') {
+    // For backwards compatibility we don't add currencyPair to
+    // the derivation path for CELOUSD
+    derivationPath = [AccountType.PRICE_ORACLE, index]
+  } else {
+    // Deterministically convert the currency pair string to a path segment
+    // keccak(currencyPair) modulo 2^31
+    const currencyDerivation = new BigNumber(Web3.utils.keccak256(currencyPair), 16)
+      .mod(2 ** 31)
+      .toNumber()
+    derivationPath = [AccountType.PRICE_ORACLE, currencyDerivation, index]
+  }
+
+  return generatePrivateKeyWithDerivations(mnemonic, derivationPath)
+}
+
 export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
@@ -126,6 +153,9 @@ const votingBotBalance = () =>
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
+
+export const getOraclePrivateKeysFor = (currencyPair: CurrencyPair, mnemonic: string, n: number) =>
+  range(0, n).map((i) => generateOraclePrivateKey(mnemonic, currencyPair, i))
 
 export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getPrivateKeysFor(accountType, mnemonic, n).map(privateKeyToAddress)
@@ -338,10 +368,10 @@ export const generateGenesis = ({
   }
 
   if (typeof churritoBlock === 'number') {
-    genesis.config.churritoBlock = churritoBlock;
+    genesis.config.churritoBlock = churritoBlock
   }
   if (typeof donutBlock === 'number') {
-    genesis.config.donutBlock = donutBlock;
+    genesis.config.donutBlock = donutBlock
   }
 
   genesis.config.chainId = chainId
@@ -405,4 +435,90 @@ export const generateGenesis = ({
   }
 
   return JSON.stringify(genesis, null, 2)
+}
+
+// This function assumes that mycelo has already been built using 'make all'
+export const generateGenesisWithMigrations = async ({
+  gethRepoPath,
+  genesisConfig,
+  mnemonic,
+  numValidators,
+}: MyceloGenesisConfig): Promise<string> => {
+  const tmpDir = path.join(tmpdir(), `mycelo-genesis-${Date.now()}`)
+  fs.mkdirSync(tmpDir)
+  const envFile = path.join(tmpDir, 'env.json')
+  const configFile = path.join(tmpDir, 'genesis-config.json')
+  const myceloBinaryPath = path.join(gethRepoPath!, '/build/bin/mycelo')
+  await spawnCmdWithExitOnFailure(
+    myceloBinaryPath,
+    [
+      'genesis-config',
+      '--template',
+      'monorepo',
+      '--mnemonic',
+      mnemonic,
+      '--validators',
+      numValidators.toString(),
+    ],
+    {
+      silent: true,
+      cwd: tmpDir,
+    }
+  )
+  const mcEnv = JSON.parse(fs.readFileSync(envFile).toString())
+  const mcConfig = JSON.parse(fs.readFileSync(configFile).toString())
+
+  // Customize and overwrite the env.json file
+  merge(mcEnv, {
+    chainId: genesisConfig.chainId,
+    accounts: {
+      validators: numValidators,
+    },
+  })
+  fs.writeFileSync(envFile, JSON.stringify(mcEnv, undefined, 2))
+
+  // Customize and overwrite the genesis-config.json file
+  if (genesisConfig.chainId) {
+    mcConfig.chainId = genesisConfig.chainId
+  }
+  if (genesisConfig.epoch) {
+    mcConfig.istanbul.epoch = genesisConfig.epoch
+  }
+  if (genesisConfig.lookbackwindow) {
+    mcConfig.istanbul.lookbackwindow = genesisConfig.lookbackwindow
+  }
+  if (genesisConfig.blockTime) {
+    mcConfig.istanbul.blockperiod = genesisConfig.blockTime
+  }
+  if (genesisConfig.requestTimeout) {
+    mcConfig.istanbul.requesttimeout = genesisConfig.requestTimeout
+  }
+  if (genesisConfig.churritoBlock !== undefined) {
+    mcConfig.hardforks.churritoBlock = genesisConfig.churritoBlock
+  }
+  if (genesisConfig.donutBlock !== undefined) {
+    mcConfig.hardforks.donutBlock = genesisConfig.donutBlock
+  }
+  if (genesisConfig.timestamp !== undefined) {
+    mcConfig.genesisTimestamp = genesisConfig.timestamp
+  }
+
+  // TODO: overrides for migrations
+
+  fs.writeFileSync(configFile, JSON.stringify(mcConfig, undefined, 2))
+
+  // Generate the genesis file, and return its contents
+  const contractsBuildPath = path.resolve(monorepoRoot, 'packages/protocol/build/contracts/')
+  await spawnCmdWithExitOnFailure(
+    myceloBinaryPath,
+    ['genesis-from-config', tmpDir, '--buildpath', contractsBuildPath],
+    {
+      silent: true,
+      cwd: tmpDir,
+    }
+  )
+  const genesis = fs.readFileSync(path.join(tmpDir, 'genesis.json')).toString()
+  // Clean up the tmp dir as it's no longer needed
+  await spawnCmd('rm', ['-rf', tmpDir], { silent: true })
+  return genesis
 }

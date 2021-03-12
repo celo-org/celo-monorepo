@@ -10,7 +10,7 @@ export const describe = 'deploy the chaoskube package'
 export const builder = {}
 
 export const handler = async (argv: InitialArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await upgradeGenericHelmChart(
     argv.celoEnv,
     helmReleaseName(argv.celoEnv),
