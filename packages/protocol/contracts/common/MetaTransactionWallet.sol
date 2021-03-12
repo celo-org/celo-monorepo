@@ -50,7 +50,7 @@ contract MetaTransactionWallet is
   // onlyGuardian functions can only be called when the guardian is not the zero address and
   // the caller is the guardian.
   modifier onlyGuardian() {
-    require(guardian != address(0), "Guardian is not set");
+    // Note that if the guardian is not set (e.g. its address 0, then this require statement will fail).
     require(guardian == msg.sender, "Caller is not the guardian");
     _;
   }
@@ -97,7 +97,8 @@ contract MetaTransactionWallet is
    * @param _guardian The address authorized to change the wallet's signer
    */
   function setGuardian(address _guardian) external onlyOwner {
-    _setGuardian(_guardian);
+    guardian = _guardian;
+    emit GuardianSet(guardian);
   }
 
   /**
@@ -310,8 +311,4 @@ contract MetaTransactionWallet is
     emit SignerSet(signer);
   }
 
-  function _setGuardian(address _guardian) internal {
-    guardian = _guardian;
-    emit GuardianSet(guardian);
-  }
 }
