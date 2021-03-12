@@ -238,6 +238,12 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         })
       })
     })
+
+    describe('when not called by the wallet contract', () => {
+      it('should revert', async () => {
+        await assertRevert(wallet.setGuardian(guardian, { from: nonSigner }))
+      })
+    })
   })
 
   describe('#recoverWallet()', () => {
