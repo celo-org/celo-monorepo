@@ -1,17 +1,17 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
-import { execCmdWithExitOnFailure } from './cmd-utils'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart
+  upgradeGenericHelmChart,
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
-  getServiceAccountKey
+  getServiceAccountKey,
 } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 const yaml = require('js-yaml')
@@ -23,9 +23,9 @@ const kubeServiceAccountName = releaseName
 // stackdriver-prometheus-sidecar relevant links:
 // GitHub: https://github.com/Stackdriver/stackdriver-prometheus-sidecar
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
-const sidecarImageTag = '0.8.0'
+const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.22.2'
+const prometheusImageTag = 'v2.25.0'
 
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
@@ -52,13 +52,18 @@ async function installPrometheus(clusterConfig?: BaseClusterConfig) {
   )
 }
 
-export async function removeHelmRelease() {
+export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus() {
+export async function upgradePrometheus(clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
+  return upgradeGenericHelmChart(
+    kubeNamespace,
+    releaseName,
+    helmChartPath,
+    await helmParameters(clusterConfig)
+  )
 }
 
 async function helmParameters(clusterConfig?: BaseClusterConfig) {
@@ -93,7 +98,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     '__name__!~"kubelet_.+"',
     '__name__!~"phoenix_.+"',
     '__name__!~"workqueue_.+"',
-    '__name__!~"nginx_.+"'
+    '__name__!~"nginx_.+"',
   ]
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -110,14 +115,15 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
   ]
-  if ((clusterConfig) && (clusterConfig.cloudProvider) !== CloudProvider.GCP ) {
+  if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
     const clusterName = clusterConfig.clusterName
     const cloudProvider = getCloudProviderPrefix(clusterConfig)
     params.push(
       `--set cluster=${clusterConfig.clusterName}`,
       `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterConfig.clusterName}`,
       `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-        clusterName, cloudProvider
+        clusterName,
+        cloudProvider
       )}`
     )
   } else {
@@ -142,22 +148,49 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
   return params
 }
 
-async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string) {
-  await switchToGCPProjectFromEnv()
-  const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
+async function getPrometheusGcloudServiceAccountKeyBase64(
+  clusterName: string,
+  cloudProvider: string
+) {
+  // First check if value already exist in helm release. If so we pass the same value
+  // and we avoid creating a new key for the service account
+  const gcloudServiceAccountKeyBase64 = await getPrometheusGcloudServiceAccountKeyBase64FromHelm()
+  if (gcloudServiceAccountKeyBase64) {
+    return gcloudServiceAccountKeyBase64
+  } else {
+    // We do not have the service account key in helm so we need to create the SA (if it does not exist)
+    // and create a new key for the service account in any case
+    await switchToGCPProjectFromEnv()
+    const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+    const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
 
-  await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
+    await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
 
-  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
-  await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
-  return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
+    await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
+    return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+  }
+}
+
+async function getPrometheusGcloudServiceAccountKeyBase64FromHelm() {
+  const prometheusInstalled = await outputIncludes(
+    `helm list -n ${kubeNamespace}`,
+    `${releaseName}`
+  )
+  if (prometheusInstalled) {
+    const [output] = await execCmd(`helm get values -n ${kubeNamespace} ${releaseName}`)
+    const prometheusValues: any = yaml.safeLoad(output)
+    return prometheusValues.gcloudServiceAccountKeyBase64
+  }
 }
 
 // createPrometheusGcloudServiceAccount creates a gcloud service account with a given
 // name and the proper permissions for writing metrics to stackdriver
-async function createPrometheusGcloudServiceAccount(serviceAccountName: string, gcloudProjectName: string) {
+async function createPrometheusGcloudServiceAccount(
+  serviceAccountName: string,
+  gcloudProjectName: string
+) {
   await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
   const accountCreated = await createServiceAccountIfNotExists(serviceAccountName)
   if (accountCreated) {
@@ -185,7 +218,9 @@ function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
 function getServiceAccountName(clusterName: string, cloudProvider: string) {
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
-  return `prometheus-${cloudProvider}-${clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+  return `prometheus-${cloudProvider}-${clusterName}`
+    .substring(0, 30)
+    .replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
 export async function installGrafanaIfNotExists() {
@@ -210,45 +245,40 @@ async function installGrafana() {
   )
 }
 
-
 async function grafanaHelmParameters() {
   const k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
   const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   const values = {
     annotations: {
-      "prometheus.io/scrape": "false",
-      "prometheus.io/path":  "/metrics",
-      "prometheus.io/port": "3000"
+      'prometheus.io/scrape': 'false',
+      'prometheus.io/path': '/metrics',
+      'prometheus.io/port': '3000',
     },
     sidecar: {
       dashboards: {
-        enabled: true
+        enabled: true,
       },
       datasources: {
-        enabled: false
+        enabled: false,
       },
       notifiers: {
-        enabled: false
-      }
+        enabled: false,
+      },
     },
     ingress: {
       enabled: true,
       annotations: {
-        "kubernetes.io/ingress.class": "nginx",
-        "kubernetes.io/tls-acme": "true"
+        'kubernetes.io/ingress.class': 'nginx',
+        'kubernetes.io/tls-acme': 'true',
       },
-      hosts: [
-        `${k8sClusterName}-grafana.${k8sDomainName}.org`
-      ],
+      hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],
       path: '/',
       tls: [
         {
           secretName: `${k8sClusterName}-grafana-tls`,
-          hosts: [
-            `${k8sClusterName}-grafana.${k8sDomainName}.org`
-          ]
-        }
-      ]
+          hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],
+        },
+      ],
     },
     persistence: {
       enabled: true,
@@ -264,33 +294,32 @@ async function grafanaHelmParameters() {
             type: 'prometheus',
             url: 'http://prometheus-server.prometheus:9090',
             access: 'proxy',
-            isDefault: true
-          }
-        ]
-      }
-    }
+            isDefault: true,
+          },
+        ],
+      },
+    },
   }
 
-  const valuesFile = "/tmp/grafana-values.yaml"
+  const valuesFile = '/tmp/grafana-values.yaml'
   fs.writeFileSync(valuesFile, yaml.safeDump(values))
 
-  const params = [
-    `-f ${valuesFile}`
-  ]
+  const params = [`-f ${valuesFile}`]
   return params
 }
 
-
 export async function upgradeGrafana() {
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(kubeNamespace, grafanaReleaseName, grafanaHelmChartPath, await grafanaHelmParameters())
+  return upgradeGenericHelmChart(
+    kubeNamespace,
+    grafanaReleaseName,
+    grafanaHelmChartPath,
+    await grafanaHelmParameters()
+  )
 }
 
 export async function removeGrafanaHelmRelease() {
-  const grafanaExists = await outputIncludes(
-    `helm list -A`,
-    grafanaReleaseName,
-  )
+  const grafanaExists = await outputIncludes(`helm list -A`, grafanaReleaseName)
   if (grafanaExists) {
     console.info('Removing grafana')
     await removeGenericHelmChart(grafanaReleaseName, kubeNamespace)

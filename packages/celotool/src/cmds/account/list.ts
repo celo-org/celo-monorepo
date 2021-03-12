@@ -27,7 +27,7 @@ export const handler = async (argv: ListArgv) => {
   const domain = getBlockscoutUrl(argv.celoEnv)
   const listUsersUrl = `${domain}/api?module=account&action=tokentx&address=0x0000000000000000000000000000000000000abe`
 
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
 
   console.log(`Getting list of users for "${argv.celoEnv}" environment`)
   const resp = await fetch(listUsersUrl)

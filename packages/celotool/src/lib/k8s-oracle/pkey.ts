@@ -1,4 +1,4 @@
-import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleIdentity } from "./base";
+import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleIdentity } from './base'
 
 export interface PrivateKeyOracleIdentity extends OracleIdentity {
   privateKey: string
@@ -18,10 +18,7 @@ export class PrivateKeyOracleDeployer extends BaseOracleDeployer {
   }
 
   async helmParameters() {
-    return [
-      ...await super.helmParameters(),
-      `--set oracle.walletType=PRIVATE_KEY`
-    ]
+    return [...(await super.helmParameters()), `--set oracle.walletType=PRIVATE_KEY`]
   }
 
   async oracleIdentityHelmParameters() {

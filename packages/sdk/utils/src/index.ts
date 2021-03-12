@@ -1,3 +1,5 @@
+import * as AddressUtils from './address'
+
 export { AccountUtils } from './account'
 export { AttestationUtils } from './attestations'
 export { CommentEncryptionUtils } from './commentEncryption'
@@ -11,3 +13,4 @@ export { IstanbulUtils } from './istanbul'
 export { PhoneNumberUtils } from './phoneNumbers'
 export { SignatureUtils } from './signatureUtils'
 export { StringUtils } from './string'
+export { AddressUtils }

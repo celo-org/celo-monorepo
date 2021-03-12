@@ -47,7 +47,7 @@ export function setArgvDefaults(argv: LoadTestArgv) {
 }
 
 export const handler = async (argv: LoadTestArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   setArgvDefaults(argv)
 
   await installHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)

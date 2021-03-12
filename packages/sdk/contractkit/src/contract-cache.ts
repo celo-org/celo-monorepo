@@ -1,4 +1,5 @@
 import { CeloContract } from './base'
+import { StableToken } from './celo-tokens'
 import { ContractKit } from './kit'
 import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
@@ -85,7 +86,6 @@ interface WrapperCacheMap {
  * Provides access to all contract wrappers for celo core contracts
  */
 export class WrapperCache {
-  // private wrapperCache: Map<CeloContract, any> = new Map()
   private wrapperCache: WrapperCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
@@ -114,8 +114,8 @@ export class WrapperCache {
   getEscrow(address?: string) {
     return this.getContract(CeloContract.Escrow, address)
   }
-  getExchange(address?: string) {
-    return this.getContract(CeloContract.Exchange, address)
+  getExchange(stableToken: StableToken = StableToken.cUSD, address?: string) {
+    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken), address)
   }
   getFreezer(address?: string) {
     return this.getContract(CeloContract.Freezer, address)
@@ -153,8 +153,8 @@ export class WrapperCache {
   getSortedOracles(address?: string) {
     return this.getContract(CeloContract.SortedOracles, address)
   }
-  getStableToken(address?: string) {
-    return this.getContract(CeloContract.StableToken, address)
+  getStableToken(stableToken: StableToken = StableToken.cUSD, address?: string) {
+    return this.getContract(this.kit.celoTokens.getContract(stableToken), address)
   }
   getValidators(address?: string) {
     return this.getContract(CeloContract.Validators, address)
@@ -170,5 +170,10 @@ export class WrapperCache {
       this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
     }
     return this.wrapperCache[contract]!
+  }
+
+  public invalidateContract<C extends ValidWrappers>(contract: C) {
+    this.kit._web3Contracts.invalidateContract(contract)
+    ;(this.wrapperCache[contract] as any) = null
   }
 }

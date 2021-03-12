@@ -2,9 +2,6 @@
 
 Transfer CELO and Celo Dollars
 
-- [`celocli transfer:celo`](#celocli-transfercelo)
-- [`celocli transfer:dollars`](#celocli-transferdollars)
-- [`celocli transfer:gold`](#celocli-transfergold)
 
 ## `celocli transfer:celo`
 

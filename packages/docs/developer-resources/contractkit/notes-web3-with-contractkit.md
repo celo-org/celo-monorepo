@@ -25,7 +25,7 @@ will work the same way
 
 ## Web3 limitations
 
-As you have read in our guide, Celo uses some extra fields: `feeCurrency`, `gatewayFeeRecipient` and `gatewayFee`, that among other things allows you yo pay gas with ERC20 Tokens. These fields are expected by the node.
+As you have read in our guide, Celo uses some extra fields: `feeCurrency`, `gatewayFeeRecipient` and `gatewayFee`, that among other things allows you to pay gas with ERC20 Tokens. These fields are expected by the node.
 
 To facilitate the life of every developer, we decided to wrap the `Provider` set in the `Web3` instance, and add our way to handle local signing using these new fields. Similar to what *Metamask* does, we intercept every transaction and perform a local signing when required. This wrapper is called `CeloProvider`.
 

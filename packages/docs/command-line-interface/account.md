@@ -2,32 +2,6 @@
 
 Manage your account, keys, and metadata
 
-- [`celocli account:authorize`](#celocli-accountauthorize)
-- [`celocli account:balance ADDRESS`](#celocli-accountbalance-address)
-- [`celocli account:claim-account FILE`](#celocli-accountclaim-account-file)
-- [`celocli account:claim-attestation-service-url FILE`](#celocli-accountclaim-attestation-service-url-file)
-- [`celocli account:claim-domain FILE`](#celocli-accountclaim-domain-file)
-- [`celocli account:claim-keybase FILE`](#celocli-accountclaim-keybase-file)
-- [`celocli account:claim-name FILE`](#celocli-accountclaim-name-file)
-- [`celocli account:claim-storage FILE`](#celocli-accountclaim-storage-file)
-- [`celocli account:create-metadata FILE`](#celocli-accountcreate-metadata-file)
-- [`celocli account:get-metadata ADDRESS`](#celocli-accountget-metadata-address)
-- [`celocli account:list`](#celocli-accountlist)
-- [`celocli account:lock ACCOUNT`](#celocli-accountlock-account)
-- [`celocli account:new`](#celocli-accountnew)
-- [`celocli account:offchain-read`](#celocli-accountoffchain-read)
-- [`celocli account:offchain-write`](#celocli-accountoffchain-write)
-- [`celocli account:proof-of-possession`](#celocli-accountproof-of-possession)
-- [`celocli account:recover-old`](#celocli-accountrecover-old)
-- [`celocli account:register`](#celocli-accountregister)
-- [`celocli account:register-data-encryption-key`](#celocli-accountregister-data-encryption-key)
-- [`celocli account:register-metadata`](#celocli-accountregister-metadata)
-- [`celocli account:set-name`](#celocli-accountset-name)
-- [`celocli account:show ADDRESS`](#celocli-accountshow-address)
-- [`celocli account:show-claimed-accounts ADDRESS`](#celocli-accountshow-claimed-accounts-address)
-- [`celocli account:show-metadata FILE`](#celocli-accountshow-metadata-file)
-- [`celocli account:unlock ACCOUNT`](#celocli-accountunlock-account)
-- [`celocli account:verify-proof-of-possession`](#celocli-accountverify-proof-of-possession)
 
 ## `celocli account:authorize`
 
@@ -383,10 +357,10 @@ OPTIONS
       Choose the change index for the derivation path
 
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use
-      "eth" as an alias of the Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating
-      the same account requires knowledge of the mnemonic, passphrase (if any), and the
-      derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'"). Use "eth"
+      as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
+      account requires knowledge of the mnemonic, passphrase (if any), and the derivation
+      path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish
@@ -420,7 +394,7 @@ EXAMPLES
 
 _See code: [src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
-## `celocli account:offchain-read`
+## `celocli account:offchain-read ADDRESS`
 
 DEV: Reads the name from offchain storage
 
@@ -428,15 +402,26 @@ DEV: Reads the name from offchain storage
 DEV: Reads the name from offchain storage
 
 USAGE
-  $ celocli account:offchain-read
+  $ celocli account:offchain-read ADDRESS
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --name=name
-  --root=root
+  --bucket=bucket                                    If using a GCP or AWS storage
+                                                     bucket this parameter is required
 
-EXAMPLE
-  offchain-read --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  --directory=directory                              [default: .] To which directory
+                                                     data should be written
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Account Address
+
+  --privateDEK=privateDEK
+
+  --provider=(git|aws|gcp)                           If the CLI should attempt to push
+                                                     to the cloud
+
+EXAMPLES
+  offchain-read 0x...
+
+  offchain-read 0x... --from 0x... --privateKey 0x...
 ```
 
 _See code: [src/commands/account/offchain-read.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-read.ts)_
@@ -452,21 +437,26 @@ USAGE
   $ celocli account:offchain-write
 
 OPTIONS
-  --directory=directory                              (required) To which directory data
-                                                     should be written
+  --bucket=bucket           If using a GCP or AWS storage bucket this parameter is
+                            required
 
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address with which to
-                                                     sign
+  --directory=directory     [default: .] To which directory data should be written
 
-  --name=name                                        (required)
+  --encryptTo=encryptTo
 
-  --uploadWithGit                                    If the CLI should attempt to push
-                                                     changes to the origin via git
+  --name=name               (required)
+
+  --privateDEK=privateDEK
+
+  --privateKey=privateKey   (required)
+
+  --provider=(git|aws|gcp)  If the CLI should attempt to push to the cloud
 
 EXAMPLES
-  offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  offchain-write --name test-account --privateKey 0x...
 
-  offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
+  offchain-write --name test-account --privateKey 0x...  privateDEK 0x... --encryptTo
+  0x...
 ```
 
 _See code: [src/commands/account/offchain-write.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-write.ts)_
@@ -514,10 +504,10 @@ OPTIONS
       Choose the change index for the derivation path
 
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use
-      "eth" as an alias of the Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating
-      the same account requires knowledge of the mnemonic, passphrase (if any), and the
-      derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'"). Use "eth"
+      as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
+      account requires knowledge of the mnemonic, passphrase (if any), and the derivation
+      path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish

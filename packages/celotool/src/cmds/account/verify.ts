@@ -5,14 +5,14 @@ import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { base64ToHex } from '@celo/utils/lib/attestations'
-import prompts from 'prompts'
 import {
   getIdentifierAndPepper,
-  printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
-} from 'src/lib/attestation'
+} from '@celo/env-tests/lib/shared/attestation'
+import { base64ToHex } from '@celo/utils/lib/attestations'
+import prompts from 'prompts'
+import { printAndIgnoreRequestErrors } from 'src/lib/attestation'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import Web3 from 'web3'
 import yargs from 'yargs'
@@ -52,7 +52,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: VerifyArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
 
   try {
     await portForwardAnd(argv.celoEnv, verifyCmd.bind(null, argv))

@@ -2,10 +2,6 @@
 
 Exchange Celo Dollars and CELO via the stability mechanism
 
-- [`celocli exchange:celo`](#celocli-exchangecelo)
-- [`celocli exchange:dollars`](#celocli-exchangedollars)
-- [`celocli exchange:gold`](#celocli-exchangegold)
-- [`celocli exchange:show`](#celocli-exchangeshow)
 
 ## `celocli exchange:celo`
 

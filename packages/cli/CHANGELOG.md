@@ -5,19 +5,66 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.0.61--dev]**
+### **[1.1.1--dev]**
 Features
-- Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
-- Add downtime slashing commands - [#5632](https://github.com/celo-org/celo-monorepo/pull/5632)
+- [one-line summary] - [link PR]
 
 Bug Fixes
-- [one-line summary] - ( [link PR] )
+- [one-line summary] - [link PR]
 
 Other Changes
-- [one-line summary - ( [link PR] )
-
-
+- [one-line summary] - [link PR]
 ## Published
+
+### **[1.1.0]** -- 2021-02-16
+Features
+- Add plugins to CLI - [#5973](https://github.com/celo-org/celo-monorepo/pull/5973)
+- New CLI command `identity:get-attestations` to query attestations - [#5974](https://github.com/celo-org/celo-monorepo/pull/5974)
+
+Bug Fixes
+- `releasegold:show` should succeed w/o account registration - [#7092](https://github.com/celo-org/celo-monorepo/pull/7092)
+- Add check for signer or registered account in `releasegold:show` - [#7098](https://github.com/celo-org/celo-monorepo/pull/7098)
+
+Other Changes
+- Clarify Docs for `multisig:transfer` - [#6982](https://github.com/celo-org/celo-monorepo/pull/6982)
+
+### **[1.0.3]** -- 2021-01-25
+Bug Fixes
+- Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [#6671](https://github.com/celo-org/celo-monorepo/pull/6671)
+
+### **[1.0.2]** -- 2021-01-22
+Bug Fixes
+- Fixed Global Flag Parsing in CLI - [#6619](https://github.com/celo-org/celo-monorepo/pull/6619)
+
+Other Changes
+- Fix libraries versions (`shrinkwrap`) to avoid supply chain attacks - [#6575](https://github.com/celo-org/celo-monorepo/pull/6575)
+
+### **[1.0.1]** -- 2021-01-20
+Features
+- Pass through [oclif table flags](https://github.com/oclif/cli-ux#clitable) to commands which output tables - [#5618](https://github.com/celo-org/celo-monorepo/pull/5618)
+- CIP 8 Encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
+- Add authorized signers to release gold show - [#5596](https://github.com/celo-org/celo-monorepo/pull/5596)
+- Extract governance:build-proposal command - [#5847](https://github.com/celo-org/celo-monorepo/pull/5847)
+- Add downtime slashing commands - [#5632](https://github.com/celo-org/celo-monorepo/pull/5632)
+- Add ability to withdraw attestation rewards via CLI [#6176](https://github.com/celo-org/celo-monorepo/pull/6176)
+- Mnemonic validation flexibility within Valora - [#6372](https://github.com/celo-org/celo-monorepo/pull/6372)
+- Write transfer and transferFrom commands for MultiSig contract - [#6425](https://github.com/celo-org/celo-monorepo/pull/6425)
+
+Bug Fixes
+- Fix param order on account:new internal call - [#6319](https://github.com/celo-org/celo-monorepo/pull/6319)
+- Remove broken header links in generated CLI docs - [#6415](https://github.com/celo-org/celo-monorepo/pull/6415)
+- Fix @ledgerhq package version in CK and CLI  - [#6496](https://github.com/celo-org/celo-monorepo/pull/6496)
+- Fix call to set gas currency in CLI base - [#6505](https://github.com/celo-org/celo-monorepo/pull/6505)
+
+Other Changes
+- KomenciKit - [#5436](https://github.com/celo-org/celo-monorepo/pull/5436)
+- Update base and utils package versions [#5655](https://github.com/celo-org/celo-monorepo/pull/5655)
+- Parallelize and simplify fetching of comprensive registry address map - [#5568](https://github.com/celo-org/celo-monorepo/pull/5568)
+- Add readability to (big) number and timestamp/duration outputs in CK and CLI - [#5584](https://github.com/celo-org/celo-monorepo/pull/5584)
+- Rename build-proposal flag - [#5885](https://github.com/celo-org/celo-monorepo/pull/5885)
+- Compatibility with Sdk Modularization - [#4790](https://github.com/celo-org/celo-monorepo/pull/4790)
+- Adjust how CLI docs are generated - [#5882](https://github.com/celo-org/celo-monorepo/pull/5882)
+- Add install instructions for CLI readme - [#6466](https://github.com/celo-org/celo-monorepo/pull/6466)
 
 ### **[0.0.60]** -- 2020-10-27
 Bug Fixes

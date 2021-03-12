@@ -1,234 +1,12 @@
-import { Address, CeloTransactionParams } from '@celo/connect'
-import { ContractKit } from '@celo/contractkit'
-import {
-  ActionableAttestation,
-  AttestationsWrapper,
-} from '@celo/contractkit/lib/wrappers/Attestations'
-import { OdisUtils } from '@celo/identity'
-import { AuthSigner } from '@celo/identity/lib/odis/query'
-import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { AttestationRequest } from '@celo/utils/lib/io'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
+import { PhoneNumberUtils } from '@celo/utils'
 import { sample } from 'lodash'
-import moment from 'moment'
 import { Twilio } from 'twilio'
 
 const DUMMY_SMS_URL = 'https://enzyutth0wxme.x.pipedream.net/'
 
-// Use the supplied salt, or if none supplied, go to ODIS and retrieve a pepper
-export async function getIdentifierAndPepper(
-  kit: ContractKit,
-  context: string,
-  account: string,
-  phoneNumber: string,
-  salt: string | null
-) {
-  if (salt) {
-    return {
-      pepper: salt,
-      identifier: PhoneNumberUtils.getPhoneHash(phoneNumber, salt!),
-    }
-  } else {
-    const authSigner: AuthSigner = {
-      authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
-      contractKit: kit,
-    }
-
-    const ret = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-      phoneNumber,
-      account,
-      authSigner,
-      OdisUtils.Query.getServiceContext(context)
-    )
-
-    return {
-      pepper: ret.pepper,
-      identifier: ret.phoneHash,
-    }
-  }
-}
-
-export async function requestMoreAttestations(
-  attestations: AttestationsWrapper,
-  phoneNumber: string,
-  attestationsRequested: number,
-  account: Address,
-  txParams: CeloTransactionParams = {}
-) {
-  const unselectedRequest = await attestations.getUnselectedRequest(phoneNumber, account)
-  if (
-    unselectedRequest.blockNumber === 0 ||
-    (await attestations.isAttestationExpired(unselectedRequest.blockNumber))
-  ) {
-    await attestations
-      .approveAttestationFee(attestationsRequested)
-      .then((txo) => txo.sendAndWaitForReceipt(txParams))
-    await attestations
-      .request(phoneNumber, attestationsRequested)
-      .then((txo) => txo.sendAndWaitForReceipt(txParams))
-  }
-
-  const selectIssuers = await attestations.selectIssuersAfterWait(phoneNumber, account)
-  await selectIssuers.sendAndWaitForReceipt(txParams)
-}
-
-type RequestAttestationError =
-  | undefined
-  | { status: number; text: string; issuer: string; name: string | undefined; known: true }
-  | { error: any; issuer: string; known: false }
-
-export async function requestAttestationsFromIssuers(
-  attestationsToReveal: ActionableAttestation[],
-  attestations: AttestationsWrapper,
-  phoneNumber: string,
-  account: string,
-  pepper: string
-): Promise<RequestAttestationError[]> {
-  return concurrentMap(5, attestationsToReveal, async (attestation) => {
-    try {
-      const revealRequest: AttestationRequest = {
-        account,
-        issuer: account,
-        phoneNumber,
-        salt: pepper,
-        smsRetrieverAppSig: undefined,
-        securityCodePrefix: undefined,
-        language: undefined,
-      }
-      const response = await attestations.revealPhoneNumberToIssuer(
-        attestation.attestationServiceURL,
-        revealRequest
-      )
-      if (!response.ok) {
-        return {
-          status: response.status,
-          text: await response.text(),
-          issuer: attestation.issuer,
-          name: attestation.name,
-          url: attestation.attestationServiceURL,
-          known: true,
-        }
-      }
-
-      return
-    } catch (error) {
-      return {
-        error,
-        issuer: attestation.issuer,
-        url: attestation.attestationServiceURL,
-        known: false,
-      }
-    }
-  })
-}
-
-export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationError[]) {
-  for (const possibleError of possibleErrors) {
-    if (possibleError) {
-      if (possibleError.known) {
-        console.info(
-          `Error while requesting from issuer ${possibleError.issuer} ${
-            possibleError.name ? `(Name: ${possibleError.name})` : ''
-          }. Returned status ${possibleError.status} with response: ${
-            possibleError.text
-          }. Ignoring.`
-        )
-      } else {
-        console.info(
-          `Unknown error while requesting from ${
-            possibleError.issuer
-          }: ${possibleError.error.toString()}. Ignoring.`
-        )
-      }
-    }
-  }
-}
-
-// Inefficient, but should be fine for now
-// Could mark already checked messages in the future
-export async function findValidCode(
-  attestations: AttestationsWrapper,
-  messages: string[],
-  identifier: string,
-  attestationsToComplete: ActionableAttestation[],
-  account: string
-) {
-  for (const message of messages) {
-    try {
-      const code = AttestationUtils.extractAttestationCodeFromMessage(message)
-      if (!code) {
-        continue
-      }
-
-      const issuer = await attestations.findMatchingIssuer(
-        identifier,
-        account,
-        code,
-        attestationsToComplete.map((_) => _.issuer)
-      )
-
-      if (!issuer) {
-        continue
-      }
-
-      const isValid = await attestations.validateAttestationCode(identifier, account, issuer, code)
-
-      if (!isValid) {
-        continue
-      }
-
-      return { code, issuer }
-    } catch {
-      continue
-    }
-  }
-
-  return
-}
-
-export async function getPhoneNumber(
-  attestations: AttestationsWrapper,
-  twilioClient: Twilio,
-  maximumNumberOfAttestations: number,
-  salt: string
-) {
-  const phoneNumber = await chooseFromAvailablePhoneNumbers(
-    attestations,
-    twilioClient,
-    maximumNumberOfAttestations,
-    salt
-  )
-
-  if (phoneNumber !== undefined) {
-    return phoneNumber
-  }
-
-  return createPhoneNumber(attestations, twilioClient, maximumNumberOfAttestations, salt)
-}
-
-export async function chooseFromAvailablePhoneNumbers(
-  attestations: AttestationsWrapper,
-  twilioClient: Twilio,
-  maximumNumberOfAttestations: number,
-  salt: string
-) {
-  const availableNumbers = (await twilioClient.incomingPhoneNumbers.list()).filter(
-    (number) => number.smsUrl === DUMMY_SMS_URL
-  )
-  if (!availableNumbers?.length) {
-    return undefined
-  }
-
-  const usableNumber = await findSuitableNumber(
-    attestations,
-    availableNumbers.map((number) => number.phoneNumber),
-    maximumNumberOfAttestations,
-    salt
-  )
-  return usableNumber
-}
-
-async function findSuitableNumber(
+export async function findSuitableNumber(
   attestations: AttestationsWrapper,
   numbers: string[],
   maximumNumberOfAttestations: number,
@@ -299,17 +77,66 @@ export async function createPhoneNumber(
   }
 }
 
-export async function fetchLatestMessagesFromToday(
-  client: Twilio,
-  phoneNumber: string,
-  count: number
+export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationError[]) {
+  for (const possibleError of possibleErrors) {
+    if (possibleError) {
+      if (possibleError.known) {
+        console.info(
+          `Error while requesting from issuer ${possibleError.issuer} ${
+            possibleError.name ? `(Name: ${possibleError.name})` : ''
+          }. Returned status ${possibleError.status} with response: ${
+            possibleError.text
+          }. Ignoring.`
+        )
+      } else {
+        console.info(
+          `Unknown error while requesting from ${
+            possibleError.issuer
+          }: ${possibleError.error.toString()}. Ignoring.`
+        )
+      }
+    }
+  }
+}
+
+export async function getPhoneNumber(
+  attestations: AttestationsWrapper,
+  twilioClient: Twilio,
+  maximumNumberOfAttestations: number,
+  salt: string
 ) {
-  return client.messages.list({
-    to: phoneNumber,
-    pageSize: count,
-    // Twilio keeps track of dates in UTC so it could be yesterday too
-    dateSentAfter: moment()
-      .subtract(2, 'day')
-      .toDate(),
-  })
+  const phoneNumber = await chooseFromAvailablePhoneNumbers(
+    attestations,
+    twilioClient,
+    maximumNumberOfAttestations,
+    salt
+  )
+
+  if (phoneNumber !== undefined) {
+    return phoneNumber
+  }
+
+  return createPhoneNumber(attestations, twilioClient, maximumNumberOfAttestations, salt)
+}
+
+export async function chooseFromAvailablePhoneNumbers(
+  attestations: AttestationsWrapper,
+  twilioClient: Twilio,
+  maximumNumberOfAttestations: number,
+  salt: string
+) {
+  const availableNumbers = (await twilioClient.incomingPhoneNumbers.list()).filter(
+    (number) => number.smsUrl === DUMMY_SMS_URL
+  )
+  if (!availableNumbers?.length) {
+    return undefined
+  }
+
+  const usableNumber = await findSuitableNumber(
+    attestations,
+    availableNumbers.map((number) => number.phoneNumber),
+    maximumNumberOfAttestations,
+    salt
+  )
+  return usableNumber
 }

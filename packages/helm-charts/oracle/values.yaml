@@ -24,14 +24,12 @@ oracle:
     ws: wss://alfajoresstaging-forno.celo-testnet.org
     http: https://alfajoresstaging-forno.celo-testnet.org
   identities:
-  - address: 0x0000000000000000000000000000000000000000
-    privateKey: 0x000
+  - address: "0x0000000000000000000000000000000000000000"
     azure:
       id: defaultId
       clientId: defaultClientId
       keyVaultName: defaultKeyVaultName
-  - address: 0x0000000000000000000000000000000000000001
-    privateKey: 0x001
+  - address: "0x0000000000000000000000000000000000000001"
     azure:
       id: defaultId1
       clientId: defaultClientId1
@@ -51,13 +49,9 @@ oracle:
       # dataFetchFrequency
       # minimumTrades
       # scalingRate
-  baseCurrency: GoldToken
-  quoteCurrency: USD
-  token: StableToken
   metrics:
     enabled: true
     prometheusPort: 9090
-  allowNotCGLD: false
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   exchanges: BITTREX,OKCOIN,COINBASE
