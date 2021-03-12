@@ -253,7 +253,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         await executeOnSelf(data)
       })
 
-      it('guardian should be able to recover wallet', async () => {
+      it('guardian should be able to recover wallet and update signer', async () => {
         assert.notEqual(await wallet.signer(), newSigner)
         res = await wallet.recoverWallet(newSigner, { from: guardian })
         assert.equal(await wallet.signer(), newSigner)
