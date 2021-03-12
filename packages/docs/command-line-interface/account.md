@@ -5,10 +5,10 @@ Manage your account, keys, and metadata
 
 ## `celocli account:authorize`
 
-Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
+Keep your locked CELO more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked CELO in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
 
 ```
-Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
+Keep your locked CELO more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked CELO in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
 
 USAGE
   $ celocli account:authorize
@@ -55,10 +55,10 @@ _See code: [src/commands/account/authorize.ts](https://github.com/celo-org/celo-
 
 ## `celocli account:balance ADDRESS`
 
-View Celo Dollar and Gold balances for an address
+View Celo Dollar and CELO balances for an address
 
 ```
-View Celo Dollar and Gold balances for an address
+View Celo Dollar and CELO balances for an address
 
 USAGE
   $ celocli account:balance ADDRESS
@@ -543,10 +543,10 @@ _See code: [src/commands/account/recover-old.ts](https://github.com/celo-org/cel
 
 ## `celocli account:register`
 
-Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
+Register an account on-chain. This allows you to lock CELO, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
 
 ```
-Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
+Register an account on-chain. This allows you to lock CELO, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
 
 USAGE
   $ celocli account:register

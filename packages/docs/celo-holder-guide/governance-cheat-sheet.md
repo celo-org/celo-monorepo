@@ -8,7 +8,7 @@
 * Whitelisting stablecoins (or other ERC20s) for use in paying gas fees 
 * The identity protocol, including how phone number attestations works
 * Linking of signers and off-chain metadata (e.g claims) to accounts 
-* Most of Proof of Stake protocol, including elections, locked gold, slashing parameters
+* Most of Proof of Stake protocol, including elections, locked CELO, slashing parameters
 * On-chain governance itself 
 * MinimumClientVersion
 * BlockGasLimit

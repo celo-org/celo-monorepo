@@ -14,13 +14,13 @@ Validator groups can have no more than a small, fixed maximum number of validato
 
 ## Registration
 
-Any account that has at least the minimum stake requirement in Locked Gold, whether voting or non-voting, can register an empty validator group. If a validating key is specified it may be used for this registration.
+Any account that has at least the minimum stake requirement in Locked CELO, whether voting or non-voting, can register an empty validator group. If a validating key is specified it may be used for this registration.
 
 ## Deregistration
 
 The account that creates a validator group is able to deregister that group if it has no members.
 
-While an account has a registered validator group, or for up to a `deregistrationPeriod` after it is deregistered, attempts to `unlock` the account's amount of Locked Gold will fail if they would cause the remaining amount to fall below the minimum stake requirement.
+While an account has a registered validator group, or for up to a `deregistrationPeriod` after it is deregistered, attempts to `unlock` the account's amount of Locked CELO will fail if they would cause the remaining amount to fall below the minimum stake requirement.
 
 ## Group Share
 
@@ -30,17 +30,17 @@ Validator groups are compensated by taking a share (the 'Group Share') of the [v
 
 The account owner controls the list of validators in their group and can at any time add, remove, or re-order validators.
 
-For a validator to be added to a group, several conditions must hold: the number of members in the group must be less than the maximum; the Locked Gold balance of the group's account must be sufficient (the stake is per-member validator); and the validator must first have set its affiliation to the group.
+For a validator to be added to a group, several conditions must hold: the number of members in the group must be less than the maximum; the Locked CELO balance of the group's account must be sufficient (the stake is per-member validator); and the validator must first have set its affiliation to the group.
 
 This means that while a group can unilaterally remove a validator, and a validator can unilaterally leave by changing its affiliation, both parties have to agree before a validator can become a member of a group.
 
 ## Votes and Voting Cap
 
-Validator Groups can receive votes from Locked Gold up to a [voting cap](validator-elections.md#group-voting-caps). This value is set to be the number of votes that would be needed to elect all of its validators, plus one more validator. The cap is enforced at the point of voting: a user can only cast a vote for a group if it currently has fewer votes than this cap.
+Validator Groups can receive votes from Locked CELO up to a [voting cap](validator-elections.md#group-voting-caps). This value is set to be the number of votes that would be needed to elect all of its validators, plus one more validator. The cap is enforced at the point of voting: a user can only cast a vote for a group if it currently has fewer votes than this cap.
 
 ## Slashing Penalty
 
-A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each validator group. This value may be reduced as a penalty for misbehavior of the validator in the group. It affects the future rewards of the group, its validators, and Locked Gold holders receiving rewards for voting for the group.
+A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each validator group. This value may be reduced as a penalty for misbehavior of the validator in the group. It affects the future rewards of the group, its validators, and Locked CELO holders receiving rewards for voting for the group.
 
 ## Metadata
 

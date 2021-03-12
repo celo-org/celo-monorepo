@@ -36,7 +36,7 @@ As a CELO holder, you have the opportunity to impact the Celo network by voting 
 
 - **Reliable**: Celo's consensus protocol relies on two-thirds of elected Validators being available in order to produce blocks and process transactions. Voter rewards are directly tied to the [uptime score](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-uptime-score) of all elected Validators in the group for which the vote was made. Any period of consecutive downtime greater than a minute reduces a Validator's uptime score.
 
-- **No recent slashing:** When Validators and groups register, their Locked Gold becomes "staked", in that it is subject to penalties for conduct that could seriously adversely affect the health of the network. Voters' Locked Gold is never slashed, but voter rewards are affected by a group's [slashing penalty](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-slashing-penalty), which is halved when a group or one of its Validators is slashed. Look for groups with a last slashing time long in the past, ideally `0` (never), and a slashing penalty value of `1.0`.
+- **No recent slashing:** When Validators and groups register, their Locked CELO becomes "staked", in that it is subject to penalties for conduct that could seriously adversely affect the health of the network. Voters' Locked CELO is never slashed, but voter rewards are affected by a group's [slashing penalty](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-slashing-penalty), which is halved when a group or one of its Validators is slashed. Look for groups with a last slashing time long in the past, ideally `0` (never), and a slashing penalty value of `1.0`.
 
 - **Runs an Attestation Service**: The [Attestation Service](../celo-codebase/protocol/identity/README.md) is an important service that Validators can run that allows users to verify that they have access to a phone number and map it to an address. Supporting Validators that run this service makes it easier for new users to begin using Celo.
 
@@ -78,9 +78,9 @@ A white check mark next to the name of a Validator Group shows that there is one
 
 The Votes Available column shows:
 
-- On the left: Votes made for the group, as a percentage of the total Locked Gold
+- On the left: Votes made for the group, as a percentage of the total Locked CELO
 
-- On the right: The voting cap of that group, as a percentage of the total Locked Gold
+- On the right: The voting cap of that group, as a percentage of the total Locked CELO
 
 - In the middle: votes made for the group as a proportion of the voting cap
 

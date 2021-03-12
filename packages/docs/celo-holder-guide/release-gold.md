@@ -8,7 +8,7 @@ The intent of the `ReleaseGold` contract is to allow beneficiaries to participat
 
 Increasing the volume of CELO that can be used in Celo’s Proof of Stake consensus promotes network security and even greater decentralization. See below for details on specific features of the `ReleaseGold` contract, as well as how they are implemented. The [source code](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) includes documentation, and technical readers are encouraged to find further details there.
 
-Warning: please do not send any ERC20 token other han CELO or cUSD to a Release Gold contract, as it will not be able to be transfered out of the contract per [source code](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol#L164).
+Warning: please do not send any ERC20 token other han CELO or cUSD to a `ReleaseGold`contract, as it will not be able to be transfered out of the contract per [source code](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol#L164).
 
 ### Example
 
@@ -24,7 +24,7 @@ The beneficiary does not yet have full rights to the remaining 70 unreleased CEL
 
 *Beneficiary*
 
-The `beneficiary` address is the recipient of the CELO in the `ReleaseGold` contract. As the CELO is released over time, it is incrementally made withdrawable solely to the beneficiary. The beneficiary is also able to use both unreleased and released CELO to participate in Celo’s Proof of Stake consensus protocol, via locking gold and voting or validating.
+The `beneficiary` address is the recipient of the CELO in the `ReleaseGold` contract. As the CELO is released over time, it is incrementally made withdrawable solely to the beneficiary. The beneficiary is also able to use both unreleased and released CELO to participate in Celo’s Proof of Stake consensus protocol, via locking CELO and voting or validating.
 
 *Release Owner*
 
