@@ -226,7 +226,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         const data = wallet.contract.methods.setGuardian(guardian).encodeABI()
         res = await executeOnSelf(data)
       })
-      it('should set a new signer', async () => {
+      it('should set a new guardian', async () => {
         assert.equal(await wallet.guardian(), guardian)
       })
       it('should emit the GuardianSet event', async () => {
