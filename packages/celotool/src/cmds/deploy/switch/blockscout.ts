@@ -11,7 +11,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: SwitchArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   const helmReleaseName = getReleaseName(argv.celoEnv)
   await switchIngressService(argv.celoEnv, helmReleaseName)

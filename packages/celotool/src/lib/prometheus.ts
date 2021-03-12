@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
-import { execCmdWithExitOnFailure } from './cmd-utils'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   installGenericHelmChart,
@@ -23,9 +23,9 @@ const kubeServiceAccountName = releaseName
 // stackdriver-prometheus-sidecar relevant links:
 // GitHub: https://github.com/Stackdriver/stackdriver-prometheus-sidecar
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
-const sidecarImageTag = '0.8.0'
+const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.22.2'
+const prometheusImageTag = 'v2.25.0'
 
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
@@ -52,13 +52,18 @@ async function installPrometheus(clusterConfig?: BaseClusterConfig) {
   )
 }
 
-export async function removeHelmRelease() {
+export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus() {
+export async function upgradePrometheus(clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
+  return upgradeGenericHelmChart(
+    kubeNamespace,
+    releaseName,
+    helmChartPath,
+    await helmParameters(clusterConfig)
+  )
 }
 
 async function helmParameters(clusterConfig?: BaseClusterConfig) {
@@ -147,16 +152,37 @@ async function getPrometheusGcloudServiceAccountKeyBase64(
   clusterName: string,
   cloudProvider: string
 ) {
-  await switchToGCPProjectFromEnv()
-  const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
+  // First check if value already exist in helm release. If so we pass the same value
+  // and we avoid creating a new key for the service account
+  const gcloudServiceAccountKeyBase64 = await getPrometheusGcloudServiceAccountKeyBase64FromHelm()
+  if (gcloudServiceAccountKeyBase64) {
+    return gcloudServiceAccountKeyBase64
+  } else {
+    // We do not have the service account key in helm so we need to create the SA (if it does not exist)
+    // and create a new key for the service account in any case
+    await switchToGCPProjectFromEnv()
+    const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+    const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
 
-  await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
+    await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
 
-  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
-  await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
-  return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
+    await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
+    return fs.readFileSync(serviceAccountKeyPath).toString('base64')
+  }
+}
+
+async function getPrometheusGcloudServiceAccountKeyBase64FromHelm() {
+  const prometheusInstalled = await outputIncludes(
+    `helm list -n ${kubeNamespace}`,
+    `${releaseName}`
+  )
+  if (prometheusInstalled) {
+    const [output] = await execCmd(`helm get values -n ${kubeNamespace} ${releaseName}`)
+    const prometheusValues: any = yaml.safeLoad(output)
+    return prometheusValues.gcloudServiceAccountKeyBase64
+  }
 }
 
 // createPrometheusGcloudServiceAccount creates a gcloud service account with a given

@@ -22,7 +22,7 @@ export const describe = 'deploy the blockscout package'
 export const handler = async (argv: InitialArgv) => {
   const instanceName = getInstanceName(argv.celoEnv)
   const helmReleaseName = getReleaseName(argv.celoEnv)
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   let blockscoutCredentials: string[] = [
     'dummyUser',
     'dummyPassword',
@@ -36,7 +36,7 @@ export const handler = async (argv: InitialArgv) => {
 
     await grantRoles(cloudSqlServiceAccountName, 'roles/cloudsql.client')
 
-    await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName)
+    await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName, argv.celoEnv)
 
     blockscoutCredentials = await createCloudSQLInstance(argv.celoEnv, instanceName)
   } else {

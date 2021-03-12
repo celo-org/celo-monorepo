@@ -21,7 +21,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: LoadTestUpgradeArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   setArgvDefaults(argv)
 
   if (argv.reset === true && !isCelotoolHelmDryRun()) {

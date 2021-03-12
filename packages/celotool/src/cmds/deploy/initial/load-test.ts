@@ -43,7 +43,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: LoadTestArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   setArgvDefaults(argv)
 
   await installHelmChart(
