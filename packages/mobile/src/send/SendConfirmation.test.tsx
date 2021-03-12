@@ -11,7 +11,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getSendFee } from 'src/send/saga'
 import SendConfirmation from 'src/send/SendConfirmation'
-import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { createMockStore, getMockStackScreenProps, sleep } from 'test/utils'
 import {
   mockAccount2Invite,
   mockAccountInvite,
@@ -20,17 +20,19 @@ import {
   mockTransactionData,
 } from 'test/values'
 
+// A fee of 0.01 cUSD.
 const TEST_FEE_INFO_CUSD = {
-  fee: new BigNumber(10).pow(15),
+  fee: new BigNumber(10).pow(16),
   gas: new BigNumber(200000),
-  gasPrice: new BigNumber(10).pow(9).times(5),
+  gasPrice: new BigNumber(10).pow(10).times(5),
   currency: CURRENCY_ENUM.DOLLAR,
 }
 
+// A fee of 0.01 CELO.
 const TEST_FEE_INFO_CELO = {
-  fee: new BigNumber(10).pow(15),
+  fee: new BigNumber(10).pow(16),
   gas: new BigNumber(200000),
-  gasPrice: new BigNumber(10).pow(9).times(5),
+  gasPrice: new BigNumber(10).pow(10).times(5),
   currency: CURRENCY_ENUM.GOLD,
 }
 
@@ -77,22 +79,23 @@ describe('SendConfirmation', () => {
       </Provider>
     )
 
-    // Initial render
+    // Initial render.
     expect(tree).toMatchSnapshot()
-    // DO NOT MERGE: Look into this TODO
-    // TODO: figure out why fee line items arent rendering
-    // fireEvent.press(tree.getByText('feeEstimate'))
-    // Run timers, because Touchable adds some delay
-    // jest.runAllTimers()
-    // expect(tree.queryByText('securityFee')).not.toBeNull()
-    // expect(tree.queryByText('0.0100')).toBeNull()
+    fireEvent.press(tree.getByText('feeEstimate'))
 
-    // TODO figure out why this waitForElement isn't working here and in tests below.
-    // Wait for fee to be calculated and displayed
-    // await waitForElement(() => getByText('0.001'))
+    // Run timers, because Touchable adds some delay.
+    // jest.runAllTimers()
+    await sleep(1000)
+    expect(tree).toMatchSnapshot()
+    expect(tree.queryAllByText('securityFee')).toHaveLength(2)
+    expect(tree.queryByText(/\$\s*0\.0133/s)).toBeNull()
+
+    // Wait for fee to be calculated and displayed as "$0.0013".
+    // NOTE: Use regex here because the text may be split by a newline.
+    await waitForElement(() => tree.getByText(/\$\s*0\.0133/s))
     // expect(queryByText('0.001')).not.toBeNull()
 
-    // expect(toJSON()).toMatchSnapshot()
+    expect(tree).toMatchSnapshot()
   })
 
   it('renders correctly for send payment confirmation with CELO fees', async () => {

@@ -41,8 +41,6 @@ import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } fr
 import { createMockStore } from 'test/utils'
 import { mockAccount, mockE164Number, mockInviteDetails } from 'test/values'
 
-// DO NOT MERGE: Add a test for the invite gas and fee.
-
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 
 const mockReceipt: CeloTxReceipt = {

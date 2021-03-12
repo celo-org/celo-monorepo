@@ -491,7 +491,6 @@ export function* moveAllFundsFromAccount(
     comment,
   })
 
-  // DO NOT MERGE: Add a test for cancellation.
   const { cancel } = yield race({
     success: call(
       sendTransaction,
