@@ -41,7 +41,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: CreateAccountArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false)
 
   const env = argv.celoEnv
   let password = argv.password

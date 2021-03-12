@@ -11,6 +11,6 @@ export const builder = {}
 
 export const handler = async (argv: DestroyArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await removeGenericHelmChart(helmReleaseName(argv.celoEnv), argv.celoEnv)
 }
