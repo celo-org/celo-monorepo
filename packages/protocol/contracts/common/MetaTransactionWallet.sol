@@ -50,7 +50,7 @@ contract MetaTransactionWallet is
   // onlyGuardian functions can only be called when the guardian is not the zero address and
   // the caller is the guardian.
   modifier onlyGuardian() {
-    // Note that if the guardian is not set (e.g. its address 0, then this require statement will fail).
+    // Note that if the guardian is not set (e.g. its address 0), this require statement will fail.
     require(guardian == msg.sender, "Caller is not the guardian");
     _;
   }
