@@ -295,6 +295,7 @@ jobs:
             if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
               git --no-pager diff packages/protocol/releaseData/versionReports
               echo "There are git differences after generating release version report snapshots"
+              echo "If these changes are intended, update the `releaseData/versionReports` accordingly"
               exit 1
             fi
 
