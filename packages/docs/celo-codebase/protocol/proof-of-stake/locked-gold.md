@@ -32,7 +32,7 @@ The flow is as follows:
 
 - The account may subsequently choose to `unvote` a specific amount of voting Locked CELO from a group, up to the total balance that the account has accrued there. Due to rewards, the Locked CELO amount may be higher than the original value passed to `vote`.
 
-- the Locked CELO immediately becomes non-voting, receives no further Epoch Rewards, and can be re-used to vote for a different group.
+- The Locked CELO immediately becomes non-voting, receives no further Epoch Rewards, and can be re-used to vote for a different group.
 
 - The account may choose to `unlock` an amount of Locked CELO at any time, provided that it is inactive: this means it is non-voting in Validator Elections, the `deregistrationPeriod` has elapsed if the amount has been used as a validator or validator group stake, and not active in any [Governance proposals](../governance.md). Once an unlocking period of 3 days has passed, the account can call `withdraw` to have the `LockedGold` contract transfer them that amount.
 
