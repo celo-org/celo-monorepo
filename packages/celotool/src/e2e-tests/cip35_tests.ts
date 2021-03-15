@@ -1,9 +1,10 @@
 // tslint:disable:no-console
 import { CeloTx } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import ejsUtil from 'ethereumjs-util'
 import lodash from 'lodash'
 import Web3 from 'web3'
 import { AccountType, generatePrivateKey } from '../lib/generate_utils'
@@ -13,15 +14,28 @@ import { getHooks, initAndSyncGethWithRetry, mnemonic, sleep } from './utils'
 const TMP_PATH = '/tmp/e2e'
 const validatorUrl = 'http://localhost:8545'
 const lightUrl = 'http://localhost:8546'
-const notYetActivatedError = 'Support for eth-compatible transactions is not enabled'
+
+const notYetActivatedError = 'support for eth-compatible transactions is not enabled'
 const notCompatibleError = 'ethCompatible is true, but non-eth-compatible fields are present'
+const noReplayProtectionError = 'replay protection is required'
+
 const validatorPrivateKey = generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0)
 const validatorAddress = privateKeyToAddress(validatorPrivateKey)
+// Arbitrary addresses to use in the transactions
+const toAddress = '0x8c36775E95A5f7FEf6894Ba658628352Ac58605B'
+const gatewayFeeRecipientAddress = '0xc77538d1e30C0e4ec44B0DcaD97FD3dc63fcaCC4'
+
 // Simple contract with a single constant
 const bytecode =
   '0x608060405260008055348015601357600080fd5b5060358060216000396000f3006080604052600080fd00a165627a7a72305820c7f3f7c299940bb1d9b122d25e8f288817e45bbdeaccdd2f6e8801677ed934e70029'
 
 const verbose = false
+
+///////// Configurable values to run only some of the tests during development ////////////////
+// ReplayProtectionTests lets you skip or run only the replay-protection tests during dev
+// Value when committing should be "run"
+// tslint:disable-next-line
+let replayProtectionTests: 'run' | 'skip' | 'only' = 'run'
 // devFilter can be used during development to only run a subset of testcases.
 // But if you're going to commit you should set them all back to undefined (i.e. no filter).
 const devFilter: Filter = {
@@ -34,6 +48,8 @@ const devFilter: Filter = {
   useGatewayFeeRecipient: undefined,
   sendRawTransaction: undefined,
 }
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 // Filter specifies which subset of cases to generate.
 // (e.g. {lightNode: true, sendRawTransaction: false} makes it only run cases which send through a light
 // node using `eth_sendRawTransaction`
@@ -138,6 +154,7 @@ function getGethRunConfig(withDonut: boolean): GethRunConfig {
 class TestEnv {
   testCases: TestCase[]
   gethConfig: GethRunConfig
+  cipIsActivated: boolean
   hooks: ReturnType<typeof getHooks>
   stableTokenAddr: string = ''
   gasPrice: string = ''
@@ -159,6 +176,7 @@ class TestEnv {
   constructor(cipIsActivated: boolean) {
     this.gethConfig = getGethRunConfig(cipIsActivated)
     this.hooks = getHooks(this.gethConfig)
+    this.cipIsActivated = cipIsActivated
     this.testCases = generateTestCases(cipIsActivated)
     this.kit = newKitFromWeb3(new Web3(validatorUrl))
     this.kitLight = newKitFromWeb3(new Web3(lightUrl))
@@ -208,6 +226,78 @@ class TestEnv {
     this.kitWithLocalWalletLight.connection.addAccount(validatorPrivateKey)
   }
 
+  async generateUnprotectedTransaction(ethCompatible: boolean): Promise<string> {
+    const encode = (ejsUtil as any).rlp.encode // the typescript typings are incomplete
+    const numToHex = (x: number | BigNumber) => ejsUtil.bufferToHex(ejsUtil.toBuffer(x))
+    const nonce = await this.kit.connection.nonce(validatorAddress)
+    const celoOnlyFields = ethCompatible ? [] : ['0x', '0x', '0x']
+    const arr = [
+      nonce > 0 ? numToHex(nonce) : '0x',
+      numToHex(parseInt(this.gasPrice, 10)),
+      numToHex(1000000), // plenty of gas
+      ...celoOnlyFields,
+      toAddress, // to
+      '0x05', // value: 5 wei
+      '0x', // no data
+    ]
+    const signingHash = ejsUtil.rlphash(arr)
+    const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
+    const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
+    arr.push(ejsUtil.bufferToHex(sig.v), ejsUtil.bufferToHex(sig.r), ejsUtil.bufferToHex(sig.s))
+    return ejsUtil.bufferToHex(encode(arr))
+  }
+
+  runReplayProtectionTests() {
+    for (const ethCompatible of [false, true]) {
+      this.runReplayProtectionTest(ethCompatible)
+    }
+  }
+
+  runReplayProtectionTest(ethCompatible: boolean) {
+    describe(`Transaction without replay protection, ethCompatible: ${ethCompatible}`, () => {
+      let minedTx: any = null // Use any because we haven't added `ethCompatible` to these types
+      let error: string | null = null
+
+      before(async () => {
+        const tx = await this.generateUnprotectedTransaction(ethCompatible)
+        try {
+          const receipt = await (await this.kit.connection.sendSignedTransaction(tx)).waitReceipt()
+          minedTx = await this.kit.web3.eth.getTransaction(receipt.transactionHash)
+          error = null
+        } catch (err) {
+          error = err.message
+        }
+      })
+
+      if (ethCompatible && !this.cipIsActivated) {
+        it('fails due to being ethereum-compatible', () => {
+          assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
+          assert.match(
+            error!,
+            new RegExp(notYetActivatedError),
+            `Got "${error}", expected "${notYetActivatedError}"`
+          )
+        })
+      } else if (this.cipIsActivated) {
+        // Replay protection is mandatory, so the transaction should fail
+        it('fails due to replay protection being mandatory', () => {
+          assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
+          assert.match(
+            error!,
+            new RegExp(noReplayProtectionError),
+            `Got "${error}", expected "${noReplayProtectionError}"`
+          )
+        })
+      } else {
+        // Should succeed, since replay protection is optional before Donut
+        it('succeeds', () => {
+          assert.isNull(error, 'Transaction failed when it should have succeeded')
+          assert.isFalse(minedTx.ethCompatible, 'Transaction has wrong ethCompatible value')
+        })
+      }
+    })
+  }
+
   runTestCase(testCase: TestCase) {
     // Generate a human-readable summary of the test case
     const options: string[] = []
@@ -219,15 +309,6 @@ class TestEnv {
     describe(`Testcase with: ${options.join(', ')}`, () => {
       let minedTx: any // Use any because we haven't added `ethCompatible` to these types
       let error: string | null = null
-
-      const getRandomAddress = (() => {
-        let counter = 0
-        return async () => {
-          counter++
-          const keys = await generateKeys(mnemonic, undefined, counter)
-          return keys.address
-        }
-      })()
 
       before(async () => {
         const tx: CeloTx = {
@@ -244,13 +325,13 @@ class TestEnv {
           tx.gatewayFee = '0x25'
         }
         if (testCase.useGatewayFeeRecipient) {
-          tx.gatewayFeeRecipient = await getRandomAddress()
+          tx.gatewayFeeRecipient = gatewayFeeRecipientAddress
         }
 
         if (testCase.contractCreation) {
           tx.data = bytecode
         } else {
-          tx.to = await getRandomAddress()
+          tx.to = await toAddress
           tx.value = 5
         }
 
@@ -320,18 +401,23 @@ describe('CIP-35 >', function(this: any) {
   this.timeout(0)
 
   describe('before activation', () => {
-    const testEnv = new TestEnv(false)
-    if (testEnv.testCases.length === 0) {
-      // No cases selected for before activation, so skip the setup
+    if (devFilter.cipIsActivated === true) {
       return
     }
+    const testEnv = new TestEnv(false)
     before(async function(this) {
       this.timeout(0)
       await testEnv.before()
     })
 
-    for (const testCase of testEnv.testCases) {
-      testEnv.runTestCase(testCase)
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
+
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
     }
 
     after(async function(this: any) {
@@ -341,18 +427,23 @@ describe('CIP-35 >', function(this: any) {
   })
 
   describe('after activation', async () => {
-    const testEnv = new TestEnv(true)
-    if (testEnv.testCases.length === 0) {
-      // No cases selected for before activation, so skip the setup
+    if (devFilter.cipIsActivated === false) {
       return
     }
+    const testEnv = new TestEnv(true)
     before(async function(this) {
       this.timeout(0)
       await testEnv.before()
     })
 
-    for (const testCase of testEnv.testCases) {
-      testEnv.runTestCase(testCase)
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
+
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
     }
 
     after(async function(this: any) {
