@@ -15,7 +15,7 @@ type TestnetArgv = UpgradeArgv & {
 export const builder = {}
 
 export const handler = async (argv: TestnetArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
   const instanceName = getInstanceName(argv.celoEnv)
