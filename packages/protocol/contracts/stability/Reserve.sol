@@ -314,6 +314,9 @@ contract Reserve is
 
   /**
    * @notice Checks if an address is able to spend as an exchange.
+   * @dev isExchangeSpender was introduced after cUSD, so the cUSD Exchange is not included in it.
+   * If cUSD's Exchange were to be added to isExchangeSpender, the check with the
+   * registry could be removed.
    * @param spender The address to be checked.
    */
   modifier isAllowedToSpendExchange(address spender) {
@@ -339,6 +342,7 @@ contract Reserve is
   /**
    * @notice Takes away an address's permission to spend Reserve funds without limits.
    * @param spender The address that is to be no longer allowed to spend Reserve funds.
+   * @param index The index in exchangeSpenderAddresses of spender.
    */
   function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
     isExchangeSpender[spender] = false;
@@ -356,7 +360,11 @@ contract Reserve is
     emit ExchangeSpenderRemoved(spender);
   }
 
-  function getExchangeSpenders() public view returns (address[] memory) {
+  /**
+   * @notice Returns all addresses of exchanges permitted to spend Reserve funds.
+   * @return An array of addresses permitted to spend Reserve funds.
+   */
+  function getExchangeSpenders() external view returns (address[] memory) {
     return exchangeSpenderAddresses;
   }
 
