@@ -184,9 +184,9 @@ export default class Show extends BaseCommand {
         voterRewards,
         {
           address: {},
-          addressPayment: { get: (e) => e.addressPayment.toFixed() },
+          addressPayment: { get: (e) => e.addressPayment.toFixed(0) },
           group: { get: (e) => e.group.address },
-          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
+          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed(0) },
           epochNumber: {},
         },
         res.flags
@@ -199,8 +199,8 @@ export default class Show extends BaseCommand {
         {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
-          groupVoterPayment: { get: (e) => e.groupVoterPayment.toFixed() },
-          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
+          groupVoterPayment: { get: (e) => e.groupVoterPayment.toFixed(0) },
+          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed(0) },
           epochNumber: {},
         },
         res.flags
@@ -230,8 +230,8 @@ export default class Show extends BaseCommand {
         {
           validatorName: { get: (e) => e.validator.name },
           validator: { get: (e) => e.validator.address },
-          validatorPayment: { get: (e) => e.validatorPayment.toFixed() },
-          validatorScore: { get: (e) => e.validator.score.toFixed() },
+          validatorPayment: { get: (e) => e.validatorPayment.toFixed(0) },
+          validatorScore: { get: (e) => e.validator.score.toFixed(0) },
           group: { get: (e) => e.group.address },
           epochNumber: {},
         },
@@ -253,9 +253,9 @@ export default class Show extends BaseCommand {
         {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
-          groupPayment: { get: (e) => e.groupPayment.toFixed() },
+          groupPayment: { get: (e) => e.groupPayment.toFixed(0) },
           validator: { get: (e) => e.validator.address },
-          validatorScore: { get: (e) => e.validator.score.toFixed() },
+          validatorScore: { get: (e) => e.validator.score.toFixed(0) },
           epochNumber: {},
         },
         res.flags
@@ -269,9 +269,9 @@ export default class Show extends BaseCommand {
         accountsSlashed,
         {
           slashed: {},
-          penalty: { get: (e) => e.penalty.toFixed() },
+          penalty: { get: (e) => e.penalty.toFixed(0) },
           reporter: {},
-          reward: { get: (e) => e.reward.toFixed() },
+          reward: { get: (e) => e.reward.toFixed(0) },
           epochNumber: {},
         },
         res.flags
