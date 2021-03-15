@@ -361,7 +361,9 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns all addresses of exchanges permitted to spend Reserve funds.
+   * @notice Returns addresses of exchanges permitted to spend Reserve funds.
+   * Because exchangeSpenderAddresses waas introduced after cUSD, cUSD's exchange
+   * is not included in this list.
    * @return An array of addresses permitted to spend Reserve funds.
    */
   function getExchangeSpenders() external view returns (address[] memory) {
