@@ -1,7 +1,7 @@
 {
   "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.baklava/contracts",
-  "newArtifactsFolder": "/home/circleci/app/packages/protocolbuild/celo-core-contracts-v2.baklava/contracts",
-  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles/",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v2.baklava/contracts",
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
       "SortedOracles": {
@@ -150,6 +150,37 @@
         }
       }
     },
-    "libraries": {}
+    "libraries": {
+      "Signatures": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [
+            {
+              "contract": "Signatures",
+              "signature": "toEthSignedTypedDataHash(bytes32,bytes32)",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Signatures",
+              "signature": "getSignerOfTypedDataHash(bytes32,bytes32,uint8,bytes32,bytes32)",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "Signatures",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "+1",
+          "patch": "0"
+        }
+      }
+    }
   }
 }

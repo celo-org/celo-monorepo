@@ -1,7 +1,7 @@
 {
   "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v0.baklava/contracts",
   "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.baklava/contracts",
-  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles/",
+  "exclude": "/.*LinkedList.*|.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
       "DowntimeSlasher": {
@@ -559,6 +559,57 @@
         }
       }
     },
-    "libraries": {}
+    "libraries": {
+      "Proposals": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [
+            {
+              "contract": "Proposals",
+              "signature": "getVersionNumber()",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "Proposals",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "+1",
+          "patch": "0"
+        }
+      },
+      "Signatures": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [
+            {
+              "contract": "Signatures",
+              "signature": "getVersionNumber()",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "Signatures",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "+1",
+          "patch": "0"
+        }
+      }
+    }
   }
 }
