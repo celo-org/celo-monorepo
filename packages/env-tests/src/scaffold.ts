@@ -97,7 +97,9 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
     context.kit.connection.addAccount(account.privateKey)
 
     const celoBalance = await goldToken.balanceOf(account.address)
-    if (celoBalance.gt(ONE)) {
+    // Exchange and transfer tests move ~0.5, so setting the threshold slightly below
+    const maxBalanceBeforeCollecting = ONE.times(0.4)
+    if (celoBalance.gt(maxBalanceBeforeCollecting)) {
       await goldToken
         .transfer(
           root.address,
@@ -119,7 +121,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
     for (const stableToken of stableTokensToClear) {
       const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
       const balance = await stableTokenInstance.balanceOf(account.address)
-      if (balance.gt(ONE)) {
+      if (balance.gt(maxBalanceBeforeCollecting)) {
         await stableTokenInstance
           .transfer(
             root.address,
