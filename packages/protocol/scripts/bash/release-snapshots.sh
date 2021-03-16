@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 NETWORK="baklava"
 
 for i in 1 2 3
