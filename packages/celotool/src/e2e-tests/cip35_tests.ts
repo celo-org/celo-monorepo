@@ -1,7 +1,7 @@
 // tslint:disable:no-console
 import { CeloTx } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { privateKeyToAddress } from '@celo/utils/src/address'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import ejsUtil from 'ethereumjs-util'
