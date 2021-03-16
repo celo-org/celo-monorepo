@@ -20,5 +20,6 @@ function build_tag() {
   fi
   [ -d "build/contracts_tmp" ] && mv build/contracts_tmp build/contracts
 
-  git restore --staged contracts && git restore contracts
+  rm -r contracts
+  git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE
 }
