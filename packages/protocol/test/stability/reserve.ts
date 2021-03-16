@@ -309,11 +309,11 @@ contract('Reserve', (accounts: string[]) => {
 
     it('has the right list of exchange spenders after addition', async () => {
       const spendersBeforeAdditions = await reserve.getExchangeSpenders()
-      assert.equal(spendersBeforeAdditions, [])
+      assert.deepEqual(spendersBeforeAdditions, [])
       await reserve.addExchangeSpender(exchangeAddress)
       await reserve.addExchangeSpender(accounts[1])
       const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders, [exchangeAddress, accounts[1]])
+      assert.deepEqual(spenders, [exchangeAddress, accounts[1]])
     })
   })
 
@@ -343,7 +343,7 @@ contract('Reserve', (accounts: string[]) => {
     it('has the right list of exchange after removing one', async () => {
       await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders, [])
+      assert.deepEqual(spenders, [])
     })
 
     it("can't be removed twice", async () => {
@@ -359,7 +359,7 @@ contract('Reserve', (accounts: string[]) => {
       await reserve.addExchangeSpender(accounts[1])
       await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders, [accounts[1]])
+      assert.deepEqual(spenders, [accounts[1]])
     })
 
     it("doesn't remove an address with the wrong index", async () => {
