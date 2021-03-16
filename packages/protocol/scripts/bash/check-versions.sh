@@ -15,18 +15,24 @@ NEW_BRANCH=""
 REPORT=""
 LOG_FILE="/tmp/celo-check-versions.log"
 
-while getopts 'a:b:r:l:' flag; do
+while getopts 'a:b:r:l:e:' flag; do
   case "${flag}" in
     a) OLD_BRANCH="${OPTARG}" ;;
     b) NEW_BRANCH="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    e) CONTRACT_EXCLUSION_REGEX="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
 [ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
+
+# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
+# MultiSig contracts, and the ReleaseGold contract.
+[ -z "$CONTRACT_EXCLUSION_REGEX" ] \
+  && CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles"
 
 REPORT_FLAG=""
 if [ ! -z "$REPORT" ]; then
@@ -43,11 +49,4 @@ OLD_BRANCH_BUILD_DIR=$BUILD_DIR
 build_tag $NEW_BRANCH $LOG_FILE
 NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 
-# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
-# MultiSig contracts, and the ReleaseGold contract.
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles"
-yarn ts-node scripts/check-backward.ts sem_check \
-    --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
-    --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
-    --exclude $CONTRACT_EXCLUSION_REGEX \
-    $REPORT_FLAG
+yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR_1/contracts --new_contracts $BUILD_DIR_2/contracts --exclude $CONTRACT_EXCLUSION_REGEX $REPORT_FLAG
