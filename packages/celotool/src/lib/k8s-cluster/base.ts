@@ -1,6 +1,10 @@
 import { createNamespaceIfNotExists } from '../cluster'
 import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
-import { installAndEnableMetricsDeps, installCertManagerAndNginx } from '../helm_deploy'
+import {
+  installAndEnableMetricsDeps,
+  installCertManagerAndNginx,
+  isCelotoolHelmDryRun,
+} from '../helm_deploy'
 
 export enum CloudProvider {
   AWS,
@@ -30,7 +34,11 @@ export abstract class BaseClusterManager {
     // Reset back to default namespace
     await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
     if (!skipSetup) {
-      await this.setupCluster(context)
+      if (!isCelotoolHelmDryRun()) {
+        await this.setupCluster(context)
+      } else {
+        console.info(`Skipping cluster setup due to --helmdryrun`)
+      }
     }
   }
 
@@ -70,11 +78,12 @@ export abstract class BaseClusterManager {
 
   async setupCluster(context?: string) {
     await createNamespaceIfNotExists(this.celoEnv)
+    if (!isCelotoolHelmDryRun()) {
+      console.info('Performing any cluster setup that needs to be done...')
 
-    console.info('Performing any cluster setup that needs to be done...')
-
-    await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
-    await installAndEnableMetricsDeps(true, context, this.clusterConfig)
+      await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
+      await installAndEnableMetricsDeps(true, context, this.clusterConfig)
+    }
   }
 
   abstract switchToSubscription(): Promise<void>
