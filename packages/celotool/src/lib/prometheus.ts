@@ -66,13 +66,13 @@ export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus(clusterConfig?: BaseClusterConfig) {
+export async function upgradePrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(clusterConfig)
+    await helmParameters(context, clusterConfig)
   )
 }
 
@@ -216,7 +216,7 @@ async function getPrometheusGcloudServiceAccountKeyBase64(
   } else {
     // We do not have the service account key in helm so we need to create the SA (if it does not exist)
     // and create a new key for the service account in any case
-    await switchToGCPProjectFromEnv(gcloudProjectName)
+    await switchToGCPProject(gcloudProjectName)
     const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
     await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
     const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
