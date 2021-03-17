@@ -169,7 +169,7 @@ const txObjectExchange = exchange.buy(
 const txObjectLock = lockedGold.lock().txo;
 
 // Then we use the 1 CELO to vote for a specific validator group address.
-// Here you have to chante the validator group address
+// Here you have to change the validator group address
 // (At the moment of writing the tuto, the 0x5edfCe0bad47e24E30625c275457F5b4Bb619241
 // was a valid address, but you could check the groups using the celocli)
 const validatorGroupAddress = "<VALIDATOR_GROUP_ADDRESS>";
