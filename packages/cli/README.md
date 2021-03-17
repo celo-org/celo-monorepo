@@ -14,6 +14,14 @@ npm install -g @celo/celocli
 
 If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
 
+### Plugins
+
+Additional plugins can be installed which make the CLI experience smoother. Currently, `celocli` only supports installing plugins published on NPM within the `@celo/*` and `@clabs/*` scopes.
+
+> ⚠️ **Warning**
+>  
+> Installing a 3rd party plugin can be dangerous! Please always be sure that you trust the plugin provider.
+
 ## Development
 
 ### Build

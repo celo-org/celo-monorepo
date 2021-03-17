@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   ErrorMessage,
+  GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
   hasValidTimestamp,
@@ -25,14 +26,6 @@ import { getContractKit } from '../web3/contracts'
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
-
-interface GetBlindedMessageSigRequest {
-  account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-  timestamp?: number
-  sessionID?: string
-}
 
 interface SignerService {
   url: string

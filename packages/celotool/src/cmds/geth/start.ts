@@ -170,8 +170,6 @@ export const handler = async (argv: StartArgv) => {
   const verbosity = argv.verbosity
   const verbose = argv.verbose
 
-  const gethDir = argv.gethDir
-  const datadir = argv.dataDir
   const networkId = parseInt(argv.networkId, 10)
   const syncMode = argv.syncMode
   const blockTime = argv.blockTime
@@ -202,9 +200,9 @@ export const handler = async (argv: StartArgv) => {
   const ethstats = argv.ethstats
 
   const gethConfig: GethRunConfig = {
-    runPath: datadir,
+    runPath: argv.dataDir,
     keepData: !purge,
-    gethRepoPath: gethDir,
+    repository: { path: argv.gethDir },
     verbosity,
     networkId,
     migrate,

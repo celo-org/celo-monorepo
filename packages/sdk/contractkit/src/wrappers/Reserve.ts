@@ -53,11 +53,45 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     undefined,
     valueToBigNumber
   )
+
+  /**
+   * @alias {getReserveCeloBalance}
+   */
   getReserveGoldBalance = proxyCall(
     this.contract.methods.getReserveGoldBalance,
     undefined,
     valueToBigNumber
   )
+
+  /**
+   * @notice Returns the amount of CELO included in the reserve
+   * @return {BigNumber} The CELO amount included in the reserve.
+   */
+  getReserveCeloBalance = this.getReserveGoldBalance
+
+  /**
+   * @notice Returns the amount of unfrozen CELO in the Reserve contract.
+   * @see {getUnfrozenReserveCeloBalance}
+   * @return {BigNumber} amount in wei
+   */
+  getUnfrozenBalance = proxyCall(
+    this.contract.methods.getUnfrozenBalance,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
+   * @notice Returns the amount of unfrozen CELO included in the reserve
+   *  contract and in other reserve addresses.
+   * @see {getUnfrozenBalance}
+   * @return {BigNumber} amount in wei
+   */
+  getUnfrozenReserveCeloBalance = proxyCall(
+    this.contract.methods.getUnfrozenReserveGoldBalance,
+    undefined,
+    valueToBigNumber
+  )
+
   getOtherReserveAddresses = proxyCall(this.contract.methods.getOtherReserveAddresses)
 
   /**

@@ -40,9 +40,9 @@ In addition, each Docker image correspinding to a released version should be tag
 
 The latest image qualified for deployment to various networks are also tagged as follows:
 
-* Alfajores: `attestation-service-alfajores`
-* Baklava: `attestation-service-baklava`
-* Mainnet: `attestation-service-mainnet`
+- Alfajores: `attestation-service-alfajores`
+- Baklava: `attestation-service-baklava`
+- Mainnet: `attestation-service-mainnet`
 
 ### Signatures
 
@@ -56,7 +56,7 @@ gpg --auto-key-locate wkd --locate-keys $EMAIL
 
 Currently hosted core developer keys used for Attestation Service releases include:
 
-* tim@clabs.co
+- tim@clabs.co
 
 ## Build process
 
@@ -76,7 +76,7 @@ docker save $(docker image inspect us.gcr.io/celo-testnet/celo-monorepo:attestat
 
 As well as monorepo CI tests, all releases are expected to go through manual testing as needed to verify security properties, accuracy of documentation, and compatibility with deployed and anticipated versions of `celocli` and wallets including Valora.
 
-This testing should include running the Valora e2e tests. Currently, these expect access to cLabs provisioned credentials for SMS providers. Follow the [Valora mobile build instructions](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/README.md#setup). Then run:
+This testing should include running the Valora e2e tests. Currently, these expect access to cLabs provisioned credentials for SMS providers. Follow the [Valora mobile build instructions](https://github.com/celo-org/wallet/blob/master/packages/mobile/README.md#setup). Then run:
 
 ```bash
 git checkout verification-e2e-tests
@@ -90,7 +90,7 @@ yarn test:e2e:ios -t e2e/src/RedeemInviteAndVerify.spec.js -i
 
 Patch releases should be constructed by cherry-picking all included commits from `master` to the `release/attestation-service/x.y` branch. The first commit of this process should change the version number encoded in the source from `x.y.z-stable` to `x.y.z+1-unstable` and the final commit should change the version number to `x.y.z+1-stable`.
 
-Major and minor releases should be constructed by pushing a commit to the `master` branch to change the encoded version number from `x.y.z-unstable` to `x.y.z`. A `release/attestation-service/x.y` branch should be created from this commit.  The next commit must change the version number from `x.y.z-stable` to `x.y+1.0-unstable`, or `x+1.0.0-unstable` if the next planned release is a major release.
+Major and minor releases should be constructed by pushing a commit to the `master` branch to change the encoded version number from `x.y.z-unstable` to `x.y.z`. A `release/attestation-service/x.y` branch should be created from this commit. The next commit must change the version number from `x.y.z-stable` to `x.y+1.0-unstable`, or `x+1.0.0-unstable` if the next planned release is a major release.
 
 Only one commit should ever have a "stable" tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or changes.
 
