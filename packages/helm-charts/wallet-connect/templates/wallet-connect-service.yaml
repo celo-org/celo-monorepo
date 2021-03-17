@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Namespace }}-wallet-connect
+  labels:
+    app: wallet-connect
+    chart: wallet-connect
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: wallet-connect
+spec:
+  selector:
+    app: wallet-connect
+    release: {{ .Release.Name }}
+    component: wallet-connect
+  clusterIP: None
+  type: {{ .Values.walletconnect.service.type }}
+  ports:
+  - port: 5000
+    targetPort: http
