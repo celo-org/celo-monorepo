@@ -1,0 +1,48 @@
+imagePullPolicy: IfNotPresent
+blockscout:
+  indexer:
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+    pool_size: 30
+    resources:
+      requests:
+        memory: 12Gi
+        cpu: 5
+  api:
+    autoscaling:
+        maxReplicas: 3
+        minReplicas: 2
+        target:
+          cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 700m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 500m
+  web:
+    autoscaling:
+      maxReplicas: 3
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 700m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
