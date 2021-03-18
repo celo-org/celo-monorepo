@@ -37,7 +37,7 @@ login = async () => {
 
 Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to interact with Celo Core Contracts to do actions like fetch a user's balance.
 
-First import and instantiate an instance of ContractKit. For ContractKit versions 1.0.0 onwards, you also need to import and instantiate a Web3 instance manually:
+First import and instantiate an instance of ContractKit. For ContractKit version 1.0.0 onwards, you also need to import and instantiate a Web3 instance manually:
 
 ```javascript
 // Add ContractKit to your file and instantiate the kit.
@@ -166,7 +166,7 @@ if (!txIsAccount) {
         feeCurrency: FeeCurrency.cUSD
       }
     ],
-    { requestId, dappName, callback: window.location.href }
+    { requestId, dappName, callback }
   );
   const respRegisterAccount = await waitForSignedTxs(requestId);
   const txRegisterAccount = await kit.connection.sendSignedTransaction(respRegisterAccount.rawTxs[0]);
