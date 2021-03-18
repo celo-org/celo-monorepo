@@ -149,7 +149,7 @@ const tenCUSD = new BigNumber("10e18");
 
 // First of all, we need to increase the allowance of the exchange address
 // to let the contract expend the amount of stable tokens to buy one CELO.
-// We are allowing the exchange contract to spend 10 cUsd
+// We are allowing the exchange contract to spend 10 cUSD
 const txObjectIncAllow = stableToken.increaseAllowance(
   exchange.address,
   tenCUSD
