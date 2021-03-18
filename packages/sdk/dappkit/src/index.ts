@@ -161,3 +161,31 @@ export async function requestTxSig(
 
   Linking.openURL(serializeDappKitRequestDeeplink(request))
 }
+
+// TODO: wrapper for Linking.openURL that checks if Valora exists and if not prompts redirect to the app store
+// potentially then retry flow? --> look into this as step two
+// TODO: look out for Valora vs. Alfajores test wallet handling --> check that the proper one is being opened?
+// TODO get this working with expo as well...
+
+// Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded
+async function openOrAppStore(url: string) {
+  let ua = navigator.userAgent.toLowerCase()
+  // let isAndroid = ua.indexOf('android') > -1; // android check
+  let isIphone = ua.indexOf('iphone') > -1 // ios check
+
+  if (isIphone == true) {
+    let app = {
+      launchApp: function() {
+        setTimeout(function() {
+          window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
+        }, 25)
+        window.location.href = url //which page to open(now from mobile, check its authorization)
+      },
+      openWebApp: function() {
+        window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
+      },
+    }
+    app.launchApp()
+    return
+  }
+}
