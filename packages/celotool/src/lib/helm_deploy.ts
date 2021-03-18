@@ -131,9 +131,10 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
 async function createAndUploadKubernetesSecretIfNotExists(
   secretName: string,
-  serviceAccountName: string
+  serviceAccountName: string,
+  celoEnv: string
 ) {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(celoEnv)
   const keyfilePath = `/tmp/${serviceAccountName}_key.json`
   const secretExists = await outputIncludes(
     `kubectl get secrets`,
@@ -153,12 +154,26 @@ async function createAndUploadKubernetesSecretIfNotExists(
   }
 }
 
-export async function createAndUploadCloudSQLSecretIfNotExists(serviceAccountName: string) {
-  return createAndUploadKubernetesSecretIfNotExists(CLOUDSQL_SECRET_NAME, serviceAccountName)
+export async function createAndUploadCloudSQLSecretIfNotExists(
+  serviceAccountName: string,
+  celoEnv: string
+) {
+  return createAndUploadKubernetesSecretIfNotExists(
+    CLOUDSQL_SECRET_NAME,
+    serviceAccountName,
+    celoEnv
+  )
 }
 
-export async function createAndUploadBackupSecretIfNotExists(serviceAccountName: string) {
-  return createAndUploadKubernetesSecretIfNotExists(BACKUP_GCS_SECRET_NAME, serviceAccountName)
+export async function createAndUploadBackupSecretIfNotExists(
+  serviceAccountName: string,
+  celoEnv: string
+) {
+  return createAndUploadKubernetesSecretIfNotExists(
+    BACKUP_GCS_SECRET_NAME,
+    serviceAccountName,
+    celoEnv
+  )
 }
 
 export function getServiceAccountName(prefix: string) {
@@ -188,15 +203,19 @@ export async function installCertManagerAndNginx(
   const nginxChartVersion = '3.9.0'
   const nginxChartNamespace = 'default'
 
-  // Cert Manager is the newer version of lego
-  const certManagerExists = await outputIncludes(
-    `helm list -n default`,
-    `cert-manager-cluster-issuers`,
-    `cert-manager-cluster-issuers exists, skipping install`
-  )
-  if (!certManagerExists) {
+  // Check if cert-manager is installed in any namespace
+  // because cert-manager crds are global and cannot live
+  // different crds version in the same cluster
+  const certManagerExists =
+    (await outputIncludes(`helm list -n default`, `cert-manager-cluster-issuers`)) ||
+    (await outputIncludes(`helm list -n cert-manager`, `cert-manager-cluster-issuers`))
+
+  if (certManagerExists) {
+    console.info('cert-manager-cluster-issuers exists, skipping install')
+  } else {
     await installCertManager()
   }
+
   const nginxIngressReleaseExists = await outputIncludes(
     `helm list -n default`,
     `nginx-ingress-release`,
@@ -276,15 +295,18 @@ export async function helmUpdateNginxRepo() {
 export async function installCertManager() {
   const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
 
+  console.info('Create the namespace for cert-manager')
+  await execCmdWithExitOnFailure(`kubectl create namespace cert-manager`)
+
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
-    `kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml`
+    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
   )
-  console.info('Updating cert-manager-cluster-issuers dependencies')
+  console.info('Updating cert-manager-cluster-issuers chart dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
   console.info('Installing cert-manager-cluster-issuers')
   await execCmdWithExitOnFailure(
-    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath} -n default`
+    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath} -n cert-manager`
   )
 }
 
@@ -852,7 +874,9 @@ export async function upgradeGenericHelmChart(
   const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
 
   if (isCelotoolHelmDryRun()) {
-    console.info(`Simulating the upgrade of helm release ${releaseName}`)
+    console.info(
+      `Simulating the upgrade of helm release ${releaseName}. No output means no change in the helm release`
+    )
     await installHelmDiffPlugin()
     await helmCommand(
       `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(

@@ -34,7 +34,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: CopyPoliciesArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
 
   try {
     // TODO(asa): Define Policy type.
@@ -44,7 +44,7 @@ export const handler = async (argv: CopyPoliciesArgv) => {
     const toPolicies: any[] = []
     const fromProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     validateAndSwitchToEnv(argv.toEnv)
-    await switchToClusterFromEnv(!argv.dryRun)
+    await switchToClusterFromEnv(argv.celoEnv, !argv.dryRun, true)
     const toNotificationChannelApplications = fetchEnv(
       envVar.STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS
     )

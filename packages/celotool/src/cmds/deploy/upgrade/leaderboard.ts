@@ -24,7 +24,7 @@ export const handler = async (argv: LeaderboardArgv) => {
   if (!isCelotoolHelmDryRun()) {
     await createClusterIfNotExists()
   }
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   if (argv.reset === true && !isCelotoolHelmDryRun()) {
     await removeHelmRelease(argv.celoEnv)
