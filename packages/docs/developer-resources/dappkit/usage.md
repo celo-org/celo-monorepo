@@ -126,7 +126,9 @@ then Locking that CELO to be able to vote for a validator group.
 import {
   requestTxSig,
   waitForSignedTxs
-} from "@celo/dappkit";
+} from '@celo/dappkit';
+
+import { BigNumber } from 'bignumber.js';
 
 const dappName = "My DappName";
 const callback = Linking.makeUrl("/my/path");
@@ -146,7 +148,7 @@ const accounts = await kit.contracts.getAccounts();
 // Let's ensure that the account is registered. If not, we need to call
 // the `createAccount` method from the Accounts contract)
 
-const txIsAccount = await accounts.isAccount(this.state.address!);
+const txIsAccount = await accounts.isAccount(this.state.address);
 const txRegisterAccountObj = accounts.createAccount().txo;
 
 if (!txIsAccount) {
