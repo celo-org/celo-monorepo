@@ -128,36 +128,38 @@ import {
   waitForSignedTxs
 } from "@celo/dappkit";
 
-// Let's assume that the address has enough cUSD to pay the
-// transaction fees of all the transactions and enough to buy 10 CELO
-// AND it's already a registered Account (otherwise it will require a call
-// to the `createAccount` method from the Accounts contract)
+const dappName = "My DappName";
+const callback = Linking.makeUrl("/my/path");
+
+// Let's assume that the address has funds enough in cUSD to pay the
+// transaction fees of all the transactions and enough to buy 1 CELO
+// AND it's already a registered Account (otherwise it will require to call
+// the `createAccount` method from the Accounts contract)
 
 // We will be using the following contracts:
 const stableToken = await kit.contracts.getStableToken();
 const exchange = await kit.contracts.getExchange();
 const lockedGold = await kit.contracts.getLockedGold();
-const election = await kit.contracts.getElection()
+const election = await kit.contracts.getElection();
 
-const decimals = await stableToken.decimals(); // both cusd and celo use the same
-
-const tenCelo = new BigNumber(10).pow(parseInt(decimals, 10)).toString();
-const oneHundredCUSD = new BigNumber(10).pow(parseInt(decimals, 10)).toString();
+// 1e18 = 1 Celo
+const oneCelo = new BigNumber("1e18");
+const tenCUSD = new BigNumber("10e18");
 // Now we will generate the transactions that we require to be signed
 
 // First of all, we need to increase the allowance of the exchange address
-// to let the contract expend the amount of stable tokens to buy some CELO.
-// We are allowing the exchange contract to spend 100 cUsd
+// to let the contract expend the amount of stable tokens to buy one CELO.
+// We are allowing the exchange contract to spend 10 cUSD
 const txObjectIncAllow = stableToken.increaseAllowance(
   exchange.address,
-  oneHundredCUSD
+  tenCUSD
 ).txo;
 
-// Then we will call the Exchange contract, and attempt to buy 10 CELO with a 
-// max price of 100 cUSD (it could use less than that).
+// Then we will call the Exchange contract, and attempt to buy 1 CELO with a 
+// max price of 10 cUSD (it could use less than that).
 const txObjectExchange = exchange.buy(
-  tenCelo,
-  oneHundredCUSD,
+  oneCelo,
+  tenCUSD,
   true
 ).txo;
 
@@ -166,15 +168,15 @@ const txObjectExchange = exchange.buy(
 // Later, the amount to be locked will be the parameter `value`.
 const txObjectLock = lockedGold.lock().txo;
 
-// Then we use the 10 CELO to vote for a specific validator group address.
-const validatorGroupAddress = "VALIDATOR_GROUP_ADDRESS";
-const txObjectVote = await election.vote(
+// Then we use the 1 CELO to vote for a specific validator group address.
+// Here you have to change the validator group address
+// (At the moment of writing the tuto, the 0x5edfCe0bad47e24E30625c275457F5b4Bb619241
+// was a valid address, but you could check the groups using the celocli)
+const validatorGroupAddress = "<VALIDATOR_GROUP_ADDRESS>";
+const txObjectVote = (await election.vote(
   validatorGroupAddress, 
-  tenCelo
-).txo;
-
-const dappName = "My DappName";
-const callback = Linking.makeUrl("/my/path");
+  oneCelo
+)).txo;
 
 const requestId = "signMeEverything";
 
@@ -185,58 +187,60 @@ requestTxSig(
     {
       tx: txObjectIncAllow,
       from: this.state.address,
-      to: stableToken.contract.options.address,
+      to: stableToken.address,
       feeCurrency: FeeCurrency.cUSD
-    }
-  ],
-  [
+    },
     {
       tx: txObjectExchange,
       from: this.state.address,
-      to: exchange.contract.options.address,
-      feeCurrency: FeeCurrency.cUSD
-    }
-  ],
-  [
+      to: exchange.address,
+      feeCurrency: FeeCurrency.cUSD,
+      estimatedGas: 200000
+    },
     {
       tx: txObjectLock,
       from: this.state.address,
-      to: lockedGold.contract.options.address,
+      to: lockedGold.address,
       feeCurrency: FeeCurrency.cUSD,
-      value: tenCelo
-    }
-  ],
-  [
+      value: oneCelo
+    },
     {
       tx: txObjectVote,
       from: this.state.address,
-      to: election.contract.options.address,
-      feeCurrency: FeeCurrency.cUSD
+      to: election.address,
+      feeCurrency: FeeCurrency.cUSD,
+      estimatedGas: 200000
     }
   ],
-  { requestIdIA, dappName, callback }
+  { requestId, dappName, callback }
 );
 
-const dappkitResponse = await waitForSignedTxs(requestIdIA);
+const dappkitResponse = await waitForSignedTxs(requestId);
 
+const receipts = [];
 // execute the allowance
-const tx0 = kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[0]);
-const receipt = await tx0.waitReceipt();
+console.log("execute the allowance");
+const tx0 = await kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[0]);
+receipts.push(await tx0.waitReceipt());
 
 // execute the exchange
-const tx1 = kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[1]);
-const receipt = await tx1.waitReceipt();
+console.log("execute the exchange");
+const tx1 = await kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[1]);
+receipts.push(await tx1.waitReceipt());
 
 // execute the lock
-const tx2 = kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[2]);
-const receipt = await tx2.waitReceipt();
+console.log("execute the lock");
+const tx2 = await kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[2]);
+receipts.push(await tx2.waitReceipt());
 
 // execute the vote
-const tx3 = kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[3]);
-const receipt = await tx3.waitReceipt();
+console.log("execute the vote");
+const tx3 = await kit.connection.sendSignedTransaction(dappkitResponse.rawTxs[3]);
+receipts.push(await tx3.waitReceipt());
+console.log("Receipts: ", receipts);
 
 const voteInfo = await election.getVoter(this.state.address);
-
+console.log("Vote info: ", voteInfo);
 // REMEMBER that after voting the next epoch you HAVE TO ACTIVATE those votes
 // using the `activate` method in the election contract.
 
