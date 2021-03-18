@@ -7,14 +7,14 @@ blockscout:
           requests:
             memory: 4Gi
             cpu: 2
-    pool_size: 30
+    pool_size: 100
     resources:
       requests:
         memory: 12Gi
         cpu: 5
   api:
     autoscaling:
-        maxReplicas: 3
+        maxReplicas: 10
         minReplicas: 2
         target:
           cpu: 70
@@ -31,7 +31,7 @@ blockscout:
         cpu: 500m
   web:
     autoscaling:
-      maxReplicas: 3
+      maxReplicas: 10
       minReplicas: 2
       target:
         cpu: 70
