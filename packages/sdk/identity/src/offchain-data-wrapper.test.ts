@@ -6,6 +6,7 @@ import { ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import {
   ensureLeading0x,
+  privateKeyToAddress,
   privateKeyToPublicKey,
   publicKeyToAddress,
   toChecksumAddress,
@@ -112,6 +113,50 @@ testWithGanache('Offchain Data', (web3) => {
 
       const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
       const resp = await readerNameAccessor.readAsResult(writer.address)
+      if (resp.ok) {
+        expect(resp.result.name).toEqual(testname)
+      } else {
+        const error = resp.error
+        switch (error.errorType) {
+          case SchemaErrorTypes.InvalidDataError:
+            console.log("Something was wrong with the schema, can't try again")
+            break
+          case SchemaErrorTypes.OffchainError:
+            const offchainError = error.error
+            switch (offchainError.errorType) {
+              case OffchainErrorTypes.FetchError:
+                console.log('Something went wrong with fetching, try again')
+                break
+              case OffchainErrorTypes.InvalidSignature:
+                console.log('Signature was wrong')
+                break
+              case OffchainErrorTypes.NoStorageRootProvidedData:
+                console.log("Account doesn't have data for this type")
+                break
+            }
+
+          default:
+            break
+        }
+        throw new Error(error.message)
+      }
+    })
+  })
+
+  describe('with the DEK being the signer', () => {
+    it.only('can write a name', async () => {
+      const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[5]
+      const writerDEK = randomBytes(32).toString('hex')
+      const compressedWriter = await setupAccount(writerPrivateKey, writerDEK, true)
+      const DEKAddress = privateKeyToAddress(writerDEK)
+      compressedWriter.wrapper.kit.connection.addAccount(writerDEK)
+      compressedWriter.wrapper.signer = DEKAddress
+
+      const nameAccessor = new PublicNameAccessor(compressedWriter.wrapper)
+      await nameAccessor.write(testPayload)
+
+      const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
+      const resp = await readerNameAccessor.readAsResult(compressedWriter.address)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       } else {
