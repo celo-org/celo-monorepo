@@ -132,7 +132,7 @@ const dappName = "My DappName";
 const callback = Linking.makeUrl("/my/path");
 
 // Let's assume that the address has funds enough in cUSD to pay the
-// transactions fees of all the transactions and enough to buy 1 CELO
+// transaction fees of all the transactions and enough to buy 1 CELO
 // AND it's already a registered Account (otherwise it will require to call
 // the `createAccount` method from the Accounts contract)
 
