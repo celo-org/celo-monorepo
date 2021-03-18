@@ -133,14 +133,42 @@ const callback = Linking.makeUrl("/my/path");
 
 // Let's assume that the address has funds enough in cUSD to pay the
 // transaction fees of all the transactions and enough to buy 1 CELO
-// AND it's already a registered Account (otherwise it will require to call
-// the `createAccount` method from the Accounts contract)
+// In this example, we also assume that we have already requested
+// the user's account address, and it is stored in `this.state.address`.
 
 // We will be using the following contracts:
 const stableToken = await kit.contracts.getStableToken();
 const exchange = await kit.contracts.getExchange();
 const lockedGold = await kit.contracts.getLockedGold();
 const election = await kit.contracts.getElection();
+const accounts = await kit.contracts.getAccounts();
+
+// Let's ensure that the account is registered. If not, we need to call
+// the `createAccount` method from the Accounts contract)
+
+const txIsAccount = await accounts.isAccount(this.state.address!);
+const txRegisterAccountObj = accounts.createAccount().txo;
+
+if (!txIsAccount) {
+  requestTxSig(
+    // @ts-ignore
+    kit,
+    [
+      {
+        tx: txRegisterAccountObj,
+        from: this.state.address,
+        to: accounts.address,
+        feeCurrency: FeeCurrency.cUSD
+      }
+    ],
+    { requestId, dappName, callback: window.location.href }
+  );
+  const respRegisterAccount = await waitForSignedTxs(requestId);
+  const txRegisterAccount = await kit.connection.sendSignedTransaction(respRegisterAccount.rawTxs[0]);
+  const receiptRegisterAccount = await txRegisterAccount.waitReceipt();
+  console.log(`Tx hash: ${receiptRegisterAccount.transactionHash}`);
+  // Handle account registration
+}
 
 // 1e18 = 1 Celo
 const oneCelo = new BigNumber("1e18");
