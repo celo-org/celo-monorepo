@@ -51,6 +51,9 @@
     "typedoc": "^0.19.2",
     "typedoc-plugin-markdown": "^2.2.16"
   },
+  "resolutions": {
+    "**/elliptic": "^6.5.4"
+  },
   "engines": {
     "node": ">=8.13.0"
   },
