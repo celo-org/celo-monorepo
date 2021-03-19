@@ -144,7 +144,7 @@ testWithGanache('Offchain Data', (web3) => {
   })
 
   describe('with the DEK being the signer', () => {
-    it.only('can write a name', async () => {
+    it('can write a name', async () => {
       const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[5]
       const writerDEK = randomBytes(32).toString('hex')
       const compressedWriter = await setupAccount(writerPrivateKey, writerDEK, true)
