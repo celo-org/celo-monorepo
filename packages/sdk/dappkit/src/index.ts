@@ -96,7 +96,7 @@ export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSucce
   return waitDecorator(requestId, checkSignedTxs)
 }
 
-export function requestAccountAddressDecorator(
+export function requestAccountAddressFactory(
   meta: DappKitRequestMeta,
   openURLCallback: (url: string) => Promise<any>
 ) {
@@ -104,7 +104,7 @@ export function requestAccountAddressDecorator(
 }
 
 export function requestAccountAddress(meta: DappKitRequestMeta) {
-  requestAccountAddressDecorator(meta, openURLOrAppStore)
+  requestAccountAddressFactory(meta, openURLOrAppStore)
 }
 
 export enum FeeCurrency {
@@ -136,7 +136,7 @@ export interface TxParams {
 }
 
 // Decorator to allow for separate openURL handling for dappkit/web
-export async function requestTxSigDecorator(
+export async function requestTxSigFactory(
   kit: ContractKit,
   txParams: TxParams[],
   meta: DappKitRequestMeta,
@@ -180,7 +180,7 @@ export async function requestTxSig(
   txParams: TxParams[],
   meta: DappKitRequestMeta
 ) {
-  return requestTxSigDecorator(kit, txParams, meta, openURLOrAppStore)
+  return requestTxSigFactory(kit, txParams, meta, openURLOrAppStore)
 }
 
 // Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded

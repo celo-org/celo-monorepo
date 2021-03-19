@@ -9,8 +9,8 @@ import {
 import {
   checkAccountAuth,
   checkSignedTxs,
-  requestAccountAddressDecorator,
-  requestTxSigDecorator,
+  requestAccountAddressFactory,
+  requestTxSigFactory,
   TxParams,
 } from './index'
 export {
@@ -85,7 +85,7 @@ export async function waitForSignedTxs(requestId: string): Promise<SignTxRespons
 }
 
 export async function requestAccountAddress(meta: DappKitRequestMeta) {
-  return requestAccountAddressDecorator(meta, openURL)
+  return requestAccountAddressFactory(meta, openURL)
 }
 
 export async function requestTxSig(
@@ -93,7 +93,7 @@ export async function requestTxSig(
   txParams: TxParams[],
   meta: DappKitRequestMeta
 ) {
-  return requestTxSigDecorator(kit, txParams, meta, openURL)
+  return requestTxSigFactory(kit, txParams, meta, openURL)
 }
 
 async function openURL(url: string) {
