@@ -1,5 +1,5 @@
 ---
-name: New Issue
+name: Add a New Issue
 about: Use this template raise an issue in the Celo Monorepo.
 title: "[Issue Title]"
 labels: 
