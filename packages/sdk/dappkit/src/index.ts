@@ -20,6 +20,10 @@ export {
   SignTxRequest,
 } from '@celo/utils'
 
+export const IOS_STORE_URL = 'https://apps.apple.com/de/app/valora-celo-payments-app/id1520414263'
+export const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=co.clabs.valora'
+export const VALORA_APP_URL = 'https://valoraapp.com/'
+
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
@@ -92,9 +96,15 @@ export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSucce
   return waitDecorator(requestId, checkSignedTxs)
 }
 
+export function requestAccountAddressDecorator(
+  meta: DappKitRequestMeta,
+  openURLCallback: (url: string) => Promise<any>
+) {
+  openURLCallback(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
+}
+
 export function requestAccountAddress(meta: DappKitRequestMeta) {
-  // Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
-  openURLOrAppStore(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
+  requestAccountAddressDecorator(meta, openURLOrAppStore)
 }
 
 export enum FeeCurrency {
@@ -125,10 +135,12 @@ export interface TxParams {
   value?: string
 }
 
-export async function requestTxSig(
+// Decorator to allow for separate openURL handling for dappkit/web
+export async function requestTxSigDecorator(
   kit: ContractKit,
   txParams: TxParams[],
-  meta: DappKitRequestMeta
+  meta: DappKitRequestMeta,
+  openURLCallback: (url: string) => Promise<any>
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
   const baseNonce = await kit.connection.nonce(txParams[0].from)
@@ -160,17 +172,16 @@ export async function requestTxSig(
   )
   const request = SignTxRequest(txs, meta)
 
-  // Linking.openURL(serializeDappKitRequestDeeplink(request))
-  openURLOrAppStore(serializeDappKitRequestDeeplink(request))
+  openURLCallback(serializeDappKitRequestDeeplink(request))
 }
 
-// TODO: wrapper for Linking.openURL that checks if Valora exists and if not prompts redirect to the app store
-// potentially then retry flow? --> look into this as step two
-// TODO: look out for Valora vs. Alfajores test wallet handling --> check that the proper one is being opened?
-// TODO get this working with expo as well...
-export const IOS_STORE_URL = 'https://apps.apple.com/de/app/valora-celo-payments-app/id1520414263'
-export const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=co.clabs.valora'
-export const VALORA_APP_URL = 'https://valoraapp.com/'
+export async function requestTxSig(
+  kit: ContractKit,
+  txParams: TxParams[],
+  meta: DappKitRequestMeta
+) {
+  return requestTxSigDecorator(kit, txParams, meta, openURLOrAppStore)
+}
 
 // Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded
 async function openURLOrAppStore(url: string) {
@@ -194,39 +205,4 @@ async function openURLOrAppStore(url: string) {
     }
   }
   Linking.openURL(callURL)
-
-  // let ua = navigator.userAgent.toLowerCase()
-  // let isAndroid = ua.indexOf('android') > -1 // android check
-  // let isIphone = ua.indexOf('iphone') > -1 // ios check
-
-  // if (isIphone == true) {
-  //   // let app = {
-  //   //   launchApp: function() {
-  //   //     setTimeout(function() {
-  //   //       window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
-  //   //     }, 25)
-  //   //     window.location.href = url //which page to open(now from mobile, check its authorization)
-  //   //   },
-  //   //   openWebApp: function() {
-  //   //     window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
-  //   //   },
-  //   // }
-  //   // app.launchApp()
-  //   console.log("Hello I'm an iPhone")
-  // } else if (isAndroid == true) {
-  //   // let app = {
-  //   //   launchApp: function () {
-  //   //     window.open(url);
-  //   //   },
-  //   //   // openWebApp: function () {
-  //   //   //   window.location.href =
-  //   //   //     'https://play.google.com/store/apps/details?id=packagename';
-  //   //   // },
-  //   // };
-  //   // app.launchApp();
-  //   console.log("Hello I'm an Android")
-  // } else {
-  //   //navigate to website url
-  // }
-  // return
 }

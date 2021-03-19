@@ -1,17 +1,25 @@
 // Special logic for Web DApps run on mobile
+import { ContractKit } from '@celo/contractkit'
 import {
   AccountAuthResponseSuccess,
+  DappKitRequestMeta,
   parseDappkitResponseDeeplink,
   SignTxResponseSuccess,
 } from '@celo/utils'
-import { checkAccountAuth, checkSignedTxs } from './index'
+import {
+  checkAccountAuth,
+  checkSignedTxs,
+  requestAccountAddressDecorator,
+  requestTxSigDecorator,
+  TxParams,
+} from './index'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
 } from '@celo/utils'
-export { FeeCurrency, requestAccountAddress, requestTxSig, TxParams } from './index'
+export { FeeCurrency, TxParams } from './index'
 
 // DappKit Web constants and helpers
 const localStorageKey = 'dappkit-web'
@@ -74,4 +82,20 @@ export async function waitForAccountAuth(requestId: string): Promise<AccountAuth
 
 export async function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
   return waitDecorator(requestId, checkSignedTxs)
+}
+
+export async function requestAccountAddress(meta: DappKitRequestMeta) {
+  return requestAccountAddressDecorator(meta, openURL)
+}
+
+export async function requestTxSig(
+  kit: ContractKit,
+  txParams: TxParams[],
+  meta: DappKitRequestMeta
+) {
+  return requestTxSigDecorator(kit, txParams, meta, openURL)
+}
+
+async function openURL(url: string) {
+  window.location.href = url
 }
