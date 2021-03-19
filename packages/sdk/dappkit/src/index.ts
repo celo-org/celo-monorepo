@@ -12,7 +12,7 @@ import {
   SignTxResponseSuccess,
   TxToSignParam,
 } from '@celo/utils'
-import { Linking } from 'react-native'
+import { Linking, Platform } from 'react-native'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -93,7 +93,8 @@ export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSucce
 }
 
 export function requestAccountAddress(meta: DappKitRequestMeta) {
-  Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
+  // Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
+  openURLOrAppStore(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
 }
 
 export enum FeeCurrency {
@@ -159,7 +160,8 @@ export async function requestTxSig(
   )
   const request = SignTxRequest(txs, meta)
 
-  Linking.openURL(serializeDappKitRequestDeeplink(request))
+  // Linking.openURL(serializeDappKitRequestDeeplink(request))
+  openURLOrAppStore(serializeDappKitRequestDeeplink(request))
 }
 
 // TODO: wrapper for Linking.openURL that checks if Valora exists and if not prompts redirect to the app store
@@ -168,24 +170,60 @@ export async function requestTxSig(
 // TODO get this working with expo as well...
 
 // Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded
-async function openOrAppStore(url: string) {
-  let ua = navigator.userAgent.toLowerCase()
-  // let isAndroid = ua.indexOf('android') > -1; // android check
-  let isIphone = ua.indexOf('iphone') > -1 // ios check
-
-  if (isIphone == true) {
-    let app = {
-      launchApp: function() {
-        setTimeout(function() {
-          window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
-        }, 25)
-        window.location.href = url //which page to open(now from mobile, check its authorization)
-      },
-      openWebApp: function() {
-        window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
-      },
+async function openURLOrAppStore(url: string) {
+  let callURL
+  if (await Linking.canOpenURL(url)) {
+    callURL = url
+  } else {
+    switch (Platform.OS) {
+      case 'ios': {
+        callURL = 'https://apps.apple.com/de/app/valora-celo-payments-app/id1520414263'
+        break
+      }
+      case 'android': {
+        callURL = 'https://play.google.com/store/apps/details?id=co.clabs.valora'
+        break
+      }
+      default: {
+        callURL = 'https://valoraapp.com/'
+        break
+      }
     }
-    app.launchApp()
-    return
   }
+  await Linking.openURL(callURL)
+
+  // let ua = navigator.userAgent.toLowerCase()
+  // let isAndroid = ua.indexOf('android') > -1 // android check
+  // let isIphone = ua.indexOf('iphone') > -1 // ios check
+
+  // if (isIphone == true) {
+  //   // let app = {
+  //   //   launchApp: function() {
+  //   //     setTimeout(function() {
+  //   //       window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
+  //   //     }, 25)
+  //   //     window.location.href = url //which page to open(now from mobile, check its authorization)
+  //   //   },
+  //   //   openWebApp: function() {
+  //   //     window.location.href = 'https://itunes.apple.com/us/app/appname/appid'
+  //   //   },
+  //   // }
+  //   // app.launchApp()
+  //   console.log("Hello I'm an iPhone")
+  // } else if (isAndroid == true) {
+  //   // let app = {
+  //   //   launchApp: function () {
+  //   //     window.open(url);
+  //   //   },
+  //   //   // openWebApp: function () {
+  //   //   //   window.location.href =
+  //   //   //     'https://play.google.com/store/apps/details?id=packagename';
+  //   //   // },
+  //   // };
+  //   // app.launchApp();
+  //   console.log("Hello I'm an Android")
+  // } else {
+  //   //navigate to website url
+  // }
+  // return
 }
