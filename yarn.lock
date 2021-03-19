@@ -1583,35 +1583,30 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-hsm-azure@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm-azure/-/wallet-hsm-azure-1.0.2.tgz#768ded33962c58b227b2109159d2d731caca7e2f"
-  integrity sha512-HI/1eq1iPWREM3ktTnvdFDwOP9kHjxWptT3xSeOBtwjvDTSjJ5kxdWcqLqLwQWB6VXYwXDBIFTOwURxxWxQA7Q==
+"@celo/wallet-hsm-azure@1.0.0-beta3":
+  version "1.0.0-beta3"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm-azure/-/wallet-hsm-azure-1.0.0-beta3.tgz#14ed865ab5f41bdc41e4467f915e515ca4b385ed"
+  integrity sha512-bGoVDQ45z24dh8kB4pDPSbxXj8zYHShl99YSH/mt9/ovVb2m80I8iyIrmQjtGBj4euoRHaiI6IIhu56csS8cUA==
   dependencies:
     "@azure/identity" "^1.1.0"
     "@azure/keyvault-keys" "^4.1.0"
     "@azure/keyvault-secrets" "^4.1.0"
-    "@celo/connect" "1.0.2"
-    "@celo/utils" "1.0.2"
-    "@celo/wallet-base" "1.0.2"
-    "@celo/wallet-hsm" "1.0.2"
-    "@celo/wallet-remote" "1.0.2"
-    "@types/secp256k1" "^4.0.0"
+    "@celo/utils" "1.0.0-beta3"
+    "@celo/wallet-base" "1.0.0-beta3"
+    "@celo/wallet-hsm" "1.0.0-beta3"
+    "@celo/wallet-remote" "1.0.0-beta3"
     bignumber.js "^9.0.0"
     debug "^4.1.1"
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
     secp256k1 "^4.0.0"
 
-"@celo/wallet-hsm@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm/-/wallet-hsm-1.0.2.tgz#d286835f62a22cd7c83f083007a236a80f85e051"
-  integrity sha512-GBnp2d75cTf90h5ip/DD+2rOgvSd1/m/Q6vkWc/39lsL7QqHJRF6NFCwUpfTjmQGwZ4lvE92Nx4J5/MsVG63oQ==
+"@celo/wallet-hsm@1.0.0-beta3":
+  version "1.0.0-beta3"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm/-/wallet-hsm-1.0.0-beta3.tgz#c941cfd1beff820039ce8ca1aa1b48dce3fc599a"
+  integrity sha512-zyIvPPbggpJ+A8XSUUnTvHhbD3qy0fuYvmWYu3PxjznBKDzbhUY+gxx//rubvIli7eepp9k7p11FczK4rlkNmw==
   dependencies:
-    "@celo/base" "1.0.2"
-    "@types/asn1js" "^0.0.2"
-    "@types/debug" "^4.1.5"
-    "@types/secp256k1" "^4.0.0"
+    "@celo/base" "1.0.0-beta3"
     asn1js "^2.0.26"
     elliptic "6.5.3"
     eth-lib "^0.2.8"
@@ -1640,16 +1635,13 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-remote@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-remote/-/wallet-remote-1.0.2.tgz#bdfce18d2dd2efa38b2dfc3ee5eb93bb8b89c8c6"
-  integrity sha512-D5AR/6oC/B/OtCD8FXRuBKFLh4PHJEznzwm9FkSLbHct8C3veIWFV8l+FqORNnBLNvfXXWUW1h9WE9yBbGuhyg==
+"@celo/wallet-remote@1.0.0-beta3":
+  version "1.0.0-beta3"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-remote/-/wallet-remote-1.0.0-beta3.tgz#739d71a93290c374d158a858fae97e437b4f2717"
+  integrity sha512-hKRQTzRhZV3EcHmFCAHaFlOJ4/DLFOV6y+YGDlZfAf1y7tklT2FSzR2/u61y9CEkANJBQIQnTb4QFCMLqJjqtQ==
   dependencies:
-    "@celo/connect" "1.0.2"
-    "@celo/utils" "1.0.2"
-    "@celo/wallet-base" "1.0.2"
-    "@types/debug" "^4.1.5"
-    "@types/ethereumjs-util" "^5.2.0"
+    "@celo/utils" "1.0.0-beta3"
+    "@celo/wallet-base" "1.0.0-beta3"
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
