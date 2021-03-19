@@ -168,6 +168,9 @@ export async function requestTxSig(
 // potentially then retry flow? --> look into this as step two
 // TODO: look out for Valora vs. Alfajores test wallet handling --> check that the proper one is being opened?
 // TODO get this working with expo as well...
+export const IOS_STORE_URL = 'https://apps.apple.com/de/app/valora-celo-payments-app/id1520414263'
+export const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=co.clabs.valora'
+export const VALORA_APP_URL = 'https://valoraapp.com/'
 
 // Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded
 async function openURLOrAppStore(url: string) {
@@ -177,20 +180,20 @@ async function openURLOrAppStore(url: string) {
   } else {
     switch (Platform.OS) {
       case 'ios': {
-        callURL = 'https://apps.apple.com/de/app/valora-celo-payments-app/id1520414263'
+        callURL = IOS_STORE_URL
         break
       }
       case 'android': {
-        callURL = 'https://play.google.com/store/apps/details?id=co.clabs.valora'
+        callURL = ANDROID_STORE_URL
         break
       }
       default: {
-        callURL = 'https://valoraapp.com/'
+        callURL = VALORA_APP_URL
         break
       }
     }
   }
-  await Linking.openURL(callURL)
+  Linking.openURL(callURL)
 
   // let ua = navigator.userAgent.toLowerCase()
   // let isAndroid = ua.indexOf('android') > -1 // android check
