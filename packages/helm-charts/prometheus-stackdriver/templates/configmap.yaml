@@ -195,4 +195,22 @@ data:
             regex: .*
             replacement: '{{ $.Values.cluster }}'
             target_label: cluster_name
-{{ end }}
+{{- end -}}
+{{- if .Values.scrapeJob }}
+  {{- if .Values.scrapeJob.Name }}
+      - job_name: {{ .Values.scrapeJob.Name }}
+  {{- end }}
+        static_configs:
+  {{- if .Values.scrapeJob.Targets }}
+          - targets:
+    {{- range .Values.scrapeJob.Targets }}
+            - {{ . }}
+    {{- end -}}
+  {{- end -}}
+  {{ if .Values.scrapeJob.Labels }}
+            labels:
+    {{- range .Values.scrapeJob.Labels }}
+              {{ . }}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
