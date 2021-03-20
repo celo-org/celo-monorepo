@@ -1,4 +1,4 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { installGenericHelmChart } from '../helm_deploy'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
@@ -22,8 +22,8 @@ export class AwsClusterManager extends BaseClusterManager {
     )
   }
 
-  async setupCluster() {
-    await super.setupCluster()
+  async setupCluster(context?: string) {
+    await super.setupCluster(context)
     await this.installKube2Iam()
   }
 

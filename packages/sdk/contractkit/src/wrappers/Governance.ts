@@ -159,8 +159,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     valueToBigNumber
   )
   /**
-   * Query proposal dequeue frequency.
-   * @returns Current proposal dequeue frequency in seconds.
+   * Query time of last proposal dequeue
+   * @returns Time of last dequeue
    */
   lastDequeue = proxyCall(this.contract.methods.lastDequeue, undefined, valueToBigNumber)
   /**
@@ -450,8 +450,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getApprovalStatus(proposalID: BigNumber.Value): Promise<ApprovalStatus> {
     const multisig = await this.getApproverMultisig()
     const approveTx = await this.approve(proposalID)
-    const confirmations = (await multisig.getTransactionDataByContent(this.address, approveTx.txo))!
-      .confirmations
+    const multisigTxs = await multisig.getTransactionDataByContent(this.address, approveTx.txo)
+    const confirmations = multisigTxs ? multisigTxs.confirmations : []
     const approvers = await multisig.getOwners()
     return {
       completion: `${confirmations.length} / ${approvers.length}`,

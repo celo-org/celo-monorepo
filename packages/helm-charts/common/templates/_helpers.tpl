@@ -183,7 +183,7 @@ fi
     exec geth \
       --port $PORT  \
 {{- if not (contains "rc1" .Release.Name) }}
-      "$BOOTNODE_FLAG" \
+      $BOOTNODE_FLAG \
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \

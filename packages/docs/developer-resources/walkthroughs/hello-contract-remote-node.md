@@ -265,7 +265,7 @@ async function initContract(){
     const deployedNetwork = HelloWorld.networks[networkId]
     
     // Create a new contract instance with the HelloWorld contract info
-    let instance = new web3.eth.Contract(
+    let instance = new kit.web3.eth.Contract(
         HelloWorld.abi,
         deployedNetwork && deployedNetwork.address
     )

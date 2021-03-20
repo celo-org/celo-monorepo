@@ -23,7 +23,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: VotingBotArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   if (!isCelotoolHelmDryRun()) {
     await setupVotingBotAccounts(argv.celoEnv)
   }

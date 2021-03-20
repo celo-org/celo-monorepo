@@ -12,7 +12,7 @@ export const handler = async (argv: DestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   failIfVmBased()
 
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   await deleteFromCluster(argv.celoEnv)
   await deleteStaticIPs(argv.celoEnv)
