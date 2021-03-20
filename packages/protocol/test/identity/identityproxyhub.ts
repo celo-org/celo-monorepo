@@ -10,6 +10,29 @@ const IdentityProxyHub: IdentityProxyHubContract = artifacts.require('IdentityPr
 const IdentityProxy: IdentityProxyContract = artifacts.require('IdentityProxy')
 const IdentityProxyTest: IdentityProxyTestContract = artifacts.require('IdentityProxyTest')
 
+const concatanateHexStrings = (...strings: string[]) => {
+  return `0x${strings.reduce((concatanated: string, s: string) => {
+    return `${concatanated}${s.slice(2)}`
+  }, '')}`
+}
+
+const computeCreate2Address = <T>(
+  salt: string,
+  deployerAddress: string,
+  Contract: Truffle.Contract<T>
+) => {
+  const hash = web3.utils.soliditySha3(
+    // @ts-ignore
+    concatanateHexStrings(
+      '0xff',
+      deployerAddress,
+      salt,
+      web3.utils.soliditySha3(Contract._json.bytecode)
+    )
+  )
+  return `0x${hash.slice(2 + 2 * 12)}`
+}
+
 contract('IdentityProxyHub', () => {
   let identityProxyHub: IdentityProxyHubInstance
   let identityProxyTest: IdentityProxyTestInstance
@@ -22,31 +45,34 @@ contract('IdentityProxyHub', () => {
   })
 
   describe('getIdentityProxy', () => {
-    it('returns a non-zero address', async () => {
-      const address = await identityProxyHub.getIdentityProxy.call(identifier1)
-      assert.notEqual(address, '0x0000000000000000000000000000000000000000')
+    it('returns the correct CREATE2 address', async () => {
+      const expectedAddress = computeCreate2Address(
+        identifier1,
+        identityProxyHub.address,
+        IdentityProxy
+      )
+      const onchainAddress = await identityProxyHub.getIdentityProxy(identifier1)
+      assert.equal(onchainAddress.toLowerCase(), expectedAddress.toLowerCase())
+    })
+  })
+
+  describe('getOrDeployIdentityProxy', () => {
+    it('returns the correct CREATE2 address', async () => {
+      const expectedAddress = computeCreate2Address(
+        identifier1,
+        identityProxyHub.address,
+        IdentityProxy
+      )
+      const onchainAddress = await identityProxyHub.getOrDeployIdentityProxy.call(identifier1)
+      assert.equal(onchainAddress.toLowerCase(), expectedAddress.toLowerCase())
     })
 
     it('returns the address of an IdentityProxy', async () => {
-      const address = await identityProxyHub.getIdentityProxy.call(identifier1)
-      await identityProxyHub.getIdentityProxy(identifier1)
+      const address = await identityProxyHub.getOrDeployIdentityProxy.call(identifier1)
+      await identityProxyHub.getOrDeployIdentityProxy(identifier1)
       const bytecode = await web3.eth.getCode(address)
       // @ts-ignore _json property not declared by typechain
-      assert.equal(IdentityProxy._json.deployedBytecode, bytecode)
-    })
-
-    it('returns different addresses for different identifiers', async () => {
-      const address1 = await identityProxyHub.getIdentityProxy.call(identifier1)
-      await identityProxyHub.getIdentityProxy(identifier1)
-      const address2 = await identityProxyHub.getIdentityProxy.call(identifier2)
-      assert.notEqual(address1, address2)
-    })
-
-    it('returns the same address each time for a given identifier', async () => {
-      const address1 = await identityProxyHub.getIdentityProxy.call(identifier1)
-      await identityProxyHub.getIdentityProxy(identifier1)
-      const address2 = await identityProxyHub.getIdentityProxy.call(identifier1)
-      assert.equal(address1, address2)
+      assert.equal(bytecode, IdentityProxy._json.deployedBytecode)
     })
   })
 
@@ -54,8 +80,8 @@ contract('IdentityProxyHub', () => {
     let address: string
 
     beforeEach(async () => {
-      address = await identityProxyHub.getIdentityProxy.call(identifier1)
-      await identityProxyHub.getIdentityProxy(identifier1)
+      address = await identityProxyHub.getIdentityProxy(identifier1)
+      await identityProxyHub.getOrDeployIdentityProxy(identifier1)
     })
 
     it('forwards calls to the destination', async () => {
@@ -79,7 +105,7 @@ contract('IdentityProxyHub', () => {
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
       await identityProxyHub.makeCall(identifier2, identityProxyTest.address, 0, txData)
       const addressThatCalled = await identityProxyTest.lastAddress()
-      const proxyAddress = await identityProxyHub.getIdentityProxy.call(identifier2)
+      const proxyAddress = await identityProxyHub.getIdentityProxy(identifier2)
       assert.equal(addressThatCalled, proxyAddress)
     })
 
