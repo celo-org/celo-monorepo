@@ -255,7 +255,7 @@ export default class Show extends BaseCommand {
           group: { get: (e) => e.group.address },
           groupPayment: { get: (e) => e.groupPayment.toFixed(0) },
           validator: { get: (e) => e.validator.address },
-          validatorScore: { get: (e) => e.validator.score.toFixed(0) },
+          validatorScore: { get: (e) => e.validator.score.toFixed() },
           epochNumber: {},
         },
         res.flags
