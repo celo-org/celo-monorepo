@@ -1,7 +1,7 @@
 import {
+  IdentityProxyContract,
   IdentityProxyHubContract,
   IdentityProxyHubInstance,
-  IdentityProxyContract,
   IdentityProxyTestContract,
   IdentityProxyTestInstance,
 } from 'types'
@@ -36,8 +36,8 @@ const computeCreate2Address = <T>(
 contract('IdentityProxyHub', () => {
   let identityProxyHub: IdentityProxyHubInstance
   let identityProxyTest: IdentityProxyTestInstance
-  let identifier1: string = '0x00000000000000000000000000000000000000000000000000000000babecafe'
-  let identifier2: string = '0x00000000000000000000000000000000000000000000000000000000deadbeef'
+  const identifier1: string = '0x00000000000000000000000000000000000000000000000000000000babecafe'
+  const identifier2: string = '0x00000000000000000000000000000000000000000000000000000000deadbeef'
 
   beforeEach(async () => {
     identityProxyHub = await IdentityProxyHub.new()
@@ -109,6 +109,7 @@ contract('IdentityProxyHub', () => {
       assert.equal(addressThatCalled, proxyAddress)
     })
 
-    it.skip('fails to call if sender does not match identity', async () => {})
+    // TODO: Implement and test an identity heuristic
+    // it('fails to call if sender does not match identity', async () => {})
   })
 })
