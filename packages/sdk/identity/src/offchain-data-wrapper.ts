@@ -181,7 +181,9 @@ class StorageRoot {
         accounts.getAttestationSigner(this.account),
         accounts.getDataEncryptionKey(this.account),
       ])
-      const signers = [keys[0], keys[1], keys[2], publicKeyToAddress(ensureUncompressed(keys[3]))]
+
+      const dekAddress = keys[3] ? publicKeyToAddress(ensureUncompressed(keys[3])) : '0x0'
+      const signers = [keys[0], keys[1], keys[2], dekAddress]
 
       if (signers.some((signer) => eqAddress(signer, guessedSigner))) {
         return Ok(body)
