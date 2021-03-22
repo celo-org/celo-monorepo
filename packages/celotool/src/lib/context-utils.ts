@@ -1,3 +1,4 @@
+import { Argv } from 'yargs'
 import {
   addCeloEnvMiddleware,
   doCheckOrPromptIfStagingOrProduction,
@@ -5,8 +6,7 @@ import {
   envVar,
   fetchEnv,
   getDynamicEnvVarValue,
-} from 'src/lib/env-utils'
-import { Argv } from 'yargs'
+} from './env-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
@@ -171,7 +171,8 @@ export function getContextDynamicEnvVarValues<T>(
 export async function switchToContextCluster(
   celoEnv: string,
   context: string,
-  checkOrPromptIfStagingOrProduction: boolean = true
+  checkOrPromptIfStagingOrProduction: boolean = true,
+  skipClusterSetup: boolean = false
 ) {
   if (!isValidContext(context)) {
     throw Error(`Invalid context, must be one of ${fetchEnv(envVar.CONTEXTS)}`)
@@ -180,7 +181,7 @@ export async function switchToContextCluster(
     await doCheckOrPromptIfStagingOrProduction()
   }
   const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
-  await clusterManager.switchToClusterContext()
+  await clusterManager.switchToClusterContext(skipClusterSetup, context)
   return clusterManager
 }
 
@@ -188,6 +189,11 @@ export function getClusterManagerForContext(celoEnv: string, context: string) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
   const clusterConfig = clusterConfigGetterByCloudProvider[cloudProvider](context)
   return getClusterManager(cloudProvider, celoEnv, clusterConfig)
+}
+
+export function getClusterConfigForContext(context: string) {
+  const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
+  return clusterConfigGetterByCloudProvider[cloudProvider](context)
 }
 
 /**
@@ -230,11 +236,13 @@ export function isValidContext(context: string) {
  * Must be one of the contexts specified in the environment
  * variable CONTEXTS.
  */
+export function addOptionalContextMiddleware(argv: Argv) {
+  return addCeloEnvMiddleware(argv).option('context', {
+    description: 'Context to perform the deployment in',
+    type: 'string',
+  })
+}
+
 export function addContextMiddleware(argv: Argv) {
-  return addCeloEnvMiddleware(argv)
-    .option('context', {
-      description: 'Context to perform the deployment in',
-      type: 'string',
-    })
-    .coerce('context', coerceContext)
+  return addOptionalContextMiddleware(argv).coerce('context', coerceContext)
 }

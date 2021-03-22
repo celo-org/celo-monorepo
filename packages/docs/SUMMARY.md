@@ -28,6 +28,7 @@
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
+- [Governance Cheat Sheet](celo-holder-guide/governance-cheat-sheet.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
 - [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
 
@@ -45,6 +46,7 @@
 - [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
+- [Celo Signal](validator-guide/celo-signal.md)
 
 ## Developer Guide
 

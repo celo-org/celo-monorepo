@@ -39,7 +39,7 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: TestnetArgv) => {
   failIfVmBased()
 
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   await upgradeStaticIPs(argv.celoEnv)
 

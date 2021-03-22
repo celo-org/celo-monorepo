@@ -6,6 +6,7 @@ function build_tag() {
 
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+  rm -r contracts
   git checkout $BRANCH -- contracts 2>>$LOG_FILE >> $LOG_FILE
 
   echo " - Build contract artifacts at $BUILD_DIR"
@@ -15,5 +16,6 @@ function build_tag() {
   mv build/contracts $BUILD_DIR
   mv build/contracts_tmp build/contracts
 
+  rm -r contracts
   git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE
 }
