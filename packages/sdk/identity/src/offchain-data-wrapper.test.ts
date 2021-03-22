@@ -1,3 +1,4 @@
+import { Result } from '@celo/base'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { createStorageClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity/metadata'
@@ -6,6 +7,7 @@ import { ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import {
   ensureLeading0x,
+  privateKeyToAddress,
   privateKeyToPublicKey,
   publicKeyToAddress,
   toChecksumAddress,
@@ -16,7 +18,7 @@ import { LocalWallet } from '@celo/wallet-local'
 import { randomBytes } from 'crypto'
 import { BasicDataWrapper, OffchainDataWrapper, OffchainErrorTypes } from './offchain-data-wrapper'
 import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
-import { SchemaErrorTypes } from './offchain/accessors/errors'
+import { SchemaErrors, SchemaErrorTypes } from './offchain/accessors/errors'
 import { PrivateNameAccessor, PublicNameAccessor } from './offchain/accessors/name'
 import { MockStorageWriter } from './offchain/storage-writers'
 
@@ -105,6 +107,36 @@ testWithGanache('Offchain Data', (web3) => {
     signer.kit.getWallet()!.removeAccount(signer.address)
   })
 
+  const assertValidNameResponse = (resp: Result<{ name: string }, SchemaErrors>) => {
+    if (resp.ok) {
+      expect(resp.result.name).toEqual(testname)
+    } else {
+      const error = resp.error
+      switch (error.errorType) {
+        case SchemaErrorTypes.InvalidDataError:
+          console.log("Something was wrong with the schema, can't try again")
+          break
+        case SchemaErrorTypes.OffchainError:
+          const offchainError = error.error
+          switch (offchainError.errorType) {
+            case OffchainErrorTypes.FetchError:
+              console.log('Something went wrong with fetching, try again')
+              break
+            case OffchainErrorTypes.InvalidSignature:
+              console.log('Signature was wrong')
+              break
+            case OffchainErrorTypes.NoStorageRootProvidedData:
+              console.log("Account doesn't have data for this type")
+              break
+          }
+
+        default:
+          break
+      }
+      throw new Error(error.message)
+    }
+  }
+
   describe('with the account being the signer', () => {
     it('can write a name', async () => {
       const nameAccessor = new PublicNameAccessor(writer.wrapper)
@@ -112,33 +144,25 @@ testWithGanache('Offchain Data', (web3) => {
 
       const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
       const resp = await readerNameAccessor.readAsResult(writer.address)
-      if (resp.ok) {
-        expect(resp.result.name).toEqual(testname)
-      } else {
-        const error = resp.error
-        switch (error.errorType) {
-          case SchemaErrorTypes.InvalidDataError:
-            console.log("Something was wrong with the schema, can't try again")
-            break
-          case SchemaErrorTypes.OffchainError:
-            const offchainError = error.error
-            switch (offchainError.errorType) {
-              case OffchainErrorTypes.FetchError:
-                console.log('Something went wrong with fetching, try again')
-                break
-              case OffchainErrorTypes.InvalidSignature:
-                console.log('Signature was wrong')
-                break
-              case OffchainErrorTypes.NoStorageRootProvidedData:
-                console.log("Account doesn't have data for this type")
-                break
-            }
+      assertValidNameResponse(resp)
+    })
+  })
 
-          default:
-            break
-        }
-        throw new Error(error.message)
-      }
+  describe('with the DEK being the signer', () => {
+    it('can write a name', async () => {
+      const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[5]
+      const writerDEK = randomBytes(32).toString('hex')
+      const compressedWriter = await setupAccount(writerPrivateKey, writerDEK, true)
+      const DEKAddress = privateKeyToAddress(writerDEK)
+      compressedWriter.wrapper.kit.connection.addAccount(writerDEK)
+      compressedWriter.wrapper.signer = DEKAddress
+
+      const nameAccessor = new PublicNameAccessor(compressedWriter.wrapper)
+      await nameAccessor.write(testPayload)
+
+      const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
+      const resp = await readerNameAccessor.readAsResult(compressedWriter.address)
+      assertValidNameResponse(resp)
     })
   })
 
