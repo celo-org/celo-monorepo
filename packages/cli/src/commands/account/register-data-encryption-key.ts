@@ -29,9 +29,7 @@ export default class RegisterDataEncryptionKey extends BaseCommand {
     const res = this.parse(RegisterDataEncryptionKey)
     this.kit.defaultAccount = res.flags.from
 
-    await newCheckBuilder(this)
-      .isAccount(res.flags.from)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(res.flags.from).runChecks()
 
     const publicKey = res.flags.publicKey
 

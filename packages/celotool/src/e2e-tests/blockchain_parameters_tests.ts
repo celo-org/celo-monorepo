@@ -9,7 +9,7 @@ import { getHooks, sleep } from './utils'
 const TMP_PATH = '/tmp/e2e'
 const rpcURL = 'http://localhost:8545'
 
-describe('Blockchain parameters tests', function(this: any) {
+describe('Blockchain parameters tests', function (this: any) {
   this.timeout(0)
 
   let kit: ContractKit
@@ -38,12 +38,12 @@ describe('Blockchain parameters tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })

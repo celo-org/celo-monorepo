@@ -221,15 +221,9 @@ function utf8ToHex(str: string): string {
 
   // remove \u0000 padding from either side
   str = str.replace(/^(?:\u0000)*/, '')
-  str = str
-    .split('')
-    .reverse()
-    .join('')
+  str = str.split('').reverse().join('')
   str = str.replace(/^(?:\u0000)*/, '')
-  str = str
-    .split('')
-    .reverse()
-    .join('')
+  str = str.split('').reverse().join('')
 
   for (let i = 0; i < str.length; i++) {
     const code = str.charCodeAt(i)
