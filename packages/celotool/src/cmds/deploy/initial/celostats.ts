@@ -7,6 +7,6 @@ export const command = 'celostats'
 export const describe = 'deploy the celostats package'
 
 export const handler = async (argv: InitialArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await installHelmChart(argv.celoEnv)
 }

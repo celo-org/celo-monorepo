@@ -27,7 +27,7 @@ export const builder = (yargs: Argv) => {
 }
 
 export const handler = async (argv: InviteArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   const phone = argv.phone
 
   console.log(`Sending invitation code to ${phone}`)

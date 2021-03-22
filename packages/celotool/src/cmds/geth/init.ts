@@ -69,7 +69,7 @@ export const handler = async (argv: InitArgv) => {
   await execCmdWithExitOnFailure(`${gethBinary} --datadir "${datadir}" init ${genesis}`)
 
   if (argv.fetchStaticNodesFromNetwork) {
-    await switchToClusterFromEnv(false)
+    await switchToClusterFromEnv(argv.celoEnv, false)
     await getEnodesAddresses(namespace).then((enodes) => {
       writeStaticNodes(enodes, datadir, STATIC_NODES_FILE_NAME)
       console.info(`Geth has been initialized successfully! 😎`)

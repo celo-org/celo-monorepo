@@ -19,6 +19,7 @@ import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
   generateGenesis,
+  generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToPublicKey,
   Validator,
@@ -1084,6 +1085,40 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   }
 }
 
+export async function writeGenesisWithMigrations(
+  gethConfig: GethRunConfig,
+  gethRepoPath: string,
+  mnemonic: string,
+  numValidators: number,
+  verbose: boolean = false
+) {
+  const genesis: string = await generateGenesisWithMigrations({
+    gethRepoPath,
+    mnemonic,
+    numValidators,
+    genesisConfig: {
+      blockTime: 1,
+      epoch: 10,
+      lookbackwindow: 3,
+      requestTimeout: 3000,
+      chainId: gethConfig.networkId,
+      ...gethConfig.genesisConfig,
+    },
+  })
+
+  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
+
+  if (verbose) {
+    console.log('writing genesis')
+  }
+
+  fs.writeFileSync(genesisPath, genesis)
+
+  if (verbose) {
+    console.log(`wrote genesis to ${genesisPath}`)
+  }
+}
+
 export async function snapshotDatadir(
   runPath: string,
   instance: GethInstanceConfig,
@@ -1114,6 +1149,10 @@ export async function restoreDatadir(runPath: string, instance: GethInstanceConf
 
 export async function buildGeth(gethPath: string) {
   await spawnCmdWithExitOnFailure('make', ['geth'], { cwd: gethPath })
+}
+
+export async function buildGethAll(gethPath: string) {
+  await spawnCmdWithExitOnFailure('make', ['all'], { cwd: gethPath })
 }
 
 export async function resetDataDir(dataDir: string, verbose: boolean) {

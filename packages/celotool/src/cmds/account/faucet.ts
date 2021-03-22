@@ -65,7 +65,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: FaucetArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   const addresses = argv.account
 

@@ -25,7 +25,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: ListArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false)
 
   await downloadArtifacts(argv.celoEnv)
   await copyContractArtifacts(

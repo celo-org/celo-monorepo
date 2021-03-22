@@ -1,4 +1,6 @@
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
+import { isCelotoolHelmDryRun } from '../helm_deploy'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
@@ -25,13 +27,16 @@ export class AksClusterManager extends BaseClusterManager {
   }
 
   async getAndSwitchToClusterContext() {
+    const kubeconfig = fetchEnvOrFallback(envVar.KUBECONFIG, '')
+      ? `--file ${fetchEnv(envVar.KUBECONFIG)}`
+      : ''
     await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing`
+      `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing ${kubeconfig}`
     )
   }
 
-  async setupCluster() {
-    await super.setupCluster()
+  async setupCluster(context?: string) {
+    await super.setupCluster(context)
     await this.installAADPodIdentity()
   }
 
@@ -46,14 +51,18 @@ export class AksClusterManager extends BaseClusterManager {
       `aad-pod-identity exists, skipping install`
     )
     if (!aadPodIdentityExists) {
-      console.info('Adding aad-pod-identity helm repository to local helm')
-      await execCmdWithExitOnFailure(
-        `helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts`
-      )
-      console.info('Installing aad-pod-identity')
-      await execCmdWithExitOnFailure(
-        `helm install aad-pod-identity aad-pod-identity/aad-pod-identity -n default`
-      )
+      if (isCelotoolHelmDryRun()) {
+        console.info('Skipping aad-pod-identity deployment due to --helmdryrun')
+      } else {
+        console.info('Adding aad-pod-identity helm repository to local helm')
+        await execCmdWithExitOnFailure(
+          `helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts`
+        )
+        console.info('Installing aad-pod-identity')
+        await execCmdWithExitOnFailure(
+          `helm install aad-pod-identity aad-pod-identity/aad-pod-identity -n default`
+        )
+      }
     }
   }
 
