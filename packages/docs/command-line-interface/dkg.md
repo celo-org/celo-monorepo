@@ -3,6 +3,26 @@
 Publish your locally computed DKG results to the blockchain
 
 
+## `celocli dkg:allowlist`
+
+Allowlist an address in the DKG
+
+```
+Allowlist an address in the DKG
+
+USAGE
+  $ celocli dkg:allowlist
+
+OPTIONS
+  --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
+
+  --participantAddress=participantAddress               (required) Address of the
+                                                        participant to allowlist
+```
+
+_See code: [src/commands/dkg/allowlist.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/allowlist.ts)_
+
 ## `celocli dkg:deploy`
 
 Deploys the DKG smart contract
@@ -100,23 +120,3 @@ OPTIONS
 ```
 
 _See code: [src/commands/dkg/start.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/start.ts)_
-
-## `celocli dkg:whitelist`
-
-Whitelist an address in the DKG
-
-```
-Whitelist an address in the DKG
-
-USAGE
-  $ celocli dkg:whitelist
-
-OPTIONS
-  --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
-
-  --participantAddress=participantAddress               (required) Address of the
-                                                        participant to whitelist
-```
-
-_See code: [src/commands/dkg/whitelist.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/whitelist.ts)_
