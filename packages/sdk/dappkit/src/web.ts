@@ -4,22 +4,22 @@ import {
   AccountAuthResponseSuccess,
   DappKitRequestMeta,
   parseDappkitResponseDeeplink,
-  SignTxResponseSuccess
+  SignTxResponseSuccess,
 } from '@celo/utils'
 import type { TxParams } from './index'
 import {
   checkAccountAuth,
   checkSignedTxs,
   requestAccountAddressFactory,
-  requestTxSigFactory
+  requestTxSigFactory,
 } from './index'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
   serializeDappKitRequestDeeplink,
-  SignTxRequest
+  SignTxRequest,
 } from '@celo/utils'
-export { FeeCurrency } from './index'
+export { ANDROID_STORE_URL, FeeCurrency, IOS_STORE_URL, VALORA_APP_URL } from './index'
 export type { TxParams }
 
 // DappKit Web constants and helpers
