@@ -6,21 +6,20 @@ import {
   parseDappkitResponseDeeplink,
   SignTxResponseSuccess,
 } from '@celo/utils'
-import type { TxParams } from './index'
 import {
   checkAccountAuth,
   checkSignedTxs,
   requestAccountAddressFactory,
   requestTxSigFactory,
-} from './index'
+  TxParams,
+} from './common'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
 } from '@celo/utils'
-export { ANDROID_STORE_URL, FeeCurrency, IOS_STORE_URL, VALORA_APP_URL } from './index'
-export type { TxParams }
+export { FeeCurrency } from './common'
 
 // DappKit Web constants and helpers
 const localStorageKey = 'dappkit-web'
