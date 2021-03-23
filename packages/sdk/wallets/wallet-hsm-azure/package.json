@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-hsm-azure",
-  "version": "1.1.0",
+  "version": "1.1.1-dev",
   "description": "Azure HSM wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
