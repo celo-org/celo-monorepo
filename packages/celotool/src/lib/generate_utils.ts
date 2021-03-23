@@ -443,6 +443,7 @@ export const generateGenesisWithMigrations = async ({
   genesisConfig,
   mnemonic,
   numValidators,
+  verbose,
 }: MyceloGenesisConfig): Promise<string> => {
   const tmpDir = path.join(tmpdir(), `mycelo-genesis-${Date.now()}`)
   fs.mkdirSync(tmpDir)
@@ -461,7 +462,7 @@ export const generateGenesisWithMigrations = async ({
       numValidators.toString(),
     ],
     {
-      silent: true,
+      silent: !verbose,
       cwd: tmpDir,
     }
   )
@@ -513,7 +514,7 @@ export const generateGenesisWithMigrations = async ({
     myceloBinaryPath,
     ['genesis-from-config', tmpDir, '--buildpath', contractsBuildPath],
     {
-      silent: true,
+      silent: !verbose,
       cwd: tmpDir,
     }
   )
