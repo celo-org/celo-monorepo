@@ -11,7 +11,7 @@ This document outlies the requirement and steps to add a new stable asset to the
 
 ### Including contracts on the registry
 
-Currently, the addition of new assets is tight to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals, only final value that can't be changed is the pre-mint amount.
+Currently, the addition of new assets is tight to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals, only final value that can't be changed is the pre-mint amount.
 
 ### Freezing
 
@@ -25,7 +25,7 @@ As new contracts are added to the registry, new [constitution parameteres](https
 
 ### Oracle activation
 
-A following governance proposal needs to be submited to enable [oracles](oracles.md) to report. This oracle proposal needs to enable addresses to report to the `StableTokenX` address and, optionally, fund them to pay for gas fees. An example of this proposal is the [cEUR oracle activation proposal](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0023.md)[2].
+A following governance proposal needs to be submited to enable [oracles](oracles.md) to report. This oracle proposal needs to enable addresses to report to the `StableTokenX` address and, optionally, fund them to pay for gas fees. An example of this proposal is the [cEUR oracle activation proposal](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0023.md)[^2].
 
 ### Oracle report
 
@@ -57,5 +57,5 @@ Adding a new stable asset involves updating many parts of the tooling, such as:
 * Supporting alfajores faucet.
 * Supporting on Dapp kit.
 
-[1] There are opened issues trying to de-couple the addition of new assets to the reserve to the release cycle.
-[2] Please note this example proposal also includes freezing, this is because, at the time of writing (22-march-2021), the tooling for proposing a contract release doesn't support freezing those contracts on the same proposal. That proposal shall not be modified manually given that the tool is meant to run verifications.
+[^1] There are opened issues trying to de-couple the addition of new assets to the reserve to the release cycle.
+[^2] Please note this example proposal also includes freezing, this is because, at the time of writing (22-march-2021), the tooling for proposing a contract release doesn't support freezing those contracts on the same proposal. That proposal shall not be modified manually given that the tool is meant to run verifications.
