@@ -186,7 +186,7 @@ export default class Show extends BaseCommand {
           address: {},
           addressPayment: { get: (e) => e.addressPayment.toFixed(0) },
           group: { get: (e) => e.group.address },
-          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed(0) },
+          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
         res.flags
@@ -200,7 +200,7 @@ export default class Show extends BaseCommand {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
           groupVoterPayment: { get: (e) => e.groupVoterPayment.toFixed(0) },
-          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed(0) },
+          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
         res.flags
@@ -231,7 +231,7 @@ export default class Show extends BaseCommand {
           validatorName: { get: (e) => e.validator.name },
           validator: { get: (e) => e.validator.address },
           validatorPayment: { get: (e) => e.validatorPayment.toFixed(0) },
-          validatorScore: { get: (e) => e.validator.score.toFixed(0) },
+          validatorScore: { get: (e) => e.validator.score.toFixed() },
           group: { get: (e) => e.group.address },
           epochNumber: {},
         },
