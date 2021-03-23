@@ -158,7 +158,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @notice Sets initialized == true on implementation contracts
-   * @param test  Set to true to skip implementation initialization
+   * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public InitializableV2(test) {}
 

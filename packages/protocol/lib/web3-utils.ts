@@ -257,7 +257,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
     deployer.deploy(ContractProxy)
-    if (checkInheritance('InitializableV2', Contract, artifacts)) {
+    if (checkImports('InitializableV2', Contract, artifacts)) {
       deployer.deploy(Contract, testingDeployment)
     } else {
       deployer.deploy(Contract)
@@ -393,7 +393,7 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
   return selectors
 }
 
-export function checkInheritance(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
+export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
   const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
   const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
   while (imports.length) { // BFS 
