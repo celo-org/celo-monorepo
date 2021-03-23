@@ -136,7 +136,7 @@ export async function createDefaultIngressIfNotExists(celoEnv: string, ingressNa
   )
   if (!ingressExists) {
     console.info(`Creating ingress ${celoEnv}-blockscout-web-ingress`)
-    const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.json`
+    const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.yaml`
     const ingressResource = `
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -145,12 +145,12 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/configuration-snippet: |
-    location ~ /admin/.* {
-      deny all;
-    }
-    location ~ /wobserver/.* {
-      deny all;
-    }
+      location ~ /admin/.* {
+        deny all;
+      }
+      location ~ /wobserver/.* {
+        deny all;
+      }
   labels:
     app: blockscout
     chart: blockscout
