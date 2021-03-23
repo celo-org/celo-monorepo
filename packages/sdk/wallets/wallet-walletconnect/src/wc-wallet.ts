@@ -132,7 +132,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
       debug('Attempted to update non existant pairing', pairing)
       return
     }
-    this.pairing.peer.metadata = pairing.peer.metadata
+    this.pairing.state.metadata = pairing.state.metadata
   }
   onPairingDeleted = () => {
     this.pairing = undefined
