@@ -1,18 +1,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Release.Namespace }}-wallet-connect
+  name: {{ .Release.Name }}
   labels:
-    app: wallet-connect
-    chart: wallet-connect
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    component: wallet-connect
+{{ include "walletconnect.labels" .  | indent 4 }}
 spec:
   selector:
-    app: wallet-connect
-    release: {{ .Release.Name }}
-    component: wallet-connect
+{{ include "walletconnect.selectorLabels" .  | indent 4 }}
   clusterIP: None
   type: {{ .Values.walletconnect.service.type }}
   ports:

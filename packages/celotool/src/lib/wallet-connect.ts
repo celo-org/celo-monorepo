@@ -1,11 +1,29 @@
-import { makeHelmParameters } from 'src/lib/helm_deploy'
+import { createNamespaceIfNotExists } from 'src/lib/cluster'
+import {
+  installGenericHelmChart,
+  makeHelmParameters,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { envVar, fetchEnv } from './env-utils'
 
-export function helmReleaseName(celoEnv: string) {
-  return celoEnv + '-wallet-connect'
-}
+const releaseName = 'walletconnect'
+const releaseNamespace = 'walletconnect'
 
 export const helmChartDir = '../helm-charts/wallet-connect'
+
+export async function installWalletConnect() {
+  await createNamespaceIfNotExists(releaseNamespace)
+  await installGenericHelmChart(releaseNamespace, releaseName, helmChartDir, helmParameters())
+}
+
+export async function upgradeWalletConnect() {
+  await upgradeGenericHelmChart(releaseNamespace, releaseName, helmChartDir, helmParameters())
+}
+
+export async function removeWalletConnect() {
+  await removeGenericHelmChart(releaseName, releaseNamespace)
+}
 
 export function helmParameters() {
   return makeHelmParameters({

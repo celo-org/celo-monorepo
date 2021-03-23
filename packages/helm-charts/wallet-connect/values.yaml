@@ -14,7 +14,7 @@ walletconnect:
     type: ClusterIP
 
 domain:
-  name: wallet-connect
+  name: walletconnect
 
 redis:
   cluster:

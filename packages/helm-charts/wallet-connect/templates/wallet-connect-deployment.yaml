@@ -1,34 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Namespace }}-wallet-connect
+  name: {{ .Release.Name }}
   labels:
-    app: wallet-connect
-    chart: wallet-connect
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    component: wallet-connect
+{{ include "walletconnect.labels" .  | indent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: wallet-connect
-      release: {{ .Release.Name }}
-      component: wallet-connect
+{{ include "walletconnect.selectorLabels" .  | indent 6 }}
   template:
     metadata:
       labels:
-        app: wallet-connect
-        release: {{ .Release.Name }}
-        component: wallet-connect
+{{ include "walletconnect.selectorLabels" .  | indent 8 }}
     spec:
       containers:
-      - name: wallet-connect
+      - name: walletconnect
         image: {{ .Values.walletconnect.image.repository }}:{{ .Values.walletconnect.image.tag }}
         imagePullPolicy: {{ .Values.walletconnect.imagePullPolicy }}
         env:
           - name: REDIS_URL
-            value: redis://walletconnect-wallet-connect-redis-headless:6379/0
+            value: redis://{{ .Release.Name }}-redis-headless:6379/0
           - name: REDIS_PREFIX
             value: walletconnect-bridge
           - name: NODE_ENV

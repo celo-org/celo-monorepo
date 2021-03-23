@@ -1,20 +1,14 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { installGenericHelmChart } from 'src/lib/helm_deploy'
-import { helmChartDir, helmParameters, helmReleaseName } from 'src/lib/wallet-connect'
+import { installWalletConnect } from 'src/lib/wallet-connect'
 import { InitialArgv } from '../../deploy/initial'
 
-export const command = 'wallet-connect'
+export const command = 'walletconnect'
 
-export const describe = 'deploy the wallet-connect package'
+export const describe = 'deploy the walletconnect package'
 
 export const builder = {}
 
 export const handler = async (argv: InitialArgv) => {
   await switchToClusterFromEnv(argv.celoEnv)
-  await installGenericHelmChart(
-    argv.celoEnv,
-    helmReleaseName(argv.celoEnv),
-    helmChartDir,
-    helmParameters()
-  )
+  await installWalletConnect()
 }
