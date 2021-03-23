@@ -18,23 +18,25 @@ Other Changes
 
 ## Published
 
-### **[1.1.0--beta.1]** -- 2021-03-05
+### **[1.1.0]** -- 2021-03-23
 Features
 - Implementation of a WalletConnect compatible wallet - [#7122](https://github.com/celo-org/celo-monorepo/pull/7122)
 - Add dappkit-web functionality - [#7328](https://github.com/celo-org/celo-monorepo/pull/7328)
-- cEUR ContractKit support - [#7257](https://github.com/celo-org/celo-monorepo/pull/7257)
 - Adds Reserve unfrozen balance methods - [#7103](https://github.com/celo-org/celo-monorepo/pull/7103)
 - Merge branch 'release/celo-core-contracts/3' - [#7183](https://github.com/celo-org/celo-monorepo/pull/7183)
 - Improve granularity of governance tooling information - [#6475](https://github.com/celo-org/celo-monorepo/pull/6475)
 - Upload/Download Profile Data with CIP8 - [#6604](https://github.com/celo-org/celo-monorepo/pull/6604)
 - CIP8 name access via the CLI - [#6855](https://github.com/celo-org/celo-monorepo/pull/6855)
+- Allow DEK to be a CIP8 signer - [#7467](https://github.com/celo-org/celo-monorepo/pull/7467)
 
 Bug Fixes
 - Fixed references to goldToken in README - [#7189](https://github.com/celo-org/celo-monorepo/pull/7189)
 - Update proposals.ts - [#7275](https://github.com/celo-org/celo-monorepo/pull/7275)
 - Functions to invalidate the contracts cache - [#7203](https://github.com/celo-org/celo-monorepo/pull/7203)
 - fix `rewards:show` - [#7325](https://github.com/celo-org/celo-monorepo/pull/7325)
--  In `getReserveGoldBalance`, dont alias itself - [#7334](https://github.com/celo-org/celo-monorepo/pull/7334)
+- In `getReserveGoldBalance`, dont alias itself - [#7334](https://github.com/celo-org/celo-monorepo/pull/7334)
+- Fix check for unregistered contracts - [#7319](https://github.com/celo-org/celo-monorepo/pull/7319)
+- Fix no approval case for `governance:approver` information - [#7478](https://github.com/celo-org/celo-monorepo/pull/7478)
 
 Other Changes
 - Makes the grace period variable governable - [#6987](https://github.com/celo-org/celo-monorepo/pull/6987)
@@ -43,6 +45,9 @@ Other Changes
 - Remove wallet code from the monorepo - [#7232](https://github.com/celo-org/celo-monorepo/pull/7232)
 - Small fixes in the proposal process for cEUR/Release 3 - [#7184](https://github.com/celo-org/celo-monorepo/pull/7184)
 - Improve dappkit example in README - [#7346](https://github.com/celo-org/celo-monorepo/pull/7346)
+- Add instructions for Eth recovery with celowallet.app in documentation - [#7350](https://github.com/celo-org/celo-monorepo/pull/7350)
+- Fix packages vulnerabilities - [#7476](https://github.com/celo-org/celo-monorepo/pull/7476)
+
 
 ### **[1.0.2]** -- 2021-02-16
 Features
