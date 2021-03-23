@@ -21,3 +21,7 @@ for traded amounts that are small relative to the bucket quantities. Whenever th
 If the oracle precisely mirrors the market rate, the on-chain CELO to Celo Dollar rate will equal the CELO to US Dollar market rate and no profit opportunity will exist as long as Celo Dollar precisely tracks the US Dollar. If the oracle price is imprecise, the two rates will differ, and a profit opportunity will be present even if Celo Dollar accurately tracks the US Dollar. However, as traders exploit this opportunity, the on-chain price $$P_t$$ will dynamically adjust in response to changes in the tank quantities until the opportunity ceases to exist. This limits the depletion potential in Mento in the case of imprecise or manipulated oracle rates.
 
 For a more detailed explanation, read the article [Zooming in on the Celo Expansion & Contraction Mechanism](https://medium.com/celoorg/zooming-in-on-the-celo-expansion-contraction-mechanism-446ca7abe4f "Zooming in on the Celo Expansion & Contraction Mechanism").
+
+## Multi-mento Deployment
+
+Many instances of mento can be deployed in parallel for different stable assets. Currently, `cEUR` and `cUSD` live side-by-side, with independent buckets and oracles (although both of them are using the `SortedOracles` contract). They all fill the CELO bucket with funds from the Reserve, but not necesarly at the same time.
