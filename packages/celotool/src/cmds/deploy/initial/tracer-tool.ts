@@ -24,7 +24,7 @@ const FIRST_ACCOUNT = '0x4da58d267cd465b9313fdb19b120ec591d957ad2'
 const SECOND_ACCOUNT = '0xc70947239385c2422866e20b6cafffa29157e4b3'
 
 export const handler = async (argv: TracerToolArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   if (!argv.faucet || isCelotoolHelmDryRun()) {
     console.info(`Skipping fauceting test accounts...`)
