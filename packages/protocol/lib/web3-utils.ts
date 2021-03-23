@@ -393,6 +393,7 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
   return selectors
 }
 
+// TODO: change to checkInheritance and use baseContracts field instead of importDirectives
 export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
   const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
   const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
