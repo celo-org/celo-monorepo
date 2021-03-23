@@ -1,10 +1,10 @@
 # Class: StableTokenWrapper
 
-Stable token with variable supply (cUSD)
+Stable token with variable supply
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹StableToken›
+  ↳ [CeloTokenWrapper](_wrappers_celotokenwrapper_.celotokenwrapper.md)‹StableToken›
 
   ↳ **StableTokenWrapper**
 
@@ -74,15 +74,17 @@ Name | Type |
 
 • **allowance**: *function* = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L42)*
+*Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[allowance](_wrappers_erc20wrapper_.erc20wrapper.md#allowance)*
 
-Gets the amount of owner's StableToken allowed to be spent by spender.
+*Defined in [contractkit/src/wrappers/Erc20Wrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Erc20Wrapper.ts#L18)*
 
-**`param`** The owner of the StableToken.
+Querying allowance.
 
-**`param`** The spender of the StableToken.
+**`param`** Account who has given the allowance.
 
-**`returns`** The amount of StableToken owner is allowing spender to spend.
+**`param`** Address of account to whom the allowance was given.
+
+**`returns`** Amount of allowance.
 
 #### Type declaration:
 
@@ -98,31 +100,29 @@ ___
 
 ###  approve
 
-• **approve**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.approve
-  )
+• **approve**: *function* = proxySend(this.kit, this.contract.methods.approve)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L181)*
+*Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[approve](_wrappers_erc20wrapper_.erc20wrapper.md#approve)*
 
-Approve a user to transfer StableToken on behalf of another user.
+*Defined in [contractkit/src/wrappers/Erc20Wrapper.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Erc20Wrapper.ts#L32)*
 
-**`param`** The address which is being approved to spend StableToken.
+Approve a user to transfer the token on behalf of another user.
 
-**`param`** The amount of StableToken approved to the spender.
+**`param`** The address which is being approved to spend the token.
+
+**`param`** The amount of the token approved to the spender.
 
 **`returns`** True if the transaction succeeds.
 
 #### Type declaration:
 
-▸ (`spender`: string, `value`: string | number): *CeloTransactionObject‹boolean›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`spender` | string |
-`value` | string &#124; number |
+`...args` | InputArgs |
 
 ___
 
@@ -134,9 +134,11 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L70)*
+*Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[balanceOf](_wrappers_erc20wrapper_.erc20wrapper.md#balanceof)*
 
-Gets the balance of the specified address using the presently stored inflation factor.
+*Defined in [contractkit/src/wrappers/Erc20Wrapper.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Erc20Wrapper.ts#L56)*
+
+Gets the balance of the specified address.
 
 **`param`** The address to query the balance of.
 
@@ -158,7 +160,7 @@ ___
 
 • **burn**: *function* = proxySend(this.kit, this.contract.methods.burn)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L121)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L83)*
 
 #### Type declaration:
 
@@ -176,9 +178,13 @@ ___
 
 • **decimals**: *function* = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L57)*
+*Inherited from [CeloTokenWrapper](_wrappers_celotokenwrapper_.celotokenwrapper.md).[decimals](_wrappers_celotokenwrapper_.celotokenwrapper.md#decimals)*
 
-**`returns`** The number of decimal places to which StableToken is divisible.
+*Defined in [contractkit/src/wrappers/CeloTokenWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/CeloTokenWrapper.ts#L29)*
+
+Returns the number of decimals used in the token.
+
+**`returns`** Number of decimals.
 
 #### Type declaration:
 
@@ -196,7 +202,7 @@ ___
 
 • **decreaseAllowance**: *function* = proxySend(this.kit, this.contract.methods.decreaseAllowance)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:119](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L119)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L81)*
 
 Decreases the allowance of another user.
 
@@ -249,7 +255,7 @@ ___
     tupleParser(stringIdentity, valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L108)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L70)*
 
 Increases the allowance of another user.
 
@@ -297,7 +303,7 @@ ___
 
 • **mint**: *function* = proxySend(this.kit, this.contract.methods.mint)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L120)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L82)*
 
 #### Type declaration:
 
@@ -315,13 +321,23 @@ ___
 
 • **name**: *function* = proxyCall(this.contract.methods.name)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L47)*
+*Inherited from [CeloTokenWrapper](_wrappers_celotokenwrapper_.celotokenwrapper.md).[name](_wrappers_celotokenwrapper_.celotokenwrapper.md#name)*
 
-**`returns`** The name of the stable token.
+*Defined in [contractkit/src/wrappers/CeloTokenWrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/CeloTokenWrapper.ts#L18)*
+
+Returns the name of the token.
+
+**`returns`** Name of the token.
 
 #### Type declaration:
 
-▸ (): *Promise‹string›*
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
 
 ___
 
@@ -329,7 +345,11 @@ ___
 
 • **owner**: *function* = proxyCall(this.contract.methods.owner)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L76)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L38)*
+
+Returns the address of the owner of the contract.
+
+**`returns`** the address of the owner of the contract.
 
 #### Type declaration:
 
@@ -347,7 +367,7 @@ ___
 
 • **setInflationParameters**: *function* = proxySend(this.kit, this.contract.methods.setInflationParameters)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L123)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L85)*
 
 #### Type declaration:
 
@@ -365,13 +385,23 @@ ___
 
 • **symbol**: *function* = proxyCall(this.contract.methods.symbol)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L52)*
+*Inherited from [CeloTokenWrapper](_wrappers_celotokenwrapper_.celotokenwrapper.md).[symbol](_wrappers_celotokenwrapper_.celotokenwrapper.md#symbol)*
 
-**`returns`** The symbol of the stable token.
+*Defined in [contractkit/src/wrappers/CeloTokenWrapper.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/CeloTokenWrapper.ts#L24)*
+
+Returns the three letter symbol of the token.
+
+**`returns`** Symbol of the token.
 
 #### Type declaration:
 
-▸ (): *Promise‹string›*
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
 
 ___
 
@@ -379,7 +409,9 @@ ___
 
 • **totalSupply**: *function* = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L63)*
+*Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[totalSupply](_wrappers_erc20wrapper_.erc20wrapper.md#totalsupply)*
+
+*Defined in [contractkit/src/wrappers/Erc20Wrapper.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Erc20Wrapper.ts#L24)*
 
 Returns the total supply of the token, that is, the amount of tokens currently minted.
 
@@ -399,29 +431,29 @@ ___
 
 ###  transfer
 
-• **transfer**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.transfer
-  )
+• **transfer**: *function* = proxySend(this.kit, this.contract.methods.transfer)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:208](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L208)*
+*Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[transfer](_wrappers_erc20wrapper_.erc20wrapper.md#transfer)*
 
-Transfers `value` from `msg.sender` to `to`
+*Defined in [contractkit/src/wrappers/Erc20Wrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Erc20Wrapper.ts#L40)*
 
-**`param`** The address to transfer to.
+Transfers the token from one address to another.
 
-**`param`** The amount to be transferred.
+**`param`** The address to transfer the token to.
+
+**`param`** The amount of the token to transfer.
+
+**`returns`** True if the transaction succeeds.
 
 #### Type declaration:
 
-▸ (`to`: string, `value`: string | number): *CeloTransactionObject‹boolean›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`to` | string |
-`value` | string &#124; number |
+`...args` | InputArgs |
 
 ___
 
@@ -429,62 +461,59 @@ ___
 
 • **transferFrom**: *function* = proxySend(this.kit, this.contract.methods.transferFrom)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:220](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L220)*
+*Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[transferFrom](_wrappers_erc20wrapper_.erc20wrapper.md#transferfrom)*
 
-Transfers StableToken from one address to another on behalf of a user.
+*Defined in [contractkit/src/wrappers/Erc20Wrapper.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Erc20Wrapper.ts#L49)*
 
-**`param`** The address to transfer StableToken from.
+Transfers the token from one address to another on behalf of a user.
 
-**`param`** The address to transfer StableToken to.
+**`param`** The address to transfer the token from.
 
-**`param`** The amount of StableToken to transfer.
+**`param`** The address to transfer the token to.
+
+**`param`** The amount of the token to transfer.
 
 **`returns`** True if the transaction succeeds.
 
 #### Type declaration:
 
-▸ (`from`: string, `to`: string, `value`: string | number): *CeloTransactionObject‹boolean›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`from` | string |
-`to` | string |
-`value` | string &#124; number |
+`...args` | InputArgs |
 
 ___
 
 ###  transferWithComment
 
-• **transferWithComment**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.transferWithComment
-  )
+• **transferWithComment**: *function* = proxySend(this.kit, this.contract.methods.transferWithComment)
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:193](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L193)*
+*Inherited from [CeloTokenWrapper](_wrappers_celotokenwrapper_.celotokenwrapper.md).[transferWithComment](_wrappers_celotokenwrapper_.celotokenwrapper.md#transferwithcomment)*
 
-Transfer token for a specified address
+*Defined in [contractkit/src/wrappers/CeloTokenWrapper.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/CeloTokenWrapper.ts#L38)*
 
-**`param`** The address to transfer to.
+Transfers the token from one address to another with a comment.
 
-**`param`** The amount to be transferred.
+**`param`** The address to transfer the token to.
 
-**`param`** The transfer comment.
+**`param`** The amount of the token to transfer.
+
+**`param`** The transfer comment
 
 **`returns`** True if the transaction succeeds.
 
 #### Type declaration:
 
-▸ (`to`: string, `value`: string | number, `comment`: string): *CeloTransactionObject‹boolean›*
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`to` | string |
-`value` | string &#124; number |
-`comment` | string |
+`...args` | InputArgs |
 
 ___
 
@@ -496,7 +525,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L96)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L58)*
 
 Returns the value of a given number of units given the current inflation factor.
 
@@ -524,7 +553,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L85)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L47)*
 
 Returns the units for a given value given the current inflation factor.
 
@@ -565,7 +594,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[StableTokenConfig](../interfaces/_wrappers_stabletokenwrapper_.stabletokenconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:142](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L142)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L104)*
 
 Returns current configuration parameters.
 
@@ -577,7 +606,7 @@ ___
 
 ▸ **getHumanReadableConfig**(): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:161](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L161)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L123)*
 
 **`dev`** Returns human readable configuration of the stabletoken contract
 
@@ -591,7 +620,7 @@ ___
 
 ▸ **getInflationParameters**(): *Promise‹[InflationParameters](../interfaces/_wrappers_stabletokenwrapper_.inflationparameters.md)›*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L129)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L91)*
 
 Querying the inflation parameters.
 

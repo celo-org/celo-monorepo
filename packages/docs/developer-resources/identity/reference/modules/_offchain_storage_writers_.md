@@ -4,6 +4,7 @@
 
 ### Classes
 
+* [AwsStorageWriter](../classes/_offchain_storage_writers_.awsstoragewriter.md)
 * [GitStorageWriter](../classes/_offchain_storage_writers_.gitstoragewriter.md)
 * [GoogleStorageWriter](../classes/_offchain_storage_writers_.googlestoragewriter.md)
 * [LocalStorageWriter](../classes/_offchain_storage_writers_.localstoragewriter.md)

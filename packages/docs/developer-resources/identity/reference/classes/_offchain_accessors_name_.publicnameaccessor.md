@@ -32,7 +32,7 @@
 
 ###  constructor
 
-\+ **new PublicNameAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)): *[PublicNameAccessor](_offchain_accessors_name_.publicnameaccessor.md)*
+\+ **new PublicNameAccessor**(`wrapper`: [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)): *[PublicNameAccessor](_offchain_accessors_name_.publicnameaccessor.md)*
 
 *Overrides [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[constructor](_offchain_accessors_simple_.publicsimpleaccessor.md#constructor)*
 
@@ -42,7 +42,7 @@
 
 Name | Type |
 ------ | ------ |
-`wrapper` | [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md) |
+`wrapper` | [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md) |
 
 **Returns:** *[PublicNameAccessor](_offchain_accessors_name_.publicnameaccessor.md)*
 
@@ -54,7 +54,7 @@ Name | Type |
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[dataPath](_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-datapath)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L21)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L27)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[read](_offchain_accessors_simple_.publicsimpleaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L61)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L67)*
 
 #### Type declaration:
 
@@ -86,13 +86,13 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[type](_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-type)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L20)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L26)*
 
 ___
 
 ### `Readonly` wrapper
 
-• **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
+• **wrapper**: *[OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)*
 
 *Overrides [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[wrapper](_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-wrapper)*
 
@@ -106,7 +106,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[readAsResult](_offchain_accessors_simple_.publicsimpleaccessor.md#readasresult)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L46)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L52)*
 
 **Parameters:**
 
@@ -124,7 +124,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md).[write](_offchain_accessors_simple_.publicsimpleaccessor.md#write)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L30)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L36)*
 
 **Parameters:**
 

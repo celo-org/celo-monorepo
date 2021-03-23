@@ -10,6 +10,8 @@
 
   ↳ [GoogleStorageWriter](_offchain_storage_writers_.googlestoragewriter.md)
 
+  ↳ [AwsStorageWriter](_offchain_storage_writers_.awsstoragewriter.md)
+
   ↳ [MockStorageWriter](_offchain_storage_writers_.mockstoragewriter.md)
 
 ## Index
@@ -32,7 +34,7 @@
 
 \+ **new LocalStorageWriter**(`root`: string): *[LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L12)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L10)*
 
 **Parameters:**
 
@@ -48,7 +50,7 @@ Name | Type |
 
 • **root**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L13)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L11)*
 
 ## Methods
 
@@ -58,7 +60,7 @@ Name | Type |
 
 *Overrides [StorageWriter](_offchain_storage_writers_.storagewriter.md).[write](_offchain_storage_writers_.storagewriter.md#abstract-write)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L16)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L14)*
 
 **Parameters:**
 

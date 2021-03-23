@@ -653,7 +653,7 @@ ___
 
 ###  getRevealStatus
 
-▸ **getRevealStatus**(`phoneNumber`: string, `account`: Address, `issuer`: Address, `serviceURL`: string, `pepper?`: undefined | string): *Promise‹Response›*
+▸ **getRevealStatus**(`phoneNumber`: string, `account`: Address, `issuer`: Address, `serviceURL`: string, `pepper?`: undefined | string): *Promise‹Response‹››*
 
 *Defined in [contractkit/src/wrappers/Attestations.ts:584](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L584)*
 
@@ -669,7 +669,7 @@ Name | Type |
 `serviceURL` | string |
 `pepper?` | undefined &#124; string |
 
-**Returns:** *Promise‹Response›*
+**Returns:** *Promise‹Response‹››*
 
 ___
 
@@ -752,7 +752,7 @@ ___
 
 ###  revealPhoneNumberToIssuer
 
-▸ **revealPhoneNumberToIssuer**(`serviceURL`: string, `requestBody`: AttestationRequest): *Promise‹Response›*
+▸ **revealPhoneNumberToIssuer**(`serviceURL`: string, `requestBody`: AttestationRequest): *Promise‹Response‹››*
 
 *Defined in [contractkit/src/wrappers/Attestations.ts:566](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L566)*
 
@@ -765,7 +765,7 @@ Name | Type |
 `serviceURL` | string |
 `requestBody` | AttestationRequest |
 
-**Returns:** *Promise‹Response›*
+**Returns:** *Promise‹Response‹››*
 
 ___
 

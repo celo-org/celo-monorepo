@@ -48,7 +48,7 @@ ___
 
 ▸ **bufferToSolidityBytes**(`input`: Buffer): *SolidityBytes*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L135)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L138)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **identity**<**A**>(`a`: A): *A*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L150)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:153](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L153)*
 
 Identity Parser
 
@@ -102,7 +102,7 @@ ___
 
 ▸ **proxyCall**<**InputArgs**, **ParsedInputArgs**, **PreParsedOutput**, **Output**>(`methodFn`: Method‹ParsedInputArgs, PreParsedOutput›, `parseInputArgs`: function, `parseOutput`: function): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:219](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L219)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:222](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L222)*
 
 Creates a proxy to call a web3 native contract method.
 
@@ -164,7 +164,7 @@ Name | Type |
 
 ▸ **proxyCall**<**InputArgs**, **PreParsedOutput**, **Output**>(`methodFn`: Method‹InputArgs, PreParsedOutput›, `x`: undefined, `parseOutput`: function): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:229](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L229)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:232](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L232)*
 
 **Type parameters:**
 
@@ -202,7 +202,7 @@ Name | Type |
 
 ▸ **proxyCall**<**InputArgs**, **ParsedInputArgs**, **Output**>(`methodFn`: Method‹ParsedInputArgs, Output›, `parseInputArgs`: function): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L234)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:237](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L237)*
 
 **Type parameters:**
 
@@ -238,7 +238,7 @@ Name | Type |
 
 ▸ **proxyCall**<**InputArgs**, **Output**>(`methodFn`: Method‹InputArgs, Output›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L238)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L241)*
 
 **Type parameters:**
 
@@ -268,7 +268,7 @@ ___
 
 ▸ **proxySend**<**InputArgs**, **ParsedInputArgs**, **Output**>(`kit`: [ContractKit](../classes/_kit_.contractkit.md), ...`sendArgs`: ProxySendArgs‹InputArgs, ParsedInputArgs, Output›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:299](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L299)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:302](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L302)*
 
 Creates a proxy to send a tx on a web3 native contract method.
 
@@ -324,7 +324,7 @@ ___
 
 ▸ **solidityBytesToString**(`input`: SolidityBytes): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L136)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L139)*
 
 **Parameters:**
 
@@ -340,7 +340,7 @@ ___
 
 ▸ **stringIdentity**(`x`: string): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:151](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L151)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:154](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L154)*
 
 **Parameters:**
 
@@ -356,7 +356,7 @@ ___
 
 ▸ **stringToSolidityBytes**(`input`: string): *SolidityBytes*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L134)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:137](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L137)*
 
 **Parameters:**
 
@@ -372,7 +372,7 @@ ___
 
 ▸ **tupleParser**<**A0**, **B0**>(`parser0`: Parser‹A0, B0›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L157)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L160)*
 
 Tuple parser
 Useful to map different input arguments
@@ -401,7 +401,7 @@ Name | Type |
 
 ▸ **tupleParser**<**A0**, **B0**, **A1**, **B1**>(`parser0`: Parser‹A0, B0›, `parser1`: Parser‹A1, B1›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:158](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L158)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:161](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L161)*
 
 **Type parameters:**
 
@@ -432,7 +432,7 @@ Name | Type |
 
 ▸ **tupleParser**<**A0**, **B0**, **A1**, **B1**, **A2**, **B2**>(`parser0`: Parser‹A0, B0›, `parser1`: Parser‹A1, B1›, `parser2`: Parser‹A2, B2›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:162](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L162)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:165](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L165)*
 
 **Type parameters:**
 
@@ -468,7 +468,7 @@ Name | Type |
 
 ▸ **tupleParser**<**A0**, **B0**, **A1**, **B1**, **A2**, **B2**, **A3**, **B3**>(`parser0`: Parser‹A0, B0›, `parser1`: Parser‹A1, B1›, `parser2`: Parser‹A2, B2›, `parser3`: Parser‹A3, B3›): *function*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L167)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:170](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L170)*
 
 **Type parameters:**
 

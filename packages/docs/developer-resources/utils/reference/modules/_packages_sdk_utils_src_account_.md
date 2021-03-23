@@ -200,34 +200,34 @@ Name | Type | Default |
 
 ### ▪ **AccountUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/account.ts:235](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L235)*
+*Defined in [packages/sdk/utils/src/account.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L238)*
 
 ###  generateKeys
 
 • **generateKeys**: *[generateKeys](_packages_sdk_utils_src_account_.md#generatekeys)*
 
-*Defined in [packages/sdk/utils/src/account.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L238)*
+*Defined in [packages/sdk/utils/src/account.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L241)*
 
 ###  generateKeysFromSeed
 
 • **generateKeysFromSeed**: *[generateKeysFromSeed](_packages_sdk_utils_src_account_.md#generatekeysfromseed)*
 
-*Defined in [packages/sdk/utils/src/account.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L240)*
+*Defined in [packages/sdk/utils/src/account.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L243)*
 
 ###  generateMnemonic
 
 • **generateMnemonic**: *[generateMnemonic](_packages_sdk_utils_src_account_.md#generatemnemonic)*
 
-*Defined in [packages/sdk/utils/src/account.ts:236](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L236)*
+*Defined in [packages/sdk/utils/src/account.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L239)*
 
 ###  generateSeed
 
 • **generateSeed**: *[generateSeed](_packages_sdk_utils_src_account_.md#generateseed)*
 
-*Defined in [packages/sdk/utils/src/account.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L239)*
+*Defined in [packages/sdk/utils/src/account.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L242)*
 
 ###  validateMnemonic
 
 • **validateMnemonic**: *[validateMnemonic](_packages_sdk_utils_src_account_.md#validatemnemonic)*
 
-*Defined in [packages/sdk/utils/src/account.ts:237](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L237)*
+*Defined in [packages/sdk/utils/src/account.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L240)*

@@ -17,7 +17,7 @@
 
 • **address**: *Address*
 
-*Defined in [contractkit/src/wrappers/Election.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L28)*
+*Defined in [contractkit/src/wrappers/Election.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L33)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **votes**: *[GroupVote](_wrappers_election_.groupvote.md)[]*
 
-*Defined in [contractkit/src/wrappers/Election.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L29)*
+*Defined in [contractkit/src/wrappers/Election.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L34)*

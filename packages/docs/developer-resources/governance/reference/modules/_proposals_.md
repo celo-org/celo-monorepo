@@ -27,7 +27,7 @@
 
 • **HOTFIX_PARAM_ABI_TYPES**: *string[]* = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
-*Defined in [proposals.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L36)*
+*Defined in [proposals.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L37)*
 
 ## Functions
 
@@ -35,7 +35,7 @@
 
 ▸ **hotfixToEncodedParams**(`kit`: ContractKit, `proposal`: Proposal, `salt`: Buffer): *string*
 
-*Defined in [proposals.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L38)*
+*Defined in [proposals.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L39)*
 
 **Parameters:**
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **hotfixToHash**(`kit`: ContractKit, `proposal`: Proposal, `salt`: Buffer): *Buffer‹›*
 
-*Defined in [proposals.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L43)*
+*Defined in [proposals.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L44)*
 
 **Parameters:**
 
@@ -71,7 +71,7 @@ ___
 
 ▸ **proposalToJSON**(`kit`: ContractKit, `proposal`: Proposal): *Promise‹[ProposalTransactionJSON](../interfaces/_proposals_.proposaltransactionjson.md)[]›*
 
-*Defined in [proposals.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L82)*
+*Defined in [proposals.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L93)*
 
 Convert a compiled proposal to a human-readable JSON form using network information.
 

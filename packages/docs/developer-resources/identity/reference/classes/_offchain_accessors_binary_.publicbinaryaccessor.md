@@ -33,7 +33,7 @@ Schema for writing any generic binary data
 
 ###  constructor
 
-\+ **new PublicBinaryAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md), `dataPath`: string): *[PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md)*
+\+ **new PublicBinaryAccessor**(`wrapper`: [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md), `dataPath`: string): *[PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md)*
 
 *Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L11)*
 
@@ -41,7 +41,7 @@ Schema for writing any generic binary data
 
 Name | Type |
 ------ | ------ |
-`wrapper` | [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md) |
+`wrapper` | [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md) |
 `dataPath` | string |
 
 **Returns:** *[PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md)*
@@ -78,7 +78,7 @@ ___
 
 ### `Readonly` wrapper
 
-• **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
+• **wrapper**: *[OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)*
 
 *Defined in [packages/sdk/identity/src/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/binary.ts#L12)*
 

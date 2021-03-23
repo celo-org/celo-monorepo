@@ -10,6 +10,8 @@ Base ContractWrapper
 
 * **BaseWrapper**
 
+  ↳ [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md)
+
   ↳ [AccountsWrapper](_wrappers_accounts_.accountswrapper.md)
 
   ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
@@ -30,8 +32,6 @@ Base ContractWrapper
 
   ↳ [GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)
 
-  ↳ [GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
-
   ↳ [GovernanceWrapper](_wrappers_governance_.governancewrapper.md)
 
   ↳ [LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)
@@ -45,8 +45,6 @@ Base ContractWrapper
   ↳ [ReserveWrapper](_wrappers_reserve_.reservewrapper.md)
 
   ↳ [SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)
-
-  ↳ [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
 
   ↳ [ReleaseGoldWrapper](_wrappers_releasegold_.releasegoldwrapper.md)
 

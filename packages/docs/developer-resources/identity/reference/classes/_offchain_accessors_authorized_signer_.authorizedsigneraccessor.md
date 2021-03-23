@@ -25,7 +25,7 @@
 
 ###  constructor
 
-\+ **new AuthorizedSignerAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)): *[AuthorizedSignerAccessor](_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md)*
+\+ **new AuthorizedSignerAccessor**(`wrapper`: [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)): *[AuthorizedSignerAccessor](_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md)*
 
 *Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L17)*
 
@@ -33,7 +33,7 @@
 
 Name | Type |
 ------ | ------ |
-`wrapper` | [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md) |
+`wrapper` | [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md) |
 
 **Returns:** *[AuthorizedSignerAccessor](_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md)*
 
@@ -67,7 +67,7 @@ ___
 
 ### `Readonly` wrapper
 
-• **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
+• **wrapper**: *[OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)*
 
 *Defined in [packages/sdk/identity/src/offchain/accessors/authorized-signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/authorized-signer.ts#L18)*
 

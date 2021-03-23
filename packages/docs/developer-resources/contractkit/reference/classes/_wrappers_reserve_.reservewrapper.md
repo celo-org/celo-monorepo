@@ -24,7 +24,10 @@ Contract for handling reserve for stable currencies
 * [frozenReserveGoldStartDay](_wrappers_reserve_.reservewrapper.md#frozenreservegoldstartday)
 * [getOrComputeTobinTax](_wrappers_reserve_.reservewrapper.md#getorcomputetobintax)
 * [getOtherReserveAddresses](_wrappers_reserve_.reservewrapper.md#getotherreserveaddresses)
+* [getReserveCeloBalance](_wrappers_reserve_.reservewrapper.md#getreservecelobalance)
 * [getReserveGoldBalance](_wrappers_reserve_.reservewrapper.md#getreservegoldbalance)
+* [getUnfrozenBalance](_wrappers_reserve_.reservewrapper.md#getunfrozenbalance)
+* [getUnfrozenReserveCeloBalance](_wrappers_reserve_.reservewrapper.md#getunfrozenreservecelobalance)
 * [isOtherReserveAddress](_wrappers_reserve_.reservewrapper.md#isotherreserveaddress)
 * [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
 * [methodIds](_wrappers_reserve_.reservewrapper.md#methodids)
@@ -195,7 +198,29 @@ ___
 
 • **getOtherReserveAddresses**: *function* = proxyCall(this.contract.methods.getOtherReserveAddresses)
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L61)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L95)*
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  getReserveCeloBalance
+
+• **getReserveCeloBalance**: *function* = this.getReserveGoldBalance
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L70)*
+
+**`notice`** Returns the amount of CELO included in the reserve
+
+**`returns`** The CELO amount included in the reserve.
 
 #### Type declaration:
 
@@ -217,7 +242,66 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L56)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L60)*
+
+**`alias`** {getReserveCeloBalance}
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  getUnfrozenBalance
+
+• **getUnfrozenBalance**: *function* = proxyCall(
+    this.contract.methods.getUnfrozenBalance,
+    undefined,
+    valueToBigNumber
+  )
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L77)*
+
+**`notice`** Returns the amount of unfrozen CELO in the Reserve contract.
+
+**`see`** {getUnfrozenReserveCeloBalance}
+
+**`returns`** amount in wei
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  getUnfrozenReserveCeloBalance
+
+• **getUnfrozenReserveCeloBalance**: *function* = proxyCall(
+    this.contract.methods.getUnfrozenReserveGoldBalance,
+    undefined,
+    valueToBigNumber
+  )
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L89)*
+
+**`notice`** Returns the amount of unfrozen CELO included in the reserve
+ contract and in other reserve addresses.
+
+**`see`** {getUnfrozenBalance}
+
+**`returns`** amount in wei
 
 #### Type declaration:
 
@@ -235,7 +319,7 @@ ___
 
 • **isOtherReserveAddress**: *function* = proxyCall(this.contract.methods.isOtherReserveAddress)
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L76)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L110)*
 
 #### Type declaration:
 
@@ -351,7 +435,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L66)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L100)*
 
 Returns current configuration parameters.
 
@@ -384,6 +468,6 @@ ___
 
 ▸ **getSpenders**(): *Promise‹Address[]›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L78)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L112)*
 
 **Returns:** *Promise‹Address[]›*

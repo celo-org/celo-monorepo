@@ -31,7 +31,7 @@
 
 ###  constructor
 
-\+ **new PublicPictureAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)): *[PublicPictureAccessor](_offchain_accessors_pictures_.publicpictureaccessor.md)*
+\+ **new PublicPictureAccessor**(`wrapper`: [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)): *[PublicPictureAccessor](_offchain_accessors_pictures_.publicpictureaccessor.md)*
 
 *Overrides [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[constructor](_offchain_accessors_binary_.publicbinaryaccessor.md#constructor)*
 
@@ -41,7 +41,7 @@
 
 Name | Type |
 ------ | ------ |
-`wrapper` | [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md) |
+`wrapper` | [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md) |
 
 **Returns:** *[PublicPictureAccessor](_offchain_accessors_pictures_.publicpictureaccessor.md)*
 
@@ -81,7 +81,7 @@ ___
 
 ### `Readonly` wrapper
 
-• **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
+• **wrapper**: *[OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)*
 
 *Overrides [PublicBinaryAccessor](_offchain_accessors_binary_.publicbinaryaccessor.md).[wrapper](_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-wrapper)*
 

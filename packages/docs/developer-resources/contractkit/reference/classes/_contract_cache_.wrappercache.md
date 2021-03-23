@@ -41,6 +41,7 @@ Provides access to all contract wrappers for celo core contracts
 * [getSortedOracles](_contract_cache_.wrappercache.md#getsortedoracles)
 * [getStableToken](_contract_cache_.wrappercache.md#getstabletoken)
 * [getValidators](_contract_cache_.wrappercache.md#getvalidators)
+* [invalidateContract](_contract_cache_.wrappercache.md#invalidatecontract)
 
 ## Constructors
 
@@ -163,9 +164,15 @@ ___
 
 ###  getExchange
 
-▸ **getExchange**(): *Promise‹[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)‹››*
+▸ **getExchange**(`stableToken`: [StableToken](../enums/_base_.celocontract.md#stabletoken)): *Promise‹[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)‹››*
 
 *Defined in [contractkit/src/contract-cache.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L117)*
+
+**Parameters:**
+
+Name | Type | Default |
+------ | ------ | ------ |
+`stableToken` | [StableToken](../enums/_base_.celocontract.md#stabletoken) | StableToken.cUSD |
 
 **Returns:** *Promise‹[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)‹››*
 
@@ -291,9 +298,15 @@ ___
 
 ###  getStableToken
 
-▸ **getStableToken**(): *Promise‹[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)‹››*
+▸ **getStableToken**(`stableToken`: [StableToken](../enums/_base_.celocontract.md#stabletoken)): *Promise‹[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)‹››*
 
 *Defined in [contractkit/src/contract-cache.ts:156](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L156)*
+
+**Parameters:**
+
+Name | Type | Default |
+------ | ------ | ------ |
+`stableToken` | [StableToken](../enums/_base_.celocontract.md#stabletoken) | StableToken.cUSD |
 
 **Returns:** *Promise‹[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)‹››*
 
@@ -306,3 +319,23 @@ ___
 *Defined in [contractkit/src/contract-cache.ts:159](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L159)*
 
 **Returns:** *Promise‹[ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)‹››*
+
+___
+
+###  invalidateContract
+
+▸ **invalidateContract**<**C**>(`contract`: C): *void*
+
+*Defined in [contractkit/src/contract-cache.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L175)*
+
+**Type parameters:**
+
+▪ **C**: *[ValidWrappers](../modules/_contract_cache_.md#validwrappers)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`contract` | C |
+
+**Returns:** *void*

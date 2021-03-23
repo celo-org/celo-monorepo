@@ -26,6 +26,6 @@
 
 ###  ReportTarget
 
-Ƭ **ReportTarget**: *[StableToken](../enums/_base_.celocontract.md#stabletoken) | Address*
+Ƭ **ReportTarget**: *[StableTokenContract](_base_.md#stabletokencontract) | Address*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L50)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L51)*
