@@ -56,7 +56,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   const accountType = AccountType.LOAD_TESTING_ACCOUNT
   const mnemonic = fetchEnv(envVar.MNEMONIC)
 
@@ -106,14 +106,18 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
   kit.defaultAccount = account
 
   const [goldToken] = await Promise.all([kit.contracts.getGoldToken()])
+  const [stableToken] = await Promise.all([kit.contracts.getStableToken()])
   const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
+  const stableTokenAmount = await convertToContractDecimals(argv.dollars, stableToken)
 
   for (let i = argv.count_from; i <= argv.count_to; i++) {
     for (let t = argv.threads_from; t <= argv.threads_to; t++) {
-      const index = parseInt(`${i}${t}`, 10)
+      const index = i * 10000 + t
       const address = generateAddress(mnemonic, accountType, index)
       console.log(`${index} --> Fauceting ${goldAmount.toFixed()} Gold to ${address}`)
       await goldToken.transfer(address, goldAmount.toFixed()).send()
+      console.log(`${index} --> Fauceting ${stableTokenAmount.toFixed()} Dollars to ${address}`)
+      await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
     }
   }
 }

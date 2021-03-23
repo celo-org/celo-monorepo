@@ -14,7 +14,7 @@ import { scaleResource } from 'src/lib/kubernetes'
 const chartDir = '../helm-charts/load-test/'
 
 function releaseName(celoEnv: string) {
-  return `${celoEnv}-load-test-bis`
+  return `${celoEnv}-load-test`
 }
 
 export async function installHelmChart(

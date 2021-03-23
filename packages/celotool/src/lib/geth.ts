@@ -508,7 +508,6 @@ export const simulateClient = async (
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKitFromWeb3(new Web3(web3Provider))
   kit.defaultAccount = senderAddress
-  const gasPriceFixed = 101000000
 
   const baseLogMessage: any = {
     loadTestID: index,
@@ -529,7 +528,7 @@ export const simulateClient = async (
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
 
-    let feeCurrency, gasPrice, txOptions
+    let feeCurrency, txOptions
     try {
       feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
     } catch (error) {
@@ -540,21 +539,25 @@ export const simulateClient = async (
       })
     }
 
-    feeCurrency = feeCurrency || ''
-    baseLogMessage.feeCurrency = feeCurrency
-
     try {
+      feeCurrency = feeCurrency || ''
+      baseLogMessage.feeCurrency = feeCurrency
+
+      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+
+      const gasPriceBase = feeCurrency
+        ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+        : await gasPriceMinimum.gasPriceMinimum()
+      const gasPrice = new BigNumber(gasPriceBase).times(5)
+
+      console.info(`gasPrice: ${gasPrice}`)
+
       if (!feeCurrencyGold) {
-        const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
-        gasPrice = new BigNumber(await gasPriceMinimum.getGasPriceMinimum(feeCurrency)).times(1)
-        gasPrice = gasPriceFixed // TODO
         txOptions = {
-          // gas: 70000,
           gasPrice: gasPrice.toString(),
           feeCurrency,
         }
       } else {
-        gasPrice = gasPriceFixed // TODO
         txOptions = {
           gasPrice: gasPrice.toString(),
         }
@@ -615,7 +618,6 @@ export const onLoadTestTxResult = async (
     p_time: receiptTime - sendTransactionTime,
     ...baseLogMessage,
   })
-
   // Continuing only with receipt received
   validateTransactionAndReceipt(senderAddress, txReceipt, (isError, data) => {
     if (isError) {
