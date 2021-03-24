@@ -270,14 +270,7 @@ contract Election is
    */
   function activate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
-    PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
-    uint256 value = pendingVote.value;
-    require(value > 0, "Vote value cannot be zero");
-    decrementPendingVotes(group, account, value);
-    uint256 units = incrementActiveVotes(group, account, value);
-    emit ValidatorGroupVoteActivated(account, group, value, units);
-    return true;
+    return _activate(group, account);
   }
 
   /**
@@ -287,7 +280,11 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activate(address group, address account) external nonReentrant returns (bool) {
+  function activateByAccount(address group, address account) external nonReentrant returns (bool) {
+    return _activate(group, account);
+  }
+
+  function _activate(address group, address account) external nonReentrant returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;
