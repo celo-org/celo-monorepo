@@ -178,7 +178,7 @@ export abstract class BaseCommand extends Command {
       await setUsdGas()
     } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
       const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
-      if (balances.CELO.isZero()) {
+      if (balances.CELO!.isZero()) {
         await setUsdGas()
       }
     }

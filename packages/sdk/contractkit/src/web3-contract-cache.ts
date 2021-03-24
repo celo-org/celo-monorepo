@@ -158,6 +158,14 @@ export class Web3ContractCache {
    */
   async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null || address !== undefined) {
+      // core contract in the registry
+      if (!address) {
+        try {
+          address = await this.kit.registry.addressFor(contract)
+        } catch (e) {
+          throw new Error(`${contract} not yet deployed for this chain`)
+        }
+      }
       debug('Initiating contract %s', contract)
       const createFn = ProxyContracts.includes(contract)
         ? newProxy
@@ -165,10 +173,9 @@ export class Web3ContractCache {
         ? (ContractFactories[contract] as CFType[C])
         : newProxy
       // @ts-ignore: Too complex union type
-      this.cacheMap[contract] = createFn(
-        this.kit.connection.web3,
-        address ?? (await this.kit.registry.addressFor(contract))
-      ) as NonNullable<ContractCacheMap[C]>
+      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as NonNullable<
+        ContractCacheMap[C]
+      >
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!

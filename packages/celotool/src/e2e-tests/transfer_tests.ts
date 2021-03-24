@@ -161,20 +161,22 @@ async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<
       current = await fetch()
     },
     delta(address: string, token: CeloTokenType) {
-      return current[address][token].minus(initial[address][token])
+      return (current[address][token] || new BigNumber(0)).minus(initial[address][token] || 0)
     },
     current(address: string, token: CeloTokenType) {
-      return current[address][token]
+      return current[address][token] || new BigNumber(0)
     },
     initial(address: string, token: CeloTokenType) {
-      return initial[address][token]
+      return initial[address][token] || new BigNumber(0)
     },
     debugPrint(address: string, token: CeloTokenType) {
       // tslint:disable-next-line: no-console
       console.log({
-        initial: initial[address][token].toString(),
-        current: current[address][token].toString(),
-        delta: current[address][token].minus(initial[address][token]).toString(),
+        initial: initial[address][token]?.toString(),
+        current: current[address][token]?.toString(),
+        delta: (current[address][token] || new BigNumber(0))
+          .minus(initial[address][token] || 0)
+          .toString(),
       })
     },
   }

@@ -18,7 +18,7 @@ export type CeloTokenType = StableToken | Token
 type CeloTokenWrapper = GoldTokenWrapper | StableTokenWrapper
 
 export type EachCeloToken<T> = {
-  [key in CeloTokenType]: T
+  [key in CeloTokenType]?: T
 }
 
 export interface CeloTokenInfo {
@@ -97,6 +97,26 @@ export class CeloTokens {
     )
   }
 
+  async getStablesConfigs(humanReadable: boolean = false) {
+    return this.forStableCeloToken(async (info: StableTokenInfo) => {
+      const stableWrapper = await this.kit.contracts.getContract(info.contract)
+      if (humanReadable) {
+        return stableWrapper.getHumanReadableConfig()
+      }
+      return stableWrapper.getConfig()
+    })
+  }
+
+  async getExchangesConfigs(humanReadable: boolean = false) {
+    return this.forStableCeloToken(async (info: StableTokenInfo) => {
+      const exchangeWrapper = await this.kit.contracts.getContract(info.exchangeContract)
+      if (humanReadable) {
+        return exchangeWrapper.getHumanReadableConfig()
+      }
+      return exchangeWrapper.getConfig()
+    })
+  }
+
   /**
    * Runs fn for each celo token found in celoTokenInfos, and returns the
    * value of each call in an object keyed by the token.
@@ -107,15 +127,46 @@ export class CeloTokens {
   async forEachCeloToken<T>(
     fn: (info: CeloTokenInfo) => T | Promise<T>
   ): Promise<EachCeloToken<T>> {
-    const wrapperInfos = await Promise.all(
-      Object.values(celoTokenInfos).map(async (info: CeloTokenInfo) => {
-        const fnResult = fn(info)
-        return {
-          symbol: info.symbol,
-          data: fnResult instanceof Promise ? await fnResult : fnResult,
-        }
-      })
-    )
+    const wrapperInfoFunction = async () =>
+      await Promise.all(
+        (await this.validCeloTokenInfos()).map(async (info) => {
+          const fnResult = fn(info)
+          return {
+            symbol: info.symbol,
+            data: fnResult instanceof Promise ? await fnResult : fnResult,
+          }
+        })
+      )
+    return this.forEachWrapperInfo(wrapperInfoFunction)
+  }
+
+  /**
+   * Runs fn for each stable token found in stableTokenInfos, and returns the
+   * value of each call in an object keyed by the token.
+   * @param fn the function to be called for each StableTokenInfo.
+   * @return an object containing the resolved value the call to fn for each
+   *  celo token.
+   */
+  async forStableCeloToken<T>(
+    fn: (info: StableTokenInfo) => T | Promise<T>
+  ): Promise<EachCeloToken<T>> {
+    const wrapperInfoFunction = async () =>
+      await Promise.all(
+        (await this.validStableTokenInfos()).map(async (info) => {
+          const fnResult = fn(info)
+          return {
+            symbol: info.symbol,
+            data: fnResult instanceof Promise ? await fnResult : fnResult,
+          }
+        })
+      )
+    return this.forEachWrapperInfo(wrapperInfoFunction)
+  }
+
+  private async forEachWrapperInfo<T>(
+    fn: () => Promise<{ symbol: CeloTokenType; data: T }[]>
+  ): Promise<EachCeloToken<T>> {
+    let wrapperInfos = await fn()
     return wrapperInfos.reduce(
       (
         obj: {
@@ -128,6 +179,41 @@ export class CeloTokens {
       }),
       {}
     ) as EachCeloToken<T>
+  }
+
+  async validCeloTokenInfos(): Promise<CeloTokenInfo[]> {
+    const results = await Promise.all(
+      Object.values(celoTokenInfos).map(async (info) => {
+        try {
+          // The registry add the valid addresses to a cache
+          await this.kit.registry.addressFor(info.contract)
+          return true
+        } catch {
+          // The contract was not deployed in the chain
+          return false
+        }
+      })
+    )
+
+    return Object.values(celoTokenInfos).filter((_v, index) => results[index])
+  }
+
+  async validStableTokenInfos(): Promise<StableTokenInfo[]> {
+    const results = await Promise.all(
+      Object.values(stableTokenInfos).map(async (info) => {
+        try {
+          // The registry add the valid addresses to a cache
+          await this.kit.registry.addressFor(info.contract)
+          await this.kit.registry.addressFor(info.exchangeContract)
+          return true
+        } catch {
+          // The contract was not deployed in the chain
+          return false
+        }
+      })
+    )
+
+    return Object.values(stableTokenInfos).filter((_v, index) => results[index])
   }
 
   /**
@@ -165,7 +251,11 @@ export class CeloTokens {
    * @return A promise resolving to the address of the token's contract
    */
   getAddress(token: CeloTokenType) {
-    return this.kit.registry.addressFor(celoTokenInfos[token].contract)
+    try {
+      return this.kit.registry.addressFor(celoTokenInfos[token].contract)
+    } catch {
+      throw new Error(`${token} token not deployed yet in the chain`)
+    }
   }
 
   /**
