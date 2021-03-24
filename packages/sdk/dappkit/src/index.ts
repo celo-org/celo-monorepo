@@ -24,7 +24,9 @@ export {
   serializeDappKitRequestDeeplink,
   SignTxRequest,
 } from '@celo/utils'
-export { FeeCurrency } from './common'
+// TODO: causes warnings for webpack/babel/expo, once prettier is upgraded use:
+// export type { TxParams } from './common'
+export { FeeCurrency, TxParams } from './common'
 
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {

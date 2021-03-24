@@ -19,7 +19,9 @@ export {
   serializeDappKitRequestDeeplink,
   SignTxRequest,
 } from '@celo/utils'
-export { FeeCurrency } from './common'
+// TODO: causes warnings for webpack/babel/expo, once prettier is upgraded use:
+// export type { TxParams } from './common'
+export { FeeCurrency, TxParams } from './common'
 
 // DappKit Web constants and helpers
 const localStorageKey = 'dappkit-web'
