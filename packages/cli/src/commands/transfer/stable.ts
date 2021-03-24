@@ -1,12 +1,12 @@
 import { StableToken } from '@celo/contractkit'
 import { flags } from '@oclif/command'
-import { TransferStableBaseDollars } from '../../transfer-stable-base'
+import { TransferStableBase } from '../../transfer-stable-base'
 
-export default class TransferStable extends TransferStableBaseDollars {
+export default class TransferStable extends TransferStableBase {
   static description = 'Transfer a stable token to a specified address.'
 
   static flags = {
-    ...TransferStableBaseDollars.flags,
+    ...TransferStableBase.flags,
     stable: flags.enum({
       options: Object.keys(StableToken),
       description: 'Name of the stable to be transfered',

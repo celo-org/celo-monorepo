@@ -1,13 +1,14 @@
 import { StableToken } from '@celo/contractkit'
+import { StableTokenWrapper } from '@celo/contractkit/src/wrappers/StableTokenWrapper'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from './base'
 import { newCheckBuilder } from './utils/checks'
-import { displaySendTx } from './utils/cli'
+import { displaySendTx, failWith } from './utils/cli'
 import { Flags } from './utils/command'
 
-export abstract class TransferStableBaseDollars extends BaseCommand {
+export abstract class TransferStableBase extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Address of the sender' }),
@@ -28,7 +29,13 @@ export abstract class TransferStableBaseDollars extends BaseCommand {
     if (!this._stableCurrency) {
       throw new Error('Stable currency not set')
     }
-    const stableToken = await this.kit.contracts.getStableToken(this._stableCurrency)
+    let stableToken: StableTokenWrapper
+    try {
+      stableToken = await this.kit.contracts.getStableToken(this._stableCurrency)
+    } catch {
+      failWith(`The ${this._stableCurrency} token was not deployed yet`)
+    }
+    stableToken = stableToken!
     await this.kit.updateGasPriceInConnectionLayer(stableToken.address)
 
     const tx = res.flags.comment

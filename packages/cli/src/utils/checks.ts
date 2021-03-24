@@ -314,7 +314,7 @@ class CheckBuilder {
     stable: StableToken = StableToken.cUSD
   ) => {
     const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} ${StableToken.cUSD}`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} ${stable}`, () =>
       this.kit.contracts
         .getStableToken(stable)
         .then((stableToken) => stableToken.balanceOf(account))
