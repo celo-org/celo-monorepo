@@ -284,7 +284,7 @@ contract Election is
     return _activate(group, account);
   }
 
-  function _activate(address group, address account) external nonReentrant returns (bool) {
+  function _activate(address group, address account) internal returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;
