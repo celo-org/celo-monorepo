@@ -1,4 +1,5 @@
 import { CeloContract } from '@celo/contractkit'
+import { stableTokenContractArray } from '@celo/contractkit/lib/base'
 import { BaseCommand } from '../../base'
 import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -13,7 +14,7 @@ export default class RemoveExpiredReports extends BaseCommand {
       required: true,
       default: CeloContract.StableToken,
       description: 'Token to remove expired reports for',
-      options: [CeloContract.StableToken, CeloContract.StableTokenEUR],
+      options: stableTokenContractArray,
     },
   ]
   static flags = {

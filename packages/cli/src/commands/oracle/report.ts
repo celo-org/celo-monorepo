@@ -1,4 +1,5 @@
 import { CeloContract } from '@celo/contractkit'
+import { stableTokenContractArray } from '@celo/contractkit/lib/base'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
@@ -15,7 +16,7 @@ export default class ReportPrice extends BaseCommand {
       required: true,
       default: CeloContract.StableToken,
       description: 'Token to report on',
-      options: [CeloContract.StableToken, CeloContract.StableTokenEUR],
+      options: stableTokenContractArray,
     },
   ]
   static flags = {

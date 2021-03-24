@@ -1,4 +1,5 @@
 import { CeloContract } from '@celo/contractkit'
+import { stableTokenContractArray } from '@celo/contractkit/lib/base'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { failWith } from '../../utils/cli'
@@ -16,7 +17,7 @@ export default class Reports extends BaseCommand {
       name: 'token',
       required: true,
       description: 'Token to list the reports for',
-      options: [CeloContract.StableToken, CeloContract.StableTokenEUR],
+      options: stableTokenContractArray,
       default: CeloContract.StableToken,
     },
   ]

@@ -1,4 +1,5 @@
 import { CeloContract } from '@celo/contractkit'
+import { stableTokenContractArray } from '@celo/contractkit/lib/base'
 import { BaseCommand } from '../../base'
 import { failWith } from '../../utils/cli'
 
@@ -14,7 +15,7 @@ export default class List extends BaseCommand {
       name: 'token',
       required: true,
       description: 'Token to list the oracles for',
-      options: [CeloContract.StableToken, CeloContract.StableTokenEUR],
+      options: stableTokenContractArray,
       default: CeloContract.StableToken,
     },
   ]
