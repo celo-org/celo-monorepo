@@ -5,6 +5,7 @@ import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
 import prompts from 'prompts'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
@@ -252,10 +253,15 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
 ) {
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
+  const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
     deployer.deploy(ContractProxy)
-    deployer.deploy(Contract)
+    if (checkImports('InitializableV2', Contract, artifacts)) {
+      deployer.deploy(Contract, testingDeployment)
+    } else {
+      deployer.deploy(Contract)
+    }
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(ContractProxy.defaults().from)
@@ -385,6 +391,23 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
       }
     })
   return selectors
+}
+
+// TODO: change to checkInheritance and use baseContracts field instead of importDirectives
+export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
+  const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
+  const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
+  while (imports.length) { // BFS 
+    const importedContractName = (imports.pop().file as string).split('/').pop().split('.')[0]
+    if (importedContractName ===  baseContractName) {
+      return true
+    }
+    const importedContractArtifact = artifacts instanceof BuildArtifacts ? 
+      artifacts.getArtifactByName(importedContractName) :
+      artifacts.require(importedContractName)
+    imports.unshift(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))
+  }
+  return false
 }
 
 export async function retryTx(fn: any, args: any[]) {

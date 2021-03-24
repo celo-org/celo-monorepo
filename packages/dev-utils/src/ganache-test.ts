@@ -95,7 +95,7 @@ export async function getContractFromEvent(
   let currBlock: any
   let contractAddress: any
   const target = web3.utils.sha3(eventSignature)
-  let matchesFound = 0
+  let found = false
   while (true) {
     currBlock = await web3.eth.getBlock(currBlockNumber)
     for (const tx of currBlock.transactions) {
@@ -105,9 +105,9 @@ export async function getContractFromEvent(
           if (log.topics) {
             for (const topic of log.topics) {
               if (topic === target) {
-                matchesFound++
-                // only every match other bc of implementation initializations
-                if ((canValidate && matchesFound === 3) || (!canValidate && matchesFound === 1)) {
+                if (canValidate && !found) {
+                  found = true
+                } else {
                   contractAddress = log.address
                 }
               }
