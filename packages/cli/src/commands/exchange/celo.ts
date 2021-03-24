@@ -1,6 +1,10 @@
+import { StableToken } from '@celo/contractkit'
+import { stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
+import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
-import { displaySendTx } from '../../utils/cli'
+import { newCheckBuilder } from '../../utils/checks'
+import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { checkNotDangerousExchange } from '../../utils/exchange'
 
@@ -9,18 +13,23 @@ const deppegedPricePercentage = 20
 
 export default class ExchangeCelo extends BaseCommand {
   static description =
-    'Exchange CELO for Celo Dollars via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)'
+    'Exchange CELO for StableTokens via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)'
 
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'The address with CELO to exchange' }),
     value: Flags.wei({
       required: true,
-      description: 'The value of CELO to exchange for Celo Dollars',
+      description: 'The value of CELO to exchange for a StableToken',
     }),
     forAtLeast: Flags.wei({
-      description: 'Optional, the minimum value of Celo Dollars to receive in return',
+      description: 'Optional, the minimum value of StableTokens to receive in return',
       default: new BigNumber(0),
+    }),
+    stableToken: flags.enum({
+      options: Object.keys(StableToken),
+      description: 'Name of the stable to receive',
+      default: StableToken.cUSD,
     }),
   }
 
@@ -28,13 +37,25 @@ export default class ExchangeCelo extends BaseCommand {
 
   static examples = [
     'celo --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
-    'celo --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'celo --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --stableToken cUSD',
   ]
 
   async run() {
     const res = this.parse(ExchangeCelo)
     const sellAmount = res.flags.value
     const minBuyAmount = res.flags.forAtLeast
+    const stableToken = res.flags.stableToken
+
+    let exchange
+    try {
+      exchange = await this.kit.contracts.getExchange(stableToken)
+    } catch {
+      failWith(`The ${stableToken} token was not deployed yet`)
+    }
+
+    await newCheckBuilder(this)
+      .hasEnoughCelo(res.flags.from, sellAmount)
+      .runChecks()
 
     if (minBuyAmount.toNumber() === 0) {
       const check = await checkNotDangerousExchange(
@@ -42,7 +63,8 @@ export default class ExchangeCelo extends BaseCommand {
         sellAmount,
         largeOrderPercentage,
         deppegedPricePercentage,
-        true
+        true,
+        stableTokenInfos[stableToken]
       )
 
       if (!check) {
@@ -52,7 +74,6 @@ export default class ExchangeCelo extends BaseCommand {
     }
 
     const celoToken = await this.kit.contracts.getGoldToken()
-    const exchange = await this.kit.contracts.getExchange()
 
     await displaySendTx(
       'increaseAllowance',
