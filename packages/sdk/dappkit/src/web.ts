@@ -1,17 +1,27 @@
 // Special logic for Web DApps run on mobile
+import { ContractKit } from '@celo/contractkit'
 import {
   AccountAuthResponseSuccess,
+  DappKitRequestMeta,
   parseDappkitResponseDeeplink,
   SignTxResponseSuccess,
 } from '@celo/utils'
-import { checkAccountAuth, checkSignedTxs } from './index'
+import {
+  checkAccountAuth,
+  checkSignedTxs,
+  requestAccountAddressFactory,
+  requestTxSigFactory,
+  TxParams,
+} from './common'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
 } from '@celo/utils'
-export { FeeCurrency, requestAccountAddress, requestTxSig, TxParams } from './index'
+// TODO: causes warnings for webpack/babel/expo, once prettier is upgraded use:
+// export type { TxParams } from './common'
+export { FeeCurrency, TxParams } from './common'
 
 // DappKit Web constants and helpers
 const localStorageKey = 'dappkit-web'
@@ -74,4 +84,20 @@ export async function waitForAccountAuth(requestId: string): Promise<AccountAuth
 
 export async function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
   return waitDecorator(requestId, checkSignedTxs)
+}
+
+export async function requestAccountAddress(meta: DappKitRequestMeta) {
+  return requestAccountAddressFactory(meta, openURL)
+}
+
+export async function requestTxSig(
+  kit: ContractKit,
+  txParams: TxParams[],
+  meta: DappKitRequestMeta
+) {
+  return requestTxSigFactory(kit, txParams, meta, openURL)
+}
+
+async function openURL(url: string) {
+  window.location.href = url
 }

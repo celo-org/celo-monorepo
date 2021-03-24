@@ -6,13 +6,13 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
 import "./ExternalCall.sol";
-import "./Initializable.sol";
+import "./InitializableV2.sol";
 import "./Signatures.sol";
 
 contract MetaTransactionWallet is
   IMetaTransactionWallet,
   ICeloVersionedContract,
-  Initializable,
+  InitializableV2,
   Ownable
 {
   using SafeMath for uint256;
@@ -54,6 +54,12 @@ contract MetaTransactionWallet is
     require(guardian == msg.sender, "Caller is not the guardian");
     _;
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @dev Fallback function allows to deposit ether.
