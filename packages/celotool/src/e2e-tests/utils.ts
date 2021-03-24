@@ -36,6 +36,9 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
+// The mnemonic used for the e2e tests
+export const mnemonic =
+  'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
 
 export async function initAndSyncGethWithRetry(
   gethConfig: GethRunConfig,
@@ -202,8 +205,6 @@ export function getHooks(gethConfig: GethRunConfig) {
 }
 
 export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {
-  const mnemonic =
-    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
 
   const numValidators = validatorInstances.length
