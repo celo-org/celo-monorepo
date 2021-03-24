@@ -1,6 +1,6 @@
 import { CeloContract } from '@celo/contractkit'
 import { BaseCommand } from '../../base'
-import { displaySendTx } from '../../utils/cli'
+import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class RemoveExpiredReports extends BaseCommand {
@@ -13,7 +13,7 @@ export default class RemoveExpiredReports extends BaseCommand {
       required: true,
       default: CeloContract.StableToken,
       description: 'Token to remove expired reports for',
-      options: [CeloContract.StableToken],
+      options: [CeloContract.StableToken, CeloContract.StableTokenEUR],
     },
   ]
   static flags = {
@@ -27,10 +27,17 @@ export default class RemoveExpiredReports extends BaseCommand {
   static example = [
     'remove-expired-reports StableToken --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
     'remove-expired-reports --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
+    'remove-expired-reports StableTokenEUR --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
   ]
 
   async run() {
     const res = this.parse(RemoveExpiredReports)
+
+    try {
+      await this.kit.registry.addressFor(res.args.token)
+    } catch {
+      failWith(`The ${res.args.token} contract was not deployed yet`)
+    }
 
     const sortedOracles = await this.kit.contracts.getSortedOracles()
     const txo = await sortedOracles.removeExpiredReports(res.args.token)
