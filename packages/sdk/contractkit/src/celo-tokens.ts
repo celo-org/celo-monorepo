@@ -32,7 +32,7 @@ export interface StableTokenInfo extends CeloTokenInfo {
 }
 
 /** Basic info for each stable token */
-const stableTokenInfos: {
+export const stableTokenInfos: {
   [key in StableToken]: StableTokenInfo
 } = {
   [StableToken.cUSD]: {
@@ -48,7 +48,7 @@ const stableTokenInfos: {
 }
 
 /** Basic info for each supported celo token, including stable tokens */
-const celoTokenInfos: {
+export const celoTokenInfos: {
   [key in CeloTokenType]: CeloTokenInfo
 } = {
   [Token.CELO]: {

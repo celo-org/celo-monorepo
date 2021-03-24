@@ -35,7 +35,7 @@ export default class TransferDollars extends BaseCommand {
       : stableToken.transfer(to, value.toFixed())
 
     await newCheckBuilder(this)
-      .hasEnoughUsd(from, value)
+      .hasEnoughStable(from, value)
       .addConditionalCheck(
         'Account can afford transfer and gas paid in cUSD',
         this.kit.connection.defaultFeeCurrency === stableToken.address,
