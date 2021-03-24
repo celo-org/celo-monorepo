@@ -44,7 +44,15 @@ export class AddressRegistry {
    * Get the address mapping for known registered contracts
    */
   async addressMapping() {
-    const addresses = await Promise.all(RegisteredContracts.map((r) => this.addressFor(r)))
+    const addresses = await Promise.all(
+      RegisteredContracts.map(async (r) => {
+        try {
+          return await this.addressFor(r)
+        } catch {
+          return 'Not deployed yet'
+        }
+      })
+    )
     return new Map(zip((r, a) => [r, a], RegisteredContracts, addresses))
   }
 }
