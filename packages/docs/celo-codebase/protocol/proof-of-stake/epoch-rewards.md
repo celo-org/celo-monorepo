@@ -3,7 +3,7 @@
 ## Overview
 
 **Epoch Rewards** are similar to the familiar notion of block rewards in other blockchains, minting and distributing new units of CELO as blocks are produced, to create several kinds of incentives. Epoch rewards are paid in the final block of the epoch and are used to:
-* Distributed [rewards for validators and validator groups](validator-rewards.md)
+* Distribute [rewards for validators and validator groups](validator-rewards.md)
 * Distribute [rewards to holders of Locked CELO](locked-gold-rewards.md) voting for groups that elected validators
 * Make payments into a [Community Fund](community-fund.md) for protocol infrastructure grants
 * [Bolster the stablecoin reserve](community-fund.md#bolstering-the-reserve) if it is under-collateralized
