@@ -189,8 +189,11 @@ spec:
 
           # Use a different fee recipient address if option available
           set +e
-          geth --help | grep -q 'tx-fee-recipient'
+          # Workaround for https://stackoverflow.com/questions/19120263/why-exit-code-141-with-grep-q
+          geth --help > /tmp/geth-help
+          cat /tmp/geth-help | grep -q 'tx-fee-recipient'
           tx_fee_available=$?
+          rm -f /tmp/geth-help
           set -e
           if [ $tx_fee_available -eq 0 ] && [ -f /root/.celo/feeRecipientAddress ] ; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --miner.validator ${ACCOUNT_ADDRESS}"
