@@ -114,7 +114,7 @@ export function getTestWallet() {
   return {
     init: async (uri: string) => {
       client = await WalletConnect.init({
-        relayProvider: process.env.WALLET_CONNECT_BRIGDE,
+        relayProvider: process.env.WALLET_CONNECT_BRIDGE,
         controller: true,
       })
 
