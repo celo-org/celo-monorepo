@@ -128,7 +128,7 @@ export class CeloTokens {
     fn: (info: CeloTokenInfo) => T | Promise<T>
   ): Promise<EachCeloToken<T>> {
     const wrapperInfoFunction = async () =>
-      await Promise.all(
+      Promise.all(
         (await this.validCeloTokenInfos()).map(async (info) => {
           const fnResult = fn(info)
           return {
@@ -151,7 +151,7 @@ export class CeloTokens {
     fn: (info: StableTokenInfo) => T | Promise<T>
   ): Promise<EachCeloToken<T>> {
     const wrapperInfoFunction = async () =>
-      await Promise.all(
+      Promise.all(
         (await this.validStableTokenInfos()).map(async (info) => {
           const fnResult = fn(info)
           return {
@@ -164,10 +164,9 @@ export class CeloTokens {
   }
 
   private async forEachWrapperInfo<T>(
-    fn: () => Promise<{ symbol: CeloTokenType; data: T }[]>
+    fn: () => Promise<Array<{ symbol: CeloTokenType; data: T }>>
   ): Promise<EachCeloToken<T>> {
-    let wrapperInfos = await fn()
-    return wrapperInfos.reduce(
+    return (await fn()).reduce(
       (
         obj: {
           [key in CeloTokenType]?: T
