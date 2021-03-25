@@ -748,14 +748,14 @@ contract('Election', (accounts: string[]) => {
 
       describe('when an epoch boundary has not passed since the pending votes were made', () => {
         it('should revert', async () => {
-          await assertRevert(election.activate(group))
+          await assertRevert(election.activateByAccount(group, voter2))
         })
       })
     })
 
     describe('when the voter does not have pending votes', () => {
       it('should revert', async () => {
-        await assertRevert(election.activate(group))
+        await assertRevert(election.activateByAccount(group, voter2))
       })
     })
   })
