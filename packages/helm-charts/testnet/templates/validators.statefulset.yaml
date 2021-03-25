@@ -180,6 +180,7 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
           else
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --light.maxpeers=1000 --maxpeers=1200"
           fi
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
@@ -228,7 +229,6 @@ spec:
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
-            --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
             ${ADDITIONAL_FLAGS}
