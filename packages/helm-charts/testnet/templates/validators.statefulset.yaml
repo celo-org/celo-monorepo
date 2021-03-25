@@ -95,7 +95,7 @@ spec:
           cat /root/.celo/bootnodeEnode
 
           # Generate a fee recipient address if available
-          if celotooljs.sh generate address-from-env --help | grep -q tx_fee_recipient; then
+          if celotooljs.sh generate address-from-env --help | grep tx_fee_recipient >/dev/null; then
             celotooljs.sh generate account-address --mnemonic "$MNEMONIC" --accountType tx_fee_recipient --index 0 > /root/.celo/feeRecipientAddress
           fi
 
@@ -169,7 +169,7 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
-          if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
+          if geth --help | grep 'proxy.proxyenodeurlpairs' >/dev/null; then
             PROXY_FLAG="--proxy.proxyenodeurlpairs"
           else
             PROXY_FLAG="--proxy.proxyenodeurlpair"
@@ -189,11 +189,8 @@ spec:
 
           # Use a different fee recipient address if option available
           set +e
-          # Workaround for https://stackoverflow.com/questions/19120263/why-exit-code-141-with-grep-q
-          geth --help > /tmp/geth-help
-          cat /tmp/geth-help | grep -q 'tx-fee-recipient'
+          geth --help | grep 'tx-fee-recipient' >/dev/null
           tx_fee_available=$?
-          rm -f /tmp/geth-help
           set -e
           if [ $tx_fee_available -eq 0 ] && [ -f /root/.celo/feeRecipientAddress ] ; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --miner.validator ${ACCOUNT_ADDRESS}"
