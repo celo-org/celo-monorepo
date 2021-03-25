@@ -28,7 +28,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
   throw new Error('Unable to get pairing session, did you lose internet connection?')
 }
 
-const defaultInitOptions: ClientOptions = { relayProvider: 'wss://bridge.walletconnect.org' }
+const defaultInitOptions: ClientOptions = { relayProvider: 'wss://relay.walletconnect.org' }
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
     name: 'ContractKit',
