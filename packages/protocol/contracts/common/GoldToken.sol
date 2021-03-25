@@ -6,12 +6,12 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
 import "./CalledByVm.sol";
-import "./Initializable.sol";
+import "./InitializableV2.sol";
 import "./interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 contract GoldToken is
-  Initializable,
+  InitializableV2,
   CalledByVm,
   Ownable,
   UsingRegistry,
@@ -37,6 +37,12 @@ contract GoldToken is
   event TransferComment(string comment);
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
