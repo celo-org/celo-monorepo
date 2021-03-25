@@ -645,7 +645,7 @@ contract('Election', (accounts: string[]) => {
         let resp: any
         beforeEach(async () => {
           await mineBlocks(EPOCH, web3)
-          resp = await election.activateByAccunt(group, voter)
+          resp = await election.activateByAccount(group, voter)
         })
 
         it("should decrement the account's pending votes for the group", async () => {
