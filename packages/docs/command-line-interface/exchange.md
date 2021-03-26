@@ -31,7 +31,7 @@ EXAMPLES
   celo --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 
   celo --value 5000000000000 --forAtLeast 100000000000000 --from
-  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --stableToken cUSD
+  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --stableToken cStableTokenSymbol
 ```
 
 _See code: [src/commands/exchange/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/celo.ts)_
@@ -172,10 +172,10 @@ OPTIONS
 
 EXAMPLES
   stable --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
-  --stableToken cUSD
+  --stableToken cStableTokenSymbol
 
   stable --value 10000000000000 --forAtLeast 50000000000000 --from
-  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --stableToken cUSD
+  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --stableToken cStableTokenSymbol
 ```
 
 _See code: [src/commands/exchange/stable.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/stable.ts)_
