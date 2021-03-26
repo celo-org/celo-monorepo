@@ -133,7 +133,7 @@ export class CeloTokens {
           const fnResult = fn(info)
           return {
             symbol: info.symbol,
-            data: fnResult instanceof Promise ? await fnResult : fnResult,
+            data: await fnResult,
           }
         })
       )
@@ -156,7 +156,7 @@ export class CeloTokens {
           const fnResult = fn(info)
           return {
             symbol: info.symbol,
-            data: fnResult instanceof Promise ? await fnResult : fnResult,
+            data: await fnResult,
           }
         })
       )

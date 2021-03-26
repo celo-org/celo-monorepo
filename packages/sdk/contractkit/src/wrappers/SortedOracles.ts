@@ -301,9 +301,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     } else if (isValidAddress(target)) {
       return target
     } else {
-      throw new Error(
-        `${target} is neither CeloContract.StableToken, CeloContract.StableTokenEUR or a valid Address`
-      )
+      throw new Error(`${target} is not StableTokenContract deployed or a valid Address`)
     }
   }
 }
