@@ -1,5 +1,4 @@
 import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
-import { fromFixed } from '@celo/utils/lib/fixidity'
 import {
   ABIDefinition,
   CeloTransactionObject,
@@ -28,6 +27,7 @@ import {
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
