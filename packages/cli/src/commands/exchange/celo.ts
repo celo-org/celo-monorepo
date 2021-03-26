@@ -7,10 +7,12 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { checkNotDangerousExchange } from '../../utils/exchange'
+import { enumEntriesDupWithLowercase } from '../../utils/helpers'
 
 const largeOrderPercentage = 1
 const deppegedPricePercentage = 20
 
+const stableTokenOptions = enumEntriesDupWithLowercase(Object.entries(StableToken))
 export default class ExchangeCelo extends BaseCommand {
   static description =
     'Exchange CELO for StableTokens via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)'
@@ -27,9 +29,9 @@ export default class ExchangeCelo extends BaseCommand {
       default: new BigNumber(0),
     }),
     stableToken: flags.enum({
-      options: Object.keys(StableToken),
+      options: Object.keys(stableTokenOptions),
       description: 'Name of the stable to receive',
-      default: StableToken.cUSD,
+      default: 'cUSD',
     }),
   }
 
@@ -44,7 +46,7 @@ export default class ExchangeCelo extends BaseCommand {
     const res = this.parse(ExchangeCelo)
     const sellAmount = res.flags.value
     const minBuyAmount = res.flags.forAtLeast
-    const stableToken = res.flags.stableToken
+    const stableToken = stableTokenOptions[res.flags.stableToken]
 
     let exchange
     try {
