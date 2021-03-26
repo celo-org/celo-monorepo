@@ -106,7 +106,7 @@ export class BlockExplorer {
     }
   }
 
-  getContractAbi = (address: string, callSignature: string) => {
+  getContractMethodAbi = (address: string, callSignature: string) => {
     const contractMapping = this.addressMapping.get(address)
     return {
       contract: contractMapping?.details.name,
@@ -116,7 +116,10 @@ export class BlockExplorer {
 
   async tryParseTxInput(address: string, input: string): Promise<null | CallDetails> {
     const callSignature = input.slice(0, 10)
-    const { contract: contractName, abi: matchedAbi } = this.getContractAbi(address, callSignature)
+    const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(
+      address,
+      callSignature
+    )
     if (!contractName || !matchedAbi) {
       return null
     }

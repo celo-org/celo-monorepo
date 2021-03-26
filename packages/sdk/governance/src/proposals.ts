@@ -135,7 +135,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
       jsonTx.params![`initialize@${initSig}`] = initParams
     } else if (isGovernanceConstitution(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
-      const { contract, abi } = blockExplorer.getContractAbi(address, functionId)
+      const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
       if (!contract || !abi) {
         throw new Error(
           `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
