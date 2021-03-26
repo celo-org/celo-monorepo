@@ -47,7 +47,7 @@ contract('GoldToken', (accounts: string[]) => {
   describe('#symbol()', () => {
     it('should have a symbol', async () => {
       const name: string = await goldToken.symbol()
-      assert.equal(name, 'cGLD')
+      assert.equal(name, 'CELO')
     })
   })
 

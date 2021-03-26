@@ -25,7 +25,7 @@ contract GoldToken is
   // solhint-disable state-visibility
   address constant TRANSFER = address(0xff - 2);
   string constant NAME = "Celo Gold";
-  string constant SYMBOL = "cGLD";
+  string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 internal totalSupply_;
   // solhint-enable state-visibility
