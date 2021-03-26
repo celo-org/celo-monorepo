@@ -180,9 +180,9 @@ export abstract class BaseCommand extends Command {
       if (!balances.CELO!.isZero()) {
         const stables = Object.entries(StableToken)
         let stableGasSet = false
-        for (let index in stables) {
-          const stableName = stables[index][0]
-          const stableToken = stables[index][1]
+        for (const stable of stables) {
+          const stableName = stable[0]
+          const stableToken = stable[1]
           // has balance
           if ((balances as any)[stableName] && !(balances as any)[stableName].isZero()) {
             await setStableTokenGas(stableToken)

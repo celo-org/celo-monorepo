@@ -2,7 +2,7 @@ import { Block } from '@celo/connect'
 import Web3 from 'web3'
 import { failWith } from './cli'
 
-export function enumEntriesDupWithLowercase<T>(entries: [string, T][]) {
+export function enumEntriesDupWithLowercase<T>(entries: Array<[string, T]>) {
   const enumMap: { [key: string]: T } = {}
   entries.forEach((value) => {
     enumMap[value[0]] = value[1]
