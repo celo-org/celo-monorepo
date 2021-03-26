@@ -540,14 +540,14 @@ contract Governance is
   function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
-    } else if (isQueued(proposalId)) {
+    }
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    if (isQueued(proposalId)) {
       return
-        isQueuedProposalExpired(proposalId) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
+        _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      return
-        isDequeuedProposalExpired(proposalId)
-          ? Proposals.Stage.Expiration
-          : proposals[proposalId].getDequeuedStage(stageDurations);
+      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+      return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
 
