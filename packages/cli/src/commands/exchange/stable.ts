@@ -1,14 +1,16 @@
 import { StableToken } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import ExchangeStableBase from '../../exchange-stable-base'
+import { enumEntriesDupWithLowercase } from '../../utils/helpers'
 
+const stableTokenOptions = enumEntriesDupWithLowercase(Object.entries(StableToken))
 export default class ExchangeStable extends ExchangeStableBase {
   static description = 'Exchange Stable Token for CELO via the stability mechanism'
 
   static flags = {
     ...ExchangeStableBase.flags,
     stableToken: flags.enum({
-      options: Object.keys(StableToken),
+      options: Object.keys(stableTokenOptions),
       description: 'Name of the stable token to be transfered',
     }),
   }
@@ -21,7 +23,7 @@ export default class ExchangeStable extends ExchangeStableBase {
   async init() {
     const res = this.parse(ExchangeStable)
     const stableName = res.flags.stableToken
-    this._stableCurrency = StableToken[stableName as keyof typeof StableToken]
+    this._stableCurrency = stableTokenOptions[stableName]
     await super.init()
   }
 }
