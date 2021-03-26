@@ -48,7 +48,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   // 2 years
   uint256 public constant EXPIRATION_TIME = 63072000;
 
-  // Beneficiary of the Celo Gold released in this contract.
+  // Beneficiary of the CELO released in this contract.
   address payable public beneficiary;
 
   // Address capable of (where applicable) revoking, setting the liquidity provision, and
