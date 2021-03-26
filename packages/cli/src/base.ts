@@ -177,7 +177,7 @@ export abstract class BaseCommand extends Command {
       await setStableTokenGas(StableToken[gasCurrencyConfig as keyof typeof StableToken])
     } else if (gasCurrencyConfig === gasOptions.auto && this.kit.defaultAccount) {
       const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
-      if (!balances.CELO!.isZero()) {
+      if (balances.CELO!.isZero()) {
         const stables = Object.entries(StableToken)
         let stableGasSet = false
         for (const stable of stables) {
