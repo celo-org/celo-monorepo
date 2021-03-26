@@ -481,12 +481,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       record.upvotes = await this.getUpvotes(proposalID)
     } else if (stage === ProposalStage.Approval) {
       record.approved = await this.isApproved(proposalID)
-      try {
-        const approvals = await this.getApprovalStatus(proposalID)
-        record.approvals = approvals
-      } catch (e) {
-        record.approvals = undefined
-      }
+      record.approvals = await this.getApprovalStatus(proposalID)
     } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
       record.approved = true
       record.passed = await this.isProposalPassing(proposalID)

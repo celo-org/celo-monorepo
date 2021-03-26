@@ -88,7 +88,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
         return tx
       }
     }
-    throw new Error('No transaction data matching content')
+    return undefined
   }
 
   async getTransaction(i: number): Promise<TransactionData> {
