@@ -179,19 +179,14 @@ export abstract class BaseCommand extends Command {
       const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
       if (balances.CELO!.isZero()) {
         const stables = Object.entries(StableToken)
-        let stableGasSet = false
         for (const stable of stables) {
           const stableName = stable[0]
           const stableToken = stable[1]
           // has balance
           if ((balances as any)[stableName] && !(balances as any)[stableName].isZero()) {
             await setStableTokenGas(stableToken)
-            stableGasSet = true
             break
           }
-        }
-        if (!stableGasSet) {
-          throw new Error("the address doesn't have funds to pay for gas")
         }
       }
     }
