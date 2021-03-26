@@ -1,6 +1,6 @@
 import { CeloContract } from '@celo/contractkit'
-import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
 import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICeloVersionedContract'
+import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
 
