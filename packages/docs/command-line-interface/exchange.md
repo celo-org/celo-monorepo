@@ -21,7 +21,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to
                                                      exchange
 
-  --stableToken=(cUSD)                               [default: cUSD] Name of the stable
+  --stableToken=(cUSD|cEUR)                          [default: cUSD] Name of the stable
                                                      to receive
 
   --value=10000000000000000000000                    (required) The value of CELO to
@@ -112,7 +112,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to
                                                      exchange
 
-  --stableToken=(cUSD)                               [default: cUSD] Name of the stable
+  --stableToken=(cUSD|cEUR)                          [default: cUSD] Name of the stable
                                                      to receive
 
   --value=10000000000000000000000                    (required) The value of CELO to
@@ -164,7 +164,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with the
                                                      Stable Token to exchange
 
-  --stableToken=(cUSD)                               Name of the stable token to be
+  --stableToken=(cUSD|cEUR)                          Name of the stable token to be
                                                      transfered
 
   --value=10000000000000000000000                    (required) The value of Stable
