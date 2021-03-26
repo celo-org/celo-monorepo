@@ -170,8 +170,8 @@ contract Reserve is
 
   /**
    * @notice Sets the balance of reserve gold frozen from transfer.
-   * @param frozenGold The amount of cGLD frozen.
-   * @param frozenDays The number of days the frozen cGLD thaws over.
+   * @param frozenGold The amount of CELO frozen.
+   * @param frozenDays The number of days the frozen CELO thaws over.
    */
   function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
     require(frozenGold <= address(this).balance, "Cannot freeze more than balance");
@@ -203,6 +203,11 @@ contract Reserve is
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
+    // NOTE: The CELO asset launched as "Celo Gold" (cGLD), but was renamed to
+    // just CELO by the community.
+    // TODO: Change "cGLD" to "CELO" in this file, after ensuring that any
+    // off chain tools working with asset allocation weights are aware of this
+    // change.
     require(assetAllocationWeights["cGLD"] != 0, "Must set cGLD asset weight");
     emit AssetAllocationSet(symbols, weights);
   }

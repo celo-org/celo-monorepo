@@ -156,9 +156,9 @@ contract GoldToken is
   }
 
   /**
-   * @notice Mints new cGLD and gives it to 'to'.
+   * @notice Mints new CELO and gives it to 'to'.
    * @param to The account for which to mint tokens.
-   * @param value The amount of cGLD to mint.
+   * @param value The amount of CELO to mint.
    */
   function mint(address to, uint256 value) external onlyVm returns (bool) {
     if (value == 0) {
