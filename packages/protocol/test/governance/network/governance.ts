@@ -2482,7 +2482,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#getProposalStage()', () => {
+  describe('#getProposalStage()', () => {
     const proposalId = 1
     const expectStage = async (expected: Stage, _proposalId?: number) => {
       const stage = await governance.getProposalStage(_proposalId ?? proposalId)
@@ -2496,7 +2496,6 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when proposal exists', () => {
       beforeEach(async () => {
-        await accountsInstance.createAccount()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -2561,7 +2560,6 @@ contract('Governance', (accounts: string[]) => {
           beforeEach(async () => {
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockLockedGold.setAccountTotalLockedGold(account, 100)
             await governance.vote(proposalId, index, VoteValue.Yes)
             const passing = await governance.isProposalPassing(proposalId)
             assert.isTrue(passing, 'proposal not passing')
