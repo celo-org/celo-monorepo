@@ -132,7 +132,7 @@ contract('Attestations', (accounts: string[]) => {
   }
 
   beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
     const mockValidators = await MockValidators.new()
