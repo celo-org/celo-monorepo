@@ -24,7 +24,7 @@ contract GoldToken is
   // Address of the TRANSFER precompiled contract.
   // solhint-disable state-visibility
   address constant TRANSFER = address(0xff - 2);
-  string constant NAME = "CELO";
+  string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 internal totalSupply_;
