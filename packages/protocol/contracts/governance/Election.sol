@@ -163,6 +163,12 @@ contract Election is
   }
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
+  /**
    * @notice Updates the minimum and maximum number of validators that can be elected.
    * @param min The minimum number of validators that can be elected.
    * @param max The maximum number of validators that can be elected.
