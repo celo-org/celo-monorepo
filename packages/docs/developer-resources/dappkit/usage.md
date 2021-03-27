@@ -31,7 +31,8 @@ login = async () => {
 
   const dappkitResponse = await waitForAccountAuth(requestId)
 
-  this.setState({ address: dappkitResponse.address, phoneNumber: dappkitResponse.phoneNumber })
+  // The pepper is not available in all Valora versions
+  this.setState({ address: dappkitResponse.address, phoneNumber: dappkitResponse.phoneNumber, pepper: dappkitResponse.pepper })
 }
 ```
 
@@ -58,6 +59,27 @@ Then add the following to your `login` method to instantiate an instance of Cont
   const cUSDBalance = this.convertToContractDecimals(cUSDBalanceBig, cUSDDecimals)
 
   this.setState({ cUSDBalance, isLoadingBalance: false })
+```
+
+## Checking attestations for the phone number
+
+If the user is using a Valora version that passes the `pepper` that Valora has for a `phone_number`, you can use both pieces of information to determine attestations for the identifier (learn more about the [lightweight identity protocol here](../../celo-codebase/identity)):
+
+```javascript
+import { PhoneNumberUtils } from '@celo/utils'
+const attestations = await kit.contracts.getAttestations()
+
+const identifier = PhoneNumberUtils.getPhoneHash(dappkitResponse.phoneNumber, dappkitResponse.pepper)
+
+// Find all accounts that have received attestations for this phone number
+const accounts = attestations.lookupAccountsForIdentifier(identifier)
+
+// Get the attestations stats for the accounts
+for (const account of accounts) {
+  const stat = await attestations.getAttestationStat(identifier, account)
+  console.log(`Total: ${stat.total}, Completed: ${stat.completed}`)
+}
+
 ```
 
 ## Signing Transactions
