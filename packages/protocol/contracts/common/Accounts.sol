@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
@@ -16,7 +16,7 @@ contract Accounts is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry
 {
   using SafeMath for uint256;
