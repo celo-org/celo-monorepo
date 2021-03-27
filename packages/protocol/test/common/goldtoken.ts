@@ -40,7 +40,7 @@ contract('GoldToken', (accounts: string[]) => {
   describe('#name()', () => {
     it('should have a name', async () => {
       const name: string = await goldToken.name()
-      assert.equal(name, 'CELO')
+      assert.equal(name, 'Celo native asset')
     })
   })
 
