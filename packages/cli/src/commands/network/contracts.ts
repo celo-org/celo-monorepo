@@ -9,6 +9,6 @@ export default class Contracts extends BaseCommand {
   }
 
   async run() {
-    printValueMap2(await this.kit.registry.addressMapping())
+    printValueMap2(await this.kit.registry.addressMappingWithNotDeployedContracts())
   }
 }
