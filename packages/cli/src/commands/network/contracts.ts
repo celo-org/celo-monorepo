@@ -1,46 +1,71 @@
-import { CeloContract } from '@celo/contractkit'
+import { concurrentMap } from '@celo/base'
+import { CeloContract, NULL_ADDRESS } from '@celo/contractkit'
 import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICeloVersionedContract'
 import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
+import { EachCeloToken } from '@celo/contractkit/lib/celo-tokens'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { printValueMapRecursive } from '../../utils/cli'
+import BigNumber from 'bignumber.js'
+
+const DEFAULT_VERSION = { 0: 1, 1: 0, 2: 0, 3: 0 }
+const UNVERSIONED_CONTRACTS = [
+  CeloContract.Registry,
+  CeloContract.FeeCurrencyWhitelist,
+  CeloContract.Freezer,
+  CeloContract.TransferWhitelist,
+]
+const UNPROXIED_CONTRACTS = [CeloContract.TransferWhitelist]
 
 export default class Contracts extends BaseCommand {
   static description = 'Lists Celo core contracts and their addesses.'
 
   static flags = {
     ...BaseCommand.flags,
+    ...(cli.table.flags() as object),
   }
 
   async run() {
     const addressMapping = await this.kit.registry.addressMapping()
-    const info: {
-      [name in CeloContract]?: {
-        version: string
-        proxy: string
-        implementation: string
-        balance: any
-      }
-    } = {}
-    for (const [contract, proxy] of addressMapping.entries()) {
-      try {
-        const proxyContract = newProxy(this.kit.web3, proxy)
-        const implementation = await proxyContract.methods._getImplementation().call()
+    const res = this.parse(Contracts)
+    const contractInfo = await concurrentMap(
+      4,
+      Array.from(addressMapping.entries()),
+      async ([contract, proxy]) => {
+        // skip implementation check for unproxied contract
+        const implementation = UNPROXIED_CONTRACTS.includes(contract)
+          ? NULL_ADDRESS
+          : await newProxy(this.kit.web3, proxy)
+              .methods._getImplementation()
+              .call()
 
-        const versionedContract = newICeloVersionedContract(this.kit.web3, implementation)
-        const version = await versionedContract.methods.getVersionNumber().call()
-        const readableVersion = `${version[0]}.${version[1]}.${version[2]}.${version[3]}`
+        // skip version check for unversioned contracts
+        const version = UNVERSIONED_CONTRACTS.includes(contract)
+          ? DEFAULT_VERSION
+          : await newICeloVersionedContract(this.kit.web3, implementation)
+              .methods.getVersionNumber()
+              .call()
 
         const balance = await this.kit.celoTokens.balancesOf(proxy)
-        info[contract] = {
-          version: readableVersion,
+        return {
+          contract,
           proxy,
           implementation,
+          version,
           balance,
         }
-      } catch (e) {
-        console.debug(`Contract ${contract} at address ${proxy} failed with ${e}`)
       }
-    }
-    printValueMapRecursive(info)
+    )
+
+    cli.table(
+      contractInfo,
+      {
+        contract: { get: (i) => i.contract },
+        proxy: { get: (i) => i.proxy },
+        implementation: { get: (i) => i.implementation },
+        version: { get: (i) => `${i.version[0]}.${i.version[1]}.${i.version[2]}.${i.version[3]}` },
+        balance: { get: (i) => i.balance },
+      },
+      { sort: 'contract', ...res.flags }
+    )
   }
 }
