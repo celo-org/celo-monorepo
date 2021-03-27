@@ -17,7 +17,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   MetaTransactionWallet.setProvider(web3.currentProvider)
 
   const deployImplementation = async (from: Address) => {
-    const impl = await MetaTransactionWallet.new({ from })
+    const impl = await MetaTransactionWallet.new(true, { from })
     return impl.address
   }
 

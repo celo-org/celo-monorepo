@@ -20,6 +20,8 @@ EXAMPLES
   list StableToken
 
   list
+
+  list StableTokenEUR
 ```
 
 _See code: [src/commands/oracle/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/list.ts)_
@@ -45,6 +47,9 @@ EXAMPLES
   remove-expired-reports StableToken --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 
   remove-expired-reports --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
+
+  remove-expired-reports StableTokenEUR --from
+  0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 ```
 
 _See code: [src/commands/oracle/remove-expired-reports.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/remove-expired-reports.ts)_
@@ -73,6 +78,8 @@ EXAMPLES
   report StableToken --value 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 
   report --value 0.99 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
+
+  report StableTokenEUR --value 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 ```
 
 _See code: [src/commands/oracle/report.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/report.ts)_
@@ -104,6 +111,8 @@ EXAMPLES
   reports StableToken
 
   reports
+
+  reports StableTokenEUR
 ```
 
 _See code: [src/commands/oracle/reports.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/reports.ts)_
