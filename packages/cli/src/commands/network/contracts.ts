@@ -2,10 +2,8 @@ import { concurrentMap } from '@celo/base'
 import { CeloContract, NULL_ADDRESS } from '@celo/contractkit'
 import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICeloVersionedContract'
 import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
-import { EachCeloToken } from '@celo/contractkit/lib/celo-tokens'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import BigNumber from 'bignumber.js'
 
 const DEFAULT_VERSION = { 0: 1, 1: 0, 2: 0, 3: 0 }
 const UNVERSIONED_CONTRACTS = [
@@ -63,6 +61,7 @@ export default class Contracts extends BaseCommand {
         proxy: { get: (i) => i.proxy },
         implementation: { get: (i) => i.implementation },
         version: { get: (i) => `${i.version[0]}.${i.version[1]}.${i.version[2]}.${i.version[3]}` },
+        // TODO: unpack balances for each token into a column
         balance: { get: (i) => i.balance },
       },
       { sort: 'contract', ...res.flags }
