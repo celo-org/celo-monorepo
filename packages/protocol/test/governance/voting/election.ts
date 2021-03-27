@@ -730,19 +730,6 @@ contract('Election', (accounts: string[]) => {
           it('should not modify the total votes', async () => {
             assertEqualBN(await election.getTotalVotes(), value + value2)
           })
-
-          it('should emit the ValidatorGroupVoteActivated event', async () => {
-            assert.equal(resp.logs.length, 1)
-            const log = resp.logs[0]
-            assertContainSubset(log, {
-              event: 'ValidatorGroupVoteActivated',
-              args: {
-                account: voter2,
-                group,
-                value: new BigNumber(value),
-              },
-            })
-          })
         })
       })
 
