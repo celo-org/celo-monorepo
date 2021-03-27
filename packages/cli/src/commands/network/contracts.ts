@@ -4,6 +4,7 @@ import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICelo
 import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
+import BigNumber from 'bignumber.js'
 
 const DEFAULT_VERSION = { 0: 1, 1: 0, 2: 0, 3: 0 }
 const UNVERSIONED_CONTRACTS = [
@@ -62,7 +63,15 @@ export default class Contracts extends BaseCommand {
         implementation: { get: (i) => i.implementation },
         version: { get: (i) => `${i.version[0]}.${i.version[1]}.${i.version[2]}.${i.version[3]}` },
         // TODO: unpack balances for each token into a column
-        balance: { get: (i) => i.balance },
+        balances: {
+          get: (i) =>
+            Object.entries(i.balance)
+              .map(([symbol, amount]) =>
+                amount!.isZero() ? '' : `${symbol}: ${amount!.toFixed()}`
+              )
+              .filter((s) => s !== '')
+              .join(', '),
+        },
       },
       { sort: 'contract', ...res.flags }
     )
