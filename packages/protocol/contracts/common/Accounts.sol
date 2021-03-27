@@ -129,7 +129,10 @@ contract Accounts is
    * @param name The name to set.
    */
   function setName(string memory name) public {
-    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isAccount(msg.sender),
+      string(abi.encodePacked(msg.sender, " is not registered account"))
+    );
     Account storage account = accounts[msg.sender];
     account.name = name;
     emit AccountNameSet(msg.sender, name);
@@ -148,7 +151,10 @@ contract Accounts is
    *      is 0x0 or msg.sender).
    */
   function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public {
-    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isAccount(msg.sender),
+      string(abi.encodePacked(msg.sender, " is not registered account"))
+    );
     if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
       address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
       require(signer == walletAddress, "Invalid signature");
@@ -174,7 +180,10 @@ contract Accounts is
    * @param metadataURL The URL to access the metadata.
    */
   function setMetadataURL(string calldata metadataURL) external {
-    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isAccount(msg.sender),
+      string(abi.encodePacked(msg.sender, " is not registered account"))
+    );
     Account storage account = accounts[msg.sender];
     account.metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
@@ -402,7 +411,7 @@ contract Accounts is
    * @return The address with which the account can sign votes.
    */
   function getVoteSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
+    require(isAccount(account), string(abi.encodePacked(msg.sender, " is not registered account")));
     address signer = accounts[account].signers.vote;
     return signer == address(0) ? account : signer;
   }
@@ -413,7 +422,7 @@ contract Accounts is
    * @return The address with which the account can register a validator or group.
    */
   function getValidatorSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
+    require(isAccount(account), string(abi.encodePacked(msg.sender, " is not registered account")));
     address signer = accounts[account].signers.validator;
     return signer == address(0) ? account : signer;
   }
@@ -424,7 +433,7 @@ contract Accounts is
    * @return The address with which the account can sign attestations.
    */
   function getAttestationSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
+    require(isAccount(account), string(abi.encodePacked(msg.sender, " is not registered account")));
     address signer = accounts[account].signers.attestation;
     return signer == address(0) ? account : signer;
   }
@@ -575,7 +584,10 @@ contract Accounts is
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {
-    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isAccount(msg.sender),
+      string(abi.encodePacked(msg.sender, " is not registered account"))
+    );
     require(
       isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
       "Cannot re-authorize address or locked gold account."
