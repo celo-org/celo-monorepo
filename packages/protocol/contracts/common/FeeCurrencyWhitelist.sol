@@ -32,7 +32,7 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable, 
     (rateNumerator, rateDenominator) = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
-      .medianRate(stable);
+      .medianRate(tokenAddress);
     require(rateDenominator > 0, "FeeCurrencyWhitelist: Invalid Oracle Price (Denominator)");
     require(rateNumerator > 0, "FeeCurrencyWhitelist: Invalid Oracle Price (Numerator)");
     whitelist.push(tokenAddress);
