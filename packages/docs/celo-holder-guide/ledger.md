@@ -11,7 +11,7 @@ The steps below require technical knowledge. You should be comfortable with the 
 ## Requirements
 
 Make sure to have the following before you begin:
-* Initialized your [Ledger Nano X](https://support.ledger.com/hc/en-us/articles/360018784134)
+* Initialized your [Ledger Nano X or S](https://support.ledger.com/hc/en-us/articles/360018784134)
 * The [latest firmware](https://support.ledger.com/hc/en-us/articles/360013349800) is installed
 * [Ledger Live](https://support.ledger.com/hc/en-us/articles/360006395233-Take-your-first-steps) is ready to be used.
 * You have [celocli](https://www.npmjs.com/package/@celo/celocli) installed.
