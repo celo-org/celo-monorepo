@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 function build_tag() {
-  BRANCH="$1"
-  LOG_FILE="$2"
+  local BRANCH="$1"
+  local LOG_FILE="$2"
 
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
