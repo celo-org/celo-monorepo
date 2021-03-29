@@ -36,10 +36,7 @@ export default class TestAttestationService extends BaseCommand {
     const address = flags.from
     const { phoneNumber, message, provider } = flags
 
-    await newCheckBuilder(this, flags.from)
-      .isSignerOrAccount()
-      .canSign(address)
-      .runChecks()
+    await newCheckBuilder(this, flags.from).isSignerOrAccount().canSign(address).runChecks()
 
     const accounts = await this.kit.contracts.getAccounts()
     const account = await accounts.signerToAccount(address)

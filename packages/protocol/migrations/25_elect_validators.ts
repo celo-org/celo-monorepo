@@ -22,10 +22,7 @@ function ganachePrivateKey(num) {
   const seed = bip39.mnemonicToSeedSync(truffle.networks.development.mnemonic)
   const hdk = hdkey.fromMasterSeed(seed)
   const addrNode = hdk.derivePath("m/44'/60'/0'/0/" + num) // m/44'/60'/0'/0/0 is derivation path for the first account. m/44'/60'/0'/0/1 is the derivation path for the second account and so on
-  return addrNode
-    .getWallet()
-    .getPrivateKey()
-    .toString('hex')
+  return addrNode.getWallet().getPrivateKey().toString('hex')
 }
 
 function serializeKeystore(keystore: any) {

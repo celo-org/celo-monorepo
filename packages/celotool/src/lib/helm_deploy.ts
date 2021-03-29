@@ -104,12 +104,8 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random()
-    .toString(36)
-    .slice(-8)
-  const blockscoutDBPassword = Math.random()
-    .toString(36)
-    .slice(-8)
+  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
+  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(

@@ -302,10 +302,7 @@ function shouldChangeVote(
   scoreSensitivity: BigNumber,
   baseChangeProbability: BigNumber
 ): boolean {
-  const scoreBasedProbability = score
-    .pow(scoreSensitivity)
-    .negated()
-    .plus(1)
+  const scoreBasedProbability = score.pow(scoreSensitivity).negated().plus(1)
   const scaledProbability = scoreBasedProbability.times(baseChangeProbability.negated().plus(1))
   const totalProbability = scaledProbability.plus(baseChangeProbability)
 
