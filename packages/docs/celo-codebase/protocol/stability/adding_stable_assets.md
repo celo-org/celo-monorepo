@@ -1,17 +1,17 @@
 # Adding more stable assets
 
-This document outlies the requirement and steps to add a new stable asset to the Celo platform. Assumming we want to add to the platform a new stable asset `cX` tracking the value of X (where X can be a fiat currency like ARS or MXN), using the [Mento exchange](doto.md).
+This document outlies the requirements and steps to add a new stable asset to the Celo platform. Assumming we want to add to the platform a new stable asset `cX` tracking the value of X (where X can be a fiat currency like ARS or MXN), using the [Mento exchange](doto.md).
 
 ## Requirements
 
-1. Liquidity: the asset X has to be liquidly traded against CELO, in a CELO/X ticker. In absense of that, X has to be liquidly traded, including weekends, agains well known assets that trade 24/7, like BTC or ETH, that way a price of X in respect of Celo has to can infered. In this second case an implicit pair can be calculated for the oracle reports.
-2. Determine pre-mint addresses and amounts. It is possible to pre-mint a fixed amout at the time of launching a new stable asset, good candidates to receive the pre-mint are the community fund and other entities commited to distribute this initial allocation to grant recipients and liquidity providers.
+1. Liquidity: the asset X has to be liquidly traded against CELO, in a CELO/X ticker. In absence of that, X has to be liquidly traded, including weekends, against well known assets that trade 24/7, like BTC or ETH, such that the price of X with respect to Celo can be inferred. In this second case, an implicit pair can be calculated for the oracle reports.
+2. Determine pre-mint addresses and amounts: It is possible to pre-mint a fixed amout at the time of launching a new stable asset, good candidates to receive the pre-mint are the community fund and other entities commited to distribute this initial allocation to grant recipients and liquidity providers.
 
 ## Procedure
 
 ### Including contracts on the registry
 
-Currently, the addition of new assets is tight to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals, only final value that can't be changed is the pre-mint amount.
+Currently, the addition of new assets is tied to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals. The only value that can't be changed is the pre-mint amount.
 
 ### Freezing
 
@@ -29,7 +29,7 @@ A following governance proposal needs to be submited to enable [oracles](oracles
 
 ### Oracle report
 
-Before fully activating `cX`, it is required to have at least one oracle report. This is required by there Reserve contract in [this line](https://github.com/celo-org/celo-monorepo/blob/9b43d07b35c9d50389f5f2f53ddfa0c21f16d0f2/packages/protocol/contracts/stability/Reserve.sol#L223). After reporting is worth double checking that the buckets sizes on `StableTokenX` are consistent with values reported and it is a good opportunity to test the oracle set up in production with no funds as risk, as the contracts involved are still frozen.
+Before fully activating `cX`, it is required to have at least one oracle report. This is required by the Reserve contract in [this line](https://github.com/celo-org/celo-monorepo/blob/9b43d07b35c9d50389f5f2f53ddfa0c21f16d0f2/packages/protocol/contracts/stability/Reserve.sol#L223). After reporting, it is worth double checking that the buckets sizes on `StableTokenX` are consistent with values reported and it is a good opportunity to test the oracle set up in production with no funds at risk, as the contracts involved are still frozen.
 
 ### Full activation
 
