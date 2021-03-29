@@ -76,17 +76,17 @@ If the user is using a Valora version that passes the `pepper` that Valora has f
 
 ```javascript
 import { PhoneNumberUtils } from '@celo/utils'
-const attestations = await kit.contracts.getAttestations()
+const attestations = await kit.contracts.getAttestations();
 
-const identifier = PhoneNumberUtils.getPhoneHash(dappkitResponse.phoneNumber, dappkitResponse.pepper)
+const identifier = PhoneNumberUtils.getPhoneHash(dappkitResponse.phoneNumber, dappkitResponse.pepper);
 
 // Find all accounts that have received attestations for this phone number
-const accounts = attestations.lookupAccountsForIdentifier(identifier)
+const accounts = attestations.lookupAccountsForIdentifier(identifier);
 
 // Get the attestations stats for the accounts
 for (const account of accounts) {
-  const stat = await attestations.getAttestationStat(identifier, account)
-  console.log(`Total: ${stat.total}, Completed: ${stat.completed}`)
+  const stat = await attestations.getAttestationStat(identifier, account);
+  console.log(`Total: ${stat.total}, Completed: ${stat.completed}`);
 }
 
 ```
