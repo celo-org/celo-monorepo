@@ -210,10 +210,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         account: 'd31509C31d654056A45185ECb6',
       }
 
-      request(app)
-        .post('/getBlindedMessagePartialSig')
-        .send(mockRequestData)
-        .expect(400, done)
+      request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
 
     it('invalid hashedPhoneNumber returns 400', (done) => {
@@ -222,10 +219,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         hashedPhoneNumber: '+1234567890',
       }
 
-      request(app)
-        .post('/getBlindedMessagePartialSig')
-        .send(mockRequestData)
-        .expect(400, done)
+      request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
 
     it('expired timestamp returns 400', (done) => {
@@ -234,10 +228,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
       }
 
-      request(app)
-        .post('/getBlindedMessagePartialSig')
-        .send(mockRequestData)
-        .expect(400, done)
+      request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
 
     it('invalid blinded phone number returns 400', (done) => {
@@ -246,10 +237,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         blindedQueryPhoneNumber: '1234567890',
       }
 
-      request(app)
-        .post('/getBlindedMessagePartialSig')
-        .send(mockRequestData)
-        .expect(400, done)
+      request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
   })
 })

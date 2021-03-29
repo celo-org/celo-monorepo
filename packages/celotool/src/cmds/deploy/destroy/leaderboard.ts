@@ -12,7 +12,7 @@ export const builder = {}
 export const handler = async (argv: DestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   await createClusterIfNotExists()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   await removeHelmRelease(argv.celoEnv)
 }

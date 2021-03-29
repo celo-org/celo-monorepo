@@ -18,6 +18,7 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
+  'ExchangeEURProxy',
   'ExchangeProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
@@ -30,6 +31,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
+  'StableTokenEURProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
 ]
@@ -66,9 +68,11 @@ export const CoreContracts = [
 
   // stability
   'Exchange',
+  'ExchangeEUR',
   'Reserve',
   'ReserveSpenderMultiSig',
   'StableToken',
+  'StableTokenEUR',
   'SortedOracles',
 ]
 

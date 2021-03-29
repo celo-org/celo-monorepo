@@ -24,7 +24,7 @@ interface VerifyContractsInitialArgv extends InitialArgv {
 
 export const handler = async (argv: VerifyContractsInitialArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   // Check if blockscout is deployed and online?
   const blockscoutUrl = getBlockscoutUrl(argv.celoEnv)
 

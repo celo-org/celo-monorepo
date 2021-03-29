@@ -32,7 +32,7 @@ export const builder = (argv: yargs.Argv) => {
 type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
 
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
   const instanceName = getInstanceName(argv.celoEnv)

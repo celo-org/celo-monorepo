@@ -25,6 +25,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: PortForwardArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
   await portForward(argv.celoEnv, argv.component, argv.ports)
 }

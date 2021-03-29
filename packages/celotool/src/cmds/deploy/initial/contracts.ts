@@ -87,7 +87,7 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
 
 export const handler = async (argv: ContractsArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)
   const cb = async () => {

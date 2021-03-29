@@ -15,8 +15,8 @@ export type ListArgv = DeployArgv
 
 export const builder = {}
 
-export const handler = async (_argv: ListArgv) => {
-  await switchToClusterFromEnv()
+export const handler = async (argv: ListArgv) => {
+  await switchToClusterFromEnv(argv.celoEnv)
   const releases = await getNonSystemHelmReleases()
   printReleases(releases)
 }

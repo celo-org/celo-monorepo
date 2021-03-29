@@ -1,18 +1,20 @@
 pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
+import "./UsingRegistry.sol";
 import "./CalledByVm.sol";
-import "./Freezable.sol";
-import "./Initializable.sol";
+import "./InitializableV2.sol";
 import "./interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 contract GoldToken is
-  Initializable,
+  InitializableV2,
   CalledByVm,
-  Freezable,
+  Ownable,
+  UsingRegistry,
   IERC20,
   ICeloToken,
   ICeloVersionedContract
@@ -37,11 +39,17 @@ contract GoldToken is
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -130,11 +138,7 @@ contract GoldToken is
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(address from, address to, uint256 value)
-    external
-    onlyWhenNotFrozen
-    returns (bool)
-  {
+  function transferFrom(address from, address to, uint256 value) external returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
@@ -233,7 +237,7 @@ contract GoldToken is
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function _transfer(address to, uint256 value) internal onlyWhenNotFrozen returns (bool) {
+  function _transfer(address to, uint256 value) internal returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 

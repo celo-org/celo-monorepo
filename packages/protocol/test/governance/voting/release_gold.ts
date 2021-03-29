@@ -54,6 +54,8 @@ const authorizationTestDescriptions = {
   },
 }
 
+const isTest = true
+
 interface ReleaseGoldConfig {
   releaseStartTime: number
   releaseCliffTime: number
@@ -139,7 +141,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3: Web3
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-    releaseGoldInstance = await ReleaseGold.new()
+    releaseGoldInstance = await ReleaseGold.new(isTest)
     await goldTokenInstance.transfer(
       releaseGoldInstance.address,
       releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
@@ -174,7 +176,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     freezerInstance = await Freezer.new()
-    goldTokenInstance = await GoldToken.new()
+    goldTokenInstance = await GoldToken.new(true)
     lockedGoldInstance = await LockedGold.new()
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
@@ -1698,9 +1700,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN)
-                .div(2)
-                .plus(1)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN).div(2).plus(1)
               await assertRevert(
                 releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
               )
