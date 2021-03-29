@@ -36,9 +36,7 @@ export default class IdentifierQuery extends BaseCommand {
     const { flags } = this.parse(IdentifierQuery)
     const { phoneNumber, from, context } = flags
 
-    await newCheckBuilder(this)
-      .isValidAddress(flags.from)
-      .runChecks()
+    await newCheckBuilder(this).isValidAddress(flags.from).runChecks()
 
     cli.action.start('Querying ODIS for identifier')
 

@@ -10,6 +10,7 @@ import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
+import { newExchangeEur } from './generated/ExchangeEUR'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
@@ -41,6 +42,7 @@ export const ContractFactories = {
   [CeloContract.EpochRewards]: newEpochRewards,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
+  [CeloContract.ExchangeEUR]: newExchangeEur,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
@@ -55,6 +57,7 @@ export const ContractFactories = {
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
+  [CeloContract.StableTokenEUR]: newStableToken,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
@@ -155,6 +158,14 @@ export class Web3ContractCache {
    */
   async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null || address !== undefined) {
+      // core contract in the registry
+      if (!address) {
+        try {
+          address = await this.kit.registry.addressFor(contract)
+        } catch (e) {
+          throw new Error(`${contract} not yet deployed for this chain`)
+        }
+      }
       debug('Initiating contract %s', contract)
       const createFn = ProxyContracts.includes(contract)
         ? newProxy
@@ -162,10 +173,9 @@ export class Web3ContractCache {
         ? (ContractFactories[contract] as CFType[C])
         : newProxy
       // @ts-ignore: Too complex union type
-      this.cacheMap[contract] = createFn(
-        this.kit.connection.web3,
-        address ?? (await this.kit.registry.addressFor(contract))
-      ) as NonNullable<ContractCacheMap[C]>
+      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as NonNullable<
+        ContractCacheMap[C]
+      >
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!
