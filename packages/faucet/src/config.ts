@@ -5,7 +5,7 @@ export interface NetworkConfig {
   nodeUrl: string
   faucetGoldAmount: string
   faucetDollarAmount: string
-  faucetTokenAmount: string
+  faucetStableAmount: string
   inviteGoldAmount: string
   inviteDollarAmount: string
   escrowDollarAmount: string
@@ -39,7 +39,7 @@ export function getNetworkConfig(net: string): NetworkConfig {
     nodeUrl: config[net].node_url,
     faucetGoldAmount: config[net].faucet_gold_amount,
     faucetDollarAmount: config[net].faucet_dollar_amount,
-    faucetTokenAmount: config[net].faucet_token_amount,
+    faucetStableAmount: config[net].faucet_stable_amount,
     inviteGoldAmount: config[net].invite_gold_amount,
     inviteDollarAmount: config[net].invite_dollar_amount,
     escrowDollarAmount: config[net].escrow_dollar_amount,

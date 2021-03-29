@@ -89,12 +89,12 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
 
 function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: NetworkConfig) {
   return async (account: AccountRecord) => {
-    // const { nodeUrl, faucetDollarAmount, faucetGoldAmount, faucetTokenAmount } = config
-    const { nodeUrl, faucetTokenAmount } = config
+    // const { nodeUrl, faucetDollarAmount, faucetGoldAmount, faucetStableAmount } = config
+    const { nodeUrl, faucetGoldAmount, faucetStableAmount } = config
     const celo = new CeloAdapter({ nodeUrl, pk: account.pk })
-    // await retryAsync(sendGold, 3, [celo, request.beneficiary, faucetGoldAmount, snap], 500)
+    await retryAsync(sendGold, 3, [celo, request.beneficiary, faucetGoldAmount, snap], 500)
     // await retryAsync(sendDollars, 3, [celo, request.beneficiary, faucetDollarAmount, snap], 500)
-    await sendTokens(celo, request.beneficiary, faucetTokenAmount, snap)
+    await sendStableTokens(celo, request.beneficiary, faucetStableAmount, snap)
   }
 }
 
@@ -168,15 +168,6 @@ async function sendGold(celo: CeloAdapter, address: Address, amount: string, sna
 async function sendTokens(celo: CeloAdapter, address: Address, amount: string, snap: DataSnapshot) {
   console.info(`req(${snap.key}): Sending ${amount} token`)
   const tokenTxs = await celo.transferTokens(address, amount)
-
-  // await Promise.all(
-  //   tokenTxs.map(async (tx) => {
-  //     const x = async () => {
-  //       console.log('receipt', await tx.sendAndWaitForReceipt())
-  //     }
-  //     await retryAsync(x, 3, [], 500)
-  //   })
-  // )
   const sendTxHelper = async (tx: CeloTransactionObject<boolean>) => {
     const txReceipt = await tx.sendAndWaitForReceipt()
     const txHash = txReceipt.transactionHash
@@ -190,16 +181,32 @@ async function sendTokens(celo: CeloAdapter, address: Address, amount: string, s
       await retryAsync(sendTxHelper, 3, [tx], 500)
     })
   )
+}
 
-  // return tokenTxs.map(async (tx) => {
-  //   await retryAsync(sendTxHelper, 3, [tx], 500)
-  // })
+async function sendStableTokens(
+  celo: CeloAdapter,
+  address: Address,
+  amount: string,
+  snap: DataSnapshot
+) {
+  console.info(`req(${snap.key}): Sending ${amount} token`)
 
-  // const tokenTxReceipt = await tokenTx.sendAndWaitForReceipt()
-  // const tokenTxHash = tokenTxReceipt.transactionHash
-  // console.info(`req(${snap.key}): token Transaction Sent. txhash:${tokenTxHash}`)
-  // await snap.ref.update({ tokenTxHash })
-  // return tokenTxHash
+  const tokenTxs = await celo.transferStableTokens(address, amount)
+  const sendTxHelper = async (symbol: string, tx: CeloTransactionObject<boolean>) => {
+    const txReceipt = await tx.sendAndWaitForReceipt()
+    const txHash = txReceipt.transactionHash
+    console.log(`req(${snap.key}): ${symbol} Transaction Sent. txhash:${txHash}`)
+    await snap.ref.update({ txHash })
+    return txHash
+  }
+
+  return Promise.all(
+    Object.entries(tokenTxs).map(async ([symbol, tx]) => {
+      if (tx) {
+        await retryAsync(sendTxHelper, 3, [symbol, tx!], 500)
+      }
+    })
+  )
 }
 
 function messageText(inviteCode: string, request: RequestRecord) {

@@ -1,5 +1,6 @@
 import { CeloTransactionObject } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { StableToken, StableTokenInfo } from '@celo/contractkit/lib/celo-tokens'
 import { CeloTokenWrapper } from '@celo/contractkit/lib/wrappers/CeloTokenWrapper'
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
@@ -33,23 +34,16 @@ export class CeloAdapter {
   }
 
   async transferTokens(to: string, amount: string) {
-    // : Promise<CeloTransactionObject<boolean>[]> {
-
-    // this.kit.celoTokens.forEachCeloToken
-    // await this.kit.celoTokens.forEachCeloToken(
-    //   (info) => info.contract // text name of contract --> need to get the contract + transfer
-    //   // maybe best to include this logic within transferDollars (keep amounts the same across stables)
-    //   // TODO: get the contract, then transfer
-    //   // this.registry.addressFor(info.contract)
-    // )
-    // TODO fix all of this, none of it probably works
-    // TODO --> decide if we want this only for stable tokens or for other tokens as well (i.e. stables + CELO, or all as "tokens")
-    // --> if so, use new forEachStableToken or whatever it's called (part of Ponti's PR)
-    // --> or add getStableWrappers?
     const wrappers = await this.kit.celoTokens.getWrappers()
-    // should return list of txObjects (or object keyed by name)
     return Object.values(wrappers).map((token: CeloTokenWrapper<any> | undefined) => {
       return token!.transfer(to, amount)
+    })
+  }
+
+  async transferStableTokens(to: string, amount: string) {
+    return this.kit.celoTokens.forStableCeloToken(async (info: StableTokenInfo) => {
+      const token = await this.kit.celoTokens.getWrapper(info.symbol as StableToken)
+      return token.transfer(to, amount)
     })
   }
 
