@@ -50,10 +50,7 @@ const buildGraph = async (): Promise<string> => {
   return JSON.stringify(dependencyGraph, null, 2)
 }
 
-const hash = (input: string): string =>
-  createHash('SHA256')
-    .update(input)
-    .digest('base64')
+const hash = (input: string): string => createHash('SHA256').update(input).digest('base64')
 
 export const graphHasChanged = async (): Promise<boolean> => {
   const oldGraph = readFileSync(DEP_GRAPH_FILENAME).toString()

@@ -67,7 +67,7 @@ const testTx = {
 }
 const decryptMessage = 'Hello'
 
-const walletConnectBridge = process.env.WALLET_CONNECT_BRIGDE
+const walletConnectBridge = process.env.WALLET_CONNECT_BRIDGE
 const E2E = !!walletConnectBridge
 
 describe('WalletConnectWallet tests', () => {

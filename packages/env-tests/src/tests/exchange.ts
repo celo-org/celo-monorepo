@@ -49,10 +49,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
           .sell(
             stableTokenAmountToSell,
             // Allow 5% deviation from the quoted price
-            goldAmount
-              .times(0.95)
-              .integerValue(BigNumber.ROUND_DOWN)
-              .toString(),
+            goldAmount.times(0.95).integerValue(BigNumber.ROUND_DOWN).toString(),
             false
           )
           .send()
@@ -82,10 +79,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
           .sellGold(
             goldAmountToSell,
             // Assume we can get at least 80 % back
-            stableTokenAmountToSell
-              .times(0.8)
-              .integerValue(BigNumber.ROUND_DOWN)
-              .toString()
+            stableTokenAmountToSell.times(0.8).integerValue(BigNumber.ROUND_DOWN).toString()
           )
           .send()
         const sellGoldReceipt = await sellGoldTx.waitReceipt()

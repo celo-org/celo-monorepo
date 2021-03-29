@@ -15,9 +15,10 @@ import {
 } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const stableTokenEUR: StableTokenEURInstance = await getDeployedProxiedContract<
-    StableTokenEURInstance
-  >('StableTokenEUR', artifacts)
+  const stableTokenEUR: StableTokenEURInstance = await getDeployedProxiedContract<StableTokenEURInstance>(
+    'StableTokenEUR',
+    artifacts
+  )
   return [
     config.registry.predeployedProxyAddress,
     stableTokenEUR.address,

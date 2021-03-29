@@ -31,7 +31,7 @@ contract('GoldToken', (accounts: string[]) => {
 
   beforeEach(async () => {
     freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
+    goldToken = await GoldToken.new(true)
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
