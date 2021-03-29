@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# USAGE: build_tag <branch> <log file>
+# This function:
+# 1. checks out the given branch
+# 2. builds contracts
+# 3. returns to original branch
+# piping output of any commands to the specified log file.
+# Sets $BUILD_DIR to the directory where resulting build artifacts may be found.
 function build_tag() {
   local BRANCH="$1"
   local LOG_FILE="$2"
