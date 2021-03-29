@@ -108,10 +108,7 @@ export function assertAlmostEqual(
   if (expected.isZero()) {
     assert.equal(actual.toFixed(), expected.toFixed())
   } else {
-    const isCloseTo = actual
-      .minus(expected)
-      .abs()
-      .lte(delta)
+    const isCloseTo = actual.minus(expected).abs().lte(delta)
     assert(
       isCloseTo,
       `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`

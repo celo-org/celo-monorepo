@@ -35,9 +35,7 @@ export class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignat
   }
 }
 
-export class NoStorageRootProvidedData extends RootError<
-  OffchainErrorTypes.NoStorageRootProvidedData
-> {
+export class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
   constructor() {
     super(OffchainErrorTypes.NoStorageRootProvidedData)
   }

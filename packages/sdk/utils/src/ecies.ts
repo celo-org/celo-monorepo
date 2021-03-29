@@ -83,9 +83,7 @@ export function AES128EncryptAndHMAC(
 ): Buffer {
   const iv = randomBytes(IV_LENGTH)
   const dataToMac = AES128Encrypt(encryptionKey, iv, plaintext)
-  const mac = createHmac('sha256', macKey)
-    .update(dataToMac)
-    .digest()
+  const mac = createHmac('sha256', macKey).update(dataToMac).digest()
 
   return Buffer.concat([dataToMac, mac])
 }
@@ -121,9 +119,7 @@ export function AES128DecryptAndHMAC(
   const message = ciphertext.slice(IV_LENGTH, ciphertext.length - 32)
   const mac = ciphertext.slice(ciphertext.length - 32, ciphertext.length)
   const dataToMac = Buffer.concat([iv, message])
-  const computedMac = createHmac('sha256', macKey)
-    .update(dataToMac)
-    .digest()
+  const computedMac = createHmac('sha256', macKey).update(dataToMac).digest()
   if (!mac.equals(computedMac)) {
     throw new Error('MAC mismatch')
   }
@@ -146,9 +142,7 @@ export function Encrypt(pubKeyTo: Buffer, plaintext: Buffer) {
   )
   const hash = ConcatKDF(px.toArrayLike(Buffer), 32)
   const encryptionKey = hash.slice(0, 16)
-  const macKey = createHash('sha256')
-    .update(hash.slice(16))
-    .digest()
+  const macKey = createHash('sha256').update(hash.slice(16)).digest()
   const message = AES128EncryptAndHMAC(encryptionKey, macKey, plaintext)
   const serializedCiphertext = Buffer.concat([
     ephemPubKeyEncoded, // 65 bytes
@@ -173,9 +167,7 @@ export function Decrypt(privKey: Buffer, encrypted: Buffer) {
   const hash = ConcatKDF(px.toBuffer(), 32)
   // km, ke
   const encryptionKey = hash.slice(0, 16)
-  const macKey = createHash('sha256')
-    .update(hash.slice(16))
-    .digest()
+  const macKey = createHash('sha256').update(hash.slice(16)).digest()
 
   return AES128DecryptAndHMAC(encryptionKey, macKey, symmetricEncrypted)
 }

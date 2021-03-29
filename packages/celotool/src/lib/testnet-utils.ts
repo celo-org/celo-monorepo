@@ -181,13 +181,10 @@ export async function uploadFileToGoogleStorage(
 
   if (makeFileWorldReadable) {
     // set the permission to be world-readable
-    await storage
-      .bucket(googleStorageBucketName)
-      .file(googleStorageFileName)
-      .acl.add({
-        entity: 'allUsers',
-        role: storage.acl.READER_ROLE,
-      })
+    await storage.bucket(googleStorageBucketName).file(googleStorageFileName).acl.add({
+      entity: 'allUsers',
+      role: storage.acl.READER_ROLE,
+    })
   }
 }
 
