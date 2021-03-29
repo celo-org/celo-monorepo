@@ -1,7 +1,6 @@
 import { CeloTransactionObject } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { StableToken, StableTokenInfo } from '@celo/contractkit/lib/celo-tokens'
-import { CeloTokenWrapper } from '@celo/contractkit/lib/wrappers/CeloTokenWrapper'
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 
@@ -31,13 +30,6 @@ export class CeloAdapter {
   async transferDollars(to: string, amount: string): Promise<CeloTransactionObject<boolean>> {
     const stableToken = await this.kit.contracts.getStableToken()
     return stableToken.transfer(to, amount)
-  }
-
-  async transferTokens(to: string, amount: string) {
-    const wrappers = await this.kit.celoTokens.getWrappers()
-    return Object.values(wrappers).map((token: CeloTokenWrapper<any> | undefined) => {
-      return token!.transfer(to, amount)
-    })
   }
 
   async transferStableTokens(to: string, amount: string) {
