@@ -18,6 +18,7 @@ const Registry: RegistryContract = artifacts.require('Registry')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const StableToken: StableTokenContract = artifacts.require('StableToken')
 
+// @ts-ignore
 StableToken.numberFormat = 'BigNumber'
 
 contract('FeeCurrencyWhitelist', (accounts: string[]) => {
