@@ -1700,9 +1700,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN)
-                .div(2)
-                .plus(1)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN).div(2).plus(1)
               await assertRevert(
                 releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
               )

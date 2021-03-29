@@ -61,7 +61,7 @@
     "jest-snapshot": "^26.1.0",
     "lerna": "^3.16.0",
     "patch-package": "^6.2.2",
-    "prettier": "1.19.1",
+    "prettier": "^2.2.1",
     "prettier-plugin-java": "^0.6.0",
     "prettier-plugin-solidity": "1.0.0-alpha.35",
     "pretty-quick": "^2.0.1",
@@ -74,7 +74,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "resolutions": {
-    "@types/prettier": "^1.19.0",
+    "@types/prettier": "^2.2.1",
     "**/axios": "0.21.1",
     "**/cross-fetch": "^3.0.2",
     "**/deep-extend": "^0.5.1",
@@ -103,7 +103,7 @@
     "npm": "^5.10.0",
     "npmi": "^4.0.0",
     "object-path": "^0.11.5",
-    "prettier": "^1.19.1",
+    "prettier": "^2.2.1",
     "randomatic": "^3.1.1",
     "react-native-flipper": "^0.70.0",
     "react-native-ntp-client": "^1.0.0",

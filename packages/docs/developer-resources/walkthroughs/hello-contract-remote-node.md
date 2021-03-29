@@ -80,7 +80,7 @@ After compiling the contract, you need to create a migration to deploy the contr
 ```javascript
 var HelloWorld = artifacts.require('HelloWorld')
 
-module.exports = function(deployer) {
+module.exports = function (deployer) {
   deployer.deploy(HelloWorld)
 }
 ```
