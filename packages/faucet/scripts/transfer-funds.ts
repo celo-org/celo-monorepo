@@ -1,3 +1,4 @@
+import { retryAsync } from '@celo/utils/lib/async'
 import Web3 from 'web3'
 import yargs from 'yargs'
 import { CeloAdapter } from '../src/celo-adapter'
@@ -23,16 +24,16 @@ yargs
   .option('dollar', {
     type: 'string',
   })
-  .option('stableTokenAddress', {
-    type: 'string',
-    description: 'Address for stable token contract',
-    demand: true,
-  })
-  .option('goldTokenAddress', {
-    type: 'string',
-    description: 'Address for the gold token contract',
-    demand: true,
-  })
+  // .option('stableTokenAddress', {
+  //   type: 'string',
+  //   description: 'Address for stable token contract',
+  //   demand: true,
+  // })
+  // .option('goldTokenAddress', {
+  //   type: 'string',
+  //   description: 'Address for the gold token contract',
+  //   demand: true,
+  // })
   .option('dryrun', { type: 'boolean' })
   .usage(
     '$0 <pk> <recipientAddress>',
@@ -61,8 +62,8 @@ yargs
 
 async function transferFunds(args: {
   nodeUrl: string
-  stableTokenAddress: string
-  goldTokenAddress: string
+  // stableTokenAddress: string
+  // goldTokenAddress: string
   pk: string
   recipientAddress: string
   dryrun?: boolean
@@ -98,9 +99,41 @@ async function transferFunds(args: {
 
   if (args.dollar) {
     const dollarAmount = Web3.utils.toBN(args.dollar)
-    const tx2 = await celo.transferDollars(to, dollarAmount.toString())
-    console.log('receipt', await tx2.sendAndWaitForReceipt())
+    // const tx2 = await celo.transferDollars(to, dollarAmount.toString())
+    // console.log('receipt', await tx2.sendAndWaitForReceipt())
+    const tokenTxs = await celo.transferTokens(to, dollarAmount.toString())
+    console.log(tokenTxs)
+    await Promise.all(
+      tokenTxs.map(async (tx) => {
+        const x = async () => {
+          console.log('receipt', await tx.sendAndWaitForReceipt())
+        }
+        await retryAsync(x, 3, [], 500)
+      })
+    )
+
+    // const x = async () => {
+    //   Promise.all(
+    //     tokenTxs.map(async (tx) => {
+    //       console.log('receipt', await tx.sendAndWaitForReceipt())
+    //     })
+    //   )
+    // }
+    // retryAsync(x, 3, [], 500)
   }
+
+  // const tokenTxs = await celo.transferTokens(to, dollarAmount)
+  // await tokenTxs.map(async (tx) => {
+  //   console.log('receipt', await tx.sendAndWaitForReceipt())
+  // })
+
+  // const sendTxHelper = async (tx: CeloTransactionObject<boolean>) => {
+  //   const txReceipt = await tx.sendAndWaitForReceipt()
+  //   const txHash = txReceipt.transactionHash
+  //   console.log(`req(${snap.key}): Transaction Sent. txhash:${txHash}`)
+  //   await snap.ref.update({ txHash })
+  //   return txHash
+  // }
 
   console.log('Funder')
   await printBalance(celo.defaultAddress)
