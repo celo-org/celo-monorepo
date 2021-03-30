@@ -1,15 +1,15 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { assertRevert } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   FeeCurrencyWhitelistContract,
   FeeCurrencyWhitelistInstance,
-  RegistryContract,
-  RegistryInstance,
   MockSortedOraclesContract,
   MockSortedOraclesInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
+  RegistryContract,
+  RegistryInstance,
 } from 'types'
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
