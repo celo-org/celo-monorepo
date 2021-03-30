@@ -4,22 +4,25 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 
 import "../common/UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
  */
-contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable, UsingRegistry {
+contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, InitializableV2, UsingRegistry {
   address[] public whitelist;
+
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress Address of the Registry contract.
    */
   function initialize(address registryAddress) external initializer {
-    setRegistry(registryAddress);
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
   }
 
   /**
