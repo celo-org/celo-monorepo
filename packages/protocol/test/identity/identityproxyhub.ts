@@ -22,11 +22,11 @@ const computeCreate2Address = <T>(
   Contract: Truffle.Contract<T>
 ) => {
   const hash = web3.utils.soliditySha3(
-    // @ts-ignore
     concatanateHexStrings(
       '0xff',
       deployerAddress,
       salt,
+      // @ts-ignore
       web3.utils.soliditySha3(Contract._json.bytecode)
     )
   )
