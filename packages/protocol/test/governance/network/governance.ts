@@ -2490,8 +2490,8 @@ contract('Governance', (accounts: string[]) => {
     }
 
     it('should return None stage when proposal doesnt exist', async () => {
-      expectStage(Stage.None, 0)
-      expectStage(Stage.None)
+      await expectStage(Stage.None, 0)
+      await expectStage(Stage.None)
     })
 
     describe('when proposal exists', () => {
@@ -2520,7 +2520,7 @@ contract('Governance', (accounts: string[]) => {
 
         it('should return Expiration when expired', async () => {
           await timeTravel(queueExpiry, web3)
-          expectStage(Stage.Expiration)
+          await expectStage(Stage.Expiration)
         })
       })
 
@@ -2538,7 +2538,7 @@ contract('Governance', (accounts: string[]) => {
 
           it('should return Expiration when expired', async () => {
             await timeTravel(approvalStageDuration, web3)
-            expectStage(Stage.Expiration)
+            await expectStage(Stage.Expiration)
           })
         })
 
@@ -2552,7 +2552,7 @@ contract('Governance', (accounts: string[]) => {
 
           it('should return Expiration when expired', async () => {
             await timeTravel(referendumStageDuration, web3)
-            expectStage(Stage.Expiration)
+            await expectStage(Stage.Expiration)
           })
         })
 
@@ -2570,7 +2570,7 @@ contract('Governance', (accounts: string[]) => {
 
           it('should return Expiration when expired', async () => {
             await timeTravel(executionStageDuration, web3)
-            expectStage(Stage.Expiration)
+            await expectStage(Stage.Expiration)
           })
         })
       })
