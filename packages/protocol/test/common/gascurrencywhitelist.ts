@@ -1,6 +1,5 @@
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { fixed1 } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
     FeeCurrencyWhitelistContract,
