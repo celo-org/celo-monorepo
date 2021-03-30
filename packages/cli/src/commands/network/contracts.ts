@@ -4,7 +4,6 @@ import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICelo
 import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import BigNumber from 'bignumber.js'
 
 const DEFAULT_VERSION = { 0: 1, 1: 0, 2: 0, 3: 0 }
 const UNVERSIONED_CONTRACTS = [

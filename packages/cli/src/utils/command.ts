@@ -1,4 +1,4 @@
-import { AllContracts, CeloContract, RegisteredContracts } from '@celo/contractkit'
+import { CeloContract, RegisteredContracts } from '@celo/contractkit'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
