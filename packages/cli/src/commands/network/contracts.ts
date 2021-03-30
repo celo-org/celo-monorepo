@@ -23,16 +23,24 @@ export default class Contracts extends BaseCommand {
   }
 
   async run() {
-    const addressMapping = await this.kit.registry.addressMapping()
     const res = this.parse(Contracts)
+
+    const undeployedMessage = 'Not deployed yet'
+    const addressMapping = await this.kit.registry.addressMappingWithNotDeployedContracts(
+      undeployedMessage
+    )
     const contractInfo = await concurrentMap(
       4,
       Array.from(addressMapping.entries()),
-      async ([contract, proxy]) => {
+      async ([contract, proxyAddress]) => {
+        if (proxyAddress === undefined || proxyAddress === undeployedMessage) {
+          return { contract, proxy: undeployedMessage, implementation: undeployedMessage }
+        }
+
         // skip implementation check for unproxied contract
         const implementation = UNPROXIED_CONTRACTS.includes(contract)
           ? NULL_ADDRESS
-          : await newProxy(this.kit.web3, proxy)
+          : await newProxy(this.kit.web3, proxyAddress)
               .methods._getImplementation()
               .call()
 
@@ -43,10 +51,10 @@ export default class Contracts extends BaseCommand {
               .methods.getVersionNumber()
               .call()
 
-        const balance = await this.kit.celoTokens.balancesOf(proxy)
+        const balance = await this.kit.celoTokens.balancesOf(proxyAddress)
         return {
           contract,
-          proxy,
+          proxy: proxyAddress,
           implementation,
           version,
           balance,
@@ -60,16 +68,23 @@ export default class Contracts extends BaseCommand {
         contract: { get: (i) => i.contract },
         proxy: { get: (i) => i.proxy },
         implementation: { get: (i) => i.implementation },
-        version: { get: (i) => `${i.version[0]}.${i.version[1]}.${i.version[2]}.${i.version[3]}` },
+        version: {
+          get: (i) =>
+            i.version
+              ? `${i.version[0]}.${i.version[1]}.${i.version[2]}.${i.version[3]}`
+              : DEFAULT_VERSION,
+        },
         // TODO: unpack balances for each token into a column
         balances: {
           get: (i) =>
-            Object.entries(i.balance)
-              .map(([symbol, amount]) =>
-                amount!.isZero() ? '' : `${symbol}: ${amount!.toFixed()}`
-              )
-              .filter((s) => s !== '')
-              .join(', '),
+            i.balance
+              ? Object.entries(i.balance)
+                  .map(([symbol, amount]) =>
+                    amount!.isZero() ? '' : `${symbol}: ${amount!.toFixed()}`
+                  )
+                  .filter((s) => s !== '')
+                  .join(', ')
+              : '',
         },
       },
       { sort: 'contract', ...res.flags }
