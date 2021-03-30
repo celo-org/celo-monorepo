@@ -47,9 +47,7 @@ export default class Contracts extends BaseCommand {
         // skip implementation check for unproxied contract
         const implementation = UNPROXIED_CONTRACTS.includes(contract)
           ? 'NONE'
-          : await newProxy(this.kit.web3, proxy)
-              .methods._getImplementation()
-              .call()
+          : await newProxy(this.kit.web3, proxy).methods._getImplementation().call()
 
         // skip version check for unversioned contracts
         let version: string
