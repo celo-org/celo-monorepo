@@ -226,9 +226,7 @@ async function purgeExpiredRecords() {
       const rowsDeleted = await table.destroy({
         where: {
           createdAt: {
-            [Op.lte]: moment()
-              .subtract(dbRecordExpiryMins!, 'minutes')
-              .toDate(),
+            [Op.lte]: moment().subtract(dbRecordExpiryMins!, 'minutes').toDate(),
           },
         },
         transaction,

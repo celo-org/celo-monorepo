@@ -1,17 +1,12 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import {
-  _setInitialProxyImplementation,
-  checkFunctionArgsLength,
-  retryTx,
-} from '@celo/protocol/lib/web3-utils'
-import { Address, isValidAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
+import { _setInitialProxyImplementation, retryTx } from '@celo/protocol/lib/web3-utils'
+import { Address, isValidAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs from 'fs'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
-  ReleaseGoldInstance,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
@@ -27,8 +22,8 @@ let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
-const ONE_CGLD = web3.utils.toWei('1', 'ether')
-const TWO_CGLD = web3.utils.toWei('2', 'ether')
+const ONE_CELO = web3.utils.toWei('1', 'ether')
+const TWO_CELO = web3.utils.toWei('2', 'ether')
 const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 const ZERO_ADDRESS: Address = '0x0000000000000000000000000000000000000000'
 
@@ -65,14 +60,11 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
 
   let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
   if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    console.info('Total value of grant less than CELO for beneficiary addreess')
     return
   }
 
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(config.numReleasePeriods)
-    .dp(0)
+  const adjustedAmountPerPeriod = totalValue.minus(startGold).div(config.numReleasePeriods).dp(0)
 
   // Reflect any rounding changes from the division above
   totalValue = adjustedAmountPerPeriod.multipliedBy(config.numReleasePeriods)
@@ -167,20 +159,10 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       from: fromAddress,
     },
   ])
-  const initializerAbiRG = checkAndReturnInitializationAbi(ReleaseGold, 'ReleaseGold')
-  const transferImplOwnershipAbiRG = checkAndReturnTransferOwnershipAbi(ReleaseGold, 'ReleaseGold')
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
-  const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
-
-  console.info('Initializing ReleaseGold...')
-  await initializeRGImplementation(
-    releaseGoldInstance,
-    fromAddress,
-    initializerAbiRG,
-    transferImplOwnershipAbiRG
-  )
+  const releaseGoldInstance = await retryTx(ReleaseGold.new, [false, { from: fromAddress }])
 
   console.info('Initializing ReleaseGoldProxy...')
   let releaseGoldTxHash
@@ -243,82 +225,13 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
 }
 
-async function initializeRGImplementation(
-  releaseGoldInstance: any,
-  from: string,
-  initializerAbiRG: string,
-  transferImplOwnershipAbiRG: string
-) {
-  // We need to fund the RG implementation instance in order to initialize it.
-  console.info('Funding ReleaseGold implementation so it can be initialized...')
-  await retryTx(web3.eth.sendTransaction, [
-    {
-      from,
-      to: releaseGoldInstance.address,
-      value: 1,
-    },
-  ])
-  // Initialize and lock ownership of RG implementation
-  const implementationInitArgs = [
-    Math.round(new Date().getTime() / 1000),
-    0,
-    1,
-    1,
-    1,
-    false, // should not be revokable
-    '0x0000000000000000000000000000000000000001',
-    NULL_ADDRESS,
-    NULL_ADDRESS,
-    true, // subjectToLiquidityProivision
-    0,
-    false, // canValidate
-    false, // canVote
-    '0x0000000000000000000000000000000000000001',
-  ]
-  const implementationTransferOwnershipArgs = ['0x0000000000000000000000000000000000000001']
-  checkFunctionArgsLength(implementationInitArgs, initializerAbiRG)
-  checkFunctionArgsLength(implementationTransferOwnershipArgs, transferImplOwnershipAbiRG)
-  const implInitCallData = web3.eth.abi.encodeFunctionCall(initializerAbiRG, implementationInitArgs)
-  const transferImplOwnershipCallData = web3.eth.abi.encodeFunctionCall(
-    transferImplOwnershipAbiRG,
-    implementationTransferOwnershipArgs
-  )
-  console.info('Sending initialize tx...')
-  await retryTx(web3.eth.sendTransaction, [
-    {
-      from,
-      to: releaseGoldInstance.address,
-      data: implInitCallData,
-      gas: 3000000,
-    },
-  ])
-  console.info('Returned from initialization tx')
-  if (!(await (releaseGoldInstance as ReleaseGoldInstance).initialized())) {
-    console.error(
-      `Failed to initialize ReleaseGold implementation at address ${releaseGoldInstance.address}`
-    )
-  }
-  console.info('ReleaseGold implementation has been successfully initialized!')
-
-  console.info(
-    'Transferring ownsership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
-  )
-  await retryTx(web3.eth.sendTransaction, [
-    {
-      from,
-      to: releaseGoldInstance.address,
-      data: transferImplOwnershipCallData,
-    },
-  ])
-}
-
 async function checkBalance(config: ReleaseGoldConfig) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(config.amountReleasedPerPeriod.toString())
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(config.numReleasePeriods)
-    .plus(ONE_CGLD) // Tx Fees
+    .plus(ONE_CELO) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -352,10 +265,10 @@ async function checkBalance(config: ReleaseGoldConfig) {
       )
       continue
     }
-    // Must be enough to handle 1cGLD test transfer and 1cGLD for transaction fees
-    if (fromBalance.gt(TWO_CGLD)) {
+    // Must be enough to handle 1CELO test transfer and 1CELO for transaction fees
+    if (fromBalance.gt(TWO_CELO)) {
       console.info(
-        '\nSending 1 cGLD as a test from ' +
+        '\nSending 1 CELO as a test from ' +
           fromAddress +
           ' to ' +
           addressResponse.newFromAddress +
@@ -365,14 +278,14 @@ async function checkBalance(config: ReleaseGoldConfig) {
         {
           from: fromAddress,
           to: addressResponse.newFromAddress,
-          value: ONE_CGLD,
+          value: ONE_CELO,
         },
       ])
       const confirmResponse = await prompts({
         type: 'confirm',
         name: 'confirmation',
         message:
-          'Please check the balance of your provided address. You should see the 1cGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
+          'Please check the balance of your provided address. You should see the 1CELO transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
       })
       if (!confirmResponse.confirmation) {
         console.info(chalk.red('Setting new address failed.\nRetrying.'))
@@ -384,7 +297,7 @@ async function checkBalance(config: ReleaseGoldConfig) {
         {
           from: fromAddress,
           to: addressResponse.newFromAddress,
-          value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
+          value: fromBalancePostTransfer.minus(ONE_CELO).toFixed(), // minus Tx Fees
         },
       ])
     }
@@ -632,7 +545,7 @@ async function handleJSONFile(data) {
       type: 'confirm',
       name: 'confirmation',
       message:
-        'Grants in provided json would send ' + totalValue.toString() + 'cGld.\nIs this OK (y/n)?',
+        'Grants in provided json would send ' + totalValue.toString() + 'CELO.\nIs this OK (y/n)?',
     })
 
     if (!response.confirmation) {
@@ -748,28 +661,4 @@ module.exports = async (callback: (error?: any) => number) => {
   } catch (error) {
     callback(error)
   }
-}
-
-function checkAndReturnInitializationAbi(Contract: any, name: string) {
-  const initializerAbi: string = Contract.abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-  )
-  if (!initializerAbi) {
-    throw new Error(
-      `Attempting to deploy implementation contract ${name} that does not have an initialize() function. Abort.`
-    )
-  }
-  return initializerAbi
-}
-
-function checkAndReturnTransferOwnershipAbi(Contract: any, name: string) {
-  const transferImplOwnershipAbi: string = Contract.abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
-  )
-  if (!transferImplOwnershipAbi) {
-    throw new Error(
-      `Attempting to deploy implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
-    )
-  }
-  return transferImplOwnershipAbi
 }

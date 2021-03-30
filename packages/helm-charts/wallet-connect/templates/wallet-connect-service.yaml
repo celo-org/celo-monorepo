@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+{{ include "walletconnect.labels" .  | indent 4 }}
+spec:
+  selector:
+{{ include "walletconnect.selectorLabels" .  | indent 4 }}
+  clusterIP: None
+  type: {{ .Values.walletconnect.service.type }}
+  ports:
+  - port: 5000
+    targetPort: http
