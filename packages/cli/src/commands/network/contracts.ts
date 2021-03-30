@@ -1,11 +1,12 @@
 import { concurrentMap } from '@celo/base'
-import { CeloContract, NULL_ADDRESS } from '@celo/contractkit'
+import { CeloContract } from '@celo/contractkit'
 import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICeloVersionedContract'
 import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
+import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
+import { table } from 'cli-ux/lib/styled/table'
 import { BaseCommand } from '../../base'
 
-const DEFAULT_VERSION = { 0: 1, 1: 0, 2: 0, 3: 0 }
 const UNVERSIONED_CONTRACTS = [
   CeloContract.Registry,
   CeloContract.FeeCurrencyWhitelist,
@@ -32,34 +33,56 @@ export default class Contracts extends BaseCommand {
     const contractInfo = await concurrentMap(
       4,
       Array.from(addressMapping.entries()),
-      async ([contract, proxyAddress]) => {
-        if (proxyAddress === undefined || proxyAddress === undeployedMessage) {
-          return { contract, proxy: undeployedMessage, implementation: undeployedMessage }
+      async ([contract, proxy]) => {
+        if (proxy === undefined || proxy === undeployedMessage) {
+          return {
+            contract,
+            proxy: undeployedMessage,
+            implementation: undeployedMessage,
+            version: 'NONE',
+            balances: await this.kit.celoTokens.forEachCeloToken(() => new BigNumber(0)),
+          }
         }
 
         // skip implementation check for unproxied contract
         const implementation = UNPROXIED_CONTRACTS.includes(contract)
-          ? NULL_ADDRESS
-          : await newProxy(this.kit.web3, proxyAddress)
+          ? 'NONE'
+          : await newProxy(this.kit.web3, proxy)
               .methods._getImplementation()
               .call()
 
         // skip version check for unversioned contracts
-        const version = UNVERSIONED_CONTRACTS.includes(contract)
-          ? DEFAULT_VERSION
-          : await newICeloVersionedContract(this.kit.web3, implementation)
-              .methods.getVersionNumber()
-              .call()
+        let version: string
+        if (UNVERSIONED_CONTRACTS.includes(contract)) {
+          version = 'NONE'
+        } else {
+          const raw = await newICeloVersionedContract(this.kit.web3, implementation)
+            .methods.getVersionNumber()
+            .call()
+          version = `${raw[0]}.${raw[1]}.${raw[2]}.${raw[3]}`
+        }
 
-        const balance = await this.kit.celoTokens.balancesOf(proxyAddress)
+        const balances = await this.kit.celoTokens.balancesOf(proxy)
         return {
           contract,
-          proxy: proxyAddress,
+          proxy,
           implementation,
           version,
-          balance,
+          balances,
         }
       }
+    )
+
+    const tokenBalanceColumns: table.Columns<typeof contractInfo[number]> = {}
+    await this.kit.celoTokens.forEachCeloToken(
+      (token) =>
+        (tokenBalanceColumns[token.symbol] = {
+          header: token.symbol,
+          get: (i) => {
+            const balance = i.balances[token.symbol]!
+            return balance.isZero() ? '0' : balance.toExponential(3)
+          },
+        })
     )
 
     cli.table(
@@ -69,23 +92,9 @@ export default class Contracts extends BaseCommand {
         proxy: { get: (i) => i.proxy },
         implementation: { get: (i) => i.implementation },
         version: {
-          get: (i) =>
-            i.version
-              ? `${i.version[0]}.${i.version[1]}.${i.version[2]}.${i.version[3]}`
-              : DEFAULT_VERSION,
+          get: (i) => i.version,
         },
-        // TODO: unpack balances for each token into a column
-        balances: {
-          get: (i) =>
-            i.balance
-              ? Object.entries(i.balance)
-                  .map(([symbol, amount]) =>
-                    amount!.isZero() ? '' : `${symbol}: ${amount!.toFixed()}`
-                  )
-                  .filter((s) => s !== '')
-                  .join(', ')
-              : '',
-        },
+        ...tokenBalanceColumns,
       },
       { sort: 'contract', ...res.flags }
     )
