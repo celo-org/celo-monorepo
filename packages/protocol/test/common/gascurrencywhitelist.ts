@@ -67,7 +67,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     })
 
     describe('#addToken()', () => {
-        it('should not allow to add a token with an invalid oracle price', async () => {
+        it('should not allow to add a token without an oracle price', async () => {
             await assertRevert(feeCurrencyWhitelist.addToken(stableToken.address))
         })
 
