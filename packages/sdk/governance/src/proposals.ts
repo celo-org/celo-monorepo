@@ -133,7 +133,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
         kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
       )
       jsonTx.params![`initialize@${initSig}`] = initParams
-    } else if (isGovernanceConstitution(jsonTx)) {
+    } else if (isGovernanceConstitutionSetter(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
       const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
       if (!contract || !abi) {
