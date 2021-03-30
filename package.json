@@ -8,8 +8,8 @@
     "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
-    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
-    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
+    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+{ts,tsx,js,jsx,sol,java}'",
+    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+{ts,tsx,js,jsx,sol,java}'",
     "reset": "yarn reset-modules && yarn reset-cache",
     "reset-cache": "yarn reset-yarn && yarn reset-rn",
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
@@ -31,7 +31,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged --pattern '**/*.+(ts|tsx|js|jsx|sol|java)'",
+      "pre-commit": "pretty-quick --staged --pattern '**/*.+{ts,tsx,js,jsx,sol,java}'",
       "pre-push": "node ./scripts/hooks/pre-push.js"
     }
   },

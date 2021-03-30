@@ -18,7 +18,7 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable, 
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize(address registryAddress) external initializer {
-     setRegistry(registryAddress);
+    setRegistry(registryAddress);
     _transferOwnership(msg.sender);
   }
 
