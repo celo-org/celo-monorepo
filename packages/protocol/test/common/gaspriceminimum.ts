@@ -179,10 +179,7 @@ contract('GasPriceMinimum', (accounts: string[]) => {
         const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
         await gasPriceMinimum.setGasPriceMinimumFloor(currentGasPriceMinimum)
         const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(1, 1)
-        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum
-          .times(5)
-          .div(4)
-          .plus(1)
+        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum.times(5).div(4).plus(1)
         assertEqualBN(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum)
       })
     })
@@ -200,10 +197,7 @@ contract('GasPriceMinimum', (accounts: string[]) => {
         const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
         await gasPriceMinimum.setGasPriceMinimumFloor(1)
         const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(0, 1)
-        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum
-          .times(3)
-          .div(4)
-          .plus(1)
+        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum.times(3).div(4).plus(1)
         assertEqualBN(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum)
       })
     })
@@ -239,9 +233,7 @@ contract('GasPriceMinimum', (accounts: string[]) => {
           const curGas = await gasPriceMinimum.gasPriceMinimum()
 
           const blockGasLimit = new BigNumber(web3.utils.randomHex(4))
-          const gasUsed = BigNumber.random()
-            .times(blockGasLimit)
-            .integerValue()
+          const gasUsed = BigNumber.random().times(blockGasLimit).integerValue()
           const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(
             gasUsed,
             blockGasLimit
