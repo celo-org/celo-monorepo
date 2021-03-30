@@ -30,11 +30,10 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   beforeEach(async () => {
     mockStableToken = await MockStableToken.new()
     registry = await Registry.new()
-    // await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
 
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
-    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new()
+    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
     await feeCurrencyWhitelist.initialize(registry.address)
   })
 
@@ -48,28 +47,31 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       await assertRevert(feeCurrencyWhitelist.initialize(registry.address))
     })
   })
-
-  describe('#addToken() with an invalid oracle price', () => {
-    it('should not allow to add a token with an invalid oracle price', async () => {
-      await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
-    })
-  })
-
-  describe('#addToken() with a valid oracle price', () => {
-    beforeEach(async () => {
-      await mockSortedOracles.setMedianRate(mockStableToken.address, stableAmountForRate)
-      await mockSortedOracles.setMedianTimestampToNow(mockStableToken.address)
-      await mockSortedOracles.setNumRates(mockStableToken.address, 2)
+  describe('#addToken()', () => {
+    describe('when token has an invalid oracle price', () => {
+      it('should not allow to add a token without a valid oracle price', async () => {
+        await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
+      })
     })
 
-    it('should allow the owner to add a token', async () => {
-      await feeCurrencyWhitelist.addToken(mockStableToken.address)
-      const tokens = await feeCurrencyWhitelist.getWhitelist()
-      assert.sameMembers(tokens, [mockStableToken.address])
-    })
+    describe('when token has a valid oracle price', () => {
+      beforeEach(async () => {
+        await mockSortedOracles.setMedianRate(mockStableToken.address, stableAmountForRate)
+        await mockSortedOracles.setMedianTimestampToNow(mockStableToken.address)
+        await mockSortedOracles.setNumRates(mockStableToken.address, 2)
+      })
 
-    it('should not allow a non-owner to add a token', async () => {
-      await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address, { from: nonOwner }))
+      it('should allow the owner to add a token', async () => {
+        await feeCurrencyWhitelist.addToken(mockStableToken.address)
+        const tokens = await feeCurrencyWhitelist.getWhitelist()
+        assert.sameMembers(tokens, [mockStableToken.address])
+      })
+
+      it('should not allow a non-owner to add a token', async () => {
+        await assertRevert(
+          feeCurrencyWhitelist.addToken(mockStableToken.address, { from: nonOwner })
+        )
+      })
     })
   })
 })
