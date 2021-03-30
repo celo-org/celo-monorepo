@@ -49,4 +49,8 @@ OLD_BRANCH_BUILD_DIR=$BUILD_DIR
 build_tag $NEW_BRANCH $LOG_FILE
 NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR_1/contracts --new_contracts $BUILD_DIR_2/contracts --exclude $CONTRACT_EXCLUSION_REGEX $REPORT_FLAG
+yarn ts-node scripts/check-backward.ts sem_check \
+  --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
+  --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
+  --exclude $CONTRACT_EXCLUSION_REGEX \
+  $REPORT_FLAG
