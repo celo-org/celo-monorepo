@@ -439,67 +439,77 @@ contract('Accounts', (accounts: string[]) => {
 
   // backwards compatibility matrix for authorizeSigner instead
   // of authorizeXXXSigner
-  ;[true, false].forEach((useGenericAuthorizeSigner) => {
-    const scenarios = [
-      {
-        key: 'vote',
-        description: 'vote signing key',
-      },
-      {
-        key: 'validator',
-        description: 'validator signing key',
-      },
-      {
-        key: 'attestation',
-        description: 'attestation signing key',
-      },
-    ]
-
-    const authorizeSigner = (role: string) => {
+  const backwardsCompatibilityMatrix = [
+    [false, false],
+    // [false, true],
+    // [true, false],
+    // [true, true],
+  ]
+  backwardsCompatibilityMatrix.forEach(function ([genericRead, genericWrite]) {
+    const authorizeSignerFactory = (role: string) => {
       return (signer, v, r, s, ...rest) => {
         accountsInstance.authorizeSignerWithSignature(signer, role, v, r, s, ...rest)
       }
     }
 
-    console.log(accountsInstance)
-    const authorizationTests = {
-      vote: {
-        fn: useGenericAuthorizeSigner
-          ? authorizeSigner('vote')
-          : accountsInstance.authorizeVoteSigner,
-        eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'VoteSignerAuthorized',
-        getAuthorizedFromAccount: accountsInstance.getVoteSigner,
-        authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
-        hasAuthorizedSigner: accountsInstance.hasAuthorizedVoteSigner,
-        removeSigner: accountsInstance.removeVoteSigner,
-      },
-      validator: {
-        fn: useGenericAuthorizeSigner
-          ? authorizeSigner('validator')
-          : accountsInstance.authorizeValidatorSigner,
-        eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
-        getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
-        authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
-        hasAuthorizedSigner: accountsInstance.hasAuthorizedValidatorSigner,
-        removeSigner: accountsInstance.removeValidatorSigner,
-      },
-      attestation: {
-        fn: useGenericAuthorizeSigner
-          ? authorizeSigner('attestation')
-          : accountsInstance.authorizeAttestationSigner,
-        eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
-        getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
-        authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
-        hasAuthorizedSigner: accountsInstance.hasAuthorizedAttestationSigner,
-        removeSigner: accountsInstance.removeAttestationSigner,
-      },
-    }
+    const VotingKey = 'celo.org/core/vote'
+    // const AttestationKey = 'celo.org/core/attestation'
+    // const ValidatorKey = 'celo.org/core/validator'
 
-    scenarios.forEach(({ key, description }) => {
-      describe(`authorization tests${useGenericAuthorizeSigner &&
-        ' using authorizeSigner()'}:`, () => {
+    const scenarios = [
+      {
+        key: VotingKey,
+        description: 'vote signing key',
+      },
+      // {
+      //   key: validator,
+      //   description: 'validator signing key',
+      // },
+      // {
+      //   key: attestation,
+      //   description: 'attestation signing key',
+      // },
+    ]
+    scenarios.forEach(function ({ key, description }) {
+      describe.only(`${description}authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let authorizationTest: any
         beforeEach(async () => {
+          const authorizationTests = {
+            [VotingKey]: {
+              fn: genericWrite
+                ? authorizeSignerFactory(VotingKey)
+                : accountsInstance.authorizeVoteSigner,
+              eventName: genericWrite ? 'SignerAuthorized' : 'VoteSignerAuthorized',
+              getAuthorizedFromAccount: genericRead
+                ? (...args) => accountsInstance.getSigner(args[0], VotingKey, ...args.slice(1))
+                : accountsInstance.getVoteSigner,
+              authorizedSignerToAccount: genericRead
+                ? (signer) => accountsInstance.signerToAccount(signer)
+                : accountsInstance.voteSignerToAccount,
+              hasAuthorizedSigner: accountsInstance.hasAuthorizedVoteSigner,
+              removeSigner: accountsInstance.removeVoteSigner,
+            },
+            // validator: {
+            //   fn: useGenericAuthorizeSigner
+            //     ? authorizeSigner('validator')
+            //     : accountsInstance.authorizeValidatorSigner,
+            //   eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
+            //   getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
+            //   authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
+            //   hasAuthorizedSigner: accountsInstance.hasAuthorizedValidatorSigner,
+            //   removeSigner: accountsInstance.removeValidatorSigner,
+            // },
+            // attestation: {
+            //   fn: useGenericAuthorizeSigner
+            //     ? authorizeSigner('attestation')
+            //     : accountsInstance.authorizeAttestationSigner,
+            //   eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
+            //   getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
+            //   authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
+            //   hasAuthorizedSigner: accountsInstance.hasAuthorizedAttestationSigner,
+            //   removeSigner: accountsInstance.removeAttestationSigner,
+            // },
+          }
           authorizationTest = authorizationTests[key]
           await accountsInstance.createAccount()
         })
@@ -528,7 +538,7 @@ contract('Accounts', (accounts: string[]) => {
             assertLogMatches(
               log,
               authorizationTest.eventName,
-              useGenericAuthorizeSigner
+              genericWrite
                 ? {
                     account,
                     role: key,

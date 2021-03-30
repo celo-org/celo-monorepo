@@ -36,8 +36,8 @@ contract Accounts is
   }
 
   struct SignerAuthorization {
+    address signer;
     bool completed;
-    bool deleted;
   }
 
   struct Account {
@@ -46,7 +46,7 @@ contract Accounts is
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Signers signers;
-    mapping(string => mapping(address => SignerAuthorization)) signerAuthorizations;
+    mapping(string => SignerAuthorization) signerAuthorizations;
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
@@ -310,9 +310,9 @@ contract Accounts is
     );
 
     authorizedBy[signer] = msg.sender;
-    accounts[msg.sender].signerAuthorizations[role][signer] = SignerAuthorization({
+    accounts[msg.sender].signerAuthorizations[role] = SignerAuthorization({
       completed: false,
-      deleted: false
+      signer: signer
     });
   }
 
@@ -326,7 +326,7 @@ contract Accounts is
     authorize(signer, v, r, s);
 
     Account storage account = accounts[msg.sender];
-    account.signerAuthorizations[role][signer].completed = true;
+    account.signerAuthorizations[role] = SignerAuthorization({ signer: signer, completed: true });
 
     if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
       account.signers.validator = signer;
@@ -344,9 +344,8 @@ contract Accounts is
     require(authorizedBy[msg.sender] == addr);
 
     Account storage account = accounts[addr];
-    SignerAuthorization storage signer = account.signerAuthorizations[role][msg.sender];
+    SignerAuthorization storage signer = account.signerAuthorizations[role];
     require(!signer.completed, "Signer already authorized");
-    require(!signer.deleted, "Signer has been removed");
 
     if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
       account.signers.validator = msg.sender;
@@ -369,14 +368,13 @@ contract Accounts is
   {
     require(isAccount(account), "Unknown account");
 
-    SignerAuthorization storage authorization = accounts[account]
-      .signerAuthorizations[role][signer];
-    return (authorization.completed && !authorization.deleted);
+    SignerAuthorization storage authorization = accounts[account].signerAuthorizations[role];
+    return (authorization.completed && authorization.signer == signer);
   }
 
   function removeSigner(address signer, string memory role) public {
     Account storage account = accounts[msg.sender];
-    account.signerAuthorizations[role][signer].deleted = true;
+    delete account.signerAuthorizations[role];
     emit SignerRemoved(msg.sender, signer, role);
   }
 
@@ -517,6 +515,12 @@ contract Accounts is
     require(isAccount(account), "Unknown account");
     address signer = accounts[account].signers.attestation;
     return signer == address(0) ? account : signer;
+  }
+
+  function getSigner(address account, string memory role) public view returns (address) {
+    require(isAccount(account), "Unknown account");
+    SignerAuthorization storage authorization = accounts[account].signerAuthorizations[role];
+    return authorization.completed ? authorization.signer : address(0);
   }
 
   /**
