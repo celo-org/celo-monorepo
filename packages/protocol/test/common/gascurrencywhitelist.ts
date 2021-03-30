@@ -34,7 +34,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
-    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new()
+    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
     await feeCurrencyWhitelist.initialize(registry.address)
   })
 
