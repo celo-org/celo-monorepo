@@ -337,6 +337,7 @@ contract Accounts is
     } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
       account.signers.vote = signer;
     }
+
     emit SignerAuthorized(msg.sender, signer, role);
   }
 
@@ -554,6 +555,32 @@ contract Accounts is
     require(isAccount(account));
     address signer = accounts[account].signers.attestation;
     return signer != address(0);
+  }
+
+  /**
+   * @notice Returns if account has specified a dedicated attestation signer.
+   * @param account The address of the account.
+   * @return Whether the account has specified a dedicated attestation signer.
+   */
+  function hasAuthorizedSigner(address account, string calldata role) external view returns (bool) {
+    require(isAccount(account));
+
+    SignerAuthorization storage signer = accounts[account].signerAuthorizations[role];
+    if (signer.completed) {
+      return true;
+    }
+
+    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+      return this.hasAuthorizedValidatorSigner(account);
+    } else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {
+      return this.hasAuthorizedAttestationSigner(account);
+    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      return this.hasAuthorizedVoteSigner(account);
+    }
+
+    return false;
   }
 
   /**
