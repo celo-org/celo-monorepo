@@ -2,7 +2,7 @@
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
 
-import { ASTCodeCompatibilityReport, } from '@celo/protocol/lib/compatibility/ast-code'
+import { ASTCodeCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
 import { Change } from '@celo/protocol/lib/compatibility/change'
