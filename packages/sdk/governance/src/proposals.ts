@@ -69,7 +69,7 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
-const isGovernanceConstitution = (tx: ProposalTransactionJSON) =>
+const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Governance' && tx.function === 'setConstitution'
 
 const registryRepointArgs = (tx: ProposalTransactionJSON) => {
