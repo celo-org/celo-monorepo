@@ -18,3 +18,7 @@ _An explanation of how the changes were tested or an explanation as to why they 
 ### Backwards compatibility
 
 _Brief explanation of why these changes are/are not backwards compatible._
+
+### Documentation
+
+_The set of community facing docs that have been added/modified because of this change_

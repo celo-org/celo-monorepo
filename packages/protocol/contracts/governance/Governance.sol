@@ -195,7 +195,7 @@ contract Governance is
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
    * @param _concurrentProposals The number of proposals to dequeue at once.
-   * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
+   * @param _minDeposit The minimum CELO deposit needed to make a proposal.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
@@ -268,7 +268,7 @@ contract Governance is
 
   /**
    * @notice Updates the minimum deposit needed to make a proposal.
-   * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
+   * @param _minDeposit The minimum CELO deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) public onlyOwner {
     require(_minDeposit > 0, "minDeposit must be larger than 0");
@@ -433,7 +433,7 @@ contract Governance is
 
   /**
    * @notice Creates a new proposal and adds it to end of the queue with no upvotes.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -715,7 +715,7 @@ contract Governance is
 
   /**
    * @notice Executes a whitelisted proposal.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -743,7 +743,7 @@ contract Governance is
   }
 
   /**
-   * @notice Withdraws refunded Celo Gold deposits.
+   * @notice Withdraws refunded CELO deposits.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {

@@ -170,8 +170,8 @@ contract Reserve is
 
   /**
    * @notice Sets the balance of reserve gold frozen from transfer.
-   * @param frozenGold The amount of cGLD frozen.
-   * @param frozenDays The number of days the frozen cGLD thaws over.
+   * @param frozenGold The amount of CELO frozen.
+   * @param frozenDays The number of days the frozen CELO thaws over.
    */
   function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
     require(frozenGold <= address(this).balance, "Cannot freeze more than balance");
@@ -181,7 +181,7 @@ contract Reserve is
   }
 
   /**
-   * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
+   * @notice Sets target allocations for CELO and a diversified basket of non-Celo assets.
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
@@ -203,6 +203,11 @@ contract Reserve is
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
+    // NOTE: The CELO asset launched as "Celo Gold" (cGLD), but was renamed to
+    // just CELO by the community.
+    // TODO: Change "cGLD" to "CELO" in this file, after ensuring that any
+    // off chain tools working with asset allocation weights are aware of this
+    // change.
     require(assetAllocationWeights["cGLD"] != 0, "Must set cGLD asset weight");
     emit AssetAllocationSet(symbols, weights);
   }
@@ -467,8 +472,8 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of unfrozen Celo Gold in the reserve.
-   * @return The total unfrozen Celo Gold in the reserve.
+   * @notice Returns the amount of unfrozen CELO in the reserve.
+   * @return The total unfrozen CELO in the reserve.
    */
   function getUnfrozenBalance() public view returns (uint256) {
     uint256 balance = address(this).balance;
@@ -477,16 +482,16 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of Celo Gold included in the reserve.
-   * @return The Celo Gold amount included in the reserve.
+   * @notice Returns the amount of CELO included in the reserve.
+   * @return The CELO amount included in the reserve.
    */
   function getReserveGoldBalance() public view returns (uint256) {
     return address(this).balance.add(getOtherReserveAddressesGoldBalance());
   }
 
   /**
-   * @notice Returns the amount of Celo Gold included in other reserve addresses.
-   * @return The Celo Gold amount included in other reserve addresses.
+   * @notice Returns the amount of CELO included in other reserve addresses.
+   * @return The CELO amount included in other reserve addresses.
    */
   function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
     uint256 reserveGoldBalance = 0;
@@ -497,16 +502,16 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of unfrozen Celo Gold included in the reserve.
-   * @return The unfrozen Celo Gold amount included in the reserve.
+   * @notice Returns the amount of unfrozen CELO included in the reserve.
+   * @return The unfrozen CELO amount included in the reserve.
    */
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
     return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
   }
 
   /**
-   * @notice Returns the amount of frozen Celo Gold in the reserve.
-   * @return The total frozen Celo Gold in the reserve.
+   * @notice Returns the amount of frozen CELO in the reserve.
+   * @return The total frozen CELO in the reserve.
    */
   function getFrozenReserveGoldBalance() public view returns (uint256) {
     uint256 currentDay = now / 1 days;
