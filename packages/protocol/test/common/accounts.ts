@@ -368,7 +368,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('general authorization', () => {
+  describe('generic authorization', () => {
     const authorized = accounts[1]
     const authorized2 = accounts[2]
     const role = 'Test Role'
@@ -401,7 +401,7 @@ contract('Accounts', (accounts: string[]) => {
 
     it('should remove the authorized signer', async () => {
       await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      await accountsInstance.removeSigner(authorized, role)
+      await accountsInstance.removeSigner(role)
       assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
     })
 
@@ -486,7 +486,9 @@ contract('Accounts', (accounts: string[]) => {
               hasAuthorizedSigner: genericRead
                 ? (signer) => accountsInstance.hasAuthorizedSigner(signer, VotingKey)
                 : accountsInstance.hasAuthorizedVoteSigner,
-              removeSigner: accountsInstance.removeVoteSigner,
+              removeSigner: genericWrite
+                ? (...args) => accountsInstance.removeSigner(VotingKey, ...args)
+                : accountsInstance.removeVoteSigner,
             },
             // validator: {
             //   fn: useGenericAuthorizeSigner
@@ -521,7 +523,7 @@ contract('Accounts', (accounts: string[]) => {
             sig = await getParsedSignatureOfAddress(web3, account, authorized)
           })
 
-          it.only(`should set the authorized key (${key})`, async () => {
+          it(`should set the authorized key (${key})`, async () => {
             assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
             assert.equal(await accountsInstance.authorizedBy(authorized), account)
@@ -651,11 +653,11 @@ contract('Accounts', (accounts: string[]) => {
         })
 
         describe(`#remove${upperFirst(description)}()`, () => {
-          it(`should be able to remove the ${key} signer after authorizing`, async () => {
+          it.only(`should be able to remove the ${key} signer after authorizing`, async () => {
             const authorized = accounts[1]
             const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
 
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
             assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
 

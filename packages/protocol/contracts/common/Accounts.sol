@@ -373,10 +373,20 @@ contract Accounts is
     return (authorization.completed && authorization.signer == signer);
   }
 
-  function removeSigner(address signer, string memory role) public {
+  function _removeSigner(string memory role) internal {
     Account storage account = accounts[msg.sender];
+
+    if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))
+    ) {} else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {} else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      emit VoteSignerRemoved(msg.sender, accounts[msg.sender].signers.vote);
+      account.signers.vote = address(0);
+    }
+
+    emit SignerRemoved(msg.sender, account.signerAuthorizations[role].signer, role);
     delete account.signerAuthorizations[role];
-    emit SignerRemoved(msg.sender, signer, role);
   }
 
   /**
@@ -384,9 +394,7 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeVoteSigner() public {
-    Account storage account = accounts[msg.sender];
-    emit VoteSignerRemoved(msg.sender, account.signers.vote);
-    account.signers.vote = address(0);
+    _removeSigner(VoteSigner);
   }
 
   /**
@@ -407,6 +415,10 @@ contract Accounts is
     Account storage account = accounts[msg.sender];
     emit AttestationSignerRemoved(msg.sender, account.signers.attestation);
     account.signers.attestation = address(0);
+  }
+
+  function removeSigner(string memory role) public {
+    _removeSigner(role);
   }
 
   /**
@@ -485,15 +497,36 @@ contract Accounts is
     }
   }
 
+  function getSigner(address _account, string memory role) public view returns (address) {
+    require(isAccount(_account), "Unknown account");
+
+    Account storage account = accounts[_account];
+    SignerAuthorization storage authorization = account.signerAuthorizations[role];
+    if (authorization.completed) {
+      return authorization.signer;
+    }
+
+    address signer;
+    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+      signer = account.signers.validator;
+    } else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {
+      signer = account.signers.attestation;
+    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      signer = account.signers.vote;
+    }
+
+    return signer == address(0) ? _account : signer;
+  }
+
   /**
    * @notice Returns the vote signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can sign votes.
    */
   function getVoteSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
-    address signer = accounts[account].signers.vote;
-    return signer == address(0) ? account : signer;
+    return getSigner(account, VoteSigner);
   }
 
   /**
@@ -518,37 +551,22 @@ contract Accounts is
     return signer == address(0) ? account : signer;
   }
 
-  function getSigner(address _account, string memory role) public view returns (address) {
-    require(isAccount(_account), "Unknown account");
-
-    Account storage account = accounts[_account];
-    SignerAuthorization storage authorization = account.signerAuthorizations[role];
-    if (authorization.completed) {
-      return authorization.signer;
-    }
-
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
-      return account.signers.validator;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
-      return account.signers.attestation;
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
-      return account.signers.vote;
-    }
-
-    return address(0);
-  }
-
   /**
    * @notice Returns if account has specified a dedicated vote signer.
-   * @param account The address of the account.
+   * @param _account The address of the account.
    * @return Whether the account has specified a dedicated vote signer.
    */
-  function hasAuthorizedVoteSigner(address account) external view returns (bool) {
-    require(isAccount(account));
-    address signer = accounts[account].signers.vote;
-    return signer != address(0);
+  function hasAuthorizedVoteSigner(address _account) external view returns (bool) {
+    require(isAccount(_account));
+
+    Account storage account = accounts[_account];
+    if (account.signers.vote != address(0)) {
+      return true;
+    } else if (account.signerAuthorizations[VoteSigner].signer != address(0)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
