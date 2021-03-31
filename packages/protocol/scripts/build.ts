@@ -84,8 +84,6 @@ const Interfaces = ['ICeloToken', 'IERC20']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
-// const TruffleTestContracts = ['Ownable'].concat(OtherContracts).concat(CoreContracts)
-
 function getArtifact(contractName: string) {
   const file = fs.readFileSync(`${BUILD_DIR}/contracts/${contractName}.json`).toString()
   return JSON.parse(file)
@@ -125,7 +123,6 @@ function generateFilesForTruffle() {
   console.log('protocol: Generating Truffle Types')
   exec(`rm -rf "${ROOT_DIR}/typechain"`)
 
-  // const globPattern = `${BUILD_DIR}/contracts/@(${TruffleTestContracts.join('|')}).json`
   const globPattern = `${BUILD_DIR}/contracts/*.json`
   exec(
     `yarn run --silent typechain --target=truffle --outDir "./types/typechain" "${globPattern}" `
