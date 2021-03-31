@@ -19,11 +19,11 @@ export const describe = 'command for fauceting an address with gold and/or dolla
 
 interface FaucetArgv extends AccountArgv {
   account: string
-  tokens: TokenArgs[]
+  tokenParams: TokenParams[]
   checkzero: boolean
   blockscout: boolean
 }
-interface TokenArgs {
+interface TokenParams {
   token: CeloTokenType
   amount: number
 }
@@ -46,20 +46,22 @@ export const builder = (argv: yargs.Argv) => {
         })
       },
     })
-    .array('tokens')
-    .option('tokens', {
+    .array('tokenParams')
+    .option('tokenParams', {
       type: 'string',
       description: '<token,amount> pair to faucet',
       demand:
-        'Please specify stableToken,amount pairs to faucet (ex: --tokens CELO,3 cUSD,10 cEUR,5)',
+        'Please specify stableToken,amount pairs to faucet (ex: --tokenParams CELO,3 cUSD,10 cEUR,5)',
       coerce: (pairs) => {
-        // Ensure that pairs are formatted properly and use possible tokens
+        // Ensure that pairs are formatted properly and use possible tokenParams
         const validCeloTokens = Object.values(celoTokenInfos).map((tokenInfo) => {
           return tokenInfo.symbol
         })
         return pairs.map((pair: string) => {
           let [token, amount] = pair.split(',')
-
+          if (token == undefined || amount == undefined) {
+            throw Error(`Format of tokenParams should be: --tokenParams tokenName,amount`)
+          }
           if (!validCeloTokens.includes(token as CeloTokenType)) {
             throw Error(`Invalid token '${token}', must be one of: ${validCeloTokens}.`)
           }
@@ -96,25 +98,25 @@ export const handler = async (argv: FaucetArgv) => {
     console.log(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
-    const faucetToken = async (tokenArgs: TokenArgs) => {
-      if (!tokenArgs.amount) {
+    const faucetToken = async (tokenParams: TokenParams) => {
+      if (!tokenParams.amount) {
         return
       }
 
-      const tokenWrapper = await kit.celoTokens.getWrapper(tokenArgs.token as any)
+      const tokenWrapper = await kit.celoTokens.getWrapper(tokenParams.token as any)
       for (const address of addresses) {
         if (argv.checkzero) {
           // Check if address account balance of this token is zero
           if (!(await tokenWrapper.balanceOf(address)).isZero()) {
             throw Error(
-              `Unable to faucet ${tokenArgs.token} to ${address} on ${argv.celoEnv}: --checkzero specified, but balance is non-zero`
+              `Unable to faucet ${tokenParams.token} to ${address} on ${argv.celoEnv}: --checkzero specified, but balance is non-zero`
             )
           }
         }
-        const tokenAmount = await convertToContractDecimals(tokenArgs.amount, tokenWrapper)
-        console.log(`Fauceting ${tokenAmount.toFixed()} of ${tokenArgs.token} to ${address}`)
+        const tokenAmount = await convertToContractDecimals(tokenParams.amount, tokenWrapper)
+        console.log(`Fauceting ${tokenAmount.toFixed()} of ${tokenParams.token} to ${address}`)
 
-        if (tokenArgs.token == Token.CELO) {
+        if (tokenParams.token == Token.CELO) {
           // Special handling for reserve transfer
           const reserve = await kit.contracts.getReserve()
           if (await reserve.isSpender(account)) {
@@ -123,14 +125,14 @@ export const handler = async (argv: FaucetArgv) => {
           }
         }
         await tokenWrapper.transfer(address, tokenAmount.toFixed()).sendAndWaitForReceipt()
-        console.log(`Successfully fauceted ${tokenArgs.token}`)
+        console.log(`Successfully fauceted ${tokenParams.token}`)
       }
     }
     // Ensure all faucets attempts are independent of failures and report failures.
     const failures = (
       await Promise.all(
-        argv.tokens.map(async (tokenArgs) => {
-          return faucetToken(tokenArgs)
+        argv.tokenParams.map(async (tokenParams) => {
+          return faucetToken(tokenParams)
             .then(() => null)
             .catch((err) => err)
         })
