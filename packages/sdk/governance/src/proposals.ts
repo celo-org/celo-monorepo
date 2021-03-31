@@ -27,6 +27,7 @@ import {
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
@@ -67,6 +68,9 @@ export interface ProposalTransactionJSON {
 
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
+
+const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Governance' && tx.function === 'setConstitution'
 
 const registryRepointArgs = (tx: ProposalTransactionJSON) => {
   if (!isRegistryRepoint(tx)) {
@@ -129,6 +133,19 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
         kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
       )
       jsonTx.params![`initialize@${initSig}`] = initParams
+    } else if (isGovernanceConstitutionSetter(jsonTx)) {
+      const [address, functionId, threshold] = jsonTx.args
+      const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
+      if (!contract || !abi) {
+        throw new Error(
+          `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
+        )
+      }
+      jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
+        contract,
+        method: abi.name,
+        threshold: fromFixed(new BigNumber(threshold)),
+      }
     }
 
     proposalJson.push(jsonTx)
