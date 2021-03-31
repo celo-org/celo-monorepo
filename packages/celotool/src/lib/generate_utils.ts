@@ -40,6 +40,9 @@ export enum AccountType {
   ATTESTATION_BOT = 8,
   VOTING_BOT = 9,
   TX_NODE_PRIVATE = 10,
+  VALIDATOR_GROUP = 11,
+  ADMIN = 12,
+  TX_FEE_RECIPIENT = 13,
 }
 
 export enum ConsensusType {
@@ -70,6 +73,9 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'attestation_bot',
   'voting_bot',
   'tx_node_private',
+  'validator_group',
+  'admin',
+  'tx_fee_recipient',
 ]
 
 export const add0x = (str: string) => {
