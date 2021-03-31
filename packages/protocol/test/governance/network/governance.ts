@@ -2483,18 +2483,18 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#getProposalStage()', () => {
-    const proposalId = 1
-    const expectStage = async (expected: Stage, _proposalId?: number) => {
-      const stage = await governance.getProposalStage(_proposalId ?? proposalId)
+    const expectStage = async (expected: Stage, _proposalId: number) => {
+      const stage = await governance.getProposalStage(_proposalId)
       assertEqualBN(stage, expected)
     }
 
     it('should return None stage when proposal doesnt exist', async () => {
       await expectStage(Stage.None, 0)
-      await expectStage(Stage.None)
+      await expectStage(Stage.None, 1)
     })
 
     describe('when proposal exists', () => {
+      let proposalId: number
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -2503,9 +2503,9 @@ contract('Governance', (accounts: string[]) => {
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           descriptionUrl,
-          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        proposalId = 1
         const exists = await governance.proposalExists(proposalId)
         assert.isTrue(exists, 'proposal does not exist')
       })
@@ -2516,11 +2516,11 @@ contract('Governance', (accounts: string[]) => {
           assert.isTrue(queued, 'proposal not queued')
         })
 
-        it('should return Queued when not expired', () => expectStage(Stage.Queued))
+        it('should return Queued when not expired', () => expectStage(Stage.Queued, proposalId))
 
         it('should return Expiration when expired', async () => {
           await timeTravel(queueExpiry, web3)
-          await expectStage(Stage.Expiration)
+          await expectStage(Stage.Expiration, proposalId)
         })
       })
 
@@ -2534,11 +2534,12 @@ contract('Governance', (accounts: string[]) => {
         })
 
         describe('when in approval stage', () => {
-          it('should return Approval when not expired', () => expectStage(Stage.Approval))
+          it('should return Approval when not expired', () =>
+            expectStage(Stage.Approval, proposalId))
 
           it('should return Expiration when expired', async () => {
             await timeTravel(approvalStageDuration, web3)
-            await expectStage(Stage.Expiration)
+            await expectStage(Stage.Expiration, proposalId)
           })
         })
 
@@ -2548,11 +2549,12 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(approvalStageDuration, web3)
           })
 
-          it('should return Referendum when not expired', () => expectStage(Stage.Referendum))
+          it('should return Referendum when not expired', () =>
+            expectStage(Stage.Referendum, proposalId))
 
           it('should return Expiration when expired', async () => {
             await timeTravel(referendumStageDuration, web3)
-            await expectStage(Stage.Expiration)
+            await expectStage(Stage.Expiration, proposalId)
           })
         })
 
@@ -2566,11 +2568,12 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(referendumStageDuration, web3)
           })
 
-          it('should return Execution when not expired', () => expectStage(Stage.Execution))
+          it('should return Execution when not expired', () =>
+            expectStage(Stage.Execution, proposalId))
 
           it('should return Expiration when expired', async () => {
             await timeTravel(executionStageDuration, web3)
-            await expectStage(Stage.Expiration)
+            await expectStage(Stage.Expiration, proposalId)
           })
         })
       })
