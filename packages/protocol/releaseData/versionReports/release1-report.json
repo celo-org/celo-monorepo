@@ -1,7 +1,7 @@
 {
-  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v0.baklava/contracts",
-  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.baklava/contracts",
-  "exclude": "/.*LinkedList.*|.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles/",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v0.mainnet/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.mainnet/contracts",
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
       "DowntimeSlasher": {
@@ -110,6 +110,31 @@
             {
               "contract": "Governance",
               "dependency": "IntegerSortedLinkedList",
+              "type": "LibraryLinkingChange"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "MetaTransactionWallet": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "MetaTransactionWallet",
+              "type": "NewContract"
+            }
+          ],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "MetaTransactionWallet",
+              "dependency": "Signatures",
               "type": "LibraryLinkingChange"
             }
           ]
@@ -560,55 +585,298 @@
       }
     },
     "libraries": {
+      "LinkedList": {
+        "storage": [],
+        "major": [
+          {
+            "contract": "LinkedList",
+            "signature": "insert(struct LinkedList.List,bytes32,bytes32,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "LinkedList",
+            "signature": "push(struct LinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "LinkedList",
+            "signature": "remove(struct LinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "LinkedList",
+            "signature": "update(struct LinkedList.List,bytes32,bytes32,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "LinkedList",
+            "signature": "contains(struct LinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "LinkedList",
+            "signature": "headN(struct LinkedList.List,uint256)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "LinkedList",
+            "signature": "getKeys(struct LinkedList.List)",
+            "type": "MethodRemoved"
+          }
+        ],
+        "minor": [],
+        "patch": [
+          {
+            "contract": "LinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "SortedLinkedList": {
+        "storage": [],
+        "major": [
+          {
+            "contract": "SortedLinkedList",
+            "signature": "insert(struct SortedLinkedList.List,bytes32,uint256,bytes32,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "remove(struct SortedLinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "update(struct SortedLinkedList.List,bytes32,uint256,bytes32,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "push(struct SortedLinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "popN(struct SortedLinkedList.List,uint256)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "contains(struct SortedLinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "getValue(struct SortedLinkedList.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "getElements(struct SortedLinkedList.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "getKeys(struct SortedLinkedList.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedList",
+            "signature": "headN(struct SortedLinkedList.List,uint256)",
+            "type": "MethodRemoved"
+          }
+        ],
+        "minor": [],
+        "patch": [
+          {
+            "contract": "SortedLinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "SortedLinkedListWithMedian": {
+        "storage": [],
+        "major": [
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "insert(struct SortedLinkedListWithMedian.List,bytes32,uint256,bytes32,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "remove(struct SortedLinkedListWithMedian.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "update(struct SortedLinkedListWithMedian.List,bytes32,uint256,bytes32,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "push(struct SortedLinkedListWithMedian.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "popN(struct SortedLinkedListWithMedian.List,uint256)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "contains(struct SortedLinkedListWithMedian.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getValue(struct SortedLinkedListWithMedian.List,bytes32)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getMedianValue(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getHead(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getMedian(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getTail(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getNumElements(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getElements(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          },
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "signature": "getKeys(struct SortedLinkedListWithMedian.List)",
+            "type": "MethodRemoved"
+          }
+        ],
+        "minor": [],
+        "patch": [
+          {
+            "contract": "SortedLinkedListWithMedian",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "AddressLinkedList": {
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "AddressLinkedList",
+            "signature": "getVersionNumber()",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "AddressLinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "AddressSortedLinkedList": {
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "AddressSortedLinkedList",
+            "signature": "getVersionNumber()",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "AddressSortedLinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "AddressSortedLinkedListWithMedian": {
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "AddressSortedLinkedListWithMedian",
+            "signature": "getVersionNumber()",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "AddressSortedLinkedListWithMedian",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "IntegerSortedLinkedList": {
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "IntegerSortedLinkedList",
+            "signature": "getVersionNumber()",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "IntegerSortedLinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
       "Proposals": {
-        "changes": {
-          "storage": [],
-          "major": [],
-          "minor": [
-            {
-              "contract": "Proposals",
-              "signature": "getVersionNumber()",
-              "type": "MethodAdded"
-            }
-          ],
-          "patch": [
-            {
-              "contract": "Proposals",
-              "type": "DeployedBytecode"
-            }
-          ]
-        },
-        "versionDelta": {
-          "storage": "=",
-          "major": "=",
-          "minor": "+1",
-          "patch": "0"
-        }
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "Proposals",
+            "signature": "getVersionNumber()",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "Proposals",
+            "type": "DeployedBytecode"
+          }
+        ]
       },
       "Signatures": {
-        "changes": {
-          "storage": [],
-          "major": [],
-          "minor": [
-            {
-              "contract": "Signatures",
-              "signature": "getVersionNumber()",
-              "type": "MethodAdded"
-            }
-          ],
-          "patch": [
-            {
-              "contract": "Signatures",
-              "type": "DeployedBytecode"
-            }
-          ]
-        },
-        "versionDelta": {
-          "storage": "=",
-          "major": "=",
-          "minor": "+1",
-          "patch": "0"
-        }
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "Signatures",
+            "signature": "getVersionNumber()",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "Signatures",
+            "type": "DeployedBytecode"
+          }
+        ]
       }
     }
   }

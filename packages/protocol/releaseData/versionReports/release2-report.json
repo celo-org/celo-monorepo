@@ -1,9 +1,28 @@
 {
-  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.baklava/contracts",
-  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v2.baklava/contracts",
-  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles/",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.mainnet/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v2.mainnet/contracts",
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
+      "MetaTransactionWalletDeployer": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "MetaTransactionWalletDeployer",
+              "type": "NewContract"
+            }
+          ],
+          "minor": [],
+          "patch": []
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
       "SortedOracles": {
         "changes": {
           "storage": [],
@@ -148,38 +167,75 @@
           "minor": "=",
           "patch": "+1"
         }
-      }
-    },
-    "libraries": {
-      "Signatures": {
+      },
+      "MetaTransactionWallet": {
         "changes": {
           "storage": [],
           "major": [],
-          "minor": [
-            {
-              "contract": "Signatures",
-              "signature": "toEthSignedTypedDataHash(bytes32,bytes32)",
-              "type": "MethodAdded"
-            },
-            {
-              "contract": "Signatures",
-              "signature": "getSignerOfTypedDataHash(bytes32,bytes32,uint8,bytes32,bytes32)",
-              "type": "MethodAdded"
-            }
-          ],
+          "minor": [],
           "patch": [
             {
-              "contract": "Signatures",
+              "contract": "MetaTransactionWallet",
+              "signature": "getMetaTransactionDigest(address,uint256,bytes,uint256)",
+              "oldValue": "public",
+              "newValue": "external",
+              "type": "MethodVisibility"
+            },
+            {
+              "contract": "MetaTransactionWallet",
+              "signature": "setSigner(address)",
+              "oldValue": "public",
+              "newValue": "external",
+              "type": "MethodVisibility"
+            },
+            {
+              "contract": "MetaTransactionWallet",
+              "signature": "getVersionNumber()",
+              "oldValue": "public",
+              "newValue": "external",
+              "type": "MethodVisibility"
+            },
+            {
+              "contract": "MetaTransactionWallet",
               "type": "DeployedBytecode"
+            },
+            {
+              "contract": "MetaTransactionWallet",
+              "dependency": "Signatures",
+              "type": "LibraryLinkingChange"
             }
           ]
         },
         "versionDelta": {
           "storage": "=",
           "major": "=",
-          "minor": "+1",
-          "patch": "0"
+          "minor": "=",
+          "patch": "+1"
         }
+      }
+    },
+    "libraries": {
+      "Signatures": {
+        "storage": [],
+        "major": [],
+        "minor": [
+          {
+            "contract": "Signatures",
+            "signature": "toEthSignedTypedDataHash(bytes32,bytes32)",
+            "type": "MethodAdded"
+          },
+          {
+            "contract": "Signatures",
+            "signature": "getSignerOfTypedDataHash(bytes32,bytes32,uint8,bytes32,bytes32)",
+            "type": "MethodAdded"
+          }
+        ],
+        "patch": [
+          {
+            "contract": "Signatures",
+            "type": "DeployedBytecode"
+          }
+        ]
       }
     }
   }

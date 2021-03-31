@@ -1,7 +1,7 @@
 {
-  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v2.baklava/contracts",
-  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v3.baklava/contracts",
-  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles/",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v2.mainnet/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v3.mainnet/contracts",
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
       "BlockchainParameters": {

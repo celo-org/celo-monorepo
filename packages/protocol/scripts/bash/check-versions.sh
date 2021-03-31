@@ -15,15 +15,13 @@ NEW_BRANCH=""
 REPORT=""
 LOG_FILE="/tmp/celo-check-versions.log"
 IGNORE_INITIALIZABLE_V2=""
-CONTRACT_EXCLUSION_REGEX=""
 
-while getopts 'a:b:r:l:e:i' flag; do
+while getopts 'a:b:r:l:i' flag; do
   case "${flag}" in
     a) OLD_BRANCH="${OPTARG}" ;;
     b) NEW_BRANCH="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
-    e) CONTRACT_EXCLUSION_REGEX="${OPTARG}" ;;
     i) IGNORE_INITIALIZABLE_V2="--ignore_initializable_v2" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
@@ -34,8 +32,7 @@ done
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
-[ -z "$CONTRACT_EXCLUSION_REGEX" ] \
-  && CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles"
+CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles"
 
 REPORT_FLAG=""
 if [ ! -z "$REPORT" ]; then
