@@ -126,9 +126,7 @@ export async function encodeTransaction(
   const v = sanitizedSignature.v
   const r = sanitizedSignature.r
   const s = sanitizedSignature.s
-  const rawTx = RLP.decode(rlpEncoded.rlpEncode)
-    .slice(0, 9)
-    .concat([v, r, s])
+  const rawTx = RLP.decode(rlpEncoded.rlpEncode).slice(0, 9).concat([v, r, s])
 
   const rawTransaction = RLP.encode(rawTx)
   const hash = getHashFromEncoded(rawTransaction)
