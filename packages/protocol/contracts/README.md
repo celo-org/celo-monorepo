@@ -2,6 +2,8 @@
 
 Smart contracts for the Celo protocols, including identity and stability.
 
+The built contract artifacts can be browsed via [unpkg.com](https://unpkg.com/browse/@celo/contracts@latest/build/).
+
 ## Usage
 
 ### Installation
