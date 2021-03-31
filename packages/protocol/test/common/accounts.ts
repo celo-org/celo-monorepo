@@ -441,16 +441,13 @@ contract('Accounts', (accounts: string[]) => {
   // of authorizeXXXSigner
   const backwardsCompatibilityMatrix = [
     [false, false],
-    // [false, true],
-    // [true, false],
-    // [true, true],
+    [false, true],
+    [true, false],
+    [true, true],
   ]
   backwardsCompatibilityMatrix.forEach(function ([genericRead, genericWrite]) {
-    const authorizeSignerFactory = (role: string) => {
-      return (signer, v, r, s, ...rest) => {
-        accountsInstance.authorizeSignerWithSignature(signer, role, v, r, s, ...rest)
-      }
-    }
+    const authorizeSignerFactory = (role: string) => (signer, v, r, s, ...rest) =>
+      accountsInstance.authorizeSignerWithSignature(signer, role, v, r, s, ...rest)
 
     const VotingKey = 'celo.org/core/vote'
     // const AttestationKey = 'celo.org/core/attestation'
@@ -471,7 +468,7 @@ contract('Accounts', (accounts: string[]) => {
       // },
     ]
     scenarios.forEach(function ({ key, description }) {
-      describe.only(`${description}authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
+      describe.only(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let authorizationTest: any
         beforeEach(async () => {
           const authorizationTests = {
@@ -486,7 +483,9 @@ contract('Accounts', (accounts: string[]) => {
               authorizedSignerToAccount: genericRead
                 ? (signer) => accountsInstance.signerToAccount(signer)
                 : accountsInstance.voteSignerToAccount,
-              hasAuthorizedSigner: accountsInstance.hasAuthorizedVoteSigner,
+              hasAuthorizedSigner: genericRead
+                ? (signer) => accountsInstance.hasAuthorizedSigner(signer, VotingKey)
+                : accountsInstance.hasAuthorizedVoteSigner,
               removeSigner: accountsInstance.removeVoteSigner,
             },
             // validator: {
@@ -514,7 +513,7 @@ contract('Accounts', (accounts: string[]) => {
           await accountsInstance.createAccount()
         })
 
-        describe(`#authorize${upperFirst(description)}()`, () => {
+        describe(`#authorize ${upperFirst(description)}()`, () => {
           const authorized = accounts[1]
           let sig
 
@@ -522,7 +521,7 @@ contract('Accounts', (accounts: string[]) => {
             sig = await getParsedSignatureOfAddress(web3, account, authorized)
           })
 
-          it(`should set the authorized ${key}`, async () => {
+          it.only(`should set the authorized key (${key})`, async () => {
             assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
             assert.equal(await accountsInstance.authorizedBy(authorized), account)

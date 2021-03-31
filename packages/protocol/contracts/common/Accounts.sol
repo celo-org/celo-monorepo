@@ -76,9 +76,9 @@ contract Accounts is
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
 
-  string constant ValidatorSigner = "validator";
-  string constant AttestationSigner = "attestation";
-  string constant VoteSigner = "vote";
+  string constant ValidatorSigner = "celo.org/core/validator";
+  string constant AttestationSigner = "celo.org/core/attestation";
+  string constant VoteSigner = "celo.org/core/vote";
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -518,10 +518,26 @@ contract Accounts is
     return signer == address(0) ? account : signer;
   }
 
-  function getSigner(address account, string memory role) public view returns (address) {
-    require(isAccount(account), "Unknown account");
-    SignerAuthorization storage authorization = accounts[account].signerAuthorizations[role];
-    return authorization.completed ? authorization.signer : address(0);
+  function getSigner(address _account, string memory role) public view returns (address) {
+    require(isAccount(_account), "Unknown account");
+
+    Account storage account = accounts[_account];
+    SignerAuthorization storage authorization = account.signerAuthorizations[role];
+    if (authorization.completed) {
+      return authorization.signer;
+    }
+
+    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+      return account.signers.validator;
+    } else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {
+      return account.signers.attestation;
+    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      return account.signers.vote;
+    }
+
+    return address(0);
   }
 
   /**
