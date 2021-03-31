@@ -4,22 +4,15 @@ Smart contracts for the Celo protocols, including identity and stability.
 
 ## Usage
 
-1. Target Release
+### Installation
 
-```
-RELEASE="celo-core-contracts-v2.mainnet"
-URL="https://gitpkg.now.sh/celo-org/celo-monorepo/packages/protocol/contracts?$RELEASE"
-```
-
-2. Installation
-
-`npm install $URL`
+`npm install @celo/contracts`
 
 or
 
-`yarn add $URL`
+`yarn add @celo/contracts`
 
-3. Development
+### Development
 
 Solidity
 
@@ -34,6 +27,20 @@ contract Example is UsingRegistry {
   }
 }
 ```
+
+Web3
+
+```javascript
+var Contract = require('web3-eth-contract');
+var jsonInterface = require('@celo/contracts/build/AddressSortedLinkedList.json');
+var contract = new Contract(jsonInterface, address);
+```
+
+For more advanced interaction with the celo core contracts, we recommend using [ContractKit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit).
+
+## Development
+
+Use `yarn publish --access public` to publish to the NPM registry.
 
 ## License
 
