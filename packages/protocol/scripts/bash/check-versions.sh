@@ -14,14 +14,17 @@ OLD_BRANCH=""
 NEW_BRANCH=""
 REPORT=""
 LOG_FILE="/tmp/celo-check-versions.log"
+IGNORE_INITIALIZABLE_V2=""
+CONTRACT_EXCLUSION_REGEX=""
 
-while getopts 'a:b:r:l:e:' flag; do
+while getopts 'a:b:r:l:e:i' flag; do
   case "${flag}" in
     a) OLD_BRANCH="${OPTARG}" ;;
     b) NEW_BRANCH="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
     e) CONTRACT_EXCLUSION_REGEX="${OPTARG}" ;;
+    i) IGNORE_INITIALIZABLE_V2="--ignore_initializable_v2" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -53,4 +56,5 @@ yarn ts-node scripts/check-backward.ts sem_check \
   --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
   --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
   --exclude $CONTRACT_EXCLUSION_REGEX \
-  $REPORT_FLAG
+  $REPORT_FLAG \
+  $IGNORE_INITIALIZABLE_V2
