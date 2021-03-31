@@ -6,7 +6,8 @@ import { WalletBase } from '@celo/wallet-base'
 /**
  * Abstract class representing a remote wallet that requires async initialization
  */
-export abstract class RemoteWallet<TSigner extends Signer> extends WalletBase<TSigner>
+export abstract class RemoteWallet<TSigner extends Signer>
+  extends WalletBase<TSigner>
   implements ReadOnlyWallet {
   private setupFinished = false
   private setupLocked = false

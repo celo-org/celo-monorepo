@@ -397,7 +397,7 @@ class TestEnv {
   }
 }
 
-describe('CIP-35 >', function(this: any) {
+describe('CIP-35 >', function (this: any) {
   this.timeout(0)
 
   describe('before activation', () => {
@@ -405,7 +405,7 @@ describe('CIP-35 >', function(this: any) {
       return
     }
     const testEnv = new TestEnv(false)
-    before(async function(this) {
+    before(async function (this) {
       this.timeout(0)
       await testEnv.before()
     })
@@ -420,7 +420,7 @@ describe('CIP-35 >', function(this: any) {
       testEnv.runReplayProtectionTests()
     }
 
-    after(async function(this: any) {
+    after(async function (this: any) {
       this.timeout(0)
       await testEnv.hooks.after()
     })
@@ -431,7 +431,7 @@ describe('CIP-35 >', function(this: any) {
       return
     }
     const testEnv = new TestEnv(true)
-    before(async function(this) {
+    before(async function (this) {
       this.timeout(0)
       await testEnv.before()
     })
@@ -446,7 +446,7 @@ describe('CIP-35 >', function(this: any) {
       testEnv.runReplayProtectionTests()
     }
 
-    after(async function(this: any) {
+    after(async function (this: any) {
       this.timeout(0)
       await testEnv.hooks.after()
     })

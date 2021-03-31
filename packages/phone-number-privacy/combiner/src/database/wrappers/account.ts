@@ -8,9 +8,7 @@ function accounts() {
 }
 
 async function getAccountExists(account: string): Promise<boolean> {
-  const existingAccountRecord = await accounts()
-    .where(ACCOUNTS_COLUMNS.address, account)
-    .first()
+  const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
   return !!existingAccountRecord
 }
 
@@ -57,8 +55,6 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
 }
 
 async function insertRecord(data: Account) {
-  await accounts()
-    .insert(data)
-    .timeout(DB_TIMEOUT)
+  await accounts().insert(data).timeout(DB_TIMEOUT)
   return true
 }

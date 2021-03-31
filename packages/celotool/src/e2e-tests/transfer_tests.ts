@@ -186,7 +186,7 @@ function assertEqualBN(value: BigNumber, expected: BigNumber) {
   assert.equal(value.toString(), expected.toString())
 }
 
-describe('Transfer tests', function(this: any) {
+describe('Transfer tests', function (this: any) {
   this.timeout(0)
 
   let kit: ContractKit
@@ -229,12 +229,12 @@ describe('Transfer tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
