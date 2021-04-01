@@ -91,8 +91,8 @@ contract Accounts is
    */
   constructor(bool test) public InitializableV2(test) {}
 
-  modifier isSenderRegistered {
-    require(isAccount(msg.sender), "Sender is not a registered account");
+  modifier onlyRegisteredAccount(address account) {
+    require(isAccount(account), "Sender is not a registered account");
     _;
   }
 
@@ -139,7 +139,7 @@ contract Accounts is
    * @notice Setter for the name of an account.
    * @param name The name to set.
    */
-  function setName(string memory name) public isSenderRegistered {
+  function setName(string memory name) public onlyRegisteredAccount(msg.sender) {
     Account storage account = accounts[msg.sender];
     account.name = name;
     emit AccountNameSet(msg.sender, name);
@@ -159,7 +159,7 @@ contract Accounts is
    */
   function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s)
     public
-    isSenderRegistered
+    onlyRegisteredAccount(msg.sender)
   {
     if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
       address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
@@ -185,7 +185,7 @@ contract Accounts is
    * @notice Setter for the metadata of an account.
    * @param metadataURL The URL to access the metadata.
    */
-  function setMetadataURL(string calldata metadataURL) external isSenderRegistered {
+  function setMetadataURL(string calldata metadataURL) external onlyRegisteredAccount(msg.sender) {
     Account storage account = accounts[msg.sender];
     account.metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
@@ -412,7 +412,12 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can sign votes.
    */
-  function getVoteSigner(address account) public view isSenderRegistered returns (address) {
+  function getVoteSigner(address account)
+    public
+    view
+    onlyRegisteredAccount(msg.sender)
+    returns (address)
+  {
     address signer = accounts[account].signers.vote;
     return signer == address(0) ? account : signer;
   }
@@ -422,7 +427,12 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  function getValidatorSigner(address account) public view isSenderRegistered returns (address) {
+  function getValidatorSigner(address account)
+    public
+    view
+    onlyRegisteredAccount(msg.sender)
+    returns (address)
+  {
     address signer = accounts[account].signers.validator;
     return signer == address(0) ? account : signer;
   }
@@ -432,7 +442,12 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can sign attestations.
    */
-  function getAttestationSigner(address account) public view isSenderRegistered returns (address) {
+  function getAttestationSigner(address account)
+    public
+    view
+    onlyRegisteredAccount(msg.sender)
+    returns (address)
+  {
     address signer = accounts[account].signers.attestation;
     return signer == address(0) ? account : signer;
   }
@@ -582,7 +597,10 @@ contract Accounts is
    * @dev Note that once an address is authorized, it may never be authorized again.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
-  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private isSenderRegistered {
+  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s)
+    private
+    onlyRegisteredAccount(msg.sender)
+  {
     require(
       isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
       "Cannot re-authorize address or locked gold account."
