@@ -1,5 +1,6 @@
 /* tslint:disable no-console */
 import { newKitFromWeb3 } from '@celo/contractkit'
+import { celoTokenInfos, CeloTokenType, Token } from '@celo/contractkit/lib/celo-tokens'
 import { sleep } from '@celo/utils/lib/async'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
@@ -18,10 +19,13 @@ export const describe = 'command for fauceting an address with gold and/or dolla
 
 interface FaucetArgv extends AccountArgv {
   account: string
-  gold: number
-  dollar: number
+  tokenParams: TokenParams[]
   checkzero: boolean
   blockscout: boolean
+}
+interface TokenParams {
+  token: CeloTokenType
+  amount: number
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -42,19 +46,38 @@ export const builder = (argv: yargs.Argv) => {
         })
       },
     })
-    .option('dollar', {
-      type: 'number',
-      description: 'Number of dollars to faucet',
-      demand: 'Please specify dollars to faucet',
-    })
-    .option('gold', {
-      type: 'number',
-      description: 'Amount of gold to faucet',
-      demand: 'Please specify gold to faucet',
+    .array('tokenParams')
+    .option('tokenParams', {
+      type: 'string',
+      description: '<token,amount> pair to faucet',
+      demand:
+        'Please specify stableToken,amount pairs to faucet (ex: --tokenParams CELO,3 cUSD,10 cEUR,5)',
+      coerce: (pairs) => {
+        // Ensure that pairs are formatted properly and use possible tokenParams
+        const validCeloTokens = Object.values(celoTokenInfos).map((tokenInfo) => {
+          return tokenInfo.symbol
+        })
+        return pairs.map((pair: string) => {
+          let [token, amount] = pair.split(',')
+          if (token == undefined || amount == undefined) {
+            throw Error(`Format of tokenParams should be: --tokenParams tokenName,amount`)
+          }
+          if (!validCeloTokens.includes(token as CeloTokenType)) {
+            throw Error(`Invalid token '${token}', must be one of: ${validCeloTokens}.`)
+          }
+          if (!(amount && /^\d+$/.test(amount))) {
+            throw Error(`Invalid amount '${amount}', must consist of only numbers.`)
+          }
+          return {
+            token: token as CeloTokenType,
+            amount: Number(amount),
+          }
+        })
+      },
     })
     .option('checkzero', {
       type: 'boolean',
-      description: 'Check that the gold balance is zero before fauceting',
+      description: 'Check that the balance is zero before fauceting',
       default: false,
     })
     .option('blockscout', {
@@ -66,7 +89,6 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: FaucetArgv) => {
   await switchToClusterFromEnv(argv.celoEnv)
-
   const addresses = argv.account
 
   const cb = async () => {
@@ -76,45 +98,49 @@ export const handler = async (argv: FaucetArgv) => {
     console.log(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
-    const [goldToken, stableToken, reserve] = await Promise.all([
-      kit.contracts.getGoldToken(),
-      kit.contracts.getStableToken(),
-      kit.contracts.getReserve(),
-    ])
+    const faucetToken = async (tokenParams: TokenParams) => {
+      if (!tokenParams.amount) {
+        return
+      }
 
-    if (argv.checkzero) {
+      const tokenWrapper = await kit.celoTokens.getWrapper(tokenParams.token as any)
       for (const address of addresses) {
-        // Check this address hasn't already been fauceted and has zero gold
-        if (
-          (argv.gold !== 0 && !(await goldToken.balanceOf(address)).isZero()) ||
-          (argv.dollar !== 0 && !(await stableToken.balanceOf(address)).isZero())
-        ) {
-          console.error(
-            `Unable to faucet ${address} on ${argv.celoEnv}: --checkzero specified, but balance is non-zero`
-          )
-          process.exit(1)
+        if (argv.checkzero) {
+          // Check if address account balance of this token is zero
+          if (!(await tokenWrapper.balanceOf(address)).isZero()) {
+            throw Error(
+              `Unable to faucet ${tokenParams.token} to ${address} on ${argv.celoEnv}: --checkzero specified, but balance is non-zero`
+            )
+          }
         }
+        const tokenAmount = await convertToContractDecimals(tokenParams.amount, tokenWrapper)
+        console.log(`Fauceting ${tokenAmount.toFixed()} of ${tokenParams.token} to ${address}`)
+
+        if (tokenParams.token == Token.CELO) {
+          // Special handling for reserve transfer
+          const reserve = await kit.contracts.getReserve()
+          if (await reserve.isSpender(account)) {
+            await reserve.transferGold(address, tokenAmount.toFixed()).sendAndWaitForReceipt()
+            return
+          }
+        }
+        await tokenWrapper.transfer(address, tokenAmount.toFixed()).sendAndWaitForReceipt()
+        console.log(`Successfully fauceted ${tokenParams.token}`)
       }
     }
-
-    for (const address of addresses) {
-      const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
-      const stableTokenAmount = await convertToContractDecimals(argv.dollar, stableToken)
-
-      console.log(
-        `Fauceting ${goldAmount.toFixed()} Gold and ${stableTokenAmount.toFixed()} StableToken to ${address}`
+    // Ensure all faucets attempts are independent of failures and report failures.
+    const failures = (
+      await Promise.all(
+        argv.tokenParams.map(async (tokenParams) => {
+          return faucetToken(tokenParams)
+            .then(() => null)
+            .catch((err) => err)
+        })
       )
-
-      if (!goldAmount.isZero()) {
-        if (await reserve.isSpender(account)) {
-          await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()
-        } else {
-          await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
-        }
-      }
-      if (!stableTokenAmount.isZero()) {
-        await stableToken.transfer(address, stableTokenAmount.toFixed()).sendAndWaitForReceipt()
-      }
+    ).filter((x) => x != null)
+    if (failures.length) {
+      console.error(Error(`Errors fauceting: ${failures}`))
+      process.exit(1)
     }
 
     if (argv.blockscout) {
