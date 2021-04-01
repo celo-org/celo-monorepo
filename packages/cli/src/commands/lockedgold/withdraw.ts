@@ -20,9 +20,7 @@ export default class Withdraw extends BaseCommand {
     this.kit.defaultAccount = flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()
 
-    await newCheckBuilder(this)
-      .isAccount(flags.from)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(flags.from).runChecks()
 
     const currentTime = Math.round(new Date().getTime() / 1000)
     while (true) {

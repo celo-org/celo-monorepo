@@ -28,10 +28,7 @@ export default class ApproveHotfix extends BaseCommand {
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
 
-    await newCheckBuilder(this)
-      .isApprover(account)
-      .hotfixNotExecuted(hash)
-      .runChecks()
+    await newCheckBuilder(this).isApprover(account).hotfixNotExecuted(hash).runChecks()
 
     await displaySendTx('approveTx', governance.approveHotfix(hash), {})
   }

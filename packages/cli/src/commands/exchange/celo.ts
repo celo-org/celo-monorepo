@@ -55,9 +55,7 @@ export default class ExchangeCelo extends BaseCommand {
       failWith(`The ${stableToken} token was not deployed yet`)
     }
 
-    await newCheckBuilder(this)
-      .hasEnoughCelo(res.flags.from, sellAmount)
-      .runChecks()
+    await newCheckBuilder(this).hasEnoughCelo(res.flags.from, sellAmount).runChecks()
 
     if (minBuyAmount.toNumber() === 0) {
       const check = await checkNotDangerousExchange(

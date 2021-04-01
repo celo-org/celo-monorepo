@@ -61,7 +61,7 @@
     "jest-snapshot": "^26.1.0",
     "lerna": "^3.16.0",
     "patch-package": "^6.2.2",
-    "prettier": "1.19.1",
+    "prettier": "^2.2.1",
     "prettier-plugin-java": "^0.6.0",
     "prettier-plugin-solidity": "1.0.0-alpha.35",
     "pretty-quick": "^2.0.1",
@@ -74,7 +74,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "resolutions": {
-    "@types/prettier": "^1.19.0",
+    "@types/prettier": "^2.2.1",
     "**/axios": "0.21.1",
     "**/cross-fetch": "^3.0.2",
     "**/deep-extend": "^0.5.1",
@@ -91,6 +91,7 @@
     "ganache-core": "https://github.com/celo-org/ganache-core.git#e7bc0bd",
     "https-proxy-agent": "^5.0.0",
     "hoek": "^6.1.3",
+    "jest-environment-jsdom": "^26.0.1",
     "js-yaml": "^3.13.1",
     "lodash": "4.17.15",
     "logkitty": "^0.7.1",
@@ -103,7 +104,7 @@
     "npm": "^5.10.0",
     "npmi": "^4.0.0",
     "object-path": "^0.11.5",
-    "prettier": "^1.19.1",
+    "prettier": "^2.2.1",
     "randomatic": "^3.1.1",
     "react-native-flipper": "^0.70.0",
     "react-native-ntp-client": "^1.0.0",
@@ -112,6 +113,6 @@
     "tar": "4.4.10",
     "web3-eth-contract": "1.3.4",
     "websocket-extensions": "^0.1.4",
-    "jest-environment-jsdom": "^26.0.1"
+    "y18n": "^5.0.5"
   }
 }

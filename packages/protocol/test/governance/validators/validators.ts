@@ -2192,13 +2192,7 @@ contract('Validators', (accounts: string[]) => {
             const removalTimestamp = removalTimestamps[i]
             const requirementExpiry = groupLockedGoldRequirements.duration.plus(removalTimestamp)
             const currentTimestamp = (await web3.eth.getBlock('latest')).timestamp
-            await timeTravel(
-              requirementExpiry
-                .minus(currentTimestamp)
-                .plus(1)
-                .toNumber(),
-              web3
-            )
+            await timeTravel(requirementExpiry.minus(currentTimestamp).plus(1).toNumber(), web3)
           }
         })
       })
