@@ -84,7 +84,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     // reverse order for recency
     for (let transactionId = transactionCount - 1; transactionId >= 0; transactionId--) {
       const tx = await this.getTransaction(transactionId)
-      if (tx.data === data && tx.destination === destination && tx.value === value) {
+      if (tx.data === data && tx.destination === destination && tx.value.isEqualTo(value)) {
         return tx
       }
     }
