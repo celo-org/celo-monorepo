@@ -91,6 +91,7 @@
     "ganache-core": "https://github.com/celo-org/ganache-core.git#e7bc0bd",
     "https-proxy-agent": "^5.0.0",
     "hoek": "^6.1.3",
+    "jest-environment-jsdom": "^26.0.1",
     "js-yaml": "^3.13.1",
     "lodash": "4.17.15",
     "logkitty": "^0.7.1",
@@ -112,6 +113,6 @@
     "tar": "4.4.10",
     "web3-eth-contract": "1.3.4",
     "websocket-extensions": "^0.1.4",
-    "jest-environment-jsdom": "^26.0.1"
+    "y18n": "^5.0.5"
   }
 }
