@@ -84,7 +84,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const Interfaces = ['ICeloToken', 'IERC20']
+const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
