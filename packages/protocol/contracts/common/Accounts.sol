@@ -92,7 +92,7 @@ contract Accounts is
   constructor(bool test) public InitializableV2(test) {}
 
   modifier onlyRegisteredAccount(address account) {
-    require(isAccount(account), "Sender is not a registered account");
+    require(isAccount(account), "Account is not a registered");
     _;
   }
 
