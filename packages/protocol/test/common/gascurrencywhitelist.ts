@@ -48,28 +48,29 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       await assertRevert(feeCurrencyWhitelist.initialize(registry.address))
     })
   })
-
-  describe('#addToken() with an invalid oracle price', () => {
+  describe('#addToken()', () => {
     it('should not allow to add a token with an invalid oracle price', async () => {
       await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
     })
-  })
 
-  describe('#addToken() with a valid oracle price', () => {
-    beforeEach(async () => {
-      await mockSortedOracles.setMedianRate(mockStableToken.address, stableAmountForRate)
-      await mockSortedOracles.setMedianTimestampToNow(mockStableToken.address)
-      await mockSortedOracles.setNumRates(mockStableToken.address, 2)
-    })
+    describe('when token has a valid oracle price', () => {
+      beforeEach(async () => {
+        await mockSortedOracles.setMedianRate(mockStableToken.address, stableAmountForRate)
+        await mockSortedOracles.setMedianTimestampToNow(mockStableToken.address)
+        await mockSortedOracles.setNumRates(mockStableToken.address, 2)
+      })
 
-    it('should allow the owner to add a token', async () => {
-      await feeCurrencyWhitelist.addToken(mockStableToken.address)
-      const tokens = await feeCurrencyWhitelist.getWhitelist()
-      assert.sameMembers(tokens, [mockStableToken.address])
-    })
+      it('should allow the owner to add a token', async () => {
+        await feeCurrencyWhitelist.addToken(mockStableToken.address)
+        const tokens = await feeCurrencyWhitelist.getWhitelist()
+        assert.sameMembers(tokens, [mockStableToken.address])
+      })
 
-    it('should not allow a non-owner to add a token', async () => {
-      await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address, { from: nonOwner }))
+      it('should not allow a non-owner to add a token', async () => {
+        await assertRevert(
+          feeCurrencyWhitelist.addToken(mockStableToken.address, { from: nonOwner })
+        )
+      })
     })
   })
 })
