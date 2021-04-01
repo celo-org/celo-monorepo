@@ -30,7 +30,6 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   beforeEach(async () => {
     mockStableToken = await MockStableToken.new()
     registry = await Registry.new()
-    // await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
 
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
