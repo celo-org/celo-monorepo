@@ -58,8 +58,8 @@ export const builder = (argv: yargs.Argv) => {
           return tokenInfo.symbol
         })
         return pairs.map((pair: string) => {
-          let [token, amount] = pair.split(',')
-          if (token == undefined || amount == undefined) {
+          const [token, amount] = pair.split(',')
+          if (token === undefined || amount === undefined) {
             throw Error(`Format of tokenParams should be: --tokenParams tokenName,amount`)
           }
           if (!validCeloTokens.includes(token as CeloTokenType)) {
@@ -116,7 +116,7 @@ export const handler = async (argv: FaucetArgv) => {
         const tokenAmount = await convertToContractDecimals(tokenParams.amount, tokenWrapper)
         console.log(`Fauceting ${tokenAmount.toFixed()} of ${tokenParams.token} to ${address}`)
 
-        if (tokenParams.token == Token.CELO) {
+        if (tokenParams.token === Token.CELO) {
           // Special handling for reserve transfer
           const reserve = await kit.contracts.getReserve()
           if (await reserve.isSpender(account)) {
