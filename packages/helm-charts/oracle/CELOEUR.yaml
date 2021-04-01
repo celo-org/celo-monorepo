@@ -7,11 +7,6 @@ oracle:
       bidMaxPercentageDeviation: 0.05
       maxPercentageBidAskSpread: 0.025
       # minReportPriceChangeThreshold
-    trades:
-      periodMs: 300000
-      # dataFetchFrequency
-      # minimumTrades
-      # scalingRate
   metrics:
     enabled: true
     prometheusPort: 9090

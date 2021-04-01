@@ -115,14 +115,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-{{ include "common.env-var" (dict "name" "AGGREGATION_PERIOD" "dict" .Values.oracle.aggregation.trades "value_name" "periodMs" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "AGGREGATION_SCALING_RATE" "dict" .Values.oracle.aggregation.trades "value_name" "scalingRate" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "API_REQUEST_TIMEOUT" "dict" .Values.oracle "value_name" "apiRequestTimeoutMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.oracle.azureHsm "value_name" "initTryCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
-{{ include "common.env-var" (dict "name" "DATA_FETCH_FREQUENCY" "dict" .Values.oracle.aggregation.trades "value_name" "dataFetchFrequency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
 {{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
 {{ include "common.env-var" (dict "name" "MAX_BLOCK_TIMESTAMP_AGE_MS" "dict" .Values.oracle "value_name" "maxBlockTimestampAgeMs" "optional" true) | indent 8 }}
@@ -132,7 +129,6 @@ spec:
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_EXCHANGE_VOLUME_SHARE" "dict" .Values.oracle.aggregation.mid "value_name" "maxExchangeVolumeShare" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_PERCENTAGE_BID_ASK_SPREAD" "dict" .Values.oracle.aggregation.mid "value_name" "maxPercentageBidAskSpread" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MIN_REPORT_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle.reporter.blockBased "value_name" "minReportPriceChangeThreshold" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "MINIMUM_DATA" "dict" .Values.oracle.aggregation.trades "value_name" "minimumTrades" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "OVERRIDE_INDEX" "dict" .Values.oracle "value_name" "overrideIndex" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.oracle "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.oracle "value_name" "privateKeyPath" "optional" true) | indent 8 }}
