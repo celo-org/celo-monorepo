@@ -21,7 +21,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+    - image: gcr.io/celo-testnet/circleci-node14:1.0.0
       auth:
         # _json_key is not a username, it looks like it is a hack which lets
         # circleci know that the corresponding `password` is actually a json
@@ -712,7 +712,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: gcr.io/celo-testnet/circleci-node14:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -725,7 +725,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: gcr.io/celo-testnet/circleci-node14:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -738,7 +738,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: gcr.io/celo-testnet/circleci-node14:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -754,7 +754,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: gcr.io/celo-testnet/circleci-node14:1.0.0
     steps:
       - run:
           name: Check if the test should run
