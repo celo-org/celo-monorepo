@@ -60,11 +60,6 @@ oracle:
     blockBased:
       minReportPriceChangeThreshold: 0.005 # 0.5%
       # targetMaxHeartbeatPeriodMs
-    timer:
-      removeExpiredFrequencyMs: 60000
-      # removeExpiredOffsetOverride
-      # removeFrequencyOverride
-      # reportOffsetOverride
   # privateKeyPath
   # unusedOracleAddresses
   # overrideIndex
