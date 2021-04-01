@@ -621,7 +621,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#activateByAccount', () => {
+  describe('#activateForAccount', () => {
     const voter = accounts[0]
     const group = accounts[1]
     const value = 1000
@@ -645,7 +645,7 @@ contract('Election', (accounts: string[]) => {
         let resp: any
         beforeEach(async () => {
           await mineBlocks(EPOCH, web3)
-          resp = await election.activateByAccount(group, voter)
+          resp = await election.activateForAccount(group, voter)
         })
 
         it("should decrement the account's pending votes for the group", async () => {
@@ -692,7 +692,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter2, value2)
             await election.vote(group, value2, NULL_ADDRESS, NULL_ADDRESS, { from: voter2 })
             await mineBlocks(EPOCH, web3)
-            await election.activateByAccount(group, voter2, { from: voter })
+            await election.activateForAccount(group, voter2, { from: voter })
           })
 
           it("should not modify the first account's active votes for the group", async () => {
@@ -735,14 +735,14 @@ contract('Election', (accounts: string[]) => {
 
       describe('when an epoch boundary has not passed since the pending votes were made', () => {
         it('should revert', async () => {
-          await assertRevert(election.activateByAccount(group, voter))
+          await assertRevert(election.activateForAccount(group, voter))
         })
       })
     })
 
     describe('when the voter does not have pending votes', () => {
       it('should revert', async () => {
-        await assertRevert(election.activateByAccount(group, voter))
+        await assertRevert(election.activateForAccount(group, voter))
       })
     })
   })
@@ -1936,11 +1936,20 @@ contract('Election', (accounts: string[]) => {
     }
 
     const randomElement = <A>(list: A[]): A => {
-      return list[Math.floor(BigNumber.random().times(list.length).toNumber())]
+      return list[
+        Math.floor(
+          BigNumber.random()
+            .times(list.length)
+            .toNumber()
+        )
+      ]
     }
 
     const randomInteger = (max: BigNumber, min: BigNumber = new BigNumber(1)): BigNumber => {
-      return BigNumber.random().times(max.minus(min)).plus(min).dp(0)
+      return BigNumber.random()
+        .times(max.minus(min))
+        .plus(min)
+        .dp(0)
     }
 
     const makeRandomAction = async (account: Account) => {
@@ -2102,7 +2111,7 @@ contract('Election', (accounts: string[]) => {
       })
     })
 
-    describe('when placing, activating, and revoking votes randomly', function (this: any) {
+    describe('when placing, activating, and revoking votes randomly', function(this: any) {
       this.timeout(0)
       describe('when no epoch rewards are distributed', () => {
         it('actual and expected should always match exactly', async () => {

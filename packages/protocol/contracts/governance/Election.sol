@@ -286,7 +286,7 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activateByAccount(address group, address account) external nonReentrant returns (bool) {
+  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
     return _activate(group, account);
   }
 
