@@ -22,5 +22,3 @@ oracle:
   reporter:
     blockBased:
       minReportPriceChangeThreshold: 0.005 # 0.5%
-    timer:
-      removeExpiredFrequencyMs: 60000

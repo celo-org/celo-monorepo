@@ -137,10 +137,6 @@ spec:
 {{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.oracle "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.oracle "value_name" "privateKeyPath" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.oracle.metrics "value_name" "prometheusPort") | indent 8 }}
-{{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_FREQUENCY" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredFrequencyMs" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredOffsetOverride" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "REPORT_FREQUENCY_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeFrequencyOverride" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "REPORT_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "reportOffsetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_STRATEGY" "dict" .Values.oracle "value_name" "reportStrategy") | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_TARGET_OVERRIDE" "dict" .Values.oracle "value_name" "reportTargetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "TARGET_MAX_HEARTBEAT_PERIOD_MS" "dict" .Values.oracle.reporter.blockBased "value_name" "targetMaxHeartbeatPeriodMs" "optional" true) | indent 8 }}
