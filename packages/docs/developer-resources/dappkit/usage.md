@@ -4,7 +4,13 @@ This page walks you through the main functionalities of DAppKit and provides sma
 
 ## Overview
 
-DAppKit uses [deeplinks](https://en.wikipedia.org/wiki/Mobile_deep_linking) to communicate between your DApp and the [Celo Developer Wallet](https://celo.org/developers/wallet) (for testing) and [Valora](https://valoraapp.com/) (for production). All 'requests' that your DApp makes to the Wallet needs to contain the following meta payload:
+DAppKit uses [deeplinks](https://en.wikipedia.org/wiki/Mobile_deep_linking) to communicate between your DApp and the [Celo Developer Wallet](https://celo.org/developers/wallet) (for testing) and [Valora](https://valoraapp.com/) (for production).
+
+{% hint style="info" %} 
+Note: DappKit uses the same deeplink for both the testing and production wallets. This means that when testing, the deeplinks will open the testing wallet vs the product wallet if both are installed on the same device. We are currently working to make separate deeplinks. Given the low transaction fees, many developers have chosen to only develop on mainnet to get around this.
+{% endhint %}
+
+All 'requests' that your DApp makes to the Wallet needs to contain the following meta payload:
 
 - `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request.
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
