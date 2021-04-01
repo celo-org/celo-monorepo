@@ -415,7 +415,7 @@ contract Accounts is
   function getVoteSigner(address account)
     public
     view
-    onlyRegisteredAccount(msg.sender)
+    onlyRegisteredAccount(account)
     returns (address)
   {
     address signer = accounts[account].signers.vote;
@@ -430,7 +430,7 @@ contract Accounts is
   function getValidatorSigner(address account)
     public
     view
-    onlyRegisteredAccount(msg.sender)
+    onlyRegisteredAccount(account)
     returns (address)
   {
     address signer = accounts[account].signers.validator;
@@ -445,7 +445,7 @@ contract Accounts is
   function getAttestationSigner(address account)
     public
     view
-    onlyRegisteredAccount(msg.sender)
+    onlyRegisteredAccount(account)
     returns (address)
   {
     address signer = accounts[account].signers.attestation;
