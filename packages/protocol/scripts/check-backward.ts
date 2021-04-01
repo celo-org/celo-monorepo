@@ -44,6 +44,11 @@ const argv = yargs
     default: false,
     type: 'boolean',
   })
+  .option('ignore_initializable_v2', {
+    description: 'Skip check for InitializableV2 inheritance',
+    default: false,
+    type: 'boolean',
+  })
   .help()
   .alias('help', 'h')
   .showHelpOnFail(true)
@@ -75,18 +80,20 @@ try {
     out
   )
 
-  const versionDeltas = backward.report.versionDeltas()
-  Object.entries(versionDeltas).forEach(([contract, delta]) => {
-    if (
-      delta.isVersionIncremented() &&
-      checkImports('Initializable', newArtifacts.getArtifactByName(contract), newArtifacts)
-    ) {
-      console.error(
-        `Contract ${contract} has positive version delta but is not using InitializableV2`
-      )
-      process.exit(1)
-    }
-  })
+  if (!argv.ignore_initializable_v2) {
+    const versionDeltas = backward.report.versionDeltas()
+    Object.entries(versionDeltas).forEach(([contract, delta]) => {
+      if (
+        delta.isVersionIncremented() &&
+        checkImports('Initializable', newArtifacts.getArtifactByName(contract), newArtifacts)
+      ) {
+        console.error(
+          `Contract ${contract} has positive version delta but is not using InitializableV2`
+        )
+        process.exit(1)
+      }
+    })
+  }
 
   out(`Writing compatibility report to ${outFile} ...`)
   writeJsonSync(outFile, backward, { spaces: 2 })
