@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 
-import "../common/InitializableV2.sol";
+import "./InitializableV2.sol";
 
 import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
