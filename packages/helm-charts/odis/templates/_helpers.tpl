@@ -2,7 +2,7 @@
 The name of the deployment
 */}}
 {{- define "name" -}}
-{{- .Values.environment.name -}}-{{- .Values.context -}}-signer
+{{- .Values.environment.cluster.name -}}
 {{- end -}}
 
 {{/*

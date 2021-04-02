@@ -142,7 +142,6 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
     `--set log.level=${loggingConfig.level}`,
     `--set log.format=${loggingConfig.format}`,
-    `--set context=${context}`,
   ].concat(await ODISSignerKeyVaultIdentityHelmParameters(context, keyVaultConfig))
 }
 
