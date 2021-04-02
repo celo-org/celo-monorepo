@@ -6,7 +6,7 @@ import "./interfaces/IFeeCurrencyWhitelist.sol";
 
 import "../common/InitializableV2.sol";
 
-import "../common/UsingRegistry.sol";
+import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
