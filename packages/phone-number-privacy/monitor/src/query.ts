@@ -11,7 +11,7 @@ const phoneNumber = fetchEnv('PHONE_NUMBER')
 const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
 
 const contractKit = newKitFromWeb3(
-  new Web3('https://rc1-forno.celo-testnet.org'),
+  new Web3(process.env.BLOCKCHAIN_PROVIDER || 'https://rc1-forno.celo-testnet.org'),
   new LocalWallet()
 )
 contractKit.connection.addAccount(privateKey)
@@ -27,7 +27,7 @@ export const queryOdisForSalt = () => {
     phoneNumber,
     accountAddress,
     authSigner,
-    OdisUtils.Query.getServiceContext('mainnet'),
+    OdisUtils.Query.getServiceContext(process.env.NETWORK),
     undefined,
     'monitor:1.0.0'
   )
