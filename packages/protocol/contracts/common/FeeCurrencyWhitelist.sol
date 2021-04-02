@@ -32,10 +32,7 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, InitializableV2
   function addToken(address tokenAddress) external onlyOwner {
     uint256 rateNumerator;
     uint256 rateDenominator;
-    (rateNumerator, rateDenominator) = ISortedOracles(
-      registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
-    )
-      .medianRate(tokenAddress);
+    (rateNumerator, rateDenominator) = getSortedOracles().medianRate(tokenAddress);
     require(rateDenominator > 0, "FeeCurrencyWhitelist: Invalid Oracle Price (Denominator)");
     require(rateNumerator > 0, "FeeCurrencyWhitelist: Invalid Oracle Price (Numerator)");
     whitelist.push(tokenAddress);
