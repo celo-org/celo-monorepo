@@ -33,13 +33,11 @@ relayer:
   port: 3000
   identities:
   - address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
-    privateKey: 0x000
     azure:
       id: defaultId
       clientId: defaultClientId
       keyVaultName: staging-komenci-eus
   - address: 0xc6f0f9bfb1aed83620ece3eac0add98a65a8574e
-    privateKey: 0x001
     azure:
       id: defaultId1
       clientId: defaultClientId1
@@ -74,7 +72,9 @@ onboarding:
   relayer:
     host: alfajores-relayer
     port: 3000
-    rpcTimeoutMs: 7000
+    rpcTimeoutMs: 12000
+    gasPriceMultiplier: 1
+    maxGasPrice: "30000000000" # 30 gwei
   db:
     host: komenci-komenci-postgresql
     port: 5432
