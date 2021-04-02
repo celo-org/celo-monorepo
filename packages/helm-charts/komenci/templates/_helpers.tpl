@@ -42,6 +42,13 @@ app.kubernetes.io/component: komenci-onboarding
 {{- end -}}
 
 {{/*
+Label specific to the komenci rewards component
+*/}}
+{{- define "komenci-rewards-component-label" -}}
+app.kubernetes.io/component: komenci-rewards
+{{- end -}}
+
+{{/*
 The name of the azure identity binding for all relayers
 */}}
 {{- define "azure-identity-binding-name" -}}

@@ -11,19 +11,26 @@ export const describe = 'upgrade komenci on an AKS cluster'
 type OracleUpgradeArgv = UpgradeArgv &
   ContextArgv & {
     useForno: boolean
+    deployRewards: boolean
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addContextMiddleware(argv).option('useForno', {
-    description: 'Uses forno for RPCs from the komenci clients',
-    default: false,
-    type: 'boolean',
-  })
+  return addContextMiddleware(argv)
+    .option('useForno', {
+      description: 'Uses forno for RPCs from the komenci clients',
+      default: false,
+      type: 'boolean',
+    })
+    .option('deployRewards', {
+      description: 'Deploy Rewards Service alongside Komenci',
+      default: true,
+      type: 'boolean',
+    })
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
   // Do not allow --helmdryrun because komenciIdentityHelmParameters function. It could be refactored to allow
   exitIfCelotoolHelmDryRun()
   await switchToContextCluster(argv.celoEnv, argv.context)
-  await upgradeKomenciChart(argv.celoEnv, argv.context, argv.useForno)
+  await upgradeKomenciChart(argv.celoEnv, argv.context, argv.useForno, argv.deployRewards)
 }
