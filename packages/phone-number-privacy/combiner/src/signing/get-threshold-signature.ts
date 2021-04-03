@@ -103,7 +103,8 @@ async function requestSignatures(request: Request, response: Response) {
             responses,
             service.url,
             blsCryptoClient,
-            request.body.blindedQueryPhoneNumber
+            request.body.blindedQueryPhoneNumber,
+            controller
           )
         } else {
           errorCodes.set(res.status, (errorCodes.get(res.status) || 0) + 1)
@@ -144,7 +145,8 @@ async function handleSuccessResponse(
   responses: SignMsgRespWithStatus[],
   serviceUrl: string,
   blsCryptoClient: BLSCryptographyClient,
-  blindedQueryPhoneNumber: string
+  blindedQueryPhoneNumber: string,
+  controller: AbortController
 ) {
   const logger: Logger = response.locals.logger
   const signResponse = JSON.parse(data) as SignerResponse
@@ -166,6 +168,8 @@ async function handleSuccessResponse(
   await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
   // Send response immediately once we cross threshold
   if (!sentResult.sent && blsCryptoClient.hasSufficientVerifiedSignatures()) {
+    // Close outstanding requests
+    controller.abort()
     const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
     if (!sentResult.sent) {
       response.json({ success: true, combinedSignature, version: VERSION })
