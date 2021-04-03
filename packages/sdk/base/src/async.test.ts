@@ -47,38 +47,36 @@ describe('selectiveRetryAsyncWithBackOff()', () => {
 })
 
 describe('retryAsyncWithBackOffAndTimeout()', () => {
-  // test('tries once if it works', async () => {
-  //   const mockFunction = jest.fn()
-  //   await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1)
-  //   expect(mockFunction).toHaveBeenCalledTimes(1)
-  // })
+  test('tries once if it works', async () => {
+    const mockFunction = jest.fn()
+    await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1)
+    expect(mockFunction).toHaveBeenCalledTimes(1)
+  })
 
-  // test('retries n times on failure', async () => {
-  //   const mockFunction = jest.fn(() => {
-  //     throw new Error('error')
-  //   })
+  test('retries n times on failure', async () => {
+    const mockFunction = jest.fn(() => {
+      throw new Error('forced error')
+    })
 
-  //   try {
-  //     await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1)
-  //     expect(false).toBeTruthy()
-  //   } catch (error) {
-  //     // should never happen
-  //   }
-  //   expect(mockFunction).toHaveBeenCalledTimes(3)
-  // })
+    try {
+      await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
+      expect(false).toBeTruthy()
+    } catch (error) {
+      expect(error.message).toContain('forced error')
+    }
+    expect(mockFunction).toHaveBeenCalledTimes(3)
+  })
 
   test('fails on timeout', async () => {
     const mockFunction = jest.fn(async () => {
       await sleep(1000)
     })
-    // await expect(async () => {
-    //   await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
-    // }).toThrow(Error)
+
     try {
       await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
       expect(false).toBeTruthy()
     } catch (error) {
-      expect(error.message).toContain('Timed')
+      expect(error.message).toContain('Timed out')
     }
 
     expect(mockFunction).toHaveBeenCalledTimes(1)
