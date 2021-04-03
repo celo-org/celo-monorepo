@@ -96,6 +96,79 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
   throw saveError
 }
 
+// Retries an async function when it raises an exeption
+// Terminates any ongoing request when the timeout is reached
+// if all the tries fail it raises the last thrown exeption
+export const retryAsyncWithBackOffAndTimeout = async <T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  tries: number,
+  params: T,
+  delayMs = 100,
+  factor = 1.5,
+  timeoutMs = 2000,
+  logger: Logger | null = null
+) => {
+  let timeoutHandle: number
+  const timeoutPromise = new Promise((_resolve, reject) => {
+    timeoutHandle = setTimeout(() => {
+      if (logger) {
+        logger(`${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`)
+      }
+      reject(new Error(`Timed out after ${timeoutMs}ms`))
+    }, timeoutMs)
+  })
+
+  Promise.race([
+    await retryAsyncWithBackOff(inFunction, tries, params, delayMs, factor, logger),
+    await timeoutPromise,
+  ]).then((result) => {
+    clearTimeout(timeoutHandle)
+    return result
+  })
+}
+
+// Retries an async function when it raises an exeption
+// if all the tries fail it raises the last thrown exeption
+// throws automatically on specified errors
+// export const retryAsyncWithBackOffAndTimeout2 = async <T extends any[], U>(
+//   inFunction: InFunction<T, U>,
+//   tries: number,
+//   params: T,
+//   delayMs = 100,
+//   factor = 1.5,
+//   timeoutMs = 2000,
+//   logger: Logger | null = null
+// ) => {
+//   let saveError
+//   const timeoutHandle = setTimeout(() => {
+//     if (logger) {
+//       logger(`${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`)
+//     }
+//     throw new Error(`Timed out after ${timeoutMs}ms`)
+//   }, timeoutMs)
+//   for (let i = 0; i < tries; i++) {
+//     try {
+//       // it awaits otherwise it'd always do all the retries
+//       clearTimeout(timeoutHandle)
+//       return await inFunction(...params)
+//     } catch (error) {
+//       if (dontRetry.some((msg) => (error as Error).message.includes(msg))) {
+//         throw error
+//       }
+//       saveError = error
+//       if (logger) {
+//         logger(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
+//       }
+//     }
+//     if (i < tries - 1) {
+//       await sleep(Math.pow(factor, i) * delayMs)
+//     }
+//   }
+
+//   clearTimeout(timeoutHandle)
+//   throw saveError
+// }
+
 /**
  * Map an async function over a list xs with a given concurrency level
  *
