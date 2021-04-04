@@ -140,11 +140,22 @@ export async function concurrentValuesMap<IN extends any, OUT extends any>(
   }, {})
 }
 
+/**
+ * Wraps an async function in a timeout before calling it.
+ *
+ * setTimeout rejects to (throws) whatever you pass in as its 3rd argument when the timeout is reached.
+ * The Promise that wraps it also rejects to the same value, as does the Promise.race that we return.
+ *
+ * @param inFunction The async function to call
+ * @param params The parameters of the async function
+ * @param timeoutMs The timeout in milliseconds
+ * @param timeoutError The value to which the returned Promise should reject to
+ */
 export const timeout = <T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,
   timeoutMs: number,
-  timeoutRes: any,
+  timeoutError: any,
   logger: Logger | null = null
 ) => {
   let timer: number
@@ -158,7 +169,7 @@ export const timeout = <T extends any[], U>(
           }
         },
         timeoutMs,
-        timeoutRes
+        timeoutError
       )
     }),
   ]).finally(() => {
