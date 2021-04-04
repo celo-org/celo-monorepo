@@ -1,8 +1,8 @@
+import { concurrentMap, sleep } from '@celo/base'
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import { queryOdisForSalt } from './query'
-
 export const runTest = async () => {
   logger.info('Performing test query')
   try {
@@ -22,4 +22,22 @@ export const runTest = async () => {
   }
 }
 
-runTest()
+export const loop = async () => {
+  while (true) {
+    const reqs = []
+    for (let i = 0; i < 100; i++) {
+      reqs.push(i)
+    }
+
+    await concurrentMap(100, reqs, async (i) => {
+      await sleep(i * 10)
+      try {
+        while (true) {
+          await runTest()
+        }
+      } catch {}
+    })
+  }
+}
+
+loop()
