@@ -138,9 +138,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
   }
 
   if (isAccountVerified) {
-    const isAccountVerifiedMeter = Histograms.getBlindedSigInstrumentation
-      .labels('isAccountVerified')
-      .startTimer()
     Counters.requestsWithVerifiedAccount.inc()
     logger.debug({ account }, 'Account is verified')
     const transactionCount = await getTransactionCount(logger, account, walletAddress)
@@ -157,7 +154,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       quota,
     })
 
-    isAccountVerifiedMeter()
     return quota
   }
 
@@ -176,6 +172,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     cUSDAccountBalance = values[0] as BigNumber
     celoAccountBalance = values[1] as BigNumber
   })
+  getBalancesMeter()
 
   // Min balance can be in either cUSD or CELO
   if (
@@ -205,8 +202,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       transactionCount,
       quota,
     })
-
-    getBalancesMeter()
     return quota
   }
 
@@ -219,12 +214,14 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     quota: 0,
   })
   logger.debug({ account }, 'Account is not verified and does not meet min balance')
-  getBalancesMeter()
   return 0
 }
 
 export async function getTransactionCount(logger: Logger, ...addresses: string[]): Promise<number> {
-  return Promise.all(
+  const getTransactionCountMeter = Histograms.getBlindedSigInstrumentation
+    .labels('getTransactionCount')
+    .startTimer()
+  const res = Promise.all(
     addresses
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
@@ -239,6 +236,8 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
     logger.trace({ addresses, txCounts: values }, 'Fetched txCounts for addresses')
     return values.reduce((a, b) => a + b)
   })
+  getTransactionCountMeter()
+  return res
 }
 
 export async function getDollarBalance(logger: Logger, ...addresses: string[]): Promise<BigNumber> {
