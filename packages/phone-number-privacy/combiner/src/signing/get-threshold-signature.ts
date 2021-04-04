@@ -117,7 +117,7 @@ async function requestSignatures(request: Request, response: Response) {
           if (timedOut) {
             logger.error({ signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
           } else {
-            logger.warn({ signer: service }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
+            logger.info({ signer: service }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
           }
         } else {
           logger.error({ signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
