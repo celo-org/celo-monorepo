@@ -139,3 +139,29 @@ export async function concurrentValuesMap<IN extends any, OUT extends any>(
     return output
   }, {})
 }
+
+export const timeout = <T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  params: T,
+  timeoutMs: number,
+  timeoutRes: any,
+  logger: Logger | null = null
+) => {
+  let timer: number
+  return Promise.race([
+    inFunction(...params),
+    new Promise(() => {
+      timer = setTimeout(
+        () => {
+          if (logger) {
+            logger(`${TAG}/@timeout Timed out after ${timeoutMs}ms`)
+          }
+        },
+        timeoutMs,
+        timeoutRes
+      )
+    }),
+  ]).finally(() => {
+    clearTimeout(timer)
+  })
+}

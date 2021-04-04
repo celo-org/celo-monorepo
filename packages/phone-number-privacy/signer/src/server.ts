@@ -1,10 +1,11 @@
+import { timeout } from '@celo/base'
 import { loggerMiddleware, rootLogger as logger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import * as PromClient from 'prom-client'
-import { Histograms } from './common/metrics'
+import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
@@ -53,28 +54,23 @@ export function createServer() {
   }
 }
 
-async function callWithTimeout(
-  handler: (req: Request, res: Response) => Promise<void>,
-  req: Request,
-  res: Response,
-  timeout: number
-) {
-  const childLogger: Logger = res.locals.logger
-  let timer: number
-  return Promise.race([
-    handler(req, res),
-    new Promise(() => timer = setTimeout(() => childLogger.warn(`Timed out after ${timeout}ms`), timeout)),
-  ]).finally(() => clearTimeout(timer))
-}
-
 async function callAndMeterLatency(
   endpoint: Endpoints,
   handler: (req: Request, res: Response) => Promise<void>,
   req: Request,
   res: Response
 ) {
+  const childLogger: Logger = res.locals.logger
   const end = Histograms.responseLatency.labels(endpoint).startTimer()
-  await callWithTimeout(handler, req, res, config.timeout).finally(end)
+  const timeoutRes = Symbol()
+  await timeout(handler, [req, res], config.timeout, timeoutRes)
+    .catch((error: any) => {
+      if (error === timeoutRes) {
+        Counters.signatureRequestsWithoutSessionID.inc()
+        childLogger.warn(`Timed out after ${config.timeout}ms`)
+      }
+    })
+    .finally(end)
 }
 
 function getSslOptions() {

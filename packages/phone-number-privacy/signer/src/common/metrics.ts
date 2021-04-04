@@ -56,6 +56,10 @@ export const Counters = {
     name: 'signature_requests_without_session_id',
     help: 'Counter for the number of signature requests without a session id',
   }),
+  timeouts: new Counter({
+    name: 'timeouts',
+    help: 'Counter for the number of signer timeouts as measured by the signer',
+  }),
 }
 
 export const Histograms = {
