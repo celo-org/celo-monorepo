@@ -15,10 +15,11 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
 
     for (const stableToken of stableTokensToTest) {
       test(`transfer ${stableToken}`, async () => {
+        const stableTokenAmountToFund = ONE
         await fundAccountWithStableToken(
           context,
           TestAccounts.TransferFrom,
-          ONE.times(10),
+          stableTokenAmountToFund,
           stableToken
         )
         const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
@@ -36,8 +37,9 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
           `Get ${stableToken} Balance Before`
         )
 
+        const stableTokenAmountToTransfer = ONE.times(0.5)
         const receipt = await stableTokenInstance
-          .transfer(to.address, ONE.toString())
+          .transfer(to.address, stableTokenAmountToTransfer.toString())
           .sendAndWaitForReceipt({ from: from.address })
 
         logger.debug({ stabletoken: stableToken, receipt }, `Transferred ${stableToken}`)
@@ -52,13 +54,15 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
           { stabletoken: stableToken, balance: toBalanceAfter.toString(), account: to.address },
           `Get ${stableToken} Balance After`
         )
-        expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
+        expect(
+          toBalanceAfter.minus(toBalanceBefore).isEqualTo(stableTokenAmountToTransfer)
+        ).toBeTruthy()
         // check whether difference of balance of 'from' account before/after - transfer amount
         // is equal to transaction fee
         expect(
           fromBalanceBefore
             .minus(fromBalanceAfter)
-            .minus(ONE)
+            .minus(stableTokenAmountToTransfer)
             .isEqualTo(transactionFee)
         ).toBeTruthy()
       })

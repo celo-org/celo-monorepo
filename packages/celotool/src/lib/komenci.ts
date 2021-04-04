@@ -1,12 +1,4 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import {
-  assignRoleIdempotent,
-  createIdentityIdempotent,
-  deleteIdentity,
-  getAKSManagedServiceIdentityObjectId,
-  getAKSServicePrincipalObjectId,
-  getIdentity,
-} from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import {
   getFornoUrl,
@@ -20,9 +12,8 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
+import { createKeyVaultIdentityIfNotExists, deleteAzureKeyVaultIdentity } from './azure'
 import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
-import { AksClusterConfig } from './k8s-cluster/aks'
-
 const helmChartPath = '../helm-charts/komenci'
 const rbacHelmChartPath = '../helm-charts/komenci-rbac'
 
@@ -130,7 +121,11 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   for (const identity of komenciConfig.identities) {
     // If the identity is using Azure HSM signing, clean it up too
     if (identity.azureHsmIdentity) {
-      await deleteKomenciAzureIdentity(context, identity)
+      await deleteAzureKeyVaultIdentity(
+        context,
+        identity.azureHsmIdentity.identityName,
+        identity.azureHsmIdentity.keyVaultName
+      )
     }
   }
 }
@@ -201,8 +196,9 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
-    `--set onboarding.publicUrl=${'https://' +
-      getPublicHostname(clusterConfig.regionName, celoEnv)}`,
+    `--set onboarding.publicUrl=${
+      'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)
+    }`,
     `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
     `--set onboarding.ruleConfig.captcha.bypassToken=${fetchEnv(
       envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN
@@ -240,7 +236,14 @@ async function komenciIdentityHelmParameters(context: string, komenciConfig: Kom
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
     if (komenciIdentity.azureHsmIdentity) {
-      const azureIdentity = await createKomenciAzureIdentityIfNotExists(context, komenciIdentity)
+      const azureIdentity = await createKeyVaultIdentityIfNotExists(
+        context,
+        komenciIdentity.azureHsmIdentity.identityName,
+        komenciIdentity.azureHsmIdentity.keyVaultName,
+        komenciIdentity.azureHsmIdentity.resourceGroup,
+        ['get', 'list', 'sign'],
+        null
+      )
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
@@ -253,105 +256,6 @@ async function komenciIdentityHelmParameters(context: string, komenciConfig: Kom
     }
   }
   return params
-}
-
-/**
- * This creates an Azure identity for a specific komenci identity. Should only be
- * called when an komenci identity is using an Azure Key Vault for HSM signing
- */
-async function createKomenciAzureIdentityIfNotExists(
-  context: string,
-  komenciIdentity: KomenciIdentity
-) {
-  const clusterConfig = getAksClusterConfig(context)
-  const identity = await createIdentityIdempotent(
-    clusterConfig,
-    komenciIdentity.azureHsmIdentity!.identityName!
-  )
-  // We want to grant the identity for the cluster permission to manage the komenci identity.
-  // Get the correct object ID depending on the cluster configuration, either
-  // the service principal or the managed service identity.
-  // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
-  let assigneeObjectId = await getAKSServicePrincipalObjectId(clusterConfig)
-  let assigneePrincipalType = 'ServicePrincipal'
-  // TODO Check how to manage the MSI type
-  if (!assigneeObjectId) {
-    assigneeObjectId = await getAKSManagedServiceIdentityObjectId(clusterConfig)
-    // assigneePrincipalType = 'MSI'
-    assigneePrincipalType = 'ServicePrincipal'
-  }
-  await assignRoleIdempotent(
-    assigneeObjectId,
-    assigneePrincipalType,
-    identity.id,
-    'Managed Identity Operator'
-  )
-  // Allow the komenci identity to access the correct key vault
-  await setKomenciKeyVaultPolicyIfNotSet(clusterConfig, komenciIdentity, identity)
-  return identity
-}
-
-async function setKomenciKeyVaultPolicyIfNotSet(
-  clusterConfig: AksClusterConfig,
-  komenciIdentity: KomenciIdentity,
-  azureIdentity: any
-) {
-  const keyPermissions = ['get', 'list', 'sign']
-  const keyVaultResourceGroup = komenciIdentity.azureHsmIdentity!.resourceGroup
-    ? komenciIdentity.azureHsmIdentity!.resourceGroup
-    : clusterConfig.resourceGroup
-  const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-    `az keyvault show --name ${
-      komenciIdentity.azureHsmIdentity!.keyVaultName
-    } -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${
-      azureIdentity.principalId
-    }' && sort(permissions.keys) == [${keyPermissions.map((perm) => `'${perm}'`).join(', ')}]]"`
-  )
-  const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
-  if (keyVaultPolicies.length) {
-    console.info(
-      `Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${
-        komenciIdentity.azureHsmIdentity!.keyVaultName
-      } and identity objectId ${azureIdentity.principalId}`
-    )
-    return
-  }
-  console.info(
-    `Setting key permissions ${keyPermissions.join(' ')} for vault ${
-      komenciIdentity.azureHsmIdentity!.keyVaultName
-    } and identity objectId ${azureIdentity.principalId}`
-  )
-  return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${
-      komenciIdentity.azureHsmIdentity!.keyVaultName
-    } --key-permissions ${keyPermissions.join(' ')} --object-id ${
-      azureIdentity.principalId
-    } -g ${keyVaultResourceGroup}`
-  )
-}
-
-/**
- * deleteKomenciAzureIdentity deletes the key vault policy and the komenci's managed identity
- */
-async function deleteKomenciAzureIdentity(context: string, komenciIdentity: KomenciIdentity) {
-  const clusterConfig = getAksClusterConfig(context)
-  await deleteKomenciKeyVaultPolicy(clusterConfig, komenciIdentity)
-  return deleteIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)
-}
-
-async function deleteKomenciKeyVaultPolicy(
-  clusterConfig: AksClusterConfig,
-  komenciIdentity: KomenciIdentity
-) {
-  const azureIdentity = await getIdentity(
-    clusterConfig,
-    komenciIdentity.azureHsmIdentity!.identityName
-  )
-  return execCmdWithExitOnFailure(
-    `az keyvault delete-policy --name ${
-      komenciIdentity.azureHsmIdentity!.keyVaultName
-    } --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
-  )
 }
 
 /**

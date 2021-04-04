@@ -1131,6 +1131,7 @@ export async function writeGenesisWithMigrations(
     gethRepoPath,
     mnemonic,
     numValidators,
+    verbose,
     genesisConfig: {
       blockTime: 1,
       epoch: 10,
