@@ -15,7 +15,7 @@ export async function getPerformedQueryCount(account: string, logger: Logger): P
   logger.debug({ account }, 'Getting performed query count')
   try {
     const getPerformedQueryCountMeter = Histograms.getBlindedSigInstrumentation
-      .labels('getPerformedQuerCount')
+      .labels('getPerformedQueryCount')
       .startTimer()
     const queryCounts = await accounts()
       .select(ACCOUNTS_COLUMNS.numLookups)
