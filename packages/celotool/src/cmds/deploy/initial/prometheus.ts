@@ -28,9 +28,9 @@ export const builder = (argv: PrometheusInitialArgv) => {
 }
 
 export const handler = async (argv: PrometheusInitialArgv) => {
-  const context = await switchToClusterFromEnvOrContext(argv, argv.skipClusterSetup)
+  const clusterConfig = await switchToClusterFromEnvOrContext(argv, argv.skipClusterSetup)
 
-  await installPrometheusIfNotExists(context)
+  await installPrometheusIfNotExists(argv.context, clusterConfig)
   if (argv.deployGrafana) {
     await installGrafanaIfNotExists()
   }

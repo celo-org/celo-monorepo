@@ -26,9 +26,7 @@ export default class Register extends BaseCommand {
 
     const accounts = await this.kit.contracts.getAccounts()
 
-    await newCheckBuilder(this)
-      .isNotAccount(res.flags.from)
-      .runChecks()
+    await newCheckBuilder(this).isNotAccount(res.flags.from).runChecks()
     await displaySendTx('register', accounts.createAccount())
     if (res.flags.name) {
       await displaySendTx('setName', accounts.setName(res.flags.name))

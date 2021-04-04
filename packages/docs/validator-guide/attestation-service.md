@@ -22,11 +22,8 @@ This guide steps you through setting up an Attestation Service:
 
 ## Recent releases
 
-* Attestation Service v1.2.0 - forthcoming
-* [Attestation Service v1.1.0](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-v1.1.0) (latest production release)
-* [Attestation Service v1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5)
-* [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4)
-* [Attestation Service v1.0.3](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-3)
+* [Attestation Service v1.2.0](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-v1.2.0) (latest production release)
+* [Attestation Service v1.1.0](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-v1.1.0)
 
 ## Deployment Architecture
 
@@ -80,7 +77,7 @@ Note that Attestation Service from version 1.2.0 no longer requires callback URL
 
 ### MessageBird
 
-MessageBird support is introduced in version 1.2.0 and later. After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and approval to send SMS to certain countries that validators must support including the USA, Canada and others. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
+MessageBird support is introduced in version 1.2.0 and later. After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and/or KYC approval to send SMS to certain countries that validators must support. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. You will need to purchase separate numbers for both the USA and Canada. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
 
 ## Installation
 

@@ -70,9 +70,7 @@ export default class Show extends BaseCommand {
 
     const governance = await this.kit.contracts.getGovernance()
     if (id) {
-      await newCheckBuilder(this)
-        .proposalExists(id)
-        .runChecks()
+      await newCheckBuilder(this).proposalExists(id).runChecks()
 
       const record = await governance.getProposalRecord(id)
       const proposal = record.proposal

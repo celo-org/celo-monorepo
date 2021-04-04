@@ -1,3 +1,4 @@
+import { CeloContract, RegisteredContracts } from '@celo/contractkit'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
@@ -43,6 +44,13 @@ const parseAddress: ParseFn<string> = (input) => {
     return input
   } else {
     throw new CLIError(`${input} is not a valid address`)
+  }
+}
+const parseCoreContract: ParseFn<string> = (input) => {
+  if (RegisteredContracts.includes(input as CeloContract)) {
+    return input
+  } else {
+    throw new CLIError(`${input} is not a core contract`)
   }
 }
 
@@ -160,6 +168,16 @@ export const Flags = {
     parse: parseBlsProofOfPossession,
     description: 'BLS Proof-of-Possession',
     helpValue: '0x',
+  }),
+  contract: flags.build({
+    parse: parseCoreContract,
+    description: 'Core Contract Name',
+    helpValue: `${CeloContract.BlockchainParameters}`,
+  }),
+  contractsArray: flags.build({
+    parse: parseArray(parseCoreContract),
+    description: 'Array of Registered Core Contracts',
+    helpValue: `\'["${CeloContract.BlockchainParameters}", "${CeloContract.Governance}", "${CeloContract.Validators}"]\'`,
   }),
   phoneNumber: flags.build({
     parse: parsePhoneNumber,
