@@ -7,7 +7,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
 import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
@@ -21,7 +21,7 @@ contract Election is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   UsingPrecompiles,
   CalledByVm
@@ -136,7 +136,7 @@ contract Election is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -161,6 +161,12 @@ contract Election is
     setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
     setElectabilityThreshold(_electabilityThreshold);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Updates the minimum and maximum number of validators that can be elected.
@@ -270,6 +276,21 @@ contract Election is
    */
   function activate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
+    return _activate(group, account);
+  }
+
+  /**
+   * @notice Converts `account`'s pending votes for `group` to active votes.
+   * @param group The validator group to vote for.
+   * @param account The validateor group account's pending votes to active votes
+   * @return True upon success.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
+    return _activate(group, account);
+  }
+
+  function _activate(address group, address account) internal returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;

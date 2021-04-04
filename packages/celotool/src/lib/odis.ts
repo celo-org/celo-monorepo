@@ -136,7 +136,7 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set db.host=${databaseConfig.host}`,
     `--set db.port=${databaseConfig.port}`,
     `--set db.username=${databaseConfig.username}`,
-    `--set db.password=${databaseConfig.password}`,
+    `--set db.password='${databaseConfig.password}'`,
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
     `--set keystore.secretName=${keyVaultConfig.secretName}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
