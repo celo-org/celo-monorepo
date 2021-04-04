@@ -44,7 +44,7 @@ export async function handleGetBlindedMessagePartialSig(
   logger.info({ request: request.body }, 'Request received')
   if (!request.body.sessionID) {
     logger.debug({ request: request.body }, 'Request does not have sessionID')
-    Counters.signatureRequestsWithoutSessionID.inc()
+    Counters.timeouts.inc()
   }
   logger.debug('Begin handleGetBlindedMessagePartialSig')
 
