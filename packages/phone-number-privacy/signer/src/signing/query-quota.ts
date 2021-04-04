@@ -110,6 +110,9 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
+  const getWalletAddressMeter = Histograms.getBlindedSigInstrumentation
+    .labels('getWalletAddress')
+    .startTimer()
   const [_walletAddress, _isAccountVerified] = await Promise.allSettled([
     getWalletAddress(logger, account),
     new Promise((resolve) =>
@@ -118,6 +121,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       )
     ),
   ])
+  getWalletAddressMeter()
   let walletAddress = _walletAddress.status === 'fulfilled' ? _walletAddress.value : NULL_ADDRESS
   const isAccountVerified =
     _isAccountVerified.status === 'fulfilled' ? _isAccountVerified.value : false
@@ -134,6 +138,9 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
   }
 
   if (isAccountVerified) {
+    const isAccountVerifiedMeter = Histograms.getBlindedSigInstrumentation
+      .labels('isAccountVerified')
+      .startTimer()
     Counters.requestsWithVerifiedAccount.inc()
     logger.debug({ account }, 'Account is verified')
     const transactionCount = await getTransactionCount(logger, account, walletAddress)
@@ -150,9 +157,11 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       quota,
     })
 
+    isAccountVerifiedMeter()
     return quota
   }
 
+  const getBalancesMeter = Histograms.getBlindedSigInstrumentation.labels('balances').startTimer()
   let cUSDAccountBalance = new BigNumber(0)
   let celoAccountBalance = new BigNumber(0)
 
@@ -197,6 +206,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       quota,
     })
 
+    getBalancesMeter()
     return quota
   }
 
@@ -209,7 +219,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     quota: 0,
   })
   logger.debug({ account }, 'Account is not verified and does not meet min balance')
-
+  getBalancesMeter()
   return 0
 }
 
