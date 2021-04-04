@@ -76,6 +76,7 @@ interface Config {
       secretKey: string
     }
   }
+  timeout: number
 }
 
 const env = process.env as any
@@ -129,5 +130,6 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
+  timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
 }
 export default config
