@@ -50,6 +50,8 @@ relayer:
     prometheusPort: 9090
   walletType: azure-hsm
   gasPriceUpdateIntervalMs: "1200000"
+  gasPriceMultiplier: 5
+  maxGasPrice: "30000000000" # 30 gwei
 
 onboarding:
   node_env: production
@@ -57,6 +59,9 @@ onboarding:
     repository: celotestnet.azurecr.io/komenci/onboarding
     tag: dae43ddce108a73da07dce73875b980ff077c7d4
   replicas: 2
+  throttle:
+    ttl: 60
+    limit: 25
   ruleEnabled:
     signature: true
     captcha: true
@@ -73,8 +78,6 @@ onboarding:
     host: alfajores-relayer
     port: 3000
     rpcTimeoutMs: 12000
-    gasPriceMultiplier: 1
-    maxGasPrice: "30000000000" # 30 gwei
   db:
     host: komenci-komenci-postgresql
     port: 5432
