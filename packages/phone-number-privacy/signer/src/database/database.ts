@@ -7,7 +7,7 @@ import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
   logger.info({ config: config.db }, 'Initializing database connection')
-  const { type, host, port, user, password, database, ssl } = config.db
+  const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
 
   let dbConfig: any
   let client: string
@@ -49,7 +49,7 @@ export async function initDatabase(doTestQuery = true) {
 
   db = knex({
     client,
-    connection: dbConfig,
+    connection: { ...dbConfig, pool: { max: poolMaxSize } },
     debug: DEV_MODE,
   })
 
