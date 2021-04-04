@@ -76,9 +76,11 @@ async function requestSignatures(request: Request, response: Response) {
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
   const signers = JSON.parse(config.odisServices.signers) as SignerService[]
+  let timedOut = false
   const signerReqs = signers.map((service) => {
     const controller = new AbortController()
     const timeout = setTimeout(() => {
+      timedOut = true
       controller.abort()
     }, config.odisServices.timeoutMilliSeconds)
 
@@ -112,7 +114,11 @@ async function requestSignatures(request: Request, response: Response) {
       })
       .catch((err) => {
         if (err.name === 'AbortError') {
-          logger.error({ signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+          if (timedOut) {
+            logger.error({ signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+          } else {
+            logger.warn({ signer: service }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
+          }
         } else {
           logger.error({ signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
         }
