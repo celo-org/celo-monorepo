@@ -66,7 +66,7 @@ async function callAndMeterLatency(
   await timeout(handler, [req, res], config.timeout, timeoutRes)
     .catch((error: any) => {
       if (error === timeoutRes) {
-        Counters.signatureRequestsWithoutSessionID.inc()
+        Counters.timeouts.inc()
         childLogger.warn(`Timed out after ${config.timeout}ms`)
       }
     })
