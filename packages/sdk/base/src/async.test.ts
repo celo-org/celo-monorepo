@@ -48,8 +48,17 @@ describe('selectiveRetryAsyncWithBackOff()', () => {
 
 describe('retryAsyncWithBackOffAndTimeout()', () => {
   test('tries once if it works', async () => {
-    const mockFunction = jest.fn()
-    await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1)
+    const mockFunction = jest.fn(async () => {
+      await sleep(10)
+      return true
+    })
+    const result: boolean = await retryAsyncWithBackOffAndTimeout<void[], boolean>(
+      mockFunction,
+      3,
+      [],
+      1
+    )
+    expect(result).toBeTruthy()
     expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 

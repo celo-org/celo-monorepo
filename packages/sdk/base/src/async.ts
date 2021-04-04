@@ -109,7 +109,7 @@ export const retryAsyncWithBackOffAndTimeout = async <T extends any[], U>(
   logger: Logger | null = null
 ) => {
   let timeoutHandle: number
-  const timeoutPromise = new Promise((_resolve, reject) => {
+  const timeoutPromise = new Promise<U>((_resolve, reject) => {
     timeoutHandle = setTimeout(() => {
       if (logger) {
         logger(`${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`)
