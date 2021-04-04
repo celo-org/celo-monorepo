@@ -8,7 +8,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
-import { RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
+import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 const ec = new EC('secp256k1')
 
@@ -81,7 +81,9 @@ export async function getDataEncryptionKey(
     },
     RETRY_COUNT,
     [],
-    RETRY_DELAY_IN_MS
+    RETRY_DELAY_IN_MS,
+    1.5,
+    FULL_NODE_TIMEOUT_IN_MS
   )
 }
 
@@ -113,7 +115,9 @@ export async function isVerified(
       },
       RETRY_COUNT,
       [],
-      RETRY_DELAY_IN_MS
+      RETRY_DELAY_IN_MS,
+      1.5,
+      FULL_NODE_TIMEOUT_IN_MS
     )
   } catch (error) {
     logger.error('Failed to get verification status: ' + error.message)
