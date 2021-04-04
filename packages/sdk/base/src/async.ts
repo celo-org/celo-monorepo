@@ -108,7 +108,7 @@ export const retryAsyncWithBackOffAndTimeout = async <T extends any[], U>(
   timeoutMs = 2000,
   logger: Logger | null = null
 ) => {
-  let timeoutHandle: number
+  let timeoutHandle: any
   const timeoutPromise = new Promise<U>((_resolve, reject) => {
     timeoutHandle = setTimeout(() => {
       if (logger) {
