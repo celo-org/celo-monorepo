@@ -109,7 +109,7 @@ const config: Config = {
     host: env.DB_HOST,
     port: env.DB_PORT ? toNum(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
-    poolMaxSize: parseInt(env.DB_POOL_MAX_SIZE) || 50,
+    poolMaxSize: Number(env.DB_POOL_MAX_SIZE) || 50,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
