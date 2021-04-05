@@ -69,7 +69,7 @@ export class LedgerSigner implements Signer {
         if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
           debug('Possible invalid feeCurrency field')
           throw new Error(
-            'ledger-signer@singTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
+            'ledger-signer@signTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
           )
         } else {
           transportErrorFriendlyMessage(error)

@@ -8,7 +8,7 @@ export default class ValidatorGroupShow extends BaseCommand {
   static description = 'Show information about an existing Validator Group'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   static args: IArg[] = [Args.address('groupAddress', { description: "ValidatorGroup's address" })]
@@ -19,9 +19,7 @@ export default class ValidatorGroupShow extends BaseCommand {
     const res = this.parse(ValidatorGroupShow)
     const validators = await this.kit.contracts.getValidators()
 
-    await newCheckBuilder(this)
-      .isValidatorGroup(res.args.groupAddress)
-      .runChecks()
+    await newCheckBuilder(this).isValidatorGroup(res.args.groupAddress).runChecks()
 
     const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
     printValueMap(validatorGroup)

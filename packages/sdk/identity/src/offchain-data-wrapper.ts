@@ -3,6 +3,8 @@ import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/r
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity/claims/types'
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity/metadata'
+import { publicKeyToAddress } from '@celo/utils/lib/address'
+import { ensureUncompressed } from '@celo/utils/lib/ecdh'
 import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
@@ -20,26 +22,26 @@ export enum OffchainErrorTypes {
   NoStorageProvider = 'NoStorageProvider',
 }
 
-class FetchError extends RootError<OffchainErrorTypes.FetchError> {
+export class FetchError extends RootError<OffchainErrorTypes.FetchError> {
   constructor(error: Error) {
     super(OffchainErrorTypes.FetchError)
     this.message = error.message
   }
 }
 
-class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
+export class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
   constructor() {
     super(OffchainErrorTypes.InvalidSignature)
   }
 }
 
-class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
+export class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
   constructor() {
     super(OffchainErrorTypes.NoStorageRootProvidedData)
   }
 }
 
-class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
+export class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
   constructor() {
     super(OffchainErrorTypes.NoStorageProvider)
   }
@@ -51,7 +53,20 @@ export type OffchainErrors =
   | NoStorageRootProvidedData
   | NoStorageProvider
 
-export default class OffchainDataWrapper {
+export interface OffchainDataWrapper {
+  kit: ContractKit
+  signer: Address
+  self: Address
+  writeDataTo(data: Buffer, signature: Buffer, dataPath: string): Promise<OffchainErrors | void>
+  readDataFromAsResult<DataType>(
+    account: Address,
+    dataPath: string,
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
+  ): Promise<Result<Buffer, OffchainErrors>>
+}
+
+export class BasicDataWrapper implements OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
   signer: string
 
@@ -158,12 +173,17 @@ class StorageRoot {
 
     const accounts = await this.wrapper.kit.contracts.getAccounts()
     if (await accounts.isAccount(this.account)) {
-      const signers = await Promise.all([
+      const keys = await Promise.all([
         accounts.getVoteSigner(this.account),
         accounts.getValidatorSigner(this.account),
         accounts.getAttestationSigner(this.account),
+        accounts.getDataEncryptionKey(this.account),
       ])
-      if (signers.some((signer) => signer === guessedSigner)) {
+
+      const dekAddress = keys[3] ? publicKeyToAddress(ensureUncompressed(keys[3])) : '0x0'
+      const signers = [keys[0], keys[1], keys[2], dekAddress]
+
+      if (signers.some((signer) => eqAddress(signer, guessedSigner))) {
         return Ok(body)
       }
 

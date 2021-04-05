@@ -6,6 +6,7 @@ import { appendPath } from '@celo/base/lib/string'
 import { Address, toTransactionObject } from '@celo/connect'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { AttestationRequest, GetAttestationRequest } from '@celo/utils/lib/io'
+import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { CeloContract } from '../base'
@@ -62,6 +63,7 @@ export interface ActionableAttestation {
   blockNumber: number
   attestationServiceURL: string
   name: string | undefined
+  version: string
 }
 
 type AttestationServiceRunningCheckResult =
@@ -329,8 +331,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
         const nameClaim = metadata.findClaim(ClaimTypes.NAME)
 
-        // TODO: Once we have status indicators, we should check if service is up
-        // https://github.com/celo-org/celo-monorepo/issues/1586
+        const resp = await fetch(
+          `${attestationServiceURLClaim.url}${
+            attestationServiceURLClaim.url.substr(-1) === '/' ? '' : '/'
+          }status`
+        )
+        if (!resp.ok) {
+          throw new Error(`Request failed with status ${resp.status}`)
+        }
+        const { status, version } = await resp.json()
+
+        if (status !== 'ok') {
+          return { isValid: false, issuer: arg.issuer }
+        }
+
         return {
           isValid: true,
           result: {
@@ -338,6 +352,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
             issuer: arg.issuer,
             attestationServiceURL: attestationServiceURLClaim.url,
             name: nameClaim ? nameClaim.name : undefined,
+            version,
           },
         }
       } catch (error) {
@@ -590,22 +605,47 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param serviceURL: validator's attestation service URL
    * @param body
    */
-  getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
+  async getAttestationForSecurityCode(
+    serviceURL: string,
+    requestBody: GetAttestationRequest,
+    signer: Address
+  ): Promise<string> {
     const urlParams = new URLSearchParams({
       phoneNumber: requestBody.phoneNumber,
       account: requestBody.account,
       issuer: requestBody.issuer,
     })
+
+    let additionalHeaders = {}
     if (requestBody.salt) {
       urlParams.set('salt', requestBody.salt)
     }
     if (requestBody.securityCode) {
       urlParams.set('securityCode', requestBody.securityCode)
+      const signature = await this.kit.signTypedData(
+        signer,
+        buildSecurityCodeTypedData(requestBody.securityCode)
+      )
+      additionalHeaders = {
+        Authentication: SignatureUtils.serializeSignature(signature),
+      }
     }
-    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+
+    const response = await fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...additionalHeaders },
     })
+
+    const { ok, status } = response
+    if (ok) {
+      const body = await response.json()
+      if (body.attestationCode) {
+        return body.attestationCode
+      }
+    }
+    throw new Error(
+      `Error getting security code for ${requestBody.issuer}. ${status}: ${await response.text()}`
+    )
   }
 
   /**
@@ -676,6 +716,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     if (!metadataURL) {
       ret.state = AttestationServiceStatusState.NoMetadataURL
+      return ret
+    }
+
+    if (metadataURL.startsWith('http://')) {
+      ret.state = AttestationServiceStatusState.InvalidAttestationServiceURL
+      return ret
     }
 
     try {
@@ -769,6 +815,7 @@ export enum AttestationServiceStatusState {
   NoMetadataURL = 'NoMetadataURL',
   InvalidMetadata = 'InvalidMetadata',
   NoAttestationServiceURL = 'NoAttestationServiceURL',
+  InvalidAttestationServiceURL = 'InvalidAttestationServiceURL',
   UnreachableAttestationService = 'UnreachableAttestationService',
   Valid = 'Valid',
   UnreachableHealthz = 'UnreachableHealthz',

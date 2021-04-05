@@ -16,12 +16,16 @@ View the [Developer Code Examples page](start.md) to get started using the Celo 
   - Manage connections to the Celo blockchain, accounts, send transactions, interact with smart contracts, etc.
   - A set of wrappers around the core protocol smart contracts to easily connect with contracts related to governance, validators, on-chain exchange, etc.
   - Includes [web3.js](https://web3js.readthedocs.io/en/v1.2.4/)
-- [Celo Ethers.js Wrapper](https://github.com/celo-tools/celo-ethers-wrapper) (*experimental*)
+- [Celo Ethers.js Wrapper](https://github.com/celo-tools/celo-ethers-wrapper) (_experimental_)
   - A minimal wrapper to make [ethers.js](https://docs.ethers.io/v5/) compatible with the Celo network
+- [use-contractkit](https://github.com/celo-tools/use-contractkit)
+  - A [Web3Modal](https://web3modal.com/)-like experience that injects ContractKit into your application. Supports a variety of different wallets, including but not limited to Valora, Ledger, Metamask (Celo compatible fork) and any WalletConnect compatible wallets
 - [DappKit](dappkit/)
   - Easily connect to the [Valora](http://valoraapp.com/) wallet
   - Valora manages user account, private keys and transaction signing, so you can focus on building your dapp
   - Learn more and see the code with the [Dappkit truffle box](https://github.com/critesjosh/celo-dappkit)
+- [Python SDK](https://github.com/blaize-tech/celo-sdk-py)
+- [Java SDK](https://github.com/blaize-tech/celo-sdk-java)
 
 ### Infrastructure
 
@@ -57,11 +61,11 @@ View the [Developer Code Examples page](start.md) to get started using the Celo 
 
 - [Community projects](celo-dapp-gallery.md)
 - [Grant recipients](https://celo.org/experience/grants/directory)
-- Python & Java SDKs
-- Web wallet (like Metamask)
+- Web wallets
+  - [celowallet.app](https://celowallet.app)
+  - [Celo Terminal](https://github.com/zviadm/celoterminal/)
 
 ## Community
 
 - Join our [Discord](https://chat.celo.org)
 - [Discourse Forum](https://forum.celo.org/)
-  

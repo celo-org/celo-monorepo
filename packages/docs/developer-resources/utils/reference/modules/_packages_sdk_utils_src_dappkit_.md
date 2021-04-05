@@ -47,7 +47,7 @@
 
 Ƭ **AccountAuthResponse**: *[AccountAuthResponseSuccess](../interfaces/_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md) | [AccountAuthResponseFailure](../interfaces/_packages_sdk_utils_src_dappkit_.accountauthresponsefailure.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:59](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L59)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L59)*
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 Ƭ **DappKitRequest**: *[AccountAuthRequest](../interfaces/_packages_sdk_utils_src_dappkit_.accountauthrequest.md) | [SignTxRequest](../interfaces/_packages_sdk_utils_src_dappkit_.signtxrequest.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:131](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L131)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:131](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L131)*
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 Ƭ **DappKitResponse**: *[AccountAuthResponse](_packages_sdk_utils_src_dappkit_.md#accountauthresponse) | [SignTxResponse](_packages_sdk_utils_src_dappkit_.md#signtxresponse)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:80](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L80)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L80)*
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 Ƭ **SignTxResponse**: *[SignTxResponseSuccess](../interfaces/_packages_sdk_utils_src_dappkit_.signtxresponsesuccess.md) | [SignTxResponseFailure](../interfaces/_packages_sdk_utils_src_dappkit_.signtxresponsefailure.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:78](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L78)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L78)*
 
 ## Variables
 
@@ -79,7 +79,7 @@ ___
 
 • **DAPPKIT_BASE_HOST**: *"celo://wallet/dappkit"* = "celo://wallet/dappkit"
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:4](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L4)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L4)*
 
 ## Functions
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **AccountAuthRequest**(`meta`: [DappKitRequestMeta](../interfaces/_packages_sdk_utils_src_dappkit_.dappkitrequestmeta.md)): *[AccountAuthRequest](../interfaces/_packages_sdk_utils_src_dappkit_.accountauthrequest.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:32](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L32)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L32)*
 
 **Parameters:**
 
@@ -103,7 +103,7 @@ ___
 
 ▸ **AccountAuthResponseSuccess**(`address`: string, `phoneNumber`: string): *[AccountAuthResponseSuccess](../interfaces/_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:44](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L44)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L44)*
 
 **Parameters:**
 
@@ -120,7 +120,7 @@ ___
 
 ▸ **SignTxRequest**(`txs`: [TxToSignParam](../interfaces/_packages_sdk_utils_src_dappkit_.txtosignparam.md)[], `meta`: [DappKitRequestMeta](../interfaces/_packages_sdk_utils_src_dappkit_.dappkitrequestmeta.md)): *[SignTxRequest](../interfaces/_packages_sdk_utils_src_dappkit_.signtxrequest.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:117](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L117)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L117)*
 
 **Parameters:**
 
@@ -137,7 +137,7 @@ ___
 
 ▸ **SignTxResponseSuccess**(`rawTxs`: string[]): *[SignTxResponseSuccess](../interfaces/_packages_sdk_utils_src_dappkit_.signtxresponsesuccess.md)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:67](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L67)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L67)*
 
 **Parameters:**
 
@@ -153,7 +153,7 @@ ___
 
 ▸ **parseDappKitRequestDeeplink**(`url`: string): *[DappKitRequest](_packages_sdk_utils_src_dappkit_.md#dappkitrequest)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:233](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L233)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:233](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L233)*
 
 **Parameters:**
 
@@ -169,7 +169,7 @@ ___
 
 ▸ **parseDappkitResponseDeeplink**(`url`: string): *[DappKitResponse](_packages_sdk_utils_src_dappkit_.md#dappkitresponse) & object*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:176](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L176)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L176)*
 
 **Parameters:**
 
@@ -185,7 +185,7 @@ ___
 
 ▸ **produceResponseDeeplink**(`request`: [DappKitRequest](_packages_sdk_utils_src_dappkit_.md#dappkitrequest), `response`: [DappKitResponse](_packages_sdk_utils_src_dappkit_.md#dappkitresponse)): *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:82](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L82)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L82)*
 
 **Parameters:**
 
@@ -202,7 +202,7 @@ ___
 
 ▸ **serializeDappKitRequestDeeplink**(`request`: [DappKitRequest](_packages_sdk_utils_src_dappkit_.md#dappkitrequest)): *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:145](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L145)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:145](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L145)*
 
 **Parameters:**
 

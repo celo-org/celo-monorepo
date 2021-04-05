@@ -35,9 +35,10 @@ export const loop = async () => {
         while (true) {
           await runTest()
         }
-      } catch {}
+      } catch {} // tslint:disable-line:no-empty
     })
   }
 }
 
-loop()
+loop() // tslint:disable-line:no-floating-promises
+

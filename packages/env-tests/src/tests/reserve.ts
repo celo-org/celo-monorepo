@@ -2,13 +2,13 @@ import { CeloContract } from '@celo/contractkit'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
+import { fundAccountWithcUSD, getKey, ONE, TestAccounts } from '../scaffold'
 export function runReserveTest(context: EnvTestContext) {
   describe('Reserve Test', () => {
     const logger = context.logger.child({ test: 'reserve' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.ReserveSpender, ONE.times(2))
-      await fundAccount(context, TestAccounts.ReserveCustodian, ONE.times(2))
+      await fundAccountWithcUSD(context, TestAccounts.ReserveSpender, ONE.times(2))
+      await fundAccountWithcUSD(context, TestAccounts.ReserveCustodian, ONE.times(2))
     })
 
     // TODO: Check if reserve account is authorized
@@ -20,9 +20,16 @@ export function runReserveTest(context: EnvTestContext) {
       const reserve = await context.kit.contracts.getReserve()
       const goldToken = await context.kit.contracts.getGoldToken()
 
-      const spenders = await reserve.getSpenders()
-      expect(spenders).toHaveLength(1)
-      const spenderMultiSigAddress = spenders[0]
+      // Find an alternate way to get the reserve spender address
+      let spenderMultiSigAddress = context.reserveSpenderMultiSigAddress
+
+      if (!spenderMultiSigAddress) {
+        context.logger.debug('have to get reserve spender multisig address')
+        const spenders = await reserve.getSpenders()
+        expect(spenders).toHaveLength(1)
+        spenderMultiSigAddress = spenders[0]
+        context.logger.debug({ spenderMultiSigAddress }, 'got reserve spender address')
+      }
 
       const custodians = await reserve.getOtherReserveAddresses()
       expect(custodians).toContain(custodian.address)

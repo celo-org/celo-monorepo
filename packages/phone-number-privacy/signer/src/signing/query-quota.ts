@@ -2,6 +2,7 @@ import { NULL_ADDRESS } from '@celo/contractkit'
 import {
   authenticateUser,
   ErrorMessage,
+  GetQuotaRequest,
   hasValidAccountParam,
   isBodyReasonablySized,
   isVerified,
@@ -23,19 +24,6 @@ import { Endpoints } from '../server'
 import { getContractKit } from '../web3/contracts'
 
 allSettled.shim()
-
-export interface GetQuotaRequest {
-  account: string
-  hashedPhoneNumber?: string
-  sessionID?: string
-}
-
-export interface GetQuotaResponse {
-  success: boolean
-  version: string
-  performedQueryCount: number
-  totalQuota: number
-}
 
 export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,

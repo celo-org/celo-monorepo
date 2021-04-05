@@ -3,7 +3,7 @@ import {
   deallocateStaticIP,
   getAKSNodeResourceGroup,
   registerStaticIPIfNotRegistered,
-  waitForStaticIPDetachment
+  waitForStaticIPDetachment,
 } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { AksClusterConfig } from '../k8s-cluster/aks'
@@ -22,7 +22,11 @@ export class AksFullNodeDeployer extends BaseFullNodeDeployer {
       `--set geth.public_ip_per_node='{${staticIps}}'`,
       // Azure has a special annotation to expose TCP and UDP on the same service.
       // Only TCP needs to be specified in that case.
-      `--set geth.service_protocols='{TCP}'`
+      `--set geth.service_protocols='{TCP}'`,
+      // Fix for LES server panic-- don't serve any LES clients!
+      `--set geth.maxpeers=150`,
+      `--set geth.light.maxpeers=0`,
+      `--set geth.light.serve=0`,
     ]
   }
 
@@ -80,7 +84,8 @@ export class AksFullNodeDeployer extends BaseFullNodeDeployer {
   }
 
   async getFullNodeIP(index: number, resourceGroup?: string): Promise<string> {
-    resourceGroup = resourceGroup || await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig)
+    resourceGroup =
+      resourceGroup || (await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig))
     return registerStaticIPIfNotRegistered(`${this.staticIPNamePrefix}-${index}`, resourceGroup)
   }
 

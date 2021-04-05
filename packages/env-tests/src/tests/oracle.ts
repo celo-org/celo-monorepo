@@ -2,13 +2,13 @@ import { CeloContract } from '@celo/contractkit'
 import { describe, expect, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
+import { fundAccountWithcUSD, getKey, ONE, TestAccounts } from '../scaffold'
 
 export function runOracleTest(context: EnvTestContext) {
   describe('Oracle Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.Exchange, ONE.times(2))
+      await fundAccountWithcUSD(context, TestAccounts.Exchange, ONE.times(2))
     })
 
     // TODO: Check if oracle account is authorized
@@ -44,7 +44,7 @@ export function runOracleTest(context: EnvTestContext) {
       }
 
       // Move the rate in one direction or another
-      rateToReport = rateToReport.times(0.95 + Math.random() * 0.1)
+      rateToReport = rateToReport.times(0.95 + Math.random() * 0.1).decimalPlaces(10)
 
       const reportTx = await oracles.report(CeloContract.StableToken, rateToReport, from.address)
       const reportTxReceipt = await reportTx.sendAndWaitForReceipt({ from: from.address })

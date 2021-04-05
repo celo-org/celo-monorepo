@@ -61,16 +61,17 @@
 
 ###  constructor
 
-\+ **new Connection**(`web3`: Web3, `wallet?`: [ReadOnlyWallet](../interfaces/_wallet_.readonlywallet.md)): *[Connection](_connection_.connection.md)*
+\+ **new Connection**(`web3`: Web3, `wallet?`: [ReadOnlyWallet](../interfaces/_wallet_.readonlywallet.md), `handleRevert`: boolean): *[Connection](_connection_.connection.md)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:52](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L52)*
+*Defined in [packages/sdk/connect/src/connection.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L52)*
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`web3` | Web3 |
-`wallet?` | [ReadOnlyWallet](../interfaces/_wallet_.readonlywallet.md) |
+Name | Type | Default |
+------ | ------ | ------ |
+`web3` | Web3 | - |
+`wallet?` | [ReadOnlyWallet](../interfaces/_wallet_.readonlywallet.md) | - |
+`handleRevert` | boolean | true |
 
 **Returns:** *[Connection](_connection_.connection.md)*
 
@@ -80,7 +81,7 @@ Name | Type |
 
 • **paramsPopulator**: *[TxParamsNormalizer](_utils_tx_params_normalizer_.txparamsnormalizer.md)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:48](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L48)*
+*Defined in [packages/sdk/connect/src/connection.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L48)*
 
 ___
 
@@ -88,7 +89,7 @@ ___
 
 • **rpcCaller**: *[RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:49](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L49)*
+*Defined in [packages/sdk/connect/src/connection.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L49)*
 
 ___
 
@@ -96,7 +97,7 @@ ___
 
 • **wallet**? : *[ReadOnlyWallet](../interfaces/_wallet_.readonlywallet.md)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L54)*
+*Defined in [packages/sdk/connect/src/connection.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L54)*
 
 ___
 
@@ -104,7 +105,7 @@ ___
 
 • **web3**: *Web3*
 
-*Defined in [packages/sdk/connect/src/connection.ts:54](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L54)*
+*Defined in [packages/sdk/connect/src/connection.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L54)*
 
 ## Accessors
 
@@ -112,7 +113,7 @@ ___
 
 • **get defaultAccount**(): *[Address](../modules/_types_.md#address) | undefined*
 
-*Defined in [packages/sdk/connect/src/connection.ts:96](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L96)*
+*Defined in [packages/sdk/connect/src/connection.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L98)*
 
 Default account for generated transactions (eg. tx.from)
 
@@ -120,7 +121,7 @@ Default account for generated transactions (eg. tx.from)
 
 • **set defaultAccount**(`address`: [Address](../modules/_types_.md#address) | undefined): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:88](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L88)*
+*Defined in [packages/sdk/connect/src/connection.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L90)*
 
 Set default account for generated transactions (eg. tx.from )
 
@@ -138,7 +139,7 @@ ___
 
 • **get defaultFeeCurrency**(): *undefined | string*
 
-*Defined in [packages/sdk/connect/src/connection.ts:128](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L128)*
+*Defined in [packages/sdk/connect/src/connection.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L130)*
 
 Set the ERC20 address for the token to use to pay for transaction fees.
 The ERC20 must be whitelisted for gas.
@@ -149,7 +150,7 @@ Set to `null` to use CELO
 
 • **set defaultFeeCurrency**(`address`: [Address](../modules/_types_.md#address) | undefined): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:124](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L124)*
+*Defined in [packages/sdk/connect/src/connection.ts:126](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L126)*
 
 Set the ERC20 address for the token to use to pay for transaction fees.
 The ERC20 must be whitelisted for gas.
@@ -170,13 +171,13 @@ ___
 
 • **get defaultGasInflationFactor**(): *number*
 
-*Defined in [packages/sdk/connect/src/connection.ts:104](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L104)*
+*Defined in [packages/sdk/connect/src/connection.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L106)*
 
 **Returns:** *number*
 
 • **set defaultGasInflationFactor**(`factor`: number): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:100](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L100)*
+*Defined in [packages/sdk/connect/src/connection.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L102)*
 
 **Parameters:**
 
@@ -192,13 +193,13 @@ ___
 
 • **get defaultGasPrice**(): *number*
 
-*Defined in [packages/sdk/connect/src/connection.ts:112](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L112)*
+*Defined in [packages/sdk/connect/src/connection.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L114)*
 
 **Returns:** *number*
 
 • **set defaultGasPrice**(`price`: number): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:108](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L108)*
+*Defined in [packages/sdk/connect/src/connection.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L110)*
 
 **Parameters:**
 
@@ -214,7 +215,7 @@ Name | Type |
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:136](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L136)*
+*Defined in [packages/sdk/connect/src/connection.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L138)*
 
 **Parameters:**
 
@@ -230,7 +231,7 @@ ___
 
 ▸ **chainId**(): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:367](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L367)*
+*Defined in [packages/sdk/connect/src/connection.ts:371](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L371)*
 
 **Returns:** *Promise‹number›*
 
@@ -240,7 +241,7 @@ ___
 
 ▸ **coinbase**(): *Promise‹string›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:384](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L384)*
+*Defined in [packages/sdk/connect/src/connection.ts:388](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L388)*
 
 **Returns:** *Promise‹string›*
 
@@ -250,7 +251,7 @@ ___
 
 ▸ **estimateGas**(`tx`: [CeloTx](../modules/_types_.md#celotx), `gasEstimator`: function, `caller`: function): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:320](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L320)*
+*Defined in [packages/sdk/connect/src/connection.ts:324](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L324)*
 
 **Parameters:**
 
@@ -284,7 +285,7 @@ ___
 
 ▸ **estimateGasWithInflationFactor**(`tx`: [CeloTx](../modules/_types_.md#celotx), `gasEstimator?`: undefined | function, `caller?`: undefined | function): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:351](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L351)*
+*Defined in [packages/sdk/connect/src/connection.ts:355](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L355)*
 
 **Parameters:**
 
@@ -302,7 +303,7 @@ ___
 
 ▸ **fillGasPrice**(`tx`: [CeloTx](../modules/_types_.md#celotx)): *[CeloTx](../modules/_types_.md#celotx)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:306](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L306)*
+*Defined in [packages/sdk/connect/src/connection.ts:310](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L310)*
 
 **Parameters:**
 
@@ -318,7 +319,7 @@ ___
 
 ▸ **gasPrice**(`feeCurrency?`: [Address](../modules/_types_.md#address)): *Promise‹string›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:390](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L390)*
+*Defined in [packages/sdk/connect/src/connection.ts:394](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L394)*
 
 **Parameters:**
 
@@ -334,7 +335,7 @@ ___
 
 ▸ **getAbiCoder**(): *[AbiCoder](../interfaces/_abi_types_.abicoder.md)*
 
-*Defined in [packages/sdk/connect/src/connection.ts:347](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L347)*
+*Defined in [packages/sdk/connect/src/connection.ts:351](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L351)*
 
 **Returns:** *[AbiCoder](../interfaces/_abi_types_.abicoder.md)*
 
@@ -344,7 +345,7 @@ ___
 
 ▸ **getAccounts**(): *Promise‹string[]›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:169](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L169)*
+*Defined in [packages/sdk/connect/src/connection.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L171)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -354,7 +355,7 @@ ___
 
 ▸ **getBalance**(`address`: [Address](../modules/_types_.md#address), `defaultBlock?`: [BlockNumber](../modules/_types_.md#blocknumber)): *Promise‹string›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:425](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L425)*
+*Defined in [packages/sdk/connect/src/connection.ts:429](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L429)*
 
 **Parameters:**
 
@@ -371,7 +372,7 @@ ___
 
 ▸ **getBlock**(`blockHashOrBlockNumber`: [BlockNumber](../modules/_types_.md#blocknumber), `fullTxObjects`: boolean): *Promise‹Block›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:406](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L406)*
+*Defined in [packages/sdk/connect/src/connection.ts:410](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L410)*
 
 **Parameters:**
 
@@ -388,7 +389,7 @@ ___
 
 ▸ **getBlockNumber**(): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:400](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L400)*
+*Defined in [packages/sdk/connect/src/connection.ts:404](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L404)*
 
 **Returns:** *Promise‹number›*
 
@@ -398,7 +399,7 @@ ___
 
 ▸ **getLocalAccounts**(): *string[]*
 
-*Defined in [packages/sdk/connect/src/connection.ts:165](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L165)*
+*Defined in [packages/sdk/connect/src/connection.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L167)*
 
 **Returns:** *string[]*
 
@@ -408,7 +409,7 @@ ___
 
 ▸ **getNodeAccounts**(): *Promise‹string[]›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:160](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L160)*
+*Defined in [packages/sdk/connect/src/connection.ts:162](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L162)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -418,7 +419,7 @@ ___
 
 ▸ **getTransaction**(`transactionHash`: string): *Promise‹[CeloTxPending](../modules/_types_.md#celotxpending)›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:434](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L434)*
+*Defined in [packages/sdk/connect/src/connection.ts:438](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L438)*
 
 **Parameters:**
 
@@ -434,7 +435,7 @@ ___
 
 ▸ **getTransactionCount**(`address`: [Address](../modules/_types_.md#address)): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:373](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L373)*
+*Defined in [packages/sdk/connect/src/connection.ts:377](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L377)*
 
 **Parameters:**
 
@@ -448,9 +449,9 @@ ___
 
 ###  getTransactionReceipt
 
-▸ **getTransactionReceipt**(`txhash`: string): *Promise‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt)›*
+▸ **getTransactionReceipt**(`txhash`: string): *Promise‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt) | null›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:442](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L442)*
+*Defined in [packages/sdk/connect/src/connection.ts:446](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L446)*
 
 **Parameters:**
 
@@ -458,7 +459,7 @@ Name | Type |
 ------ | ------ |
 `txhash` | string |
 
-**Returns:** *Promise‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt)›*
+**Returns:** *Promise‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt) | null›*
 
 ___
 
@@ -466,7 +467,7 @@ ___
 
 ▸ **isListening**(): *Promise‹boolean›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:177](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L177)*
+*Defined in [packages/sdk/connect/src/connection.ts:179](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L179)*
 
 **Returns:** *Promise‹boolean›*
 
@@ -476,7 +477,7 @@ ___
 
 ▸ **isLocalAccount**(`address?`: [Address](../modules/_types_.md#address)): *boolean*
 
-*Defined in [packages/sdk/connect/src/connection.ts:132](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L132)*
+*Defined in [packages/sdk/connect/src/connection.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L134)*
 
 **Parameters:**
 
@@ -492,7 +493,7 @@ ___
 
 ▸ **isSyncing**(): *Promise‹boolean›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:181](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L181)*
+*Defined in [packages/sdk/connect/src/connection.ts:183](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L183)*
 
 **Returns:** *Promise‹boolean›*
 
@@ -502,7 +503,7 @@ ___
 
 ▸ **nonce**(`address`: [Address](../modules/_types_.md#address)): *Promise‹number›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:380](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L380)*
+*Defined in [packages/sdk/connect/src/connection.ts:384](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L384)*
 
 **Parameters:**
 
@@ -518,7 +519,7 @@ ___
 
 ▸ **removeAccount**(`address`: string): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:148](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L148)*
+*Defined in [packages/sdk/connect/src/connection.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L150)*
 
 **Parameters:**
 
@@ -534,7 +535,7 @@ ___
 
 ▸ **sendSignedTransaction**(`signedTransactionData`: string): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:301](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L301)*
+*Defined in [packages/sdk/connect/src/connection.ts:305](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L305)*
 
 **Parameters:**
 
@@ -550,7 +551,7 @@ ___
 
 ▸ **sendTransaction**(`tx`: [CeloTx](../modules/_types_.md#celotx)): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:205](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L205)*
+*Defined in [packages/sdk/connect/src/connection.ts:207](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L207)*
 
 Send a transaction to celo-blockchain.
 
@@ -573,7 +574,7 @@ ___
 
 ▸ **sendTransactionObject**(`txObj`: [CeloTxObject](../interfaces/_types_.celotxobject.md)‹any›, `tx?`: Omit‹[CeloTx](../modules/_types_.md#celotx), "data"›): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:222](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L222)*
+*Defined in [packages/sdk/connect/src/connection.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L224)*
 
 **Parameters:**
 
@@ -590,7 +591,7 @@ ___
 
 ▸ **setGasPriceForCurrency**(`address`: [Address](../modules/_types_.md#address), `gasPrice`: string): *Promise‹void›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:316](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L316)*
+*Defined in [packages/sdk/connect/src/connection.ts:320](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L320)*
 
 **Parameters:**
 
@@ -607,7 +608,7 @@ ___
 
 ▸ **setProvider**(`provider`: [Provider](../interfaces/_types_.provider.md)): *boolean*
 
-*Defined in [packages/sdk/connect/src/connection.ts:69](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L69)*
+*Defined in [packages/sdk/connect/src/connection.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L71)*
 
 **Parameters:**
 
@@ -623,7 +624,7 @@ ___
 
 ▸ **sign**(`dataToSign`: string, `address`: [Address](../modules/_types_.md#address) | number): *Promise‹string›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:275](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L275)*
+*Defined in [packages/sdk/connect/src/connection.ts:278](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L278)*
 
 **Parameters:**
 
@@ -640,7 +641,7 @@ ___
 
 ▸ **signTypedData**(`signer`: string, `typedData`: EIP712TypedData): *Promise‹Signature›*
 
-*Defined in [packages/sdk/connect/src/connection.ts:248](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L248)*
+*Defined in [packages/sdk/connect/src/connection.ts:250](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L250)*
 
 **Parameters:**
 
@@ -657,6 +658,6 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [packages/sdk/connect/src/connection.ts:463](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L463)*
+*Defined in [packages/sdk/connect/src/connection.ts:472](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L472)*
 
 **Returns:** *void*

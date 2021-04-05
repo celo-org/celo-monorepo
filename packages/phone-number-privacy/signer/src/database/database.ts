@@ -70,9 +70,7 @@ export async function initDatabase(doTestQuery = true) {
 
 async function executeTestQuery(_db: Knex) {
   logger.info('Counting accounts')
-  const result = await _db(ACCOUNTS_TABLE)
-    .count(ACCOUNTS_COLUMNS.address)
-    .first()
+  const result = await _db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
 
   if (!result) {
     throw new Error('No result from count, have migrations been run?')

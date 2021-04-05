@@ -106,7 +106,7 @@ contract('Exchange', (accounts: string[]) => {
 
   beforeEach(async () => {
     freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
+    goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
     stableToken = await StableToken.new()
     registry = await Registry.new()
@@ -125,7 +125,8 @@ contract('Exchange', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK,
       [],
-      []
+      [],
+      'Exchange' // USD
     )
 
     mockSortedOracles = await MockSortedOracles.new()
