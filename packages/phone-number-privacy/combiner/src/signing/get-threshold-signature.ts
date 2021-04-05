@@ -151,12 +151,11 @@ async function requestSignatures(request: Request, response: Response) {
       .finally(() => {
         performance.mark(endMark)
         performance.measure(entryName, startMark, endMark)
-        clearTimeout(timeout)
       })
   })
 
   await Promise.all(signerReqs)
-
+  clearTimeout(timeout)
   performance.clearMarks()
   obs.disconnect()
 
