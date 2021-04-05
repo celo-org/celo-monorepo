@@ -13,10 +13,10 @@ function accounts() {
  */
 export async function getPerformedQueryCount(account: string, logger: Logger): Promise<number> {
   logger.debug({ account }, 'Getting performed query count')
+  const getPerformedQueryCountMeter = Histograms.getBlindedSigInstrumentation // TODO: should we have a different histogram for this?
+    .labels('getPerformedQueryCount')
+    .startTimer()
   try {
-    const getPerformedQueryCountMeter = Histograms.getBlindedSigInstrumentation
-      .labels('getPerformedQueryCount')
-      .startTimer()
     const queryCounts = await accounts()
       .select(ACCOUNTS_COLUMNS.numLookups)
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -27,6 +27,7 @@ export async function getPerformedQueryCount(account: string, logger: Logger): P
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
+    getPerformedQueryCountMeter()
     return 0
   }
 }

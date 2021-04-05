@@ -135,7 +135,6 @@ export async function handleGetBlindedMessagePartialSig(
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
     meterGenerateSignature()
 
-    const meterDbOps = Histograms.getBlindedSigInstrumentation.labels('dbOps').startTimer()
     if (await getRequestExists(request.body, logger)) {
       Counters.duplicateRequests.inc()
       logger.debug(
@@ -143,6 +142,10 @@ export async function handleGetBlindedMessagePartialSig(
       )
       errorMsgs.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
     } else {
+      const meterDbWriteOps = Histograms.getBlindedSigInstrumentation
+        .labels('dbWriteOps')
+        .startTimer()
+      // TODO(Alec): Parallelize these requests
       if (!(await storeRequest(request.body, logger))) {
         logger.debug('Did not store request.')
         errorMsgs.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
@@ -153,8 +156,8 @@ export async function handleGetBlindedMessagePartialSig(
       } else {
         performedQueryCount++
       }
+      meterDbWriteOps()
     }
-    meterDbOps()
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {
