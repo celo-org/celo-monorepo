@@ -108,23 +108,14 @@ export const retryAsyncWithBackOffAndTimeout = async <T extends any[], U>(
   timeoutMs = 2000,
   logger: Logger | null = null
 ) => {
-  let timeoutHandle: any
-  const timeoutPromise = new Promise<U>((_resolve, reject) => {
-    timeoutHandle = setTimeout(() => {
-      if (logger) {
-        logger(`${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`)
-      }
-      reject(new Error(`Timed out after ${timeoutMs}ms`))
-    }, timeoutMs)
-  })
-
-  return Promise.race([
-    retryAsyncWithBackOff(inFunction, tries, params, delayMs, factor, logger),
-    timeoutPromise,
-  ]).then((result) => {
-    clearTimeout(timeoutHandle)
-    return result
-  })
+  return timeout(
+    retryAsyncWithBackOff,
+    [inFunction, tries, params, delayMs, factor, logger],
+    timeoutMs,
+    new Error(`Timed out after ${timeoutMs}ms`),
+    `${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`,
+    logger
+  )
 }
 
 /**
@@ -184,6 +175,7 @@ export const timeout = <T extends any[], U>(
   params: T,
   timeoutMs: number,
   timeoutError: any,
+  timeoutLogMsg: string | null = null,
   logger: Logger | null = null
 ) => {
   let timer: any
@@ -192,7 +184,7 @@ export const timeout = <T extends any[], U>(
     new Promise<U>((_resolve, reject) => {
       timer = setTimeout(() => {
         if (logger) {
-          logger(`${TAG}/@timeout Timed out after ${timeoutMs}ms`)
+          logger(timeoutLogMsg || `${TAG}/@timeout Timed out after ${timeoutMs}ms`)
         }
         reject(timeoutError)
       }, timeoutMs)
