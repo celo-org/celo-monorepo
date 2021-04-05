@@ -208,7 +208,7 @@ async function handleSuccessResponse(
 }
 
 // Fail fast if a sufficient number of signatures cannot be collected
-async function handleFailedResponse(
+function handleFailedResponse(
   service: SignerService,
   status: number,
   signerCount: number,
