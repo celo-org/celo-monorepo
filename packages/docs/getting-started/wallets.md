@@ -6,7 +6,7 @@ Wallets are tools that create accounts, manage keys, and help users transact on 
 
 It's important to be careful when choosing a wallet because they manage your secret account keys. You should only use reputable wallets that are well maintained by organizations/people that you trust.
 
-The [Celo Native Wallets](#celo-native-wallets) section shows some popular wallets that were built specifically for the Celo network. They often includes features that more general wallets do not, like paying for fees with cUSD. The [Celo Compatible Wallets](#celo-compatible-wallets) section has wallets that can work with Celo but were built for other networks (like Ethereum) or through company partnerships (like Pesabase).
+The [Celo Native Wallets](#celo-native-wallets) section shows some popular wallets that were built specifically for the Celo network. They often include features that more general wallets do not, like paying for fees with cUSD. The [Celo Compatible Wallets](#celo-compatible-wallets) section has wallets that can work with Celo but were built for other networks (like Ethereum) or through company partnerships (like Pesabase).
 
 ## Celo Native Wallets
 
