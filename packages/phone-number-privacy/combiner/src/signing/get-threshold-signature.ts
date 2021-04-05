@@ -123,14 +123,14 @@ async function requestSignatures(request: Request, response: Response) {
         }
       })
       .catch((err) => {
-        let status = 500
+        let status: number | undefined = 500
         if (err.name === 'AbortError') {
           if (timedOut) {
             status = 408
             logger.error({ signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
           } else {
             // Request was cancelled, assuming it would have been successful
-            status = 200
+            status = undefined
             logger.info({ signer: service }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
           }
         } else {
@@ -210,7 +210,7 @@ async function handleSuccessResponse(
 // Fail fast if a sufficient number of signatures cannot be collected
 function handleFailedResponse(
   service: SignerService,
-  status: number,
+  status: number | undefined,
   signerCount: number,
   failedRequests: Set<string>,
   response: Response,
@@ -218,7 +218,9 @@ function handleFailedResponse(
   controller: AbortController,
   errorCodes: Map<number, number>
 ) {
-  errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
+  if (status) {
+    errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
+  }
   const logger: Logger = response.locals.logger
   // Tracking failed request count via signer url prevents
   // double counting the same failed request by mistake
@@ -310,7 +312,12 @@ function requestSignature(
 }
 
 function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
-  if (errorCodes.size > 1) {
+  // Ignore timeouts
+  const ignoredErrorCodes = [408]
+  const uniqueErrorCount = Array.from(errorCodes.keys()).filter(
+    (status) => !ignoredErrorCodes.includes(status)
+  ).length
+  if (uniqueErrorCount > 1) {
     logger.error(
       { errorCodes: JSON.stringify([...errorCodes]) },
       ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
