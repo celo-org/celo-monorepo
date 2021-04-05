@@ -418,3 +418,56 @@ export async function addressMinedLatestBlock(address: string) {
   const block = await web3.eth.getBlock('latest')
   return isSameAddress(block.miner, address)
 }
+
+
+/*
+export async function assumeOwnership(contractsToOwn: string[], proposalId: number = 1, dequeuedIndex: number = 0) {
+	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
+	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
+	const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
+		'GovernanceApproverMultiSig',
+		artifacts
+	)
+	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+	// @ts-ignore
+	await lockedGold.lock({ value: '10000000000000000000000000' })
+	const proposalTransactions = await Promise.all(
+		contractsToOwn.map(async (x: string) => {
+			return {
+				value: 0,
+				destination: (await getDeployedProxiedContract(x, artifacts)).address,
+				data: Buffer.from(
+					stripHexEncoding(
+						// Any contract's `transferOwnership` function will work here as the function signatures are all the same.
+						// @ts-ignore
+						registry.contract.methods.transferOwnership(accounts[0]).encodeABI()
+					),
+					'hex'
+				),
+			}
+		})
+	)
+	await governance.propose(
+		proposalTransactions.map((x: any) => x.value),
+		proposalTransactions.map((x: any) => x.destination),
+		// @ts-ignore
+		Buffer.concat(proposalTransactions.map((x: any) => x.data)),
+		proposalTransactions.map((x: any) => x.data.length),
+		'URL',
+		// @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+	)
+
+	await governance.upvote(proposalId, 0, 0)
+	await timeTravel(config.governance.dequeueFrequency, web3)
+	// @ts-ignore
+	const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+	await multiSig.submitTransaction(governance.address, 0, txData, {
+		from: accounts[0],
+	})
+	await timeTravel(config.governance.approvalStageDuration, web3)
+	await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+	await timeTravel(config.governance.referendumStageDuration, web3)
+	await governance.execute(proposalId, dequeuedIndex)
+}
+*/

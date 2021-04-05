@@ -37,7 +37,10 @@ module.exports = async (callback: (error?: any) => number) => {
 
     console.info('Deploying Proxy clone with factory...')
     await proxyCloneFactory.setProxyAddress(proxy.address)
-    const proxyCloneFromFactory = await proxyCloneFactory.createProxy({ from: argv.from })
+    // TODO: Fix
+    const proxyCloneFromFactory = await proxyCloneFactory.deploy(argv.from, '', '', {
+      from: argv.from,
+    })
     console.log(
       `  Deploying a proxy clone with a factory takes ${proxyCloneFromFactory.receipt.gasUsed} gas`
     )
