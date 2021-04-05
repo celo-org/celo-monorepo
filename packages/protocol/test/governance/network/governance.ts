@@ -1500,7 +1500,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#revokeVotes()', () => {
+  describe('#revokeVotes()', () => {
     const proposalId = 1
     const index = 0
     const value = VoteValue.Yes
