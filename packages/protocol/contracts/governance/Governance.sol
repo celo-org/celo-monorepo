@@ -148,6 +148,8 @@ contract Governance is
     uint256 weight
   );
 
+  event AccountProposalsVoteRevoked(address indexed account);
+
   event ProposalExecuted(uint256 indexed proposalId);
 
   event ProposalExpired(uint256 indexed proposalId);
@@ -647,6 +649,29 @@ contract Governance is
     return true;
   }
   /* solhint-enable code-complexity */
+
+  /**
+   * @notice Revoke votes on all proposal of sender in the referendum stage.
+   * @return Whether or not all votes of an account was successfully revoked.
+   */
+  function revokeVotes() external nonReentrant returns (bool) {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    Voter storage voter = voters[account];
+    for (uint256 i = 0; i < dequeued.length; i = i.add(1)) {
+      VoteRecord storage voteRecord = voter.referendumVotes[i];
+      (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
+        voteRecord.proposalId,
+        i
+      );
+      require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+      proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
+      proposal.networkWeight = proposal.networkWeight - voteRecord.weight;
+      voter.referendumVotes[i] = VoteRecord(Proposals.VoteValue.None, voteRecord.proposalId, 0);
+    }
+    voter.mostRecentReferendumProposal = 0;
+    emit AccountProposalsVoteRevoked(account);
+    return true;
+  }
 
   /**
    * @notice Executes a proposal in the execution stage, removing it from `dequeued`.
