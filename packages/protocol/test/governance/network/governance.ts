@@ -62,9 +62,9 @@ const parseTransactionParams = (transactionParams: any) => {
 
 enum VoteValue {
   None = 0,
-  Abstain = 1,
-  No = 2,
-  Yes = 3,
+  Abstain,
+  No,
+  Yes,
 }
 
 interface Transaction {
@@ -1500,7 +1500,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#vote()', () => {
+  describe('#vote()', () => {
     const proposalId = 1
     const index = 0
     const value = VoteValue.Yes
