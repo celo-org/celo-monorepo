@@ -1,5 +1,7 @@
 import { concurrentLoadTest } from '../test'
 
+/* tslint:disable:no-console */
+
 const args = process.argv.slice(2)
 
 const printHelpAndExit = () => {
@@ -24,4 +26,4 @@ switch (args[0]) {
 }
 process.env.NETWORK = args[0]
 
-concurrentLoadTest(Number(args[1]))
+concurrentLoadTest(Number(args[1])) // tslint:disable-line:no-floating-promises

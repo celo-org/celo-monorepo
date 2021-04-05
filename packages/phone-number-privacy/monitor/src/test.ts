@@ -27,7 +27,7 @@ export async function serialLoadTest(n: number) {
   for (let i = 0; i < n; i++) {
     try {
       await test()
-    } catch {}
+    } catch {} // tslint:disable-line:no-empty
   }
 }
 
@@ -43,7 +43,7 @@ export async function concurrentLoadTest(workers: number) {
         while (true) {
           await test()
         }
-      } catch {}
+      } catch {} // tslint:disable-line:no-empty
     })
   }
 }
