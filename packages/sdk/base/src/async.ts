@@ -139,3 +139,34 @@ export async function concurrentValuesMap<IN extends any, OUT extends any>(
     return output
   }, {})
 }
+
+/**
+ * Wraps an async function in a timeout before calling it.
+ *
+ * @param inFunction The async function to call
+ * @param params The parameters of the async function
+ * @param timeoutMs The timeout in milliseconds
+ * @param timeoutError The value to which the returned Promise should reject to
+ */
+export const timeout = <T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  params: T,
+  timeoutMs: number,
+  timeoutError: any,
+  logger: Logger | null = null
+) => {
+  let timer: any
+  return Promise.race([
+    inFunction(...params),
+    new Promise<U>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        if (logger) {
+          logger(`${TAG}/@timeout Timed out after ${timeoutMs}ms`)
+        }
+        reject(timeoutError)
+      }, timeoutMs)
+    }),
+  ]).finally(() => {
+    clearTimeout(timer)
+  })
+}

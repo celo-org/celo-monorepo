@@ -1,4 +1,4 @@
-import { concurrentMap, retryAsync, selectiveRetryAsyncWithBackOff, sleep } from './async'
+import { concurrentMap, retryAsync, selectiveRetryAsyncWithBackOff, sleep, timeout } from './async'
 
 describe('retryAsync()', () => {
   test('tries once if it works', async () => {
@@ -95,5 +95,23 @@ describe('concurrentMap()', () => {
     await sleep(7)
     expect(c.val()).toEqual(xs.length)
     await p
+  })
+})
+
+describe('timeout()', () => {
+  test('fails on timeout', async () => {
+    const mockFunction = jest.fn(async () => {
+      await sleep(1000)
+    })
+
+    const timeoutError = Symbol()
+    try {
+      await timeout(mockFunction, [], 900, timeoutError)
+      expect(false).toBeTruthy()
+    } catch (error) {
+      expect(error).toBe(timeoutError)
+    }
+
+    expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 })
