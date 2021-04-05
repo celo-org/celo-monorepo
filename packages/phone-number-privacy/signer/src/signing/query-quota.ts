@@ -84,7 +84,7 @@ export async function getRemainingQueryCount(
   hashedPhoneNumber?: string
 ): Promise<{ performedQueryCount: number; totalQuota: number }> {
   logger.debug({ account }, 'Retrieving remaining query count')
-  const meterGetRemainingQueryCount = Histograms.getBlindedSigInstrumentation
+  const meterGetRemainingQueryCount = Histograms.getRemainingQueryCountInstrumentation
     .labels('getRemainingQueryCount')
     .startTimer()
   const [totalQuota, performedQueryCount] = await Promise.all([
@@ -102,11 +102,11 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
-  const getQueryQuotaMeter = Histograms.getBlindedSigInstrumentation // TODO: Seperate histogram?
+  const getQueryQuotaMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getQueryQuota')
     .startTimer()
 
-  const getWalletAddressAndIsVerifiedMeter = Histograms.getBlindedSigInstrumentation // TODO: Seperate histogram?
+  const getWalletAddressAndIsVerifiedMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getWalletAddressAndIsVerified')
     .startTimer()
   const [_walletAddress, _isAccountVerified] = await Promise.allSettled([
@@ -156,7 +156,9 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     return quota
   }
 
-  const getBalancesMeter = Histograms.getBlindedSigInstrumentation.labels('balances').startTimer()
+  const getBalancesMeter = Histograms.getRemainingQueryCountInstrumentation
+    .labels('balances')
+    .startTimer()
   let cUSDAccountBalance = new BigNumber(0)
   let celoAccountBalance = new BigNumber(0)
 
@@ -219,7 +221,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
 }
 
 export async function getTransactionCount(logger: Logger, ...addresses: string[]): Promise<number> {
-  const getTransactionCountMeter = Histograms.getBlindedSigInstrumentation
+  const getTransactionCountMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getTransactionCount')
     .startTimer()
   const res = Promise.all(
@@ -284,11 +286,12 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
 }
 
 export async function getWalletAddress(logger: Logger, account: string): Promise<string> {
-  const getWalletAddressMeter = Histograms.getBlindedSigInstrumentation // TODO: Seperate histogram?
+  const getWalletAddressMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getWalletAddress')
     .startTimer()
 
   return retryAsyncWithBackOff(
+    // TODO(Alec): add timeouts to these
     async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
     RETRY_COUNT,
     [],

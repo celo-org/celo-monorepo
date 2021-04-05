@@ -18,7 +18,7 @@ export async function getRequestExists(
     return false // TODO(Alec) make timestamps required
   }
   logger.debug({ request }, 'Checking if request exists')
-  const getRequestExistsMeter = Histograms.getBlindedSigInstrumentation // TODO: should we have a different histogram for this?
+  const getRequestExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getRequestExists')
     .startTimer()
   try {
@@ -45,14 +45,17 @@ export async function storeRequest(request: GetBlindedMessagePartialSigRequest, 
     logger.debug('request does not have timestamp')
     return true // TODO remove once backwards compatibility isn't necessary
   }
+  const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {
     await requests().insert(new Request(request)).timeout(DB_TIMEOUT)
+    storeRequestMeter()
     return true
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error(err)
+    storeRequestMeter()
     return null
   }
 }
