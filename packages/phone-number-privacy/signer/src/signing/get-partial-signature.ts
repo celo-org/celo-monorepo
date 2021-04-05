@@ -143,11 +143,15 @@ export async function handleGetBlindedMessagePartialSig(
       )
       errorMsgs.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
     } else {
-      if (!(await storeRequest(request.body, logger))) {
+      const [requestStored, queryCountIncremented] = await Promise.all([
+        storeRequest(request.body, logger),
+        incrementQueryCount(account, logger),
+      ])
+      if (!requestStored) {
         logger.debug('Did not store request.')
         errorMsgs.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
       }
-      if (!(await incrementQueryCount(account, logger))) {
+      if (!queryCountIncremented) {
         logger.debug('Did not increment query count.')
         errorMsgs.push(ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT)
       } else {
