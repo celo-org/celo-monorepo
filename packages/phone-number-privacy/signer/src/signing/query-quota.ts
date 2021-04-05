@@ -84,11 +84,15 @@ export async function getRemainingQueryCount(
   hashedPhoneNumber?: string
 ): Promise<{ performedQueryCount: number; totalQuota: number }> {
   logger.debug({ account }, 'Retrieving remaining query count')
+  const meterGetRemainingQueryCount = Histograms.getRemainingQueryCountInstrumentation
+    .labels('getRemainingQueryCount')
+    .startTimer()
   const [totalQuota, performedQueryCount] = await Promise.all([
     getQueryQuota(logger, account, hashedPhoneNumber),
     getPerformedQueryCount(account, logger),
   ])
   Histograms.userRemainingQuotaAtRequest.observe(totalQuota - performedQueryCount)
+  meterGetRemainingQueryCount()
   return { performedQueryCount, totalQuota }
 }
 
@@ -98,8 +102,12 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
-  const getWalletAddressMeter = Histograms.getBlindedSigInstrumentation
-    .labels('getWalletAddress')
+  const getQueryQuotaMeter = Histograms.getRemainingQueryCountInstrumentation
+    .labels('getQueryQuota')
+    .startTimer()
+
+  const getWalletAddressAndIsVerifiedMeter = Histograms.getRemainingQueryCountInstrumentation
+    .labels('getWalletAddressAndIsVerified')
     .startTimer()
   const [_walletAddress, _isAccountVerified] = await Promise.allSettled([
     getWalletAddress(logger, account),
@@ -109,7 +117,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       )
     ),
   ])
-  getWalletAddressMeter()
+
   let walletAddress = _walletAddress.status === 'fulfilled' ? _walletAddress.value : NULL_ADDRESS
   const isAccountVerified =
     _isAccountVerified.status === 'fulfilled' ? _isAccountVerified.value : false
@@ -124,6 +132,8 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
   if (walletAddress !== NULL_ADDRESS) {
     Counters.requestsWithWalletAddress.inc()
   }
+
+  getWalletAddressAndIsVerifiedMeter()
 
   if (isAccountVerified) {
     Counters.requestsWithVerifiedAccount.inc()
@@ -142,10 +152,13 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       quota,
     })
 
+    getQueryQuotaMeter()
     return quota
   }
 
-  const getBalancesMeter = Histograms.getBlindedSigInstrumentation.labels('balances').startTimer()
+  const getBalancesMeter = Histograms.getRemainingQueryCountInstrumentation
+    .labels('balances')
+    .startTimer()
   let cUSDAccountBalance = new BigNumber(0)
   let celoAccountBalance = new BigNumber(0)
 
@@ -190,6 +203,8 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       transactionCount,
       quota,
     })
+
+    getQueryQuotaMeter()
     return quota
   }
 
@@ -206,7 +221,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
 }
 
 export async function getTransactionCount(logger: Logger, ...addresses: string[]): Promise<number> {
-  const getTransactionCountMeter = Histograms.getBlindedSigInstrumentation
+  const getTransactionCountMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getTransactionCount')
     .startTimer()
   const res = Promise.all(
@@ -271,16 +286,21 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
 }
 
 export async function getWalletAddress(logger: Logger, account: string): Promise<string> {
-  try {
-    return retryAsyncWithBackOff(
-      async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
-      RETRY_COUNT,
-      [],
-      RETRY_DELAY_IN_MS
-    )
-  } catch (err) {
-    logger.error({ account }, 'failed to get wallet address for account')
-    logger.error(err)
-    return NULL_ADDRESS
-  }
+  const getWalletAddressMeter = Histograms.getRemainingQueryCountInstrumentation
+    .labels('getWalletAddress')
+    .startTimer()
+
+  return retryAsyncWithBackOff(
+    // TODO(Alec): add timeouts to these
+    async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
+    .catch((err) => {
+      logger.error({ account }, 'failed to get wallet address for account')
+      logger.error(err)
+      return NULL_ADDRESS
+    })
+    .finally(getWalletAddressMeter)
 }

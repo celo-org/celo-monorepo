@@ -13,10 +13,10 @@ function accounts() {
  */
 export async function getPerformedQueryCount(account: string, logger: Logger): Promise<number> {
   logger.debug({ account }, 'Getting performed query count')
+  const getPerformedQueryCountMeter = Histograms.dbOpsInstrumentation
+    .labels('getPerformedQueryCount')
+    .startTimer()
   try {
-    const getPerformedQueryCountMeter = Histograms.getBlindedSigInstrumentation
-      .labels('getPerformedQueryCount')
-      .startTimer()
     const queryCounts = await accounts()
       .select(ACCOUNTS_COLUMNS.numLookups)
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -27,19 +27,24 @@ export async function getPerformedQueryCount(account: string, logger: Logger): P
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
+    getPerformedQueryCountMeter()
     return 0
   }
 }
 
 async function getAccountExists(account: string): Promise<boolean> {
+  const getAccountExistsMeter = Histograms.dbOpsInstrumentation
+    .labels('getAccountExists')
+    .startTimer()
   const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
+  getAccountExistsMeter()
   return !!existingAccountRecord
 }
 
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-export async function incrementQueryCount(account: string, logger: Logger) {
+async function _incrementQueryCount(account: string, logger: Logger) {
   logger.debug({ account }, 'Incrementing query count')
   try {
     if (await getAccountExists(account)) {
@@ -60,10 +65,17 @@ export async function incrementQueryCount(account: string, logger: Logger) {
   }
 }
 
+export async function incrementQueryCount(account: string, logger: Logger) {
+  const incrementQueryCountMeter = Histograms.dbOpsInstrumentation
+    .labels('incrementQueryCount')
+    .startTimer()
+  return _incrementQueryCount(account, logger).finally(incrementQueryCountMeter)
+}
+
 /*
  * Returns whether account has already performed matchmaking
  */
-export async function getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
+async function _getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
   try {
     const didMatchmaking = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -81,16 +93,23 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
   }
 }
 
+export async function getDidMatchmaking(account: string, logger: Logger) {
+  const getDidMatchmakingMeter = Histograms.dbOpsInstrumentation
+    .labels('getDidMatchmaking')
+    .startTimer()
+  return _getDidMatchmaking(account, logger).finally(getDidMatchmakingMeter)
+}
+
 /*
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
-export async function setDidMatchmaking(account: string, logger: Logger) {
+async function _setDidMatchmaking(account: string, logger: Logger) {
   logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
-        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date()) // TODO(Alec): add timeouts here?
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
@@ -102,6 +121,13 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
     logger.error(err)
     return null
   }
+}
+
+export async function setDidMatchmaking(account: string, logger: Logger) {
+  const setDidMatchmakingMeter = Histograms.dbOpsInstrumentation
+    .labels('setDidMatchmaking')
+    .startTimer()
+  return _setDidMatchmaking(account, logger).finally(setDidMatchmakingMeter)
 }
 
 async function insertRecord(data: Account) {
