@@ -19,14 +19,6 @@ export enum Endpoints {
   GET_QUOTA = '/getQuota',
 }
 
-// export function timeoutMiddleware(req: Request, res: Response, next?: NextFunction) {
-//   req.setTimeout(500000, function(){
-//     // call back function is called when request timed out.
-// });
-// next();
-
-// }
-
 export function createServer() {
   logger.info('Creating express server')
   const app = express()
