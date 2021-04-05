@@ -48,12 +48,7 @@ Celo Extension Wallet is a fork of Metamask for the Celo Network. It's a browser
 
 ## Celo Compatible Wallets
 
-_Note: With the upcoming [Donut hard-fork](https://github.com/celo-org/celo-proposals/issues/94), the Celo network will become compatible with Ethereum. This will allow more Ethereum wallets to work with Celo. More updates on this coming soon._
-
-### Nifty Wallet
-
-- [chrome.google.com/webstore](https://chrome.google.com/webstore/detail/nifty-wallet/jbdaocneiiinmjbjlgalhcelgbejmnid)
-- Platforms: Chrome Browser
+There are currently a few other compatible wallets. When the upcoming [Donut hard-fork](https://github.com/celo-org/celo-proposals/issues/94) is live, Celo transactions will become compatible with Ethereum transactions. This will allow some Ethereum wallets to work with Celo. More updates on this coming soon.
 
 ### Dove Wallet
 
