@@ -96,6 +96,37 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
   throw saveError
 }
 
+// Retries an async function when it raises an exeption
+// Terminates any ongoing request when the timeout is reached
+// if all the tries fail it raises the last thrown exeption
+export const retryAsyncWithBackOffAndTimeout = async <T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  tries: number,
+  params: T,
+  delayMs = 100,
+  factor = 1.5,
+  timeoutMs = 2000,
+  logger: Logger | null = null
+) => {
+  let timeoutHandle: any
+  const timeoutPromise = new Promise<U>((_resolve, reject) => {
+    timeoutHandle = setTimeout(() => {
+      if (logger) {
+        logger(`${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`)
+      }
+      reject(new Error(`Timed out after ${timeoutMs}ms`))
+    }, timeoutMs)
+  })
+
+  return Promise.race([
+    retryAsyncWithBackOff(inFunction, tries, params, delayMs, factor, logger),
+    timeoutPromise,
+  ]).then((result) => {
+    clearTimeout(timeoutHandle)
+    return result
+  })
+}
+
 /**
  * Map an async function over a list xs with a given concurrency level
  *
