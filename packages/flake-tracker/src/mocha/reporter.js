@@ -13,17 +13,17 @@ function FlakeReporter(runner) {
   let skipped = []
   let currErrors = []
 
-  before('Fetch Flakey Tests', async function() {
+  before('Fetch Flakey Tests', async function () {
     manager = await FlakeManager.build()
     skip = shouldSkipKnownFlakes ? db.readKnownFlakes().map((i) => i.title) : []
   })
 
-  after('Process Flakey Tests', async function() {
+  after('Process Flakey Tests', async function () {
     db.writeSkippedFlakes(skipped)
     await manager.finish()
   })
 
-  runner.on('retry', function(test, err) {
+  runner.on('retry', function (test, err) {
     console.log('Retry #' + (test.currentRetry() + 1) + ' for test ' + getTestID(test))
     if (shouldLogRetryErrorsOnFailure) {
       console.log('\n' + fmtError(err) + '\n')
@@ -31,7 +31,7 @@ function FlakeReporter(runner) {
     currErrors.push(fmtError(err))
   })
 
-  runner.on('test', function(test) {
+  runner.on('test', function (test) {
     if (skip.length) {
       let testID = getTestID(test)
       if (skip.some((knownFlake) => knownFlake.includes(testID))) {
@@ -42,7 +42,7 @@ function FlakeReporter(runner) {
     }
   })
 
-  runner.on('pass', function(test) {
+  runner.on('pass', function (test) {
     if (test.currentRetry() > 0) {
       // Note that we could store these errors locally in a map and not use the db at all.
       // We use the db here for consistency with jest which must use the db, and also because
@@ -51,7 +51,7 @@ function FlakeReporter(runner) {
     }
   })
 
-  runner.on('test end', function(test) {
+  runner.on('test end', function (test) {
     currErrors = []
   })
 }

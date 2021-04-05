@@ -17,7 +17,7 @@
 
 ▸ **getChainIdFromGenesis**(`genesis`: string): *number*
 
-*Defined in [genesis-block-utils.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/network-utils/src/genesis-block-utils.ts#L22)*
+*Defined in [genesis-block-utils.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/network-utils/src/genesis-block-utils.ts#L22)*
 
 **Parameters:**
 
@@ -33,7 +33,7 @@ ___
 
 ▸ **getGenesisBlockAsync**(`networkName`: string): *Promise‹string›*
 
-*Defined in [genesis-block-utils.ts:14](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/network-utils/src/genesis-block-utils.ts#L14)*
+*Defined in [genesis-block-utils.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/network-utils/src/genesis-block-utils.ts#L14)*
 
 Fetches the genesis block (as JSON data) from Google Storage.
 If the network is not working, the method will reject the returned promise

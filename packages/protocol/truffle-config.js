@@ -35,12 +35,15 @@ const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
+const STAGING_FROM = '0x4e3d385ecdee402da395a3b18575b05cc5e8ff21'
 
 const gasLimit = 13000000
+const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
+const hostPort = parseInt(process.env.CELO_NODE_PORT || '8545')
 
 const defaultConfig = {
-  host: '127.0.0.1',
-  port: 8545,
+  host: hostAddress,
+  port: hostPort,
   network_id: 1101,
   from: OG_FROM,
   gas: gasLimit,
@@ -57,6 +60,7 @@ const fornoUrls = {
   baklava: 'https://baklava-forno.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
+  staging: 'https://staging-forno.celo-networks-dev.org',
 }
 
 const networks = {
@@ -69,8 +73,8 @@ const networks = {
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   rc0: {
-    host: '127.0.0.1',
-    port: 8545,
+    host: hostAddress,
+    port: hostPort,
     from: RC0_FROM,
     network_id: 200312,
     gasPrice: 100000000000,
@@ -89,7 +93,7 @@ const networks = {
     gasPrice: 0,
     gas: gasLimit,
     from: DEVELOPMENT_FROM,
-    provider: function() {
+    provider: function () {
       if (coverageProvider == null) {
         console.log('building provider!')
         coverageProvider = new ProviderEngine()
@@ -177,6 +181,10 @@ const networks = {
     from: BAKLAVASTAGING_FROM,
     network_id: BAKLAVASTAGING_NETWORKID,
   },
+  staging: {
+    ...defaultConfig,
+    from: STAGING_FROM,
+  },
 }
 // Equivalent
 networks.mainnet = networks.rc1
@@ -200,7 +208,7 @@ if (process.argv.includes('--forno')) {
 
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
-  networks[argv.network].provider = function() {
+  networks[argv.network].provider = function () {
     return new Web3.providers.HttpProvider(fornoUrls[argv.network])
   }
 }

@@ -5,7 +5,9 @@ import { Args } from '../../utils/command'
 export default class Lock extends BaseCommand {
   static description = 'Lock an account which was previously unlocked'
 
-  static flags = BaseCommand.flagsWithoutLocalAddresses()
+  static flags = {
+    ...BaseCommand.flags,
+  }
 
   static args: IArg[] = [Args.address('account', { description: 'Account address' })]
 

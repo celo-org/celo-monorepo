@@ -1,5 +1,9 @@
 # Full Node Incentives
 
+{% hint style="info" %}
+Full node incentives are still very much in the early-research stage.
+{% endhint %}
+
 The Celo protocol supports **gateway fees**. These fees create an incentive for node operators to run a full node that is not a validator and act as a 'gateway', i.e. answer requests and forward transactions, on behalf of light clients. This is important since it is likely that the vast majority of nodes in the Celo network will be light or ultralight clients, and so the vast majority of full nodes will need to be deployed to service them rather than act as validators. In contrast, in Ethereum, there are few incentives to run a full node that is not mining and so few nodes serve light clients, resulting in a poor experience for mobile wallets.
 
 ![](https://storage.googleapis.com/celo-website/docs/network-detail.png)

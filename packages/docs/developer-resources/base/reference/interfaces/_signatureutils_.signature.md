@@ -18,7 +18,7 @@
 
 • **r**: *string*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:21](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L21)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L21)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **s**: *string*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:22](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L22)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L22)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **v**: *number*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:20](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L20)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L20)*

@@ -9,7 +9,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
     "Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol"
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     ...(cli.table.flags() as object),
   }
 
@@ -53,6 +53,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
               case AttestationServiceStatusState.UnreachableAttestationService:
               case AttestationServiceStatusState.WrongAccount:
               case AttestationServiceStatusState.Unhealthy:
+              case AttestationServiceStatusState.InvalidAttestationServiceURL:
                 return chalk.red(r.state)
               case AttestationServiceStatusState.Valid:
                 return chalk.green(r.state)

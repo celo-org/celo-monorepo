@@ -19,7 +19,7 @@
 
 • **displayName**? : *undefined | string*
 
-*Defined in [packages/sdk/base/src/contacts.ts:8](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L8)*
+*Defined in [packages/sdk/base/src/contacts.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L8)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **phoneNumbers**? : *[ContactPhoneNumber](_contacts_.contactphonenumber.md)[]*
 
-*Defined in [packages/sdk/base/src/contacts.ts:9](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L9)*
+*Defined in [packages/sdk/base/src/contacts.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L9)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **recordID**: *string*
 
-*Defined in [packages/sdk/base/src/contacts.ts:7](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L7)*
+*Defined in [packages/sdk/base/src/contacts.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L7)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **thumbnailPath**? : *undefined | string*
 
-*Defined in [packages/sdk/base/src/contacts.ts:10](https://github.com/medhak1/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L10)*
+*Defined in [packages/sdk/base/src/contacts.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/contacts.ts#L10)*
