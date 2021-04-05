@@ -65,7 +65,7 @@ contract MetaTransactionWallet is
    * @dev Fallback function allows to deposit ether.
    */
   function() external payable {
-    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
+    // if (msg.value > 0) emit Deposit(msg.sender, msg.value);
   }
 
   /**
@@ -80,7 +80,8 @@ contract MetaTransactionWallet is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _signer The address authorized to execute transactions via this wallet.
    */
-  function initialize(address _signer) external initializer {
+  function initialize(address _signer) external {
+    require(signer == address(0));
     _setSigner(_signer);
     setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions

@@ -603,6 +603,8 @@ const linkedLibraries = {
     'Accounts',
     'Attestations',
     'AttestationsTest',
+    'AttestationsV2',
+    'AttestationsV2Test',
     'LockedGold',
     'Escrow',
     'MetaTransactionWallet',

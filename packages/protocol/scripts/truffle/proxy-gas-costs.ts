@@ -37,8 +37,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     console.info('Deploying Proxy clone with factory...')
     await proxyCloneFactory.setProxyAddress(proxy.address)
-    // TODO: Fix
-    const proxyCloneFromFactory = await proxyCloneFactory.deploy(argv.from, '', '', {
+    const proxyCloneFromFactory = await proxyCloneFactory.deployAndFund(argv.from, '', '', {
       from: argv.from,
     })
     console.log(
