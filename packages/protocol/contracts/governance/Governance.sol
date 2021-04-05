@@ -659,10 +659,11 @@ contract Governance is
     Voter storage voter = voters[account];
     for (uint256 i = 0; i < dequeued.length; i = i.add(1)) {
       VoteRecord storage voteRecord = voter.referendumVotes[i];
-      (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
-        voteRecord.proposalId,
-        i
-      );
+      (Proposals.Proposal storage proposal, Proposals.Stage stage) =
+        requireDequeuedAndDeleteExpired(
+          voteRecord.proposalId,
+          i
+        );
       require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
       proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
       proposal.networkWeight = proposal.networkWeight - voteRecord.weight;
