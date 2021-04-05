@@ -16,6 +16,7 @@ export async function getBlockNumber(): Promise<number> {
     .labels('getBlockNumber')
     .startTimer()
   const res = retryAsyncWithBackOff(
+    // TODO(Alec) Add timeout
     () => getContractKit().connection.getBlockNumber(),
     RETRY_COUNT,
     [],

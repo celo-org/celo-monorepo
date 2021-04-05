@@ -214,6 +214,7 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
+          // TODO(Alec) Add timeout
           () => getContractKit().connection.getTransactionCount(address),
           RETRY_COUNT,
           [],
@@ -234,6 +235,7 @@ export async function getDollarBalance(logger: Logger, ...addresses: string[]): 
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
+          // TODO(Alec) Add timeout
           async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
           RETRY_COUNT,
           [],
@@ -255,6 +257,7 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
+          // TODO(Alec) Add timeout
           async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
           RETRY_COUNT,
           [],
@@ -273,6 +276,7 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
 export async function getWalletAddress(logger: Logger, account: string): Promise<string> {
   try {
     return retryAsyncWithBackOff(
+      // TODO(Alec) Add timeout
       async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
       RETRY_COUNT,
       [],

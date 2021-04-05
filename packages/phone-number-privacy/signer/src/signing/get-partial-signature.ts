@@ -63,7 +63,7 @@ export async function handleGetBlindedMessagePartialSig(
       .labels('authenticateUser')
       .startTimer()
     if (
-      !(await authenticateUser(request, getContractKit(), logger).finally(meterAuthenticateUser))
+      !(await authenticateUser(request, getContractKit(), logger).finally(meterAuthenticateUser)) //TODO(Alec) add timeouts in common package?
     ) {
       respondWithError(
         Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
