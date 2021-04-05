@@ -629,7 +629,7 @@ contract Governance is
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(proposal.isApproved(), "Proposal not approved");
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
-    require(value != Proposals.VoteValue.None, "Vote value unset");
+    require(value > Proposals.VoteValue.Abstain, "Vote value unset");
     require(weight > 0, "Voter weight zero");
     VoteRecord storage voteRecord = voter.referendumVotes[index];
     proposal.updateVote(

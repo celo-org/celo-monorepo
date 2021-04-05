@@ -62,9 +62,9 @@ const parseTransactionParams = (transactionParams: any) => {
 
 enum VoteValue {
   None = 0,
-  Abstain,
-  No,
-  Yes,
+  Abstain = 1,
+  No = 2,
+  Yes = 3,
 }
 
 interface Transaction {
@@ -1500,7 +1500,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#vote()', () => {
+  describe.only('#vote()', () => {
     const proposalId = 1
     const index = 0
     const value = VoteValue.Yes
@@ -1564,6 +1564,10 @@ contract('Governance', (accounts: string[]) => {
           weight: new BigNumber(weight),
         },
       })
+    })
+
+    it('should revert for abstain vote', async () => {
+      await assertRevert(governance.vote(proposalId, index, VoteValue.Abstain))
     })
 
     it('should revert when the account weight is 0', async () => {
