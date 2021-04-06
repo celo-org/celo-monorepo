@@ -3,7 +3,8 @@ import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-ide
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import { queryOdisForSalt } from './query'
-export const runTest = async () => {
+
+export async function testQuery() {
   logger.info('Performing test query')
   try {
     const odisResponse: PhoneNumberHashDetails = await queryOdisForSalt()
@@ -22,22 +23,27 @@ export const runTest = async () => {
   }
 }
 
-export const loop = async () => {
-  while (true) {
-    const reqs = []
-    for (let i = 0; i < 100; i++) {
-      reqs.push(i)
-    }
-
-    await concurrentMap(100, reqs, async (i) => {
-      await sleep(i * 10)
-      try {
-        while (true) {
-          await runTest()
-        }
-      } catch {} // tslint:disable-line:no-empty
-    })
+export async function serialLoadTest(n: number) {
+  for (let i = 0; i < n; i++) {
+    try {
+      await testQuery()
+    } catch {} // tslint:disable-line:no-empty
   }
 }
 
-loop() // tslint:disable-line:no-floating-promises
+export async function concurrentLoadTest(workers: number) {
+  while (true) {
+    const reqs = []
+    for (let i = 0; i < workers; i++) {
+      reqs.push(i)
+    }
+    await concurrentMap(workers, reqs, async (i) => {
+      await sleep(i * 10)
+      while (true) {
+        try {
+          await testQuery()
+        } catch {} // tslint:disable-line:no-empty
+      }
+    })
+  }
+}
