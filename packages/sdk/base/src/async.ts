@@ -96,6 +96,28 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
   throw saveError
 }
 
+// Retries an async function when it raises an exeption
+// Terminates any ongoing request when the timeout is reached
+// if all the tries fail it raises the last thrown exeption
+export const retryAsyncWithBackOffAndTimeout = async <T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  tries: number,
+  params: T,
+  delayMs = 100,
+  factor = 1.5,
+  timeoutMs = 2000,
+  logger: Logger | null = null
+) => {
+  return timeout(
+    retryAsyncWithBackOff,
+    [inFunction, tries, params, delayMs, factor, logger],
+    timeoutMs,
+    new Error(`Timed out after ${timeoutMs}ms`),
+    `${TAG}/@retryAsyncWithBackOffAndTimeout, Timed out after ${timeoutMs}ms`,
+    logger
+  )
+}
+
 /**
  * Map an async function over a list xs with a given concurrency level
  *
@@ -138,4 +160,36 @@ export async function concurrentValuesMap<IN extends any, OUT extends any>(
     output[xk[index]] = value
     return output
   }, {})
+}
+
+/**
+ * Wraps an async function in a timeout before calling it.
+ *
+ * @param inFunction The async function to call
+ * @param params The parameters of the async function
+ * @param timeoutMs The timeout in milliseconds
+ * @param timeoutError The value to which the returned Promise should reject to
+ */
+export const timeout = <T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  params: T,
+  timeoutMs: number,
+  timeoutError: any,
+  timeoutLogMsg: string | null = null,
+  logger: Logger | null = null
+) => {
+  let timer: any
+  return Promise.race([
+    inFunction(...params),
+    new Promise<U>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        if (logger) {
+          logger(timeoutLogMsg || `${TAG}/@timeout Timed out after ${timeoutMs}ms`)
+        }
+        reject(timeoutError)
+      }, timeoutMs)
+    }),
+  ]).finally(() => {
+    clearTimeout(timer)
+  })
 }

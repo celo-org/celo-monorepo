@@ -52,10 +52,6 @@ export const Counters = {
     help:
       'Counter for the number of requests in which the account is not verified but meets min balance',
   }),
-  signatureRequestsWithoutSessionID: new Counter({
-    name: 'signature_requests_without_session_id',
-    help: 'Counter for the number of signature requests without a session id',
-  }),
 }
 const buckets = [
   0.001,

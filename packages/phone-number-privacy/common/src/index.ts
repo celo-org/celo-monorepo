@@ -1,3 +1,4 @@
+export { retryAsyncWithBackOffAndTimeout, timeout } from '@celo/base'
 export * from './interfaces'
 export { ErrorMessage, WarningMessage } from './interfaces/error-utils'
 export {
