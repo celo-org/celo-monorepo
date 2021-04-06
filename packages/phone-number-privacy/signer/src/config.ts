@@ -77,6 +77,7 @@ interface Config {
       secretKey: string
     }
   }
+  whitelist_percentage: number
 }
 
 const env = process.env as any
@@ -131,5 +132,6 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
+  whitelist_percentage: Number(env.WHITELIST_PERCENTAGE) || 0,
 }
 export default config

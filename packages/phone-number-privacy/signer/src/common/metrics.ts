@@ -52,6 +52,10 @@ export const Counters = {
     help:
       'Counter for the number of requests in which the account is not verified but meets min balance',
   }),
+  whitelistedRequests: new Counter({
+    name: 'whitelisted_requests',
+    help: 'Counter for the number of whitelisted requests not requiring quota (testing only)',
+  }),
 }
 const buckets = [
   0.001,
