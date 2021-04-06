@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions'
-import { test } from './test'
+import { testQuery } from './test'
 
 const haveConfig = !!functions.config().blockchain
 export const network = haveConfig ? functions.config().blockchain.network : process.env.NETWORK
@@ -10,4 +10,4 @@ export const blockchainProvider: string = haveConfig
 export const odisMonitorScheduleFunction = functions
   .region('us-central1', 'europe-west3')
   .pubsub.schedule('every 5 minutes')
-  .onRun(test)
+  .onRun(testQuery)

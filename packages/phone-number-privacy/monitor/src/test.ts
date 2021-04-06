@@ -4,7 +4,7 @@ import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import { queryOdisForSalt } from './query'
 
-export async function test() {
+export async function testQuery() {
   logger.info('Performing test query')
   try {
     const odisResponse: PhoneNumberHashDetails = await queryOdisForSalt()
@@ -26,7 +26,7 @@ export async function test() {
 export async function serialLoadTest(n: number) {
   for (let i = 0; i < n; i++) {
     try {
-      await test()
+      await testQuery()
     } catch {} // tslint:disable-line:no-empty
   }
 }
@@ -39,11 +39,11 @@ export async function concurrentLoadTest(workers: number) {
     }
     await concurrentMap(workers, reqs, async (i) => {
       await sleep(i * 10)
-      try {
-        while (true) {
-          await test()
-        }
-      } catch {} // tslint:disable-line:no-empty
+      while (true) {
+        try {
+          await testQuery()
+        } catch {} // tslint:disable-line:no-empty
+      }
     })
   }
 }
