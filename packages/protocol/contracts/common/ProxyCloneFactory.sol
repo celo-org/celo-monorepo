@@ -17,14 +17,26 @@ contract ProxyCloneFactory is CloneFactory, Ownable {
     proxyAddress = _proxyAddress;
   }
 
-  function deployAndFund(address owner, address implementation, bytes calldata initCallData)
-    external
-  {
+  function deploy(address owner, address implementation, bytes calldata initCallData) external {
     ProxyV2 proxy = ProxyV2(createClone(proxyAddress));
     proxy._initialize(address(this));
     proxy._setAndInitializeImplementation(implementation, initCallData);
     proxy._transferOwnership(owner);
-    // address(proxy).transfer(150000000000000000);
+    emit ProxyCreated(proxy);
+  }
+
+  function deployAndFund(
+    address owner,
+    address implementation,
+    bytes calldata initCallData,
+    address token,
+    uint256 value
+  ) external {
+    ProxyV2 proxy = ProxyV2(createClone(proxyAddress));
+    proxy._initialize(address(this));
+    proxy._setAndInitializeImplementation(implementation, initCallData);
+    proxy._transferOwnership(owner);
+    IERC20(token).transfer(address(proxy), value);
     emit ProxyCreated(proxy);
   }
 }

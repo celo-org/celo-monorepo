@@ -29,6 +29,7 @@ contract AttestationsV2 is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
+  // TODO(asa): Is it more efficient to have a smaller request size if there are multiple requests?
   struct Request {
     // The block at which the attestations were requested.
     uint128 blockNumber;
@@ -138,7 +139,7 @@ contract AttestationsV2 is
     payable
     nonReentrant
   {
-    require(msg.value == attestationsRequested.mul(attestationRequestFee));
+    require(msg.value == attestationsRequested.mul(attestationRequestFee), "Insufficient fee");
     require(
       0 < attestationsRequested && attestationsRequested <= maxAttestations,
       "Invalid attestationsRequested"
