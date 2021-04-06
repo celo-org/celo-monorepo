@@ -15,7 +15,7 @@ export const CURRENCIES: CurrencyObject = {
   [CURRENCY_ENUM.GOLD]: {
     symbol: '',
     code: 'cGLD',
-    displayDecimals: 3,
+    displayDecimals: 4,
   },
   [CURRENCY_ENUM.DOLLAR]: {
     symbol: '$',
