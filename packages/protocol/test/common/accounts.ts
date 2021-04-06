@@ -468,7 +468,7 @@ contract('Accounts', (accounts: string[]) => {
       // },
     ]
     scenarios.forEach(function ({ key, description }) {
-      describe.only(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
+      describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let authorizationTest: any
         beforeEach(async () => {
           const authorizationTests = {
@@ -653,7 +653,7 @@ contract('Accounts', (accounts: string[]) => {
         })
 
         describe(`#remove${upperFirst(description)}()`, () => {
-          it.only(`should be able to remove the ${key} signer after authorizing`, async () => {
+          it(`should be able to remove the ${key} signer after authorizing`, async () => {
             const authorized = accounts[1]
             const sig = await getParsedSignatureOfAddress(web3, account, authorized)
 
