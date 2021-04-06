@@ -31,6 +31,7 @@ export function loggerMiddleware(req: Request, res: Response, next?: NextFunctio
   const requestLogger = rootLogger.child({
     endpoint: req.path,
     sessionID: req.body.sessionID, // May be undefined
+    requestID: genRequestID(),
   })
 
   res.locals.logger = requestLogger
@@ -38,4 +39,8 @@ export function loggerMiddleware(req: Request, res: Response, next?: NextFunctio
     next()
   }
   return requestLogger
+}
+
+export function genRequestID() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 }
