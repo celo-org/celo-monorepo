@@ -52,9 +52,9 @@ export const Counters = {
     help:
       'Counter for the number of requests in which the account is not verified but meets min balance',
   }),
-  signatureRequestsWithoutSessionID: new Counter({
-    name: 'signature_requests_without_session_id',
-    help: 'Counter for the number of signature requests without a session id',
+  whitelistedRequests: new Counter({
+    name: 'whitelisted_requests',
+    help: 'Counter for the number of whitelisted requests not requiring quota (testing only)',
   }),
   timeouts: new Counter({
     name: 'timeouts',
@@ -98,6 +98,18 @@ export const Histograms = {
     name: 'get_blinded_sig_instrumentation',
     help: 'Histogram tracking latency of blinded sig function by code segment',
     labelNames: ['codeSegment'],
+    buckets,
+  }),
+  getRemainingQueryCountInstrumentation: new Histogram({
+    name: 'get_remaining_query_count_instrumentation',
+    help: 'Histogram tracking latency of getRemainingQueryCount function by code segment',
+    labelNames: ['codeSegment'],
+    buckets,
+  }),
+  dbOpsInstrumentation: new Histogram({
+    name: 'db_ops_instrumentation',
+    help: 'Histogram tracking latency of all database operations',
+    labelNames: ['operation'],
     buckets,
   }),
   userRemainingQuotaAtRequest: new Histogram({

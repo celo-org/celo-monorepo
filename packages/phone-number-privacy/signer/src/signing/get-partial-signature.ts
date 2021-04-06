@@ -16,7 +16,7 @@ import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms, Labels } from '../common/metrics'
-import { getVersion } from '../config'
+import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
@@ -42,10 +42,6 @@ export async function handleGetBlindedMessagePartialSig(
 
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
-  if (!request.body.sessionID) {
-    logger.debug({ request: request.body }, 'Request does not have sessionID')
-    Counters.signatureRequestsWithoutSessionID.inc()
-  }
   logger.debug('Begin handleGetBlindedMessagePartialSig')
 
   try {
@@ -77,54 +73,59 @@ export async function handleGetBlindedMessagePartialSig(
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
 
     const errorMsgs: string[] = []
-    // In the case of a DB or blockchain connection failure, don't block user
+    // In the case of a blockchain connection failure, don't block user
     // but set the error status accordingly
+    //
     const meterGetQueryCountAndBlockNumber = Histograms.getBlindedSigInstrumentation
       .labels('getQueryCountAndBlockNumber')
       .startTimer()
     const [_queryCount, _blockNumber] = await Promise.allSettled([
-      getRemainingQueryCount(logger, account, hashedPhoneNumber).catch((err) => {
-        Counters.databaseErrors.labels(Labels.read).inc()
-        logger.error('Failed to get user quota')
-        logger.error({ err })
-        errorMsgs.push(ErrorMessage.DATABASE_GET_FAILURE)
-        return { performedQueryCount: -1, totalQuota: -1 }
-      }),
-      getBlockNumber().catch((err) => {
-        Counters.blockchainErrors.labels(Labels.read).inc()
-        logger.error('Failed to get latest block number')
-        logger.error({ err })
-        errorMsgs.push(ErrorMessage.CONTRACT_GET_FAILURE)
-        return -1
-      }),
+      // Note: The database read of the user's performedQueryCount
+      // included here resolves to 0 on error
+      getRemainingQueryCount(logger, account, hashedPhoneNumber),
+      getBlockNumber(),
     ]).finally(meterGetQueryCountAndBlockNumber)
 
     let totalQuota = -1
     let performedQueryCount = -1
     let blockNumber = -1
+    let hadBlockchainError = false
     if (_queryCount.status === 'fulfilled') {
       performedQueryCount = _queryCount.value.performedQueryCount
       totalQuota = _queryCount.value.totalQuota
+    } else {
+      logger.error(_queryCount.reason)
+      hadBlockchainError = true
     }
     if (_blockNumber.status === 'fulfilled') {
       blockNumber = _blockNumber.value
+    } else {
+      logger.error(_blockNumber.reason)
+      hadBlockchainError = true
     }
 
-    if (
-      !errorMsgs.includes(ErrorMessage.DATABASE_GET_FAILURE) &&
-      performedQueryCount >= totalQuota
-    ) {
+    if (hadBlockchainError) {
+      Counters.blockchainErrors.labels(Labels.read).inc()
+      errorMsgs.push(ErrorMessage.CONTRACT_GET_FAILURE)
+    }
+
+    if (_queryCount.status === 'fulfilled' && performedQueryCount >= totalQuota) {
       logger.debug('No remaining query count')
-      respondWithError(
-        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
-        response,
-        403,
-        WarningMessage.EXCEEDED_QUOTA,
-        performedQueryCount,
-        totalQuota,
-        blockNumber
-      )
-      return
+      if (isWhitelisted(request.body)) {
+        Counters.whitelistedRequests.inc()
+        logger.info({ request: request.body }, 'Request whitelisted')
+      } else {
+        respondWithError(
+          Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+          response,
+          403,
+          WarningMessage.EXCEEDED_QUOTA,
+          performedQueryCount,
+          totalQuota,
+          blockNumber
+        )
+        return
+      }
     }
 
     const meterGenerateSignature = Histograms.getBlindedSigInstrumentation
@@ -135,7 +136,6 @@ export async function handleGetBlindedMessagePartialSig(
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
     meterGenerateSignature()
 
-    const meterDbOps = Histograms.getBlindedSigInstrumentation.labels('dbOps').startTimer()
     if (await getRequestExists(request.body, logger)) {
       Counters.duplicateRequests.inc()
       logger.debug(
@@ -143,6 +143,9 @@ export async function handleGetBlindedMessagePartialSig(
       )
       errorMsgs.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
     } else {
+      const meterDbWriteOps = Histograms.getBlindedSigInstrumentation
+        .labels('dbWriteOps')
+        .startTimer()
       const [requestStored, queryCountIncremented] = await Promise.all([
         storeRequest(request.body, logger),
         incrementQueryCount(account, logger),
@@ -157,8 +160,8 @@ export async function handleGetBlindedMessagePartialSig(
       } else {
         performedQueryCount++
       }
+      meterDbWriteOps()
     }
-    meterDbOps()
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {
@@ -199,4 +202,9 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigReques
     isBodyReasonablySized(requestBody) &&
     hasValidTimestamp(requestBody)
   )
+}
+
+function isWhitelisted(requestBody: GetBlindedMessagePartialSigRequest) {
+  const sessionID = Number(requestBody.sessionID)
+  return sessionID && sessionID % 100 < config.whitelist_percentage
 }

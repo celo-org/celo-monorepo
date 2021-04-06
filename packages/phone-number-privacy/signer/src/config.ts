@@ -78,6 +78,7 @@ interface Config {
     }
   }
   timeout: number
+  whitelist_percentage: number
 }
 
 const env = process.env as any
@@ -133,5 +134,6 @@ const config: Config = {
     },
   },
   timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
+  whitelist_percentage: Number(env.WHITELIST_PERCENTAGE) || 0,
 }
 export default config
