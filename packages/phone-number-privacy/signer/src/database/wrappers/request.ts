@@ -26,6 +26,7 @@ export async function getRequestExists(
         [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
       })
       .first()
+      .timeout(DB_TIMEOUT)
     return !!existingRequest
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
