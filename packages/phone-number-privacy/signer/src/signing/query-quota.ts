@@ -293,14 +293,15 @@ export async function getWalletAddress(logger: Logger, account: string): Promise
   const getWalletAddressMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getWalletAddress')
     .startTimer()
-  return retryAsyncWithBackOff(
-    // TODO(Alec): add timeouts to these
+  return retryAsyncWithBackOffAndTimeout(
     async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
     RETRY_COUNT,
     [],
-    RETRY_DELAY_IN_MS
+    RETRY_DELAY_IN_MS,
+    undefined,
+    FULL_NODE_TIMEOUT_IN_MS
   )
-    .catch((err) => {
+    .catch((err: any) => {
       logger.error({ account }, 'failed to get wallet address for account')
       logger.error(err)
       return NULL_ADDRESS

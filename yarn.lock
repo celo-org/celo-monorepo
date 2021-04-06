@@ -1319,6 +1319,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.0.2.tgz#6226d100b20c0186bd32e3c8a4dba0a17780b526"
   integrity sha512-ovNTm6CFbt3bK3LYgVTMvz2yngxKYb0mVIlUv1p6c4suqej5hPzQQyB2dfszInCG4JwzqnTXqR3I/w5qXZ1luA==
 
+"@celo/base@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.1.1.tgz#13c4f5fd8bb69a54632f5c362a8bfc77c7dbec4c"
+  integrity sha512-IJozhIIqe6NFDYhC7Kwq3Ug35uA30gJKHaxYXZ9XZhysS3vt7XBbtZAhBpGhPK475nWLLl9EoHKG+DfGaKjAAQ==
+
 "@celo/connect@1.0.0-beta3":
   version "1.0.0-beta3"
   resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-1.0.0-beta3.tgz#93fa09e13011baed93b934c59f4fddb5b9b3f3ad"
@@ -1445,12 +1450,12 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/phone-number-privacy-common@1.0.26":
-  version "1.0.26"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.26.tgz#1ad59afe0fa56fa6e064c99dd296f41505b1cb26"
-  integrity sha512-flVkZndXL20m2bYy5/hMOtafj/JeVOn7LEHXn0YqwgyzXTjooqosbEB1BWf26hdMPLrobRpUIH99Kjy1jy+jBw==
+"@celo/phone-number-privacy-common@1.0.27":
+  version "1.0.27"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.27.tgz#70a2ce7ea070b68f156ce246b76338ead0d2a865"
+  integrity sha512-4g5+2Qi5Ije3SKg2CxgDrzOpQEdNH5fuZsU1tI9x8ziHVp+DZQ9K11j7vCFkz8Ro5Xmi085+lVuf0eo/OSRixw==
   dependencies:
-    "@celo/base" "1.1.1-dev"
+    "@celo/base" "1.1.1"
     "@celo/contractkit" "1.0.2"
     "@celo/identity" "1.0.2"
     "@celo/utils" "1.0.2"
