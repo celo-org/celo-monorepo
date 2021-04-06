@@ -25,7 +25,7 @@
 
 Ƭ **RandomNumberGenerator**: *function*
 
-*Defined in [packages/sdk/base/src/account.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L19)*
+*Defined in [packages/sdk/base/src/account.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L20)*
 
 #### Type declaration:
 

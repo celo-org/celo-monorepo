@@ -1,4 +1,11 @@
-import { concurrentMap, retryAsync, selectiveRetryAsyncWithBackOff, sleep, timeout } from './async'
+import {
+  concurrentMap,
+  retryAsync,
+  retryAsyncWithBackOffAndTimeout,
+  selectiveRetryAsyncWithBackOff,
+  sleep,
+  timeout,
+} from './async'
 
 describe('retryAsync()', () => {
   test('tries once if it works', async () => {
@@ -37,6 +44,52 @@ describe('selectiveRetryAsyncWithBackOff()', () => {
     }
     expect(mockFunction).toHaveBeenCalledTimes(1)
     expect(didThrowError).toBeTruthy()
+  })
+})
+
+describe('retryAsyncWithBackOffAndTimeout()', () => {
+  test('tries once if it works', async () => {
+    const mockFunction = jest.fn(async () => {
+      await sleep(10)
+      return true
+    })
+    const result: boolean = await retryAsyncWithBackOffAndTimeout<void[], boolean>(
+      mockFunction,
+      3,
+      [],
+      1
+    )
+    expect(result).toBeTruthy()
+    expect(mockFunction).toHaveBeenCalledTimes(1)
+  })
+
+  test('retries n times on failure', async () => {
+    const mockFunction = jest.fn(() => {
+      throw new Error('forced error')
+    })
+
+    try {
+      await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
+      expect(false).toBeTruthy()
+    } catch (error) {
+      expect(error.message).toContain('forced error')
+    }
+    expect(mockFunction).toHaveBeenCalledTimes(3)
+  })
+
+  test('fails on timeout', async () => {
+    const mockFunction = jest.fn(async () => {
+      await sleep(1000)
+    })
+
+    try {
+      await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
+      expect(false).toBeTruthy()
+    } catch (error) {
+      expect(error.message).toContain('Timed out')
+    }
+
+    expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -105,9 +158,12 @@ describe('timeout()', () => {
     })
 
     const timeoutError = Symbol()
-    await timeout(mockFunction, [], 900, timeoutError).catch((error) => {
+    try {
+      await timeout(mockFunction, [], 900, timeoutError)
+      expect(false).toBeTruthy()
+    } catch (error) {
       expect(error).toBe(timeoutError)
-    })
+    }
 
     expect(mockFunction).toHaveBeenCalledTimes(1)
   })
