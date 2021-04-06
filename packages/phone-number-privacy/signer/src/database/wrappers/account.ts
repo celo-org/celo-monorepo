@@ -21,6 +21,7 @@ export async function getPerformedQueryCount(account: string, logger: Logger): P
       .select(ACCOUNTS_COLUMNS.numLookups)
       .where(ACCOUNTS_COLUMNS.address, account)
       .first()
+      .timeout(DB_TIMEOUT)
     getPerformedQueryCountMeter()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (err) {
@@ -51,6 +52,7 @@ async function _incrementQueryCount(account: string, logger: Logger) {
       await accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
+        .timeout(DB_TIMEOUT)
       return true
     } else {
       const newAccount = new Account(account)
@@ -81,6 +83,7 @@ async function _getDidMatchmaking(account: string, logger: Logger): Promise<bool
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
+      .timeout(DB_TIMEOUT)
     if (!didMatchmaking) {
       return false
     }
@@ -109,6 +112,8 @@ async function _setDidMatchmaking(account: string, logger: Logger) {
     if (await getAccountExists(account)) {
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
+        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+        .timeout(DB_TIMEOUT)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date()) // TODO(Alec): add timeouts here?
     } else {
       const newAccount = new Account(account)

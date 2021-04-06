@@ -77,6 +77,7 @@ interface Config {
       secretKey: string
     }
   }
+  timeout: number
   whitelist_percentage: number
 }
 
@@ -132,6 +133,7 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
+  timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
   whitelist_percentage: Number(env.WHITELIST_PERCENTAGE) || 0,
 }
 export default config

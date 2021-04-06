@@ -56,6 +56,10 @@ export const Counters = {
     name: 'whitelisted_requests',
     help: 'Counter for the number of whitelisted requests not requiring quota (testing only)',
   }),
+  timeouts: new Counter({
+    name: 'timeouts',
+    help: 'Counter for the number of signer timeouts as measured by the signer',
+  }),
 }
 const buckets = [
   0.001,
