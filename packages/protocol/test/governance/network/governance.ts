@@ -1566,8 +1566,8 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert for abstain vote', async () => {
-      await assertRevert(governance.vote(proposalId, index, VoteValue.Abstain))
+    it('should revert for abstain plus 1 vote', async () => {
+      await assertRevert(governance.vote(proposalId, index, VoteValue.Abstain + 1))
     })
 
     it('should revert when the account weight is 0', async () => {
