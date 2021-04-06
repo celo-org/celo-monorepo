@@ -16,7 +16,7 @@ import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms, Labels } from '../common/metrics'
-import { getVersion } from '../config'
+import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
@@ -111,16 +111,21 @@ export async function handleGetBlindedMessagePartialSig(
       performedQueryCount >= totalQuota
     ) {
       logger.debug('No remaining query count')
-      respondWithError(
-        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
-        response,
-        403,
-        WarningMessage.EXCEEDED_QUOTA,
-        performedQueryCount,
-        totalQuota,
-        blockNumber
-      )
-      return
+      if (isWhitelisted(request.body)) {
+        Counters.whitelistedRequests.inc()
+        logger.info({ request: request.body }, 'Request whitelisted')
+      } else {
+        respondWithError(
+          Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+          response,
+          403,
+          WarningMessage.EXCEEDED_QUOTA,
+          performedQueryCount,
+          totalQuota,
+          blockNumber
+        )
+        return
+      }
     }
 
     const meterGenerateSignature = Histograms.getBlindedSigInstrumentation
@@ -191,4 +196,9 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigReques
     isBodyReasonablySized(requestBody) &&
     hasValidTimestamp(requestBody)
   )
+}
+
+function isWhitelisted(requestBody: GetBlindedMessagePartialSigRequest) {
+  const sessionID = Number(requestBody.sessionID)
+  return sessionID && sessionID % 100 < config.whitelist_percentage
 }
