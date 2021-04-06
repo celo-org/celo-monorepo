@@ -1527,17 +1527,6 @@ contract('Governance', (accounts: string[]) => {
       assert.isTrue(success)
     })
 
-    it("should update the voter's vote record", async () => {
-      await governance.revokeVotes()
-      const [recordProposalId, recordValue, recordWeight] = await governance.getVoteRecord(
-        account,
-        index
-      )
-      assertEqualBN(recordProposalId, proposalId)
-      assertEqualBN(recordValue, VoteValue.None)
-      assertEqualBN(recordWeight, 0)
-    })
-
     it('should unset the most recent referendum proposal voted on', async () => {
       await governance.revokeVotes()
       assert.equal((await governance.getMostRecentReferendumProposal(account)).toNumber(), 0)
@@ -1549,14 +1538,17 @@ contract('Governance', (accounts: string[]) => {
       assert.isFalse(voting)
     })
 
-    it('should emit the AccountProposalsVoteRevoked event', async () => {
+    it('should emit the ProposalVoteRevoked event', async () => {
       const resp = await governance.revokeVotes()
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'AccountProposalsVoteRevoked',
+        event: 'ProposalVoteRevoked',
         args: {
+          proposalId,
           account,
+          value,
+          weight,
         },
       })
     })
@@ -1603,6 +1595,11 @@ contract('Governance', (accounts: string[]) => {
         await governance.revokeVotes()
         const voting = await governance.isVoting(accounts[0])
         assert.isFalse(voting)
+      })
+
+      it('should emit the ProposalVoteRevoked event 3 times', async () => {
+        const resp = await governance.revokeVotes()
+        assert.equal(resp.logs.length, 3)
       })
     })
   })
