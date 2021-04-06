@@ -1,7 +1,9 @@
+import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { NULL_ADDRESS } from '@celo/contractkit'
 import {
   authenticateUser,
   ErrorMessage,
+  FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -11,7 +13,6 @@ import {
   RETRY_DELAY_IN_MS,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
@@ -213,12 +214,13 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
     addresses
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
-        retryAsyncWithBackOff(
-          // TODO(Alec) Add timeout
+        retryAsyncWithBackOffAndTimeout(
           () => getContractKit().connection.getTransactionCount(address),
           RETRY_COUNT,
           [],
-          RETRY_DELAY_IN_MS
+          RETRY_DELAY_IN_MS,
+          undefined,
+          FULL_NODE_TIMEOUT_IN_MS
         )
       )
   ).then((values) => {
@@ -234,12 +236,13 @@ export async function getDollarBalance(logger: Logger, ...addresses: string[]): 
     addresses
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
-        retryAsyncWithBackOff(
-          // TODO(Alec) Add timeout
+        retryAsyncWithBackOffAndTimeout(
           async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
           RETRY_COUNT,
           [],
-          RETRY_DELAY_IN_MS
+          RETRY_DELAY_IN_MS,
+          undefined,
+          FULL_NODE_TIMEOUT_IN_MS
         )
       )
   ).then((values) => {
@@ -256,12 +259,13 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
     addresses
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
-        retryAsyncWithBackOff(
-          // TODO(Alec) Add timeout
+        retryAsyncWithBackOffAndTimeout(
           async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
           RETRY_COUNT,
           [],
-          RETRY_DELAY_IN_MS
+          RETRY_DELAY_IN_MS,
+          undefined,
+          FULL_NODE_TIMEOUT_IN_MS
         )
       )
   ).then((values) => {
@@ -275,12 +279,13 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
 
 export async function getWalletAddress(logger: Logger, account: string): Promise<string> {
   try {
-    return retryAsyncWithBackOff(
-      // TODO(Alec) Add timeout
+    return retryAsyncWithBackOffAndTimeout(
       async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
       RETRY_COUNT,
       [],
-      RETRY_DELAY_IN_MS
+      RETRY_DELAY_IN_MS,
+      undefined,
+      FULL_NODE_TIMEOUT_IN_MS
     )
   } catch (err) {
     logger.error({ account }, 'failed to get wallet address for account')

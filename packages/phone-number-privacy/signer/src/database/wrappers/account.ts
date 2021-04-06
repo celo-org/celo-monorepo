@@ -90,7 +90,7 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
     if (await getAccountExists(account)) {
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
-        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date()) // TODO(Alec): add db timeouts
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()

@@ -68,7 +68,6 @@ export async function getDataEncryptionKey(
   contractKit: ContractKit
 ): Promise<string> {
   return retryAsyncWithBackOff(
-    // TODO(Alec) Add timeout
     async () => {
       const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
       return accountWrapper.getDataEncryptionKey(address)
@@ -86,7 +85,6 @@ export async function isVerified(
   logger: Logger
 ): Promise<boolean> {
   return retryAsyncWithBackOff(
-    // TODO(Alec) Add timeout
     async () => {
       const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
       const {

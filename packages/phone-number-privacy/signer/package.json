@@ -18,6 +18,7 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
+    "@celo/base": "1.1.1-dev",
     "@celo/contractkit": "1.0.0-beta3",
     "@celo/phone-number-privacy-common": "1.0.24",
     "@celo/identity": "1.0.0-beta3",
