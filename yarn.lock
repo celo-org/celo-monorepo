@@ -1450,10 +1450,10 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/phone-number-privacy-common@1.0.27":
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.27.tgz#70a2ce7ea070b68f156ce246b76338ead0d2a865"
-  integrity sha512-4g5+2Qi5Ije3SKg2CxgDrzOpQEdNH5fuZsU1tI9x8ziHVp+DZQ9K11j7vCFkz8Ro5Xmi085+lVuf0eo/OSRixw==
+"@celo/phone-number-privacy-common@1.0.29":
+  version "1.0.29"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.29.tgz#8804a8f474f08981cf05ab356a60c8928da8fe62"
+  integrity sha512-u1WJwFLcnDatt55Q4vltIBDyijz9zcAw5sh9xIFbfXUk5dHq6WSrofQgBeutX4NWt4Q1xxD2glV8p4TFGn8GZg==
   dependencies:
     "@celo/base" "1.1.1"
     "@celo/contractkit" "1.0.2"
@@ -7400,6 +7400,11 @@ blakejs@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.1.0.tgz#69df92ef953aa88ca51a32df6ab1c54a155fc7a5"
   integrity sha1-ad+S75U6qIylGjLfarHFShVfx6U=
+
+"blind-threshold-bls@git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a":
+  version "0.1.0"
+  uid e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208
+  resolved "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
 
 "blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a":
   version "0.1.0"
