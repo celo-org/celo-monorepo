@@ -1445,14 +1445,15 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/phone-number-privacy-common@1.0.24":
-  version "1.0.24"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.24.tgz#29116a40338f2fa266f8df16af834259dc2f5ec8"
-  integrity sha512-/w+qYKHMHNztMjSTKJVi+9EKms4tT4V5rZnid5HwRCEzSbOJujlwwH9ypiCMfalO2zY9uvYbeNoLUr2RZiK9tA==
+"@celo/phone-number-privacy-common@1.0.26":
+  version "1.0.26"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.26.tgz#1ad59afe0fa56fa6e064c99dd296f41505b1cb26"
+  integrity sha512-flVkZndXL20m2bYy5/hMOtafj/JeVOn7LEHXn0YqwgyzXTjooqosbEB1BWf26hdMPLrobRpUIH99Kjy1jy+jBw==
   dependencies:
-    "@celo/contractkit" "1.0.0-beta3"
-    "@celo/identity" "1.0.0-beta3"
-    "@celo/utils" "1.0.0-beta3"
+    "@celo/base" "1.1.1-dev"
+    "@celo/contractkit" "1.0.2"
+    "@celo/identity" "1.0.2"
+    "@celo/utils" "1.0.2"
     bignumber.js "^9.0.0"
     blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
     btoa "1.2.1"
@@ -1460,10 +1461,9 @@
     bunyan-debug-stream "2.0.0"
     bunyan-gke-stackdriver "0.1.2"
     dotenv "^8.2.0"
-    elliptic "6.5.3"
+    elliptic "^6.5.4"
     is-base64 "^1.1.0"
     libphonenumber-js "^1.9.11"
-    web3 "1.3.0"
 
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
