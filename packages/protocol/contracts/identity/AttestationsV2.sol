@@ -218,7 +218,9 @@ contract AttestationsV2 is
       uint256 idx = uint256(seed) % issuersLength;
       address signer = validatorSignerAddressFromCurrentSet(issuers[idx]);
       address issuer = accounts.signerToAccount(signer);
-      if (attestations.issuedAt[issuer] == 0) {
+      uint256 issuedAt = attestations.issuedAt[issuer];
+      if (issuedAt == attestationsRequest.blockNumber || issuedAt == 0) {
+        // The issuer is the `currentIndex`th issuer for this attestation request.
         if (currentIndex == issuerIndex) {
           return issuer;
         }
