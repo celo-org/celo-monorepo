@@ -17,7 +17,8 @@
     "config:set:mainnet": "firebase functions:config:set --project celo-pgpnp-mainnet",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
-    "lint": "tslint --project ."
+    "lint": "tslint --project .",
+    "loadTest": "ts-node src/scripts/runLoadTest.ts"
   },
   "dependencies": {
     "@celo/contractkit": "1.0.0-beta3",
