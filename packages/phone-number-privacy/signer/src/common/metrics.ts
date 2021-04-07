@@ -52,9 +52,9 @@ export const Counters = {
     help:
       'Counter for the number of requests in which the account is not verified but meets min balance',
   }),
-  whitelistedRequests: new Counter({
-    name: 'whitelisted_requests',
-    help: 'Counter for the number of whitelisted requests not requiring quota (testing only)',
+  testQuotaBypassedRequests: new Counter({
+    name: 'test_quota_bypassed_requests',
+    help: 'Counter for the number of requests not requiring quota (testing only)',
   }),
   timeouts: new Counter({
     name: 'timeouts',

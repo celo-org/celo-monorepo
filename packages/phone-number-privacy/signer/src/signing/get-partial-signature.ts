@@ -111,9 +111,9 @@ export async function handleGetBlindedMessagePartialSig(
 
     if (_queryCount.status === 'fulfilled' && performedQueryCount >= totalQuota) {
       logger.debug('No remaining query count')
-      if (isWhitelisted(request.body)) {
-        Counters.whitelistedRequests.inc()
-        logger.info({ request: request.body }, 'Request whitelisted')
+      if (bypassQuotaForTesting(request.body)) {
+        Counters.testQuotaBypassedRequests.inc()
+        logger.info({ request: request.body }, 'Request will bypass quota check for testing')
       } else {
         respondWithError(
           Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
@@ -204,7 +204,7 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigReques
   )
 }
 
-function isWhitelisted(requestBody: GetBlindedMessagePartialSigRequest) {
+function bypassQuotaForTesting(requestBody: GetBlindedMessagePartialSigRequest) {
   const sessionID = Number(requestBody.sessionID)
-  return sessionID && sessionID % 100 < config.whitelist_percentage
+  return sessionID && sessionID % 100 < config.test_quota_bypass_percentage
 }
