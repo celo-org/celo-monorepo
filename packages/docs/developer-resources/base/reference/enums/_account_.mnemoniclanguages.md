@@ -11,6 +11,7 @@
 * [italian](_account_.mnemoniclanguages.md#italian)
 * [japanese](_account_.mnemoniclanguages.md#japanese)
 * [korean](_account_.mnemoniclanguages.md#korean)
+* [portuguese](_account_.mnemoniclanguages.md#portuguese)
 * [spanish](_account_.mnemoniclanguages.md#spanish)
 
 ## Enumeration members
@@ -68,6 +69,14 @@ ___
 • **korean**:
 
 *Defined in [packages/sdk/base/src/account.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L15)*
+
+___
+
+###  portuguese
+
+• **portuguese**:
+
+*Defined in [packages/sdk/base/src/account.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L17)*
 
 ___
 

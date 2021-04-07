@@ -2,7 +2,7 @@
 The name of the deployment
 */}}
 {{- define "name" -}}
-{{- .Values.environment.name -}}-odis-signer
+{{- .Values.environment.cluster.name -}}
 {{- end -}}
 
 {{/*
