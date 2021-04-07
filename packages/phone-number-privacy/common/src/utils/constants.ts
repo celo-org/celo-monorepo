@@ -1,4 +1,6 @@
-export const REASONABLE_BODY_CHAR_LIMIT: number = 2000
+// a getContactMatches request with 300 phone numbers still fits under
+// this limit.
+export const REASONABLE_BODY_CHAR_LIMIT: number = 16_000
 export const DB_TIMEOUT = 10000
 export const RETRY_COUNT = 5
 export const RETRY_DELAY_IN_MS = 100
