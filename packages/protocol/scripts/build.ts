@@ -118,7 +118,7 @@ function compile() {
         process.exit(1)
       }
     } catch (e) {
-      console.error(
+      console.debug(
         `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
     }
