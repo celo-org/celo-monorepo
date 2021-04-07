@@ -67,6 +67,15 @@ enum VoteValue {
   Yes,
 }
 
+enum Stage {
+  None = 0,
+  Queued,
+  Approval,
+  Referendum,
+  Execution,
+  Expiration,
+}
+
 interface Transaction {
   value: number
   destination: string
@@ -2469,6 +2478,104 @@ contract('Governance', (accounts: string[]) => {
       it('should return false', async () => {
         const passing = await governance.isProposalPassing(proposalId)
         assert.isFalse(passing)
+      })
+    })
+  })
+
+  describe('#getProposalStage()', () => {
+    const expectStage = async (expected: Stage, _proposalId: number) => {
+      const stage = await governance.getProposalStage(_proposalId)
+      assertEqualBN(stage, expected)
+    }
+
+    it('should return None stage when proposal doesnt exist', async () => {
+      await expectStage(Stage.None, 0)
+      await expectStage(Stage.None, 1)
+    })
+
+    describe('when proposal exists', () => {
+      let proposalId: number
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          { value: minDeposit }
+        )
+        proposalId = 1
+        const exists = await governance.proposalExists(proposalId)
+        assert.isTrue(exists, 'proposal does not exist')
+      })
+
+      describe('when proposal is queued', () => {
+        beforeEach(async () => {
+          const queued = await governance.isQueued(proposalId)
+          assert.isTrue(queued, 'proposal not queued')
+        })
+
+        it('should return Queued when not expired', () => expectStage(Stage.Queued, proposalId))
+
+        it('should return Expiration when expired', async () => {
+          await timeTravel(queueExpiry, web3)
+          await expectStage(Stage.Expiration, proposalId)
+        })
+      })
+
+      describe('when proposal is dequeued', () => {
+        const index = 0
+        beforeEach(async () => {
+          await timeTravel(dequeueFrequency, web3)
+          await governance.dequeueProposalsIfReady()
+          const dequeued = await governance.isDequeuedProposal(proposalId, index)
+          assert.isTrue(dequeued, 'proposal not dequeued')
+        })
+
+        describe('when in approval stage', () => {
+          it('should return Approval when not expired', () =>
+            expectStage(Stage.Approval, proposalId))
+
+          it('should return Expiration when expired', async () => {
+            await timeTravel(approvalStageDuration, web3)
+            await expectStage(Stage.Expiration, proposalId)
+          })
+        })
+
+        describe('when in referendum stage', () => {
+          beforeEach(async () => {
+            await governance.approve(proposalId, index)
+            await timeTravel(approvalStageDuration, web3)
+          })
+
+          it('should return Referendum when not expired', () =>
+            expectStage(Stage.Referendum, proposalId))
+
+          it('should return Expiration when expired', async () => {
+            await timeTravel(referendumStageDuration, web3)
+            await expectStage(Stage.Expiration, proposalId)
+          })
+        })
+
+        describe('when in execution stage', () => {
+          beforeEach(async () => {
+            await governance.approve(proposalId, index)
+            await timeTravel(approvalStageDuration, web3)
+            await governance.vote(proposalId, index, VoteValue.Yes)
+            const passing = await governance.isProposalPassing(proposalId)
+            assert.isTrue(passing, 'proposal not passing')
+            await timeTravel(referendumStageDuration, web3)
+          })
+
+          it('should return Execution when not expired', () =>
+            expectStage(Stage.Execution, proposalId))
+
+          it('should return Expiration when expired', async () => {
+            await timeTravel(executionStageDuration, web3)
+            await expectStage(Stage.Expiration, proposalId)
+          })
+        })
       })
     })
   })
