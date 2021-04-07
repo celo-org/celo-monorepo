@@ -16,6 +16,8 @@ import {
   MockValidatorsContract,
   MetaTransactionWalletContract,
   MetaTransactionWalletInstance,
+  MultiMetaTransactionWalletContract,
+  MultiMetaTransactionWalletInstance,
   MetaTransactionWalletDeployerContract,
   MetaTransactionWalletDeployerInstance,
   ProxyContract,
@@ -49,6 +51,7 @@ const getExecuteMetaTransactionData = async (
 
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
 const MTW: MetaTransactionWalletContract = artifacts.require('MetaTransactionWallet')
+const MultiMTW: MultiMetaTransactionWalletContract = artifacts.require('MultiMetaTransactionWallet')
 const MTWDeployer: MetaTransactionWalletDeployerContract = artifacts.require(
   'MetaTransactionWalletDeployer'
 )
@@ -115,7 +118,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
   let mtw: MetaTransactionWalletInstance
   let random: MockRandomInstance
   let registry: RegistryInstance
-  let komencimtw: MetaTransactionWalletInstance
+  let relayermtw: MetaTransactionWalletInstance
   let transactions: any[]
   const attestationExpiryBlocks = (60 * 60) / 5
   const selectIssuersWaitBlocks = 4
@@ -132,8 +135,8 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
     mtw = await MTW.new(false)
     // The komenci version is set as a test contract because we are not using it with a proxy.
-    komencimtw = await MTW.new(true)
-    await komencimtw.initialize(_accounts[0])
+    relayermtw = await MTW.new(true)
+    await relayermtw.initialize(_accounts[0])
 
     // Set up the required mocks the will allow verification to work.
     registry = await getDeployedProxiedContract('Registry', artifacts)
@@ -212,7 +215,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         console.log(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
         totalCost += setAccountTx.receipt.gasUsed
 
-        await stableToken.transfer(komencimtw.address, attestationFee)
+        await stableToken.transfer(relayermtw.address, attestationFee)
 
         const approve = {
           value: 0,
@@ -252,7 +255,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         }
 
         transactions = [transfer, approveMeta, requestMeta]
-        const requestTx = await komencimtw.executeTransactions(
+        const requestTx = await relayermtw.executeTransactions(
           transactions.map((t) => t.destination),
           transactions.map((t) => t.value),
           ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
@@ -313,47 +316,22 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         await proxyCloneFactory.setProxyAddress(proxy.address)
       })
 
+      // The same as the current komenci flow, but using EIP-1167 proxies, and transferring the
+      // proxy ownership to the proxy rather than the user (this does not affect gas costs in
+      // this flow, but will save gas in future flows.)
       describe('Current flow', () => {
         it('should onboard a new user', async () => {
           let totalCost = 0
 
-          await stableToken.transfer(komencimtw.address, attestationFee)
-
-          const deploymentTx = await proxyCloneFactory.deploy(
-            // TODO: Should proxy ownership be transferred to itself instead of the signer?
-            komencimtw.address,
+          const deploymentTx = await proxyCloneFactory.deployV2(
             mtw.address,
             // @ts-ignore
-            mtw.contract.methods.initialize(ensureLeading0x(komencimtw.address)).encodeABI()
+            mtw.contract.methods.initialize(ensureLeading0x(user)).encodeABI()
           )
           console.log(`Deploying a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
           totalCost += deploymentTx.receipt.gasUsed
           const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
           mtw = await MTW.at(proxy.address)
-
-          const ownership = {
-            value: 0,
-            destination: proxy.address,
-            // @ts-ignore
-            data: proxy.contract.methods._transferOwnership(user).encodeABI(),
-          }
-          // Set signer is only owner and so it needs to be called via the mtw
-          // @ts-ignore
-          const signerData = mtw.contract.methods.setSigner(user).encodeABI()
-          const signer = {
-            value: 0,
-            destination: mtw.address,
-            // @ts-ignore
-            data: mtw.contract.methods.executeTransaction(mtw.address, 0, signerData).encodeABI(),
-          }
-          transactions = [ownership, signer]
-          const ownershipTx = await komencimtw.executeTransactions(
-            transactions.map((t) => t.destination),
-            transactions.map((t) => t.value),
-            ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
-            transactions.map((t) => trimLeading0x(t.data).length / 2)
-          )
-          console.log(`Transferring ownership to the user takes ${ownershipTx.receipt.gasUsed} gas`)
 
           let { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
           const setAccount = {
@@ -367,8 +345,10 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           console.log(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
           totalCost += setAccountTx.receipt.gasUsed
 
-          await stableToken.transfer(komencimtw.address, attestationFee)
+          await stableToken.transfer(relayermtw.address, attestationFee)
 
+          // Is is cheaper to submit these two as separate meta transaction than as a single
+          // meta transaction batch by ~10k gas.
           const approve = {
             value: 0,
             destination: stableToken.address,
@@ -407,7 +387,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           }
 
           transactions = [transfer, approveMeta, requestMeta]
-          const requestTx = await komencimtw.executeTransactions(
+          const requestTx = await relayermtw.executeTransactions(
             transactions.map((t) => t.destination),
             transactions.map((t) => t.value),
             ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
@@ -448,31 +428,183 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           }
           console.log(`Onboarding a user takes ${totalCost} gas`)
         })
-        // Deploying a proxy takes 187870 gas
-        // Transferring ownership to the user takes 73158 gas
+        // Deploying a proxy takes 187488 gas
         // Setting the account takes 189943 gas
-        // Requesting attestations takes 236676 gas
+        // Requesting attestations takes 221676 gas
         // Selecting issuers takes 250184 gas
         // Completing an attestation takes 145670 gas
         // Completing an attestation takes 105110 gas
         // Completing an attestation takes 105066 gas
-        // Onboarding a user takes 1220519 gas
-        // 71% if we don't pre-deploy
-        // 60% if we do pre-deploy
+        // Onboarding a user takes 1205137 gas
+        // Total gas cost: 70.6% of current.
+        // Throughput increase: 41.7%.
       })
 
-      describe('Optimized flow', () => {
+      // In this flow, the user is onboarded using an EIP-1167 compliant proxy that has already
+      // been deployed. On the Valora side, it should look identical to the non-pooled approach.
+      // Note the added benefit of eliminating the need for one mtw per relayer; instead, all
+      // relayers call into the same multimtw, which means we only need to keep track of a single
+      // cUSD account balance.
+      describe('Pooled proxy flow', () => {
+        it('should onboard a new user', async () => {
+          let totalCost = 0
+
+          // All proxies in the pool are owned by the multimtw contract which is essentially a 1/n
+          // multisig. Note it is substantially more gas efficient than a MultiSig wallet with
+          // confirmations set to 1.
+          const poolmtw: MultiMetaTransactionWalletInstance = await MultiMTW.new(false)
+          await poolmtw.initialize([_accounts[0]])
+
+          const deploymentTx = await proxyCloneFactory.deployV2(
+            mtw.address,
+            // @ts-ignore
+            mtw.contract.methods.initialize(ensureLeading0x(poolmtw.address)).encodeABI()
+          )
+          console.log(`Deploying a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
+          totalCost += deploymentTx.receipt.gasUsed
+          const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
+          mtw = await MTW.at(proxy.address)
+
+          // Changing the signer needs to be doubly nested.
+          // @ts-ignore
+          const signerData = mtw.contract.methods.setSigner(user).encodeABI()
+          // @ts-ignore
+          const signerDataData = mtw.contract.methods
+            .executeTransaction(mtw.address, 0, signerData)
+            .encodeABI()
+          const signerTx = await poolmtw.executeTransaction(mtw.address, 0, signerDataData)
+          console.log(`Transferring ownership to the user takes ${signerTx.receipt.gasUsed} gas`)
+          totalCost += signerTx.receipt.gasUsed
+
+          // From here on out, the flow looks exactly the same as the non-pooled case.
+          let { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
+          const setAccount = {
+            value: 0,
+            destination: accounts.address,
+            // @ts-ignore
+            data: accounts.contract.methods.setAccount('', dek, user, v, r, s).encodeABI(),
+            nonce: 0,
+          }
+          const setAccountTx = await executeMetaTransaction(user, mtw, setAccount)
+          console.log(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
+          totalCost += setAccountTx.receipt.gasUsed
+
+          await stableToken.transfer(poolmtw.address, attestationFee)
+
+          // Is is cheaper to submit these two as separate meta transaction than as a single
+          // meta transaction batch by ~10k gas.
+          const approve = {
+            value: 0,
+            destination: stableToken.address,
+            // @ts-ignore
+            data: stableToken.contract.methods
+              .approve(attestations.address, attestationFee)
+              .encodeABI(),
+            nonce: 1,
+          }
+          const approveMeta = {
+            value: 0,
+            destination: mtw.address,
+            data: await getExecuteMetaTransactionData(user, mtw, approve),
+          }
+
+          const request = {
+            value: 0,
+            destination: attestations.address,
+            // @ts-ignore
+            data: attestations.contract.methods
+              .request(identifier, numAttestations, stableToken.address)
+              .encodeABI(),
+            nonce: 2,
+          }
+          const requestMeta = {
+            value: 0,
+            destination: mtw.address,
+            data: await getExecuteMetaTransactionData(user, mtw, request),
+          }
+
+          const transfer = {
+            value: 0,
+            destination: stableToken.address,
+            // @ts-ignore
+            data: stableToken.contract.methods.transfer(mtw.address, attestationFee).encodeABI(),
+          }
+
+          transactions = [transfer, approveMeta, requestMeta]
+          const requestTx = await poolmtw.executeTransactions(
+            transactions.map((t) => t.destination),
+            transactions.map((t) => t.value),
+            ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
+            transactions.map((t) => trimLeading0x(t.data).length / 2)
+          )
+          console.log(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
+          totalCost += requestTx.receipt.gasUsed
+
+          // Add fake randomness so that issuers can be selected.
+          const requestBlockNumber = await web3.eth.getBlockNumber()
+          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
+
+          const select = {
+            value: 0,
+            destination: attestations.address,
+            // @ts-ignore
+            data: attestations.contract.methods.selectIssuers(identifier).encodeABI(),
+            nonce: 3,
+          }
+          const selectTx = await executeMetaTransaction(user, mtw, select)
+          console.log(`Selecting issuers takes ${selectTx.receipt.gasUsed} gas`)
+          totalCost += selectTx.receipt.gasUsed
+
+          const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
+          for (let i = 0; i < numAttestations; i++) {
+            const issuer = issuers[i]
+            ;[v, r, s] = await getVerificationCodeSignature(mtw.address, issuer, identifier)
+            const complete = {
+              value: 0,
+              destination: attestations.address,
+              // @ts-ignore
+              data: attestations.contract.methods.complete(identifier, v, r, s).encodeABI(),
+              nonce: i + 4,
+            }
+            const completeTx = await executeMetaTransaction(user, mtw, complete)
+            console.log(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
+            totalCost += completeTx.receipt.gasUsed
+          }
+          console.log(`Onboarding a user takes ${totalCost} gas`)
+          // Deploying a proxy takes 187510 gas
+          // Transferring ownership to the user takes 52583 gas
+          // Setting the account takes 189943 gas
+          // Requesting attestations takes 221981 gas
+          // Selecting issuers takes 250184 gas
+          // Completing an attestation takes 145670 gas
+          // Completing an attestation takes 105110 gas
+          // Completing an attestation takes 105066 gas
+          // Onboarding a user takes 1258047 gas
+          // Adding pooling increases total gas costs by 4.3%, but allows us to pre-pay such that
+          // the total cost after a user hits Komenci is 88.8% of the unpooled approach,
+          // increasing throughput by 12.6%.
+        })
+      })
+
+      // In this flow, we further optimize by pre-funding the pooled proxies, bundling setAccount
+      // with the attestations request, and by transferring ownership of the mtw as late as
+      // possible.
+      describe('Pooled proxy optimized flow', () => {
         it('should onboard a new user', async () => {
           let totalCost = 0
 
           await stableToken.transfer(proxyCloneFactory.address, attestationFee)
 
-          const deploymentTx = await proxyCloneFactory.deployAndFund(
-            // TODO: Should proxy ownership be transferred to itself instead of the signer?
-            komencimtw.address,
+          // All proxies in the pool are owned by the multimtw contract which is essentially a 1/n
+          // multisig. Note it is substantially more gas efficient than a MultiSig wallet with
+          // confirmations set to 1.
+          const poolmtw: MultiMetaTransactionWalletInstance = await MultiMTW.new(false)
+          await poolmtw.initialize([_accounts[0]])
+
+          const deploymentTx = await proxyCloneFactory.deployAndFundV2(
             mtw.address,
             // @ts-ignore
-            mtw.contract.methods.initialize(ensureLeading0x(komencimtw.address)).encodeABI(),
+            mtw.contract.methods.initialize(ensureLeading0x(poolmtw.address)).encodeABI(),
             stableToken.address,
             attestationFee
           )
@@ -481,7 +613,9 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
           mtw = await MTW.at(proxy.address)
 
-          // TODO(asa): Can we bundle the pre-approval in the deployment? Probably.
+          // TODO(asa): Can we bundle the pre-approval in the deployment?
+          // Probably, and it's important that we do, so that the deployment can easily be pooled,
+          // or not.
           // @ts-ignore
           const approveData = stableToken.contract.methods
             .approve(attestations.address, attestationFee)
@@ -491,12 +625,39 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             .executeTransaction(stableToken.address, 0, approveData)
             .encodeABI()
 
-          const approveTx = await komencimtw.executeTransaction(mtw.address, 0, approveExecuteData)
+          const approveTx = await poolmtw.executeTransaction(mtw.address, 0, approveExecuteData)
           console.log(`Pre-approving takes ${approveTx.receipt.gasUsed} gas`)
           totalCost += approveTx.receipt.gasUsed
 
+          // Things to try:
+          // 1. pool.executeTransaction(user.executeTransactions(setAccount, request)), pool.executeTransaction(user.executeTransactions(select, signer))
+          // Requesting attestations takes 270205 gas
+          // Selecting issuers takes 274851 gas
+          // 2. pool.executeTransaction(user.executeTransaction(request)), pool.executeTransaction(user.executeTransactions(setAccount, select, signer))
+          // Requesting attestations takes 117858 gas
+          // Selecting issuers takes 419141 gas
+          // 8k more gas efficient
+
+          // @ts-ignore
+          const requestData = attestations.contract.methods
+            .request(identifier, numAttestations, stableToken.address)
+            .encodeABI()
+          // @ts-ignore
+          const requestDataData = mtw.contract.methods
+            .executeTransaction(attestations.address, 0, requestData)
+            .encodeABI()
+          const requestTx = await poolmtw.executeTransaction(mtw.address, 0, requestDataData)
+          console.log(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
+          totalCost += requestTx.receipt.gasUsed
+
+          // Add fake randomness so that issuers can be selected.
+          const selectIssuersWaitBlocks = 4
+          const requestBlockNumber = await web3.eth.getBlockNumber()
+          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
+
           // It saves us approximately 20k gas to batch these at the mtw level instead of the
-          // komencimtw level.
+          // relayermtw level.
+          // TODO(asa): Can we batch setAccount into the next one?
           let { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
           // @ts-ignore
           const setAccountData = accounts.contract.methods
@@ -509,35 +670,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           }
 
           // @ts-ignore
-          const requestData = attestations.contract.methods
-            .request(identifier, numAttestations, stableToken.address)
-            .encodeABI()
-          const request = {
-            value: 0,
-            destination: attestations.address,
-            data: requestData,
-          }
-
-          transactions = [setAccount, request]
-          // @ts-ignore
-          const requestTxData = mtw.contract.methods
-            .executeTransactions(
-              transactions.map((t) => t.destination),
-              transactions.map((t) => t.value),
-              ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
-              transactions.map((t) => trimLeading0x(t.data).length / 2)
-            )
-            .encodeABI()
-          const requestTx = await komencimtw.executeTransaction(mtw.address, 0, requestTxData)
-          console.log(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
-          totalCost += requestTx.receipt.gasUsed
-
-          // Add fake randomness so that issuers can be selected.
-          const selectIssuersWaitBlocks = 4
-          const requestBlockNumber = await web3.eth.getBlockNumber()
-          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-
-          // @ts-ignore
           const selectData = attestations.contract.methods.selectIssuers(identifier).encodeABI()
           let select = {
             value: 0,
@@ -546,6 +678,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             data: selectData,
           }
           // Set signer is only owner and so it needs to be called via the mtw
+          // TODO(asa): This might need to be nested again...
           // @ts-ignore
           const signerData = mtw.contract.methods.setSigner(user).encodeABI()
           const signer = {
@@ -554,9 +687,9 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             // @ts-ignore
             data: signerData,
           }
-          transactions = [select, signer]
+          transactions = [setAccount, select, signer]
           // @ts-ignore
-          const selectTxData = mtw.contract.methods
+          const batchData = mtw.contract.methods
             .executeTransactions(
               transactions.map((t) => t.destination),
               transactions.map((t) => t.value),
@@ -564,25 +697,8 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
               transactions.map((t) => trimLeading0x(t.data).length / 2)
             )
             .encodeABI()
-          select = {
-            value: 0,
-            destination: mtw.address,
-            data: selectTxData,
-          }
+          const selectTx = await poolmtw.executeTransaction(mtw.address, 0, batchData)
 
-          const ownership = {
-            value: 0,
-            destination: proxy.address,
-            // @ts-ignore
-            data: proxy.contract.methods._transferOwnership(user).encodeABI(),
-          }
-          transactions = [select, ownership]
-          const selectTx = await komencimtw.executeTransactions(
-            transactions.map((t) => t.destination),
-            transactions.map((t) => t.value),
-            ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
-            transactions.map((t) => trimLeading0x(t.data).length / 2)
-          )
           console.log(`Selecting issuers takes ${selectTx.receipt.gasUsed} gas`)
           totalCost += selectTx.receipt.gasUsed
 
@@ -603,17 +719,17 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           }
           console.log(`Onboarding a user takes ${totalCost} gas`)
         })
-        // This flow is a ~10% improvement over the above if we pre-deploy.
-        // Deploying and funding a proxy takes 216812 gas
-        // Pre-approving takes 70189 gas
-        // Requesting attestations takes 270133 gas
-        // Selecting issuers takes 297262 gas
+        // Deploying and funding a proxy takes 216366 gas
+        // Pre-approving takes 70261 gas
+        // Requesting attestations takes 117858 gas
+        // Selecting issuers takes 419141 gas
         // Completing an attestation takes 160690 gas
         // Completing an attestation takes 105098 gas
         // Completing an attestation takes 105078 gas
-        // Onboarding a user takes 1225262 gas
-        // 72% if we don't pre-deploy
-        // 55% if we pre-deploy
+        // Onboarding a user takes 1194492 gas
+        // The total cost of onboarding a user is 94.9% of the un-optimized pooled flow.
+        // The cost after the user hits Komenci is 84.8% of the un-optimized pooled flow, giving
+        // a throughput increase of 17.9%.
       })
     })
   })
@@ -647,17 +763,21 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     })
 
     // TODO(asa): Fix attestation fee.
-    describe.only('Optimized flow with EIP-1167', () => {
+    describe.only('Pooled proxy optimized flow', () => {
       it('should onboard a new user', async () => {
         let totalCost = 0
 
+        // All proxies in the pool are owned by the multimtw contract which is essentially a 1/n
+        // multisig. Note it is substantially more gas efficient than a MultiSig wallet with
+        // confirmations set to 1.
+        const poolmtw: MultiMetaTransactionWalletInstance = await MultiMTW.new(false)
+        await poolmtw.initialize([_accounts[0]])
+
         // Possibly batch completions
-        const deploymentTx = await proxyCloneFactory.deploy(
-          // TODO: Should proxy ownership be transferred to itself instead of the signer?
-          komencimtw.address,
+        const deploymentTx = await proxyCloneFactory.deployV2(
           mtw.address,
           // @ts-ignore
-          mtw.contract.methods.initialize(ensureLeading0x(komencimtw.address)).encodeABI()
+          mtw.contract.methods.initialize(ensureLeading0x(poolmtw.address)).encodeABI()
         )
         console.log(
           `Deploying and funding a proxy takes ${deploymentTx.receipt.gasUsed + 21000} gas`
@@ -666,6 +786,8 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
         mtw = await MTW.at(proxy.address)
         // TODO(asa): Find a way to bundle this into the deployment tx
+        // TOOD(asa): Alternatively, allow other users to pay for requests in cUSD.
+        // What would that look like? At deployment time, proxyCloneFactory would call stableToken.approve(mtw.address, fee). Easy peasy.
         await web3.eth.sendTransaction({
           from: _accounts[0],
           to: proxy.address,
@@ -713,26 +835,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             transactions.map((t) => trimLeading0x(t.data).length / 2)
           )
           .encodeABI()
-        const batch = {
-          value: 0,
-          destination: mtw.address,
-          data: batchData,
-        }
-
-        const ownership = {
-          value: 0,
-          destination: proxy.address,
-          // @ts-ignore
-          data: proxy.contract.methods._transferOwnership(user).encodeABI(),
-        }
-
-        transactions = [batch, ownership]
-        const requestTx = await komencimtw.executeTransactions(
-          transactions.map((t) => t.destination),
-          transactions.map((t) => t.value),
-          ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
-          transactions.map((t) => trimLeading0x(t.data).length / 2)
-        )
+        const requestTx = await poolmtw.executeTransaction(mtw.address, 0, batchData)
         console.log(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
         totalCost += requestTx.receipt.gasUsed
 
@@ -761,14 +864,15 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           totalCost += completeTx.receipt.gasUsed
         }
         console.log(`Onboarding a user takes ${totalCost} gas`)
-        // Deploying and funding a proxy takes 208870 gas
-        // Requesting attestations takes 319354 gas
+        // Deploying and funding a proxy takes 208510 gas
+        // Requesting attestations takes 295586 gas
         // Completing an attestation takes 175421 gas
         // Completing an attestation takes 126117 gas
         // Completing an attestation takes 132416 gas
-        // Onboarding a user takes 941178 gas
-        // 55% if we don't pre-deploy
-        // 43% if we pre-deploy
+        // Onboarding a user takes 917050 gas
+        // The total cost of onboarding a user is 76.8% of the best V1 flow.
+        // The cost after the user hits Komenci is 78% of the best V1 flow, giving
+        // a throughput increase of 28%.
       })
     })
   })

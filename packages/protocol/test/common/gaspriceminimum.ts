@@ -174,6 +174,18 @@ contract('GasPriceMinimum', (accounts: string[]) => {
   })
 
   describe('#getUpdatedGasPriceMinimum', () => {
+    describe.only('trying to force an underflow', () => {
+      it('should not underflow', async () => {
+        const runs = 100
+        for (let i = 0; i < runs; i++) {}
+        const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
+        await gasPriceMinimum.setGasPriceMinimumFloor(currentGasPriceMinimum)
+        const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(1, 1)
+        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum.times(5).div(4).plus(1)
+        assertEqualBN(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum)
+      })
+    })
+
     describe('when the block is full', () => {
       it('should return 25% more than the initial minimum and should not be limited by the gas price minimum floor as a whole', async () => {
         const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()

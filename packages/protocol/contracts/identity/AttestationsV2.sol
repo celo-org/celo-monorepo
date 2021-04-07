@@ -71,6 +71,7 @@ contract AttestationsV2 is
 
   // The attestation request fee in cUSD, which will be translated into CELO.
   uint256 public attestationRequestFee;
+  address public attestationRequestFeeToken;
 
   // Maps an attestation issuer to the amount that they're owed.
   mapping(address => uint256) public pendingWithdrawals;
@@ -106,7 +107,8 @@ contract AttestationsV2 is
     uint256 _attestationExpiryBlocks,
     uint256 _selectIssuersWaitBlocks,
     uint256 _maxAttestations,
-    uint256 _attestationRequestFee
+    uint256 _attestationRequestFee,
+    address _attestationRequestFeeToken
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -114,6 +116,7 @@ contract AttestationsV2 is
     setSelectIssuersWaitBlocks(_selectIssuersWaitBlocks);
     setMaxAttestations(_maxAttestations);
     attestationRequestFee = _attestationRequestFee;
+    attestationRequestFeeToken = _attestationRequestFeeToken;
   }
 
   /**
@@ -139,10 +142,19 @@ contract AttestationsV2 is
     payable
     nonReentrant
   {
-    require(msg.value == attestationsRequested.mul(attestationRequestFee), "Insufficient fee");
+    // require(msg.value == attestationsRequested.mul(attestationRequestFee), "Insufficient fee");
     require(
       0 < attestationsRequested && attestationsRequested <= maxAttestations,
       "Invalid attestationsRequested"
+    );
+
+    require(
+      IERC20(attestationRequestFeeToken).transferFrom(
+        msg.sender,
+        address(this),
+        attestationRequestFees[attestationRequestFeeToken].mul(attestationsRequested)
+      ),
+      "Transfer of attestation request fees failed"
     );
 
     Attestations storage attestations = identifiers[identifier].attestations[msg.sender];
