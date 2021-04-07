@@ -3,6 +3,7 @@ import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
+import { ERROR, getError } from '@walletconnect/utils'
 import debugConfig from 'debug'
 import { SupportedMethods } from './types'
 import { WalletConnectSigner } from './wc-signer'
@@ -174,10 +175,14 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
       throw new Error('Wallet must be initialized before calling close()')
     }
 
+    const reason = getError(ERROR.USER_DISCONNECTED)
     if (this.session) {
-      await this.client.disconnect({ topic: this.session.topic, reason: 'Session closed' })
+      await this.client.disconnect({
+        topic: this.session.topic,
+        reason,
+      })
     }
 
-    await this.client.pairing.delete({ topic: this.pairing!.topic, reason: 'Session closed' })
+    await this.client.pairing.delete({ topic: this.pairing!.topic, reason })
   }
 }
