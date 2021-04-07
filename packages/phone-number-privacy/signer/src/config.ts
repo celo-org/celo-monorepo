@@ -89,7 +89,7 @@ const config: Config = {
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   quota: {
-    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 2,
+    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 10,
     additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
     queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
     // Min balance is .01 cUSD
