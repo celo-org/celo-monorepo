@@ -29,21 +29,14 @@ export const rootLogger: Logger = createLogger({
 })
 
 export function loggerMiddleware(req: Request, res: Response, next?: NextFunction): Logger {
-  const sessionID = req.body.sessionID || genSessionID()
-
   const requestLogger = rootLogger.child({
     endpoint: req.path,
-    sessionID,
+    sessionID: req.body.sessionID, // May be undefined
   })
   res.locals.logger = requestLogger
 
   if (!req.body.sessionID) {
-    req.body.sessionID = sessionID
     requestLogger.info(WarningMessage.MISSING_SESSION_ID)
-    requestLogger.info(
-      { request: req.body },
-      `Request received w/o sessionID, assigning ${sessionID}`
-    )
   }
 
   if (next) {
