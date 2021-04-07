@@ -1319,6 +1319,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.0.2.tgz#6226d100b20c0186bd32e3c8a4dba0a17780b526"
   integrity sha512-ovNTm6CFbt3bK3LYgVTMvz2yngxKYb0mVIlUv1p6c4suqej5hPzQQyB2dfszInCG4JwzqnTXqR3I/w5qXZ1luA==
 
+"@celo/base@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.1.1.tgz#13c4f5fd8bb69a54632f5c362a8bfc77c7dbec4c"
+  integrity sha512-IJozhIIqe6NFDYhC7Kwq3Ug35uA30gJKHaxYXZ9XZhysS3vt7XBbtZAhBpGhPK475nWLLl9EoHKG+DfGaKjAAQ==
+
 "@celo/connect@1.0.0-beta3":
   version "1.0.0-beta3"
   resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-1.0.0-beta3.tgz#93fa09e13011baed93b934c59f4fddb5b9b3f3ad"
@@ -1464,26 +1469,6 @@
     is-base64 "^1.1.0"
     libphonenumber-js "^1.9.11"
     web3 "1.3.0"
-
-"@celo/phone-number-privacy-common@1.0.31":
-  version "1.0.31"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.31.tgz#3fde5e1ec52fe86f43759e22bbbc55d9070f7020"
-  integrity sha512-EDr3u5PP4Avcjmk1whrxlZlVW/9N+iAbo8pJsbuAuWYvonyYUmqpBeZJbhmNg7PNf2ygvDbH/WlOT04JqL6ulQ==
-  dependencies:
-    "@celo/base" "1.1.1-dev"
-    "@celo/contractkit" "1.0.2"
-    "@celo/identity" "1.0.2"
-    "@celo/utils" "1.0.2"
-    bignumber.js "^9.0.0"
-    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
-    btoa "1.2.1"
-    bunyan "1.8.12"
-    bunyan-debug-stream "2.0.0"
-    bunyan-gke-stackdriver "0.1.2"
-    dotenv "^8.2.0"
-    elliptic "^6.5.4"
-    is-base64 "^1.1.0"
-    libphonenumber-js "^1.9.11"
 
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
