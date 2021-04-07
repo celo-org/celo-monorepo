@@ -668,11 +668,9 @@ contract Governance is
       dequeueIndex = dequeueIndex.add(1)
     ) {
       VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
-      (Proposals.Proposal storage proposal, Proposals.Stage stage) =
-        requireDequeuedAndDeleteExpired(
-          voteRecord.proposalId,
-          dequeueIndex
-        );
+      Proposals.Proposal storage proposal;
+      Proposals.Stage stage;
+      (proposal, stage) = requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex);
       require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
       uint256 weight = voteRecord.weight;
       Proposals.VoteValue value = voteRecord.value;
