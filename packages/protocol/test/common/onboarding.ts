@@ -734,6 +734,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     })
   })
 
+  // possible.
   describe('With AttestationsV2', () => {
     const Proxy: ProxyContract = artifacts.require('ProxyV2')
     const ProxyCloneFactory: ProxyCloneFactoryContract = artifacts.require('ProxyCloneFactory')
@@ -762,7 +763,14 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
       await proxyCloneFactory.setProxyAddress(proxy.address)
     })
 
-    // TODO(asa): Fix attestation fee.
+    // In this flow, we further optimize by using a version of the attestations contract that uses
+    // significantly less storage, allows for fees to be paid in CELO, and removes the
+    // selectIssuers step.
+    // Note that the guarantees around issuer selection across multiple attestations request
+    // differ slightly but significantly from the current version.
+    // TODO: Attestation fees in CELO don't work well, particularly when they are pre-paid. Is
+    // there a more gas efficient way to pay in cUSD (e.g. by allowing Alice to pay for Bob?)
+    // TODO: Can the optimizations in V2 be rolled out in a backwards compatible way?
     describe.only('Pooled proxy optimized flow', () => {
       it('should onboard a new user', async () => {
         let totalCost = 0
@@ -786,8 +794,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
         mtw = await MTW.at(proxy.address)
         // TODO(asa): Find a way to bundle this into the deployment tx
-        // TOOD(asa): Alternatively, allow other users to pay for requests in cUSD.
-        // What would that look like? At deployment time, proxyCloneFactory would call stableToken.approve(mtw.address, fee). Easy peasy.
         await web3.eth.sendTransaction({
           from: _accounts[0],
           to: proxy.address,
