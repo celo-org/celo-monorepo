@@ -1,6 +1,11 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { failIfVmBased } from 'src/lib/env-utils'
-import { resetAndUpgradeHelmChart, upgradeHelmChart, upgradeStaticIPs } from 'src/lib/helm_deploy'
+import {
+  isCelotoolHelmDryRun,
+  resetAndUpgradeHelmChart,
+  upgradeHelmChart,
+  upgradeStaticIPs,
+} from 'src/lib/helm_deploy'
 import {
   uploadEnvFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
@@ -34,7 +39,7 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: TestnetArgv) => {
   failIfVmBased()
 
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   await upgradeStaticIPs(argv.celoEnv)
 
@@ -46,7 +51,7 @@ export const handler = async (argv: TestnetArgv) => {
   } else {
     await upgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
   }
-  if (process.env.CELOTOOL_HELM_DRY_RUN !== 'true') {
+  if (!isCelotoolHelmDryRun()) {
     await uploadTestnetStaticNodesToGoogleStorage(argv.celoEnv)
     await uploadEnvFileToGoogleStorage(argv.celoEnv)
   }

@@ -3,7 +3,7 @@ import {
   deallocateStaticIP,
   getAKSNodeResourceGroup,
   registerStaticIPIfNotRegistered,
-  waitForStaticIPDetachment
+  waitForStaticIPDetachment,
 } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { AksClusterConfig } from '../k8s-cluster/aks'
@@ -87,7 +87,8 @@ export class AksFullNodeDeployer extends BaseFullNodeDeployer {
   }
 
   async getFullNodeIP(index: number, resourceGroup?: string): Promise<string> {
-    resourceGroup = resourceGroup || await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig)
+    resourceGroup =
+      resourceGroup || (await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig))
     return registerStaticIPIfNotRegistered(`${this.staticIPNamePrefix}-${index}`, resourceGroup)
   }
 

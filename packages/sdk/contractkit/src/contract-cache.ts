@@ -1,4 +1,5 @@
 import { CeloContract } from './base'
+import { StableToken } from './celo-tokens'
 import { ContractKit } from './kit'
 import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
@@ -32,6 +33,7 @@ const WrapperFactories = {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
+  [CeloContract.ExchangeEUR]: ExchangeWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
@@ -46,6 +48,7 @@ const WrapperFactories = {
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
+  [CeloContract.StableTokenEUR]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
 }
 
@@ -62,6 +65,7 @@ interface WrapperCacheMap {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
+  [CeloContract.ExchangeEUR]?: ExchangeWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -76,6 +80,7 @@ interface WrapperCacheMap {
   [CeloContract.Reserve]?: ReserveWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
+  [CeloContract.StableTokenEUR]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
@@ -85,7 +90,6 @@ interface WrapperCacheMap {
  * Provides access to all contract wrappers for celo core contracts
  */
 export class WrapperCache {
-  // private wrapperCache: Map<CeloContract, any> = new Map()
   private wrapperCache: WrapperCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
@@ -114,8 +118,8 @@ export class WrapperCache {
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
-  getExchange() {
-    return this.getContract(CeloContract.Exchange)
+  getExchange(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
   }
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
@@ -153,8 +157,8 @@ export class WrapperCache {
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-  getStableToken() {
-    return this.getContract(CeloContract.StableToken)
+  getStableToken(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getContract(stableToken))
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
@@ -170,5 +174,10 @@ export class WrapperCache {
       this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
     }
     return this.wrapperCache[contract]!
+  }
+
+  public invalidateContract<C extends ValidWrappers>(contract: C) {
+    this.kit._web3Contracts.invalidateContract(contract)
+    ;(this.wrapperCache[contract] as any) = null
   }
 }

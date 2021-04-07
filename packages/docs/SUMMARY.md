@@ -6,6 +6,7 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
+- [Wallets](getting-started/wallets.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
@@ -16,6 +17,7 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Hosted nodes](getting-started/hosted-nodes.md)
 - [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
@@ -27,6 +29,7 @@
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
+- [Governance Cheat Sheet](celo-holder-guide/governance-cheat-sheet.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
 - [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
 
@@ -44,6 +47,7 @@
 - [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
+- [Celo Signal](validator-guide/celo-signal.md)
 
 ## Developer Guide
 
@@ -54,6 +58,7 @@
   - [Deploy and Interact with Contracts (Remotely)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
+  - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
   <!-- - [The Celo Protocol]()
     - [Architecture]()

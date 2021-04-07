@@ -27,7 +27,7 @@ export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: numb
 }
 
 export async function getVerificationPoolConfig(celoEnv: string) {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(celoEnv)
 
   const ip = await retrieveTxNodeIpAddress(celoEnv, 0)
 

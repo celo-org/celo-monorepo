@@ -1,4 +1,0 @@
-NSCameraUsageDescription = "Conectar tu cámara te permite escanear códigos para hacer pagos.";
-NSContactsUsageDescription = "Agregar tus contactos facilita enviar y solicitar pagos a tus amigos.";
-NSPhotoLibraryAddUsageDescription = "Conectar tu galería de fotos te permite guardar tu código en tus fotos.";
-NSPhotoLibraryUsageDescription = "El permiso es necesario para poder elegir una foto de perfil.";

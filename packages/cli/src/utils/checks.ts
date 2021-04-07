@@ -1,5 +1,6 @@
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address } from '@celo/connect'
+import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
@@ -136,8 +137,8 @@ class CheckBuilder {
       this.withGovernance(async (governance) => {
         const match = (await governance.getProposalStage(proposalID)) === stage
         if (!match) {
-          const timeUntilStages = await governance.timeUntilStages(proposalID)
-          printValueMapRecursive({ timeUntilStages })
+          const schedule = await governance.proposalSchedule(proposalID)
+          printValueMapRecursive(schedule)
         }
         return match
       })
@@ -307,11 +308,15 @@ class CheckBuilder {
     )
   }
 
-  hasEnoughUsd = (account: Address, value: BigNumber) => {
+  hasEnoughStable = (
+    account: Address,
+    value: BigNumber,
+    stable: StableToken = StableToken.cUSD
+  ) => {
     const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} ${stable}`, () =>
       this.kit.contracts
-        .getStableToken()
+        .getStableToken(stable)
         .then((stableToken) => stableToken.balanceOf(account))
         .then((balance) => balance.gte(value))
     )

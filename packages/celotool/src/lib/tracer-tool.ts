@@ -1,30 +1,37 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesAddresses } from 'src/lib/geth'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { envVar, fetchEnv } from './env-utils'
 
+const chartDir = '../helm-charts/tracer-tool/'
+
+function releaseName(celoEnv: string) {
+  return `${celoEnv}-tracer-tool`
+}
+
 export async function installHelmChart(celoEnv: string) {
-  console.info(`Installing helm release ${celoEnv}-tracer-tool`)
-
-  const params = await helmParameters(celoEnv)
-
-  await execCmdWithExitOnFailure(
-    `helm install ${celoEnv}-tracer-tool ../helm-charts/tracer-tool/ ${params}`
+  await installGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    chartDir,
+    await helmParameters(celoEnv)
   )
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  console.info(`Upgrading helm release ${celoEnv}-tracer-tool`)
-
-  const params = await helmParameters(celoEnv)
-
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${celoEnv}--tracer-tool ../helm-charts/tracer-tool/ ${params}`
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    chartDir,
+    await helmParameters(celoEnv)
   )
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  console.info(`Deleting helm chart ${celoEnv}-tracer-tool`)
-  await execCmdWithExitOnFailure(`helm uninstall --namespace ${celoEnv} ${celoEnv}-tracer-tool`)
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
 }
 
 async function helmParameters(celoEnv: string) {
@@ -37,5 +44,5 @@ async function helmParameters(celoEnv: string) {
     `--set imageTag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
     `--set environment=${celoEnv}`,
     `--set enodes="${b64EnodesJSON}"`,
-  ].join(' ')
+  ]
 }
