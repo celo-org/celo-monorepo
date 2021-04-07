@@ -6,6 +6,7 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
+- [Wallets](getting-started/wallets.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
