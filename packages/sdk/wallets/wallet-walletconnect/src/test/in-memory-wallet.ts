@@ -123,7 +123,7 @@ export function getTestWallet() {
       client.on(CLIENT_EVENTS.session.created, onSessionCreated)
       client.on(CLIENT_EVENTS.session.updated, onSessionUpdated)
       client.on(CLIENT_EVENTS.session.deleted, onSessionDeleted)
-      client.on(CLIENT_EVENTS.session.request, onSessionRequest)
+      client.on(CLIENT_EVENTS.session.payload, onSessionRequest)
 
       client.on(CLIENT_EVENTS.pairing.proposal, onPairingProposal)
       client.on(CLIENT_EVENTS.pairing.created, onPairingCreated)

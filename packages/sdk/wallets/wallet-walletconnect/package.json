@@ -18,6 +18,7 @@
     "clean": "tsc -b . --clean",
     "docs": "typedoc && ts-node ../../utils/scripts/linkdocs.ts wallet-walletconnect",
     "test": "jest --runInBand",
+    "test-staging": "WALLET_CONNECT_BRIDGE=wss://relay.walletconnect.org yarn test",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },

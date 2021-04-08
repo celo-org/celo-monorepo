@@ -96,7 +96,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
 
     // when we're in certain environments (like the browser) the
     // WalletConnect client will handle retrieving old sessions.
-    if (this.client.session.values.length > 0 && this.client.pairing.values.length > 0) {
+    if (this.client.session?.values.length > 0 && this.client.pairing?.values.length > 0) {
       this.pairing = this.client.pairing.values[0]
       this.session = this.client.session.values[0]
 
@@ -125,22 +125,27 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     debug('onSessionProposal', sessionProposal)
   }
   onSessionCreated = (session: SessionTypes.Created) => {
+    debug('onSessionCreated', session)
     this.session = session
   }
   onSessionUpdated = (session: SessionTypes.Update) => {
     debug('onSessionUpdated', session)
   }
   onSessionDeleted = () => {
+    debug('onSessionDeleted')
     this.session = undefined
   }
 
   onPairingProposal = (pairingProposal: PairingTypes.Proposal) => {
+    debug('onPairingProposal', pairingProposal)
     this.pairingProposal = pairingProposal
   }
   onPairingCreated = (pairing: PairingTypes.Created) => {
+    debug('onPairingCreated', pairing)
     this.pairing = pairing
   }
   onPairingUpdated = (pairing: PairingTypes.Update) => {
+    debug('onPairingUpdated', pairing)
     if (!this.pairing) {
       debug('Attempted to update non existant pairing', pairing)
       return
@@ -148,6 +153,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     this.pairing.state.metadata = pairing.state.metadata
   }
   onPairingDeleted = () => {
+    debug('onPairingDeleted')
     this.pairing = undefined
   }
 

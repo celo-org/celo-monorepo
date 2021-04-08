@@ -77,6 +77,7 @@ describe('WalletConnectWallet tests', () => {
   wallet = new WalletConnectWallet({
     init: {
       relayProvider: walletConnectBridge,
+      logger: 'error',
     },
     connect: {
       metadata: {
