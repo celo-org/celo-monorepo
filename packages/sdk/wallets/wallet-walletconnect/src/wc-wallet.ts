@@ -5,7 +5,7 @@ import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
 import { ERROR, getError } from '@walletconnect/utils'
 import debugConfig from 'debug'
-import { SupportedMethods } from './types'
+import { SupportedMethods, WalletConnectWalletOptions } from './types'
 import { WalletConnectSigner } from './wc-signer'
 
 const debug = debugConfig('kit:wallet:wallet-connect-wallet')
@@ -49,20 +49,6 @@ const defaultConnectOptions: ClientTypes.ConnectParams = {
       methods: Object.values(SupportedMethods),
     },
   },
-}
-
-/**
- * Utility for making the API of this package nicer.
- *
- * We want to force passing metadata (name, description, etc), but not permissions,
- * which will likely remain static across dapps.
- */
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
-type ConnectOptions = Optional<ClientTypes.ConnectParams, 'permissions'>
-
-export type WalletConnectWalletOptions = {
-  init?: ClientOptions
-  connect?: ConnectOptions
 }
 
 export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
