@@ -46,7 +46,7 @@ npm install node-libs-react-native vm-browserify
 yarn add node-libs-react-native vm-browserify
 ```
 
-You will need to add the following `metro.config.js` to your project root
+You will need to add the following `metro.config.js` to your project root and make sure that the associated npm packages are installed.
 
 ```js
 const crypto = require.resolve('crypto-browserify')
