@@ -117,13 +117,14 @@ export function getTestWallet() {
       client = await WalletConnect.init({
         relayProvider: process.env.WALLET_CONNECT_BRIDGE,
         controller: true,
+        logger: 'error',
       })
 
       client.on(CLIENT_EVENTS.session.proposal, onSessionProposal)
       client.on(CLIENT_EVENTS.session.created, onSessionCreated)
       client.on(CLIENT_EVENTS.session.updated, onSessionUpdated)
       client.on(CLIENT_EVENTS.session.deleted, onSessionDeleted)
-      client.on(CLIENT_EVENTS.session.payload, onSessionRequest)
+      client.on(CLIENT_EVENTS.session.request, onSessionRequest)
 
       client.on(CLIENT_EVENTS.pairing.proposal, onPairingProposal)
       client.on(CLIENT_EVENTS.pairing.created, onPairingCreated)

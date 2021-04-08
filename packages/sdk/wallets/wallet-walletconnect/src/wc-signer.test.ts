@@ -191,7 +191,7 @@ describe('WalletConnectWallet tests', () => {
     })
   })
 
-  describe('with a new address', () => {
+  describe('with a known address', () => {
     it('hasAccount()', async () => {
       expect(wallet.hasAccount(testAddress)).toBeTruthy()
     })
