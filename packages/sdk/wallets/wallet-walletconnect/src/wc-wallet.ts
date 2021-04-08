@@ -29,7 +29,9 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
   throw new Error('Unable to get pairing session, did you lose internet connection?')
 }
 
-const defaultInitOptions: ClientOptions = { relayProvider: 'wss://relay.walletconnect.org' }
+const defaultInitOptions: ClientOptions = {
+  relayProvider: 'wss://relay.walletconnect.org',
+}
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
     name: 'ContractKit',
@@ -58,6 +60,11 @@ const defaultConnectOptions: ClientTypes.ConnectParams = {
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
 type ConnectOptions = Optional<ClientTypes.ConnectParams, 'permissions'>
 
+export type WalletConnectWalletOptions = {
+  init?: ClientOptions
+  connect?: ConnectOptions
+}
+
 /*
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
@@ -71,7 +78,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private pairingProposal?: PairingTypes.Proposal
   private session?: SessionTypes.Settled
 
-  constructor({ init, connect }: { init?: ClientOptions; connect?: ConnectOptions }) {
+  constructor({ init, connect }: WalletConnectWalletOptions) {
     super()
 
     this.initOptions = { ...defaultInitOptions, ...init }
@@ -88,8 +95,17 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   /**
    * Get the URI needed for out of band session establishment
    */
-  public async getUri() {
+  public async getUri(): Promise<string | void> {
     this.client = await this.getWalletConnectClient()
+
+    // when we're in certain environments (like the browser) the
+    // WalletConnect client will handle retrieving old sessions.
+    if (this.client.session.values.length > 0 && this.client.pairing.values.length > 0) {
+      this.pairing = this.client.pairing.values[0]
+      this.session = this.client.session.values[0]
+
+      return
+    }
 
     this.client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
     this.client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
