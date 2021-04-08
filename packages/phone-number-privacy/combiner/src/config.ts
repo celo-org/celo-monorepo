@@ -10,7 +10,7 @@ export const DEV_PRIVATE_KEY =
   '00000000dd0005bf4de5f2f052174f5cf58dae1af1d556c7f7f85d6fb3656e1d0f10720f'
 export const DEV_POLYNOMIAL =
   '01000000000000001f33136ac029a702eb041096bd9ef09dc9c368dde52a972866bdeaff0896f8596b74ab7adfd7318bba38527599768400df44bcab66bcf3843c17a2ce838bcd5a8ba1634c18314ff0565a7c769905b8a8fba27a86bf4c6cb22df89e1badfe2b81'
-
+const DEFAULT_EVENT_LOOP_LAG_LIMIT = 50
 interface Config {
   blockchain: {
     provider: string
@@ -30,6 +30,7 @@ interface Config {
     threshold: number
     polynomial: string
   }
+  eventLoopLagLimit: number
 }
 
 let config: Config
@@ -55,6 +56,7 @@ if (DEV_MODE) {
       threshold: 1,
       polynomial: DEV_POLYNOMIAL,
     },
+    eventLoopLagLimit: parseInt(process.env.EVENT_LOOP_LAG_LIMIT!) || DEFAULT_EVENT_LOOP_LAG_LIMIT,
   }
 } else {
   const functionConfig = functions.config()
@@ -77,6 +79,7 @@ if (DEV_MODE) {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
       polynomial: functionConfig.threshold_signature.threshold_polynomial,
     },
+    eventLoopLagLimit: functionConfig.eventLoopLagLimit || DEFAULT_EVENT_LOOP_LAG_LIMIT,
   }
 }
 export default config

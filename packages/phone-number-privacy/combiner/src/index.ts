@@ -2,7 +2,7 @@ import { ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-commo
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { VERSION } from './config'
+import config, { VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'
 
@@ -21,8 +21,9 @@ async function meterResponse(
   logger.fields.endpoint = endpoint
   logger.info({ req: req.body }, 'Request received')
   const eventLoopLagMeasurementStart = Date.now()
+  let eventLoopLag = 0
   setTimeout(() => {
-    const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
+    eventLoopLag = Date.now() - eventLoopLagMeasurementStart
     logger.info({ eventLoopLag }, 'Measure event loop lag')
   })
   const startMark = `Begin ${handler.name}`
@@ -50,6 +51,11 @@ async function meterResponse(
   performance.measure(entryName, startMark, endMark)
   performance.clearMarks()
   obs.disconnect()
+
+  if (eventLoopLag > config.eventLoopLagLimit || eventLoopLag === 0) {
+    logger.error(`Event loop lag is greater than ${config.eventLoopLagLimit}, exiting 1`)
+    process.exit(1)
+  }
 }
 
 // DEPRECATED, TODO: Remove once clients are all on contract kit version 4.11
