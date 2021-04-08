@@ -35,7 +35,7 @@ export function loggerMiddleware(req: Request, res: Response, next?: NextFunctio
   })
   res.locals.logger = requestLogger
 
-  if (!req.body.sessionID) {
+  if (!req.body.sessionID && req.path !== '/metrics' && req.path !== '/status') {
     requestLogger.info(WarningMessage.MISSING_SESSION_ID)
   }
 
