@@ -1,7 +1,7 @@
 /* tslint:disable no-console */
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { celoTokenInfos, CeloTokenType, Token } from '@celo/contractkit/lib/celo-tokens'
-import { sleep } from '@celo/utils/lib/async'
+import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
@@ -20,7 +20,8 @@ export const describe = 'command for fauceting an address with gold and/or dolla
 interface FaucetArgv extends AccountArgv {
   account: string
   tokenParams: TokenParams[]
-  checkzero: boolean
+  checkZero: boolean
+  checkDeployed: boolean
   blockscout: boolean
 }
 interface TokenParams {
@@ -62,6 +63,7 @@ export const builder = (argv: yargs.Argv) => {
           if (token === undefined || amount === undefined) {
             throw Error(`Format of tokenParams should be: --tokenParams tokenName,amount`)
           }
+          // Note: this does not check if token has been deployed on network
           if (!validCeloTokens.includes(token as CeloTokenType)) {
             throw Error(`Invalid token '${token}', must be one of: ${validCeloTokens}.`)
           }
@@ -75,9 +77,14 @@ export const builder = (argv: yargs.Argv) => {
         })
       },
     })
-    .option('checkzero', {
+    .option('checkZero', {
       type: 'boolean',
       description: 'Check that the balance is zero before fauceting',
+      default: false,
+    })
+    .option('checkDeployed', {
+      type: 'boolean',
+      description: 'Check that token is deployed on current network',
       default: false,
     })
     .option('blockscout', {
@@ -98,6 +105,22 @@ export const handler = async (argv: FaucetArgv) => {
     console.log(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
+    // Check that input token has been deployed to this network
+    if (argv.checkDeployed) {
+      const deployedCeloTokens = Object.values(await kit.celoTokens.validCeloTokenInfos()).map(
+        (tokenInfo) => {
+          return tokenInfo.symbol
+        }
+      )
+      argv.tokenParams.map((tokenParam) => {
+        if (!deployedCeloTokens.includes(tokenParam.token)) {
+          throw Error(
+            `Invalid token '${tokenParam.token}' (or not yet deployed on ${argv.celoEnv}) must be one of: ${deployedCeloTokens}.`
+          )
+        }
+      })
+    }
+
     const faucetToken = async (tokenParams: TokenParams) => {
       if (!tokenParams.amount) {
         return
@@ -105,11 +128,11 @@ export const handler = async (argv: FaucetArgv) => {
 
       const tokenWrapper = await kit.celoTokens.getWrapper(tokenParams.token as any)
       for (const address of addresses) {
-        if (argv.checkzero) {
-          // Check if address account balance of this token is zero
+        if (argv.checkZero) {
+          // Throw error if address account balance of this token is not zero
           if (!(await tokenWrapper.balanceOf(address)).isZero()) {
             throw Error(
-              `Unable to faucet ${tokenParams.token} to ${address} on ${argv.celoEnv}: --checkzero specified, but balance is non-zero`
+              `Unable to faucet ${tokenParams.token} to ${address} on ${argv.celoEnv}: --checkZero specified, but balance is non-zero`
             )
           }
         }
@@ -130,17 +153,19 @@ export const handler = async (argv: FaucetArgv) => {
     }
     // Ensure all faucets attempts are independent of failures and report failures.
     const failures = (
-      await Promise.all(
-        argv.tokenParams.map(async (tokenParams) => {
+      await concurrentMap(
+        Math.min(argv.tokenParams.length, 10),
+        argv.tokenParams,
+        async (tokenParams) => {
           return faucetToken(tokenParams)
             .then(() => null)
-            .catch((err) => err)
-        })
+            .catch((err) => `Token ${tokenParams.token}: (${err})`)
+        }
       )
     ).filter((x) => x != null)
     if (failures.length) {
-      console.error(Error(`Errors fauceting: ${failures}`))
-      process.exit(1)
+      console.error(`Error(s) fauceting: \n${failures.join('\n')}`)
+      return
     }
 
     if (argv.blockscout) {
