@@ -30,7 +30,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
 }
 
 const defaultInitOptions: ClientOptions = {
-  relayProvider: 'wss://relay.walletconnect.org',
+  relayProvider: 'wss://walletconnect.celo-networks-dev.org',
 }
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
@@ -65,10 +65,6 @@ export type WalletConnectWalletOptions = {
   connect?: ConnectOptions
 }
 
-/*
- *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
- *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
- */
 export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private initOptions: ClientOptions
   private connectOptions: ClientTypes.ConnectParams

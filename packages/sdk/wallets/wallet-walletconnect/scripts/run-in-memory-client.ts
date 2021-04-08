@@ -2,9 +2,7 @@ import { newKit } from '@celo/contractkit'
 import { WalletConnectWallet } from '../src'
 
 async function main() {
-  const name = `CLI DApp ${Math.random()
-    .toString()
-    .substring(12)}`
+  const name = `CLI DApp ${Math.random().toString().substring(12)}`
 
   const wallet = new WalletConnectWallet({
     connect: {
@@ -22,6 +20,11 @@ async function main() {
   })
 
   const uri = await wallet.getUri()
+  if (!uri) {
+    console.error('No connection URI, something has gone terribly wrong')
+    process.exit(1)
+  }
+
   console.log(`=== START OUT OF BAND URI FOR ${name} ===
 ${uri.toString()}
 === END OUT OF BAND URI ===`)
