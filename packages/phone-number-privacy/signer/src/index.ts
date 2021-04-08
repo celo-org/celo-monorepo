@@ -1,5 +1,4 @@
 import { rootLogger as logger } from '@celo/phone-number-privacy-common'
-import { Counters } from './common/metrics'
 import config, { DEV_MODE } from './config'
 import { initDatabase } from './database/database'
 import { initKeyProvider } from './key-management/key-provider'
@@ -18,10 +17,7 @@ async function start() {
     .listen(port, () => {
       logger.info(`Server is listening on port ${port}`)
     })
-    .setTimeout(backupTimeout, () => {
-      Counters.timeouts.inc()
-      logger.warn(`Timed out after ${backupTimeout}ms`)
-    })
+    .setTimeout(backupTimeout)
 }
 
 start().catch((err) => {
