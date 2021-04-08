@@ -18,7 +18,7 @@ export enum SupportedMethods {
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
 type ConnectOptions = Optional<ClientTypes.ConnectParams, 'permissions'>
 
-export type WalletConnectWalletOptions = {
+export interface WalletConnectWalletOptions {
   init?: ClientOptions
   connect?: ConnectOptions
 }
