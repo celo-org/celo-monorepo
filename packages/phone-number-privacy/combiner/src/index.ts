@@ -20,6 +20,11 @@ async function meterResponse(
   const logger: Logger = loggerMiddleware(req, res)
   logger.fields.endpoint = endpoint
   logger.info({ req: req.body }, 'Request received')
+  const eventLoopLagMeasurementStart = Date.now()
+  setTimeout(() => {
+    const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
+    logger.info({ eventLoopLag }, 'Measure event loop lag')
+  })
   const startMark = `Begin ${handler.name}`
   const endMark = `End ${handler.name}`
   const entryName = `${handler.name} latency`
