@@ -73,6 +73,9 @@ contract AttestationsV2 is
   uint256 public attestationRequestFee;
   address public attestationRequestFeeToken;
 
+  // Make it compile
+  mapping(address => uint256) public attestationRequestFees;
+
   // Maps an attestation issuer to the amount that they're owed.
   mapping(address => uint256) public pendingWithdrawals;
 

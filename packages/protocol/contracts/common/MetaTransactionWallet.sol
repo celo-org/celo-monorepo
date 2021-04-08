@@ -81,6 +81,15 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function initialize(address _signer) external {
+    _initialize(_signer);
+  }
+
+  function initializeAndCall(address _signer, bytes calldata initCallback) external {
+    _initialize(_signer);
+    ExternalCall.execute(address(this), 0, initCallback);
+  }
+
+  function _initialize(address _signer) internal {
     require(signer == address(0));
     _setSigner(_signer);
     setEip712DomainSeparator();

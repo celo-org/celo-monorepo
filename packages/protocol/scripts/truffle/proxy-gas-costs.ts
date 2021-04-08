@@ -1,4 +1,4 @@
-import { ProxyContract, ProxyCloneFactoryContract, ProxyFactoryContract } from 'types'
+import { ProxyCloneFactoryContract, ProxyContract, ProxyFactoryContract } from 'types'
 
 /*
  * A script for testing gas optimizations for proxy deployments.

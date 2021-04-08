@@ -45,7 +45,7 @@ contract ProxyCloneFactory is CloneFactory, Ownable {
     proxy._initialize(address(this));
     proxy._setAndInitializeImplementation(implementation, initCallData);
     proxy._transferOwnership(owner);
-    IERC20(token).transfer(address(proxy), value);
+    IERC20(token).transferFrom(msg.sender, address(proxy), value);
     emit ProxyCreated(proxy);
   }
 
@@ -60,14 +60,13 @@ contract ProxyCloneFactory is CloneFactory, Ownable {
     proxy._setAndInitializeImplementation(implementation, initCallData);
     // TODO(asa): This is different, I believe in current komenci we transfer ownership to the user?
     proxy._transferOwnership(address(proxy));
-    IERC20(token).transfer(address(proxy), value);
+    IERC20(token).transferFrom(msg.sender, address(proxy), value);
     emit ProxyCreated(proxy);
   }
 
   function deployAndFundV3(
     address implementation,
     bytes calldata initCallData,
-    bytes calldata approvalCallData,
     address token,
     uint256 value
   ) external {
@@ -78,7 +77,7 @@ contract ProxyCloneFactory is CloneFactory, Ownable {
     // Call MetaTransactionWallet(proxy).executeTransactions([approve cUSD, set signer])
     // TODO(asa): This is different, I believe in current komenci we transfer ownership to the user?
     proxy._transferOwnership(address(proxy));
-    IERC20(token).transfer(address(proxy), value);
+    IERC20(token).transferFrom(msg.sender, address(proxy), value);
     emit ProxyCreated(proxy);
   }
 }
