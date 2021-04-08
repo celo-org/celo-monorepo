@@ -17,7 +17,7 @@ oracle:
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  exchanges: COINBASE
+  exchanges: COINBASE,BITTREX
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
