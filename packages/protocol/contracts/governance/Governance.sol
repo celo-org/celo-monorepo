@@ -671,16 +671,10 @@ contract Governance is
       (Proposals.Proposal storage proposal, Proposals.Stage stage) =
         requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
       require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
-      uint256 weight = voteRecord.weight;
       Proposals.VoteValue value = voteRecord.value;
-      proposal.updateVote(weight, 0, value, Proposals.VoteValue.None);
+      proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
       proposal.networkWeight = getLockedGold().getTotalLockedGold();
-      voter.referendumVotes[dequeueIndex] = VoteRecord(
-        Proposals.VoteValue.None,
-        voteRecord.proposalId,
-        0
-      );
-      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), weight);
+      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
       delete voter.referendumVotes[dequeueIndex];
     }
     voter.mostRecentReferendumProposal = 0;
