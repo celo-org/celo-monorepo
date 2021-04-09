@@ -41,7 +41,7 @@ export async function handleGetQuota(
       respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
+    if (!(await authenticateUser(request, getContractKit() as any, logger))) {
       respondWithError(Endpoints.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
@@ -105,7 +105,9 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     getWalletAddress(logger, account),
     new Promise((resolve) =>
       resolve(
-        hashedPhoneNumber ? isVerified(account, hashedPhoneNumber, getContractKit(), logger) : false
+        hashedPhoneNumber
+          ? isVerified(account, hashedPhoneNumber, getContractKit() as any, logger)
+          : false
       )
     ),
   ])

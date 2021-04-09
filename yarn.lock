@@ -1319,6 +1319,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.0.2.tgz#6226d100b20c0186bd32e3c8a4dba0a17780b526"
   integrity sha512-ovNTm6CFbt3bK3LYgVTMvz2yngxKYb0mVIlUv1p6c4suqej5hPzQQyB2dfszInCG4JwzqnTXqR3I/w5qXZ1luA==
 
+"@celo/base@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.1.1.tgz#13c4f5fd8bb69a54632f5c362a8bfc77c7dbec4c"
+  integrity sha512-IJozhIIqe6NFDYhC7Kwq3Ug35uA30gJKHaxYXZ9XZhysS3vt7XBbtZAhBpGhPK475nWLLl9EoHKG+DfGaKjAAQ==
+
 "@celo/connect@1.0.0-beta3":
   version "1.0.0-beta3"
   resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-1.0.0-beta3.tgz#93fa09e13011baed93b934c59f4fddb5b9b3f3ad"
@@ -1465,12 +1470,12 @@
     libphonenumber-js "^1.9.11"
     web3 "1.3.0"
 
-"@celo/phone-number-privacy-common@1.0.25":
-  version "1.0.25"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.25.tgz#171e6d8a8a34df7c0c8b176645c6636d85ae644f"
-  integrity sha512-BjeqhiLyvMCsRFMbaKJE/PkF+vBC+ILbv/KbvG7yQYfh7v5D1HZTp25QTpXk44TbBwTZsW4d/aqXNLHN7VeSUw==
+"@celo/phone-number-privacy-common@1.0.32":
+  version "1.0.32"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.32.tgz#9e2d45c4f8a0086d16264b5874793fe3ce0cdaac"
+  integrity sha512-jj69OC3PiCQMEHoSHF60/2BQDwaZ2o57HuDpVVmkQaHpegxvPm2fmNqR+bkwBBO6+6jy473WCe1fLgeYM0WsEQ==
   dependencies:
-    "@celo/base" "1.1.1-dev"
+    "@celo/base" "1.1.1"
     "@celo/contractkit" "1.0.2"
     "@celo/identity" "1.0.2"
     "@celo/utils" "1.0.2"
