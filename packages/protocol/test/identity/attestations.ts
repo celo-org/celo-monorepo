@@ -18,6 +18,10 @@ import {
   AccountsInstance,
   AttestationsTestContract,
   AttestationsTestInstance,
+  MockElectionContract,
+  MockElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
   MockRandomContract,
   MockRandomInstance,
   MockStableTokenContract,
@@ -27,7 +31,7 @@ import {
   RegistryInstance,
 } from 'types'
 import Web3 from 'web3'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
+import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 import { beforeEachWithRetries } from '../customHooks'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -38,6 +42,8 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
  */
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Random: MockRandomContract = artifacts.require('MockRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -48,6 +54,8 @@ contract('Attestations', (accounts: string[]) => {
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: MockRandomInstance
+  let mockElection: MockElectionInstance
+  let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
   const web3: Web3 = new Web3('http://localhost:8545')
   const phoneNumber: string = '+18005551212'
@@ -132,6 +140,7 @@ contract('Attestations', (accounts: string[]) => {
     random = await Random.new()
     await random.initialize(256)
     await random.addTestRandomness(0, '0x00')
+    mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -152,8 +161,16 @@ contract('Attestations', (accounts: string[]) => {
       })
     )
 
+    mockElection = await MockElection.new()
+    await mockElection.setElectedValidators(
+      accounts.map((account) =>
+        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
+      )
+    )
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Random, random.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await attestations.initialize(
       registry.address,
       attestationExpiryBlocks,
@@ -440,7 +457,7 @@ contract('Attestations', (accounts: string[]) => {
 
       // These tests/functionality implicitly relies on randomness to only be available
       // historically. The attestation contract itself will not test that the current block
-      // number is sufficiently in the future after the request block
+      //  number is sufficiently in the future after the request block
       describe('when the randomness of the right block has been set', () => {
         beforeEach(async () => {
           const requestBlockNumber = await web3.eth.getBlockNumber()

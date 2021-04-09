@@ -18,16 +18,7 @@ library ExternalCall {
     bool success;
     bytes memory returnData;
     (success, returnData) = destination.call.value(value)(data);
-    //require(success, string(returnData));
-    if (success == false) {
-      assembly {
-        let ptr := mload(0x40)
-        let size := returndatasize
-        returndatacopy(ptr, 0, size)
-        revert(ptr, size)
-      }
-    }
-
+    require(success, "Transaction execution failed.");
     return returnData;
   }
 }

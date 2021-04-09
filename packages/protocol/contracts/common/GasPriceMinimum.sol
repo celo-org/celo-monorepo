@@ -66,10 +66,6 @@ contract GasPriceMinimum is
     setAdjustmentSpeed(_adjustmentSpeed);
   }
 
-  function setGasPriceMinimum(uint256 gpm) public onlyOwner {
-    gasPriceMinimum = gpm;
-  }
-
   /**
    * @notice Set a multiplier that impacts how quickly gas price minimum is adjusted.
    * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
