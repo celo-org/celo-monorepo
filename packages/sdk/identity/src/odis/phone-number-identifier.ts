@@ -140,10 +140,7 @@ export async function getPhoneNumberIdentifierFromSignature(
 // It simply hashes it with sha256 and encodes it to hex
 export function getPepperFromThresholdSignature(sigBuf: Buffer) {
   // Currently uses 13 chars for a 78 bit pepper
-  return createHash('sha256')
-    .update(sigBuf)
-    .digest('base64')
-    .slice(0, PEPPER_CHAR_LENGTH)
+  return createHash('sha256').update(sigBuf).digest('base64').slice(0, PEPPER_CHAR_LENGTH)
 }
 
 /**

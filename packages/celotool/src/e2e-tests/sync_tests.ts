@@ -8,7 +8,7 @@ import { getHooks, initAndSyncGethWithRetry, killInstance, waitForBlock } from '
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
 
-describe('sync tests', function(this: any) {
+describe('sync tests', function (this: any) {
   this.timeout(0)
 
   const gethConfig: GethRunConfig = {
@@ -64,7 +64,7 @@ describe('sync tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     // Start validator nodes and migrate contracts.
     await hooks.before()
@@ -80,7 +80,7 @@ describe('sync tests', function(this: any) {
     )
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -133,12 +133,12 @@ describe('sync tests', function(this: any) {
     })
   }
   describe(`when a validator's data directory is deleted`, () => {
-    beforeEach(async function(this: any) {
+    beforeEach(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await hooks.restart()
     })
 
-    it('should continue to block produce', async function(this: any) {
+    it('should continue to block produce', async function (this: any) {
       this.timeout(0)
       const instance: GethInstanceConfig = gethConfig.instances[1]
       await killInstance(instance)

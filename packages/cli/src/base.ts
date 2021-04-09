@@ -1,5 +1,6 @@
 import { ReadOnlyWallet } from '@celo/connect'
-import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3, StableToken, Token } from '@celo/contractkit'
+import { stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
 import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
 import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
 import { LocalWallet } from '@celo/wallet-local'
@@ -9,15 +10,13 @@ import { ParserOutput } from '@oclif/parser/lib/parse'
 import net from 'net'
 import Web3 from 'web3'
 import { getGasCurrency, getNodeUrl } from './utils/config'
-import { requireNodeIsSynced } from './utils/helpers'
+import { enumEntriesDupWithLowercase, requireNodeIsSynced } from './utils/helpers'
 
-export enum GasOptions {
-  celo = 'celo',
-  CELO = 'celo',
-  cusd = 'cusd',
-  cUSD = 'cusd',
-  auto = 'auto',
-  Auto = 'auto',
+export const gasOptions = {
+  auto: 'auto',
+  Auto: 'auto',
+  ...enumEntriesDupWithLowercase(Object.entries(Token)),
+  ...enumEntriesDupWithLowercase(Object.entries(StableToken)),
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -34,7 +33,7 @@ export abstract class BaseCommand extends Command {
       hidden: true,
     }),
     gasCurrency: flags.enum({
-      options: Object.keys(GasOptions),
+      options: Object.keys(gasOptions),
       description:
         "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
       hidden: true,
@@ -165,21 +164,30 @@ export abstract class BaseCommand extends Command {
     }
 
     const gasCurrencyConfig = res.flags.gasCurrency
-      ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
+      ? (gasOptions as any)[res.flags.gasCurrency]
       : getGasCurrency(this.config.configDir)
 
-    const setUsdGas = async () => {
-      await this.kit.setFeeCurrency(CeloContract.StableToken)
+    const setStableTokenGas = async (stable: StableToken) => {
+      await this.kit.setFeeCurrency(stableTokenInfos[stable].contract)
       await this.kit.updateGasPriceInConnectionLayer(
-        await this.kit.registry.addressFor(CeloContract.StableToken)
+        await this.kit.registry.addressFor(stableTokenInfos[stable].contract)
       )
     }
-    if (gasCurrencyConfig === GasOptions.cUSD) {
-      await setUsdGas()
-    } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
+    if (Object.keys(StableToken).includes(gasCurrencyConfig)) {
+      await setStableTokenGas(StableToken[gasCurrencyConfig as keyof typeof StableToken])
+    } else if (gasCurrencyConfig === gasOptions.auto && this.kit.defaultAccount) {
       const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
-      if (balances.CELO.isZero()) {
-        await setUsdGas()
+      if (balances.CELO!.isZero()) {
+        const stables = Object.entries(StableToken)
+        for (const stable of stables) {
+          const stableName = stable[0]
+          const stableToken = stable[1]
+          // has balance
+          if ((balances as any)[stableName] && !(balances as any)[stableName].isZero()) {
+            await setStableTokenGas(stableToken)
+            break
+          }
+        }
       }
     }
   }

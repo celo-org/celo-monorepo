@@ -2,7 +2,7 @@
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
 
-import { ASTCodeCompatibilityReport, } from '@celo/protocol/lib/compatibility/ast-code'
+import { ASTCodeCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
 import { Change } from '@celo/protocol/lib/compatibility/change'
@@ -118,10 +118,10 @@ export interface ContractReports {
 
 export interface ASTVersionedReportIndex {
   contracts: ContractReports
-  libraries: ContractReports
+  libraries: CategorizedChangesIndex
 }
 
-const isLibrary = (contract: string, artifacts: BuildArtifacts) => {
+export const isLibrary = (contract: string, artifacts: BuildArtifacts) => {
   const artifact = artifacts.getArtifactByName(contract)
   const zContract = makeZContract(artifact)
   const ast = new ContractAST(zContract, artifacts)
@@ -164,10 +164,10 @@ export class ASTVersionedReport {
       libraries: {}
     }
     Object.keys(changesByContract).forEach((contract: string) => {
-      const report = ASTVersionedReport.create(changesByContract[contract])
       if (isLibrary(contract, artifacts)) {
-        reportIndex.libraries[contract] = report
+        reportIndex.libraries[contract] = changesByContract[contract]
       } else {
+        const report = ASTVersionedReport.create(changesByContract[contract])
         reportIndex.contracts[contract] = report
       }
     })
@@ -192,7 +192,7 @@ export class ASTDetailedVersionedReport {
 
   constructor(
     public readonly contracts: ContractReports,
-    public readonly libraries: ContractReports
+    public readonly libraries: CategorizedChangesIndex
   ) {}
 
   versionDeltas = (): ContractVersionDeltaIndex => {

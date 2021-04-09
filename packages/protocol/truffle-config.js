@@ -93,7 +93,7 @@ const networks = {
     gasPrice: 0,
     gas: gasLimit,
     from: DEVELOPMENT_FROM,
-    provider: function() {
+    provider: function () {
       if (coverageProvider == null) {
         console.log('building provider!')
         coverageProvider = new ProviderEngine()
@@ -208,7 +208,7 @@ if (process.argv.includes('--forno')) {
 
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
-  networks[argv.network].provider = function() {
+  networks[argv.network].provider = function () {
     return new Web3.providers.HttpProvider(fornoUrls[argv.network])
   }
 }
