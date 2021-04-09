@@ -22,6 +22,7 @@ export default class Approve extends BaseCommand {
     }),
     from: Flags.address({ required: true, description: "Approver's address" }),
     useMultiSig: flags.boolean({
+      default: true,
       description: 'True means the request will be sent through multisig.',
     }),
     hotfix: flags.string({
@@ -56,7 +57,6 @@ export default class Approve extends BaseCommand {
       )
 
     let governanceTx: CeloTransactionObject<any>
-    let logEvent: string
     if (id) {
       if (await governance.isQueued(id)) {
         await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
@@ -68,12 +68,10 @@ export default class Approve extends BaseCommand {
         .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
         .runChecks()
       governanceTx = await governance.approve(id)
-      logEvent = 'ProposalApproved'
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer
       await checkBuilder.hotfixNotExecuted(hotfixBuf).hotfixNotApproved(hotfixBuf).runChecks()
       governanceTx = governance.approveHotfix(hotfixBuf)
-      logEvent = 'HotfixApproved'
     } else {
       failWith('Proposal ID or hotfix must be provided')
     }
@@ -84,6 +82,6 @@ export default class Approve extends BaseCommand {
           governanceTx.txo
         )
       : governanceTx
-    await displaySendTx<string | void | boolean>('approveTx', tx, {}, logEvent)
+    await displaySendTx<string | void | boolean>('approveTx', tx)
   }
 }
