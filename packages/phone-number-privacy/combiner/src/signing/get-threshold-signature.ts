@@ -192,6 +192,12 @@ async function handleSuccessResponse(
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
+
+  if (sentResult.sent) {
+    logger.info({ signer: serviceUrl }, 'Response already sent, not processing response')
+    return
+  }
+
   responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
