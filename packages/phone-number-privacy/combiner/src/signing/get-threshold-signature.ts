@@ -191,6 +191,9 @@ async function handleSuccessResponse(
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
+
+  // Only process signatures if we still need more
+  // Signature verification takes around 500ms
   if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
     responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
     const partialSig = { url: serviceUrl, signature: signResponse.signature }
@@ -205,9 +208,10 @@ async function handleSuccessResponse(
       },
       'Added signature'
     )
-  } else {
-    // Close outstanding requests
-    controller.abort()
+    if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
+      // Close outstanding requests
+      controller.abort()
+    }
   }
 }
 
