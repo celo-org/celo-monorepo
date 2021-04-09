@@ -75,13 +75,13 @@ async function transferFunds(args: {
   }
 
   if (args.goldAmount) {
-    const goldAmount = Web3.utils.toBN(args.goldAmount)
+    const goldAmount = Web3.utils.toWei(args.goldAmount)
     const tx = await celo.transferGold(to, goldAmount.toString())
     console.log('receipt', await tx.sendAndWaitForReceipt())
   }
 
   if (args.stableAmount) {
-    const stableAmount = Web3.utils.toBN(args.stableAmount)
+    const stableAmount = Web3.utils.toWei(args.stableAmount)
     const tokenTxs = await celo.transferStableTokens(to, stableAmount.toString())
     await Promise.all(
       Object.entries(tokenTxs).map(async ([symbol, tx]) => {
