@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "1.0.0-beta3",
-    "@celo/phone-number-privacy-common": "1.0.24",
+    "@celo/phone-number-privacy-common": "1.0.32",
     "@celo/identity": "1.0.0-beta3",
     "@celo/utils": "1.0.0-beta3",
     "@celo/wallet-hsm-azure": "1.0.0-beta3",
