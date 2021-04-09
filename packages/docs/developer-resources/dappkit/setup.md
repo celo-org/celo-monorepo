@@ -28,12 +28,12 @@ We are big fans of Typescript, so if you used the tabs template, you can support
 
 ### Setup
 
-To add DAppKit, simply add `@celo/dappkit@0.0.9` to your package.json or
+To add DAppKit, run
 
 ```bash
-npm install @celo/dappkit@0.0.9
+npm install @celo/dappkit
 // or
-yarn add @celo/dappkit@0.0.9
+yarn add @celo/dappkit
 ```
 
 You will need node version `8.13.0` or higher.
@@ -46,7 +46,7 @@ npm install node-libs-react-native vm-browserify
 yarn add node-libs-react-native vm-browserify
 ```
 
-You will need to add the following `metro.config.js` to your project root
+You will need to add the following `metro.config.js` to your project root and make sure that the associated npm packages are installed.
 
 ```js
 const crypto = require.resolve('crypto-browserify')
@@ -56,13 +56,16 @@ module.exports = {
     extraNodeModules: {
       crypto,
       url,
+      fs: require.resolve('expo-file-system'),
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
+      net: require.resolve('react-native-tcp'),
       os: require.resolve('os-browserify/browser.js'),
+      path: require.resolve('path-browserify'),
       stream: require.resolve('readable-stream'),
-      vm: require.resolve('vm-browserify'),
-    },
-  },
+      vm: require.resolve('vm-browserify')
+    }
+  }
 }
 ```
 
@@ -94,7 +97,7 @@ global.location = {
 }
 ```
 
-You'll also constantly get two warnings that can be ignored, you can suppress them in the yellow banner with the following in your `App.js/tsx`
+You may also get two warnings that can be ignored, you can suppress them in the yellow banner with the following in your `App.js/tsx`
 
 ```typescript
 import { YellowBox } from 'react-native'
