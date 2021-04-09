@@ -30,6 +30,7 @@ const computeCreate2Address = <T>(
       web3.utils.soliditySha3(Contract._json.bytecode)
     )
   )
+  // Skip '0x' and the first 12 bytes (so take the last 20 bytes).
   return `0x${hash.slice(2 + 2 * 12)}`
 }
 
