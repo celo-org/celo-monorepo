@@ -204,12 +204,6 @@ contract Governance is
   }
 
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
-   */
-  constructor(bool test) public InitializableV2(test) {}
-
-  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.

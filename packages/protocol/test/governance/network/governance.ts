@@ -1531,11 +1531,6 @@ contract('Governance', (accounts: string[]) => {
       await governance.vote(proposalId, index, value)
     })
 
-    it('should return true', async () => {
-      const success = await governance.revokeVotes.call()
-      assert.isTrue(success)
-    })
-
     it('should unset the most recent referendum proposal voted on', async () => {
       await governance.revokeVotes()
       assert.equal((await governance.getMostRecentReferendumProposal(account)).toNumber(), 0)
