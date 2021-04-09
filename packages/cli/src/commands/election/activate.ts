@@ -23,9 +23,7 @@ export default class ElectionVote extends BaseCommand {
   async run() {
     const res = this.parse(ElectionVote)
 
-    await newCheckBuilder(this, res.flags.from)
-      .isSignerOrAccount()
-      .runChecks()
+    await newCheckBuilder(this, res.flags.from).isSignerOrAccount().runChecks()
 
     const election = await this.kit.contracts.getElection()
     const accounts = await this.kit.contracts.getAccounts()

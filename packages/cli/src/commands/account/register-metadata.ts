@@ -33,9 +33,7 @@ export default class RegisterMetadata extends BaseCommand {
   async run() {
     const res = this.parse(RegisterMetadata)
 
-    await newCheckBuilder(this)
-      .isAccount(res.flags.from)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(res.flags.from).runChecks()
 
     const metadataURL = res.flags.url
 

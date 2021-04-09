@@ -64,10 +64,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     return
   }
 
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(config.numReleasePeriods)
-    .dp(0)
+  const adjustedAmountPerPeriod = totalValue.minus(startGold).div(config.numReleasePeriods).dp(0)
 
   // Reflect any rounding changes from the division above
   totalValue = adjustedAmountPerPeriod.multipliedBy(config.numReleasePeriods)

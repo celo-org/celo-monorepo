@@ -60,8 +60,6 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
 }
 
 async function insertRecord(data: Account) {
-  await accounts()
-    .insert(data)
-    .timeout(DB_TIMEOUT)
+  await accounts().insert(data).timeout(DB_TIMEOUT)
   return true
 }

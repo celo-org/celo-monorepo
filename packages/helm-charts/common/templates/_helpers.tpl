@@ -62,14 +62,10 @@ release: {{ .Release.Name }}
         wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
         wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
       fi
-      CHAINDATA_IS_EMPTY=false
-      if [ -z "$(ls -A -- "/root/.celo/celo/chaindata")" ]; then
-        CHAINDATA_IS_EMPTY=true
-      fi
       # There are issues with running geth init over existing chaindata around the use of forks.
       # The case that this could cause problems is when a network is set up with Base64 genesis files & chaindata
       # as that could interfere with accessing bootnodes for newly created nodes.
-      if [ "{{ .Values.geth.use_gstorage_data | default false }}" == "false" || "$CHAINDATA_IS_EMPTY" == "true" ]; then
+      if [ "{{ .Values.geth.use_gstorage_data | default false }}" == "false" ]; then
         geth init /root/.celo/genesis.json
       fi
   volumeMounts:
@@ -101,8 +97,6 @@ release: {{ .Release.Name }}
 {{- define "common.bootnode-flag-script" -}}
 if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Release.Name }}"
-elif [[ "{{ .Values.namespace | default "" }}" == "alfajores" || "{{ .Values.namespace | default "" }}" == "baklava" ]]; then
-  BOOTNODE_FLAG="--{{ .Values.namespace }}"
 else
   BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi

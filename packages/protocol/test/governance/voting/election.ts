@@ -1936,20 +1936,11 @@ contract('Election', (accounts: string[]) => {
     }
 
     const randomElement = <A>(list: A[]): A => {
-      return list[
-        Math.floor(
-          BigNumber.random()
-            .times(list.length)
-            .toNumber()
-        )
-      ]
+      return list[Math.floor(BigNumber.random().times(list.length).toNumber())]
     }
 
     const randomInteger = (max: BigNumber, min: BigNumber = new BigNumber(1)): BigNumber => {
-      return BigNumber.random()
-        .times(max.minus(min))
-        .plus(min)
-        .dp(0)
+      return BigNumber.random().times(max.minus(min)).plus(min).dp(0)
     }
 
     const makeRandomAction = async (account: Account) => {
@@ -2111,7 +2102,7 @@ contract('Election', (accounts: string[]) => {
       })
     })
 
-    describe('when placing, activating, and revoking votes randomly', function(this: any) {
+    describe('when placing, activating, and revoking votes randomly', function (this: any) {
       this.timeout(0)
       describe('when no epoch rewards are distributed', () => {
         it('actual and expected should always match exactly', async () => {
