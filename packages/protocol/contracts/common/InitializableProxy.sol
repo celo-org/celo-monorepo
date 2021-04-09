@@ -8,7 +8,7 @@ import "./Proxy.sol";
  */
 contract InitializableProxy is Proxy {
   function _initialize(address owner) external {
-    require(_getOwner() == address(0));
+    require(_getOwner() == address(0), "Owner already set");
     _setOwner(owner);
   }
 }

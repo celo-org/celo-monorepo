@@ -78,7 +78,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
   const attestationFee = '150000000000000000'
   before(async () => {
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
-    mtw = await MTW.new(false)
     // The komenci version is set as a test contract because we are not using it with a proxy.
     relayermtw = await MTW.new(true)
     await relayermtw.initialize(_accounts[0])
@@ -143,6 +142,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
       let mtwDeployer: MetaTransactionWalletDeployerInstance
       before(async () => {
         mtwDeployer = await MTWDeployer.new()
+        mtw = await MTW.new(false)
       })
 
       it('should onboard a new user', async () => {
@@ -274,6 +274,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         const proxy: ProxyInstance = await Proxy.new()
         proxyCloneFactory = await ProxyCloneFactory.new()
         await proxyCloneFactory.setProxyAddress(proxy.address)
+        mtw = await MTW.new(false)
       })
 
       // The same as the current komenci flow, but using EIP-1167 proxies, and transferring the
