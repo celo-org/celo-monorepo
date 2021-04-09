@@ -55,6 +55,7 @@ interface Config {
     host: string
     port?: number
     ssl: boolean
+    poolMaxSize: number
   }
   keystore: {
     type: SupportedKeystore
@@ -108,6 +109,7 @@ const config: Config = {
     host: env.DB_HOST,
     port: env.DB_PORT ? toNum(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
+    poolMaxSize: env.DB_POOL_MAX_SIZE || 50,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
