@@ -8,7 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -20,7 +20,7 @@ contract Reserve is
   IReserve,
   ICeloVersionedContract,
   Ownable,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   ReentrancyGuard
 {
@@ -72,6 +72,12 @@ contract Reserve is
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");

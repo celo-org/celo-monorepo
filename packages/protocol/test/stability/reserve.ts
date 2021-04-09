@@ -45,7 +45,7 @@ contract('Reserve', (accounts: string[]) => {
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
-    reserve = await Reserve.new()
+    reserve = await Reserve.new(true)
     registry = await Registry.new()
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
@@ -460,8 +460,14 @@ contract('Reserve', (accounts: string[]) => {
       web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64),
     ]
     const newAssetAllocationWeights = [
-      new BigNumber(10).pow(24).dividedBy(new BigNumber(2)).integerValue(),
-      new BigNumber(10).pow(24).dividedBy(new BigNumber(2)).integerValue(),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(2))
+        .integerValue(),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(2))
+        .integerValue(),
     ]
     let mockStableToken: MockStableTokenInstance
 
@@ -546,7 +552,10 @@ contract('Reserve', (accounts: string[]) => {
       })
 
       it('should set tobin tax to 0.5% when reserve gold balance < gold value of floating stable tokens', async () => {
-        const stableTokenSupply = new BN(10).pow(new BN(20)).mul(new BN(6)).toString()
+        const stableTokenSupply = new BN(10)
+          .pow(new BN(20))
+          .mul(new BN(6))
+          .toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
         await anotherMockStableToken.setTotalSupply(stableTokenSupply)
         const actual = await getOrComputeTobinTax()
@@ -705,9 +714,19 @@ contract('Reserve', (accounts: string[]) => {
       web3.utils.padRight(web3.utils.utf8ToHex('ETH'), 64),
     ]
     const newAssetAllocationWeights = [
-      new BigNumber(10).pow(24).dividedBy(new BigNumber(3)).integerValue().plus(new BigNumber(1)),
-      new BigNumber(10).pow(24).dividedBy(new BigNumber(3)).integerValue(),
-      new BigNumber(10).pow(24).dividedBy(new BigNumber(3)).integerValue(),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(3))
+        .integerValue()
+        .plus(new BigNumber(1)),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(3))
+        .integerValue(),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(3))
+        .integerValue(),
     ]
 
     it('should allow owner to set asset allocations', async () => {
