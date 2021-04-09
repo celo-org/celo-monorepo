@@ -185,6 +185,12 @@ contract Governance is
     _;
   }
 
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
   function() external payable {
     require(msg.data.length == 0, "unknown method");
   }
@@ -553,11 +559,14 @@ contract Governance is
   function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
-    } else if (isQueued(proposalId)) {
+    }
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    if (isQueued(proposalId)) {
       return
-        isQueuedProposalExpired(proposalId) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
+        _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      return proposals[proposalId].getDequeuedStage(stageDurations);
+      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+      return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
 
@@ -659,6 +668,7 @@ contract Governance is
     emit ProposalVoted(proposalId, account, uint256(value), weight);
     return true;
   }
+
   /* solhint-enable code-complexity */
 
   /**
@@ -1129,7 +1139,6 @@ contract Governance is
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
-
   }
 
   /**

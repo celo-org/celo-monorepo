@@ -1319,6 +1319,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.0.2.tgz#6226d100b20c0186bd32e3c8a4dba0a17780b526"
   integrity sha512-ovNTm6CFbt3bK3LYgVTMvz2yngxKYb0mVIlUv1p6c4suqej5hPzQQyB2dfszInCG4JwzqnTXqR3I/w5qXZ1luA==
 
+"@celo/base@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.1.1.tgz#13c4f5fd8bb69a54632f5c362a8bfc77c7dbec4c"
+  integrity sha512-IJozhIIqe6NFDYhC7Kwq3Ug35uA30gJKHaxYXZ9XZhysS3vt7XBbtZAhBpGhPK475nWLLl9EoHKG+DfGaKjAAQ==
+
 "@celo/connect@1.0.0-beta3":
   version "1.0.0-beta3"
   resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-1.0.0-beta3.tgz#93fa09e13011baed93b934c59f4fddb5b9b3f3ad"
@@ -1465,12 +1470,12 @@
     libphonenumber-js "^1.9.11"
     web3 "1.3.0"
 
-"@celo/phone-number-privacy-common@1.0.25":
-  version "1.0.25"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.25.tgz#171e6d8a8a34df7c0c8b176645c6636d85ae644f"
-  integrity sha512-BjeqhiLyvMCsRFMbaKJE/PkF+vBC+ILbv/KbvG7yQYfh7v5D1HZTp25QTpXk44TbBwTZsW4d/aqXNLHN7VeSUw==
+"@celo/phone-number-privacy-common@1.0.32":
+  version "1.0.32"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.32.tgz#9e2d45c4f8a0086d16264b5874793fe3ce0cdaac"
+  integrity sha512-jj69OC3PiCQMEHoSHF60/2BQDwaZ2o57HuDpVVmkQaHpegxvPm2fmNqR+bkwBBO6+6jy473WCe1fLgeYM0WsEQ==
   dependencies:
-    "@celo/base" "1.1.1-dev"
+    "@celo/base" "1.1.1"
     "@celo/contractkit" "1.0.2"
     "@celo/identity" "1.0.2"
     "@celo/utils" "1.0.2"
@@ -5414,16 +5419,16 @@
   version "1.0.0"
   resolved "https://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
 
-"@walletconnect/client@2.0.0-alpha.32":
-  version "2.0.0-alpha.32"
-  resolved "https://registry.yarnpkg.com/@walletconnect/client/-/client-2.0.0-alpha.32.tgz#9645dd9b6f204468e25ebd85f50c308093cc52e3"
-  integrity sha512-lf3o/rM/B73a6mJ5z3RQOvJN5MckpClts1F4UlpS3xU0C6iKlzVFI3bp9wWdzT+fMUv9Ls3EtEga7Y8PmFaecQ==
+"@walletconnect/client@2.0.0-alpha.35":
+  version "2.0.0-alpha.35"
+  resolved "https://registry.yarnpkg.com/@walletconnect/client/-/client-2.0.0-alpha.35.tgz#2cdfdb8780171a6d8fe469daeb96d578e8ef63db"
+  integrity sha512-LaEDcZ2JWRXPAd9TtQXT+n5EzDh+OJz0AAVreF4uD64jSe9T23r4PyLtfJ8dSLivcU/qCzld92WMrInP0vpGLw==
   dependencies:
     "@json-rpc-tools/provider" "^1.6.4"
     "@json-rpc-tools/utils" "^1.6.4"
     "@pedrouid/pino-utils" "^1.0.1"
-    "@walletconnect/types" "^2.0.0-alpha.32"
-    "@walletconnect/utils" "^2.0.0-alpha.32"
+    "@walletconnect/types" "^2.0.0-alpha.35"
+    "@walletconnect/utils" "^2.0.0-alpha.35"
     enc-utils "^3.0.0"
     keyvaluestorage "^0.7.1"
     pino "^6.7.0"
@@ -5431,23 +5436,23 @@
     relay-provider "^1.2.1"
     safe-json-utils "^1.1.1"
 
-"@walletconnect/types@^2.0.0-alpha.32":
-  version "2.0.0-alpha.32"
-  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-2.0.0-alpha.32.tgz#05f6f641f369abc2db099f5560f958be5e047901"
-  integrity sha512-m8lsJIJEVbpGYbnjC6qkseB0HsN2go4dJIfaDw2jjTtKIGEvBlkKFEPWcUbmUdAjUWhdyFgHCotq4hmBCcDIbA==
+"@walletconnect/types@2.0.0-alpha.35", "@walletconnect/types@^2.0.0-alpha.35":
+  version "2.0.0-alpha.35"
+  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-2.0.0-alpha.35.tgz#277422625a5ad79f4750ecb9386f968e52cc1948"
+  integrity sha512-LvGCisroY6FNZ5xNT1cYwmuDxkut5wvolbcGrG5tjl9pp2iiTDLpnk51azopA+wn1giPRSMfk6qRU2czfQd5kA==
   dependencies:
     "@json-rpc-tools/types" "^1.6.4"
     keyvaluestorage "^0.7.1"
     pino "^6.7.0"
     pino-pretty "^4.3.0"
 
-"@walletconnect/utils@^2.0.0-alpha.32":
-  version "2.0.0-alpha.32"
-  resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-2.0.0-alpha.32.tgz#feceffd467f24530208938c5f8b0b24004fbe1ad"
-  integrity sha512-6P/qsd4X3kXn+Yrq8Pk05xBHXv4zSI3tpK3KaXjJizzYUT+k/VgwLCXikyuOoVhcBOPBREAMurVzCsmtbP9DRw==
+"@walletconnect/utils@^2.0.0-alpha.35":
+  version "2.0.0-alpha.35"
+  resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-2.0.0-alpha.35.tgz#77ec70fc6af5e23c3b40e308c07d9b6de20aea48"
+  integrity sha512-/aCL2Wc3x0vO24cV8Q16QkiBU0OyDd65Frt1+P0mDFxCebMHmmE7YTtUyNPqKTuqXA9j/gnJf0VPQa8LV7QT4Q==
   dependencies:
     "@json-rpc-tools/utils" "^1.6.4"
-    "@walletconnect/types" "^2.0.0-alpha.32"
+    "@walletconnect/types" "^2.0.0-alpha.35"
     ecies-25519 "^1.3.0"
     enc-utils "^3.0.0"
     query-string "^6.13.5"
