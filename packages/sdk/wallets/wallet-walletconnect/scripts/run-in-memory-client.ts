@@ -1,5 +1,6 @@
 import { newKit } from '@celo/contractkit'
 import { WalletConnectWallet } from '../src'
+import { stagingEndpoint } from '../src/constants'
 
 async function main() {
   const name = `CLI DApp ${Math.random().toString().substring(12)}`
@@ -14,7 +15,7 @@ async function main() {
       },
     },
     init: {
-      relayProvider: 'wss://walletconnect.celo-networks-dev.org',
+      relayProvider: stagingEndpoint,
       logger: 'error',
     },
   })

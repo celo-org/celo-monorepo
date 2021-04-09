@@ -5,6 +5,7 @@ import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
 import { ERROR, getError } from '@walletconnect/utils'
 import debugConfig from 'debug'
+import { stagingEndpoint } from './constants'
 import { SupportedMethods, WalletConnectWalletOptions } from './types'
 import { WalletConnectSigner } from './wc-signer'
 
@@ -30,7 +31,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
 }
 
 const defaultInitOptions: ClientOptions = {
-  relayProvider: 'wss://walletconnect.celo-networks-dev.org',
+  relayProvider: stagingEndpoint,
 }
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
