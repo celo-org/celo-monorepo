@@ -63,7 +63,9 @@ export async function handleGetBlindedMessagePartialSig(
       .labels('authenticateUser')
       .startTimer()
     if (
-      !(await authenticateUser(request, getContractKit(), logger).finally(meterAuthenticateUser))
+      !(await authenticateUser(request, getContractKit() as any, logger).finally(
+        meterAuthenticateUser
+      ))
     ) {
       respondWithError(
         Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
