@@ -9,7 +9,7 @@ import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -24,7 +24,7 @@ contract Governance is
   IGovernance,
   ICeloVersionedContract,
   Ownable,
-  Initializable,
+  InitializableV2,
   ReentrancyGuard,
   UsingRegistry,
   UsingPrecompiles
@@ -194,8 +194,14 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 2);
+    return (1, 2, 1, 2);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
