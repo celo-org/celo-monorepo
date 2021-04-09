@@ -734,7 +734,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     })
   })
 
-  // possible.
   describe('With AttestationsV2', () => {
     const Proxy: ProxyContract = artifacts.require('ProxyV2')
     const ProxyCloneFactory: ProxyCloneFactoryContract = artifacts.require('ProxyCloneFactory')
