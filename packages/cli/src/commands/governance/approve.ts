@@ -82,6 +82,6 @@ export default class Approve extends BaseCommand {
           governanceTx.txo
         )
       : governanceTx
-    await displaySendTx<string | void | boolean>('approveTx', tx)
+    await displaySendTx('approveTx', tx)
   }
 }

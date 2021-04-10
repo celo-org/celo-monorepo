@@ -1,4 +1,4 @@
-import { CeloTransactionObject, CeloTx, EventLog, parseDecodedParams } from '@celo/connect'
+import { CeloTransactionObject, CeloTx, parseDecodedParams } from '@celo/connect'
 import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -16,8 +16,7 @@ export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<CeloTx, 
 export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
-  tx?: Omit<CeloTx, 'data'>,
-  displayEventName?: string
+  tx?: Omit<CeloTx, 'data'>
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
   try {
@@ -31,14 +30,12 @@ export async function displaySendTx<A>(
     const txReceipt = await txResult.waitReceipt()
     cli.action.stop()
 
-    if (displayEventName && txReceipt.events) {
-      Object.entries(txReceipt.events)
-        .filter(([eventName]) => eventName === displayEventName)
-        .forEach(([eventName, log]) => {
-          const { params } = parseDecodedParams((log as EventLog).returnValues)
-          console.log(chalk.magenta.bold(`${eventName}:`))
-          printValueMap(params, chalk.magenta)
-        })
+    if (txReceipt.events) {
+      let events: { [key: string]: any } = {}
+      Object.values(txReceipt.events).forEach(
+        (log) => (events[log.event] = parseDecodedParams(log.returnValues).params)
+      )
+      printValueMapRecursive(events, chalk.magenta)
     }
   } catch (e) {
     cli.action.stop(`failed: ${e.message}`)
@@ -46,44 +43,32 @@ export async function displaySendTx<A>(
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>, color = chalk.yellowBright.bold) {
-  console.log(
-    Object.keys(valueMap)
-      .map((key) => color(`${key}: `) + valueMap[key])
-      .join('\n')
-  )
-}
+export const printValueMap = (valueMap: Record<string, any>, color = chalk.yellowBright.bold) =>
+  printValueMapRecursive(valueMap, color)
 
-export function printValueMap2(valueMap: Map<any, any>, color = chalk.yellowBright.bold) {
-  valueMap.forEach((value, key) => console.log(color(`${key}: `) + value))
-}
+export const printValueMapRecursive = (
+  valueMap: Record<string, any>,
+  color = chalk.yellowBright.bold
+) => console.log(toStringValueMapRecursive(valueMap, '', color))
 
-export function printValueMapRecursive(valueMap: Record<string, any>) {
-  console.log(toStringValueMapRecursive(valueMap, ''))
-}
-
-function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string): string {
+function toStringValueMapRecursive(
+  valueMap: Record<string, any>,
+  prefix: string,
+  color = chalk.yellowBright.bold
+): string {
   const printValue = (v: any): string => {
     if (typeof v === 'object' && v != null) {
       if (BigNumber.isBigNumber(v)) {
         const extra = v.isGreaterThan(new BigNumber(10).pow(3)) ? `(~${v.toExponential(3)})` : ''
         return `${v.toFixed()} ${extra}`
       }
-      return '\n' + toStringValueMapRecursive(v, prefix + '  ')
+      return '\n' + toStringValueMapRecursive(v, prefix + '  ', color)
     }
     return chalk`${v}`
   }
   return Object.keys(valueMap)
-    .map((key) => prefix + chalk.yellowBright.bold(`${key}: `) + printValue(valueMap[key]))
+    .map((key) => prefix + color(`${key}: `) + printValue(valueMap[key]))
     .join('\n')
-}
-
-export function printVTable(valueMap: Record<string, any>) {
-  const table = new Table()
-  Object.keys(valueMap).forEach((key) => {
-    table.push({ [key]: valueMap[key] })
-  })
-  console.log(table.toString())
 }
 
 export function failWith(msg: string): never {

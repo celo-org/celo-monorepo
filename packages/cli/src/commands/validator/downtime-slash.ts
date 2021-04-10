@@ -83,7 +83,7 @@ export default class DowntimeSlashCommand extends BaseCommand {
         .runChecks()
 
       const tx = await downtimeSlasher.slashValidator(validator, intervals)
-      await displaySendTx('slash', tx, undefined, 'DowntimeSlashPerformed')
+      await displaySendTx('slash', tx)
     }
   }
 }

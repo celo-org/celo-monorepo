@@ -53,7 +53,7 @@ export default class SetBitmapsCommand extends BaseCommand {
 
     for (const interval of intervals) {
       const tx = downtimeSlasher.setBitmapForInterval(interval)
-      await displaySendTx('setBitmap', tx, undefined, 'BitmapSetForInterval')
+      await displaySendTx('setBitmap', tx)
     }
   }
 }
