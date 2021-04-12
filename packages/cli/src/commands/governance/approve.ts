@@ -3,7 +3,7 @@ import { flags } from '@oclif/command'
 import { toBuffer } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Approve extends BaseCommand {
@@ -22,7 +22,6 @@ export default class Approve extends BaseCommand {
     }),
     from: Flags.address({ required: true, description: "Approver's address" }),
     useMultiSig: flags.boolean({
-      default: true,
       description: 'True means the request will be sent through multisig.',
     }),
     hotfix: flags.string({
@@ -71,7 +70,7 @@ export default class Approve extends BaseCommand {
       governanceTx = governance.approveHotfix(hotfixBuf)
       logEvent = 'HotfixApproved'
     } else {
-      throw new Error('Proposal ID or hotfix must be provided')
+      failWith('Proposal ID or hotfix must be provided')
     }
 
     await checkBuilder.runChecks()
