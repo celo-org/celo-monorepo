@@ -2,6 +2,7 @@ import { getSignatureForMetaTransaction, MetaTransaction } from '@celo/protocol/
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
+  assertEqualBN,
   assumeOwnership,
   getDerivedKey,
   getVerificationCodeSignature,
@@ -51,7 +52,14 @@ const getExecuteMetaTransactionData = async (
     .encodeABI()
 }
 
-// tslint:disable:no-console
+const logCosts = false
+const logCost = (output: string) => {
+  if (logCosts) {
+    // tslint:disable-next-line:no-console
+    console.log(output)
+  }
+}
+
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
 const MTW: MetaTransactionWalletContract = artifacts.require('MetaTransactionWallet')
@@ -154,7 +162,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           // @ts-ignore
           mtw.contract.methods.initialize(ensureLeading0x(user)).encodeABI()
         )
-        console.log(`Deploying and initializing a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
+        logCost(`Deploying and initializing a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
         totalCost += deploymentTx.receipt.gasUsed
         mtw = await MTW.at(deploymentTx.logs[0].args.wallet)
 
@@ -167,7 +175,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           nonce: 0,
         }
         const setAccountTx = await executeMetaTransaction(user, mtw, setAccount)
-        console.log(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
+        logCost(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
         totalCost += setAccountTx.receipt.gasUsed
 
         await stableToken.transfer(relayermtw.address, attestationFee)
@@ -216,7 +224,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
           transactions.map((t) => trimLeading0x(t.data).length / 2)
         )
-        console.log(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
+        logCost(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
         totalCost += requestTx.receipt.gasUsed
 
         // Add fake randomness so that issuers can be selected.
@@ -231,7 +239,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           nonce: 3,
         }
         const selectTx = await executeMetaTransaction(user, mtw, select)
-        console.log(`Selecting issuers takes ${selectTx.receipt.gasUsed} gas`)
+        logCost(`Selecting issuers takes ${selectTx.receipt.gasUsed} gas`)
         totalCost += selectTx.receipt.gasUsed
 
         const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
@@ -251,10 +259,13 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             nonce: i + 4,
           }
           const completeTx = await executeMetaTransaction(user, mtw, complete)
-          console.log(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
+          logCost(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
           totalCost += completeTx.receipt.gasUsed
         }
-        console.log(`Onboarding a user takes ${totalCost} gas`)
+        const [completed, total] = await attestations.getAttestationStats(identifier, user)
+        assertEqualBN(completed, numAttestations)
+        assertEqualBN(total, numAttestations)
+        logCost(`Onboarding a user takes ${totalCost} gas`)
       })
       // Deploying and initializing a proxy takes 695743 gas
       // Setting the account takes 189023 gas
@@ -289,7 +300,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             // @ts-ignore
             mtw.contract.methods.initialize(ensureLeading0x(user)).encodeABI()
           )
-          console.log(`Deploying a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
+          logCost(`Deploying a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
           totalCost += deploymentTx.receipt.gasUsed
           const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
           mtw = await MTW.at(proxy.address)
@@ -303,7 +314,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             nonce: 0,
           }
           const setAccountTx = await executeMetaTransaction(user, mtw, setAccount)
-          console.log(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
+          logCost(`Setting the account takes ${setAccountTx.receipt.gasUsed} gas`)
           totalCost += setAccountTx.receipt.gasUsed
 
           await stableToken.transfer(relayermtw.address, attestationFee)
@@ -354,7 +365,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
             transactions.map((t) => trimLeading0x(t.data).length / 2)
           )
-          console.log(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
+          logCost(`Requesting attestations takes ${requestTx.receipt.gasUsed} gas`)
           totalCost += requestTx.receipt.gasUsed
 
           // Add fake randomness so that issuers can be selected.
@@ -369,7 +380,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             nonce: 3,
           }
           const selectTx = await executeMetaTransaction(user, mtw, select)
-          console.log(`Selecting issuers takes ${selectTx.receipt.gasUsed} gas`)
+          logCost(`Selecting issuers takes ${selectTx.receipt.gasUsed} gas`)
           totalCost += selectTx.receipt.gasUsed
 
           const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
@@ -389,10 +400,13 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
               nonce: i + 4,
             }
             const completeTx = await executeMetaTransaction(user, mtw, complete)
-            console.log(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
+            logCost(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
             totalCost += completeTx.receipt.gasUsed
           }
-          console.log(`Onboarding a user takes ${totalCost} gas`)
+          const [completed, total] = await attestations.getAttestationStats(identifier, user)
+          assertEqualBN(completed, numAttestations)
+          assertEqualBN(total, numAttestations)
+          logCost(`Onboarding a user takes ${totalCost} gas`)
         })
         // Deploying a proxy takes 187488 gas
         // Setting the account takes 189943 gas
