@@ -1,8 +1,5 @@
-import { MetaTransaction, getSignatureForMetaTransaction } from '@celo/protocol/lib/meta-tx-utils'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { getSignatureForMetaTransaction, MetaTransaction } from '@celo/protocol/lib/meta-tx-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assumeOwnership,
@@ -11,24 +8,26 @@ import {
   KeyOffsets,
   unlockAndAuthorizeKey,
 } from '@celo/protocol/lib/test-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { ensureLeading0x, privateKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
 import {
   AccountsContract,
   AccountsInstance,
   AttestationsTestContract,
   AttestationsTestInstance,
-  StableTokenInstance,
-  MockRandomInstance,
-  MockRandomContract,
-  MockValidatorsContract,
   MetaTransactionWalletContract,
-  MetaTransactionWalletInstance,
   MetaTransactionWalletDeployerContract,
   MetaTransactionWalletDeployerInstance,
-  ProxyContract,
-  ProxyInstance,
+  MetaTransactionWalletInstance,
+  MockRandomContract,
+  MockRandomInstance,
+  MockValidatorsContract,
   ProxyCloneFactoryContract,
   ProxyCloneFactoryInstance,
+  ProxyContract,
+  ProxyInstance,
   RegistryInstance,
+  StableTokenInstance,
 } from 'types'
 
 const executeMetaTransaction = async (
@@ -52,6 +51,7 @@ const getExecuteMetaTransactionData = async (
     .encodeABI()
 }
 
+// tslint:disable:no-console
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
 const MTW: MetaTransactionWalletContract = artifacts.require('MetaTransactionWallet')

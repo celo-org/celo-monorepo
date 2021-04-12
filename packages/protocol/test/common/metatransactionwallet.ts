@@ -1,9 +1,9 @@
-import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import {
-  getDomainDigest,
   constructMetaTransactionExecutionDigest,
+  getDomainDigest,
   getSignatureForMetaTransaction,
 } from '@celo/protocol/lib/meta-tx-utils'
+import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 

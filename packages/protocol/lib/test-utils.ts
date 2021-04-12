@@ -1,8 +1,8 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import {
-  getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils'
+import {getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { config } from '@celo/protocol/migrationsConfig'
+import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
@@ -11,8 +11,6 @@ import chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
-import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationUtils } from '@celo/utils'
 import Web3 from 'web3'
 
 // tslint:disable-next-line: ordered-imports
