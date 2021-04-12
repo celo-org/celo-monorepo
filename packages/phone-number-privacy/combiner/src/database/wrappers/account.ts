@@ -8,7 +8,10 @@ function accounts() {
 }
 
 async function getAccountExists(account: string): Promise<boolean> {
-  const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
+  const existingAccountRecord = await accounts()
+    .where(ACCOUNTS_COLUMNS.address, account)
+    .first()
+    .timeout(DB_TIMEOUT)
   return !!existingAccountRecord
 }
 
@@ -21,6 +24,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
+      .timeout(DB_TIMEOUT)
     if (!didMatchmaking) {
       return false
     }
@@ -42,6 +46,7 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+        .timeout(DB_TIMEOUT)
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()

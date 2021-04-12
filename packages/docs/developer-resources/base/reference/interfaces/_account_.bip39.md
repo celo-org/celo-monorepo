@@ -19,7 +19,7 @@
 
 • **generateMnemonic**: *function*
 
-*Defined in [packages/sdk/base/src/account.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L27)*
+*Defined in [packages/sdk/base/src/account.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L28)*
 
 #### Type declaration:
 
@@ -39,7 +39,7 @@ ___
 
 • **mnemonicToSeed**: *function*
 
-*Defined in [packages/sdk/base/src/account.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L26)*
+*Defined in [packages/sdk/base/src/account.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L27)*
 
 #### Type declaration:
 
@@ -58,7 +58,7 @@ ___
 
 • **mnemonicToSeedSync**: *function*
 
-*Defined in [packages/sdk/base/src/account.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L25)*
+*Defined in [packages/sdk/base/src/account.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L26)*
 
 #### Type declaration:
 
@@ -77,7 +77,7 @@ ___
 
 • **validateMnemonic**: *function*
 
-*Defined in [packages/sdk/base/src/account.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L32)*
+*Defined in [packages/sdk/base/src/account.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/account.ts#L33)*
 
 #### Type declaration:
 
