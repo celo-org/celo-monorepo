@@ -3,11 +3,10 @@ import path from 'path'
 
 import { CoreContracts } from './build'
 
-const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
-
 const UNSAFE_OPCODES = ['selfdestruct', 'delegatecall']
-const IGNORE_CONTRACTS = ['ReleaseGold', 'TransferWhitelist']
 
+// ignore deprecated and known contracts
+const IGNORE_CONTRACTS = ['ReleaseGold', 'TransferWhitelist']
 const CHECK_CONTRACTS = CoreContracts.filter((c) => !IGNORE_CONTRACTS.includes(c))
 
 const handleRgOutput = (err: ExecException, rgOutput: string, stderr: string) => {
@@ -35,4 +34,7 @@ const handleRgOutput = (err: ExecException, rgOutput: string, stderr: string) =>
   }
 }
 
-exec(`rg --no-heading "${UNSAFE_OPCODES.join('|')}" ${ROOT_DIR}/contracts`, handleRgOutput)
+exec(
+  `rg --no-heading "${UNSAFE_OPCODES.join('|')}" ${path.join(__dirname, '../contracts')}`,
+  handleRgOutput
+)
