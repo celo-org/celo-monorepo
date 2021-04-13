@@ -58,22 +58,25 @@ export default class Approve extends BaseCommand {
     let governanceTx: CeloTransactionObject<any>
     let logEvent: string
     if (id) {
-      checkBuilder
+      if (await governance.isQueued(id)) {
+        await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      }
+
+      await checkBuilder
         .proposalExists(id)
         .proposalInStage(id, 'Approval')
         .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
+        .runChecks()
       governanceTx = await governance.approve(id)
       logEvent = 'ProposalApproved'
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer
-      checkBuilder.hotfixNotExecuted(hotfixBuf).hotfixNotApproved(hotfixBuf)
+      await checkBuilder.hotfixNotExecuted(hotfixBuf).hotfixNotApproved(hotfixBuf).runChecks()
       governanceTx = governance.approveHotfix(hotfixBuf)
       logEvent = 'HotfixApproved'
     } else {
       failWith('Proposal ID or hotfix must be provided')
     }
-
-    await checkBuilder.runChecks()
 
     const tx = useMultiSig
       ? await governanceApproverMultiSig!.submitOrConfirmTransaction(
