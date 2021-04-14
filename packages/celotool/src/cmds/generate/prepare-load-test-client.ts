@@ -2,6 +2,7 @@
 import * as fs from 'fs'
 import { AccountType, generatePrivateKey, privateKeyToAddress } from 'src/lib/generate_utils'
 import yargs from 'yargs'
+const keythereum = require('keythereum')
 
 interface Bip32Argv {
   mnemonic: string
@@ -35,12 +36,6 @@ export const builder = (argv: yargs.Argv) => {
     })
 }
 
-/*
- * Given a BIP-39 mnemonic, we generate a level 1 child private key using the
- * BIP-32 standard.
- * https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
- * https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
- */
 export const handler = async (argv: Bip32Argv) => {
   const accountType = AccountType.LOAD_TESTING_ACCOUNT
   for (let t = 0; t < argv.threads; t++) {
@@ -51,5 +46,6 @@ export const handler = async (argv: Bip32Argv) => {
     fs.writeFileSync(`/root/.celo/pkey${t}`, `${privateKey}\n`)
     fs.appendFileSync(`/root/.celo/address`, `${address}\n`)
     console.log(`Address for index ${argv.index} and thread ${t} --> ${address}`)
+    const dk = keythereum.crea
   }
 }

@@ -96,6 +96,7 @@ export const handler = async (argv: SimulateClientArgv) => {
       argv.blockscoutUrl,
       argv.blockscoutMeasurePercent,
       argv.index,
+      thread,
       `http://localhost:${web3ProviderPort}`
     )
   }

@@ -523,6 +523,7 @@ export const simulateClient = async (
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
   index: number,
+  thread: number,
   web3Provider: string = 'http://localhost:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
@@ -552,11 +553,9 @@ export const simulateClient = async (
   console.info(`Sleeping for ${sleepMs} ms`)
   await sleep(sleepMs)
 
-  // const clientRPC = new DefaultRpcCaller(kit.web3.currentProvider as Provider)
-  // await clientRPC.call('personal_listWallets', )
-
   const baseLogMessage: any = {
     loadTestID: index,
+    threadID: thread,
     sender: senderAddress,
     recipient: recipientAddress,
     feeCurrency: '',
@@ -605,7 +604,7 @@ export const simulateClient = async (
         nonce = await kit.connection.nonce(kit.defaultAccount)
       } else {
         nonce = (await kit.connection.nonce(kit.defaultAccount)) - 1
-        gasPrice = gasPrice.times(3)
+        gasPrice = gasPrice.times(6)
         console.warn(
           `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
         )
