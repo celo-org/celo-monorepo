@@ -219,14 +219,19 @@ spec:
               --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
-            memory: 2Gi
-            cpu: 1
+            memory: 4Gi
+            cpu: 2
         env:
         - name: MNEMONIC
           valueFrom:
             secretKeyRef:
               name: {{ .Values.environment }}-load-test
               key: mnemonic
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.environment }}-load-test
+              key: accountSecret
         volumeMounts:
         - name: data
           mountPath: /root/.celo
