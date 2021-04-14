@@ -42,7 +42,7 @@ export function getGasCurrency(configDir: string): string {
 }
 
 export function writeConfig(configDir: string, configObj: CeloConfig) {
-  if (Object.keys(gasOptions).includes(configObj.gasCurrency)) {
+  if (!Object.keys(gasOptions).includes(configObj.gasCurrency)) {
     throw new Error('Invalid gas option')
   }
   fs.outputJSONSync(configPath(configDir), configObj)
