@@ -520,3 +520,19 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - name: data
     mountPath: /root/.celo
 {{- end -}}
+
+{{- /* jcortejoso TODO */ -}}
+{{- define "common.mycelo" -}}
+- name: mycelo
+  image: {{ .Values.mycelo.image.repository | default .Values.bootnode.image.repository }}:{{ .Values.mycelo.image.tag | default .Values.bootnode.image.tag }}
+  imagePullPolicy: {{ .Values.mycelo.image.imagePullPolicy | default "Always" }}
+  command:
+  - "/bin/sh"
+  - "-c"
+  args:
+  - |
+    # Prepare the 
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}

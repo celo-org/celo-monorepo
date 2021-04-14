@@ -1072,3 +1072,5 @@ function rollingUpdateHelmVariables() {
     )}`,
   ]
 }
+
+function setupMyCelo() {}
