@@ -4,7 +4,13 @@ This page walks you through the main functionalities of DAppKit and provides sma
 
 ## Overview
 
-DAppKit uses [deeplinks](https://en.wikipedia.org/wiki/Mobile_deep_linking) to communicate between your DApp and the [Celo Developer Wallet](https://celo.org/developers/wallet) (for testing) and [Valora](https://valoraapp.com/) (for production). All 'requests' that your DApp makes to the Wallet needs to contain the following meta payload:
+DAppKit uses [deeplinks](https://en.wikipedia.org/wiki/Mobile_deep_linking) to communicate between your DApp and the [Celo Developer Wallet](https://celo.org/developers/wallet) (for testing) and [Valora](https://valoraapp.com/) (for production).
+
+{% hint style="info" %} 
+Note: DappKit uses the same deeplink for both the testing and production wallets. This means that when testing on iOS devices, the deeplinks will open the testing wallet vs the product wallet if both are installed on the same device. On Android devices, when multiple wallets are installed users are able to select which wallet they would like to use to open the deeplink. We are currently working to make separate deeplinks. Given the low transaction fees, many developers have chosen to only develop on mainnet to get around this.
+{% endhint %}
+
+All 'requests' that your DApp makes to the Wallet needs to contain the following meta payload:
 
 - `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request.
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
@@ -31,7 +37,8 @@ login = async () => {
 
   const dappkitResponse = await waitForAccountAuth(requestId);
 
-  this.setState({ address: dappkitResponse.address, phoneNumber: dappkitResponse.phoneNumber });
+  // The pepper is not available in all Valora versions
+  this.setState({ address: dappkitResponse.address, phoneNumber: dappkitResponse.phoneNumber, pepper: dappkitResponse.pepper });
 }
 ```
 
@@ -67,6 +74,27 @@ const cUSDBalanceBig = await stableToken.balanceOf(kit.defaultAccount);
 // Convert from a big number to a string
 let cUSDBalance = cUSDBalanceBig.toString();
 this.setState({ cUSDBalance, isLoadingBalance: false });
+```
+
+## Checking attestations for the phone number
+
+If the user is using a Valora version that passes the `pepper` that Valora has for a `phone_number`, you can use both pieces of information to determine attestations for the identifier (learn more about the [lightweight identity protocol here](../../celo-codebase/protocol/identity)):
+
+```javascript
+import { PhoneNumberUtils } from '@celo/utils'
+const attestations = await kit.contracts.getAttestations();
+
+const identifier = PhoneNumberUtils.getPhoneHash(dappkitResponse.phoneNumber, dappkitResponse.pepper);
+
+// Find all accounts that have received attestations for this phone number
+const accounts = attestations.lookupAccountsForIdentifier(identifier);
+
+// Get the attestations stats for the accounts
+for (const account of accounts) {
+  const stat = await attestations.getAttestationStat(identifier, account);
+  console.log(`Total: ${stat.total}, Completed: ${stat.completed}`);
+}
+
 ```
 
 ## Signing Transactions

@@ -8,8 +8,10 @@
 * [concurrentValuesMap](_async_.md#concurrentvaluesmap)
 * [retryAsync](_async_.md#const-retryasync)
 * [retryAsyncWithBackOff](_async_.md#const-retryasyncwithbackoff)
+* [retryAsyncWithBackOffAndTimeout](_async_.md#const-retryasyncwithbackoffandtimeout)
 * [selectiveRetryAsyncWithBackOff](_async_.md#const-selectiveretryasyncwithbackoff)
 * [sleep](_async_.md#sleep)
+* [timeout](_async_.md#const-timeout)
 
 ## Functions
 
@@ -17,7 +19,7 @@
 
 ▸ **concurrentMap**<**A**, **B**>(`concurrency`: number, `xs`: A[], `mapFn`: function): *Promise‹B[]›*
 
-*Defined in [packages/sdk/base/src/async.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L106)*
+*Defined in [packages/sdk/base/src/async.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L128)*
 
 Map an async function over a list xs with a given concurrency level
 
@@ -58,7 +60,7 @@ ___
 
 ▸ **concurrentValuesMap**<**IN**, **OUT**>(`concurrency`: number, `x`: Record‹string, IN›, `mapFn`: function): *Promise‹Record‹string, OUT››*
 
-*Defined in [packages/sdk/base/src/async.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L128)*
+*Defined in [packages/sdk/base/src/async.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L150)*
 
 Map an async function over the values in Object x with a given concurrency level
 
@@ -148,6 +150,34 @@ Name | Type | Default |
 
 ___
 
+### `Const` retryAsyncWithBackOffAndTimeout
+
+▸ **retryAsyncWithBackOffAndTimeout**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delayMs`: number, `factor`: number, `timeoutMs`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+
+*Defined in [packages/sdk/base/src/async.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L102)*
+
+**Type parameters:**
+
+▪ **T**: *any[]*
+
+▪ **U**
+
+**Parameters:**
+
+Name | Type | Default |
+------ | ------ | ------ |
+`inFunction` | InFunction‹T, U› | - |
+`tries` | number | - |
+`params` | T | - |
+`delayMs` | number | 100 |
+`factor` | number | 1.5 |
+`timeoutMs` | number | 2000 |
+`logger` | [Logger](_logger_.md#logger) &#124; null | null |
+
+**Returns:** *Promise‹U›*
+
+___
+
 ### `Const` selectiveRetryAsyncWithBackOff
 
 ▸ **selectiveRetryAsyncWithBackOff**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `dontRetry`: string[], `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
@@ -191,3 +221,32 @@ Name | Type |
 `ms` | number |
 
 **Returns:** *Promise‹void›*
+
+___
+
+### `Const` timeout
+
+▸ **timeout**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `params`: T, `timeoutMs`: number, `timeoutError`: any, `timeoutLogMsg`: string | null, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+
+*Defined in [packages/sdk/base/src/async.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L173)*
+
+Wraps an async function in a timeout before calling it.
+
+**Type parameters:**
+
+▪ **T**: *any[]*
+
+▪ **U**
+
+**Parameters:**
+
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`inFunction` | InFunction‹T, U› | - | The async function to call |
+`params` | T | - | The parameters of the async function |
+`timeoutMs` | number | - | The timeout in milliseconds |
+`timeoutError` | any | - | The value to which the returned Promise should reject to  |
+`timeoutLogMsg` | string &#124; null | null | - |
+`logger` | [Logger](_logger_.md#logger) &#124; null | null | - |
+
+**Returns:** *Promise‹U›*
