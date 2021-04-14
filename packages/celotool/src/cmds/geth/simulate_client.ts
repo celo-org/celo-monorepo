@@ -1,5 +1,4 @@
 /* tslint:disable no-console */
-import sleep from 'sleep-promise'
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
 import { simulateClient } from 'src/lib/geth'
 import * as yargs from 'yargs'
@@ -15,6 +14,7 @@ interface SimulateClientArgv extends yargs.Argv {
   mnemonic: string
   recipientIndex: number
   clientCount: number
+  reuseClient: boolean
 }
 
 export const builder = () => {
@@ -56,13 +56,17 @@ export const builder = () => {
       description: 'Number of clients to simulate',
       default: 1,
     })
+    .options('reuse-client', {
+      type: 'boolean',
+      description: 'Use the same light client for all the threads/accounts',
+      default: false,
+    })
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
-  // So we can transactions to another load testing account
-  for (let x = 0; x < argv.clientCount; x++) {
-    const senderIndex = argv.index * 10000 + x
-    const recipientIndex = argv.recipientIndex * 10000 + x
+  for (let thread = 0; thread < argv.clientCount; thread++) {
+    const senderIndex = argv.index * 10000 + thread
+    const recipientIndex = argv.recipientIndex * 10000 + thread
     const senderAddress = generateAddress(
       argv.mnemonic,
       AccountType.LOAD_TESTING_ACCOUNT,
@@ -74,21 +78,15 @@ export const handler = async (argv: SimulateClientArgv) => {
       recipientIndex
     )
 
-    const web3ProviderPort = 8545 + x
+    const web3ProviderPort = argv.reuseClient ? 8545 : 8545 + thread
 
     console.log(
-      `Account for sender index ${argv.index} thread ${x}, final index ${senderIndex}: ${senderAddress}`
+      `Account for sender index ${argv.index} thread ${thread}, final index ${senderIndex}: ${senderAddress}`
     )
     console.log(
-      `Account for recipient index ${argv.recipientIndex} thread ${x}, final index ${recipientIndex}: ${recipientAddress}`
+      `Account for recipient index ${argv.recipientIndex} thread ${thread}, final index ${recipientIndex}: ${recipientAddress}`
     )
-
-    // sleep a random amount of time in the range [0, argv.delay] before starting so
-    // that if multiple simulations are started at the same time, they don't all
-    // submit transactions at the same time
-    const sleepMs = Math.random() * argv.delay
-    console.info(`Sleeping for ${sleepMs} ms`)
-    await sleep(sleepMs)
+    console.log(`web3ProviderPort for thread ${thread}: ${web3ProviderPort}`)
 
     // tslint:disable-next-line: no-floating-promises
     simulateClient(

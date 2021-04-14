@@ -1,3 +1,4 @@
+{{- $reuseClient := .Values.reuse_light_clients | default false -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -87,6 +88,13 @@ spec:
           for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
             geth --nousb account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
           done
+          # Josh branch for bulk import
+          #pkeys=""
+          #cd /root/.celo
+          #for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
+          #  pkeys="$pkeys pkey$thread"
+          #done
+          #geth --nousb account import --password /root/.celo/account/accountSecret $pkeys || true
         volumeMounts:
         - name: data
           mountPath: /root/.celo
@@ -94,7 +102,52 @@ spec:
           mountPath: "/root/.celo/account"
           readOnly: true
       containers:
-{{ range $index, $e := until (.Values.threads | int) }}
+{{- if $reuseClient }}
+      - name: geth
+        image: {{ $.Values.geth.image.repository }}:{{ $.Values.geth.image.tag }}
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          set -euo pipefail
+          cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
+
+          ACCOUNT_ADDRESSES=$(cat /root/.celo/address | tr '\n' ',')
+          ACCOUNT_ADDRESSES=${ACCOUNT_ADDRESSES::-1}
+
+          exec geth \
+          --datadir /root/.celo \
+          --ipcpath=geth.ipc \
+          --nousb \
+          --rpc \
+          --rpcapi=eth,web3,debug,admin,personal,net \
+          --allow-insecure-unlock \
+          --rpcvhosts=* \
+          --networkid={{ $.Values.geth.networkID }} \
+          --nodekey=/root/.celo/pkey0 \
+          --syncmode=fast \
+          --consoleformat=json \
+          --consoleoutput=stdout \
+          --verbosity=1 \
+          --unlock=$ACCOUNT_ADDRESSES \
+          --password=/root/.celo/account/accountSecret \
+          --port 30303 \
+          --rpcport 8545
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: config
+          mountPath: /var/geth
+        - name: account
+          mountPath: "/root/.celo/account"
+          readOnly: true
+{{- else }}
+{{- range $index, $e := until (.Values.threads | int) }}
       - name: geth-{{ $index }}
         image: {{ $.Values.geth.image.repository }}:{{ $.Values.geth.image.tag }}
         imagePullPolicy: {{ $.Values.imagePullPolicy }}
@@ -107,7 +160,6 @@ spec:
           cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
 
           ACCOUNT_ADDRESS=$(awk 'NR=={{ add $index 1 }}' /root/.celo/address)
-          PASSWORD=$(cat /root/.celo/account/accountSecret)
 
           exec geth \
           --nousb \
@@ -129,9 +181,6 @@ spec:
           requests:
             memory: 200Mi
             cpu: 100m
-          limits:
-            memory: 1Gi
-            cpu: 1
         volumeMounts:
         - name: data
           mountPath: /root/.celo_share
@@ -141,7 +190,8 @@ spec:
         - name: account
           mountPath: "/root/.celo_share/account"
           readOnly: true
-{{ end }}
+{{- end }}
+{{- end }}
       - name: simulate-client
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -157,6 +207,9 @@ spec:
             RECIPIENT_INDEX=$(( ($RID + 1) % {{ .Values.replicas }} ))
 
             exec celotooljs.sh geth simulate-client \
+{{- if $reuseClient }}
+              --reuse-client \
+{{- end }}
               --index $RID \
               --recipient-index $RECIPIENT_INDEX \
               --delay {{ .Values.delay }} \
@@ -166,8 +219,8 @@ spec:
               --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
-            memory: 400Mi
-            cpu: 400m
+            memory: 2Gi
+            cpu: 1
         env:
         - name: MNEMONIC
           valueFrom:
@@ -186,3 +239,14 @@ spec:
       - name: account
         secret:
           secretName: {{ .Values.environment }}-load-test
+{{- if $reuseClient }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      storageClassName: ssd
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.geth.diskSize | default 10 }}Gi
+{{- end }}

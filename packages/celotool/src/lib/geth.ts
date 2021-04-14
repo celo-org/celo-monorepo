@@ -459,6 +459,7 @@ export const transferCeloGold = async (
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
@@ -469,6 +470,7 @@ export const transferCeloGold = async (
     feeCurrency: txOptions.feeCurrency,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
   })
 }
 
@@ -483,6 +485,7 @@ export const transferCeloDollars = async (
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
@@ -493,7 +496,24 @@ export const transferCeloDollars = async (
     feeCurrency: txOptions.feeCurrency,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
   })
+}
+
+export const unlock = async (
+  kit: ContractKit,
+  address: string,
+  password: string,
+  unlockPeriod: number,
+  unlockNeeded: boolean
+) => {
+  if (unlockNeeded) {
+    try {
+      kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
+    } catch (error) {
+      console.error(`Unlock account ${address} failed:`, error)
+    }
+  }
 }
 
 export const simulateClient = async (
@@ -507,7 +527,33 @@ export const simulateClient = async (
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKitFromWeb3(new Web3(web3Provider))
+  const password = fetchEnv('PASSWORD')
+
+  let lastNonce: number = 0
+  let lastTx: string = ''
+  let nonce: number = 0
+  let unlockNeeded: boolean = true
+
+  const sleepTime = 5000
+  while (await kit.connection.isSyncing()) {
+    console.info(
+      `LoadTestId ${index} waiting for web3Provider to be synced. Sleeping ${sleepTime}ms`
+    )
+    await sleep(sleepTime)
+  }
   kit.defaultAccount = senderAddress
+
+  // sleep a random amount of time in the range [0, txPeriodMs/5secs) before starting so
+  // that if multiple simulations are started at the same time, they don't all
+  // submit transactions at the same time
+  const maxSleep = 5000 // Sleep 5 seg at most
+  const randomSleep = Math.random() * txPeriodMs
+  const sleepMs = randomSleep > maxSleep ? maxSleep : randomSleep
+  console.info(`Sleeping for ${sleepMs} ms`)
+  await sleep(sleepMs)
+
+  // const clientRPC = new DefaultRpcCaller(kit.web3.currentProvider as Provider)
+  // await clientRPC.call('personal_listWallets', )
 
   const baseLogMessage: any = {
     loadTestID: index,
@@ -519,7 +565,9 @@ export const simulateClient = async (
 
   while (true) {
     const sendTransactionTime = Date.now()
+    await unlock(kit, kit.defaultAccount, password, 9223372036, unlockNeeded)
 
+    unlockNeeded = false
     // randomly choose which token to use
     const transferGold = Boolean(Math.round(Math.random()))
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
@@ -548,18 +596,31 @@ export const simulateClient = async (
       const gasPriceBase = feeCurrency
         ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
         : await gasPriceMinimum.gasPriceMinimum()
-      const gasPrice = new BigNumber(gasPriceBase).times(5)
+      let gasPrice = new BigNumber(gasPriceBase).times(2)
 
-      console.info(`gasPrice: ${gasPrice}`)
+      // Check if last tx was mined. If not, reuse the same nonce
+      if (lastTx === '' || lastNonce === 0) {
+        nonce = await kit.connection.nonce(kit.defaultAccount)
+      } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
+        nonce = await kit.connection.nonce(kit.defaultAccount)
+      } else {
+        nonce = (await kit.connection.nonce(kit.defaultAccount)) - 1
+        gasPrice = gasPrice.times(3)
+        console.warn(
+          `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
+        )
+      }
 
       if (!feeCurrencyGold) {
         txOptions = {
           gasPrice: gasPrice.toString(),
           feeCurrency,
+          nonce: nonce,
         }
       } else {
         txOptions = {
           gasPrice: gasPrice.toString(),
+          nonce: nonce,
         }
       }
     } catch (error) {
@@ -574,6 +635,8 @@ export const simulateClient = async (
     // not after processing a transaction's result
     await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
+        lastTx = await txResult.getHash()
+        lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
         await onLoadTestTxResult(
           kit,
           senderAddress,
@@ -585,12 +648,20 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        console.error('Load test transaction failed with error:', error)
-        tracerLog({
-          tag: LOG_TAG_TRANSACTION_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
+        if (
+          typeof error === 'string' &&
+          error.includes('Error: authentication needed: password or unlock')
+        ) {
+          console.warn('Load test transaction failed with locked account:', error)
+          unlockNeeded = true
+        } else {
+          console.error('Load test transaction failed with error:', error)
+          tracerLog({
+            tag: LOG_TAG_TRANSACTION_ERROR,
+            error: error.toString(),
+            ...baseLogMessage,
+          })
+        }
       })
     if (sendTransactionTime + txPeriodMs > Date.now()) {
       await sleep(sendTransactionTime + txPeriodMs - Date.now())
