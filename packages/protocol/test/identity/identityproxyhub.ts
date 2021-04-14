@@ -1,14 +1,21 @@
+import { assertRevert } from '@celo/protocol/lib/test-utils'
 import {
   IdentityProxyContract,
   IdentityProxyHubContract,
   IdentityProxyHubInstance,
   IdentityProxyTestContract,
   IdentityProxyTestInstance,
+  MockAttestationsContract,
+  MockAttestationsInstance,
+  RegistryContract,
+  RegistryInstance,
 } from 'types'
 
 const IdentityProxyHub: IdentityProxyHubContract = artifacts.require('IdentityProxyHub')
 const IdentityProxy: IdentityProxyContract = artifacts.require('IdentityProxy')
 const IdentityProxyTest: IdentityProxyTestContract = artifacts.require('IdentityProxyTest')
+const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
+const Registry: RegistryContract = artifacts.require('Registry')
 
 const concatanateHexStrings = (...strings: string[]) => {
   return `0x${strings.reduce((concatanated: string, s: string) => {
@@ -34,25 +41,32 @@ const computeCreate2Address = <T>(
   return `0x${hash.slice(2 + 2 * 12)}`
 }
 
-contract('IdentityProxyHub', () => {
+contract('IdentityProxyHub', (accounts: string[]) => {
   let identityProxyHub: IdentityProxyHubInstance
   let identityProxyTest: IdentityProxyTestInstance
-  const identifier1: string = '0x00000000000000000000000000000000000000000000000000000000babecafe'
-  const identifier2: string = '0x00000000000000000000000000000000000000000000000000000000deadbeef'
+  let attestations: MockAttestationsInstance
+  let registry: RegistryInstance
+  const identifier: string = '0x00000000000000000000000000000000000000000000000000000000babecafe'
 
   beforeEach(async () => {
+    registry = await Registry.new()
+    await registry.initialize()
+    attestations = await MockAttestations.new()
+    await registry.setAddressFor('Attestations', attestations.address)
+
     identityProxyHub = await IdentityProxyHub.new()
     identityProxyTest = await IdentityProxyTest.new()
+    await identityProxyHub.setRegistry(registry.address)
   })
 
   describe('getIdentityProxy', () => {
     it('returns the correct CREATE2 address', async () => {
       const expectedAddress = computeCreate2Address(
-        identifier1,
+        identifier,
         identityProxyHub.address,
         IdentityProxy
       )
-      const onchainAddress = await identityProxyHub.getIdentityProxy(identifier1)
+      const onchainAddress = await identityProxyHub.getIdentityProxy(identifier)
       assert.equal(onchainAddress.toLowerCase(), expectedAddress.toLowerCase())
     })
   })
@@ -60,17 +74,17 @@ contract('IdentityProxyHub', () => {
   describe('getOrDeployIdentityProxy', () => {
     it('returns the correct CREATE2 address', async () => {
       const expectedAddress = computeCreate2Address(
-        identifier1,
+        identifier,
         identityProxyHub.address,
         IdentityProxy
       )
-      const onchainAddress = await identityProxyHub.getOrDeployIdentityProxy.call(identifier1)
+      const onchainAddress = await identityProxyHub.getOrDeployIdentityProxy.call(identifier)
       assert.equal(onchainAddress.toLowerCase(), expectedAddress.toLowerCase())
     })
 
     it('returns the address of an IdentityProxy', async () => {
-      const address = await identityProxyHub.getOrDeployIdentityProxy.call(identifier1)
-      await identityProxyHub.getOrDeployIdentityProxy(identifier1)
+      const address = await identityProxyHub.getOrDeployIdentityProxy.call(identifier)
+      await identityProxyHub.getOrDeployIdentityProxy(identifier)
       const bytecode = await web3.eth.getCode(address)
       // @ts-ignore _json property not declared by typechain
       assert.equal(bytecode, IdentityProxy._json.deployedBytecode)
@@ -81,36 +95,105 @@ contract('IdentityProxyHub', () => {
     let address: string
 
     beforeEach(async () => {
-      address = await identityProxyHub.getIdentityProxy(identifier1)
-      await identityProxyHub.getOrDeployIdentityProxy(identifier1)
+      address = await identityProxyHub.getIdentityProxy(identifier)
+      await identityProxyHub.getOrDeployIdentityProxy(identifier)
     })
 
-    it('forwards calls to the destination', async () => {
-      // @ts-ignore
-      const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
-      await identityProxyHub.makeCall(identifier1, identityProxyTest.address, 0, txData)
-      const x = await identityProxyTest.x()
-      assert.equal(x.toNumber(), 42)
+    describe('when called by a contract related to the identifier', () => {
+      beforeEach(async () => {
+        await attestations.complete(identifier, 0, '0x0', '0x0')
+        await attestations.complete(identifier, 0, '0x0', '0x0')
+        await attestations.complete(identifier, 0, '0x0', '0x0')
+      })
+
+      it('forwards calls to the destination', async () => {
+        // @ts-ignore
+        const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        const x = await identityProxyTest.x()
+        assert.equal(x.toNumber(), 42)
+      })
+
+      it('forwards calls even when completed/requested ration is close to 50%', async () => {
+        await attestations.request(identifier, 0, '0x0', '0x0')
+        await attestations.request(identifier, 0, '0x0', '0x0')
+        await attestations.request(identifier, 0, '0x0', '0x0')
+        await attestations.request(identifier, 0, '0x0', '0x0')
+        await attestations.request(identifier, 0, '0x0', '0x0')
+
+        // @ts-ignore
+        const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        const x = await identityProxyTest.x()
+        assert.equal(x.toNumber(), 42)
+      })
+
+      it('forwards calls as long as no other address has more completions', async () => {
+        await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+        await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+        await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+
+        // @ts-ignore
+        const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        const x = await identityProxyTest.x()
+        assert.equal(x.toNumber(), 42)
+      })
+
+      it('forwards a call through the proxy related to the identifier', async () => {
+        // @ts-ignore
+        const txData = identityProxyTest.contract.methods.callMe().encodeABI()
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        const addressThatCalled = await identityProxyTest.lastAddress()
+        assert.equal(address, addressThatCalled)
+      })
     })
 
-    it('forwards a call through the proxy related to the identifier', async () => {
+    it('fails to call if sender does not have at least 3 attestation completions', async () => {
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await identityProxyHub.makeCall(identifier1, identityProxyTest.address, 0, txData)
-      const addressThatCalled = await identityProxyTest.lastAddress()
-      assert.equal(address, addressThatCalled)
+      await assertRevert(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+      )
     })
 
-    it('provisions a proxy if one did not exist yet', async () => {
+    it('fails to call if sender does not have more than 50% attestation completions', async () => {
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+
+      await attestations.request(identifier, 0, '0x0', '0x0')
+      await attestations.request(identifier, 0, '0x0', '0x0')
+      await attestations.request(identifier, 0, '0x0', '0x0')
+      await attestations.request(identifier, 0, '0x0', '0x0')
+      await attestations.request(identifier, 0, '0x0', '0x0')
+      await attestations.request(identifier, 0, '0x0', '0x0')
+
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await identityProxyHub.makeCall(identifier2, identityProxyTest.address, 0, txData)
-      const addressThatCalled = await identityProxyTest.lastAddress()
-      const proxyAddress = await identityProxyHub.getIdentityProxy(identifier2)
-      assert.equal(addressThatCalled, proxyAddress)
+      await assertRevert(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+      )
     })
 
-    // TODO: Implement and test an identity heuristic
-    // it('fails to call if sender does not match identity', async () => {})
+    it('fails to call if another address has more attestations completed', async () => {
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+      await attestations.complete(identifier, 0, '0x0', '0x0')
+
+      await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+      await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+      await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+      await attestations.complete(identifier, 0, '0x0', '0x0', { from: accounts[1] })
+
+      // @ts-ignore
+      const txData = identityProxyTest.contract.methods.callMe().encodeABI()
+      await assertRevert(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+      )
+    })
   })
 })
