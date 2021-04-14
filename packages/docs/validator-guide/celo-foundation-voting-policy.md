@@ -77,18 +77,15 @@ Make sure to complete all prerequisites before applying.
 {% endhint %}
 
 {% hint style="info" %}
-Note: Application for Cohort 7 is now open.
+Note: Application for Cohort 7 is now closed.
 {% endhint %}
-
-
-[APPLY FOR FOUNDATION VOTES HERE](https://forum.celo.org/t/cohort-7-application-of-foundation-voting-program-is-now-open/829)
 
 ### Timings
 Cohort 7 application deadline: **April 10, 2021 at 23:59 UTC**
 
 Anticipated vote date for selected applicants in Cohort 7: **May 1, 2021**
 
-{% hint style="info" %}
+{% hint style="danger" %}
 Note: The anticipated vote date for new cohorts is a best-guess estimate given the requirements and coordination when it comes to voting for new applicants. 
 {% endhint %}
 
