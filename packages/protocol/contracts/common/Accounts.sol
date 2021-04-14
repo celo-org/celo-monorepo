@@ -373,28 +373,30 @@ contract Accounts is
     return (authorization.completed && authorization.signer == signer);
   }
 
-  function _removeSigner(string memory role) internal {
-    Account storage account = accounts[msg.sender];
+  // function _removeSigner(address signer, string memory role) internal {
+  //   Account storage account = accounts[msg.sender];
 
-    if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))
-    ) {} else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {} else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
-      emit VoteSignerRemoved(msg.sender, accounts[msg.sender].signers.vote);
-      account.signers.vote = address(0);
-    }
+  //   if (
+  //     keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))
+  //   ) {} else if (
+  //     keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+  //   ) {} else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+  //     emit VoteSignerRemoved(msg.sender, accounts[msg.sender].signers.vote);
+  //     account.signers.vote = address(0);
+  //   }
 
-    emit SignerRemoved(msg.sender, account.signerAuthorizations[role].signer, role);
-    delete account.signerAuthorizations[role];
-  }
+  //   emit SignerRemoved(msg.sender, signer, role);
+  //   delete account.signerAuthorizations[role][signer];
+  // }
 
   /**
    * @notice Removes the currently authorized vote signer for the account.
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeVoteSigner() public {
-    _removeSigner(VoteSigner);
+    Account storage account = accounts[msg.sender];
+    emit VoteSignerRemoved(msg.sender, account.signers.vote);
+    account.signers.vote = address(0);
   }
 
   /**
@@ -417,8 +419,10 @@ contract Accounts is
     account.signers.attestation = address(0);
   }
 
-  function removeSigner(string memory role) public {
-    _removeSigner(role);
+  function removeSigner(address signer, string memory role) public {
+    Account storage account = accounts[msg.sender];
+    emit SignerRemoved(msg.sender, signer, role);
+    delete account.signerAuthorizations[role][signer];
   }
 
   /**
