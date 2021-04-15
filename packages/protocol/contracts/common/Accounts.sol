@@ -46,12 +46,8 @@ contract Accounts is
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Signers signers;
-<<<<<<< HEAD
-    mapping(string => SignerAuthorization) signerAuthorizations;
-=======
     mapping(string => address) defaultSigners;
     mapping(string => mapping(address => SignerAuthorization)) signerAuthorizations;
->>>>>>> ca447ea28... feat: tests passing with defaultSigners
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
@@ -200,6 +196,59 @@ contract Accounts is
   }
 
   /**
+   * @notice Set the indexed signer for a specific role
+   * @param signer the address to set as default
+   * @param role the role to register a default signer for
+   */
+  function setDefaultSigner(address signer, string memory role) public {
+    require(
+      isGenericSigner(msg.sender, signer, role),
+      "Must finish authorization before setting default signer"
+    );
+
+    Account storage account = accounts[msg.sender];
+    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      account.signers.vote = signer;
+    } else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {
+      account.signers.attestation = signer;
+    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+      account.signers.validator = signer;
+    }
+
+    account.defaultSigners[role] = signer;
+    emit DefaultSignerSet(msg.sender, signer, role);
+  }
+
+  /**
+   * @notice Authorizes an address to as a signer on behalf of the account.
+   * @param signer The address of the signing key to authorize.
+   * @param role The role to authorize signing for.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   */
+  function authorizeSignerWithSignature(
+    address signer,
+    string memory role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public {
+    authorize(signer, v, r, s);
+
+    Account storage account = accounts[msg.sender];
+    account.signerAuthorizations[role][signer] = SignerAuthorization({
+      started: true,
+      completed: true
+    });
+
+    emit SignerAuthorized(msg.sender, signer, role);
+  }
+
+  /**
    * @notice Authorizes an address to sign votes on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -309,6 +358,11 @@ contract Accounts is
     emit AttestationSignerAuthorized(msg.sender, signer);
   }
 
+  /**
+   * @notice Begin the process of authorizing an address to sign on behalf of the account
+   * @param signer The address of the signing key to authorize.
+   * @param role The role to authorize signing for.
+   */
   function authorizeSigner(address signer, string memory role) public {
     require(isAccount(msg.sender), "Unknown account");
     require(
@@ -324,31 +378,11 @@ contract Accounts is
     emit SignerAuthorized(msg.sender, signer, role);
   }
 
-  function authorizeSignerWithSignature(
-    address signer,
-    string memory role,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) public {
-    authorize(signer, v, r, s);
-
-    Account storage account = accounts[msg.sender];
-    account.signerAuthorizations[role] = SignerAuthorization({ signer: signer, completed: true });
-
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
-      account.signers.validator = signer;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
-      account.signers.attestation = signer;
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
-      account.signers.vote = signer;
-    }
-
-    emit SignerAuthorized(msg.sender, signer, role);
-  }
-
+  /**
+   * @notice Finish the process of authorizing an address to sign on behalf of the account. 
+   * @param _signer The address of account that authorized signing.
+   * @param role The role to finish authorizing for.
+   */
   function completeSignerAuthorization(address _account, string memory role) public {
     Account storage account = accounts[_account];
     require(
@@ -365,6 +399,12 @@ contract Accounts is
     emit SignerAuthorized(_account, msg.sender, role);
   }
 
+  /**
+   * @notice Whether or not the signer has been registered as a signer for role
+   * @param account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
   function isGenericSigner(address account, address signer, string memory role)
     internal
     view
@@ -374,27 +414,12 @@ contract Accounts is
     return accounts[account].signerAuthorizations[role][signer].completed;
   }
 
-  function setDefaultSigner(address signer, string memory role) public {
-    require(
-      isGenericSigner(msg.sender, signer, role),
-      "Must finish authorization before setting default signer"
-    );
-
-    Account storage account = accounts[msg.sender];
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
-      account.signers.vote = signer;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
-      account.signers.attestation = signer;
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
-      account.signers.validator = signer;
-    }
-
-    account.defaultSigners[role] = signer;
-    emit DefaultSignerSet(msg.sender, signer, role);
-  }
-
+  /**
+   * @notice Whether or not the signer has been registered as the default signer for role
+   * @param _account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
   function isDefaultSigner(address _account, address signer, string memory role)
     internal
     view
@@ -423,6 +448,12 @@ contract Accounts is
     return account.defaultSigners[role] == signer;
   }
 
+  /**
+   * @notice Whether or not the signer has been registered as a signer for role
+   * @param account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
   function isSigner(address account, address signer, string memory role)
     public
     view
@@ -431,6 +462,11 @@ contract Accounts is
     return isGenericSigner(account, signer, role) || isDefaultSigner(account, signer, role);
   }
 
+  /**
+   * @notice Removes the currently authorized signer for a specific role.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
   function removeSigner(address signer, string memory role) public {
     address defaultSigner = getDefaultSigner(msg.sender, role);
     if (defaultSigner == signer) {
@@ -441,6 +477,10 @@ contract Accounts is
     emit SignerRemoved(msg.sender, signer, role);
   }
 
+  /**
+   * @notice Removes the signer for a default role.
+   * @param role The role that has been authorized.
+   */
   function removeDefaultSigner(string memory role) public {
     Account storage account = accounts[msg.sender];
 
@@ -550,6 +590,11 @@ contract Accounts is
     }
   }
 
+  /**
+   * @notice Returns the signer for the specified account and role.
+   * @param account The address of the account.
+   * @param account The role of the signer.
+   */
   function getDefaultSigner(address _account, string memory role) public view returns (address) {
     require(isAccount(_account), "Unknown account");
 
