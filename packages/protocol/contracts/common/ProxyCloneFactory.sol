@@ -15,7 +15,7 @@ contract ProxyCloneFactory is Ownable {
 
   /**
    * @notice Sets the address of the Proxy implementation to clone.
-   * @param The address of the Proxy implementation to clone.
+   * @param _proxyImplementationAddress The address of the Proxy implementation to clone.
    */
   function setImplementationAddress(address _proxyImplementationAddress) external onlyOwner {
     proxyImplementationAddress = _proxyImplementationAddress;
