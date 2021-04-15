@@ -474,11 +474,47 @@ contract('Accounts', (accounts: string[]) => {
       assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized2))
     })
 
-    describe.skip('when a previous authorization has been made', () => {})
+    it('can authorize a signer for multiple roles', async () => {
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role2))
+
+      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
+      await accountsInstance.authorizeSignerWithSignature(authorized, role2, sig.v, sig.r, sig.s)
+
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role2))
+      assert.equal(await accountsInstance.authorizedBy(authorized), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+    })
+
+    it('can set the default signer for a role', async () => {
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
+      assert.equal(await accountsInstance.getDefaultSigner(account, role), account)
+
+      await assertRevert(accountsInstance.setDefaultSigner(authorized, role))
+      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
+      await accountsInstance.setDefaultSigner(authorized, role)
+
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.isTrue(await accountsInstance.hasDefaultSigner(account, role))
+      assert.equal(await accountsInstance.getDefaultSigner(account, role), authorized)
+    })
+
+    it('can remove the default signer for a role', async () => {
+      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
+      await accountsInstance.setDefaultSigner(authorized, role)
+
+      await accountsInstance.removeDefaultSigner(authorized, role)
+
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
+      assert.equal(await accountsInstance.getDefaultSigner(account, role), NULL_ADDRESS)
+    })
   })
 
   Object.keys(authorizationTestDescriptions).forEach((key) => {
-    describe('authorization tests:', () => {
+    describe.only('authorization tests:', () => {
       let authorizationTest: any
       beforeEach(async () => {
         authorizationTest = authorizationTests[key]
@@ -504,8 +540,8 @@ contract('Accounts', (accounts: string[]) => {
 
         it(`should emit the right event`, async () => {
           const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
+          assert.equal(resp.logs.length, 3)
+          const log = resp.logs[2]
           const expected = { account, signer: authorized }
           assertLogMatches(log, authorizationTest.eventName, expected)
         })
