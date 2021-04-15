@@ -1,6 +1,6 @@
-variable backend_max_requests_per_second {
+variable backend_max_requests_per_instance_per_second {
   type        = number
-  description = "The max number of requests per second that a backend can receive. In this case, a backend refers to all the nodes in a cluster."
+  description = "The max number of requests per second that a instance backend can receive. In this case, a backend refers to each pod in a forno region"
 }
 
 variable celo_env {
