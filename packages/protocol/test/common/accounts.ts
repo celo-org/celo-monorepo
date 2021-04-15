@@ -14,21 +14,6 @@ import {
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
-const authorizationTests: any = {}
-const authorizationTestDescriptions = {
-  voting: {
-    me: 'vote signing key',
-    subject: 'voteSigner',
-  },
-  validating: {
-    me: 'validator signing key',
-    subject: 'validatorSigner',
-  },
-  attesting: {
-    me: 'attestation signing key',
-    subject: 'attestationSigner',
-  },
-}
 
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -49,31 +34,6 @@ contract('Accounts', (accounts: string[]) => {
     const registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await accountsInstance.initialize(registry.address)
-
-    authorizationTests.voting = {
-      fn: accountsInstance.authorizeVoteSigner,
-      eventName: 'VoteSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getVoteSigner,
-      authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
-      hasAuthorizedSigner: accountsInstance.hasAuthorizedVoteSigner,
-      removeSigner: accountsInstance.removeVoteSigner,
-    }
-    authorizationTests.validating = {
-      fn: accountsInstance.authorizeValidatorSigner,
-      eventName: 'ValidatorSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
-      authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
-      hasAuthorizedSigner: accountsInstance.hasAuthorizedValidatorSigner,
-      removeSigner: accountsInstance.removeValidatorSigner,
-    }
-    authorizationTests.attesting = {
-      fn: accountsInstance.authorizeAttestationSigner,
-      eventName: 'AttestationSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
-      authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
-      hasAuthorizedSigner: accountsInstance.hasAuthorizedAttestationSigner,
-      removeSigner: accountsInstance.removeAttestationSigner,
-    }
   })
 
   describe('#createAccount', () => {
@@ -504,7 +464,7 @@ contract('Accounts', (accounts: string[]) => {
     it('can remove the default signer for a role', async () => {
       await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
       await accountsInstance.setDefaultSigner(authorized, role)
-      await accountsInstance.removeDefaultSigner(authorized, role)
+      await accountsInstance.removeDefaultSigner(role)
 
       assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
       assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
@@ -512,154 +472,6 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  Object.keys(authorizationTestDescriptions).forEach((key) => {
-    describe('authorization tests:', () => {
-      let authorizationTest: any
-      beforeEach(async () => {
-        authorizationTest = authorizationTests[key]
-        await accountsInstance.createAccount()
-      })
-
-      describe(`#authorize${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
-        const authorized = accounts[1]
-        let sig
-
-        beforeEach(async () => {
-          sig = await getParsedSignatureOfAddress(web3, account, authorized)
-        })
-
-        it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
-          assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
-          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          assert.equal(await accountsInstance.authorizedBy(authorized), account)
-          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-          assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
-          assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
-        })
-
-        it(`should emit the right event`, async () => {
-          const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          assert.equal(resp.logs.length, 3)
-          const log = resp.logs[2]
-          const expected = { account, signer: authorized }
-          assertLogMatches(log, authorizationTest.eventName, expected)
-        })
-
-        it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
-          await accountsInstance.createAccount({ from: authorized })
-          await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
-        })
-
-        it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
-          const otherAccount = accounts[2]
-          const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
-          await accountsInstance.createAccount({ from: otherAccount })
-          await authorizationTest.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
-            from: otherAccount,
-          })
-          await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
-        })
-
-        it('should revert if the signature is incorrect', async () => {
-          const nonVoter = accounts[3]
-          const incorrectSig = await getParsedSignatureOfAddress(web3, account, nonVoter)
-          await assertRevert(
-            authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
-          )
-        })
-
-        describe('when a previous authorization has been made', () => {
-          const newAuthorized = accounts[2]
-          let newSig
-          beforeEach(async () => {
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-            newSig = await getParsedSignatureOfAddress(web3, account, newAuthorized)
-            await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
-          })
-
-          it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
-            assert.equal(await accountsInstance.authorizedBy(newAuthorized), account)
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
-            assert.equal(await authorizationTest.authorizedSignerToAccount(newAuthorized), account)
-          })
-
-          it('should preserve the previous authorization', async () => {
-            assert.equal(await accountsInstance.authorizedBy(authorized), account)
-          })
-        })
-      })
-
-      describe(`#getAccountFrom${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
-        describe(`when the account has not authorized a ${authorizationTestDescriptions[key].me}`, () => {
-          it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
-          })
-
-          it('should revert when passed an address that is not an account', async () => {
-            await assertRevert(authorizationTest.authorizedSignerToAccount(accounts[1]))
-          })
-        })
-
-        describe(`when the account has authorized a ${authorizationTestDescriptions[key].me}`, () => {
-          const authorized = accounts[1]
-          beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          })
-
-          it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
-          })
-
-          it(`should return the account when passed the ${authorizationTestDescriptions[key].me}`, async () => {
-            assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
-          })
-        })
-      })
-
-      describe(`#get${upperFirst(authorizationTestDescriptions[key].subject)}FromAccount()`, () => {
-        describe(`when the account has not authorized a ${authorizationTestDescriptions[key].me}`, () => {
-          it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
-          })
-
-          it('should revert when not passed an account', async () => {
-            await assertRevert(authorizationTest.getAuthorizedFromAccount(accounts[1]), account)
-          })
-        })
-
-        describe(`when the account has authorized a ${authorizationTestDescriptions[key].me}`, () => {
-          const authorized = accounts[1]
-
-          beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          })
-
-          it(`should return the ${key} when passed the account`, async () => {
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-          })
-        })
-      })
-
-      describe(`#remove${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
-        it(`should be able to remove the ${key} signer after authorizing`, async () => {
-          const authorized = accounts[1]
-          const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-
-          assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
-          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-
-          await authorizationTest.removeSigner()
-          assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
-          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
-        })
-      })
-    })
-  })
-
-  // BAK
   // backwards compatibility matrix for authorizeSigner instead
   // of authorizeXXXSigner
   const backwardsCompatibilityMatrix = [
@@ -669,8 +481,20 @@ contract('Accounts', (accounts: string[]) => {
     [true, true],
   ]
   backwardsCompatibilityMatrix.forEach(function ([genericRead, genericWrite]) {
-    const authorizeSignerFactory = (role: string) => (signer, v, r, s, ...rest) =>
-      accountsInstance.authorizeSignerWithSignature(signer, role, v, r, s, ...rest)
+    const authorizeSignerFactory = (role: string) => async (signer, v, r, s, ...rest) => {
+      const result1 = await accountsInstance.authorizeSignerWithSignature(
+        signer,
+        role,
+        v,
+        r,
+        s,
+        ...rest
+      )
+      const result2 = await accountsInstance.setDefaultSigner(signer, role, ...rest)
+      return {
+        logs: [...result1.logs, ...result2.logs],
+      }
+    }
 
     const VotingKey = 'celo.org/core/vote'
     // const AttestationKey = 'celo.org/core/attestation'
@@ -691,7 +515,7 @@ contract('Accounts', (accounts: string[]) => {
       // },
     ]
     scenarios.forEach(function ({ key, description }) {
-      describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
+      describe.only(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let authorizationTest: any
         beforeEach(async () => {
           const authorizationTests = {
@@ -701,16 +525,20 @@ contract('Accounts', (accounts: string[]) => {
                 : accountsInstance.authorizeVoteSigner,
               eventName: genericWrite ? 'SignerAuthorized' : 'VoteSignerAuthorized',
               getAuthorizedFromAccount: genericRead
-                ? (...args) => accountsInstance.getSigner(args[0], VotingKey, ...args.slice(1))
+                ? (...args) =>
+                    accountsInstance.getDefaultSigner(args[0], VotingKey, ...args.slice(1))
                 : accountsInstance.getVoteSigner,
               authorizedSignerToAccount: genericRead
                 ? (signer) => accountsInstance.signerToAccount(signer)
                 : accountsInstance.voteSignerToAccount,
               hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasAuthorizedSigner(signer, VotingKey)
+                ? (signer) => accountsInstance.hasDefaultSigner(signer, VotingKey)
                 : accountsInstance.hasAuthorizedVoteSigner,
               removeSigner: genericWrite
-                ? (...args) => accountsInstance.removeSigner(VotingKey, ...args)
+                ? async () => {
+                    const defaultSigner = await accountsInstance.getVoteSigner(account)
+                    await accountsInstance.removeSigner(defaultSigner, VotingKey)
+                  }
                 : accountsInstance.removeVoteSigner,
             },
             // validator: {
@@ -757,8 +585,9 @@ contract('Accounts', (accounts: string[]) => {
 
           it(`should emit the right event`, async () => {
             const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-            assert.equal(resp.logs.length, 1)
-            const log = resp.logs[0]
+
+            assert.equal(resp.logs.length, genericWrite ? 2 : 3)
+            const log = resp.logs[genericWrite ? 0 : 2]
             assertLogMatches(
               log,
               authorizationTest.eventName,
