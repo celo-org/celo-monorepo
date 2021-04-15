@@ -5,7 +5,6 @@ import {
   hasValidAccountParam,
   hasValidContactPhoneNumbersParam,
   hasValidUserPhoneNumberParam,
-  isBodyReasonablySized,
   isVerified,
   phoneNumberHashIsValidIfExists,
   WarningMessage,
@@ -74,7 +73,6 @@ function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): b
     hasValidUserPhoneNumberParam(requestBody) &&
     hasValidContactPhoneNumbersParam(requestBody) &&
     !!requestBody.hashedPhoneNumber &&
-    phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody)
+    phoneNumberHashIsValidIfExists(requestBody)
   )
 }

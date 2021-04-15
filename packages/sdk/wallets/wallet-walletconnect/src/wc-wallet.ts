@@ -3,8 +3,10 @@ import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
+import { ERROR, getError } from '@walletconnect/utils'
 import debugConfig from 'debug'
-import { SupportedMethods } from './types'
+import { stagingEndpoint } from './constants'
+import { SupportedMethods, WalletConnectWalletOptions } from './types'
 import { WalletConnectSigner } from './wc-signer'
 
 const debug = debugConfig('kit:wallet:wallet-connect-wallet')
@@ -28,7 +30,9 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
   throw new Error('Unable to get pairing session, did you lose internet connection?')
 }
 
-const defaultInitOptions: ClientOptions = { relayProvider: 'wss://relay.walletconnect.org' }
+const defaultInitOptions: ClientOptions = {
+  relayProvider: stagingEndpoint,
+}
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
     name: 'ContractKit',
@@ -48,19 +52,6 @@ const defaultConnectOptions: ClientTypes.ConnectParams = {
   },
 }
 
-/**
- * Utility for making the API of this package nicer.
- *
- * We want to force passing metadata (name, description, etc), but not permissions,
- * which will likely remain static across dapps.
- */
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
-type ConnectOptions = Optional<ClientTypes.ConnectParams, 'permissions'>
-
-/*
- *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
- *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
- */
 export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private initOptions: ClientOptions
   private connectOptions: ClientTypes.ConnectParams
@@ -70,7 +61,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   private pairingProposal?: PairingTypes.Proposal
   private session?: SessionTypes.Settled
 
-  constructor({ init, connect }: { init?: ClientOptions; connect?: ConnectOptions }) {
+  constructor({ init, connect }: WalletConnectWalletOptions) {
     super()
 
     this.initOptions = { ...defaultInitOptions, ...init }
@@ -87,8 +78,17 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
   /**
    * Get the URI needed for out of band session establishment
    */
-  public async getUri() {
+  public async getUri(): Promise<string | void> {
     this.client = await this.getWalletConnectClient()
+
+    // when we're in certain environments (like the browser) the
+    // WalletConnect client will handle retrieving old sessions.
+    if (this.client.session?.values.length > 0 && this.client.pairing?.values.length > 0) {
+      this.pairing = this.client.pairing.values[0]
+      this.session = this.client.session.values[0]
+
+      return
+    }
 
     this.client.on(CLIENT_EVENTS.session.proposal, this.onSessionProposal)
     this.client.on(CLIENT_EVENTS.session.created, this.onSessionCreated)
@@ -112,22 +112,27 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     debug('onSessionProposal', sessionProposal)
   }
   onSessionCreated = (session: SessionTypes.Created) => {
+    debug('onSessionCreated', session)
     this.session = session
   }
   onSessionUpdated = (session: SessionTypes.Update) => {
     debug('onSessionUpdated', session)
   }
   onSessionDeleted = () => {
+    debug('onSessionDeleted')
     this.session = undefined
   }
 
   onPairingProposal = (pairingProposal: PairingTypes.Proposal) => {
+    debug('onPairingProposal', pairingProposal)
     this.pairingProposal = pairingProposal
   }
   onPairingCreated = (pairing: PairingTypes.Created) => {
+    debug('onPairingCreated', pairing)
     this.pairing = pairing
   }
   onPairingUpdated = (pairing: PairingTypes.Update) => {
+    debug('onPairingUpdated', pairing)
     if (!this.pairing) {
       debug('Attempted to update non existant pairing', pairing)
       return
@@ -135,6 +140,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     this.pairing.state.metadata = pairing.state.metadata
   }
   onPairingDeleted = () => {
+    debug('onPairingDeleted')
     this.pairing = undefined
   }
 
@@ -174,10 +180,14 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
       throw new Error('Wallet must be initialized before calling close()')
     }
 
+    const reason = getError(ERROR.USER_DISCONNECTED)
     if (this.session) {
-      await this.client.disconnect({ topic: this.session.topic, reason: 'Session closed' })
+      await this.client.disconnect({
+        topic: this.session.topic,
+        reason,
+      })
     }
 
-    await this.client.pairing.delete({ topic: this.pairing!.topic, reason: 'Session closed' })
+    await this.client.pairing.delete({ topic: this.pairing!.topic, reason })
   }
 }
