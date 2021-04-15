@@ -63,7 +63,13 @@ const logCost = (output: string) => {
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
 const MTW: MetaTransactionWalletContract = artifacts.require('MetaTransactionWallet')
+const MTWDeployer: MetaTransactionWalletDeployerContract = artifacts.require(
+  'MetaTransactionWalletDeployer'
+)
+const Proxy: ProxyContract = artifacts.require('InitializableProxy')
+const ProxyCloneFactory: ProxyCloneFactoryContract = artifacts.require('ProxyCloneFactory')
 const Random: MockRandomContract = artifacts.require('MockRandom')
+const Validators: MockValidatorsContract = artifacts.require('MockValidators')
 contract('Komenci Onboarding', (_accounts: string[]) => {
   let accounts: AccountsInstance
   let stableToken: StableTokenInstance
@@ -80,9 +86,9 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
   const dek = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const identifier = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e016111111'
   const numAttestations = 3
-  // TODO(asa): Clean this up
-  // const perAttestationFee = web3.utils.toWei(numAttestations * 0.05, 'ether').toString()
+  // $0.05
   const perAttestationFee = '50000000000000000'
+  // $0.15
   const attestationFee = '150000000000000000'
   before(async () => {
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
@@ -99,7 +105,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     await assumeOwnership(['Registry'], _accounts[0])
     await registry.setAddressFor(CeloContractName.Random, random.address)
     await registry.setAddressFor(CeloContractName.Accounts, accounts.address)
-    const Validators: MockValidatorsContract = artifacts.require('MockValidators')
     const mockValidators = await Validators.new()
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
@@ -144,9 +149,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     })
 
     describe('Current flow', () => {
-      const MTWDeployer: MetaTransactionWalletDeployerContract = artifacts.require(
-        'MetaTransactionWalletDeployer'
-      )
       let mtwDeployer: MetaTransactionWalletDeployerInstance
       before(async () => {
         mtwDeployer = await MTWDeployer.new()
@@ -245,7 +247,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
         for (let i = 0; i < numAttestations; i++) {
           const issuer = issuers[i]
-          ;[v, r, s] = await getVerificationCodeSignature(
+          let { v, r, s } = await getVerificationCodeSignature(
             mtw.address,
             issuer,
             identifier,
@@ -278,8 +280,6 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     })
 
     describe('With EIP-1167', () => {
-      const Proxy: ProxyContract = artifacts.require('InitializableProxy')
-      const ProxyCloneFactory: ProxyCloneFactoryContract = artifacts.require('ProxyCloneFactory')
       let proxyCloneFactory: ProxyCloneFactoryInstance
       before(async () => {
         const proxy: ProxyInstance = await Proxy.new()
@@ -290,7 +290,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
 
       // The same as the current komenci flow, but using EIP-1167 proxies, and transferring the
       // proxy ownership to the proxy rather than the user (this does not affect gas costs in
-      // this flow, but will save gas in future flows.)
+      // this flow, but will save gas in future flows which use a pool of pre-deployed proxies)
       describe('Current flow', () => {
         it('should onboard a new user', async () => {
           let totalCost = 0
@@ -386,7 +386,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
           for (let i = 0; i < numAttestations; i++) {
             const issuer = issuers[i]
-            ;[v, r, s] = await getVerificationCodeSignature(
+            let { v, r, s } = await getVerificationCodeSignature(
               mtw.address,
               issuer,
               identifier,

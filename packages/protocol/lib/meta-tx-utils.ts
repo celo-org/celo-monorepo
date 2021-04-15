@@ -33,14 +33,7 @@ const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
       chainId,
       verifyingContract: walletAddress,
     },
-    message: tx
-      ? {
-          destination: tx.destination,
-          value: tx.value,
-          data: tx.data,
-          nonce: tx.nonce,
-        }
-      : {},
+    message: tx ? tx : {},
   }
   return typedData
 }

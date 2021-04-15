@@ -439,30 +439,28 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 		artifacts
 	)
 	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+  // Enough to pass the governance proposal unilaterally (and then some).
+  const tenMillionCELO = '10000000000000000000000000'
 	// @ts-ignore
-	await lockedGold.lock({ value: '10000000000000000000000000' })
+	await lockedGold.lock({ value: tenMillionCELO })
+  // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
+	// @ts-ignore
+  const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
 	const proposalTransactions = await Promise.all(
-		contractsToOwn.map(async (x: string) => {
+		contractsToOwn.map(async (contractName: string) => {
 			return {
 				value: 0,
-				destination: (await getDeployedProxiedContract(x, artifacts)).address,
-				data: Buffer.from(
-					stripHexEncoding(
-						// Any contract's `transferOwnership` function will work here as the function signatures are all the same.
-						// @ts-ignore
-						registry.contract.methods.transferOwnership(to).encodeABI()
-					),
-					'hex'
-				),
+				destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
+				data: transferOwnershipData,
 			}
 		})
 	)
 	await governance.propose(
-		proposalTransactions.map((x: any) => x.value),
-		proposalTransactions.map((x: any) => x.destination),
+		proposalTransactions.map((tx: any) => tx.value),
+		proposalTransactions.map((tx: any) => tx.destination),
 		// @ts-ignore
-		Buffer.concat(proposalTransactions.map((x: any) => x.data)),
-		proposalTransactions.map((x: any) => x.data.length),
+		Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
+		proposalTransactions.map((tx: any) => tx.data.length),
 		'URL',
 		// @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
 		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
@@ -508,10 +506,9 @@ export async function getVerificationCodeSignature(
   issuer: string,
   identifier: string,
   accounts: string[]
-): Promise<[number, string, string]> {
+): Promise<any> {
   const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
-  const { v, r, s } = AttestationUtils.attestToIdentifier(identifier, account, privateKey)
-  return [v, r, s]
+  return AttestationUtils.attestToIdentifier(identifier, account, privateKey)
 }
 
 export const getDerivedKey = (offset: number, address: string, accounts: string[]) => {

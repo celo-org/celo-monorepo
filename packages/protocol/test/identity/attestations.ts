@@ -579,13 +579,11 @@ contract('Attestations', (accounts: string[]) => {
 
   describe('#complete()', () => {
     let issuer: string
-    let v: number
-    let r: string, s: string
 
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      ;[v, r, s] = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+      const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
     })
 
     it('should add the account to the list upon completion', async () => {
@@ -601,7 +599,12 @@ contract('Attestations', (accounts: string[]) => {
     it('should not add the account twice to the list', async () => {
       await attestations.complete(phoneHash, v, r, s)
       const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
-      ;[v, r, s] = await getVerificationCodeSignature(caller, secondIssuer, phoneHash, accounts)
+      const { v, r, s } = await getVerificationCodeSignature(
+        caller,
+        secondIssuer,
+        phoneHash,
+        accounts
+      )
 
       await attestations.complete(phoneHash, v, r, s)
       const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
@@ -666,12 +669,17 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when an invalid attestation code is provided', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(accounts[1], issuer, phoneHash, accounts)
+      const { v, r, s } = await getVerificationCodeSignature(
+        accounts[1],
+        issuer,
+        phoneHash,
+        accounts
+      )
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
     it('should revert with a non-requested issuer', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(
+      const { v, r, s } = await getVerificationCodeSignature(
         caller,
         await getNonIssuer(),
         phoneHash,
@@ -696,7 +704,7 @@ contract('Attestations', (accounts: string[]) => {
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const [v, r, s] = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+      const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
       await attestations.complete(phoneHash, v, r, s)
       await mockStableToken.mint(attestations.address, attestationFee)
     })
@@ -767,7 +775,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const [v, r, s] = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+    const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -873,7 +881,12 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.selectIssuers(phoneHash, { from: other })
 
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const [v, r, s] = await getVerificationCodeSignature(other, issuer, phoneHash, accounts)
+            const { v, r, s } = await getVerificationCodeSignature(
+              other,
+              issuer,
+              phoneHash,
+              accounts
+            )
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
           })
@@ -1098,7 +1111,7 @@ contract('Attestations', (accounts: string[]) => {
             from: replacementAddress,
           })
         )[0]
-        const [v, r, s] = await getVerificationCodeSignature(
+        const { v, r, s } = await getVerificationCodeSignature(
           replacementAddress,
           issuer,
           phoneHash,
