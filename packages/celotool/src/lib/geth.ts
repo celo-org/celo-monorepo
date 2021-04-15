@@ -532,6 +532,7 @@ export const simulateClient = async (
 
   let lastNonce: number = 0
   let lastTx: string = ''
+  let lastGasPriceMinimum: BigNumber = new BigNumber(0)
   let nonce: number = 0
   let unlockNeeded: boolean = true
 
@@ -604,12 +605,13 @@ export const simulateClient = async (
         nonce = await kit.connection.nonce(kit.defaultAccount)
       } else {
         nonce = (await kit.connection.nonce(kit.defaultAccount)) - 1
-        gasPrice = gasPrice.times(6)
+        gasPrice = lastGasPriceMinimum.times(1.15)
         console.warn(
           `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
         )
       }
 
+      lastGasPriceMinimum = gasPrice
       if (!feeCurrencyGold) {
         txOptions = {
           gasPrice: gasPrice.toString(),
