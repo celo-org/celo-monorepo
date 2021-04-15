@@ -24,7 +24,7 @@ contract ProxyCloneFactory is Ownable {
   // TODO: Upgrade solc version and import from open-zeppelin instead.
   /**
    * @notice Creates an EIP-1167 style clone of the specified `_proxyImplementationAddress`.
-   * @param The address of the Proxy implementation to clone.
+   * @param _proxyImplementationAddress The address of the Proxy implementation to clone.
    * @return The address of the clone.
    * @dev Copied from open-zeppelin.
    */
@@ -43,7 +43,7 @@ contract ProxyCloneFactory is Ownable {
   /**
    * @notice Creates an EIP-1167 style clone of a Proxy contract, points the Proxy to an
    *         implementation and initializes it.
-   * @param implementation The address to point the proxy to.  
+   * @param implementation The address to point the Proxy to.
    * @param initCallData The function to call on the implementation and the corresponding args.
    */
   function deploy(address implementation, bytes calldata initCallData) external {
