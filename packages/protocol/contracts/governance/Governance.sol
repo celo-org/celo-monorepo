@@ -148,6 +148,13 @@ contract Governance is
     uint256 weight
   );
 
+  event ProposalVoteRevoked(
+    uint256 indexed proposalId,
+    address indexed account,
+    uint256 value,
+    uint256 weight
+  );
+
   event ProposalExecuted(uint256 indexed proposalId);
 
   event ProposalExpired(uint256 indexed proposalId);
@@ -193,7 +200,7 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 3);
+    return (1, 2, 1, 0);
   }
 
   /**
@@ -657,6 +664,32 @@ contract Governance is
   }
 
   /* solhint-enable code-complexity */
+
+  /**
+   * @notice Revoke votes on all proposal of sender in the referendum stage.
+   * @return Whether or not all votes of an account was successfully revoked.
+   */
+  function revokeVotes() external nonReentrant returns (bool) {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    Voter storage voter = voters[account];
+    for (
+      uint256 dequeueIndex = 0;
+      dequeueIndex < dequeued.length;
+      dequeueIndex = dequeueIndex.add(1)
+    ) {
+      VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
+      (Proposals.Proposal storage proposal, Proposals.Stage stage) =
+        requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
+      require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+      Proposals.VoteValue value = voteRecord.value;
+      proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
+      proposal.networkWeight = getLockedGold().getTotalLockedGold();
+      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
+      delete voter.referendumVotes[dequeueIndex];
+    }
+    voter.mostRecentReferendumProposal = 0;
+    return true;
+  }
 
   /**
    * @notice Executes a proposal in the execution stage, removing it from `dequeued`.
