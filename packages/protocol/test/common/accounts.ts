@@ -504,17 +504,16 @@ contract('Accounts', (accounts: string[]) => {
     it('can remove the default signer for a role', async () => {
       await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
       await accountsInstance.setDefaultSigner(authorized, role)
-
       await accountsInstance.removeDefaultSigner(authorized, role)
 
       assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
       assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
-      assert.equal(await accountsInstance.getDefaultSigner(account, role), NULL_ADDRESS)
+      assert.equal(await accountsInstance.getDefaultSigner(account, role), account)
     })
   })
 
   Object.keys(authorizationTestDescriptions).forEach((key) => {
-    describe.only('authorization tests:', () => {
+    describe('authorization tests:', () => {
       let authorizationTest: any
       beforeEach(async () => {
         authorizationTest = authorizationTests[key]
