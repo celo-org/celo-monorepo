@@ -380,7 +380,7 @@ contract Accounts is
 
   /**
    * @notice Finish the process of authorizing an address to sign on behalf of the account. 
-   * @param _signer The address of account that authorized signing.
+   * @param _account The address of account that authorized signing.
    * @param role The role to finish authorizing for.
    */
   function completeSignerAuthorization(address _account, string memory role) public {
@@ -592,8 +592,8 @@ contract Accounts is
 
   /**
    * @notice Returns the signer for the specified account and role.
-   * @param account The address of the account.
-   * @param account The role of the signer.
+   * @param _account The address of the account.
+   * @param role The role of the signer.
    */
   function getDefaultSigner(address _account, string memory role) public view returns (address) {
     require(isAccount(_account), "Unknown account");
