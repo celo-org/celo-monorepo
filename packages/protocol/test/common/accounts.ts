@@ -497,25 +497,25 @@ contract('Accounts', (accounts: string[]) => {
     }
 
     const VotingKey = 'celo.org/core/vote'
-    // const AttestationKey = 'celo.org/core/attestation'
-    // const ValidatorKey = 'celo.org/core/validator'
+    const ValidatorKey = 'celo.org/core/validator'
+    const AttestationKey = 'celo.org/core/attestation'
 
     const scenarios = [
       {
         key: VotingKey,
         description: 'vote signing key',
       },
-      // {
-      //   key: validator,
-      //   description: 'validator signing key',
-      // },
-      // {
-      //   key: attestation,
-      //   description: 'attestation signing key',
-      // },
+      {
+        key: ValidatorKey,
+        description: 'validator signing key',
+      },
+      {
+        key: AttestationKey,
+        description: 'attestation signing key',
+      },
     ]
     scenarios.forEach(function ({ key, description }) {
-      describe.only(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
+      describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let authorizationTest: any
         beforeEach(async () => {
           const authorizationTests = {
@@ -541,26 +541,50 @@ contract('Accounts', (accounts: string[]) => {
                   }
                 : accountsInstance.removeVoteSigner,
             },
-            // validator: {
-            //   fn: useGenericAuthorizeSigner
-            //     ? authorizeSigner('validator')
-            //     : accountsInstance.authorizeValidatorSigner,
-            //   eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
-            //   getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
-            //   authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
-            //   hasAuthorizedSigner: accountsInstance.hasAuthorizedValidatorSigner,
-            //   removeSigner: accountsInstance.removeValidatorSigner,
-            // },
-            // attestation: {
-            //   fn: useGenericAuthorizeSigner
-            //     ? authorizeSigner('attestation')
-            //     : accountsInstance.authorizeAttestationSigner,
-            //   eventName: useGenericAuthorizeSigner ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
-            //   getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
-            //   authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
-            //   hasAuthorizedSigner: accountsInstance.hasAuthorizedAttestationSigner,
-            //   removeSigner: accountsInstance.removeAttestationSigner,
-            // },
+            [ValidatorKey]: {
+              fn: genericWrite
+                ? authorizeSignerFactory(ValidatorKey)
+                : accountsInstance.authorizeValidatorSigner,
+              eventName: genericWrite ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
+              getAuthorizedFromAccount: genericRead
+                ? (...args) =>
+                    accountsInstance.getDefaultSigner(args[0], ValidatorKey, ...args.slice(1))
+                : accountsInstance.getValidatorSigner,
+              authorizedSignerToAccount: genericRead
+                ? (signer) => accountsInstance.signerToAccount(signer)
+                : accountsInstance.validatorSignerToAccount,
+              hasAuthorizedSigner: genericRead
+                ? (signer) => accountsInstance.hasDefaultSigner(signer, ValidatorKey)
+                : accountsInstance.hasAuthorizedValidatorSigner,
+              removeSigner: genericWrite
+                ? async () => {
+                    const defaultSigner = await accountsInstance.getValidatorSigner(account)
+                    await accountsInstance.removeSigner(defaultSigner, ValidatorKey)
+                  }
+                : accountsInstance.removeValidatorSigner,
+            },
+            [AttestationKey]: {
+              fn: genericWrite
+                ? authorizeSignerFactory(AttestationKey)
+                : accountsInstance.authorizeAttestationSigner,
+              eventName: genericWrite ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
+              getAuthorizedFromAccount: genericRead
+                ? (...args) =>
+                    accountsInstance.getDefaultSigner(args[0], AttestationKey, ...args.slice(1))
+                : accountsInstance.getAttestationSigner,
+              authorizedSignerToAccount: genericRead
+                ? (signer) => accountsInstance.signerToAccount(signer)
+                : accountsInstance.attestationSignerToAccount,
+              hasAuthorizedSigner: genericRead
+                ? (signer) => accountsInstance.hasDefaultSigner(signer, AttestationKey)
+                : accountsInstance.hasAuthorizedAttestationSigner,
+              removeSigner: genericWrite
+                ? async () => {
+                    const defaultSigner = await accountsInstance.getAttestationSigner(account)
+                    await accountsInstance.removeSigner(defaultSigner, AttestationKey)
+                  }
+                : accountsInstance.removeAttestationSigner,
+            },
           }
           authorizationTest = authorizationTests[key]
           await accountsInstance.createAccount()
