@@ -11,6 +11,7 @@ import {
   MockValidatorsInstance,
   RegistryContract,
 } from 'types'
+import { keccak256 } from 'web3-utils'
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -369,45 +370,47 @@ contract('Accounts', (accounts: string[]) => {
   })
 
   describe('generic authorization', () => {
-    const authorized = accounts[1]
-    const authorized2 = accounts[2]
-    const role = 'Test Role'
+    const signer = accounts[1]
+    const signer2 = accounts[2]
+    const role = keccak256('Test Role')
+    const role2 = keccak256('Test Role 2')
     let sig, sig2
 
     beforeEach(async () => {
-      sig = await getParsedSignatureOfAddress(web3, account, authorized)
-      sig2 = await getParsedSignatureOfAddress(web3, account, authorized2)
+      sig = await getParsedSignatureOfAddress(web3, account, signer)
+      sig2 = await getParsedSignatureOfAddress(web3, account, signer2)
       await accountsInstance.createAccount()
     })
 
-    it('should set the authorized signer as a smart contract', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-      await accountsInstance.authorizeSigner(authorized, role)
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-      await accountsInstance.completeSignerAuthorization(account, role, { from: authorized })
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+    it('should set the authorized signer in two steps', async () => {
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+      await accountsInstance.authorizeSigner(signer, role)
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
 
-      assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+      await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
+      assert.equal(await accountsInstance.authorizedBy(signer), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
     })
 
     it('should set the authorized signer in one step', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
-      assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
+      assert.equal(await accountsInstance.authorizedBy(signer), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
     })
 
     it('should remove the authorized signer', async () => {
-      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      await accountsInstance.removeSigner(role)
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+      await accountsInstance.removeSigner(signer, role)
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
     })
 
     it(`should emit the right event`, async () => {
       const resp = await accountsInstance.authorizeSignerWithSignature(
-        authorized,
+        signer,
         role,
         sig.v,
         sig.r,
@@ -415,58 +418,58 @@ contract('Accounts', (accounts: string[]) => {
       )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
-      const expected = { account, signer: authorized, role }
+      const expected = { account, signer: signer, role }
       assertLogMatches(log, 'SignerAuthorized', expected)
     })
 
     it('can authorize multiple signers for a role', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-      assert.isFalse(await accountsInstance.isSigner(account, authorized2, role))
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+      assert.isFalse(await accountsInstance.isSigner(account, signer2, role))
 
-      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      await accountsInstance.authorizeSignerWithSignature(authorized2, role, sig2.v, sig2.r, sig2.s)
+      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+      await accountsInstance.authorizeSignerWithSignature(signer2, role, sig2.v, sig2.r, sig2.s)
 
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
-      assert.isTrue(await accountsInstance.isSigner(account, authorized2, role))
-      assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      assert.equal(await accountsInstance.authorizedBy(authorized2), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized2))
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
+      assert.isTrue(await accountsInstance.isSigner(account, signer2, role))
+      assert.equal(await accountsInstance.authorizedBy(signer), account)
+      assert.equal(await accountsInstance.authorizedBy(signer2), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer2))
     })
 
     it('can authorize a signer for multiple roles', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role2))
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role2))
 
-      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      await accountsInstance.authorizeSignerWithSignature(authorized, role2, sig.v, sig.r, sig.s)
+      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+      await accountsInstance.authorizeSignerWithSignature(signer, role2, sig.v, sig.r, sig.s)
 
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role2))
-      assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role2))
+      assert.equal(await accountsInstance.authorizedBy(signer), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
     })
 
     it('can set the default signer for a role', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
       assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
       assert.equal(await accountsInstance.getDefaultSigner(account, role), account)
 
-      await assertRevert(accountsInstance.setDefaultSigner(authorized, role))
-      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      await accountsInstance.setDefaultSigner(authorized, role)
+      await assertRevert(accountsInstance.setDefaultSigner(signer, role))
+      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+      await accountsInstance.setDefaultSigner(signer, role)
 
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
       assert.isTrue(await accountsInstance.hasDefaultSigner(account, role))
-      assert.equal(await accountsInstance.getDefaultSigner(account, role), authorized)
+      assert.equal(await accountsInstance.getDefaultSigner(account, role), signer)
     })
 
     it('can remove the default signer for a role', async () => {
-      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      await accountsInstance.setDefaultSigner(authorized, role)
+      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+      await accountsInstance.setDefaultSigner(signer, role)
       await accountsInstance.removeDefaultSigner(role)
 
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
       assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
       assert.equal(await accountsInstance.getDefaultSigner(account, role), account)
     })
@@ -496,9 +499,9 @@ contract('Accounts', (accounts: string[]) => {
       }
     }
 
-    const VotingKey = 'celo.org/core/vote'
-    const ValidatorKey = 'celo.org/core/validator'
-    const AttestationKey = 'celo.org/core/attestation'
+    const VotingKey = keccak256('celo.org/core/vote')
+    const ValidatorKey = keccak256('celo.org/core/validator')
+    const AttestationKey = keccak256('celo.org/core/attestation')
 
     const scenarios = [
       {

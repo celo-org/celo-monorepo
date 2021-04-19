@@ -46,8 +46,8 @@ contract Accounts is
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Signers signers;
-    mapping(string => address) defaultSigners;
-    mapping(string => mapping(address => SignerAuthorization)) signerAuthorizations;
+    mapping(bytes32 => address) defaultSigners;
+    mapping(bytes32 => mapping(address => SignerAuthorization)) signerAuthorizations;
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
@@ -66,22 +66,22 @@ contract Accounts is
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidatorSignerAuthorized(address indexed account, address signer);
-  event SignerAuthorized(address indexed account, address signer, string role);
+  event SignerAuthorized(address indexed account, address signer, bytes32 indexed role);
   event AttestationSignerRemoved(address indexed account, address oldSigner);
   event VoteSignerRemoved(address indexed account, address oldSigner);
   event ValidatorSignerRemoved(address indexed account, address oldSigner);
-  event DefaultSignerSet(address indexed account, address signer, string role);
-  event DefaultSignerRemoved(address indexed account, address oldSigner, string role);
-  event SignerRemoved(address indexed account, address oldSigner, string role);
+  event DefaultSignerSet(address indexed account, address signer, bytes32 role);
+  event DefaultSignerRemoved(address indexed account, address oldSigner, bytes32 role);
+  event SignerRemoved(address indexed account, address oldSigner, bytes32 indexed role);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountNameSet(address indexed account, string name);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
 
-  string constant ValidatorSigner = "celo.org/core/validator";
-  string constant AttestationSigner = "celo.org/core/attestation";
-  string constant VoteSigner = "celo.org/core/vote";
+  bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
+  bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
+  bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -200,20 +200,18 @@ contract Accounts is
    * @param signer the address to set as default
    * @param role the role to register a default signer for
    */
-  function setDefaultSigner(address signer, string memory role) public {
+  function setDefaultSigner(address signer, bytes32 role) public {
     require(
       isGenericSigner(msg.sender, signer, role),
       "Must finish authorization before setting default signer"
     );
 
     Account storage account = accounts[msg.sender];
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+    if (role == VoteSigner) {
       account.signers.vote = signer;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
+    } else if (role == AttestationSigner) {
       account.signers.attestation = signer;
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+    } else if (role == ValidatorSigner) {
       account.signers.validator = signer;
     }
 
@@ -230,13 +228,9 @@ contract Accounts is
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
-  function authorizeSignerWithSignature(
-    address signer,
-    string memory role,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) public {
+  function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
+    public
+  {
     authorize(signer, v, r, s);
 
     Account storage account = accounts[msg.sender];
@@ -363,7 +357,7 @@ contract Accounts is
    * @param signer The address of the signing key to authorize.
    * @param role The role to authorize signing for.
    */
-  function authorizeSigner(address signer, string memory role) public {
+  function authorizeSigner(address signer, bytes32 role) public {
     require(isAccount(msg.sender), "Unknown account");
     require(
       isNotAccount(signer) && isNotAuthorizedSigner(signer),
@@ -383,7 +377,7 @@ contract Accounts is
    * @param _account The address of account that authorized signing.
    * @param role The role to finish authorizing for.
    */
-  function completeSignerAuthorization(address _account, string memory role) public {
+  function completeSignerAuthorization(address _account, bytes32 role) public {
     Account storage account = accounts[_account];
     require(
       account.signerAuthorizations[role][msg.sender].started == true,
@@ -405,8 +399,8 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isGenericSigner(address account, address signer, string memory role)
-    internal
+  function isGenericSigner(address account, address signer, bytes32 role)
+    public
     view
     returns (bool)
   {
@@ -420,28 +414,19 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isDefaultSigner(address _account, address signer, string memory role)
-    internal
+  function isDefaultSigner(address _account, address signer, bytes32 role)
+    public
     view
     returns (bool)
   {
     require(isAccount(_account), "Unknown account");
     Account storage account = accounts[_account];
 
-    if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner)) &&
-      account.signers.validator == signer
-    ) {
+    if (role == ValidatorSigner && account.signers.validator == signer) {
       return true;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner)) &&
-      account.signers.attestation == signer
-    ) {
+    } else if (role == AttestationSigner && account.signers.attestation == signer) {
       return true;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner)) &&
-      account.signers.vote == signer
-    ) {
+    } else if (role == VoteSigner && account.signers.vote == signer) {
       return true;
     }
 
@@ -454,11 +439,7 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isSigner(address account, address signer, string memory role)
-    public
-    view
-    returns (bool)
-  {
+  function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
     return isGenericSigner(account, signer, role) || isDefaultSigner(account, signer, role);
   }
 
@@ -467,9 +448,8 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function removeSigner(address signer, string memory role) public {
-    address defaultSigner = getDefaultSigner(msg.sender, role);
-    if (defaultSigner == signer) {
+  function removeSigner(address signer, bytes32 role) public {
+    if (getDefaultSigner(msg.sender, role) == signer) {
       removeDefaultSigner(role);
     }
 
@@ -481,21 +461,19 @@ contract Accounts is
    * @notice Removes the signer for a default role.
    * @param role The role that has been authorized.
    */
-  function removeDefaultSigner(string memory role) public {
+  function removeDefaultSigner(bytes32 role) public {
     Account storage account = accounts[msg.sender];
 
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+    if (role == ValidatorSigner) {
       account.signers.validator = address(0);
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
+    } else if (role == AttestationSigner) {
       account.signers.attestation = address(0);
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+    } else if (role == VoteSigner) {
       account.signers.vote = address(0);
     }
 
-    emit DefaultSignerRemoved(msg.sender, account.defaultSigners[role], role);
     account.defaultSigners[role] = address(0);
+    emit DefaultSignerRemoved(msg.sender, account.defaultSigners[role], role);
   }
 
   /**
@@ -528,11 +506,7 @@ contract Accounts is
     emit AttestationSignerRemoved(msg.sender, signer);
   }
 
-  function defaultSignerToAccount(address signer, string memory role)
-    public
-    view
-    returns (address)
-  {
+  function defaultSignerToAccount(address signer, bytes32 role) public view returns (address) {
     address account = authorizedBy[signer];
 
     if (account != address(0)) {
@@ -595,7 +569,7 @@ contract Accounts is
    * @param _account The address of the account.
    * @param role The role of the signer.
    */
-  function getDefaultSigner(address _account, string memory role) public view returns (address) {
+  function getDefaultSigner(address _account, bytes32 role) public view returns (address) {
     require(isAccount(_account), "Unknown account");
 
     Account storage account = accounts[_account];
@@ -646,11 +620,9 @@ contract Accounts is
     return getDefaultSigner(account, AttestationSigner);
   }
 
-  function hasDefaultSigner(address account, string memory role) public view returns (bool) {
+  function hasDefaultSigner(address account, bytes32 role) public view returns (bool) {
     require(isAccount(account));
-
-    address defaultSigner = getDefaultSigner(account, role);
-    return defaultSigner != account;
+    return getDefaultSigner(account, role) != account;
   }
 
   /**
