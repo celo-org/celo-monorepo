@@ -504,15 +504,12 @@ export const unlock = async (
   kit: ContractKit,
   address: string,
   password: string,
-  unlockPeriod: number,
-  unlockNeeded: boolean
+  unlockPeriod: number
 ) => {
-  if (unlockNeeded) {
-    try {
-      kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
-    } catch (error) {
-      console.error(`Unlock account ${address} failed:`, error)
-    }
+  try {
+    kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
+  } catch (error) {
+    console.error(`Unlock account ${address} failed:`, error)
   }
 }
 
@@ -530,7 +527,7 @@ export const simulateClient = async (
   const kit = newKitFromWeb3(new Web3(web3Provider))
   const password = fetchEnv('PASSWORD')
 
-  let lastNonce: number = 0
+  let lastNonce: number = -1
   let lastTx: string = ''
   let lastGasPriceMinimum: BigNumber = new BigNumber(0)
   let nonce: number = 0
@@ -545,14 +542,12 @@ export const simulateClient = async (
   }
   kit.defaultAccount = senderAddress
 
-  // sleep a random amount of time in the range [0, txPeriodMs/5secs) before starting so
+  // sleep a random amount of time in the range [0, txPeriodMs) before starting so
   // that if multiple simulations are started at the same time, they don't all
   // submit transactions at the same time
-  const maxSleep = 5000 // Sleep 5 sec at most
   const randomSleep = Math.random() * txPeriodMs
-  const sleepMs = randomSleep > maxSleep ? maxSleep : randomSleep
-  console.info(`Sleeping for ${sleepMs} ms`)
-  await sleep(sleepMs)
+  console.info(`Sleeping for ${randomSleep} ms`)
+  await sleep(randomSleep)
 
   const baseLogMessage: any = {
     loadTestID: index,
@@ -565,9 +560,10 @@ export const simulateClient = async (
 
   while (true) {
     const sendTransactionTime = Date.now()
-    await unlock(kit, kit.defaultAccount, password, 9223372036, unlockNeeded)
-
-    unlockNeeded = false
+    if (unlockNeeded) {
+      await unlock(kit, kit.defaultAccount, password, 9223372036)
+      unlockNeeded = false
+    }
     // randomly choose which token to use
     const transferGold = Boolean(Math.round(Math.random()))
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
@@ -588,7 +584,6 @@ export const simulateClient = async (
     }
 
     try {
-      feeCurrency = feeCurrency || ''
       baseLogMessage.feeCurrency = feeCurrency
 
       const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
@@ -599,13 +594,13 @@ export const simulateClient = async (
       let gasPrice = new BigNumber(gasPriceBase).times(2)
 
       // Check if last tx was mined. If not, reuse the same nonce
-      if (lastTx === '' || lastNonce === 0) {
-        nonce = await kit.connection.nonce(kit.defaultAccount)
+      if (lastTx === '' || lastNonce === -1) {
+        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
       } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
-        nonce = await kit.connection.nonce(kit.defaultAccount)
+        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
       } else {
-        nonce = (await kit.connection.nonce(kit.defaultAccount)) - 1
-        gasPrice = lastGasPriceMinimum.times(1.15)
+        nonce = (await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')) - 1
+        gasPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15))
         console.warn(
           `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
         )

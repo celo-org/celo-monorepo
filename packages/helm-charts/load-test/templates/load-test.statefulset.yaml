@@ -88,13 +88,6 @@ spec:
           for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
             geth --nousb account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
           done
-          # Josh branch for bulk import
-          #pkeys=""
-          #cd /root/.celo
-          #for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
-          #  pkeys="$pkeys pkey$thread"
-          #done
-          #geth --nousb account import --password /root/.celo/account/accountSecret $pkeys || true
         volumeMounts:
         - name: data
           mountPath: /root/.celo

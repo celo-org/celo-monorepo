@@ -9,10 +9,10 @@ import { portForwardAnd } from 'src/lib/port_forward'
 import yargs from 'yargs'
 
 interface FaucetLoadTest extends CeloEnvArgv {
-  count_from: number
   gold: number
   dollars: number
-  count_to: number
+  replica_from: number
+  replica_to: number
   threads_from: number
   threads_to: number
 }
@@ -34,12 +34,12 @@ export const builder = (argv: yargs.Argv) => {
         description: 'Celo Dollars amount to transfer',
         default: 10,
       })
-      .option('count_from', {
+      .option('replica_from', {
         type: 'number',
         description: 'Index count from',
         demandOption: 'Please specify a key index',
       })
-      .option('count_to', {
+      .option('replica_to', {
         type: 'number',
         description: 'Index count to',
         demandOption: 'Please specify a key index',
@@ -78,7 +78,7 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
       convertToContractDecimals(argv.dollars, stableToken),
     ])
 
-    for (let podIndex = argv.count_from; podIndex <= argv.count_to; podIndex++) {
+    for (let podIndex = argv.replica_from; podIndex <= argv.replica_to; podIndex++) {
       for (let threadIndex = argv.threads_from; threadIndex <= argv.threads_to; threadIndex++) {
         const index = getIndexForLoadTestThread(podIndex, threadIndex)
         const address = generateAddress(mnemonic, accountType, index)

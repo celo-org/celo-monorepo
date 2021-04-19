@@ -58,7 +58,7 @@ export const builder = () => {
     })
     .options('reuse-client', {
       type: 'boolean',
-      description: 'Use the same light client for all the threads/accounts',
+      description: 'Use the same client for all the threads/accounts',
       default: false,
     })
 }

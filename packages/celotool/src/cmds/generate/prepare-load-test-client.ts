@@ -12,7 +12,8 @@ interface Bip32Argv {
 
 export const command = 'prepare-load-test'
 
-export const describe = 'command for generating public and private keys for a load test instance'
+export const describe =
+  'command for generating public and private keys for a load test instance. Expected to run inside the loadtest pod'
 
 export const builder = (argv: yargs.Argv) => {
   return argv
@@ -46,6 +47,5 @@ export const handler = async (argv: Bip32Argv) => {
     fs.writeFileSync(`/root/.celo/pkey${t}`, `${privateKey}\n`)
     fs.appendFileSync(`/root/.celo/address`, `${address}\n`)
     console.log(`Address for index ${argv.index} and thread ${t} --> ${address}`)
-    const dk = keythereum.crea
   }
 }
