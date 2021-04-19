@@ -30,7 +30,7 @@ export const builder = (argv: yargs.Argv) => {
       })
       .option('dollars', {
         type: 'number',
-        description: 'Celo Gold amount to transfer',
+        description: 'Celo Dollars amount to transfer',
         default: 10,
       })
       .option('count_from', {
