@@ -1,6 +1,6 @@
 /* tslint:disable no-console */
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
-import { simulateClient } from 'src/lib/geth'
+import { getIndexForLoadTestThread, simulateClient } from 'src/lib/geth'
 import * as yargs from 'yargs'
 export const command = 'simulate-client'
 
@@ -65,8 +65,8 @@ export const builder = () => {
 
 export const handler = async (argv: SimulateClientArgv) => {
   for (let thread = 0; thread < argv.clientCount; thread++) {
-    const senderIndex = argv.index * 10000 + thread
-    const recipientIndex = argv.recipientIndex * 10000 + thread
+    const senderIndex = getIndexForLoadTestThread(argv.index, thread)
+    const recipientIndex = getIndexForLoadTestThread(argv.recipientIndex, thread)
     const senderAddress = generateAddress(
       argv.mnemonic,
       AccountType.LOAD_TESTING_ACCOUNT,

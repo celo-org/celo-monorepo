@@ -723,6 +723,18 @@ export const onLoadTestTxResult = async (
 }
 
 /**
+ * This method generates key derivation index for loadtest clients and threads
+ *
+ * @param pod the pod replica number
+ * @param thread the thread number inside the pod
+ */
+export function getIndexForLoadTestThread(pod: number, thread: number) {
+  // max number of threads to avoid overlap is [0, base)
+  const base = 10000
+  return pod * base + thread
+}
+
+/**
  * This method sends ERC20 tokens
  *
  * @param kit instance of the contract kit

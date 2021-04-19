@@ -4,6 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
+import { getIndexForLoadTestThread } from 'src/lib/geth'
 import { portForwardAnd } from 'src/lib/port_forward'
 import yargs from 'yargs'
 
@@ -67,14 +68,19 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
     console.log(`Using account: ${account}`)
     kit.defaultAccount = account
 
-    const [goldToken] = await Promise.all([kit.contracts.getGoldToken()])
-    const [stableToken] = await Promise.all([kit.contracts.getStableToken()])
-    const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
-    const stableTokenAmount = await convertToContractDecimals(argv.dollars, stableToken)
+    const [goldToken, stableToken] = await Promise.all([
+      kit.contracts.getGoldToken(),
+      kit.contracts.getStableToken(),
+    ])
 
-    for (let i = argv.count_from; i <= argv.count_to; i++) {
-      for (let t = argv.threads_from; t <= argv.threads_to; t++) {
-        const index = i * 10000 + t
+    const [goldAmount, stableTokenAmount] = await Promise.all([
+      convertToContractDecimals(argv.gold, goldToken),
+      convertToContractDecimals(argv.dollars, stableToken),
+    ])
+
+    for (let podIndex = argv.count_from; podIndex <= argv.count_to; podIndex++) {
+      for (let threadIndex = argv.threads_from; threadIndex <= argv.threads_to; threadIndex++) {
+        const index = getIndexForLoadTestThread(podIndex, threadIndex)
         const address = generateAddress(mnemonic, accountType, index)
         console.log(`${index} --> Fauceting ${goldAmount.toFixed()} Gold to ${address}`)
         await goldToken.transfer(address, goldAmount.toFixed()).send()

@@ -23,6 +23,7 @@ import {
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
+import { getIndexForLoadTestThread } from './geth'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
@@ -207,9 +208,9 @@ const getFaucetedAccountsForLoadTest = (
 ) => {
   const addresses: string[] = []
   // const length = clients.toString.length + threads.toString.length
-  for (const c of range(0, clients)) {
-    for (const t of range(0, threads)) {
-      const index = c * 10000 + t
+  for (const podIndex of range(0, clients)) {
+    for (const threadIndex of range(0, threads)) {
+      const index = getIndexForLoadTestThread(podIndex, threadIndex)
       addresses.push(strip0x(generateAddress(mnemonic, accountType, parseInt(`${index}`, 10))))
     }
   }
