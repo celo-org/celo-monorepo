@@ -22,7 +22,6 @@ export default class Approve extends BaseCommand {
     }),
     from: Flags.address({ required: true, description: "Approver's address" }),
     useMultiSig: flags.boolean({
-      default: true,
       description: 'True means the request will be sent through multisig.',
     }),
     hotfix: flags.string({
