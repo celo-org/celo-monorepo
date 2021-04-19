@@ -575,13 +575,11 @@ contract Accounts is
     Account storage account = accounts[_account];
 
     address signer;
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+    if (role == ValidatorSigner) {
       signer = account.signers.validator;
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
+    } else if (role == AttestationSigner) {
       signer = account.signers.attestation;
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+    } else if (role == VoteSigner) {
       signer = account.signers.vote;
     }
 
