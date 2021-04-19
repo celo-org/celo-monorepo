@@ -548,7 +548,7 @@ export const simulateClient = async (
   // sleep a random amount of time in the range [0, txPeriodMs/5secs) before starting so
   // that if multiple simulations are started at the same time, they don't all
   // submit transactions at the same time
-  const maxSleep = 5000 // Sleep 5 seg at most
+  const maxSleep = 5000 // Sleep 5 sec at most
   const randomSleep = Math.random() * txPeriodMs
   const sleepMs = randomSleep > maxSleep ? maxSleep : randomSleep
   console.info(`Sleeping for ${sleepMs} ms`)

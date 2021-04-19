@@ -207,7 +207,6 @@ const getFaucetedAccountsForLoadTest = (
   balance: string
 ) => {
   const addresses: string[] = []
-  // const length = clients.toString.length + threads.toString.length
   for (const podIndex of range(0, clients)) {
     for (const threadIndex of range(0, threads)) {
       const index = getIndexForLoadTestThread(podIndex, threadIndex)
