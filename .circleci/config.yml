@@ -21,7 +21,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: gcr.io/$GOOGLE_PROJECT_ID/circleci:latest
+    - image: gcr.io/$GOOGLE_PROJECT_ID/circleci:0.0.1
       auth:
         # _json_key is not a username, it looks like it is a hack which lets circleci know that the corresponding
         # `password` is actually a json encoded key. _json_key is used when authenticating with a gcloud
