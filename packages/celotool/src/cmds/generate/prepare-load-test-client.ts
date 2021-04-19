@@ -2,7 +2,6 @@
 import * as fs from 'fs'
 import { AccountType, generatePrivateKey, privateKeyToAddress } from 'src/lib/generate_utils'
 import yargs from 'yargs'
-const keythereum = require('keythereum')
 
 interface Bip32Argv {
   mnemonic: string
