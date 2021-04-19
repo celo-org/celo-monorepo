@@ -55,11 +55,8 @@ export default class Propose extends BaseCommand {
     printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
     const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx(
-      'proposeTx',
-      governance.propose(proposal, res.flags.descriptionURL),
-      { value: deposit.toString() },
-      'ProposalQueued'
-    )
+    await displaySendTx('proposeTx', governance.propose(proposal, res.flags.descriptionURL), {
+      value: deposit.toString(),
+    })
   }
 }

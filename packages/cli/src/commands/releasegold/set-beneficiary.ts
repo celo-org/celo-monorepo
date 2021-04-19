@@ -60,12 +60,7 @@ export default class SetBeneficiary extends ReleaseGoldBaseCommand {
       this.contractAddress,
       setBeneficiaryTx.txo
     )
-    await displaySendTx<any>(
-      'setBeneficiary',
-      setBeneficiaryMultiSigTx,
-      { from: flags.from },
-      'BeneficiarySet'
-    )
+    await displaySendTx<any>('setBeneficiary', setBeneficiaryMultiSigTx, { from: flags.from })
     const replaceOwnerTx = releaseGoldMultiSig.replaceOwner(currentBeneficiary, newBeneficiary)
     const replaceOwnerMultiSigTx = await releaseGoldMultiSig.submitOrConfirmTransaction(
       releaseGoldMultiSig.address,

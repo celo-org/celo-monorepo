@@ -48,6 +48,6 @@ export default class MultiSigTransfer extends BaseCommand {
       transferTx = celoToken.transfer(to, amountBN)
     }
     const multiSigTx = await multisig.submitOrConfirmTransaction(celoToken.address, transferTx.txo)
-    await displaySendTx<any>('submitOrApproveTransfer', multiSigTx, { from }, 'tx Sent')
+    await displaySendTx<any>('submitOrApproveTransfer', multiSigTx, { from })
   }
 }

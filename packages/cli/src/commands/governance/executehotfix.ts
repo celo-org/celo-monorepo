@@ -49,11 +49,6 @@ export default class ExecuteHotfix extends BaseCommand {
       .addCheck(`Hotfix 0x${hash.toString('hex')} is approved`, () => record.approved)
       .runChecks()
 
-    await displaySendTx(
-      'executeHotfixTx',
-      governance.executeHotfix(hotfix, saltBuff),
-      {},
-      'HotfixExecuted'
-    )
+    await displaySendTx('executeHotfixTx', governance.executeHotfix(hotfix, saltBuff))
   }
 }
