@@ -507,7 +507,7 @@ export const unlock = async (
   unlockPeriod: number
 ) => {
   try {
-    kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
+    await kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
   } catch (error) {
     console.error(`Unlock account ${address} failed:`, error)
   }
@@ -611,12 +611,12 @@ export const simulateClient = async (
         txOptions = {
           gasPrice: gasPrice.toString(),
           feeCurrency,
-          nonce: nonce,
+          nonce,
         }
       } else {
         txOptions = {
           gasPrice: gasPrice.toString(),
-          nonce: nonce,
+          nonce,
         }
       }
     } catch (error) {
