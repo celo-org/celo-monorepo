@@ -418,7 +418,7 @@ contract('Accounts', (accounts: string[]) => {
       )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
-      const expected = { account, signer: signer, role }
+      const expected = { account, signer, role }
       assertLogMatches(log, 'SignerAuthorized', expected)
     })
 
@@ -483,7 +483,7 @@ contract('Accounts', (accounts: string[]) => {
     [true, false],
     [true, true],
   ]
-  backwardsCompatibilityMatrix.forEach(function ([genericRead, genericWrite]) {
+  backwardsCompatibilityMatrix.forEach(([genericRead, genericWrite]) => {
     const authorizeSignerFactory = (role: string) => async (signer, v, r, s, ...rest) => {
       const result1 = await accountsInstance.authorizeSignerWithSignature(
         signer,
@@ -517,7 +517,7 @@ contract('Accounts', (accounts: string[]) => {
         description: 'attestation signing key',
       },
     ]
-    scenarios.forEach(function ({ key, description }) {
+    scenarios.forEach(({ key, description }) => {
       describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let authorizationTest: any
         beforeEach(async () => {
