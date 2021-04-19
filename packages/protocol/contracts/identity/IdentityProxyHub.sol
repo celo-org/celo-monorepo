@@ -9,8 +9,6 @@ contract IdentityProxyHub is UsingRegistry {
     abi.encodePacked(type(IdentityProxy).creationCode)
   );
 
-  mapping(bytes32 => IdentityProxy) public identityProxies;
-
   /**
    * @notice Returns the IdentityProxy address corresponding to the identifier.
    * @param identifier The identifier whose proxy address is computed.
@@ -31,10 +29,13 @@ contract IdentityProxyHub is UsingRegistry {
    * @return The identifier's IdentityProxy address.
    */
   function getOrDeployIdentityProxy(bytes32 identifier) public returns (IdentityProxy) {
-    IdentityProxy identityProxy = identityProxies[identifier];
-    if (address(identityProxy) == address(0)) {
-      identityProxy = deployIdentityProxy(identifier);
-      identityProxies[identifier] = identityProxy;
+    IdentityProxy identityProxy = getIdentityProxy(identifier);
+    uint256 codeSize;
+    assembly {
+      codeSize := extcodesize(identityProxy)
+    }
+    if (codeSize == 0) {
+      deployIdentityProxy(identifier);
     }
 
     return identityProxy;
