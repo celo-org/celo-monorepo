@@ -100,6 +100,7 @@ async function helmParameters(
       celoEnv
     )}"`,
     `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
+    `--set blockscout.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
   ]
   if (useMetadataCrawler !== 'false') {
     params.push(

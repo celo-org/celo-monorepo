@@ -582,7 +582,7 @@ contract('EpochRewards', (accounts: string[]) => {
     let reserve: ReserveInstance
 
     beforeEach(async () => {
-      reserve = await Reserve.new()
+      reserve = await Reserve.new(true)
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(
         registry.address,
@@ -760,7 +760,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     beforeEach(async () => {
       const totalSupply = new BigNumber(129762987346298761037469283746)
-      reserve = await Reserve.new()
+      reserve = await Reserve.new(true)
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(
         registry.address,
