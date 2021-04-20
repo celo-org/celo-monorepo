@@ -89,11 +89,9 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
 
 function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: NetworkConfig) {
   return async (account: AccountRecord) => {
-    const { nodeUrl, faucetGoldAmount, faucetDollarAmount, faucetStableAmount } = config
+    const { nodeUrl, faucetGoldAmount, faucetStableAmount } = config
     const celo = new CeloAdapter({ nodeUrl, pk: account.pk })
     await retryAsync(sendGold, 3, [celo, request.beneficiary, faucetGoldAmount, snap], 500)
-    // TODO EN: for now keep this in while testing sendStableTokens; remove aftewards
-    await retryAsync(sendDollars, 3, [celo, request.beneficiary, faucetDollarAmount, snap], 500)
     await sendStableTokens(celo, request.beneficiary, faucetStableAmount, snap)
   }
 }

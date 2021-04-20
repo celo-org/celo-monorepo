@@ -4,7 +4,6 @@ import twilio, { Twilio } from 'twilio'
 export interface NetworkConfig {
   nodeUrl: string
   faucetGoldAmount: string
-  faucetDollarAmount: string
   faucetStableAmount: string
   inviteGoldAmount: string
   inviteDollarAmount: string
@@ -38,7 +37,6 @@ export function getNetworkConfig(net: string): NetworkConfig {
   return {
     nodeUrl: config[net].node_url,
     faucetGoldAmount: config[net].faucet_gold_amount,
-    faucetDollarAmount: config[net].faucet_dollar_amount,
     faucetStableAmount: config[net].faucet_stable_amount,
     inviteGoldAmount: config[net].invite_gold_amount,
     inviteDollarAmount: config[net].invite_dollar_amount,
