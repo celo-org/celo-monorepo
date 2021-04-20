@@ -171,7 +171,7 @@ async function sendStableTokens(
   amount: string,
   snap: DataSnapshot
 ) {
-  console.info(`req(${snap.key}): Sending ${amount} token`)
+  console.info(`req(${snap.key}): Sending ${amount} of each stable token`)
 
   const tokenTxs = await celo.transferStableTokens(address, amount)
   const sendTxHelper = async (symbol: string, tx: CeloTransactionObject<boolean>) => {
