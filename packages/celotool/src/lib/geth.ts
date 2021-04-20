@@ -467,7 +467,7 @@ export const transferCeloGold = async (
     from: fromAddress,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    feeCurrency: txOptions.feeCurrency,
+    feeCurrency: txOptions.feeCurrency || undefined,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
     nonce: txOptions.nonce,
@@ -493,7 +493,7 @@ export const transferCeloDollars = async (
     from: fromAddress,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    feeCurrency: txOptions.feeCurrency,
+    feeCurrency: txOptions.feeCurrency || undefined,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
     nonce: txOptions.nonce,
@@ -607,17 +607,10 @@ export const simulateClient = async (
       }
 
       lastGasPriceMinimum = gasPrice
-      if (!feeCurrencyGold) {
-        txOptions = {
-          gasPrice: gasPrice.toString(),
-          feeCurrency,
-          nonce,
-        }
-      } else {
-        txOptions = {
-          gasPrice: gasPrice.toString(),
-          nonce,
-        }
+      txOptions = {
+        gasPrice: gasPrice.toString(),
+        feeCurrency,
+        nonce,
       }
     } catch (error) {
       tracerLog({
