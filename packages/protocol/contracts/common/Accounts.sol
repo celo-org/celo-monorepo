@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
@@ -16,7 +16,7 @@ contract Accounts is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry
 {
   using SafeMath for uint256;
@@ -84,11 +84,17 @@ contract Accounts is
   bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 1, 2);
   }
 
   /**
