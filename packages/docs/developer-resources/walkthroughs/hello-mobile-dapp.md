@@ -158,5 +158,5 @@ You should now have the necessary skills to get started with developing mobile a
  - View transactions with a block explorer
  - Mobile development using React Native and Expo
 
-This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://discord.gg/745Qntv) if you need any help (or just want to chat)!
+This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://chat.celo.org) if you need any help (or just want to chat)!
 

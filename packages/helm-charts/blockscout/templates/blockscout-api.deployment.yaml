@@ -82,6 +82,16 @@ spec:
           value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.api.pool_size | quote }}
+        - name: BLOCKSCOUT_HOST
+          value: {{ .Values.blockscout.web.host | quote }}
+        - name: ENABLE_SOURCIFY_INTEGRATION
+          value: {{ .Values.blockscout.web.sourcify.enabled | quote }}
+        - name: SOURCIFY_SERVER_URL
+          value: {{ .Values.blockscout.web.sourcify.serverUrl | quote }}
+        - name: SOURCIFY_REPO_URL
+          value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
+        - name: CHAIN_ID
+          value: {{ .Values.blockscout.networkID | quote }}
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

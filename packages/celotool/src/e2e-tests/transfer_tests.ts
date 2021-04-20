@@ -75,42 +75,6 @@ class InflationManager {
   }
 }
 
-const freeze = async (validatorUri: string, validatorAddress: string, token: CeloTokenType) => {
-  const kit = newKitFromWeb3(new Web3(validatorUri))
-  const tokenAddress = await kit.celoTokens.getAddress(token)
-  const freezer = await kit.contracts.getFreezer()
-  await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
-}
-
-const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloTokenType) => {
-  const kit = newKitFromWeb3(new Web3(validatorUri))
-  const tokenAddress = await kit.celoTokens.getAddress(token)
-  const freezer = await kit.contracts.getFreezer()
-  await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
-}
-
-const whitelistAddress = async (
-  validatorUri: string,
-  validatorAddress: string,
-  address: string
-) => {
-  const kit = newKitFromWeb3(new Web3(validatorUri))
-  const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
-}
-
-const setAddressWhitelist = async (
-  validatorUri: string,
-  validatorAddress: string,
-  whitelist: string[]
-) => {
-  const kit = newKitFromWeb3(new Web3(validatorUri))
-  const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods
-    .setDirectlyWhitelistedAddresses(whitelist)
-    .send({ from: validatorAddress, gas: 500000 })
-}
-
 const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
   const kit = newKitFromWeb3(new Web3(validatorUri))
   const parameters = await kit.contracts.getBlockchainParameters()
@@ -894,88 +858,6 @@ describe('Transfer tests', function (this: any) {
                   .minus(balances.initial(governanceAddress, StableToken.cUSD).idiv(2)),
                 expectedFees.base
               )
-            })
-          })
-        })
-      })
-    }
-  })
-
-  describe('Transfers Frozen >', () => {
-    before(restartWithCleanNodes)
-
-    for (const syncMode of syncModes) {
-      describe(`${syncMode} Node >`, () => {
-        before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
-
-        describe('when CeloGold is frozen', () => {
-          before('ensure gold transfers are frozen', async () => {
-            await freeze('http://localhost:8545', validatorAddress, Token.CELO)
-          })
-
-          describe('check if frozen', () => {
-            it('should be frozen', async () => {
-              const goldTokenAddress = await kit.celoTokens.getAddress(Token.CELO)
-              const freezer = await kit.contracts.getFreezer()
-              const isFrozen = await freezer.isFrozen(goldTokenAddress)
-              assert(isFrozen)
-            })
-          })
-          describe('when neither sender nor receiver is whitelisted', () => {
-            before('ensure neither sender nor receiver is whitelisted', async () => {
-              await setAddressWhitelist('http://localhost:8545', validatorAddress, [])
-            })
-            testTxPoolFiltering({
-              gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-              feeToken: StableToken.cUSD,
-              expectedError: 'Error: transfers are currently frozen',
-            })
-          })
-          describe('when receiver is whitelisted', () => {
-            it('should transfer succesfully', async () => {
-              const whitelistedAddress = await kit.registry.addressFor(CeloContract.LockedGold)
-              testTransferToken({
-                expectedGas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-                transferToken: Token.CELO,
-                feeToken: Token.CELO,
-                toAddress: whitelistedAddress,
-              })
-            })
-          })
-          describe('when sender is whitelisted', () => {
-            before('add sender to transfer whitelist', async () => {
-              await whitelistAddress('http://localhost:8545', validatorAddress, FromAddress)
-            })
-            it('should transfer succesfully', async () => {
-              testTransferToken({
-                expectedGas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-                transferToken: Token.CELO,
-                feeToken: Token.CELO,
-              })
-            })
-
-            describe('when sender is removed again from whitelist', () => {
-              before('remove sender from whitelist', async () => {
-                await setAddressWhitelist('http://localhost:8545', validatorAddress, [])
-              })
-              testTxPoolFiltering({
-                gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-                feeToken: Token.CELO,
-                expectedError: 'Error: transfers are currently frozen',
-              })
-            })
-          })
-
-          describe('when gold transfers are unfrozen again', async () => {
-            before('unfreeze gold transfers', async () => {
-              await unfreeze('http://localhost:8545', validatorAddress, Token.CELO)
-            })
-            it('should transfer normally', async () => {
-              testTransferToken({
-                expectedGas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-                transferToken: Token.CELO,
-                feeToken: Token.CELO,
-              })
             })
           })
         })

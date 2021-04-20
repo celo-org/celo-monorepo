@@ -1,23 +1,32 @@
 import { newKit } from '@celo/contractkit'
 import { WalletConnectWallet } from '../src'
+import { stagingEndpoint } from '../src/constants'
 
 async function main() {
+  const name = `CLI DApp ${Math.random().toString().substring(12)}`
+
   const wallet = new WalletConnectWallet({
     connect: {
       metadata: {
-        name: 'use-contractkit demo',
-        description: 'A showcase of use-contractkit',
+        name,
+        description: 'A CLI DApp for testing WalletConnect integrations',
         url: 'https://use-contractkit.vercel.app',
         icons: [],
       },
     },
     init: {
-      relayProvider: 'wss://relay.walletconnect.org',
+      relayProvider: stagingEndpoint,
       logger: 'error',
     },
   })
+
   const uri = await wallet.getUri()
-  console.log(`=== START OUT OF BAND URI ===
+  if (!uri) {
+    console.error('No connection URI, something has gone terribly wrong')
+    process.exit(1)
+  }
+
+  console.log(`=== START OUT OF BAND URI FOR ${name} ===
 ${uri.toString()}
 === END OUT OF BAND URI ===`)
   await wallet.init()
@@ -28,11 +37,18 @@ ${uri.toString()}
   /**
    * Uncomment to send a test transaction
    */
-  // const gold = await kit.contracts.getGoldToken()
-  // await gold
-  //   .transfer('0x4132F04EaCfdE9E2b707667A13CB69DbC5BABb68', '1')
-  //   .sendAndWaitForReceipt({ from })
-  // console.log('Transaction sent!')
+  // async function transfer() {
+  //   try {
+  //     const gold = await kit.contracts.getGoldToken()
+  //     await gold
+  //       .transfer('0x4132F04EaCfdE9E2b707667A13CB69DbC5BABb68', '1')
+  //       .sendAndWaitForReceipt({ from })
+  //     console.log('Transaction sent!')
+  //   } catch (e) {
+  //     console.log('Failed', e.message)
+  //   }
+  // }
+  // await transfer()
 
   /**
    * Uncomment to sign a test payload
