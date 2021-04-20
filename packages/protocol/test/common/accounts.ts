@@ -711,10 +711,6 @@ contract('Accounts', (accounts: string[]) => {
             it('should return the account when passed the account', async () => {
               assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
             })
-
-            it('should revert when not passed an account', async () => {
-              await assertRevert(authorizationTest.getAuthorizedFromAccount(accounts[1]), account)
-            })
           })
 
           describe(`when the account has authorized a ${key}`, () => {

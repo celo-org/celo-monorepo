@@ -404,7 +404,6 @@ contract Accounts is
     view
     returns (bool)
   {
-    require(isAccount(account), "Unknown account");
     return accounts[account].signerAuthorizations[role][signer].completed;
   }
 
@@ -419,7 +418,6 @@ contract Accounts is
     view
     returns (bool)
   {
-    require(isAccount(_account), "Unknown account");
     Account storage account = accounts[_account];
 
     if (role == ValidatorSigner && account.signers.validator == signer) {
@@ -565,13 +563,12 @@ contract Accounts is
   }
 
   /**
-   * @notice Returns the signer for the specified account and role.
+   * @notice Returns the signer for the specified account and role. If no 
+   * signer has been specified it will return the account itself.
    * @param _account The address of the account.
    * @param role The role of the signer.
    */
   function getDefaultSigner(address _account, bytes32 role) public view returns (address) {
-    require(isAccount(_account), "Unknown account");
-
     Account storage account = accounts[_account];
 
     address signer;
@@ -619,7 +616,6 @@ contract Accounts is
   }
 
   function hasDefaultSigner(address account, bytes32 role) public view returns (bool) {
-    require(isAccount(account));
     return getDefaultSigner(account, role) != account;
   }
 
