@@ -73,6 +73,9 @@ export default class GetAttestations extends BaseCommand {
     accounts.forEach(async (accountAddress) => {
       console.log('Account address: ' + accountAddress)
       console.log('\tWallet address: ' + (await accountsContract.getWalletAddress(accountAddress)))
+      console.log(
+        '\tData-Encryption Key: ' + (await accountsContract.getDataEncryptionKey(accountAddress))
+      )
     })
   }
 
