@@ -1,6 +1,6 @@
 # Valora Accounts
 
-Behind every Valora wallet are two types of accounts: an externally owned account (EOA) and a meta-transaction wallet (MTW). EOAs are what most people think of when they imagine a blockchain wallet. EOAs are comprised of an ECDSA public/private key pair. With Valora, this EOA is generated and stored on the user's mobile device and backed up via the mnemonic phrase. A meta-transaction wallet on the other hand is a smart contract that can be used to interact with other smart contracts on behalf of an EOA. In this case you can think of the MTW as a proxy account and the EOA as the only controller of this account.
+Behind every Valora wallet are two types of accounts: an externally owned account (EOA) and a meta-transaction wallet (MTW). EOAs are what most people think of when they imagine a blockchain wallet. EOAs are comprised of an ECDSA public/private key pair from which the on-chain address is derived. With Valora, this EOA is generated and stored on the user's mobile device and backed up via the mnemonic phrase. A meta-transaction wallet on the other hand is a smart contract that can be used to interact with other smart contracts on behalf of an EOA. In this case you can think of the MTW as a proxy account and the EOA as the only controller of this account.
 
 ## Benefits of a Meta-Transaction Wallet
 
