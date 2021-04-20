@@ -10,7 +10,7 @@ import yargs from 'yargs'
 export const command = 'address-from-env'
 
 export const describe =
-  'command for fetching addresses (validator, load_testing, tx_node, bootnode and faucet) as specified by the current environment'
+  'command for fetching addresses for the different account types using the environment mnemonic'
 
 interface AccountAddressArgv extends CeloEnvArgv {
   index: number

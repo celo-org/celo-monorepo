@@ -1,31 +1,33 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { rootLogger as logger, TestUtils } from '@celo/phone-number-privacy-common'
-import { PhoneNumberUtils } from '@celo/utils'
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import {
+  GetQuotaResponse,
+  rootLogger as logger,
+  TestUtils,
+} from '@celo/phone-number-privacy-common'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import config from '../../src/config'
-import { GetQuotaResponse, getWalletAddress } from '../../src/signing/query-quota'
+import { getWalletAddress } from '../../src/signing/query-quota'
 
 require('dotenv').config()
 
-const { replenishQuota, getBlindedPhoneNumber, registerWalletAddress } = TestUtils.Utils
+const {
+  ACCOUNT_ADDRESS1,
+  ACCOUNT_ADDRESS2,
+  ACCOUNT_ADDRESS3,
+  BLINDED_PHONE_NUMBER,
+  IDENTIFIER,
+  PRIVATE_KEY1,
+  PRIVATE_KEY2,
+  PRIVATE_KEY3,
+} = TestUtils.Values
+const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
-const PRIVATE_KEY1 = '535029bfb19fe5440dbd549b88fbf5ee847b059485e4eafc2a3e3bdfbf9b31ac'
-const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
-const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
-const ACCOUNT_ADDRESS2 = privateKeyToAddress(PRIVATE_KEY2)
-const PRIVATE_KEY3 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff1d'
-const ACCOUNT_ADDRESS3 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY3))
-const PHONE_NUMBER = '+15555555555'
-const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
-const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
-const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 const DEFAULT_FORNO_URL = config.blockchain.provider
 
 const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
@@ -48,8 +50,7 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(400)
     })
 
-    xit('With invalid blindedQueryPhoneNumber', async () => {
-      // TODO: update input-validation.ts to detect invalid blindedQueryPhoneNumber
+    it('With invalid blindedQueryPhoneNumber', async () => {
       const response = await postToSignMessage('invalid', ACCOUNT_ADDRESS1, Date.now())
       expect(response.status).toBe(400)
     })

@@ -36,7 +36,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: VmTestnetArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   let onDeployFailed = () => Promise.resolve()
   if (argv.reset === true) {

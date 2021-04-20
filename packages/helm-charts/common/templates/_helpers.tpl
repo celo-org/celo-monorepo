@@ -183,11 +183,11 @@ fi
     exec geth \
       --port $PORT  \
 {{- if not (contains "rc1" .Release.Name) }}
-      "$BOOTNODE_FLAG" \
+      $BOOTNODE_FLAG \
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1100 }} \
+      --maxpeers {{ .maxpeers | default 1200 }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -378,6 +378,7 @@ if [ ! $NOT_SYNCING ]; then
   exit 1
 fi
 
+{{ if .Values.geth.fullnodeCheckBlockAge }}
 # then make sure that the latest block is new
 LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
 BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
@@ -400,7 +401,8 @@ if [ $BLOCK_AGE_SECONDS -gt $ALLOWED_AGE ]; then
   exit 1
 fi
 exit 0
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{- define "common.geth-exporter-container" -}}
 - name: geth-exporter

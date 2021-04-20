@@ -94,6 +94,11 @@ spec:
           echo -n "Generating Bootnode enode for the validator: "
           cat /root/.celo/bootnodeEnode
 
+          # Generate a fee recipient address if available
+          if celotooljs.sh generate address-from-env --help | grep tx_fee_recipient >/dev/null; then
+            celotooljs.sh generate account-address --mnemonic "$MNEMONIC" --accountType tx_fee_recipient --index 0 > /root/.celo/feeRecipientAddress
+          fi
+
           # If this validator is meant to be proxied
           if [[ ! -z "$PROXY_COUNT" ]]; then
             # Put the all the validator's proxy IP addresses into a comma separated string
@@ -164,7 +169,7 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
-          if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
+          if geth --help | grep 'proxy.proxyenodeurlpairs' >/dev/null; then
             PROXY_FLAG="--proxy.proxyenodeurlpairs"
           else
             PROXY_FLAG="--proxy.proxyenodeurlpair"
@@ -175,11 +180,24 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
           else
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --light.maxpeers=1000 --maxpeers=1200"
           fi
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
+
+          # Use a different fee recipient address if option available
+          set +e
+          geth --help | grep 'tx-fee-recipient' >/dev/null
+          tx_fee_available=$?
+          set -e
+          if [ $tx_fee_available -eq 0 ] && [ -f /root/.celo/feeRecipientAddress ] ; then
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --miner.validator ${ACCOUNT_ADDRESS}"
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --tx-fee-recipient $(cat /root/.celo/feeRecipientAddress)"
+          else
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+          fi
 
 {{ include  "common.bootnode-flag-script" . | indent 10 }}
 
@@ -206,13 +224,11 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --etherbase=${ACCOUNT_ADDRESS} \
             --syncmode=full \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
-            --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
             ${ADDITIONAL_FLAGS}

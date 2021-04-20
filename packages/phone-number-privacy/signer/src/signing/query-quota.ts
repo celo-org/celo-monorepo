@@ -2,6 +2,7 @@ import { NULL_ADDRESS } from '@celo/contractkit'
 import {
   authenticateUser,
   ErrorMessage,
+  GetQuotaRequest,
   hasValidAccountParam,
   isBodyReasonablySized,
   isVerified,
@@ -24,19 +25,6 @@ import { getContractKit } from '../web3/contracts'
 
 allSettled.shim()
 
-export interface GetQuotaRequest {
-  account: string
-  hashedPhoneNumber?: string
-  sessionID?: string
-}
-
-export interface GetQuotaResponse {
-  success: boolean
-  version: string
-  performedQueryCount: number
-  totalQuota: number
-}
-
 export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,
   response: Response
@@ -53,7 +41,7 @@ export async function handleGetQuota(
       respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
+    if (!(await authenticateUser(request, getContractKit() as any, logger))) {
       respondWithError(Endpoints.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
@@ -110,14 +98,20 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
+  const getWalletAddressMeter = Histograms.getBlindedSigInstrumentation
+    .labels('getWalletAddress')
+    .startTimer()
   const [_walletAddress, _isAccountVerified] = await Promise.allSettled([
     getWalletAddress(logger, account),
     new Promise((resolve) =>
       resolve(
-        hashedPhoneNumber ? isVerified(account, hashedPhoneNumber, getContractKit(), logger) : false
+        hashedPhoneNumber
+          ? isVerified(account, hashedPhoneNumber, getContractKit() as any, logger)
+          : false
       )
     ),
   ])
+  getWalletAddressMeter()
   let walletAddress = _walletAddress.status === 'fulfilled' ? _walletAddress.value : NULL_ADDRESS
   const isAccountVerified =
     _isAccountVerified.status === 'fulfilled' ? _isAccountVerified.value : false
@@ -153,6 +147,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     return quota
   }
 
+  const getBalancesMeter = Histograms.getBlindedSigInstrumentation.labels('balances').startTimer()
   let cUSDAccountBalance = new BigNumber(0)
   let celoAccountBalance = new BigNumber(0)
 
@@ -167,6 +162,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     cUSDAccountBalance = values[0] as BigNumber
     celoAccountBalance = values[1] as BigNumber
   })
+  getBalancesMeter()
 
   // Min balance can be in either cUSD or CELO
   if (
@@ -196,7 +192,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       transactionCount,
       quota,
     })
-
     return quota
   }
 
@@ -209,12 +204,14 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     quota: 0,
   })
   logger.debug({ account }, 'Account is not verified and does not meet min balance')
-
   return 0
 }
 
 export async function getTransactionCount(logger: Logger, ...addresses: string[]): Promise<number> {
-  return Promise.all(
+  const getTransactionCountMeter = Histograms.getBlindedSigInstrumentation
+    .labels('getTransactionCount')
+    .startTimer()
+  const res = Promise.all(
     addresses
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
@@ -229,6 +226,8 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
     logger.trace({ addresses, txCounts: values }, 'Fetched txCounts for addresses')
     return values.reduce((a, b) => a + b)
   })
+  getTransactionCountMeter()
+  return res
 }
 
 export async function getDollarBalance(logger: Logger, ...addresses: string[]): Promise<BigNumber> {

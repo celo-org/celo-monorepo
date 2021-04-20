@@ -38,7 +38,9 @@ export async function installHelmChart(
       blockscoutDBUsername,
       blockscoutDBPassword,
       blockscoutDBConnectionName
-    )
+    ),
+    true,
+    `values-${celoEnv}.yaml`
   )
 }
 
@@ -60,7 +62,13 @@ export async function upgradeHelmChart(
     blockscoutDBPassword,
     blockscoutDBConnectionName
   )
-  await upgradeGenericHelmChart(celoEnv, helmReleaseName, helmChartPath, params)
+  await upgradeGenericHelmChart(
+    celoEnv,
+    helmReleaseName,
+    helmChartPath,
+    params,
+    `values-${celoEnv}.yaml`
+  )
 
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }
@@ -92,6 +100,7 @@ async function helmParameters(
       celoEnv
     )}"`,
     `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
+    `--set blockscout.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
   ]
   if (useMetadataCrawler !== 'false') {
     params.push(

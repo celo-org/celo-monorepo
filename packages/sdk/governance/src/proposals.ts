@@ -9,6 +9,7 @@ import {
   parseDecodedParams,
 } from '@celo/connect'
 import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
+import { stripProxy, suffixProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 // tslint:disable: ordered-imports
 import {
@@ -26,6 +27,7 @@ import {
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
@@ -67,6 +69,19 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Governance' && tx.function === 'setConstitution'
+
+const registryRepointArgs = (tx: ProposalTransactionJSON) => {
+  if (!isRegistryRepoint(tx)) {
+    throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
+  }
+  return {
+    name: tx.args[0] as CeloContract,
+    address: tx.args[1] as string,
+  }
+}
+
 const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
   tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
 
@@ -100,12 +115,12 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     }
 
     if (isRegistryRepoint(jsonTx)) {
-      const [name, address] = jsonTx.args
-      await blockExplorer.updateContractDetailsMapping(name, address)
+      const args = registryRepointArgs(jsonTx)
+      await blockExplorer.updateContractDetailsMapping(stripProxy(args.name), args.address)
     } else if (isProxySetFunction(jsonTx)) {
-      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+      jsonTx.contract = suffixProxy(jsonTx.contract)
     } else if (isProxySetAndInitFunction(jsonTx)) {
-      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+      jsonTx.contract = suffixProxy(jsonTx.contract)
 
       // Transform delegate call initialize args into a readable params map
       const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
@@ -118,6 +133,19 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
         kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
       )
       jsonTx.params![`initialize@${initSig}`] = initParams
+    } else if (isGovernanceConstitutionSetter(jsonTx)) {
+      const [address, functionId, threshold] = jsonTx.args
+      const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
+      if (!contract || !abi) {
+        throw new Error(
+          `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
+        )
+      }
+      jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
+        contract,
+        method: abi.name,
+        threshold: fromFixed(new BigNumber(threshold)),
+      }
     }
 
     proposalJson.push(jsonTx)
@@ -204,9 +232,19 @@ export class ProposalBuilder {
     this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
+  setRegistryAddition = (contract: CeloContract, address: string) =>
+    (this.registryAdditions[stripProxy(contract)] = address)
+
+  getRegistryAddition = (contract: CeloContract): string | undefined =>
+    this.registryAdditions[stripProxy(contract)]
+
+  isRegistered = (contract: CeloContract) =>
+    RegisteredContracts.includes(stripProxy(contract)) ||
+    this.getRegistryAddition(contract) !== undefined
+
   fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     // handle sending value to unregistered contracts
-    if (!RegisteredContracts.includes(tx.contract)) {
+    if (!this.isRegistered(tx.contract)) {
       if (!isValidAddress(tx.contract)) {
         throw new Error(
           `Transaction to unregistered contract ${tx.contract} only supported by address`
@@ -220,16 +258,13 @@ export class ProposalBuilder {
     }
 
     // Account for canonical registry addresses from current proposal
-    let address = this.registryAdditions[tx.contract]
-
-    if (!address) {
-      address = await this.kit.registry.addressFor(tx.contract)
-    }
+    const address =
+      this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
 
     if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
-      this.registryAdditions[tx.args[0]] = tx.args[1]
-      this.registryAdditions[tx.args[0] + 'Proxy'] = tx.args[1]
+      const args = registryRepointArgs(tx)
+      this.setRegistryAddition(args.name, args.address)
     } else if (
       tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
       Array.isArray(tx.args[1])

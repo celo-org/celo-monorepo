@@ -1,7 +1,6 @@
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
-import { zip } from '@celo/base/lib/collections'
 import debugFactory from 'debug'
-import { CeloContract, RegisteredContracts } from './base'
+import { CeloContract, RegisteredContracts, stripProxy } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
 
@@ -27,9 +26,8 @@ export class AddressRegistry {
    */
   async addressFor(contract: CeloContract): Promise<Address> {
     if (!this.cache.has(contract)) {
-      const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const address = await this.registry.methods.getAddressForString(proxyStrippedContract).call()
+      const address = await this.registry.methods.getAddressForString(stripProxy(contract)).call()
 
       debug('Fetched address %s', address)
       if (!address || address === NULL_ADDRESS) {
@@ -45,7 +43,24 @@ export class AddressRegistry {
    * Get the address mapping for known registered contracts
    */
   async addressMapping() {
-    const addresses = await Promise.all(RegisteredContracts.map((r) => this.addressFor(r)))
-    return new Map(zip((r, a) => [r, a], RegisteredContracts, addresses))
+    const allContracts = await this.addressMappingWithNotDeployedContracts()
+    const contracts: Map<CeloContract, string> = new Map()
+    allContracts.forEach((value, key) => (value ? contracts.set(key, value) : undefined))
+    return contracts
+  }
+
+  async addressMappingWithNotDeployedContracts(notDeployedValue?: string) {
+    const contracts: Map<CeloContract, string | undefined> = new Map()
+    await Promise.all(
+      RegisteredContracts.map(async (r) => {
+        try {
+          const address = await this.addressFor(r)
+          contracts.set(r, address)
+        } catch {
+          contracts.set(r, notDeployedValue)
+        }
+      })
+    )
+    return contracts
   }
 }

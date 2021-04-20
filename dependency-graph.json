@@ -67,6 +67,7 @@
   "@celo/faucet-app": {
     "location": "packages/faucet",
     "dependencies": [
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
@@ -110,6 +111,7 @@
   "@celo/phone-number-privacy-common": {
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/identity",
       "@celo/utils"
@@ -285,6 +287,17 @@
   },
   "@celo/wallet-rpc": {
     "location": "packages/sdk/wallets/wallet-rpc",
+    "dependencies": [
+      "@celo/connect",
+      "@celo/contractkit",
+      "@celo/dev-utils",
+      "@celo/utils",
+      "@celo/wallet-base",
+      "@celo/wallet-remote"
+    ]
+  },
+  "@celo/wallet-walletconnect": {
+    "location": "packages/sdk/wallets/wallet-walletconnect",
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",

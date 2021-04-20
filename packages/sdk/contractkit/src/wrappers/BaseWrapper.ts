@@ -68,9 +68,7 @@ export const valueToFixidityString = (input: BigNumber.Value) =>
   toFixed(valueToBigNumber(input)).toFixed()
 
 export const valueToInt = (input: BigNumber.Value) =>
-  valueToBigNumber(input)
-    .integerValue()
-    .toNumber()
+  valueToBigNumber(input).integerValue().toNumber()
 
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
@@ -126,10 +124,7 @@ export const blocksToDurationString = (input: BigNumber.Value) =>
   secondsToDurationString(valueToBigNumber(input).times(5)) // TODO: fetch blocktime
 
 export const unixSecondsTimestampToDateString = (input: BigNumber.Value) =>
-  moment
-    .unix(valueToInt(input))
-    .local()
-    .format('llll [UTC]Z')
+  moment.unix(valueToInt(input)).local().format('llll [UTC]Z')
 
 // Type of bytes in solidity gets repesented as a string of number array by typechain and web3
 // Hopefull this will improve in the future, at which point we can make improvements here

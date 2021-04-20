@@ -21,7 +21,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: RevokeArgv) => {
-  await switchToClusterFromEnv(true)
+  await switchToClusterFromEnv(argv.celoEnv, true, false)
   console.info(`Sending invitation code to ${argv.phone}`)
   const cb = async () => {
     await execCmd(`yarn --cwd ../protocol run revoke -n ${argv.celoEnv} -p ${argv.phone}`)

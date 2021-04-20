@@ -34,7 +34,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     const balanceBefore = await kit.getTotalBalance(beneficiary)
     await Withdraw.run(['--contract', contractAddress, '--value', '10000000000000000000000'])
     const balanceAfter = await kit.getTotalBalance(beneficiary)
-    await expect(balanceBefore.CELO.toNumber()).toBeLessThan(balanceAfter.CELO.toNumber())
+    expect(balanceBefore.CELO!.toNumber()).toBeLessThan(balanceAfter.CELO!.toNumber())
   })
 
   test("can't withdraw the whole balance if there is a cUSD balance", async () => {
@@ -67,7 +67,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
 
     await Withdraw.run(['--contract', contractAddress, '--value', remainingBalance.toString()])
     const balanceAfter = await kit.getTotalBalance(beneficiary)
-    await expect(balanceBefore.CELO.toNumber()).toBeLessThan(balanceAfter.CELO.toNumber())
+    expect(balanceBefore.CELO!.toNumber()).toBeLessThan(balanceAfter.CELO!.toNumber())
 
     // Contract should self-destruct now
     await expect(releaseGoldWrapper.getRemainingUnlockedBalance()).rejects.toThrow()

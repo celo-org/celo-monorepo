@@ -1,24 +1,32 @@
-import { ContractSendMethod } from '@celo/connect'
-import { CeloContract, ContractKit } from '@celo/contractkit'
+import { ContractKit } from '@celo/contractkit'
 import {
-  AccountAuthRequest,
   AccountAuthResponseSuccess,
   DappKitRequestMeta,
   DappKitRequestTypes,
   DappKitResponseStatus,
   parseDappkitResponseDeeplink,
-  serializeDappKitRequestDeeplink,
-  SignTxRequest,
   SignTxResponseSuccess,
-  TxToSignParam,
 } from '@celo/utils'
-import { Linking } from 'expo'
+import { Linking, Platform } from 'react-native'
+import {
+  ANDROID_STORE_URL,
+  checkAccountAuth,
+  checkSignedTxs,
+  IOS_STORE_URL,
+  requestAccountAddressFactory,
+  requestTxSigFactory,
+  TxParams,
+  VALORA_APP_URL,
+} from './common'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
 } from '@celo/utils'
+// TODO: causes warnings for webpack/babel/expo, once prettier is upgraded use:
+// export type { TxParams } from './common'
+export { FeeCurrency, TxParams } from './common'
 
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
@@ -31,48 +39,6 @@ export function listenToAccount(callback: (account: string) => void) {
         callback(dappKitResponse.address)
       }
     } catch (error) {}
-  })
-}
-
-export function waitForAccountAuth(requestId: string): Promise<AccountAuthResponseSuccess> {
-  return new Promise((resolve, reject) => {
-    const handler = ({ url }: { url: string }) => {
-      try {
-        const dappKitResponse = parseDappkitResponseDeeplink(url)
-        if (
-          requestId === dappKitResponse.requestId &&
-          dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
-          dappKitResponse.status === DappKitResponseStatus.SUCCESS
-        ) {
-          Linking.removeEventListener('url', handler)
-          resolve(dappKitResponse)
-        }
-      } catch (error) {
-        reject(error)
-      }
-    }
-    Linking.addEventListener('url', handler)
-  })
-}
-
-export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
-  return new Promise((resolve, reject) => {
-    const handler = ({ url }: { url: string }) => {
-      try {
-        const dappKitResponse = parseDappkitResponseDeeplink(url)
-        if (
-          requestId === dappKitResponse.requestId &&
-          dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
-          dappKitResponse.status === DappKitResponseStatus.SUCCESS
-        ) {
-          Linking.removeEventListener('url', handler)
-          resolve(dappKitResponse)
-        }
-      } catch (error) {
-        reject(error)
-      }
-    }
-    Linking.addEventListener('url', handler)
   })
 }
 
@@ -90,36 +56,36 @@ export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
   })
 }
 
+function waitDecorator(
+  requestId: string,
+  checkCallback: (requestId: string, dappKitResponse: any) => boolean
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const handler = ({ url }: { url: string }) => {
+      try {
+        const dappKitResponse = parseDappkitResponseDeeplink(url)
+        if (checkCallback(requestId, dappKitResponse)) {
+          Linking.removeEventListener('url', handler)
+          resolve(dappKitResponse)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    }
+    Linking.addEventListener('url', handler)
+  })
+}
+
+export function waitForAccountAuth(requestId: string): Promise<AccountAuthResponseSuccess> {
+  return waitDecorator(requestId, checkAccountAuth)
+}
+
+export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
+  return waitDecorator(requestId, checkSignedTxs)
+}
+
 export function requestAccountAddress(meta: DappKitRequestMeta) {
-  Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
-}
-
-export enum FeeCurrency {
-  cUSD = 'cUSD',
-  cGLD = 'cGLD',
-}
-
-async function getFeeCurrencyContractAddress(
-  kit: ContractKit,
-  feeCurrency: FeeCurrency
-): Promise<string> {
-  switch (feeCurrency) {
-    case FeeCurrency.cUSD:
-      return kit.registry.addressFor(CeloContract.StableToken)
-    case FeeCurrency.cGLD:
-      return kit.registry.addressFor(CeloContract.GoldToken)
-    default:
-      return kit.registry.addressFor(CeloContract.StableToken)
-  }
-}
-
-export interface TxParams {
-  tx: ContractSendMethod
-  from: string
-  to?: string
-  feeCurrency?: FeeCurrency
-  estimatedGas?: number
-  value?: string
+  requestAccountAddressFactory(meta, openURLOrAppStore)
 }
 
 export async function requestTxSig(
@@ -127,35 +93,37 @@ export async function requestTxSig(
   txParams: TxParams[],
   meta: DappKitRequestMeta
 ) {
-  // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
-  const baseNonce = await kit.connection.nonce(txParams[0].from)
-  const txs: TxToSignParam[] = await Promise.all(
-    txParams.map(async (txParam, index) => {
-      const feeCurrency = txParam.feeCurrency ? txParam.feeCurrency : FeeCurrency.cGLD
-      const feeCurrencyContractAddress = await getFeeCurrencyContractAddress(kit, feeCurrency)
-      const value = txParam.value === undefined ? '0' : txParam.value
+  return requestTxSigFactory(kit, txParams, meta, openURLOrAppStore)
+}
 
-      const estimatedTxParams = {
-        feeCurrency: feeCurrencyContractAddress,
-        from: txParam.from,
-        value,
-      } as any
-      const estimatedGas =
-        txParam.estimatedGas === undefined
-          ? await txParam.tx.estimateGas(estimatedTxParams)
-          : txParam.estimatedGas
-
-      return {
-        txData: txParam.tx.encodeABI(),
-        estimatedGas,
-        nonce: baseNonce + index,
-        feeCurrencyAddress: feeCurrencyContractAddress,
-        value,
-        ...txParam,
+// Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded
+async function openURLOrAppStore(url: string) {
+  const openAppStore = async () => {
+    let storeURL: string
+    switch (Platform.OS) {
+      case 'ios': {
+        storeURL = IOS_STORE_URL
+        break
       }
-    })
-  )
-  const request = SignTxRequest(txs, meta)
+      case 'android': {
+        storeURL = ANDROID_STORE_URL
+        break
+      }
+      default: {
+        storeURL = VALORA_APP_URL
+        break
+      }
+    }
+    await Linking.openURL(storeURL)
+  }
 
-  Linking.openURL(serializeDappKitRequestDeeplink(request))
+  // IOS 13 fails for Linking.canOpenURL, but this should work for most platforms.
+  try {
+    await Linking.openURL(url)
+  } catch (error) {
+    console.error(error)
+    await openAppStore()
+    // Allow DApp developer to handle broken flow
+    throw Error('Error opening deeplink: App likely not installed')
+  }
 }

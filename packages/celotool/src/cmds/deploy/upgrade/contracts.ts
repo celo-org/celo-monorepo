@@ -25,7 +25,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: ContractsArgv) => {
   exitIfCelotoolHelmDryRun()
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   console.info(`Upgrading smart contracts on ${argv.celoEnv}`)
   const cb = async () => {
