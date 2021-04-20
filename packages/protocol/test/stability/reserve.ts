@@ -45,7 +45,7 @@ contract('Reserve', (accounts: string[]) => {
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
-    reserve = await Reserve.new()
+    reserve = await Reserve.new(true)
     registry = await Registry.new()
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
@@ -288,7 +288,7 @@ contract('Reserve', (accounts: string[]) => {
 
   describe('#addExchangeSpender(exchangeAddress)', () => {
     it('only allows owner', async () => {
-      await assertRevert(reserve.addExchangeSpender(nonOwner, { from: nonOwner }))
+      await assertRevert(reserve.addExchangeSpender(exchangeSpenderAddress, { from: nonOwner }))
     })
 
     it('should emit addExchangeSpender event on add', async () => {
@@ -308,12 +308,12 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it('has the right list of exchange spenders after addition', async () => {
+      const spendersBeforeAdditions = await reserve.getExchangeSpenders()
+      assert.deepEqual(spendersBeforeAdditions, [])
       await reserve.addExchangeSpender(exchangeAddress)
       await reserve.addExchangeSpender(accounts[1])
       const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders.length, 2)
-      assert.equal(spenders[0], exchangeAddress)
-      assert.equal(spenders[1], accounts[1])
+      assert.deepEqual(spenders, [exchangeAddress, accounts[1]])
     })
   })
 
@@ -323,7 +323,9 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it('only allows owner', async () => {
-      await assertRevert(reserve.removeExchangeSpender(nonOwner, 0, { from: nonOwner }))
+      await assertRevert(
+        reserve.removeExchangeSpender(exchangeSpenderAddress, 0, { from: nonOwner })
+      )
     })
 
     it('should emit removeExchangeSpender event on remove', async () => {
@@ -338,16 +340,10 @@ contract('Reserve', (accounts: string[]) => {
       })
     })
 
-    it('has the right list of exchange spenders', async () => {
-      const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders.length, 1)
-      assert.equal(spenders[0], exchangeSpenderAddress)
-    })
-
     it('has the right list of exchange after removing one', async () => {
       await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders.length, 0)
+      assert.deepEqual(spenders, [])
     })
 
     it("can't be removed twice", async () => {
@@ -363,8 +359,7 @@ contract('Reserve', (accounts: string[]) => {
       await reserve.addExchangeSpender(accounts[1])
       await reserve.removeExchangeSpender(exchangeSpenderAddress, 0)
       const spenders = await reserve.getExchangeSpenders()
-      assert.equal(spenders.length, 1)
-      assert.equal(spenders[0], accounts[1])
+      assert.deepEqual(spenders, [accounts[1]])
     })
 
     it("doesn't remove an address with the wrong index", async () => {
