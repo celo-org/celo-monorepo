@@ -12,6 +12,21 @@ When new users sign up with Valora, most wallets start with an empty balance. Th
 
 Meta-transaction wallets can also be useful if a user ever loses their phone and backup account key. Any ERC20 tokens that the EOA has [approved](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) their meta-transaction wallet to use, can be recovered. In the case of loss of EOA, a new EOA will be created and granted signer rights to the original MTW. This would allow the lost funds to still be accessed, even though the original EOA is unrecoverable. This recovery mechanism hasn't been rolled out yet, but is actively being worked on by cLabs.
 
+## For Wallet Developers
+
+When performing a payment to a Valora wallet, it's important that the address that is receiving funds is the EOA, and not the MTW since funds in the MTW are not displayed or directly accessible to Valora users. To look up a wallet using a phone number:
+
+1. Use ODIS to query the phone number pepper
+2. Use the phone number pepper to get the on-chain identifier
+3. Use the on-chain identifier to get the account address
+4. Use the account address to get the wallet address (EOA)
+
+The first two steps are covered extensively in [this guide](../../../developer-resources/contractkit/odis.md).
+To get the account address (step 3) you can use the [Attestation contract method `lookupAccountsForIdentifier`](https://github.com/celo-org/celo-monorepo/blob/e6fdaf798a662ffe2c12f9a74b28e0fa1c1f8101/packages/sdk/contractkit/src/wrappers/Attestations.ts#L472).
+To get the wallet address from the account (step 4) you can use the [Account contract method `getWalletAddress`](https://github.com/celo-org/celo-monorepo/blob/e6fdaf798a662ffe2c12f9a74b28e0fa1c1f8101/packages/sdk/contractkit/src/wrappers/Accounts.ts#L318).
+
+You can view a working example of this all tied together in [the `celocli` command `identity:get-attestations`](https://github.com/celo-org/celo-monorepo/blob/master/packages/cli/src/commands/identity/get-attestations.ts).
+
 ## For Dapp Developers
 
 ### EIP-712
