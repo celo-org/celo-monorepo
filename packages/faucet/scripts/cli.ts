@@ -113,7 +113,7 @@ yargs
         .option('faucetGoldAmount', {
           type: 'string',
         })
-        .option('faucetDollarAmount', {
+        .option('faucetStableAmount', {
           type: 'string',
         })
         .option('inviteGoldAmount', {
@@ -169,7 +169,7 @@ yargs
     (args) => {
       setConfig(args.net, {
         faucetGoldAmount: args.faucetGoldAmount,
-        faucetDollarAmount: args.faucetDollarAmount,
+        faucetStableAmount: args.faucetStableAmount,
         inviteGoldAmount: args.inviteGoldAmount,
         inviteDollarAmount: args.inviteDollarAmount,
         escrowDollarAmount: args.escrowDollarAmount,
@@ -199,7 +199,7 @@ function setConfig(network: string, config: Partial<NetworkConfig & TwilioParams
   const variables = [
     setIfPresent('node_url', config.nodeUrl),
     setIfPresent('faucet_gold_amount', config.faucetGoldAmount),
-    setIfPresent('faucet_dollar_amount', config.faucetDollarAmount),
+    setIfPresent('faucet_stable_amount', config.faucetStableAmount),
     setIfPresent('invite_gold_amount', config.inviteGoldAmount),
     setIfPresent('invite_dollar_amount', config.inviteDollarAmount),
     setIfPresent('escrow_dollar_amount', config.escrowDollarAmount),
