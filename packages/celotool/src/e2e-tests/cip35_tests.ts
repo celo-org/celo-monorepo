@@ -243,7 +243,6 @@ class TestEnv {
     const signingHash = ejsUtil.rlphash(arr)
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
-    // @ts-ignore
     arr.push(ejsUtil.bufferToHex(sig.v), ejsUtil.bufferToHex(sig.r), ejsUtil.bufferToHex(sig.s))
     return ejsUtil.bufferToHex(encode(arr))
   }
