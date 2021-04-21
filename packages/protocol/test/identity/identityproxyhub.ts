@@ -96,7 +96,6 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
     beforeEach(async () => {
       address = await identityProxyHub.getIdentityProxy(identifier)
-      await identityProxyHub.getOrDeployIdentityProxy(identifier)
     })
 
     describe('when called by a contract related to the identifier', () => {
