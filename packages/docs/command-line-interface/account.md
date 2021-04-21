@@ -28,6 +28,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
+  --globalHelp                                         View all available global flags
+
   --signature=0x                                       (required) Signature (a.k.a
                                                        proof-of-possession) of the
                                                        signer key
@@ -63,6 +65,9 @@ View Celo Dollar and Gold balances for an address
 USAGE
   $ celocli account:balance ADDRESS
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -90,6 +95,8 @@ OPTIONS
                                                      to set metadata for or an
                                                      authorized signer for the address
                                                      in the metadata
+
+  --globalHelp                                       View all available global flags
 
   --publicKey=publicKey                              The public key of the account that
                                                      others may use to send you
@@ -123,6 +130,8 @@ OPTIONS
                                                      authorized signer for the address
                                                      in the metadata
 
+  --globalHelp                                       View all available global flags
+
   --url=https://www.celo.org                         (required) The URL you want to
                                                      claim. Should begin http://
 
@@ -155,6 +164,8 @@ OPTIONS
                                                      authorized signer for the address
                                                      in the metadata
 
+  --globalHelp                                       View all available global flags
+
 EXAMPLE
   claim-domain ~/metadata.json --domain test.com --from
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
@@ -180,6 +191,8 @@ OPTIONS
                                                      to set metadata for or an
                                                      authorized signer for the address
                                                      in the metadata
+
+  --globalHelp                                       View all available global flags
 
   --username=username                                (required) The keybase username you
                                                      want to claim
@@ -210,6 +223,8 @@ OPTIONS
                                                      authorized signer for the address
                                                      in the metadata
 
+  --globalHelp                                       View all available global flags
+
   --name=name                                        (required) The name you want to
                                                      claim
 
@@ -238,6 +253,8 @@ OPTIONS
                                                      to set metadata for or an
                                                      authorized signer for the address
                                                      in the metadata
+
+  --globalHelp                                       View all available global flags
 
   --url=https://www.celo.org                         (required) The URL of the storage
                                                      root you want to claim
@@ -268,6 +285,8 @@ OPTIONS
                                                      authorized signer for the address
                                                      in the metadata
 
+  --globalHelp                                       View all available global flags
+
 EXAMPLE
   create-metadata ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
@@ -292,6 +311,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -314,8 +334,10 @@ USAGE
   $ celocli account:list
 
 OPTIONS
-  --local  If set, only show local and hardware wallet accounts. Use no-local to only
-           show keystore addresses.
+  --globalHelp  View all available global flags
+
+  --local       If set, only show local and hardware wallet accounts. Use no-local to
+                only show keystore addresses.
 ```
 
 _See code: [src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
@@ -332,6 +354,9 @@ USAGE
 
 ARGUMENTS
   ACCOUNT  Account address
+
+OPTIONS
+  --globalHelp  View all available global flags
 
 EXAMPLE
   lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -361,6 +386,9 @@ OPTIONS
       as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
       account requires knowledge of the mnemonic, passphrase (if any), and the derivation
       path
+
+  --globalHelp
+      View all available global flags
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish
@@ -413,6 +441,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Account Address
 
+  --globalHelp                                       View all available global flags
+
   --privateDEK=privateDEK
 
   --provider=(git|aws|gcp)                           If the CLI should attempt to push
@@ -443,6 +473,8 @@ OPTIONS
   --directory=directory     [default: .] To which directory data should be written
 
   --encryptTo=encryptTo
+
+  --globalHelp              View all available global flags
 
   --name=name               (required)
 
@@ -476,6 +508,8 @@ OPTIONS
                                                         account that needs to prove
                                                         possession of the signer key.
 
+  --globalHelp                                          View all available global flags
+
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer
                                                         key to prove possession of.
 
@@ -508,6 +542,9 @@ OPTIONS
       as an alias of the Ethereum derivation path ("m/44'/60'/0'"). Recreating the same
       account requires knowledge of the mnemonic, passphrase (if any), and the derivation
       path
+
+  --globalHelp
+      View all available global flags
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|kore
   an|spanish
@@ -553,6 +590,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --globalHelp                                       View all available global flags
   --name=name
 
 EXAMPLES
@@ -576,6 +614,8 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to
                                                      set the data encryption key for
+
+  --globalHelp                                       View all available global flags
 
   --publicKey=publicKey                              (required) The public key you want
                                                      to register
@@ -614,6 +654,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to
                                                      set metadata for
 
+  --globalHelp                                       View all available global flags
+
   --no-header                                        hide table header from output
 
   --no-truncate                                      do not truncate output to fit
@@ -647,6 +689,7 @@ USAGE
 
 OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --globalHelp                                          View all available global flags
   --name=name                                           (required)
 
 EXAMPLE
@@ -665,6 +708,9 @@ Show information for an account, including name, authorized vote, validator, and
 USAGE
   $ celocli account:show ADDRESS
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -680,6 +726,9 @@ Show information about claimed accounts
 
 USAGE
   $ celocli account:show-claimed-accounts ADDRESS
+
+OPTIONS
+  --globalHelp  View all available global flags
 
 EXAMPLE
   show-claimed-accounts 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -705,6 +754,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -733,6 +783,8 @@ OPTIONS
   --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until
                        the node exits by default.
 
+  --globalHelp         View all available global flags
+
   --password=password  Password used to unlock the account. If not specified, you will
                        be prompted for a password.
 
@@ -758,6 +810,8 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                         account that needs to prove
                                                         possession of the signer key.
+
+  --globalHelp                                          View all available global flags
 
   --signature=0x                                        (required) Signature (a.k.a.
                                                         proof-of-possession) of the

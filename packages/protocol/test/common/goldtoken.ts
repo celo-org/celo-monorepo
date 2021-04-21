@@ -31,7 +31,7 @@ contract('GoldToken', (accounts: string[]) => {
 
   beforeEach(async () => {
     freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
+    goldToken = await GoldToken.new(true)
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
@@ -40,14 +40,14 @@ contract('GoldToken', (accounts: string[]) => {
   describe('#name()', () => {
     it('should have a name', async () => {
       const name: string = await goldToken.name()
-      assert.equal(name, 'Celo Gold')
+      assert.equal(name, 'Celo native asset')
     })
   })
 
   describe('#symbol()', () => {
     it('should have a symbol', async () => {
       const name: string = await goldToken.symbol()
-      assert.equal(name, 'cGLD')
+      assert.equal(name, 'CELO')
     })
   })
 

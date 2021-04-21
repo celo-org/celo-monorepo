@@ -183,11 +183,11 @@ fi
     exec geth \
       --port $PORT  \
 {{- if not (contains "rc1" .Release.Name) }}
-      "$BOOTNODE_FLAG" \
+      $BOOTNODE_FLAG \
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1100 }} \
+      --maxpeers {{ .maxpeers | default 1200 }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \

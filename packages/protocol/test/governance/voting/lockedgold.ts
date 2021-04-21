@@ -12,7 +12,7 @@ import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
-  ElectionTestContract,
+  ElectionContract,
   ElectionTestInstance,
   LockedGoldContract,
   LockedGoldInstance,
@@ -30,7 +30,7 @@ import {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
-const ElectionTest: ElectionTestContract = artifacts.require('Election')
+const Election: ElectionContract = artifacts.require('Election')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
@@ -42,7 +42,7 @@ const Registry: RegistryContract = artifacts.require('Registry')
 LockedGold.numberFormat = 'BigNumber'
 // @ts-ignore
 // TODO(mcortesi): Use BN
-ElectionTest.numberFormat = 'BigNumber'
+Election.numberFormat = 'BigNumber'
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
@@ -476,7 +476,7 @@ contract('LockedGold', (accounts: string[]) => {
     const reporter = accounts[3]
 
     beforeEach(async () => {
-      election = await ElectionTest.new()
+      election = await Election.new(true)
       await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
       await election.initialize(
         registry.address,

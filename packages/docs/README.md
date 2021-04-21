@@ -115,7 +115,7 @@ Try Celo out:
 
 Read the Whitepapers:
 
-- [Main Celo Whitepaper](https://celo.org/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf) and [introductory blog post](https://medium.com/celohq/a-look-at-the-celo-whitepaper-c0061118ffd4)
+- [Main Celo Whitepaper](https://celo.org/papers/whitepaper) and [introductory blog post](https://medium.com/celohq/a-look-at-the-celo-whitepaper-c0061118ffd4)
 - [Stability Analysis Whitepaper](https://celo.org/papers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5)
 - [BFTree \(Longer Term Consensus Plan\)](https://storage.googleapis.com/celo_whitepapers/BFTree%20-%20Scaling%20HotStuff%20to%20Millions%20of%20Validators.pdf)
 
@@ -129,7 +129,7 @@ Alfajores Testnet links:
 Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
-- [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
+- [Celo Developer Chat on Discord](https://chat.celo.org)
 - [Celo Subreddit](https://www.reddit.com/r/celo/)
 - [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)

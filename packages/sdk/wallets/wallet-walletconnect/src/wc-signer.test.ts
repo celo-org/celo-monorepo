@@ -67,7 +67,7 @@ const testTx = {
 }
 const decryptMessage = 'Hello'
 
-const walletConnectBridge = process.env.WALLET_CONNECT_BRIGDE
+const walletConnectBridge = process.env.WALLET_CONNECT_BRIDGE
 const E2E = !!walletConnectBridge
 
 describe('WalletConnectWallet tests', () => {
@@ -77,6 +77,7 @@ describe('WalletConnectWallet tests', () => {
   wallet = new WalletConnectWallet({
     init: {
       relayProvider: walletConnectBridge,
+      logger: 'error',
     },
     connect: {
       metadata: {
@@ -190,7 +191,7 @@ describe('WalletConnectWallet tests', () => {
     })
   })
 
-  describe('with a new address', () => {
+  describe('with a known address', () => {
     it('hasAccount()', async () => {
       expect(wallet.hasAccount(testAddress)).toBeTruthy()
     })

@@ -17,7 +17,13 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
 
     for (const stableToken of stableTokensToTest) {
       test(`exchange ${stableToken} for CELO`, async () => {
-        await fundAccountWithStableToken(context, TestAccounts.Exchange, ONE.times(10), stableToken)
+        const stableTokenAmountToFund = ONE
+        await fundAccountWithStableToken(
+          context,
+          TestAccounts.Exchange,
+          stableTokenAmountToFund,
+          stableToken
+        )
         const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
 
         const from = await getKey(context.mnemonic, TestAccounts.Exchange)
@@ -28,22 +34,22 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
 
         const exchange = await initExchangeFromRegistry(stableToken, context.kit)
         const previousGoldBalance = await goldToken.balanceOf(from.address)
-        const goldAmount = await exchange.getBuyTokenAmount(ONE, false)
+        const stableTokenAmountToSell = stableTokenAmountToFund.times(0.5)
+        const goldAmount = await exchange.getBuyTokenAmount(stableTokenAmountToSell, false)
         logger.debug(
           { rate: goldAmount.toString(), stabletoken: stableToken },
           `quote selling ${stableToken}`
         )
 
-        const approveTx = await stableTokenInstance.approve(exchange.address, ONE.toString()).send()
+        const approveTx = await stableTokenInstance
+          .approve(exchange.address, stableTokenAmountToSell.toString())
+          .send()
         await approveTx.waitReceipt()
         const sellTx = await exchange
           .sell(
-            ONE,
+            stableTokenAmountToSell,
             // Allow 5% deviation from the quoted price
-            goldAmount
-              .times(0.95)
-              .integerValue(BigNumber.ROUND_DOWN)
-              .toString(),
+            goldAmount.times(0.95).integerValue(BigNumber.ROUND_DOWN).toString(),
             false
           )
           .send()
@@ -51,7 +57,6 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
         const receipt = await sellTx.waitReceipt()
         logger.debug({ stabletoken: stableToken, receipt }, `Sold ${stableToken}`)
 
-        // Sell more to receive at least 1 cUSD / cEUR back
         const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(
           previousGoldBalance
         )
@@ -73,10 +78,8 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
         const sellGoldTx = await exchange
           .sellGold(
             goldAmountToSell,
-            // Assume wee can get at least 80 cents back
-            ONE.times(0.8)
-              .integerValue(BigNumber.ROUND_DOWN)
-              .toString()
+            // Assume we can get at least 80 % back
+            stableTokenAmountToSell.times(0.8).integerValue(BigNumber.ROUND_DOWN).toString()
           )
           .send()
         const sellGoldReceipt = await sellGoldTx.waitReceipt()

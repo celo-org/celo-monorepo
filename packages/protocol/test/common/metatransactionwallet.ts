@@ -102,7 +102,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     wallet.executeTransaction(wallet.address, value, data, { from: signer })
 
   beforeEach(async () => {
-    wallet = await MetaTransactionWallet.new()
+    wallet = await MetaTransactionWallet.new(true)
     initializeRes = await wallet.initialize(signer)
   })
 
@@ -212,6 +212,76 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     describe('when called by the signer', () => {
       it('should revert', async () => {
         await assertRevert(wallet.setSigner(newSigner, { from: signer }))
+      })
+    })
+  })
+
+  describe('#setGuardian()', () => {
+    const guardian = accounts[4]
+
+    describe('when called by the wallet contract', () => {
+      let res
+      beforeEach(async () => {
+        // @ts-ignore
+        const data = wallet.contract.methods.setGuardian(guardian).encodeABI()
+        res = await executeOnSelf(data)
+      })
+      it('should set a new guardian', async () => {
+        assert.equal(await wallet.guardian(), guardian)
+      })
+      it('should emit the GuardianSet event', async () => {
+        assertLogMatches2(res.logs[0], {
+          event: 'GuardianSet',
+          args: {
+            guardian,
+          },
+        })
+      })
+    })
+
+    describe('when not called by the wallet contract', () => {
+      it('should revert', async () => {
+        await assertRevert(wallet.setGuardian(guardian, { from: nonSigner }))
+      })
+    })
+  })
+
+  describe('#recoverWallet()', () => {
+    const newSigner = accounts[3]
+    const guardian = accounts[4]
+    const nonGuardian = accounts[5]
+
+    describe('When the guardian is set', async () => {
+      let res
+      beforeEach(async () => {
+        // @ts-ignore
+        const data = wallet.contract.methods.setGuardian(guardian).encodeABI()
+        await executeOnSelf(data)
+      })
+
+      it('guardian should be able to recover wallet and update signer', async () => {
+        assert.notEqual(await wallet.signer(), newSigner)
+        res = await wallet.recoverWallet(newSigner, { from: guardian })
+        assert.equal(await wallet.signer(), newSigner)
+      })
+
+      it('should emit the SignerSet event', async () => {
+        assertLogMatches2(res.logs[1], {
+          event: 'WalletRecovered',
+          args: {
+            newSigner,
+          },
+        })
+      })
+
+      it('non guardian should not be able to recover wallet', async () => {
+        await assertRevert(wallet.recoverWallet(newSigner, { from: nonGuardian }))
+      })
+    })
+
+    describe('when the guardian is not set', () => {
+      it('should not be able to recover wallet', async () => {
+        await assertRevert(wallet.recoverWallet(newSigner, { from: guardian }))
       })
     })
   })

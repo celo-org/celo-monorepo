@@ -42,9 +42,7 @@ export async function storeRequest(request: GetBlindedMessagePartialSigRequest, 
   }
   logger.debug({ request }, 'Storing salt request')
   try {
-    await requests()
-      .insert(new Request(request))
-      .timeout(DB_TIMEOUT)
+    await requests().insert(new Request(request)).timeout(DB_TIMEOUT)
     return true
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()

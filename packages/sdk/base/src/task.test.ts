@@ -122,10 +122,7 @@ describe('repeatTask()', () => {
 
 describe('conditionWatcher()', () => {
   test('will execute onSuccess when condition triggers', async () => {
-    const pollCondition = jest
-      .fn()
-      .mockResolvedValueOnce(false)
-      .mockResolvedValueOnce(true)
+    const pollCondition = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true)
     const onSuccess = jest.fn()
 
     const task = conditionWatcher({
@@ -183,10 +180,7 @@ describe('tryObtainValueWithRetries()', () => {
     const task = tryObtainValueWithRetries({
       name: 'testGet',
       maxAttemps: 2,
-      tryGetValue: jest
-        .fn()
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce('HELLO'),
+      tryGetValue: jest.fn().mockResolvedValueOnce(null).mockResolvedValueOnce('HELLO'),
       timeInBetweenMS: 7,
     })
 
