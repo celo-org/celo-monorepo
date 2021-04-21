@@ -34,9 +34,9 @@ All off-chain observers can be immediately convinced of fraud (as they can check
 
 Instead, Optics guarantees the following:
 
-Fraud is costly
-All users can learn about fraud
-All users can block a fraudulent message before they are accepted
+- Fraud is costly
+- All users can learn about fraud
+- All users can block a fraudulent message before they are accepted
 
 In other words, rather than using a globally verifiable fraud-proof, Optics relies on local verification by participants. This tradeoff allows Optics to save 90% on gas fees compared to pessimistic relays, while still maintaining a high degree of security.
 
