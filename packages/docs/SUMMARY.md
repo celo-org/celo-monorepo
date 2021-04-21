@@ -6,6 +6,7 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
+- [Wallets](getting-started/wallets.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
@@ -16,6 +17,7 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Hosted nodes](getting-started/hosted-nodes.md)
 - [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
@@ -27,7 +29,9 @@
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
+- [Governance Cheat Sheet](celo-holder-guide/governance-cheat-sheet.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
+- [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
 
 ## Validator Guide
 
@@ -38,9 +42,12 @@
   - [Validator Signer Key Rotation](validator-guide/key-management/key-rotation.md)
 - [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
 - [Monitoring](validator-guide/monitoring.md)
+- [Devops Best Practices](validator-guide/devops-best-practices.md)
 - [Upgrading a Node](validator-guide/node-upgrades.md)
+- [Running Proxies](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
+- [Celo Signal](validator-guide/celo-signal.md)
 
 ## Developer Guide
 
@@ -48,9 +55,10 @@
 - [Code Examples](developer-resources/start.md)
   - [Sending CELO & cUSD](developer-resources/walkthroughs/hellocelo.md)
   - [Deploy a Contract (local node)](developer-resources/walkthroughs/hellocontracts.md)
-  - [Deploy a Contract (Forno)](developer-resources/walkthroughs/hello-contract-remote-node.md)
+  - [Deploy and Interact with Contracts (Remotely)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
+  - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
   <!-- - [The Celo Protocol]()
     - [Architecture]()
@@ -896,6 +904,7 @@
     - [Phone Number Privacy](celo-codebase/protocol/identity/phone-number-privacy.md)
     - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
+  - [Optics](celo-codebase/protocol/optics.md)
   - [Plumo Ultralight Sync](celo-codebase/protocol/plumo.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
@@ -937,7 +946,7 @@
 - [Release Process](community/release-process/README.md)
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
-  - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
+  - [Celocli and ContractKit](community/release-process/base-cli-contractkit-dappkit-utils.md)
   - [Attestation Service](community/release-process/attestation-service.md)
 
 ## Important Information

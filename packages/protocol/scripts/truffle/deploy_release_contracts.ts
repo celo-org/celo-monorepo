@@ -1,6 +1,6 @@
-import { retryTx } from '@celo/protocol/lib/proxy-utils'
-import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
-import { Address, isValidAddress } from '@celo/utils/src/address'
+import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+import { _setInitialProxyImplementation, retryTx } from '@celo/protocol/lib/web3-utils'
+import { Address, isValidAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs from 'fs'
@@ -22,8 +22,8 @@ let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
-const ONE_CGLD = web3.utils.toWei('1', 'ether')
-const TWO_CGLD = web3.utils.toWei('2', 'ether')
+const ONE_CELO = web3.utils.toWei('1', 'ether')
+const TWO_CELO = web3.utils.toWei('2', 'ether')
 const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 const ZERO_ADDRESS: Address = '0x0000000000000000000000000000000000000000'
 
@@ -60,14 +60,11 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
 
   let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
   if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    console.info('Total value of grant less than CELO for beneficiary addreess')
     return
   }
 
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(config.numReleasePeriods)
-    .dp(0)
+  const adjustedAmountPerPeriod = totalValue.minus(startGold).div(config.numReleasePeriods).dp(0)
 
   // Reflect any rounding changes from the division above
   totalValue = adjustedAmountPerPeriod.multipliedBy(config.numReleasePeriods)
@@ -86,7 +83,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     config.initialDistributionRatio,
     config.canValidate,
     config.canVote,
-    '0x000000000000000000000000000000000000ce10',
+    celoRegistryAddress,
   ]
 
   const bytecode = await web3.eth.getCode(config.beneficiary)
@@ -165,8 +162,9 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
-  const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
+  const releaseGoldInstance = await retryTx(ReleaseGold.new, [false, { from: fromAddress }])
 
+  console.info('Initializing ReleaseGoldProxy...')
   let releaseGoldTxHash
   try {
     releaseGoldTxHash = await _setInitialProxyImplementation(
@@ -233,7 +231,7 @@ async function checkBalance(config: ReleaseGoldConfig) {
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(config.numReleasePeriods)
-    .plus(ONE_CGLD) // Tx Fees
+    .plus(ONE_CELO) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -267,10 +265,10 @@ async function checkBalance(config: ReleaseGoldConfig) {
       )
       continue
     }
-    // Must be enough to handle 1cGLD test transfer and 1cGLD for transaction fees
-    if (fromBalance.gt(TWO_CGLD)) {
+    // Must be enough to handle 1CELO test transfer and 1CELO for transaction fees
+    if (fromBalance.gt(TWO_CELO)) {
       console.info(
-        '\nSending 1 cGLD as a test from ' +
+        '\nSending 1 CELO as a test from ' +
           fromAddress +
           ' to ' +
           addressResponse.newFromAddress +
@@ -280,14 +278,14 @@ async function checkBalance(config: ReleaseGoldConfig) {
         {
           from: fromAddress,
           to: addressResponse.newFromAddress,
-          value: ONE_CGLD,
+          value: ONE_CELO,
         },
       ])
       const confirmResponse = await prompts({
         type: 'confirm',
         name: 'confirmation',
         message:
-          'Please check the balance of your provided address. You should see the 1cGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
+          'Please check the balance of your provided address. You should see the 1CELO transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
       })
       if (!confirmResponse.confirmation) {
         console.info(chalk.red('Setting new address failed.\nRetrying.'))
@@ -299,7 +297,7 @@ async function checkBalance(config: ReleaseGoldConfig) {
         {
           from: fromAddress,
           to: addressResponse.newFromAddress,
-          value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
+          value: fromBalancePostTransfer.minus(ONE_CELO).toFixed(), // minus Tx Fees
         },
       ])
     }
@@ -547,7 +545,7 @@ async function handleJSONFile(data) {
       type: 'confirm',
       name: 'confirmation',
       message:
-        'Grants in provided json would send ' + totalValue.toString() + 'cGld.\nIs this OK (y/n)?',
+        'Grants in provided json would send ' + totalValue.toString() + 'CELO.\nIs this OK (y/n)?',
     })
 
     if (!response.confirmation) {

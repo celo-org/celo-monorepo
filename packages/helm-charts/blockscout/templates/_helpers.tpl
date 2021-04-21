@@ -63,15 +63,35 @@ the `volumes` section.
 */ -}}
 {{- define "celo.blockscout-db-sidecar" -}}
 - name: cloudsql-proxy
-  image: gcr.io/cloudsql-docker/gce-proxy:1.16
+  image: gcr.io/cloudsql-docker/gce-proxy:1.19.1
   command: ["/cloud_sql_proxy",
             "-instances={{ .Values.blockscout.db.connection_name }}{{ .DbSuffix | default "" }}=tcp:5432",
             "-credential_file=/secrets/cloudsql/credentials.json",
             "-term_timeout=30s"]
+  {{- if .Database.proxy.livenessProbe.enabled }}
+  livenessProbe:
+    tcpSocket:
+      port: {{ .Database.proxy.port }}
+    initialDelaySeconds: {{ .Database.proxy.livenessProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Database.proxy.livenessProbe.periodSeconds }}
+    timeoutSeconds: {{ .Database.proxy.livenessProbe.timeoutSeconds }}
+    successThreshold: {{ .Database.proxy.livenessProbe.successThreshold }}
+    failureThreshold: {{ .Database.proxy.livenessProbe.failureThreshold }}
+  {{- end }}
+  {{- if .Database.proxy.readinessProbe.enabled }}
+  readinessProbe:
+    tcpSocket:
+      port: {{ .Database.proxy.port }}
+    initialDelaySeconds: {{ .Database.proxy.readinessProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Database.proxy.readinessProbe.periodSeconds }}
+    timeoutSeconds: {{ .Database.proxy.readinessProbe.timeoutSeconds }}
+    successThreshold: {{ .Database.proxy.readinessProbe.successThreshold }}
+    failureThreshold: {{ .Database.proxy.readinessProbe.failureThreshold }}
+  {{- end }}
   resources:
     requests:
-      memory: 500Mi
-      cpu: 200m
+      memory: {{ .Database.proxy.resources.requests.memory }}
+      cpu: {{ .Database.proxy.resources.requests.cpu }}
   securityContext:
     runAsUser: 2  # non-root user
     allowPrivilegeEscalation: false
@@ -106,6 +126,8 @@ blockscout components.
   value: {{ .Values.blockscout.subnetwork }}
 - name: COIN
   value: cGLD
+- name: SEGMENT_KEY
+  value: {{ .Values.blockscout.segment_key }}
 - name: ECTO_USE_SSL
   value: "false"
 - name: ETHEREUM_JSONRPC_VARIANT

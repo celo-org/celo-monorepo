@@ -16,6 +16,10 @@ describe('attestations tests', () => {
     networkId: 1101,
     network: 'local',
     migrate: true,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator0',
@@ -59,12 +63,12 @@ describe('attestations tests', () => {
   let contractKit: ContractKit
   let Attestations: AttestationsWrapper
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     await context.hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await context.hooks.after()
   })
@@ -82,12 +86,12 @@ describe('attestations tests', () => {
   }
 
   describe('Attestations', () => {
-    before(async function() {
+    before(async function () {
       this.timeout(0)
       await restart()
     })
 
-    it('requests an attestation', async function(this: any) {
+    it('requests an attestation', async function (this: any) {
       this.timeout(10000)
 
       const approve = await Attestations.approveAttestationFee(2)

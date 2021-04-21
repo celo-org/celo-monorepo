@@ -67,6 +67,10 @@ contract StableToken is
 
   InflationState inflationState;
 
+  // The registry ID of the exchange contract with permission to mint and burn this token.
+  // Unique per StableToken instance.
+  bytes32 exchangeRegistryId;
+
   /**
    * @notice Recomputes and updates inflation factor if more than `updatePeriod`
    * has passed since last update.
@@ -90,7 +94,7 @@ contract StableToken is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -99,9 +103,10 @@ contract StableToken is
    * @param _decimals Tokens are divisible to this many decimal places.
    * @param registryAddress Address of the Registry contract.
    * @param inflationRate Weekly inflation rate.
-   * @param inflationFactorUpdatePeriod How often the inflation factor is updated.
+   * @param inflationFactorUpdatePeriod How often the inflation factor is updated, in seconds.
    * @param initialBalanceAddresses Array of addresses with an initial balance.
    * @param initialBalanceValues Array of balance values corresponding to initialBalanceAddresses.
+   * @param exchangeIdentifier String identifier of exchange in registry (for specific fiat pairs)
    */
   function initialize(
     string calldata _name,
@@ -111,7 +116,8 @@ contract StableToken is
     uint256 inflationRate,
     uint256 inflationFactorUpdatePeriod,
     address[] calldata initialBalanceAddresses,
-    uint256[] calldata initialBalanceValues
+    uint256[] calldata initialBalanceValues,
+    string calldata exchangeIdentifier
   ) external initializer {
     require(inflationRate != 0, "Must provide a non-zero inflation rate");
     require(inflationFactorUpdatePeriod > 0, "inflationFactorUpdatePeriod must be > 0");
@@ -134,6 +140,7 @@ contract StableToken is
       _mint(initialBalanceAddresses[i], initialBalanceValues[i]);
     }
     setRegistry(registryAddress);
+    exchangeRegistryId = keccak256(abi.encodePacked(exchangeIdentifier));
   }
 
   /**
@@ -216,7 +223,7 @@ contract StableToken is
    */
   function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
     require(
-      msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
+      msg.sender == registry.getAddressForOrDie(getExchangeRegistryId()) ||
         msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID),
       "Only the Exchange and Validators contracts are authorized to mint"
     );
@@ -265,7 +272,7 @@ contract StableToken is
    */
   function burn(uint256 value)
     external
-    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    onlyRegisteredContract(getExchangeRegistryId())
     updateInflationFactor
     returns (bool)
   {
@@ -381,6 +388,23 @@ contract StableToken is
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
     return _valueToUnits(updatedInflationFactor, value);
+  }
+
+  /**
+   * @notice Returns the exchange id in the registry of the corresponding fiat pair exchange.
+   * @dev When this storage is uninitialized, it falls back to the default EXCHANGE_REGISTRY_ID.
+   * exchangeRegistryId was introduced after the initial release of cUSD's StableToken,
+   * so exchangeRegistryId will be uninitialized for that contract. If cUSD's StableToken
+   * exchangeRegistryId were to be correctly initialized, this function could be deprecated
+   * in favor of using exchangeRegistryId directly.
+   * @return Registry id for the corresponding exchange.
+   */
+  function getExchangeRegistryId() public view returns (bytes32) {
+    if (exchangeRegistryId == bytes32(0)) {
+      return EXCHANGE_REGISTRY_ID;
+    } else {
+      return exchangeRegistryId;
+    }
   }
 
   /**

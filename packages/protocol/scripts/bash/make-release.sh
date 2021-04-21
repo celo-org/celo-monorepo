@@ -40,17 +40,8 @@ done
 [ -z "$INITIALIZE_DATA" ] && echo "Need to set the initialization data via the -i flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
-BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-git fetch --all --tags
-git checkout $BRANCH
-rm -rf build/contracts
-yarn build
-rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-mv build/contracts $BUILD_DIR
-cp migrationsConfig.js $BUILD_DIR/
-git checkout -
-cp $BUILD_DIR/migrationsConfig.js ./
-yarn build:ts
+source scripts/bash/release-lib.sh
+build_tag $BRANCH "/dev/null"
 
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \
@@ -59,5 +50,3 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --proposal $PROPOSAL \
   --from $FROM \
   --initialize_data $INITIALIZE_DATA $DRYRUN
-
-git checkout migrationsConfig.js

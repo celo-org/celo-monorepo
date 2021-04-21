@@ -1,6 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Counters, Labels } from '../../common/metrics'
+import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -14,10 +14,14 @@ function accounts() {
 export async function getPerformedQueryCount(account: string, logger: Logger): Promise<number> {
   logger.debug({ account }, 'Getting performed query count')
   try {
+    const getPerformedQueryCountMeter = Histograms.getBlindedSigInstrumentation
+      .labels('getPerformedQueryCount')
+      .startTimer()
     const queryCounts = await accounts()
       .select(ACCOUNTS_COLUMNS.numLookups)
       .where(ACCOUNTS_COLUMNS.address, account)
       .first()
+    getPerformedQueryCountMeter()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
@@ -28,9 +32,7 @@ export async function getPerformedQueryCount(account: string, logger: Logger): P
 }
 
 async function getAccountExists(account: string): Promise<boolean> {
-  const existingAccountRecord = await accounts()
-    .where(ACCOUNTS_COLUMNS.address, account)
-    .first()
+  const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
   return !!existingAccountRecord
 }
 
@@ -103,8 +105,6 @@ export async function setDidMatchmaking(account: string, logger: Logger) {
 }
 
 async function insertRecord(data: Account) {
-  await accounts()
-    .insert(data)
-    .timeout(DB_TIMEOUT)
+  await accounts().insert(data).timeout(DB_TIMEOUT)
   return true
 }

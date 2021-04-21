@@ -54,6 +54,8 @@ const authorizationTestDescriptions = {
   },
 }
 
+const isTest = true
+
 interface ReleaseGoldConfig {
   releaseStartTime: number
   releaseCliffTime: number
@@ -139,7 +141,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3: Web3
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-    releaseGoldInstance = await ReleaseGold.new()
+    releaseGoldInstance = await ReleaseGold.new(isTest)
     await goldTokenInstance.transfer(
       releaseGoldInstance.address,
       releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
@@ -174,7 +176,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     freezerInstance = await Freezer.new()
-    goldTokenInstance = await GoldToken.new()
+    goldTokenInstance = await GoldToken.new(true)
     lockedGoldInstance = await LockedGold.new()
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
@@ -859,14 +861,14 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         // The attestations signer does not send txs.
         if (authorizationTestDescriptions[key].subject !== 'attestationSigner') {
-          it(`should transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          it(`should transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
             const balance1 = await web3.eth.getBalance(authorized)
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
             const balance2 = await web3.eth.getBalance(authorized)
             assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
           })
         } else {
-          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
             const balance1 = await web3.eth.getBalance(authorized)
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
             const balance2 = await web3.eth.getBalance(authorized)
@@ -942,7 +944,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             )
           })
 
-          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
             const balance2 = await web3.eth.getBalance(newAuthorized)
             assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
           })
@@ -1698,9 +1700,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN)
-                .div(2)
-                .plus(1)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN).div(2).plus(1)
               await assertRevert(
                 releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
               )

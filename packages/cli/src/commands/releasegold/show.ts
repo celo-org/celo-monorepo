@@ -21,16 +21,20 @@ export default class Show extends ReleaseGoldBaseCommand {
       currentReleasedTotalAmount: await this.releaseGoldWrapper.getCurrentReleasedTotalAmount(),
     }
     const accounts = await this.kit.contracts.getAccounts()
-    const authorizedSigners = {
-      voter: await accounts.getVoteSigner(this.releaseGoldWrapper.address),
-      validator: await accounts.getValidatorSigner(this.releaseGoldWrapper.address),
-      attestations: await accounts.getAttestationSigner(this.releaseGoldWrapper.address),
-    }
+    const isAccount = await accounts.isAccount(this.releaseGoldWrapper.address)
+    const authorizedSigners = isAccount
+      ? {
+          voter: await accounts.getVoteSigner(this.releaseGoldWrapper.address),
+          validator: await accounts.getValidatorSigner(this.releaseGoldWrapper.address),
+          attestations: await accounts.getAttestationSigner(this.releaseGoldWrapper.address),
+        }
+      : { voter: null, validator: null, attestations: null }
     const releaseGoldInfo = {
       releaseGoldWrapperAddress: this.releaseGoldWrapper.address,
       beneficiary: await this.releaseGoldWrapper.getBeneficiary(),
       authorizedSigners,
       releaseOwner: await this.releaseGoldWrapper.getReleaseOwner(),
+      owner: await this.releaseGoldWrapper.getOwner(),
       refundAddress: await this.releaseGoldWrapper.getRefundAddress(),
       liquidityProvisionMet: await this.releaseGoldWrapper.getLiquidityProvisionMet(),
       canValidate: await this.releaseGoldWrapper.getCanValidate(),

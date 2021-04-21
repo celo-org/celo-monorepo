@@ -26,31 +26,33 @@ describe('governance tests', () => {
     })),
     genesisConfig: {
       epoch: EPOCH,
+      churritoBlock: 0,
+      donutBlock: 0,
     },
   }
 
   const context: any = getContext(gethConfig)
   let web3: Web3
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     await context.hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await context.hooks.after()
   })
 
   describe('Validator ordering', () => {
-    before(async function() {
+    before(async function () {
       this.timeout(0)
       web3 = new Web3('http://localhost:8545')
       await context.hooks.restart()
     })
 
-    it('properly orders validators randomly', async function(this: any) {
-      this.timeout(160000 /* 160 seconds */)
+    it('properly orders validators randomly', async function (this: any) {
+      this.timeout(320000 /* 320 seconds */)
       // If a consensus round fails during this test, the results are inconclusive.
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
       this.retries(2)

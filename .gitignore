@@ -46,6 +46,7 @@ local.properties
 # node.js
 #
 node_modules/
+dist/
 npm-debug.log
 yarn-error.log
 
@@ -89,3 +90,12 @@ packages/docs/_book/
 
 */.next/*
 .env.local
+
+# old packages
+packages/reserve-site/*
+packages/blockchain-api/*
+packages/komencikit/*
+packages/mobile/*
+packages/moonpay-auth/*
+packages/notification-service/*
+packages/react-components/*

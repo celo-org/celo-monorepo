@@ -1,5 +1,12 @@
-import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from 'src/lib/env-utils'
 import { Argv } from 'yargs'
+import {
+  addCeloEnvMiddleware,
+  doCheckOrPromptIfStagingOrProduction,
+  DynamicEnvVar,
+  envVar,
+  fetchEnv,
+  getDynamicEnvVarValue,
+} from './env-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
@@ -9,7 +16,9 @@ import { getClusterManager } from './k8s-cluster/utils'
 /**
  * Env vars corresponding to each value for the AksClusterConfig for a particular context
  */
-const contextAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+const contextAksClusterConfigDynamicEnvVars: {
+  [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar
+} = {
   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
   subscriptionId: DynamicEnvVar.AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.AZURE_TENANT_ID,
@@ -20,7 +29,9 @@ const contextAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig
 /**
  * Env vars corresponding to each value for the AwsClusterConfig for a particular context
  */
-const contextAwsClusterConfigDynamicEnvVars: { [k in keyof Omit<AwsClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+const contextAwsClusterConfigDynamicEnvVars: {
+  [k in keyof Omit<AwsClusterConfig, 'cloudProvider'>]: DynamicEnvVar
+} = {
   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
   clusterRegion: DynamicEnvVar.AWS_CLUSTER_REGION,
   resourceGroupTag: DynamicEnvVar.AWS_RESOURCE_GROUP_TAG,
@@ -29,7 +40,9 @@ const contextAwsClusterConfigDynamicEnvVars: { [k in keyof Omit<AwsClusterConfig
 /**
  * Env vars corresponding to each value for the GCPClusterConfig for a particular context
  */
-const contextGCPClusterConfigDynamicEnvVars: { [k in keyof Omit<GCPClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+const contextGCPClusterConfigDynamicEnvVars: {
+  [k in keyof Omit<GCPClusterConfig, 'cloudProvider'>]: DynamicEnvVar
+} = {
   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
   projectName: DynamicEnvVar.GCP_PROJECT_NAME,
   zone: DynamicEnvVar.GCP_ZONE,
@@ -58,10 +71,13 @@ export function getCloudProviderFromContext(context: string): CloudProvider {
  * @return an AksClusterConfig for the context
  */
 export function getAksClusterConfig(context: string): AksClusterConfig {
-  const azureDynamicEnvVars = getContextDynamicEnvVarValues(contextAksClusterConfigDynamicEnvVars, context)
+  const azureDynamicEnvVars = getContextDynamicEnvVarValues(
+    contextAksClusterConfigDynamicEnvVars,
+    context
+  )
   const clusterConfig: AksClusterConfig = {
     cloudProvider: CloudProvider.AZURE,
-    ...azureDynamicEnvVars
+    ...azureDynamicEnvVars,
   }
   return clusterConfig
 }
@@ -72,10 +88,13 @@ export function getAksClusterConfig(context: string): AksClusterConfig {
  * @return an AwsClusterConfig for the context
  */
 export function getAwsClusterConfig(context: string): AwsClusterConfig {
-  const awsDynamicEnvVars = getContextDynamicEnvVarValues(contextAwsClusterConfigDynamicEnvVars, context)
+  const awsDynamicEnvVars = getContextDynamicEnvVarValues(
+    contextAwsClusterConfigDynamicEnvVars,
+    context
+  )
   const clusterConfig: AwsClusterConfig = {
     cloudProvider: CloudProvider.AZURE,
-    ...awsDynamicEnvVars
+    ...awsDynamicEnvVars,
   }
   return clusterConfig
 }
@@ -86,12 +105,44 @@ export function getAwsClusterConfig(context: string): AwsClusterConfig {
  * @return an AwsClusterConfig for the context
  */
 export function getGCPClusterConfig(context: string): GCPClusterConfig {
-  const gcpDynamicEnvVars = getContextDynamicEnvVarValues(contextGCPClusterConfigDynamicEnvVars, context)
+  const gcpDynamicEnvVars = getContextDynamicEnvVarValues(
+    contextGCPClusterConfigDynamicEnvVars,
+    context
+  )
   const clusterConfig: GCPClusterConfig = {
     cloudProvider: CloudProvider.GCP,
-    ...gcpDynamicEnvVars
+    ...gcpDynamicEnvVars,
   }
   return clusterConfig
+}
+
+/**
+ * Helper function used to extract multiple dynamic env vars based on
+ * an object of dynamic props used for templating.
+ * @param dynamicEnvVars an object whose values correspond to the desired
+ *   dynamic env vars to fetch.
+ * @param dynamicProps the properties used for templatin the variables
+ * @param defaultValues Optional default values if the dynamic env vars are not found
+ * @return an object with the same keys as dynamicEnvVars, but the values are
+ *   the values of the dynamic env vars for the particular context
+ */
+export function getDynamicEnvVarValues<T, P extends object>(
+  dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
+  dynamicProps: P,
+  defaultValues?: { [k in keyof T]: string }
+): {
+  [k in keyof T]: string
+} {
+  return Object.keys(dynamicEnvVars).reduce((values: any, k: string) => {
+    const key = k as keyof T
+    const dynamicEnvVar = dynamicEnvVars[key]
+    const defaultValue = defaultValues ? defaultValues[key] : undefined
+    const value = getDynamicEnvVarValue(dynamicEnvVar, dynamicProps, defaultValue)
+    return {
+      ...values,
+      [key]: value,
+    }
+  }, {})
 }
 
 /**
@@ -111,26 +162,18 @@ export function getContextDynamicEnvVarValues<T>(
 ): {
   [k in keyof T]: string
 } {
-  return Object.keys(dynamicEnvVars).reduce(
-    (values: any, k: string) => {
-      const key = k as keyof T
-      const dynamicEnvVar = dynamicEnvVars[key]
-      const defaultValue = defaultValues ? defaultValues[key] : undefined
-      const value = getDynamicEnvVarValue(dynamicEnvVar, {
-        context
-      }, defaultValue)
-      return {
-        ...values,
-        [key]: value,
-      }
-    },
-  {})
+  return getDynamicEnvVarValues(dynamicEnvVars, { context }, defaultValues)
 }
 
 /**
  * Reads the context and switches to the appropriate Azure or AWS Cluster
  */
-export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction: boolean = true) {
+export async function switchToContextCluster(
+  celoEnv: string,
+  context: string,
+  checkOrPromptIfStagingOrProduction: boolean = true,
+  skipClusterSetup: boolean = false
+) {
   if (!isValidContext(context)) {
     throw Error(`Invalid context, must be one of ${fetchEnv(envVar.CONTEXTS)}`)
   }
@@ -138,7 +181,7 @@ export async function switchToContextCluster(celoEnv: string, context: string, c
     await doCheckOrPromptIfStagingOrProduction()
   }
   const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
-  await clusterManager.switchToClusterContext()
+  await clusterManager.switchToClusterContext(skipClusterSetup, context)
   return clusterManager
 }
 
@@ -148,6 +191,10 @@ export function getClusterManagerForContext(celoEnv: string, context: string) {
   return getClusterManager(cloudProvider, celoEnv, clusterConfig)
 }
 
+export function getClusterConfigForContext(context: string) {
+  const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
+  return clusterConfigGetterByCloudProvider[cloudProvider](context)
+}
 
 /**
  * yargs argv type for an command that requires a context
@@ -163,9 +210,7 @@ export interface ContextArgv {
  * (must start with letter and not end with an underscore), it will throw.
  */
 export function coerceContext(rawContextStr: string) {
-  const context = rawContextStr
-    .toUpperCase()
-    .replace(/-/g, '_')
+  const context = rawContextStr.toUpperCase().replace(/-/g, '_')
   if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
     throw Error(`Invalid context. Raw ${rawContextStr}, implied ${context}`)
   }
@@ -173,9 +218,7 @@ export function coerceContext(rawContextStr: string) {
 }
 
 export function readableContext(context: string) {
-  const readable = context
-    .toLowerCase()
-    .replace(/_/g, '-')
+  const readable = context.toLowerCase().replace(/_/g, '-')
   if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
     throw Error(`Invalid context. Context ${context}, readable ${readable}`)
   }
@@ -183,8 +226,7 @@ export function readableContext(context: string) {
 }
 
 export function isValidContext(context: string) {
-  const validContexts = fetchEnv(envVar.CONTEXTS)
-    .split(',')
+  const validContexts = fetchEnv(envVar.CONTEXTS).split(',')
   const validContextsCoerced = validContexts.map(coerceContext)
   return validContextsCoerced.includes(context)
 }
@@ -194,11 +236,13 @@ export function isValidContext(context: string) {
  * Must be one of the contexts specified in the environment
  * variable CONTEXTS.
  */
+export function addOptionalContextMiddleware(argv: Argv) {
+  return addCeloEnvMiddleware(argv).option('context', {
+    description: 'Context to perform the deployment in',
+    type: 'string',
+  })
+}
+
 export function addContextMiddleware(argv: Argv) {
-  return addCeloEnvMiddleware(argv)
-    .option('context', {
-      description: 'Context to perform the deployment in',
-      type: 'string',
-    })
-    .coerce('context', coerceContext)
+  return addOptionalContextMiddleware(argv).coerce('context', coerceContext)
 }

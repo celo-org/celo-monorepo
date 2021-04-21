@@ -13,9 +13,10 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
-  const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<
-    GovernanceApproverMultiSigInstance
-  >(CeloContractName.GovernanceApproverMultiSig, artifacts)
+  const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<GovernanceApproverMultiSigInstance>(
+    CeloContractName.GovernanceApproverMultiSig,
+    artifacts
+  )
   const networkFrom: string = require('@celo/protocol/truffle-config.js').networks[networkName].from
   const approver: string = config.governanceApproverMultiSig.useMultiSig
     ? governanceApproverMultiSig.address
@@ -81,6 +82,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'EpochRewards',
       'Escrow',
       'Exchange',
+      'ExchangeEUR',
       'FeeCurrencyWhitelist',
       'Freezer',
       'GasPriceMinimum',
@@ -93,6 +95,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Reserve',
       'SortedOracles',
       'StableToken',
+      'StableTokenEUR',
       'Validators',
     ]
 

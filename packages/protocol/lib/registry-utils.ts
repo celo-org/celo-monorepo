@@ -1,3 +1,11 @@
+/**
+ * Be careful when adding to this file or relying on this file.
+ * The verification tooling uses the CeloContractName enum as a
+ * source of truth for what contracts are considered "core" and
+ * need to be checked for backwards compatability and bytecode on
+ * an environment.
+ */
+
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
 export enum CeloContractName {
@@ -10,6 +18,7 @@ export enum CeloContractName {
   EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
+  ExchangeEUR = 'ExchangeEUR',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -23,18 +32,17 @@ export enum CeloContractName {
   ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
+  StableTokenEUR = 'StableTokenEUR',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 
-// TODO(amy): Pull this list from the build artifacts instead
 export const usesRegistry = [
   CeloContractName.Escrow,
   CeloContractName.Reserve,
   CeloContractName.StableToken,
 ]
 
-// TODO(amy): Find another way to create this list
 export const hasEntryInRegistry: string[] = [
   CeloContractName.Accounts,
   CeloContractName.Attestations,
