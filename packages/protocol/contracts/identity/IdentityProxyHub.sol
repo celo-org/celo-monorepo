@@ -49,7 +49,7 @@ contract IdentityProxyHub is UsingRegistry {
    * @return True if the given address is the likely owner of the given
    * identifier, false otherwise.
    */
-  function passesIdentityHeuristic(address addr, bytes32 identifier) public returns (bool) {
+  function passesIdentityHeuristic(address addr, bytes32 identifier) public view returns (bool) {
     IAttestations attestations = getAttestations();
     (uint32 completed, uint32 requested) = attestations.getAttestationStats(identifier, addr);
 
