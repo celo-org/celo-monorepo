@@ -22,7 +22,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
     it('can be used to forward calls', async () => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
-      await identityProxy.makeCall(identityProxyTest.address, 0, txData)
+      await identityProxy.makeCall(identityProxyTest.address, txData)
       const x = await identityProxyTest.x()
       assert.equal(x.toNumber(), 42)
     })
@@ -30,7 +30,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
     it('makes calls from the address of the proxy', async () => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await identityProxy.makeCall(identityProxyTest.address, 0, txData)
+      await identityProxy.makeCall(identityProxyTest.address, txData)
       const address = await identityProxyTest.lastAddress()
       assert.equal(address, identityProxy.address)
     })
@@ -39,7 +39,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
       await assertRevert(
-        identityProxy.makeCall(identityProxyTest.address, 0, txData, { from: accounts[1] })
+        identityProxy.makeCall(identityProxyTest.address, txData, { from: accounts[1] })
       )
     })
   })

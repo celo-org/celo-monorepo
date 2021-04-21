@@ -109,7 +109,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
       it('forwards calls to the destination', async () => {
         // @ts-ignore
         const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
-        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
         const x = await identityProxyTest.x()
         assert.equal(x.toNumber(), 42)
       })
@@ -123,7 +123,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
         // @ts-ignore
         const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
-        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
         const x = await identityProxyTest.x()
         assert.equal(x.toNumber(), 42)
       })
@@ -135,7 +135,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
         // @ts-ignore
         const txData = identityProxyTest.contract.methods.setX(42).encodeABI()
-        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
         const x = await identityProxyTest.x()
         assert.equal(x.toNumber(), 42)
       })
@@ -143,9 +143,24 @@ contract('IdentityProxyHub', (accounts: string[]) => {
       it('forwards a call through the proxy related to the identifier', async () => {
         // @ts-ignore
         const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-        await identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
         const addressThatCalled = await identityProxyTest.lastAddress()
         assert.equal(address, addressThatCalled)
+      })
+
+      it('can send a payment', async () => {
+        const balanceBefore = await web3.eth.getBalance(identityProxyTest.address)
+        // @ts-ignore
+        const txData = identityProxyTest.contract.methods.payMe().encodeABI()
+        // @ts-ignore
+        await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData, {
+          value: 100,
+        })
+        const proxyBalance = await web3.eth.getBalance(address)
+        const balanceAfter = await web3.eth.getBalance(identityProxyTest.address)
+        assert.equal(balanceBefore, 0)
+        assert.equal(proxyBalance, 0)
+        assert.equal(balanceAfter, 100)
       })
     })
 
@@ -155,9 +170,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(
-        identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
-      )
+      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
     })
 
     it('fails to call if sender does not have more than 50% attestation completions', async () => {
@@ -174,9 +187,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(
-        identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
-      )
+      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
     })
 
     it('fails to call if another address has more attestations completed', async () => {
@@ -191,9 +202,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(
-        identityProxyHub.makeCall(identifier, identityProxyTest.address, 0, txData)
-      )
+      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
     })
   })
 })

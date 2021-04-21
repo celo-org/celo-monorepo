@@ -84,14 +84,11 @@ contract IdentityProxyHub is UsingRegistry {
    * assuming msg.sender passes the identity heuristic.
    * @param identifier The identifier whose IdentityProxy to call through.
    * @param destination The address the IdentityProxy should call.
-   * @param value The value of native token the IdentityProxy should transfer.
    * @param data The calldata the IdentityProxy should send with the call.
    */
-  function makeCall(bytes32 identifier, address destination, uint256 value, bytes calldata data)
-    external
-  {
+  function makeCall(bytes32 identifier, address destination, bytes calldata data) external payable {
     require(passesIdentityHeuristic(msg.sender, identifier));
-    getOrDeployIdentityProxy(identifier).makeCall(destination, value, data);
+    getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
   }
 
   function deployIdentityProxy(bytes32 identifier) internal returns (IdentityProxy) {
