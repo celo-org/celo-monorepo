@@ -48,7 +48,8 @@ export default class GetAttestations extends BaseCommand {
       throw Error('Must specify either --from or --pepper or --identifier')
     }
     const network = res.flags.network
-    const attestations = await this.kit.contracts.getAttestations()
+    const attestationsContract = await this.kit.contracts.getAttestations()
+    const accountsContract = await this.kit.contracts.getAccounts()
 
     if (!identifier) {
       if (!phoneNumber) {
@@ -68,7 +69,14 @@ export default class GetAttestations extends BaseCommand {
       identifier = computedIdentifier!
       console.log('Identifier: ' + identifier)
     }
-    console.log('Accounts:\n' + (await attestations.lookupAccountsForIdentifier(identifier)))
+    const accounts = await attestationsContract.lookupAccountsForIdentifier(identifier)
+    accounts.forEach(async (accountAddress) => {
+      console.log('Account address: ' + accountAddress)
+      console.log('\tWallet address: ' + (await accountsContract.getWalletAddress(accountAddress)))
+      console.log(
+        '\tData-Encryption Key: ' + (await accountsContract.getDataEncryptionKey(accountAddress))
+      )
+    })
   }
 
   async getPhoneNumberPepper(
