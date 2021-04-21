@@ -16,6 +16,7 @@ USAGE
 OPTIONS
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
   --value=value                                      (required) Amount to transfer (in
@@ -41,6 +42,7 @@ USAGE
 OPTIONS
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
   --value=value                                      (required) Amount to transfer (in
@@ -66,6 +68,7 @@ USAGE
 OPTIONS
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
   --value=value                                      (required) Amount to transfer (in
@@ -91,6 +94,7 @@ USAGE
 OPTIONS
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
   --value=value                                      (required) Amount to transfer (in
@@ -116,6 +120,7 @@ USAGE
 OPTIONS
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
   --stableToken=(cUSD|cusd|cEUR|ceur)                Name of the stable to be transfered
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
