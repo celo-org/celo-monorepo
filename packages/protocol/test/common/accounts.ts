@@ -370,8 +370,9 @@ contract('Accounts', (accounts: string[]) => {
   })
 
   describe('generic authorization', () => {
-    const signer = accounts[1]
-    const signer2 = accounts[2]
+    const account2 = accounts[1]
+    const signer = accounts[2]
+    const signer2 = accounts[3]
     const role = keccak256('Test Role')
     const role2 = keccak256('Test Role 2')
     let sig, sig2
@@ -380,6 +381,7 @@ contract('Accounts', (accounts: string[]) => {
       sig = await getParsedSignatureOfAddress(web3, account, signer)
       sig2 = await getParsedSignatureOfAddress(web3, account, signer2)
       await accountsInstance.createAccount()
+      await accountsInstance.createAccount({ from: account2 })
     })
 
     it('should set the authorized signer in two steps', async () => {
@@ -448,6 +450,23 @@ contract('Accounts', (accounts: string[]) => {
       assert.isTrue(await accountsInstance.isSigner(account, signer, role2))
       assert.equal(await accountsInstance.authorizedBy(signer), account)
       assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
+    })
+
+    it('signer cannot be authorized by two accounts', async () => {
+      const sigOne = await getParsedSignatureOfAddress(web3, account, signer)
+      const sigTwo = await getParsedSignatureOfAddress(web3, account2, signer)
+
+      await accountsInstance.authorizeSignerWithSignature(
+        signer,
+        role,
+        sigOne.v,
+        sigOne.r,
+        sigOne.s
+      )
+      await assertRevert(
+        accountsInstance.authorizeSignerWithSignature(signer, role, sigTwo.v, sigTwo.r, sigTwo.s),
+        'Cannot re-authorize address or locked gold account for another account'
+      )
     })
 
     it('can set the default signer for a role', async () => {
