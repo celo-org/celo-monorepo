@@ -40,9 +40,9 @@ As an example of a common stablecoin swap, you can exchange CELO for cUSD using 
 celocli exchange:celo --value <VALUE-TO-EXCHANGE> --from $CELO_ACCOUNT_ADDRESS
 ```
 
-## Transfer Native Assets
+## Transfer Stablecoins
 
-When you have sufficient balance, you can send Celo native assets such as cUSD to other accounts. Note that the unit of value is cUSD Wei (1 cUSD = 10^18 cUSD Wei).
+When you have sufficient balance, you can send stablecoins such as cUSD to other accounts. Note that the unit of value is cUSD Wei (1 cUSD = 10^18 cUSD Wei).
 
 ```
 celocli transfer:dollars --from $CELO_ACCOUNT_ADDRESS --to <RECIPIENT-ADDRESS> --value <VALUE-TO-TRANSFER>
