@@ -7,6 +7,7 @@ import { LocalWallet } from '@celo/wallet-local'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
+import chalk from 'chalk'
 import net from 'net'
 import Web3 from 'web3'
 import { getGasCurrency, getNodeUrl } from './utils/config'
@@ -70,6 +71,11 @@ export abstract class BaseCommand extends Command {
       hidden: true,
       description: 'Set it to ask confirmation for the address of the transaction from the ledger',
     }),
+    globalHelp: flags.boolean({
+      default: false,
+      hidden: false,
+      description: 'View all available global flags',
+    }),
   }
   // This specifies whether the node needs to be synced before the command
   // can be run. In most cases, this should be `true`, so that's the default.
@@ -119,7 +125,16 @@ export abstract class BaseCommand extends Command {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
     }
+
     const res: ParserOutput<any, any> = this.parse()
+    if (res.flags.globalHelp) {
+      console.log(chalk.red.bold('GLOBAL OPTIONS'))
+      Object.entries(BaseCommand.flags).forEach(([name, flag]) => {
+        console.log(chalk.black(`  --${name}`).padEnd(40) + chalk.gray(`${flag.description}`))
+      })
+      process.exit(0)
+    }
+
     if (res.flags.useLedger) {
       let transport: Transport
       try {
