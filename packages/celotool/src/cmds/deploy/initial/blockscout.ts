@@ -5,6 +5,7 @@ import {
   installHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
@@ -12,7 +13,6 @@ import {
   grantRoles,
   isCelotoolHelmDryRun,
 } from 'src/lib/helm_deploy'
-import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { createServiceAccountIfNotExists } from 'src/lib/service-account-utils'
 import { InitialArgv } from '../../deploy/initial'
 
