@@ -1,6 +1,10 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
+import {
+  buildAuthorizeSignerTypedData,
+  getParsedSignatureOfAddress,
+} from '@celo/protocol/lib/signing-utils'
 import { assertLogMatches, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { upperFirst } from 'lodash'
@@ -22,6 +26,9 @@ contract('Accounts', (accounts: string[]) => {
   const account = accounts[0]
   const caller = accounts[0]
 
+  let kit: ContractKit
+  let chainId: number
+
   const name = 'Account'
   const metadataURL = 'https://www.celo.org'
   const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
@@ -34,7 +41,11 @@ contract('Accounts', (accounts: string[]) => {
     mockValidators = await MockValidators.new()
     const registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await accountsInstance.initialize(registry.address)
+
+    kit = newKitFromWeb3(web3)
+    chainId = await kit.connection.chainId()
   })
 
   describe('#createAccount', () => {
@@ -369,7 +380,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('generic authorization', () => {
+  describe.only('generic authorization', () => {
     const account2 = accounts[1]
     const signer = accounts[2]
     const signer2 = accounts[3]
@@ -378,8 +389,26 @@ contract('Accounts', (accounts: string[]) => {
     let sig, sig2
 
     beforeEach(async () => {
-      sig = await getParsedSignatureOfAddress(web3, account, signer)
-      sig2 = await getParsedSignatureOfAddress(web3, account, signer2)
+      sig = await kit.connection.signTypedData(
+        signer,
+        buildAuthorizeSignerTypedData({
+          account,
+          signer,
+          role,
+          accountsContractAddress: accountsInstance.address,
+          chainId,
+        })
+      )
+      sig2 = await kit.connection.signTypedData(
+        signer,
+        buildAuthorizeSignerTypedData({
+          account,
+          signer,
+          role: role2,
+          accountsContractAddress: accountsInstance.address,
+          chainId,
+        })
+      )
       await accountsInstance.createAccount()
       await accountsInstance.createAccount({ from: account2 })
     })
@@ -395,9 +424,36 @@ contract('Accounts', (accounts: string[]) => {
       assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
     })
 
-    it('should set the authorized signer in one step', async () => {
+    it.only('should set the authorized signer in one step with signature', async () => {
       assert.isFalse(await accountsInstance.isSigner(account, signer, role))
-      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+
+      console.log('Account', account)
+      console.log('Signer', signer)
+
+      try {
+        console.log(
+          '>>> testing',
+          await accountsInstance.getRoleAuthorizationSigner(
+            account,
+            signer,
+            role,
+            sig.v,
+            sig.r,
+            sig.s
+          )
+        )
+
+        const a = await accountsInstance.authorizeSignerWithSignature(
+          signer,
+          role,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+        console.log(JSON.stringify(a, null, 2))
+      } catch (e) {
+        console.log(e)
+      }
 
       assert.isTrue(await accountsInstance.isSigner(account, signer, role))
       assert.equal(await accountsInstance.authorizedBy(signer), account)

@@ -2,6 +2,7 @@
 
 import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { EIP712TypedData } from '@celo/utils/src/sign-typed-data-utils'
 import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
 import _ from 'underscore'
 import Web3 from 'web3'
@@ -30,6 +31,46 @@ export const getParsedSignatureOfAddress = async (web3: Web3, address: string, s
   const signature = await web3.eth.sign(addressHash, signer)
   return parseSignature(addressHash, signature, signer)
 }
+
+export const buildAuthorizeSignerTypedData = ({
+  account,
+  signer,
+  chainId,
+  role,
+  accountsContractAddress,
+}: {
+  chainId: number
+  signer: string
+  account: string
+  role: string
+  accountsContractAddress: string
+}): EIP712TypedData => ({
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    AuthorizeSigner: [
+      { name: 'account', type: 'address' },
+      { name: 'signer', type: 'address' },
+      { name: 'role', type: 'bytes32' },
+    ],
+  },
+  primaryType: 'AuthorizeSigner',
+  domain: {
+    name: 'Celo Core Contracts',
+    version: '1.0',
+    chainId,
+    verifyingContract: accountsContractAddress,
+  },
+  message: {
+    account,
+    signer,
+    role,
+  },
+})
 
 export async function signTransaction(web3: Web3, txn: any, privateKey: string) {
   let result: any
@@ -81,9 +122,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
         privateKey
       )
 
-      const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 9)
-        .concat(Account.decodeSignature(signature))
+      const rawTx = RLP.decode(rlpEncoded).slice(0, 9).concat(Account.decodeSignature(signature))
 
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))

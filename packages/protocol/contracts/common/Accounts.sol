@@ -87,6 +87,11 @@ contract Accounts is
   bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
 
+  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
+    "AuthorizeSigner(address account,address signer,bytes32 role)"
+  );
+  bytes32 public eip712DomainSeparator;
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -108,6 +113,26 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setEip712DomainSeparator();
+  }
+
+  function setEip712DomainSeparator() private {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
+    }
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("Celo Core Contracts")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
   }
 
   /**
@@ -239,7 +264,25 @@ contract Accounts is
   function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
     public
   {
-    authorize(signer, v, r, s);
+    authorizeAddressWithRole(signer, role, v, r, s);
+
+    Account storage account = accounts[msg.sender];
+    account.signerAuthorizations[role][signer] = SignerAuthorization({
+      started: true,
+      completed: true
+    });
+
+    emit SignerAuthorized(msg.sender, signer, role);
+  }
+
+  function legacyAuthorizeSignerWithSignature(
+    address signer,
+    bytes32 role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) private {
+    authorizeAddress(signer, v, r, s);
 
     Account storage account = accounts[msg.sender];
     account.signerAuthorizations[role][signer] = SignerAuthorization({
@@ -262,7 +305,7 @@ contract Accounts is
     external
     nonReentrant
   {
-    authorizeSignerWithSignature(signer, VoteSigner, v, r, s);
+    legacyAuthorizeSignerWithSignature(signer, VoteSigner, v, r, s);
     setDefaultSigner(signer, VoteSigner);
 
     emit VoteSignerAuthorized(msg.sender, signer);
@@ -280,7 +323,7 @@ contract Accounts is
     external
     nonReentrant
   {
-    authorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
+    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
     setDefaultSigner(signer, ValidatorSigner);
 
     require(!getValidators().isValidator(msg.sender), "Cannot authorize validator signer");
@@ -303,7 +346,7 @@ contract Accounts is
     bytes32 s,
     bytes calldata ecdsaPublicKey
   ) external nonReentrant {
-    authorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
+    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
     setDefaultSigner(signer, ValidatorSigner);
 
     require(
@@ -335,7 +378,7 @@ contract Accounts is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant {
-    authorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
+    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
     setDefaultSigner(signer, ValidatorSigner);
 
     require(
@@ -354,7 +397,7 @@ contract Accounts is
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
   function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s) public {
-    authorizeSignerWithSignature(signer, AttestationSigner, v, r, s);
+    legacyAuthorizeSignerWithSignature(signer, AttestationSigner, v, r, s);
     setDefaultSigner(signer, AttestationSigner);
 
     emit AttestationSignerAuthorized(msg.sender, signer);
@@ -775,15 +818,50 @@ contract Accounts is
    * @dev Note that once an address is authorized, it may never be authorized again.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
-  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {
+  function authorizeAddress(address authorized, uint8 v, bytes32 r, bytes32 s) private {
+    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+    require(signer == authorized, "Invalid signature");
+
+    authorize(authorized);
+  }
+
+  /**
+   */
+  function getRoleAuthorizationStructHash(address account, address signer, bytes32 role)
+    internal
+    view
+    returns (bytes32)
+  {
+    return keccak256(abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role));
+  }
+
+  function getRoleAuthorizationSigner(
+    address account,
+    address signer,
+    bytes32 role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public view returns (address) {
+    bytes32 structHash = getRoleAuthorizationStructHash(account, signer, role);
+    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
+  }
+
+  function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
+    private
+  {
+    address signer = getRoleAuthorizationSigner(msg.sender, authorized, role, v, r, s);
+    require(signer == authorized, "Invalid signature");
+
+    authorize(authorized);
+  }
+
+  function authorize(address authorized) private {
     require(isAccount(msg.sender), "Unknown account");
     require(
       isNotAccount(authorized) && isNotAuthorizedSignerForAnotherAccount(authorized),
       "Cannot re-authorize address or locked gold account for another account"
     );
-
-    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == authorized, "Invalid signature");
 
     authorizedBy[authorized] = msg.sender;
   }
