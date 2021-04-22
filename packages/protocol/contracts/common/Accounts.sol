@@ -46,8 +46,6 @@ contract Accounts is
     // validating or attestation. These keys may not be keys of other accounts,
     // and may not be authorized by any other account for any purpose.
     Signers signers;
-    mapping(bytes32 => address) defaultSigners;
-    mapping(bytes32 => mapping(address => SignerAuthorization)) signerAuthorizations;
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
@@ -57,6 +55,10 @@ contract Accounts is
     bytes dataEncryptionKey;
     // The URL under which an account adds metadata and claims
     string metadataURL;
+    // Indexable signers by account
+    mapping(bytes32 => address) defaultSigners;
+    // All signers and their roles for a given account
+    mapping(bytes32 => mapping(address => SignerAuthorization)) signerAuthorizations;
   }
 
   mapping(address => Account) internal accounts;
@@ -510,7 +512,7 @@ contract Accounts is
     emit AttestationSignerRemoved(msg.sender, signer);
   }
 
-  function defaultSignerToAccount(address signer, bytes32 role) public view returns (address) {
+  function signerToAccountWithRole(address signer, bytes32 role) public view returns (address) {
     address account = authorizedBy[signer];
 
     if (account != address(0)) {
@@ -529,7 +531,7 @@ contract Accounts is
    * @return The associated account.
    */
   function attestationSignerToAccount(address signer) external view returns (address) {
-    return defaultSignerToAccount(signer, AttestationSigner);
+    return signerToAccountWithRole(signer, AttestationSigner);
   }
 
   /**
@@ -539,7 +541,7 @@ contract Accounts is
    * @return The associated account.
    */
   function validatorSignerToAccount(address signer) public view returns (address) {
-    return defaultSignerToAccount(signer, ValidatorSigner);
+    return signerToAccountWithRole(signer, ValidatorSigner);
   }
 
   /**
@@ -549,7 +551,7 @@ contract Accounts is
    * @return The associated account.
    */
   function voteSignerToAccount(address signer) external view returns (address) {
-    return defaultSignerToAccount(signer, VoteSigner);
+    return signerToAccountWithRole(signer, VoteSigner);
   }
 
   /**
