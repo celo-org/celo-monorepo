@@ -89,6 +89,7 @@
     "dependencies": [
       "@celo/base",
       "@celo/connect",
+      "@celo/contractkit",
       "@celo/flake-tracker",
       "@celo/typescript",
       "@celo/utils"
