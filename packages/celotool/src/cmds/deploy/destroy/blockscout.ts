@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { deleteCloudSQLInstance, exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { outputIncludes } from 'src/lib/utils'
-import { fetchEnvOrFallback } from 'src/lib/env-utils'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
