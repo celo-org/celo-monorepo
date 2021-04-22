@@ -1,8 +1,9 @@
-import { SpawnOptions, spawn } from 'child_process'
+import ganache from '@celo/ganache-cli'
+
+import { spawn, SpawnOptions } from 'child_process'
 
 import chalk from 'chalk'
 import fs from 'fs-extra'
-import ganache from '@celo/ganache-cli'
 import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
@@ -254,6 +255,7 @@ async function runDevChainFromTar(filename: string, saveto?: string) {
   return () =>
     stopGanache().finally(async () => {
       if (saveto) {
+        // tslint:disable-next-line: no-console
         console.log(`Saving chaindata to ${saveto}`)
         await compressChain(chainCopy.name, saveto)
       }
