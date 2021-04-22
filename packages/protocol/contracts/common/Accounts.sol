@@ -69,6 +69,8 @@ contract Accounts is
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidatorSignerAuthorized(address indexed account, address signer);
   event SignerAuthorized(address indexed account, address signer, bytes32 indexed role);
+  event SignerAuthorizationStarted(address indexed account, address signer, bytes32 indexed role);
+  event SignerAuthorizationCompleted(address indexed account, address signer, bytes32 indexed role);
   event AttestationSignerRemoved(address indexed account, address oldSigner);
   event VoteSignerRemoved(address indexed account, address oldSigner);
   event ValidatorSignerRemoved(address indexed account, address oldSigner);
@@ -209,10 +211,7 @@ contract Accounts is
    * @param role the role to register a default signer for
    */
   function setDefaultSigner(address signer, bytes32 role) public {
-    require(
-      isGenericSigner(msg.sender, signer, role),
-      "Must finish authorization before setting default signer"
-    );
+    require(isSigner(msg.sender, signer, role), "Must authorize signer before setting as default");
 
     Account storage account = accounts[msg.sender];
     if (role == VoteSigner) {
@@ -221,9 +220,10 @@ contract Accounts is
       account.signers.attestation = signer;
     } else if (role == ValidatorSigner) {
       account.signers.validator = signer;
+    } else {
+      account.defaultSigners[role] = signer;
     }
 
-    account.defaultSigners[role] = signer;
     emit DefaultSignerSet(msg.sender, signer, role);
   }
 
@@ -376,8 +376,7 @@ contract Accounts is
       started: true,
       completed: false
     });
-
-    emit SignerAuthorized(msg.sender, signer, role);
+    emit SignerAuthorizationStarted(msg.sender, signer, role);
   }
 
   /**
@@ -391,28 +390,10 @@ contract Accounts is
       account.signerAuthorizations[role][msg.sender].started == true,
       "Signer authorization not started"
     );
-    require(
-      account.signerAuthorizations[role][msg.sender].completed == false,
-      "Signer already authorized"
-    );
 
     authorizedBy[msg.sender] = _account;
     account.signerAuthorizations[role][msg.sender].completed = true;
-    emit SignerAuthorized(_account, msg.sender, role);
-  }
-
-  /**
-   * @notice Whether or not the signer has been registered as a signer for role
-   * @param account The address of account that authorized signing.
-   * @param signer The address of the signer.
-   * @param role The role that has been authorized.
-   */
-  function isGenericSigner(address account, address signer, bytes32 role)
-    public
-    view
-    returns (bool)
-  {
-    return accounts[account].signerAuthorizations[role][signer].completed;
+    emit SignerAuthorizationCompleted(_account, msg.sender, role);
   }
 
   /**
@@ -421,22 +402,21 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isDefaultSigner(address _account, address signer, bytes32 role)
+  function isLegacySigner(address _account, address signer, bytes32 role)
     public
     view
     returns (bool)
   {
     Account storage account = accounts[_account];
-
     if (role == ValidatorSigner && account.signers.validator == signer) {
       return true;
     } else if (role == AttestationSigner && account.signers.attestation == signer) {
       return true;
     } else if (role == VoteSigner && account.signers.vote == signer) {
       return true;
+    } else {
+      return false;
     }
-
-    return account.defaultSigners[role] == signer;
   }
 
   /**
@@ -446,7 +426,10 @@ contract Accounts is
    * @param role The role that has been authorized.
    */
   function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
-    return isGenericSigner(account, signer, role) || isDefaultSigner(account, signer, role);
+    return
+      isLegacySigner(account, signer, role) ||
+      accounts[account].signerAuthorizations[role][signer].completed;
+
   }
 
   /**
@@ -512,7 +495,7 @@ contract Accounts is
     emit AttestationSignerRemoved(msg.sender, signer);
   }
 
-  function signerToAccountWithRole(address signer, bytes32 role) public view returns (address) {
+  function signerToAccountWithRole(address signer, bytes32 role) internal view returns (address) {
     address account = authorizedBy[signer];
 
     if (account != address(0)) {
