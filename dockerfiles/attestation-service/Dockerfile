@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10-alpine
 WORKDIR /celo-monorepo
 
 # ensure yarn.lock is evaluated by kaniko cache diff
