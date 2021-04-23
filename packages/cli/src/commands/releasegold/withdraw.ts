@@ -56,6 +56,6 @@ export default class Withdraw extends ReleaseGoldBaseCommand {
       .runChecks()
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getBeneficiary()
-    await displaySendTx('withdrawTx', this.releaseGoldWrapper.withdraw(value.toNumber()))
+    await displaySendTx('withdrawTx', this.releaseGoldWrapper.withdraw(value))
   }
 }
