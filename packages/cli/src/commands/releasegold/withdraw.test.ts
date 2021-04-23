@@ -32,11 +32,11 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await timeTravel(100000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
     const beneficiary = await releaseGoldWrapper.getBeneficiary()
-    const balanceBefore = await (await kit.getTotalBalance(beneficiary)).CELO!
+    const balanceBefore = (await kit.getTotalBalance(beneficiary)).CELO!
     // Use a value which would lose precision if converted to a normal javascript number
     const withdrawalAmount = '10000000000000000000005'
     await Withdraw.run(['--contract', contractAddress, '--value', withdrawalAmount])
-    const balanceAfter = await (await kit.getTotalBalance(beneficiary)).CELO!
+    const balanceAfter = (await kit.getTotalBalance(beneficiary)).CELO!
     const difference = balanceAfter.minus(balanceBefore)
     expect(difference).toEqBigNumber(new BigNumber(withdrawalAmount))
   })
