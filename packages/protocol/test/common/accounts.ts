@@ -624,7 +624,7 @@ contract('Accounts', (accounts: string[]) => {
     ]
 
     scenarios.forEach(({ keyName, key, description }) => {
-      describe.only(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
+      describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let testInstance: any
         let getSignature
 
