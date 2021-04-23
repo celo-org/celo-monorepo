@@ -1,10 +1,11 @@
-import { NULL_ADDRESS } from '@celo/base/lib/address'
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { Address, ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { assertLogMatches, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
+import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
 import { upperFirst } from 'lodash'
 import {
   AccountsContract,
@@ -24,9 +25,6 @@ contract('Accounts', (accounts: string[]) => {
   const account = accounts[0]
   const caller = accounts[0]
 
-  let kit: ContractKit
-  const chainId = 1
-
   const name = 'Account'
   const metadataURL = 'https://www.celo.org'
   const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
@@ -41,8 +39,6 @@ contract('Accounts', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await accountsInstance.initialize(registry.address)
-
-    kit = newKitFromWeb3(web3)
   })
 
   describe('#createAccount', () => {
@@ -377,6 +373,41 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
+  const getSignatureForAuthorization = async (
+    account: Address,
+    signer: Address,
+    role: string,
+    accountsContractAddress: string
+  ) => {
+    const typedData = buildAuthorizeSignerTypedData({
+      account,
+      signer,
+      accountsContractAddress,
+      role,
+      chainId: 1,
+    })
+
+    const signature = await new Promise<string>((resolve, reject) => {
+      web3.currentProvider.send(
+        {
+          method: 'eth_signTypedData',
+          params: [signer, typedData],
+        },
+        (error, resp) => {
+          if (error) {
+            reject(error)
+          } else {
+            resolve(resp.result)
+          }
+        }
+      )
+    })
+
+    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
+    return parsedSignature
+  }
+
   describe('generic authorization', () => {
     const account2 = accounts[1]
     const signer = accounts[2]
@@ -386,16 +417,7 @@ contract('Accounts', (accounts: string[]) => {
     let sig
 
     beforeEach(async () => {
-      sig = await kit.connection.signTypedData(
-        signer,
-        buildAuthorizeSignerTypedData({
-          account,
-          signer,
-          role,
-          accountsContractAddress: accountsInstance.address,
-          chainId,
-        })
-      )
+      sig = await getSignatureForAuthorization(account, signer, role, accountsInstance.address)
       await accountsInstance.createAccount()
       await accountsInstance.createAccount({ from: account2 })
     })
@@ -456,15 +478,11 @@ contract('Accounts', (accounts: string[]) => {
       assert.isFalse(await accountsInstance.isSigner(account, signer, role))
       assert.isFalse(await accountsInstance.isSigner(account, signer2, role))
 
-      const sigTwo = await kit.connection.signTypedData(
+      const sigTwo = await getSignatureForAuthorization(
+        account,
         signer2,
-        buildAuthorizeSignerTypedData({
-          account,
-          signer: signer2,
-          role,
-          accountsContractAddress: accountsInstance.address,
-          chainId,
-        })
+        role,
+        accountsInstance.address
       )
 
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
@@ -488,15 +506,11 @@ contract('Accounts', (accounts: string[]) => {
       assert.isFalse(await accountsInstance.isSigner(account, signer, role))
       assert.isFalse(await accountsInstance.isSigner(account, signer, role2))
 
-      const sigTwo = await kit.connection.signTypedData(
+      const sigTwo = await getSignatureForAuthorization(
+        account,
         signer,
-        buildAuthorizeSignerTypedData({
-          account,
-          signer,
-          role: role2,
-          accountsContractAddress: accountsInstance.address,
-          chainId,
-        })
+        role2,
+        accountsInstance.address
       )
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
       await accountsInstance.authorizeSignerWithSignature(
@@ -514,15 +528,11 @@ contract('Accounts', (accounts: string[]) => {
     })
 
     it('signer cannot be authorized by two accounts', async () => {
-      const sigTwo = await kit.connection.signTypedData(
+      const sigTwo = await getSignatureForAuthorization(
+        account2,
         signer,
-        buildAuthorizeSignerTypedData({
-          account: account2,
-          signer,
-          role,
-          accountsContractAddress: accountsInstance.address,
-          chainId,
-        })
+        role,
+        accountsInstance.address
       )
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
       await assertRevert(
@@ -607,16 +617,7 @@ contract('Accounts', (accounts: string[]) => {
 
           getSignature = (account, signer) => {
             if (genericWrite) {
-              return kit.connection.signTypedData(
-                signer,
-                buildAuthorizeSignerTypedData({
-                  account,
-                  signer,
-                  role: key,
-                  accountsContractAddress: accountsInstance.address,
-                  chainId,
-                })
-              )
+              return getSignatureForAuthorization(account, signer, key, accountsInstance.address)
             }
             return getParsedSignatureOfAddress(web3, account, signer)
           }

@@ -707,14 +707,26 @@ contract Accounts is
     return getLegacySigner(account, AttestationSigner);
   }
 
+  /**
+   * @notice Checks whether or not the account has an indexed signer
+   * registered for one of the legacy roles
+   */
   function hasLegacySigner(address account, bytes32 role) public view returns (bool) {
     return getLegacySigner(account, role) != account;
   }
 
+  /**
+   * @notice Checks whether or not the account has an indexed signer
+   * registered for a role
+   */
   function hasDefaultSigner(address account, bytes32 role) public view returns (bool) {
     return getDefaultSigner(account, role) != account;
   }
 
+  /**
+   * @notice Checks whether or not the account has an indexed signer
+   * registered for the role
+   */
   function hasIndexedSigner(address account, bytes32 role) public view returns (bool) {
     return isLegacyRole(role) ? hasLegacySigner(account, role) : hasDefaultSigner(account, role);
   }
