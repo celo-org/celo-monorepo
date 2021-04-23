@@ -629,13 +629,13 @@ contract('Accounts', (accounts: string[]) => {
               eventName: genericWrite ? 'SignerAuthorized' : 'VoteSignerAuthorized',
               getAuthorizedFromAccount: genericRead
                 ? (...args) =>
-                    accountsInstance.getDefaultSigner(args[0], VotingKey, ...args.slice(1))
+                    accountsInstance.getIndexedSigner(args[0], VotingKey, ...args.slice(1))
                 : accountsInstance.getVoteSigner,
               authorizedSignerToAccount: genericRead
                 ? (signer) => accountsInstance.signerToAccount(signer)
                 : accountsInstance.voteSignerToAccount,
               hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasDefaultSigner(signer, VotingKey)
+                ? (signer) => accountsInstance.hasIndexedSigner(signer, VotingKey)
                 : accountsInstance.hasAuthorizedVoteSigner,
               removeSigner: genericWrite
                 ? async () => {
@@ -651,13 +651,13 @@ contract('Accounts', (accounts: string[]) => {
               eventName: genericWrite ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
               getAuthorizedFromAccount: genericRead
                 ? (...args) =>
-                    accountsInstance.getDefaultSigner(args[0], ValidatorKey, ...args.slice(1))
+                    accountsInstance.getIndexedSigner(args[0], ValidatorKey, ...args.slice(1))
                 : accountsInstance.getValidatorSigner,
               authorizedSignerToAccount: genericRead
                 ? (signer) => accountsInstance.signerToAccount(signer)
                 : accountsInstance.validatorSignerToAccount,
               hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasDefaultSigner(signer, ValidatorKey)
+                ? (signer) => accountsInstance.hasIndexedSigner(signer, ValidatorKey)
                 : accountsInstance.hasAuthorizedValidatorSigner,
               removeSigner: genericWrite
                 ? async () => {
@@ -673,13 +673,13 @@ contract('Accounts', (accounts: string[]) => {
               eventName: genericWrite ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
               getAuthorizedFromAccount: genericRead
                 ? (...args) =>
-                    accountsInstance.getDefaultSigner(args[0], AttestationKey, ...args.slice(1))
+                    accountsInstance.getIndexedSigner(args[0], AttestationKey, ...args.slice(1))
                 : accountsInstance.getAttestationSigner,
               authorizedSignerToAccount: genericRead
                 ? (signer) => accountsInstance.signerToAccount(signer)
                 : accountsInstance.attestationSignerToAccount,
               hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasDefaultSigner(signer, AttestationKey)
+                ? (signer) => accountsInstance.hasIndexedSigner(signer, AttestationKey)
                 : accountsInstance.hasAuthorizedAttestationSigner,
               removeSigner: genericWrite
                 ? async () => {

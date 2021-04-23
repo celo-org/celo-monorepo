@@ -462,6 +462,25 @@ contract Accounts is
     }
   }
 
+  function isDefaultSigner(address account, address signer, bytes32 role)
+    public
+    view
+    returns (bool)
+  {
+    return accounts[account].defaultSigners[role] == signer;
+  }
+
+  function isIndexedSigner(address account, address signer, bytes32 role)
+    public
+    view
+    returns (bool)
+  {
+    return
+      isLegacyRole(role)
+        ? isLegacySigner(account, signer, role)
+        : isDefaultSigner(account, signer, role);
+  }
+
   /**
    * @notice Whether or not the signer has been registered as a signer for role
    * @param account The address of account that authorized signing.
@@ -476,24 +495,21 @@ contract Accounts is
   }
 
   /**
-   * @notice Removes the currently authorized signer for a specific role.
-   * @param signer The address of the signer.
-   * @param role The role that has been authorized.
-   */
-  function removeSigner(address signer, bytes32 role) public {
-    if (getDefaultSigner(msg.sender, role) == signer) {
-      removeDefaultSigner(role);
-    }
-
-    delete accounts[msg.sender].signerAuthorizations[role][signer];
-    emit SignerRemoved(msg.sender, signer, role);
-  }
-
-  /**
    * @notice Removes the signer for a default role.
    * @param role The role that has been authorized.
    */
   function removeDefaultSigner(bytes32 role) public {
+    address signer = accounts[msg.sender].defaultSigners[role];
+    accounts[msg.sender].defaultSigners[role] = address(0);
+    emit DefaultSignerRemoved(msg.sender, signer, role);
+  }
+
+  /**
+   * @notice Remove one of the Validator, Attestation or 
+   * Vote signers from an account. Should only be called from
+   * methods that check the role is a legacy signer.
+   */
+  function removeLegacySigner(bytes32 role) private {
     Account storage account = accounts[msg.sender];
 
     if (role == ValidatorSigner) {
@@ -503,9 +519,25 @@ contract Accounts is
     } else if (role == VoteSigner) {
       account.signers.vote = address(0);
     }
+  }
 
-    account.defaultSigners[role] = address(0);
-    emit DefaultSignerRemoved(msg.sender, account.defaultSigners[role], role);
+  function removeIndexedSigner(bytes32 role) public {
+    isLegacyRole(role) ? removeLegacySigner(role) : removeDefaultSigner(role);
+  }
+
+  /**
+   * @notice Removes the currently authorized signer for a specific role and 
+   * if the signer is indexed, remove that as well.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
+  function removeSigner(address signer, bytes32 role) public {
+    if (isIndexedSigner(msg.sender, signer, role)) {
+      removeIndexedSigner(role);
+    }
+
+    delete accounts[msg.sender].signerAuthorizations[role][signer];
+    emit SignerRemoved(msg.sender, signer, role);
   }
 
   /**
@@ -513,8 +545,8 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeVoteSigner() public {
-    address signer = getDefaultSigner(msg.sender, VoteSigner);
-    removeSigner(signer, VoteSigner);
+    address signer = getLegacySigner(msg.sender, VoteSigner);
+    removeLegacySigner(VoteSigner);
     emit VoteSignerRemoved(msg.sender, signer);
   }
 
@@ -523,8 +555,8 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeValidatorSigner() public {
-    address signer = getDefaultSigner(msg.sender, ValidatorSigner);
-    removeSigner(signer, ValidatorSigner);
+    address signer = getLegacySigner(msg.sender, ValidatorSigner);
+    removeLegacySigner(ValidatorSigner);
     emit ValidatorSignerRemoved(msg.sender, signer);
   }
 
@@ -533,8 +565,8 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeAttestationSigner() public {
-    address signer = getDefaultSigner(msg.sender, AttestationSigner);
-    removeSigner(signer, AttestationSigner);
+    address signer = getLegacySigner(msg.sender, AttestationSigner);
+    removeLegacySigner(AttestationSigner);
     emit AttestationSignerRemoved(msg.sender, signer);
   }
 
@@ -597,14 +629,24 @@ contract Accounts is
   }
 
   /**
-   * @notice Returns the signer for the specified account and role. If no 
-   * signer has been specified it will return the account itself.
+   * @notice Checks whether the role is one of Vote, Validator or 
+   * Attestation
+   * @param role The role to check
+   */
+  function isLegacyRole(bytes32 role) public view returns (bool) {
+    return role == ValidatorSigner || role == AttestationSigner || role == VoteSigner;
+  }
+
+  /**
+   * @notice Returns the legacy signer for the specified account and 
+   * role. If no signer has been specified it will return the account itself.
    * @param _account The address of the account.
    * @param role The role of the signer.
    */
-  function getDefaultSigner(address _account, bytes32 role) public view returns (address) {
-    Account storage account = accounts[_account];
+  function getLegacySigner(address _account, bytes32 role) public view returns (address) {
+    require(isLegacyRole(role), "Role is not a legacy signer");
 
+    Account storage account = accounts[_account];
     address signer;
     if (role == ValidatorSigner) {
       signer = account.signers.validator;
@@ -614,12 +656,28 @@ contract Accounts is
       signer = account.signers.vote;
     }
 
-    if (signer != address(0)) {
-      return signer;
-    }
+    return signer == address(0) ? _account : signer;
+  }
 
-    address defaultSigner = account.defaultSigners[role];
-    return defaultSigner == address(0) ? _account : defaultSigner;
+  /**
+   * @notice Returns the default signer for the specified account and 
+   * role. If no signer has been specified it will return the account itself.
+   * @param account The address of the account.
+   * @param role The role of the signer.
+   */
+  function getDefaultSigner(address account, bytes32 role) public view returns (address) {
+    address defaultSigner = accounts[account].defaultSigners[role];
+    return defaultSigner == address(0) ? account : defaultSigner;
+  }
+
+  /**
+   * @notice Returns the indexed signer for the specified account and role. 
+   * If no signer has been specified it will return the account itself.
+   * @param account The address of the account.
+   * @param role The role of the signer.
+   */
+  function getIndexedSigner(address account, bytes32 role) public view returns (address) {
+    return isLegacyRole(role) ? getLegacySigner(account, role) : getDefaultSigner(account, role);
   }
 
   /**
@@ -628,7 +686,7 @@ contract Accounts is
    * @return The address with which the account can sign votes.
    */
   function getVoteSigner(address account) public view returns (address) {
-    return getDefaultSigner(account, VoteSigner);
+    return getLegacySigner(account, VoteSigner);
   }
 
   /**
@@ -637,7 +695,7 @@ contract Accounts is
    * @return The address with which the account can register a validator or group.
    */
   function getValidatorSigner(address account) public view returns (address) {
-    return getDefaultSigner(account, ValidatorSigner);
+    return getLegacySigner(account, ValidatorSigner);
   }
 
   /**
@@ -646,11 +704,19 @@ contract Accounts is
    * @return The address with which the account can sign attestations.
    */
   function getAttestationSigner(address account) public view returns (address) {
-    return getDefaultSigner(account, AttestationSigner);
+    return getLegacySigner(account, AttestationSigner);
+  }
+
+  function hasLegacySigner(address account, bytes32 role) public view returns (bool) {
+    return getLegacySigner(account, role) != account;
   }
 
   function hasDefaultSigner(address account, bytes32 role) public view returns (bool) {
     return getDefaultSigner(account, role) != account;
+  }
+
+  function hasIndexedSigner(address account, bytes32 role) public view returns (bool) {
+    return isLegacyRole(role) ? hasLegacySigner(account, role) : hasDefaultSigner(account, role);
   }
 
   /**
@@ -659,7 +725,7 @@ contract Accounts is
    * @return Whether the account has specified a dedicated vote signer.
    */
   function hasAuthorizedVoteSigner(address account) external view returns (bool) {
-    return hasDefaultSigner(account, VoteSigner);
+    return hasLegacySigner(account, VoteSigner);
   }
 
   /**
@@ -668,7 +734,7 @@ contract Accounts is
    * @return Whether the account has specified a dedicated validator signer.
    */
   function hasAuthorizedValidatorSigner(address account) external view returns (bool) {
-    return hasDefaultSigner(account, ValidatorSigner);
+    return hasLegacySigner(account, ValidatorSigner);
   }
 
   /**
@@ -677,7 +743,7 @@ contract Accounts is
    * @return Whether the account has specified a dedicated attestation signer.
    */
   function hasAuthorizedAttestationSigner(address account) external view returns (bool) {
-    return hasDefaultSigner(account, AttestationSigner);
+    return hasLegacySigner(account, AttestationSigner);
   }
 
   /**
