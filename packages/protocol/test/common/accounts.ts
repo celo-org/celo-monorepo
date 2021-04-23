@@ -373,13 +373,13 @@ contract('Accounts', (accounts: string[]) => {
   })
 
   const getSignatureForAuthorization = async (
-    account: Address,
+    _account: Address,
     signer: Address,
     role: string,
     accountsContractAddress: string
   ) => {
     const typedData = buildAuthorizeSignerTypedData({
-      account,
+      account: _account,
       signer,
       accountsContractAddress,
       role,
@@ -576,23 +576,23 @@ contract('Accounts', (accounts: string[]) => {
   backwardsCompatibilityMatrix.forEach(([genericRead, genericWrite]) => {
     const scenarios = [
       {
-        name: 'Vote',
+        keyName: 'Vote',
         key: keccak256('celo.org/core/vote'),
         description: 'vote signing key',
       },
       {
-        name: 'Validator',
+        keyName: 'Validator',
         key: keccak256('celo.org/core/validator'),
         description: 'validator signing key',
       },
       {
-        name: 'Attestation',
+        keyName: 'Attestation',
         key: keccak256('celo.org/core/attestation'),
         description: 'attestation signing key',
       },
     ]
 
-    scenarios.forEach(({ name, key, description }) => {
+    scenarios.forEach(({ keyName, key, description }) => {
       describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let testInstance: any
         let getSignature
@@ -613,7 +613,7 @@ contract('Accounts', (accounts: string[]) => {
             }
           }
 
-          getSignature = (account, signer) => {
+          getSignature = (_account, signer) => {
             if (genericWrite) {
               return getSignatureForAuthorization(account, signer, key, accountsInstance.address)
             }
@@ -623,28 +623,28 @@ contract('Accounts', (accounts: string[]) => {
           testInstance = {
             fn: genericWrite
               ? authorizeSignerFactory(key)
-              : accountsInstance[`authorize${name}Signer`],
-            eventName: genericWrite ? 'SignerAuthorized' : `${name}SignerAuthorized`,
+              : accountsInstance[`authorize${keyName}Signer`],
+            eventName: genericWrite ? 'SignerAuthorized' : `${keyName}SignerAuthorized`,
             getAuthorizedFromAccount: genericRead
               ? (...args) => accountsInstance.getIndexedSigner(args[0], key, ...args.slice(1))
-              : accountsInstance[`get${name}Signer`],
+              : accountsInstance[`get${keyName}Signer`],
             authorizedSignerToAccount: genericRead
               ? (signer) => accountsInstance.signerToAccount(signer)
               : accountsInstance[`${name.toLowerCase()}SignerToAccount`],
             hasAuthorizedSigner: genericRead
               ? (signer) => accountsInstance.hasIndexedSigner(signer, key)
-              : accountsInstance[`hasAuthorized${name}Signer`],
+              : accountsInstance[`hasAuthorized${keyName}Signer`],
             removeSigner: genericWrite
               ? async () => {
-                  const defaultSigner = await accountsInstance[`get${name}Signer`](account)
+                  const defaultSigner = await accountsInstance[`get${keyName}Signer`](account)
                   await accountsInstance.removeSigner(defaultSigner, key)
                 }
-              : accountsInstance[`remove${name}Signer`],
+              : accountsInstance[`remove${keyName}Signer`],
           }
           await accountsInstance.createAccount()
         })
 
-        describe(`#authorize${name}Signer()`, () => {
+        describe(`#authorize${keyName}Signer()`, () => {
           const authorized = accounts[1]
           let sig
 
@@ -726,7 +726,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`#getAccountFrom${name}Signer()`, () => {
+        describe(`#getAccountFrom${keyName}Signer()`, () => {
           describe(`when the account has not authorized a ${description}`, () => {
             it('should return the account when passed the account', async () => {
               assert.equal(await testInstance.authorizedSignerToAccount(account), account)
@@ -754,7 +754,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`#get${name}SignerFromAccount()`, () => {
+        describe(`#get${keyName}SignerFromAccount()`, () => {
           describe(`when the account has not authorized a ${description}`, () => {
             it('should return the account when passed the account', async () => {
               assert.equal(await testInstance.getAuthorizedFromAccount(account), account)
@@ -775,7 +775,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`#remove${name}Signer()`, () => {
+        describe(`#remove${keyName}Signer()`, () => {
           it(`should be able to remove the ${description} signer after authorizing`, async () => {
             const authorized = accounts[1]
             const sig = await getSignature(account, authorized)
