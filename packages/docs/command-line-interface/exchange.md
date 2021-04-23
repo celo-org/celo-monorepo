@@ -21,6 +21,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to
                                                      exchange
 
+  --globalHelp                                       View all available global flags
+
   --stableToken=(cUSD|cusd|cEUR|ceur)                [default: cUSD] Name of the stable
                                                      to receive
 
@@ -53,6 +55,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo
                                                      Dollars to exchange
 
+  --globalHelp                                       View all available global flags
+
   --value=10000000000000000000000                    (required) The value of Celo
                                                      Dollars to exchange for CELO
 
@@ -81,6 +85,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo
                                                      Euros to exchange
+
+  --globalHelp                                       View all available global flags
 
   --value=10000000000000000000000                    (required) The value of Celo Euros
                                                      to exchange for CELO
@@ -112,6 +118,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to
                                                      exchange
 
+  --globalHelp                                       View all available global flags
+
   --stableToken=(cUSD|cusd|cEUR|ceur)                [default: cUSD] Name of the stable
                                                      to receive
 
@@ -141,6 +149,8 @@ OPTIONS
   --amount=amount  [default: 1000000000000000000] Amount of the token being exchanged to
                    report rates for
 
+  --globalHelp     View all available global flags
+
 EXAMPLE
   list
 ```
@@ -163,6 +173,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with the
                                                      Stable Token to exchange
+
+  --globalHelp                                       View all available global flags
 
   --stableToken=(cUSD|cusd|cEUR|ceur)                Name of the stable token to be
                                                      transfered

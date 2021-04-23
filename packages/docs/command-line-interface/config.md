@@ -12,6 +12,9 @@ Output network node configuration
 
 USAGE
   $ celocli config:get
+
+OPTIONS
+  --globalHelp  View all available global flags
 ```
 
 _See code: [src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)_
@@ -36,6 +39,9 @@ OPTIONS
                                                            (defaults to 'auto' which
                                                            uses whatever feeCurrency is
                                                            available)
+
+  --globalHelp                                             View all available global
+                                                           flags
 
 EXAMPLES
   set --node ws://localhost:2500
