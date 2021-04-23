@@ -1,6 +1,8 @@
 FROM node:10-alpine
 WORKDIR /celo-monorepo
 
+RUN apk update && apk add git
+ 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
