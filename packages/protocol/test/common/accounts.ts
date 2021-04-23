@@ -421,7 +421,7 @@ contract('Accounts', (accounts: string[]) => {
       await accountsInstance.createAccount({ from: account2 })
     })
 
-    it('should recover the correct signer', async () => {
+    it('should recover the correct signer from EIP712 signature', async () => {
       const recoveredSigner = await accountsInstance.getRoleAuthorizationSigner(
         account,
         signer,
@@ -433,44 +433,75 @@ contract('Accounts', (accounts: string[]) => {
       expect(signer).to.be.equal(recoveredSigner)
     })
 
-    it('should set the authorized signer in two steps', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
-      await accountsInstance.authorizeSigner(signer, role)
-      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+    describe('smart contract signers', async () => {
+      it("can't complete an authorization that hasn't been started", async () => {
+        await assertRevert(
+          accountsInstance.completeSignerAuthorization(account, role, { from: signer }),
+          'Signer authorization not started'
+        )
+      })
 
-      await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
-      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
-      assert.equal(await accountsInstance.authorizedBy(signer), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
+      it('starting the authorization does not complete it', async () => {
+        await accountsInstance.authorizeSigner(signer, role)
+        assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+      })
+
+      it('should set the authorized signer in two steps', async () => {
+        await accountsInstance.authorizeSigner(signer, role)
+        await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
+
+        assert.isTrue(await accountsInstance.isSigner(account, signer, role))
+        assert.equal(await accountsInstance.authorizedBy(signer), account)
+        assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
+      })
+
+      it(`should emit the right event`, async () => {
+        const { logs: startLogs } = await accountsInstance.authorizeSigner(signer, role)
+        const { logs: completeLogs } = await accountsInstance.completeSignerAuthorization(
+          account,
+          role,
+          {
+            from: signer,
+          }
+        )
+
+        assert.equal(startLogs.length, 1)
+        assertLogMatches(startLogs[0], 'SignerAuthorizationStarted', { account, signer, role })
+
+        assert.equal(completeLogs.length, 1)
+        assertLogMatches(completeLogs[0], 'SignerAuthorizationCompleted', { account, signer, role })
+      })
     })
 
-    it('should set the authorized signer in one step with signature', async () => {
-      assert.isFalse(await accountsInstance.isSigner(account, signer, role))
-      await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
+    describe('EOA signers', async () => {
+      it('should set the authorized signer in one step with signature', async () => {
+        assert.isFalse(await accountsInstance.isSigner(account, signer, role))
+        await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
 
-      assert.isTrue(await accountsInstance.isSigner(account, signer, role))
-      assert.equal(await accountsInstance.authorizedBy(signer), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
+        assert.isTrue(await accountsInstance.isSigner(account, signer, role))
+        assert.equal(await accountsInstance.authorizedBy(signer), account)
+        assert.isTrue(await accountsInstance.isAuthorizedSigner(signer))
+      })
+
+      it(`should emit the right event`, async () => {
+        const resp = await accountsInstance.authorizeSignerWithSignature(
+          signer,
+          role,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        const expected = { account, signer, role }
+        assertLogMatches(log, 'SignerAuthorized', expected)
+      })
     })
 
     it('should remove the authorized signer', async () => {
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
       await accountsInstance.removeSigner(signer, role)
       assert.isFalse(await accountsInstance.isSigner(account, signer, role))
-    })
-
-    it(`should emit the right event`, async () => {
-      const resp = await accountsInstance.authorizeSignerWithSignature(
-        signer,
-        role,
-        sig.v,
-        sig.r,
-        sig.s
-      )
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      const expected = { account, signer, role }
-      assertLogMatches(log, 'SignerAuthorized', expected)
     })
 
     it('can authorize multiple signers for a role', async () => {
@@ -593,7 +624,7 @@ contract('Accounts', (accounts: string[]) => {
     ]
 
     scenarios.forEach(({ keyName, key, description }) => {
-      describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
+      describe.only(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
         let testInstance: any
         let getSignature
 
@@ -615,9 +646,9 @@ contract('Accounts', (accounts: string[]) => {
 
           getSignature = (_account, signer) => {
             if (genericWrite) {
-              return getSignatureForAuthorization(account, signer, key, accountsInstance.address)
+              return getSignatureForAuthorization(_account, signer, key, accountsInstance.address)
             }
-            return getParsedSignatureOfAddress(web3, account, signer)
+            return getParsedSignatureOfAddress(web3, _account, signer)
           }
 
           testInstance = {
@@ -630,7 +661,7 @@ contract('Accounts', (accounts: string[]) => {
               : accountsInstance[`get${keyName}Signer`],
             authorizedSignerToAccount: genericRead
               ? (signer) => accountsInstance.signerToAccount(signer)
-              : accountsInstance[`${name.toLowerCase()}SignerToAccount`],
+              : accountsInstance[`${keyName.toLowerCase()}SignerToAccount`],
             hasAuthorizedSigner: genericRead
               ? (signer) => accountsInstance.hasIndexedSigner(signer, key)
               : accountsInstance[`hasAuthorized${keyName}Signer`],
