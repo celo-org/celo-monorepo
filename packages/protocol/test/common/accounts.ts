@@ -6,7 +6,6 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
-import { upperFirst } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -575,28 +574,27 @@ contract('Accounts', (accounts: string[]) => {
     [true, true],
   ]
   backwardsCompatibilityMatrix.forEach(([genericRead, genericWrite]) => {
-    const VotingKey = keccak256('celo.org/core/vote')
-    const ValidatorKey = keccak256('celo.org/core/validator')
-    const AttestationKey = keccak256('celo.org/core/attestation')
-
     const scenarios = [
       {
-        key: VotingKey,
+        name: 'Vote',
+        key: keccak256('celo.org/core/vote'),
         description: 'vote signing key',
       },
       {
-        key: ValidatorKey,
+        name: 'Validator',
+        key: keccak256('celo.org/core/validator'),
         description: 'validator signing key',
       },
       {
-        key: AttestationKey,
+        name: 'Attestation',
+        key: keccak256('celo.org/core/attestation'),
         description: 'attestation signing key',
       },
     ]
 
-    scenarios.forEach(({ key, description }) => {
+    scenarios.forEach(({ name, key, description }) => {
       describe(`${description} authorization tests (generic writes ${genericWrite} and generic reads ${genericRead})`, () => {
-        let authorizationTest: any
+        let testInstance: any
         let getSignature
 
         beforeEach(async () => {
@@ -622,79 +620,31 @@ contract('Accounts', (accounts: string[]) => {
             return getParsedSignatureOfAddress(web3, account, signer)
           }
 
-          const authorizationTests = {
-            [VotingKey]: {
-              fn: genericWrite
-                ? authorizeSignerFactory(VotingKey)
-                : accountsInstance.authorizeVoteSigner,
-              eventName: genericWrite ? 'SignerAuthorized' : 'VoteSignerAuthorized',
-              getAuthorizedFromAccount: genericRead
-                ? (...args) =>
-                    accountsInstance.getIndexedSigner(args[0], VotingKey, ...args.slice(1))
-                : accountsInstance.getVoteSigner,
-              authorizedSignerToAccount: genericRead
-                ? (signer) => accountsInstance.signerToAccount(signer)
-                : accountsInstance.voteSignerToAccount,
-              hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasIndexedSigner(signer, VotingKey)
-                : accountsInstance.hasAuthorizedVoteSigner,
-              removeSigner: genericWrite
-                ? async () => {
-                    const defaultSigner = await accountsInstance.getVoteSigner(account)
-                    await accountsInstance.removeSigner(defaultSigner, VotingKey)
-                  }
-                : accountsInstance.removeVoteSigner,
-            },
-            [ValidatorKey]: {
-              fn: genericWrite
-                ? authorizeSignerFactory(ValidatorKey)
-                : accountsInstance.authorizeValidatorSigner,
-              eventName: genericWrite ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
-              getAuthorizedFromAccount: genericRead
-                ? (...args) =>
-                    accountsInstance.getIndexedSigner(args[0], ValidatorKey, ...args.slice(1))
-                : accountsInstance.getValidatorSigner,
-              authorizedSignerToAccount: genericRead
-                ? (signer) => accountsInstance.signerToAccount(signer)
-                : accountsInstance.validatorSignerToAccount,
-              hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasIndexedSigner(signer, ValidatorKey)
-                : accountsInstance.hasAuthorizedValidatorSigner,
-              removeSigner: genericWrite
-                ? async () => {
-                    const defaultSigner = await accountsInstance.getValidatorSigner(account)
-                    await accountsInstance.removeSigner(defaultSigner, ValidatorKey)
-                  }
-                : accountsInstance.removeValidatorSigner,
-            },
-            [AttestationKey]: {
-              fn: genericWrite
-                ? authorizeSignerFactory(AttestationKey)
-                : accountsInstance.authorizeAttestationSigner,
-              eventName: genericWrite ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
-              getAuthorizedFromAccount: genericRead
-                ? (...args) =>
-                    accountsInstance.getIndexedSigner(args[0], AttestationKey, ...args.slice(1))
-                : accountsInstance.getAttestationSigner,
-              authorizedSignerToAccount: genericRead
-                ? (signer) => accountsInstance.signerToAccount(signer)
-                : accountsInstance.attestationSignerToAccount,
-              hasAuthorizedSigner: genericRead
-                ? (signer) => accountsInstance.hasIndexedSigner(signer, AttestationKey)
-                : accountsInstance.hasAuthorizedAttestationSigner,
-              removeSigner: genericWrite
-                ? async () => {
-                    const defaultSigner = await accountsInstance.getAttestationSigner(account)
-                    await accountsInstance.removeSigner(defaultSigner, AttestationKey)
-                  }
-                : accountsInstance.removeAttestationSigner,
-            },
+          testInstance = {
+            fn: genericWrite
+              ? authorizeSignerFactory(key)
+              : accountsInstance[`authorize${name}Signer`],
+            eventName: genericWrite ? 'SignerAuthorized' : `${name}SignerAuthorized`,
+            getAuthorizedFromAccount: genericRead
+              ? (...args) => accountsInstance.getIndexedSigner(args[0], key, ...args.slice(1))
+              : accountsInstance[`get${name}Signer`],
+            authorizedSignerToAccount: genericRead
+              ? (signer) => accountsInstance.signerToAccount(signer)
+              : accountsInstance[`${name.toLowerCase()}SignerToAccount`],
+            hasAuthorizedSigner: genericRead
+              ? (signer) => accountsInstance.hasIndexedSigner(signer, key)
+              : accountsInstance[`hasAuthorized${name}Signer`],
+            removeSigner: genericWrite
+              ? async () => {
+                  const defaultSigner = await accountsInstance[`get${name}Signer`](account)
+                  await accountsInstance.removeSigner(defaultSigner, key)
+                }
+              : accountsInstance[`remove${name}Signer`],
           }
-          authorizationTest = authorizationTests[key]
           await accountsInstance.createAccount()
         })
 
-        describe(`#authorize ${upperFirst(description)}()`, () => {
+        describe(`#authorize${name}Signer()`, () => {
           const authorized = accounts[1]
           let sig
 
@@ -703,22 +653,22 @@ contract('Accounts', (accounts: string[]) => {
           })
 
           it(`should set the authorized key (${description})`, async () => {
-            assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            assert.isFalse(await testInstance.hasAuthorizedSigner(account))
+            await testInstance.fn(authorized, sig.v, sig.r, sig.s)
             assert.equal(await accountsInstance.authorizedBy(authorized), account)
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-            assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
-            assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
+            assert.equal(await testInstance.getAuthorizedFromAccount(account), authorized)
+            assert.equal(await testInstance.authorizedSignerToAccount(authorized), account)
+            assert.isTrue(await testInstance.hasAuthorizedSigner(account))
           })
 
           it(`should emit the right event`, async () => {
-            const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            const resp = await testInstance.fn(authorized, sig.v, sig.r, sig.s)
 
             assert.equal(resp.logs.length, genericWrite ? 2 : 3)
             const log = resp.logs[genericWrite ? 0 : 2]
             assertLogMatches(
               log,
-              authorizationTest.eventName,
+              testInstance.eventName,
               genericWrite
                 ? {
                     account,
@@ -734,24 +684,24 @@ contract('Accounts', (accounts: string[]) => {
 
           it(`should revert if the ${description} is an account`, async () => {
             await accountsInstance.createAccount({ from: authorized })
-            await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
+            await assertRevert(testInstance.fn(authorized, sig.v, sig.r, sig.s))
           })
 
           it(`should revert if the ${description} is already authorized`, async () => {
             const otherAccount = accounts[2]
             const otherSig = await getSignature(otherAccount, authorized)
             await accountsInstance.createAccount({ from: otherAccount })
-            await authorizationTest.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
+            await testInstance.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
               from: otherAccount,
             })
-            await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
+            await assertRevert(testInstance.fn(authorized, sig.v, sig.r, sig.s))
           })
 
           it('should revert if the signature is incorrect', async () => {
             const nonVoter = accounts[3]
             const incorrectSig = await getSignature(account, nonVoter)
             await assertRevert(
-              authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
+              testInstance.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
             )
           })
 
@@ -759,18 +709,15 @@ contract('Accounts', (accounts: string[]) => {
             const newAuthorized = accounts[2]
             let newSig
             beforeEach(async () => {
-              await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+              await testInstance.fn(authorized, sig.v, sig.r, sig.s)
               newSig = await getSignature(account, newAuthorized)
-              await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
+              await testInstance.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
             })
 
             it(`should set the new authorized ${description}`, async () => {
               assert.equal(await accountsInstance.authorizedBy(newAuthorized), account)
-              assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
-              assert.equal(
-                await authorizationTest.authorizedSignerToAccount(newAuthorized),
-                account
-              )
+              assert.equal(await testInstance.getAuthorizedFromAccount(account), newAuthorized)
+              assert.equal(await testInstance.authorizedSignerToAccount(newAuthorized), account)
             })
 
             it('should preserve the previous authorization', async () => {
@@ -779,14 +726,14 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`#getAccountFrom${upperFirst(description)}()`, () => {
+        describe(`#getAccountFrom${name}Signer()`, () => {
           describe(`when the account has not authorized a ${description}`, () => {
             it('should return the account when passed the account', async () => {
-              assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
+              assert.equal(await testInstance.authorizedSignerToAccount(account), account)
             })
 
             it('should revert when passed an address that is not an account', async () => {
-              await assertRevert(authorizationTest.authorizedSignerToAccount(accounts[1]))
+              await assertRevert(testInstance.authorizedSignerToAccount(accounts[1]))
             })
           })
 
@@ -794,23 +741,23 @@ contract('Accounts', (accounts: string[]) => {
             const authorized = accounts[1]
             beforeEach(async () => {
               const sig = await getSignature(account, authorized)
-              await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+              await testInstance.fn(authorized, sig.v, sig.r, sig.s)
             })
 
             it('should return the account when passed the account', async () => {
-              assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
+              assert.equal(await testInstance.authorizedSignerToAccount(account), account)
             })
 
             it(`should return the account when passed the ${description}`, async () => {
-              assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
+              assert.equal(await testInstance.authorizedSignerToAccount(authorized), account)
             })
           })
         })
 
-        describe(`#get${upperFirst(description)}FromAccount()`, () => {
+        describe(`#get${name}SignerFromAccount()`, () => {
           describe(`when the account has not authorized a ${description}`, () => {
             it('should return the account when passed the account', async () => {
-              assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
+              assert.equal(await testInstance.getAuthorizedFromAccount(account), account)
             })
           })
 
@@ -819,27 +766,27 @@ contract('Accounts', (accounts: string[]) => {
 
             beforeEach(async () => {
               const sig = await getSignature(account, authorized)
-              await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+              await testInstance.fn(authorized, sig.v, sig.r, sig.s)
             })
 
             it(`should return the ${description} when passed the account`, async () => {
-              assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+              assert.equal(await testInstance.getAuthorizedFromAccount(account), authorized)
             })
           })
         })
 
-        describe(`#remove${upperFirst(description)}()`, () => {
+        describe(`#remove${name}Signer()`, () => {
           it(`should be able to remove the ${description} signer after authorizing`, async () => {
             const authorized = accounts[1]
             const sig = await getSignature(account, authorized)
 
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-            assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+            await testInstance.fn(authorized, sig.v, sig.r, sig.s)
+            assert.isTrue(await testInstance.hasAuthorizedSigner(account))
+            assert.equal(await testInstance.getAuthorizedFromAccount(account), authorized)
 
-            await authorizationTest.removeSigner()
-            assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
+            await testInstance.removeSigner()
+            assert.isFalse(await testInstance.hasAuthorizedSigner(account))
+            assert.equal(await testInstance.getAuthorizedFromAccount(account), account)
           })
         })
       })
