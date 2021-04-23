@@ -1,12 +1,10 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  buildAuthorizeSignerTypedData,
-  getParsedSignatureOfAddress,
-} from '@celo/protocol/lib/signing-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { assertLogMatches, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { upperFirst } from 'lodash'
 import {
   AccountsContract,
