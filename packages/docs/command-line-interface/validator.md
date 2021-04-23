@@ -20,6 +20,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's
                                                      address
 
+  --globalHelp                                       View all available global flags
+
   --yes                                              Answer yes to prompt
 
 EXAMPLE
@@ -43,6 +45,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's
                                                      address
 
+  --globalHelp                                       View all available global flags
+
 EXAMPLE
   deaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
@@ -62,6 +66,8 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's
                                                      address
+
+  --globalHelp                                       View all available global flags
 
 EXAMPLE
   deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
@@ -85,6 +91,9 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
       (required) From address to perform the slash (reward recipient)
+
+  --globalHelp
+      View all available global flags
 
   --intervals='[0:1], [1:2]'
       Array of intervals, ordered by min start to max end
@@ -118,6 +127,10 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
+
+  --globalHelp                                            View all available global
+                                                          flags
+
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
 
 EXAMPLE
@@ -142,6 +155,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -171,6 +185,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the
                                                      Validator
 
+  --globalHelp                                       View all available global flags
+
   --yes                                              Answer yes to prompt
 
 EXAMPLE
@@ -196,6 +212,9 @@ List the Locked Gold requirements for registering a Validator. This consists of 
 USAGE
   $ celocli validator:requirements
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLE
   requirements
 ```
@@ -216,6 +235,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d            (required) From address
                                                                to sign set bitmap
                                                                transactions
+
+  --globalHelp                                                 View all available global
+                                                               flags
 
   --intervals='[0:1], [1:2]'                                   Array of intervals,
                                                                ordered by min start to
@@ -252,6 +274,9 @@ USAGE
 ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
@@ -271,6 +296,9 @@ USAGE
 OPTIONS
   --at-block=at-block
       latest block to examine for signer activity
+
+  --globalHelp
+      View all available global flags
 
   --lookback=lookback
       [default: 120] how many blocks to look back for signer activity
@@ -336,6 +364,9 @@ OPTIONS
   --filter=filter                                         filter property by partial
                                                           string matching, ex: name=foo
 
+  --globalHelp                                            View all available global
+                                                          flags
+
   --no-header                                             hide table header from output
 
   --no-truncate                                           do not truncate output to fit
@@ -387,6 +418,7 @@ OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+  --globalHelp                                       View all available global flags
 
 DESCRIPTION
 

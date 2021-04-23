@@ -8,7 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -20,7 +20,7 @@ contract Reserve is
   IReserve,
   ICeloVersionedContract,
   Ownable,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   ReentrancyGuard
 {
@@ -73,6 +73,12 @@ contract Reserve is
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
 
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
     _;
@@ -83,7 +89,7 @@ contract Reserve is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 1, 2, 1);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -319,6 +325,9 @@ contract Reserve is
 
   /**
    * @notice Checks if an address is able to spend as an exchange.
+   * @dev isExchangeSpender was introduced after cUSD, so the cUSD Exchange is not included in it.
+   * If cUSD's Exchange were to be added to isExchangeSpender, the check with the
+   * registry could be removed.
    * @param spender The address to be checked.
    */
   modifier isAllowedToSpendExchange(address spender) {
@@ -344,6 +353,7 @@ contract Reserve is
   /**
    * @notice Takes away an address's permission to spend Reserve funds without limits.
    * @param spender The address that is to be no longer allowed to spend Reserve funds.
+   * @param index The index in exchangeSpenderAddresses of spender.
    */
   function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
     isExchangeSpender[spender] = false;
@@ -361,7 +371,13 @@ contract Reserve is
     emit ExchangeSpenderRemoved(spender);
   }
 
-  function getExchangeSpenders() public view returns (address[] memory) {
+  /**
+   * @notice Returns addresses of exchanges permitted to spend Reserve funds.
+   * Because exchangeSpenderAddresses was introduced after cUSD, cUSD's exchange
+   * is not included in this list.
+   * @return An array of addresses permitted to spend Reserve funds.
+   */
+  function getExchangeSpenders() external view returns (address[] memory) {
     return exchangeSpenderAddresses;
   }
 

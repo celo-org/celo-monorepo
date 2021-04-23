@@ -1,6 +1,6 @@
 import { getInstanceName, getReleaseName, installHelmChart } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
@@ -18,8 +18,9 @@ export const handler = async (argv: TestnetArgv) => {
   await switchToClusterFromEnv(argv.celoEnv)
 
   const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
-  const instanceName = getInstanceName(argv.celoEnv)
-  const helmReleaseName = getReleaseName(argv.celoEnv)
+  const imageTag = fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)
+  const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
+  const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
 
   const [
     blockscoutDBUsername,
@@ -31,6 +32,7 @@ export const handler = async (argv: TestnetArgv) => {
   await installHelmChart(
     argv.celoEnv,
     helmReleaseName,
+    imageTag,
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName

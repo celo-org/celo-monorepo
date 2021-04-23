@@ -51,6 +51,6 @@
     "@celo/flake-tracker": "0.0.1-dev"
   },
   "engines": {
-    "node": "10"
+    "node": ">=10"
   }
 }

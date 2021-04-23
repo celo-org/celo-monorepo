@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.1.1--dev]**
+### **[1.2.2--dev]**
 Features
 -  one-line summary - [#](link PR)
 
@@ -17,6 +17,29 @@ Other Changes
 
 
 ## Published
+
+### **[1.2.1]** (only utils and base) -- 2021-04-22
+
+Other Changes
+-  Unified web3 version (1.3.5) to reduce bundle size
+
+
+### **[1.2.0]** -- 2021-04-22
+Features
+- cEUR ContractKit support - [#7257](https://github.com/celo-org/celo-monorepo/pull/7257)
+- CK works with StableTokens not yet deployed - [#7524](https://github.com/celo-org/celo-monorepo/pull/7524)
+- Decode Governance.setConstitution proposals - [#7415](https://github.com/celo-org/celo-monorepo/pull/7415)
+- Adds timeout functions to sdk/base package - [#7617](https://github.com/celo-org/celo-monorepo/pull/7617)
+
+Bug Fixes
+- Dappkit fixes - [#7385](https://github.com/celo-org/celo-monorepo/pull/7385), [#7658](https://github.com/celo-org/celo-monorepo/pull/7658)
+- WalletConnect improvements - [#7507](https://github.com/celo-org/celo-monorepo/pull/7507), [#7645](https://github.com/celo-org/celo-monorepo/pull/7645)
+- Fix Governance.getProposalStage - [#7326](https://github.com/celo-org/celo-monorepo/pull/7326)
+
+Other Changes
+- Update @celo/utils to allow AccountAuthResponseSuccess to include pepper - [#7546](https://github.com/celo-org/celo-monorepo/pull/7546)
+- Updated ledger blob to support cEUR - [#7531](https://github.com/celo-org/celo-monorepo/pull/7531)
+- Bump web3 from 1.3.4 to 1.3.5 - [#7684](https://github.com/celo-org/celo-monorepo/pull/7684)
 
 ### **[1.1.0]** -- 2021-03-23
 Features
