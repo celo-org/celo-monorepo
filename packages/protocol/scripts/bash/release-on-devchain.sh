@@ -33,7 +33,7 @@ then
 fi
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar $BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then

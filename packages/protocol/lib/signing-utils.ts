@@ -31,8 +31,6 @@ export const getParsedSignatureOfAddress = async (web3: Web3, address: string, s
   return parseSignature(addressHash, signature, signer)
 }
 
-
-
 export async function signTransaction(web3: Web3, txn: any, privateKey: string) {
   let result: any
 
