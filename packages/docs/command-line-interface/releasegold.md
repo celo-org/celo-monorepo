@@ -27,6 +27,8 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
+  --globalHelp                                           View all available global flags
+
   --role=vote|validator|attestation                      (required)
 
   --signature=0x                                         (required) Signature (a.k.a.
@@ -71,6 +73,8 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
+  --globalHelp                                           View all available global flags
+
 EXAMPLE
   create-account --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
@@ -93,6 +97,8 @@ OPTIONS
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
+
+  --globalHelp                                           View all available global flags
 
   --value=10000000000000000000000                        (required) Amount of gold to
                                                          perform `action` with
@@ -126,6 +132,8 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
+  --globalHelp                                           View all available global flags
+
 EXAMPLE
   refund-and-finalize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
@@ -145,6 +153,8 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
+
+  --globalHelp                                           View all available global flags
 
   --yesreally                                            Override prompt to set
                                                          liquidity (be careful!)
@@ -168,6 +178,8 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
+
+  --globalHelp                                           View all available global flags
 
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group
                                                          to revoke votes from
@@ -201,6 +213,8 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
+  --globalHelp                                           View all available global flags
+
 EXAMPLES
   set-account --contract 0x5719118266779B58D0f9519383A4A27aA7b829E5 --property name
   --value mywallet
@@ -229,6 +243,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
       (required) Address of the ReleaseGold Contract
+
+  --globalHelp
+      View all available global flags
 
   --pop=pop
       ECDSA PoP for signer over contract's account
@@ -267,6 +284,9 @@ OPTIONS
                                                             multisig transaction from
                                                             (one of the owners)
 
+  --globalHelp                                              View all available global
+                                                            flags
+
   --yesreally                                               Override prompt to set new
                                                             beneficiary (be careful!)
 
@@ -292,6 +312,8 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
+  --globalHelp                                           View all available global flags
+
   --value=(true|false|True|False)                        (required) canExpire value
 
   --yesreally                                            Override prompt to set
@@ -316,6 +338,8 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
+
+  --globalHelp                                           View all available global flags
 
   --yesreally                                            Override prompt to set
                                                          liquidity (be careful!)
@@ -345,6 +369,8 @@ OPTIONS
                                                          indicating % of total balance
                                                          available for distribution.
 
+  --globalHelp                                           View all available global flags
+
   --yesreally                                            Override prompt to set new
                                                          maximum distribution (be
                                                          careful!)
@@ -370,6 +396,8 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
+  --globalHelp                                           View all available global flags
+
 EXAMPLE
   show --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
@@ -389,6 +417,8 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
+
+  --globalHelp                                           View all available global flags
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        (required) Address of the
                                                          recipient of Celo Dollars
@@ -417,6 +447,8 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
+
+  --globalHelp                                           View all available global flags
 
   --value=10000000000000000000000                        (required) Amount of released
                                                          gold (in wei) to withdraw

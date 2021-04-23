@@ -98,24 +98,32 @@ export async function requestTxSig(
 
 // Function to wrap Linking.openURL to try to redirect to App Store if app isn't downloaded
 async function openURLOrAppStore(url: string) {
-  let callURL
-  if (await Linking.canOpenURL(url)) {
-    callURL = url
-  } else {
+  const openAppStore = async () => {
+    let storeURL: string
     switch (Platform.OS) {
       case 'ios': {
-        callURL = IOS_STORE_URL
+        storeURL = IOS_STORE_URL
         break
       }
       case 'android': {
-        callURL = ANDROID_STORE_URL
+        storeURL = ANDROID_STORE_URL
         break
       }
       default: {
-        callURL = VALORA_APP_URL
+        storeURL = VALORA_APP_URL
         break
       }
     }
+    await Linking.openURL(storeURL)
   }
-  Linking.openURL(callURL)
+
+  // IOS 13 fails for Linking.canOpenURL, but this should work for most platforms.
+  try {
+    await Linking.openURL(url)
+  } catch (error) {
+    console.error(error)
+    await openAppStore()
+    // Allow DApp developer to handle broken flow
+    throw Error('Error opening deeplink: App likely not installed')
+  }
 }

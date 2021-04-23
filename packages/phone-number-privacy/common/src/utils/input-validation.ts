@@ -1,6 +1,5 @@
 import { isValidAddress, trimLeading0x } from '@celo/utils/lib/address'
 import isBase64 from 'is-base64'
-import { isValidPhoneNumber } from 'libphonenumber-js'
 import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
@@ -12,15 +11,19 @@ export function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && isValidAddress(requestBody.account)
 }
 
+function isValidPhoneNumberHash(phoneNumber: string) {
+  return isBase64(phoneNumber) && Buffer.from(phoneNumber, 'base64').length === 32
+}
+
 export function hasValidUserPhoneNumberParam(requestBody: GetContactMatchesRequest): boolean {
-  return !!requestBody.userPhoneNumber && isValidPhoneNumber(requestBody.userPhoneNumber)
+  return !!requestBody.userPhoneNumber && isValidPhoneNumberHash(requestBody.userPhoneNumber)
 }
 
 export function hasValidContactPhoneNumbersParam(requestBody: GetContactMatchesRequest): boolean {
   return (
     Array.isArray(requestBody.contactPhoneNumbers) &&
     requestBody.contactPhoneNumbers.length > 0 &&
-    requestBody.contactPhoneNumbers.every((contact) => isValidPhoneNumber(contact))
+    requestBody.contactPhoneNumbers.every((contact) => isValidPhoneNumberHash(contact))
   )
 }
 
