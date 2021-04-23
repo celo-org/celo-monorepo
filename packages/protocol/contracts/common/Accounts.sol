@@ -65,6 +65,15 @@ contract Accounts is
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
 
+  bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
+  bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
+  bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
+
+  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
+    "AuthorizeSigner(address account,address signer,bytes32 role)"
+  );
+  bytes32 public eip712DomainSeparator;
+
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidatorSignerAuthorized(address indexed account, address signer);
@@ -82,15 +91,6 @@ contract Accounts is
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
-
-  bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
-  bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
-  bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
-
-  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
-    "AuthorizeSigner(address account,address signer,bytes32 role)"
-  );
-  bytes32 public eip712DomainSeparator;
 
   /**
    * @notice Sets initialized == true on implementation contracts
