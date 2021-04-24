@@ -31,8 +31,8 @@ In this guide, you will:
 - Install the Celo CLI (and optionally, a local node to connect to the network)
 - Access the `ReleaseGold` account associated with your address using your existing Ledger
 - Authorize a voting key, which you will hold on a new, second Ledger
-- Lock some of the Gold in your `ReleaseGold` account
-- Use that Locked Gold to vote for Validator Groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
+- Lock some of the Gold (CELO) in your `ReleaseGold` account
+- Use that Locked Gold (CELO) to vote for Validator Groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
 
 ## Preparing Ledgers
 
@@ -193,13 +193,13 @@ celocli releasegold:create-account --contract $CELO_RG_ADDRESS --useLedger
 
 You'll need to press right on the Ledger several times to review details of the transactions, then when the device says "Accept and send" press both buttons together.
 
-Check that the `ReleaseGold` contract address is associated with a registered Locked Gold Account:
+Check that the `ReleaseGold` contract address is associated with a registered Locked Gold (CELO) Account:
 
 ```bash
 celocli account:show $CELO_RG_ADDRESS
 ```
 
-Now, using the proof-of-possession you generated above, as the Locked Gold Account account, you will authorize the vote signing key to vote on the Locked Gold Account's behalf:
+Now, using the proof-of-possession you generated above, as the Locked Gold (CELO) Account account, you will authorize the vote signing key to vote on the Locked Gold Account's behalf:
 
 ```bash
 # Using the Beneficiary Ledger

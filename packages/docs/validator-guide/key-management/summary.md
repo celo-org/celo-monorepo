@@ -11,7 +11,7 @@ The Celo protocol was designed with the understanding that there is often an inh
 
 ## Summary
 
-The table below outlines a summary of the various account roles in the Celo protocol. Note that these roles are often  *mutually exclusive*. An account that has been designated as one role can often not be used for a different purpose. Also note that under the hood, all of these accounts) are based on secp256k1 ECDSA private keys with the exception of the BLS signer. The different account roles are simply a concept encoded into the Celo proof-of-stake smart contracts, specifically [Accounts.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol).
+The table below outlines a summary of the various account roles in the Celo protocol. Note that these roles are often  *mutually exclusive*. An account that has been designated as one role can often not be used for a different purpose. Also note that under the hood, all of these accounts are based on secp256k1 ECDSA private keys with the exception of the BLS signer. The different account roles are simply a concept encoded into the Celo proof-of-stake smart contracts, specifically [Accounts.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol).
 
 For more details on a specific key type, please see the more detailed sections below.
 

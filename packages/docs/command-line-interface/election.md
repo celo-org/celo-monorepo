@@ -171,7 +171,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
   --globalHelp                                       View all available global flags
 
-  --value=value                                      (required) Amount of Gold used to
+  --value=value                                      (required) Amount of CELO used to
                                                      vote for group
 
 EXAMPLE

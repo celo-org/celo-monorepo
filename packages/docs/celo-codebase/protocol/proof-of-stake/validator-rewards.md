@@ -34,7 +34,7 @@ The validator’s overall uptime score is an exponential moving average of the u
 
 ## Calculating Slashing Penalty
 
-The protocol also tracks for each group a ‘slashing penalty’, initially equal to one but successively reduced on each occasion a validator in that group is slashed. The penalty returns to one 30 days after it was last reduced.
+The protocol also tracks a score named **slashing penalty** for each group, which is initially equal to 1.0 but successively reduced on each occasion a validator in that group is slashed. The score is reset to `1.0` after `slashing_penalty_reset_epochs` epochs (currently 30 days) if no further slashings occur.
 
 This factor is applied to all rewards to validators in that group, to the group itself, and to voters for the group.
 
