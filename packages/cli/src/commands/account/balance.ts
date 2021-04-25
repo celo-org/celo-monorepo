@@ -8,7 +8,7 @@ export default class Balance extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     erc20Address: Flags.address({
-      description: "Address of generic ERC-20 token to also check balance for",
+      description: 'Address of generic ERC-20 token to also check balance for',
     }),
   }
 

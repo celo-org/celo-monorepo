@@ -66,8 +66,9 @@ USAGE
   $ celocli account:balance ADDRESS
 
 OPTIONS
-  --erc20Address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Custom erc20 to check it's
-                                                             balance too
+  --erc20Address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Address of generic ERC-20
+                                                             token to also check balance
+                                                             for
 
   --globalHelp                                               View all available global
                                                              flags
