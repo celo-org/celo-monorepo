@@ -16,6 +16,7 @@ USAGE
 OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
+  --globalHelp                                          View all available global flags
 
   --participantAddress=participantAddress               (required) Address of the
                                                         participant to allowlist
@@ -35,6 +36,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
 
   --phaseDuration=phaseDuration                      (required) Duration of each DKG
                                                      phase in blocks
@@ -59,6 +61,10 @@ OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d                 (required) DKG
                                                                        Contract Address
 
+  --globalHelp                                                         View all
+                                                                       available global
+                                                                       flags
+
   --method=(shares|responses|justifications|participants|phase|group)  (required) Getter
                                                                        method to call
 ```
@@ -82,6 +88,8 @@ OPTIONS
                                                         being published
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
+
+  --globalHelp                                          View all available global flags
 ```
 
 _See code: [src/commands/dkg/publish.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/publish.ts)_
@@ -100,6 +108,7 @@ OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --blsKey=blsKey                                       (required)
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
+  --globalHelp                                          View all available global flags
 ```
 
 _See code: [src/commands/dkg/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/register.ts)_
@@ -117,6 +126,7 @@ USAGE
 OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
+  --globalHelp                                          View all available global flags
 ```
 
 _See code: [src/commands/dkg/start.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/start.ts)_
