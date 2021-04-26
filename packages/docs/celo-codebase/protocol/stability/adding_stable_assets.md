@@ -12,7 +12,7 @@ A good criteria to a successfully decide a pre-mint amount is to check by how mu
 
 ### Including contracts on the registry
 
-Currently, the addition of new assets is tied to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals. The only value that can't be changed is the pre-mint amount.
+Currently, the addition of new assets is tied to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals. The only value that can't be changed is the pre-mint amount.
 
 ### Freezing
 
