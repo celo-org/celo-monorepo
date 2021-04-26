@@ -2,7 +2,7 @@
 
 ### **Overview**
 
-As part of Celo’s identity protocol, a public encryption key is stored along with a user’s address in the `Attestations` contract. Both the address key pair and the encryption key pair are derived from the backup phrase. When sending a transaction the encryption key of the recipient is retrieved when getting his or her address. The comment is then encrypted using a 128 bit hybrid encryption scheme \(ECDH on secp256k1 with AES-128-CTR\). This system ensures that comments can only be read by the sending and receiving parties and that messages will be recovered when restoring a wallet from its backup phrase.
+As part of Celo’s identity protocol, a public encryption key is stored along with a user’s address in the `Accounts` contract. Both the address key pair and the encryption key pair are derived from the backup phrase. When sending a transaction the encryption key of the recipient is retrieved when getting his or her address. The comment is then encrypted using a 128 bit hybrid encryption scheme \(ECDH on secp256k1 with AES-128-CTR\). This system ensures that comments can only be read by the sending and receiving parties and that messages will be recovered when restoring a wallet from its backup phrase.
 
 ### **Comment Encryption Technical Details**
 
