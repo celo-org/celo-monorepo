@@ -69,10 +69,7 @@ contract IdentityProxyHub is UsingRegistry {
           identifier,
           otherAddr
         );
-        if (otherCompleted > completed) {
-          hasMostCompletions = false;
-          break;
-        }
+        hasMostCompletions = hasMostCompletions && otherCompleted <= completed;
       }
     }
 
