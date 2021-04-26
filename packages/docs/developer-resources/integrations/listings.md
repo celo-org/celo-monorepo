@@ -22,7 +22,7 @@ For more specific use-cases for exchanges, please checkout the [Custody and Exch
 ## Important Information
 ### Celo Native Asset and Stable Value Currencies
 
-There are key assets on the Celo network, the Celo native asset (CELO) and Celo-powered Stable Value Currencies, such as Celo Dollar (cUSD) and Celo Dollar (cEUR). CELO was formerly called Celo Gold (cGLD) when the contract was deployed, so you will often see references to Celo Gold (CGLD) in the codebase. To learn more about the two, please read [this](https://docs.celo.org/developer-guide/celo-for-eth-devs#the-celo-native-asset-and-the-celo-dollar) section of the docs.
+There are key assets on the Celo network, the Celo native asset (CELO) and Celo-powered Stable Value Currencies, such as Celo Dollar (cUSD) and Celo Euro (cEUR). CELO was formerly called Celo Gold (cGLD) when the contract was deployed, so you will often see references to Celo Gold and CGLD in the codebase. To learn more about the two, please read [this](https://docs.celo.org/developer-guide/celo-for-eth-devs#the-celo-native-asset-and-the-celo-dollar) section of the docs.
 
 You can also view the CGP proposal regarding the name change [here](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0003.md) and the forum post about the name change [here](https://forum.celo.org/t/proposal-to-rename-celo-gold-to-celo-native-asset/528).
 
