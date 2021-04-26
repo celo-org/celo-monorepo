@@ -1,9 +1,8 @@
-import ganache from '@celo/ganache-cli'
-
-import { spawn, SpawnOptions } from 'child_process'
+import { SpawnOptions, spawn } from 'child_process'
 
 import chalk from 'chalk'
 import fs from 'fs-extra'
+import ganache from '@celo/ganache-cli'
 import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
@@ -243,23 +242,16 @@ function deployReleaseGold(releaseGoldContracts: string) {
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
-async function runDevChainFromTar(filename: string, saveto?: string) {
-  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+async function runDevChainFromTar(filename: string, saveToDir?: string) {
+  const save = saveToDir !== undefined
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: save, unsafeCleanup: !save, dir: saveToDir })
   // tslint:disable-next-line: no-console
   console.log(`Creating tmp folder: ${chainCopy.name}`)
 
   await decompressChain(filename, chainCopy.name)
 
   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
-
-  return () =>
-    stopGanache().finally(async () => {
-      if (saveto) {
-        // tslint:disable-next-line: no-console
-        console.log(`Saving chaindata to ${saveto}`)
-        await compressChain(chainCopy.name, saveto)
-      }
-    })
+  return stopGanache
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {

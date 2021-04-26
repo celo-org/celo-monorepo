@@ -269,7 +269,7 @@ jobs:
     resource_class: large
     environment:
       RELEASE_TAG: celo-core-contracts-v3.rc0
-      POST_RELEASE_ARCHIVE: devchain.v3.tar.gz
+      POST_RELEASE_DATADIR: /tmp/$CIRCLE_SHA1/$RELEASE_TAG/
     steps:
       - attach_workspace:
           at: ~/app
@@ -289,12 +289,13 @@ jobs:
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
             BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout -s $POST_RELEASE_ARCHIVE
+            mkdir -p $POST_RELEASE_DATADIR
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout -s $POST_RELEASE_DATADIR
       - run:
           name: Execute release proposal with celocli
           command: |
-            TEST_PROPOSAL="../protocol/proposal.json"
-            DEVCHAIN_DATADIR=$POST_RELEASE_ARCHIVE
+            TEST_PROPOSAL="../protocol/proposal.json" \
+            DEVCHAIN_DATADIR=$POST_RELEASE_DATADIR \
             yarn --cwd packages/cli test src/commands/governance/conduct-proposal.test.ts
 
   protocol-test-release-snapshots:
