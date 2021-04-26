@@ -1,6 +1,6 @@
 import ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
-import { SpawnOptions, spawn } from 'child_process'
+import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs-extra'
 import path from 'path'
 import targz from 'targz'

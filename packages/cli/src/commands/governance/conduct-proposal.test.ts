@@ -35,7 +35,7 @@ testWithGanache('conduct proposal lifecycle', (web3: Web3) => {
   let stageDurations: any
   let args: string[]
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const accounts = await web3.eth.getAccounts()
     args = ['--from', accounts[0]]
 
