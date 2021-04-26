@@ -1,17 +1,19 @@
 # Adding more stable assets
 
-This document outlies the requirement and steps to add a new stable asset to the Celo platform. Assumming we want to add to the platform a new stable asset `cX` tracking the value of X (where X can be a fiat currency like ARS or MXN), using the [Mento exchange](doto.md).
+This document outlies the requirement and steps to add a new stable asset to the Celo platform. Assuming we want to add to the platform a new stable asset `cX` tracking the value of X (where X can be a fiat currency like ARS or MXN), using the [Mento exchange](doto.md).
 
 ## Requirements
 
-1. Liquidity: the asset X has to be liquidly traded against CELO, in a CELO/X ticker. In absense of that, X has to be liquidly traded, including weekends, agains well known assets that trade 24/7, like BTC or ETH, that way a price of X in respect of Celo has to can infered. In this second case an implicit pair can be calculated for the oracle reports.
-2. Determine pre-mint addresses and amounts. It is possible to pre-mint a fixed amout at the time of launching a new stable asset, good candidates to receive the pre-mint are the community fund and other entities commited to distribute this initial allocation to grant recipients and liquidity providers.
+1. Liquidity: the asset X has to be liquidly traded against CELO, in a CELO/X ticker. In absence of that, X has to be liquidly traded, including weekends, against well known assets that trade 24/7, like BTC or ETH, that way a price of X in respect of Celo has to can inferred. In this second case an implicit pair can be calculated for the oracle reports.
+2. Determine pre-mint addresses and amounts. It is possible to pre-mint a fixed amount at the time of launching a new stable asset, good candidates to receive the pre-mint are the community fund and other entities committed to distribute this initial allocation to grant recipients and liquidity providers. 
+
+A good criteria to a successfully decide a pre-mint amount is to check by how much it would affect the reserve collateralization ratio, this is, the ratio of all stable assets, divided by all the reserve holdings. Reserve information, as well as the collateralization ration can be found on the [Reserve website](https://celoreserve.org/).
 
 ## Procedure
 
 ### Including contracts on the registry
 
-Currently, the addition of new assets is tight to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals, only final value that can't be changed is the pre-mint amount.
+Currently, the addition of new assets is tight to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals, only final value that can't be changed is the pre-mint amount.
 
 ### Freezing
 
@@ -21,11 +23,11 @@ For the [deployment of cEUR](https://github.com/celo-org/celo-proposals/blob/mas
 
 ### Constitutional parameters
 
-As new contracts are added to the registry, new [constitution parameteres](https://docs.celo.org/developer-guide/sdk-code-reference/summary-2/classes/_wrappers_governance_.governancewrapper#isproposalpassing) need to be set. There's an [issue open](https://github.com/celo-org/celo-monorepo/issues/7318) to include this in the tooling to support it as part of the Contract Release.
+As new contracts are added to the registry, new [constitution parameters](https://docs.celo.org/developer-guide/sdk-code-reference/summary-2/classes/_wrappers_governance_.governancewrapper#isproposalpassing) need to be set. There's an [issue open](https://github.com/celo-org/celo-monorepo/issues/7318) to include this in the tooling to support it as part of the Contract Release.
 
 ### Oracle activation
 
-A following governance proposal needs to be submited to enable [oracles](oracles.md) to report. This oracle proposal needs to enable addresses to report to the `StableTokenX` address and, optionally, fund them to pay for gas fees. An example of this proposal is the [cEUR oracle activation proposal](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0023.md)[^2].
+A following governance proposal needs to be submitted to enable [oracles](oracles.md) to report. This oracle proposal needs to enable addresses to report to the `StableTokenX` address and, optionally, fund them to pay for gas fees. An example of this proposal is the [cEUR oracle activation proposal](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0023.md)[^2].
 
 ### Oracle report
 
@@ -35,11 +37,11 @@ Before fully activating `cX`, it is required to have at least one oracle report.
 
 The last governance proposal is expected to unfreeze the contract and attach the last strings in the process to get a fully transferable asset stabilized by the Reserve. This propose involves:
 
-1. Unfreezing both `StableTokenX` y `ExchangeX`.
+1. Unfreezing both `StableTokenX` & `ExchangeX`.
 2. Making `ExchangeX` able to pull CELO out of the Reserve for the buckets `Reserve.addExchangeSpender`
 3. Declaring the token to the Reserve as an asset to be stabilized calling `Reserve.addToken`
 4. Enable `StableTokenX` as a fee currency, so that it can be used to pay for gas `FeeCurrencyWhitelist.addToken`.
-5. In case necesarry, parameters such as `reserveFraction` and `spread` can also be updated in this governance proposal.
+5. In case necessary, parameters such as `reserveFraction` and `spread` can also be updated in this governance proposal.
 
 
 After passing this last proposal, `cX` should be fully activated.

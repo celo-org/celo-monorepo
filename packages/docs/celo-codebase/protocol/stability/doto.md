@@ -24,4 +24,4 @@ For a more detailed explanation, read the article [Zooming in on the Celo Expans
 
 ## Multi-mento Deployment
 
-Many instances of mento can be deployed in parallel for different stable assets. Currently, `cEUR` and `cUSD` live side-by-side, with independent buckets and oracles (although both of them are using the `SortedOracles` contract). They all fill the CELO bucket with funds from the Reserve, but not necesarly at the same time.
+Many instances of mento can be deployed in parallel for different stable assets. Currently, `cEUR` and `cUSD` live side-by-side, with independent buckets and oracle reports (although both of them are using the same `SortedOracles` instance). They all fill the CELO bucket with funds from the Reserve, but not necessarily at the same time.
