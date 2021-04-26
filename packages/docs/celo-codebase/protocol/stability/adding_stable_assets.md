@@ -1,23 +1,22 @@
 # Adding more stable assets
 
-This document outlies the requirement and steps to add a new stable asset to the Celo platform. Assuming we want to add to the platform a new stable asset `cX` tracking the value of X (where X can be a fiat currency like ARS or MXN), using the [Mento exchange](doto.md).
+This document outlies the requirements and steps to add a new stable asset to the Celo platform. Assuming we want to add to the platform a new stable asset `cX` tracking the value of X (where X can be a fiat currency like ARS or MXN), using the [Mento exchange](doto.md).
 
 ## Requirements
 
-1. Liquidity: the asset X has to be liquidly traded against CELO, in a CELO/X ticker. In absence of that, X has to be liquidly traded, including weekends, against well known assets that trade 24/7, like BTC or ETH, that way a price of X in respect of Celo has to can inferred. In this second case an implicit pair can be calculated for the oracle reports.
-2. Determine pre-mint addresses and amounts. It is possible to pre-mint a fixed amount at the time of launching a new stable asset, good candidates to receive the pre-mint are the community fund and other entities committed to distribute this initial allocation to grant recipients and liquidity providers. 
+1. Liquidity: the asset X has to be liquidly traded against CELO, in a CELO/X ticker. In absence of that, X has to be liquidly traded, including weekends, against well known assets that trade 24/7, like BTC or ETH, such that the price of X with respect to Celo can be inferred. In this second case, an implicit pair can be calculated for the oracle reports.
+2. Determine pre-mint addresses and amounts: It is possible to pre-mint a fixed amount at the time of launching a new stable asset, good candidates to receive the pre-mint are the community fund and other entities commited to distribute this initial allocation to grant recipients and liquidity providers.
 
 A good criteria to a successfully decide a pre-mint amount is to check by how much it would affect the reserve collateralization ratio, this is, the ratio of all stable assets, divided by all the reserve holdings. Reserve information, as well as the collateralization ration can be found on the [Reserve website](https://celoreserve.org/).
-
 ## Procedure
 
 ### Including contracts on the registry
 
-Currently, the addition of new assets is tight to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals, only final value that can't be changed is the pre-mint amount.
+Currently, the addition of new assets is tied to the [Contract Release Cycle](https://docs.celo.org/community/release-process/smart-contracts), as the contracts `ExchangeX` and `StableTokenX` need to be checked in [^1]. These new contracts just inherit from Exchange and StableToken, that are the ones originally used for `cUSD`. As StableToken `cX` will be initialized by the contract release, key parameters like spread and Reserve fraction can should be included, although they can be later modified by setters in the following governance proposals. The only value that can't be changed is the pre-mint amount.
 
 ### Freezing
 
-These contracts should be set as frozen to prevent `cX` from being transferable before Mento supports it in a governance proposal. At this point, as there are no oracles, the contract `ExchangeX` can't update buckets and it is thus imposible to mint and burn `cX`. There is [an issue open](https://github.com/celo-org/celo-monorepo/issues/7331) to include this step as part of the Contract Release.
+These contracts should be set as frozen to prevent `cX` from being transferable before Mento supports it in a governance proposal. At this point, as there are no oracles, the contract `ExchangeX` can't update buckets and it is thus impossible to mint and burn `cX`. There is [an issue open](https://github.com/celo-org/celo-monorepo/issues/7331) to include this step as part of the Contract Release.
 
 For the [deployment of cEUR](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0023.md), this was included as part of the [Oracle activation](#Oracle activation) proposal. 
 
@@ -31,7 +30,7 @@ A following governance proposal needs to be submitted to enable [oracles](oracle
 
 ### Oracle report
 
-Before fully activating `cX`, it is required to have at least one oracle report. This is required by there Reserve contract in [this line](https://github.com/celo-org/celo-monorepo/blob/9b43d07b35c9d50389f5f2f53ddfa0c21f16d0f2/packages/protocol/contracts/stability/Reserve.sol#L223). After reporting is worth double checking that the buckets sizes on `StableTokenX` are consistent with values reported and it is a good opportunity to test the oracle set up in production with no funds as risk, as the contracts involved are still frozen.
+Before fully activating `cX`, it is required to have at least one oracle report. This is required by the Reserve contract in [this line](https://github.com/celo-org/celo-monorepo/blob/9b43d07b35c9d50389f5f2f53ddfa0c21f16d0f2/packages/protocol/contracts/stability/Reserve.sol#L223). After reporting, it is worth double checking that the buckets sizes on `StableTokenX` are consistent with values reported and it is a good opportunity to test the oracle set up in production with no funds at risk, as the contracts involved are still frozen.
 
 ### Full activation
 
@@ -60,4 +59,4 @@ Adding a new stable asset involves updating many parts of the tooling, such as:
 * Supporting on Dapp kit.
 
 [^1] There are opened issues trying to de-couple the addition of new assets to the reserve to the release cycle.
-[^2] Please note this example proposal also includes freezing, this is because, at the time of writing (22-march-2021), the tooling for proposing a contract release doesn't support freezing those contracts on the same proposal. That proposal shall not be modified manually given that the tool is meant to run verifications.
+[^2] Please note this example proposal also includes freezing, this is because, at the time of writing (22-march-2021), the tooling for proposing a contract release doesn't support freezing those contracts on the same proposal. Proposals shall not be modified manually given that the tool is meant to run verifications.
