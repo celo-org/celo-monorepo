@@ -6,6 +6,7 @@ export enum CeloContract {
   DowntimeSlasher = 'DowntimeSlasher',
   Election = 'Election',
   EpochRewards = 'EpochRewards',
+  ERC20 = 'ERC20',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
