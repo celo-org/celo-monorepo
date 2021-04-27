@@ -65,7 +65,7 @@ For API endpoints useful for listing that follow [CMC requirements](https://docs
 * cEUR/CELO contract - [`0xE383394B913d7302c49F794C7d3243c429d53D1d`](https://explorer.celo.org/address/0xE383394B913d7302c49F794C7d3243c429d53D1d/transactions)
 
 ##### Summary
-Summary overview of market data for all tickers and all markets. This endpoints don't yet support cEUR.
+Summary overview of market data for all tickers and all markets. These endpoints don't yet support cEUR.
 
 ```sh 
 $ curl https://thecelo.com/api/v0.1.js?method=ex_summary
