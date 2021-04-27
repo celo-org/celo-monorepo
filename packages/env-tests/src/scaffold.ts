@@ -103,10 +103,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
       await goldToken
         .transfer(
           root.address,
-          celoBalance
-            .times(0.99)
-            .integerValue(BigNumber.ROUND_DOWN)
-            .toString()
+          celoBalance.times(0.99).integerValue(BigNumber.ROUND_DOWN).toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
       context.logger.debug(
@@ -123,13 +120,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
       const balance = await stableTokenInstance.balanceOf(account.address)
       if (balance.gt(maxBalanceBeforeCollecting)) {
         await stableTokenInstance
-          .transfer(
-            root.address,
-            balance
-              .times(0.99)
-              .integerValue(BigNumber.ROUND_DOWN)
-              .toString()
-          )
+          .transfer(root.address, balance.times(0.99).integerValue(BigNumber.ROUND_DOWN).toString())
           .sendAndWaitForReceipt({
             feeCurrency: stableTokenInstance.address,
             from: account.address,

@@ -164,7 +164,7 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
-          if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
+          if geth --help | grep 'proxy.proxyenodeurlpairs' >/dev/null; then
             PROXY_FLAG="--proxy.proxyenodeurlpairs"
           else
             PROXY_FLAG="--proxy.proxyenodeurlpair"

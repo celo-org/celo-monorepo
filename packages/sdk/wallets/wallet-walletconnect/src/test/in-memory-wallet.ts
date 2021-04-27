@@ -2,6 +2,7 @@ import { newKit } from '@celo/contractkit'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { PairingTypes, SessionTypes } from '@walletconnect/types'
+import { ERROR, getError } from '@walletconnect/utils'
 import debugConfig from 'debug'
 import { SupportedMethods } from '../types'
 import {
@@ -65,29 +66,34 @@ export function getTestWallet() {
     debug('onPairingDeleted', pairing)
   }
 
-  async function onSessionPayload(event: SessionTypes.PayloadEvent) {
+  async function onSessionRequest(event: SessionTypes.RequestParams) {
     const {
       topic,
-      // @ts-ignore todo: ask Pedro why this isn't typed
-      payload: { id, method },
+      request: {
+        // @ts-ignore
+        id,
+        method,
+        // @ts-ignore
+        params,
+      },
     } = event
 
     let result: any
 
     if (method === SupportedMethods.personalSign) {
-      const { payload, from } = parsePersonalSign(event)
+      const { payload, from } = parsePersonalSign(params)
       result = await wallet.signPersonalMessage(from, payload)
     } else if (method === SupportedMethods.signTypedData) {
-      const { from, payload } = parseSignTypedData(event)
+      const { from, payload } = parseSignTypedData(params)
       result = await wallet.signTypedData(from, payload)
     } else if (method === SupportedMethods.signTransaction) {
-      const tx = parseSignTransaction(event)
+      const tx = parseSignTransaction(params)
       result = await wallet.signTransaction(tx)
     } else if (method === SupportedMethods.computeSharedSecret) {
-      const { from, publicKey } = parseComputeSharedSecret(event)
+      const { from, publicKey } = parseComputeSharedSecret(params)
       result = (await wallet.computeSharedSecret(from, publicKey)).toString('hex')
     } else if (method === SupportedMethods.decrypt) {
-      const { from, payload } = parseDecrypt(event)
+      const { from, payload } = parseDecrypt(params)
       result = (await wallet.decrypt(from, payload)).toString('hex')
     } else {
       // client.reject({})
@@ -109,13 +115,16 @@ export function getTestWallet() {
   return {
     init: async (uri: string) => {
       client = await WalletConnect.init({
-        relayProvider: process.env.WALLET_CONNECT_BRIGDE,
+        relayProvider: process.env.WALLET_CONNECT_BRIDGE,
+        controller: true,
+        logger: 'error',
       })
+
       client.on(CLIENT_EVENTS.session.proposal, onSessionProposal)
       client.on(CLIENT_EVENTS.session.created, onSessionCreated)
       client.on(CLIENT_EVENTS.session.updated, onSessionUpdated)
       client.on(CLIENT_EVENTS.session.deleted, onSessionDeleted)
-      client.on(CLIENT_EVENTS.session.payload, onSessionPayload)
+      client.on(CLIENT_EVENTS.session.request, onSessionRequest)
 
       client.on(CLIENT_EVENTS.pairing.proposal, onPairingProposal)
       client.on(CLIENT_EVENTS.pairing.created, onPairingCreated)
@@ -125,8 +134,9 @@ export function getTestWallet() {
       await client.pair({ uri })
     },
     async close() {
-      await client.disconnect({ reason: 'End of session', topic: sessionTopic })
-      await client.pairing.delete({ topic: pairingTopic, reason: 'End of session' })
+      const reason = getError(ERROR.USER_DISCONNECTED)
+      await client.disconnect({ topic: sessionTopic, reason })
+      await client.pairing.delete({ topic: pairingTopic, reason })
     },
   }
 }

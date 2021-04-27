@@ -15,9 +15,10 @@ import {
 } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const stableTokenEUR: StableTokenEURInstance = await getDeployedProxiedContract<
-    StableTokenEURInstance
-  >('StableTokenEUR', artifacts)
+  const stableTokenEUR: StableTokenEURInstance = await getDeployedProxiedContract<StableTokenEURInstance>(
+    'StableTokenEUR',
+    artifacts
+  )
   return [
     config.registry.predeployedProxyAddress,
     stableTokenEUR.address,
@@ -46,7 +47,7 @@ module.exports = deploymentForCoreContract<ExchangeEURInstance>(
       'Reserve',
       artifacts
     )
-    // cUSD doesn't need to be added as it currently harcoded on reserve.sol
+    // cUSD doesn't need to be added as it currently harcoded in Reserve.sol
     await reserve.addExchangeSpender(exchange.address)
   }
 )

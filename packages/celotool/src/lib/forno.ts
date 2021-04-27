@@ -9,9 +9,7 @@ import { deployModule, destroyModule } from './vm-testnet-utils'
 const FORNO_TERRAFORM_MODULE_NAME = 'forno'
 
 export async function deployForno(celoEnv: string) {
-  const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS)
-    .split(',')
-    .map(coerceContext)
+  const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS).split(',').map(coerceContext)
   console.info('Deploying Forno with full node contexts:', contexts)
   const terraformVars: TerraformVars = await getFornoTerraformVars(celoEnv, contexts)
   // This prints the global IP address for forno
@@ -22,9 +20,7 @@ export async function deployForno(celoEnv: string) {
 }
 
 export async function destroyForno(celoEnv: string) {
-  const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS)
-    .split(',')
-    .map(coerceContext)
+  const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS).split(',').map(coerceContext)
   console.info('DESTROYING Forno')
   const terraformVars: TerraformVars = await getFornoTerraformVars(celoEnv, contexts)
   await destroyModule(celoEnv, FORNO_TERRAFORM_MODULE_NAME, terraformVars)

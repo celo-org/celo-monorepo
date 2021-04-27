@@ -57,20 +57,48 @@ export const Counters = {
     help: 'Counter for the number of signature requests without a session id',
   }),
 }
+const buckets = [
+  0.001,
+  0.01,
+  0.1,
+  0.2,
+  0.3,
+  0.5,
+  0.6,
+  0.7,
+  0.8,
+  0.9,
+  1,
+  1.2,
+  1.4,
+  1.6,
+  1.8,
+  2,
+  2.3,
+  2.6,
+  2.9,
+  3.5,
+  4,
+  5,
+  10,
+]
 
 export const Histograms = {
   responseLatency: new Histogram({
     name: 'signature_endpoint_latency',
     help: 'Histogram tracking latency of signature endpoint',
     labelNames: ['endpoint'],
+    buckets,
   }),
   getBlindedSigInstrumentation: new Histogram({
     name: 'get_blinded_sig_instrumentation',
     help: 'Histogram tracking latency of blinded sig function by code segment',
     labelNames: ['codeSegment'],
+    buckets,
   }),
   userRemainingQuotaAtRequest: new Histogram({
     name: 'user_remaining_quota_at_request',
     help: 'Histogram tracking remaining quota of users at time of request',
+    buckets,
   }),
 }

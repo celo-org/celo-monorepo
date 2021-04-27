@@ -6,6 +6,7 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
+- [Wallets](getting-started/wallets.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
@@ -903,6 +904,7 @@
     - [Phone Number Privacy](celo-codebase/protocol/identity/phone-number-privacy.md)
     - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
+  - [Optics](celo-codebase/protocol/optics.md)
   - [Plumo Ultralight Sync](celo-codebase/protocol/plumo.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
