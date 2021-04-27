@@ -463,7 +463,7 @@ contract Accounts is
 
   /**
    * @notice Whether or not the signer has been registered as the default signer for role
-   * @param _account The address of account that authorized signing.
+   * @param account The address of account that authorized signing.
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
