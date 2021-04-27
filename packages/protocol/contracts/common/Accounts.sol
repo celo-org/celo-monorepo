@@ -643,7 +643,7 @@ contract Accounts is
    * Attestation
    * @param role The role to check
    */
-  function isLegacyRole(bytes32 role) public view returns (bool) {
+  function isLegacyRole(bytes32 role) public pure returns (bool) {
     return role == VoteSigner || role == ValidatorSigner || role == AttestationSigner;
   }
 
@@ -917,7 +917,7 @@ contract Accounts is
    */
   function getRoleAuthorizationStructHash(address account, address signer, bytes32 role)
     internal
-    view
+    pure
     returns (bytes32)
   {
     return keccak256(abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role));
