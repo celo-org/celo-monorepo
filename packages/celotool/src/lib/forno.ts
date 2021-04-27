@@ -94,7 +94,7 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
   const contextInfosWs = await getContextInfos(WS_RPC_PORT)
 
   return {
-    backend_max_requests_per_second: '300',
+    backend_max_requests_per_instance_per_second: '200',
     celo_env: celoEnv,
     context_info_http: JSON.stringify(contextInfosHttp),
     context_info_ws: JSON.stringify(contextInfosWs),
