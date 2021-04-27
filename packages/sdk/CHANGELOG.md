@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.2.1--dev]**
+### **[1.2.2--dev]**
 Features
 -  one-line summary - [#](link PR)
 
@@ -17,6 +17,12 @@ Other Changes
 
 
 ## Published
+
+### **[1.2.1]** (only utils and base) -- 2021-04-22
+
+Other Changes
+-  Unified web3 version (1.3.5) to reduce bundle size
+
 
 ### **[1.2.0]** -- 2021-04-22
 Features
