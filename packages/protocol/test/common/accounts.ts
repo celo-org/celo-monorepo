@@ -38,6 +38,7 @@ contract('Accounts', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await accountsInstance.initialize(registry.address)
+    await accountsInstance.setEip712DomainSeparator()
   })
 
   describe('#createAccount', () => {

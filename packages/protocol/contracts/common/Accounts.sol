@@ -113,10 +113,9 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setEip712DomainSeparator();
   }
 
-  function setEip712DomainSeparator() private {
+  function setEip712DomainSeparator() public onlyOwner {
     uint256 chainId;
     assembly {
       chainId := chainid
@@ -440,7 +439,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Whether or not the signer has been registered as the default signer for role
+   * @notice Whether or not the signer has been registered as the legacy signer for role
    * @param _account The address of account that authorized signing.
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
@@ -462,6 +461,12 @@ contract Accounts is
     }
   }
 
+  /**
+   * @notice Whether or not the signer has been registered as the default signer for role
+   * @param _account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
   function isDefaultSigner(address account, address signer, bytes32 role)
     public
     view
@@ -470,6 +475,12 @@ contract Accounts is
     return accounts[account].defaultSigners[role] == signer;
   }
 
+  /**
+   * @notice Whether or not the signer has been registered as an indexed signer for role
+   * @param _account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
   function isIndexedSigner(address account, address signer, bytes32 role)
     public
     view
@@ -491,7 +502,6 @@ contract Accounts is
     return
       isLegacySigner(account, signer, role) ||
       accounts[account].signerAuthorizations[role][signer].completed;
-
   }
 
   /**
@@ -634,7 +644,7 @@ contract Accounts is
    * @param role The role to check
    */
   function isLegacyRole(bytes32 role) public view returns (bool) {
-    return role == ValidatorSigner || role == AttestationSigner || role == VoteSigner;
+    return role == VoteSigner || role == ValidatorSigner || role == AttestationSigner;
   }
 
   /**
