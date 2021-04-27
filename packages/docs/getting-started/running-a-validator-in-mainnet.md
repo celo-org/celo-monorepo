@@ -435,7 +435,7 @@ In order to validate we need to authorize the Validator signer:
 
 ```bash
 # On your local machine
-celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
+celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
 ```
 
 {% hint style="info" %} The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 CELO to cover tx fees. Any subsequent validator signers you authorize will not be funded. {% endhint %}
