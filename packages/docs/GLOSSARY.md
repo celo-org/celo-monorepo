@@ -98,7 +98,7 @@ When a validator signs two different blocks at the same height and with the same
 
 ## Epoch
 
-A fixed number of blocks, configured in the network's genesis block, during which the same validator set is used for consensus. A validator election is carried out after the last block of an epoch, and any resulting changes to the validator set are written into that block's header.
+A fixed number of blocks, configured in the network's genesis block, during which the same validator set is used for consensus. One epoch equals roughly one day. A validator election is carried out after the last block of an epoch, and any resulting changes to the validator set are written into that block's header.
 
 ## Epoch Rewards
 
