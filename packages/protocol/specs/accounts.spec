@@ -45,35 +45,35 @@ invariant address_signer_if_authorizedby(address x, address d, bytes32 role)
 /**
  * Given  account x address d a current signer, then d can not be a current signer of account y
  */
-rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, method f) { 
+rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, bytes32 role, method f) { 
 	// x and y are accounts d is authorizedby
 	require(x != 0 && y != 0 && d != 0 && x != d && y != x && y != d);  
 	require(sinvoke isAccount(x) && sinvoke _getAuthorizedBy(d) == x, "x is not registered or authorized");
 	require(sinvoke isAccount(y), "y is not a registered account");
-  calldataarg arg;
 	require(
     sinvoke _getAttestationSigner(x) == d ||
     sinvoke _getVoteSigner(x) == d ||
     sinvoke _getValidatorSigner(x) == d ||
-    sinvoke getIndexedSigner(x, arg) == d,
+    sinvoke getIndexedSigner(x, role) == d,
     "d must be a signer of some capacity for x"
   );
 	require(
     sinvoke _getAttestationSigner(y) != d &&
     sinvoke _getVoteSigner(y) != d &&
-    sinvoke _getValidatorSigner(y) != d,
-    sinvoke getIndexedSigner(y, arg) != d,
-    "d must not be a signer of any capacity for y");
+    sinvoke _getValidatorSigner(y) != d &&
+    sinvoke getIndexedSigner(y, role) != d,
+    "d must not be a signer of any capacity for y"
+  );
 	// Simulate all possible execution of all methods
 	env eF;
-	calldataarg arg;	  
+  calldataarg arg;
 	sinvoke f(eF, arg);
 	// Check that d is still not a current signer of y of any type
 	assert(
     sinvoke _getAttestationSigner(y) != d &&
     sinvoke _getVoteSigner(y) != d &&
-    sinvoke _getValidatorSigner(y) != d,
-    sinvoke getIndexedSigner(y, arg) != d,
+    sinvoke _getValidatorSigner(y) != d &&
+    sinvoke getIndexedSigner(y, role) != d,
     "d must still not be a signer of any capacity for y"
   );
 }
