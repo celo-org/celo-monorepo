@@ -30,6 +30,6 @@
     "firebase-functions": "^3.6.0"
   },
   "engines": {
-    "node": "10"
+    "node": ">=10"
   }
 }
