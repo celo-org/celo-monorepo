@@ -413,7 +413,7 @@ contract Accounts is
   function authorizeSigner(address signer, bytes32 role) public {
     require(isAccount(msg.sender), "Unknown account");
     require(
-      isNotAccount(signer) && isNotAuthorizedSigner(signer),
+      isNotAccount(signer) && isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
       "Cannot re-authorize address signer"
     );
 
@@ -426,19 +426,23 @@ contract Accounts is
 
   /**
    * @notice Finish the process of authorizing an address to sign on behalf of the account. 
-   * @param _account The address of account that authorized signing.
+   * @param account The address of account that authorized signing.
    * @param role The role to finish authorizing for.
    */
-  function completeSignerAuthorization(address _account, bytes32 role) public {
-    require(isAccount(_account), "Unknown account");
+  function completeSignerAuthorization(address account, bytes32 role) public {
+    require(isAccount(account), "Unknown account");
     require(
-      accounts[_account].signerAuthorizations[role][msg.sender].started == true,
+      isNotAccount(msg.sender) && isNotAuthorizedSignerForAnotherAccount(account, msg.sender),
+      "Cannot re-authorize address signer"
+    );
+    require(
+      accounts[account].signerAuthorizations[role][msg.sender].started == true,
       "Signer authorization not started"
     );
 
-    authorizedBy[msg.sender] = _account;
-    accounts[_account].signerAuthorizations[role][msg.sender].completed = true;
-    emit SignerAuthorizationCompleted(_account, msg.sender, role);
+    authorizedBy[msg.sender] = account;
+    accounts[account].signerAuthorizations[role][msg.sender].completed = true;
+    emit SignerAuthorizationCompleted(account, msg.sender, role);
   }
 
   /**
@@ -900,6 +904,20 @@ contract Accounts is
   }
 
   /**
+   * @notice Check if an address has been an authorized signer for an account.
+   * @param account The authorizing account address.
+   * @param signer The possibly authorized address.
+   * @return Returns `false` if authorized. Returns `true` otherwise.
+   */
+  function isNotAuthorizedSignerForAnotherAccount(address account, address signer)
+    internal
+    view
+    returns (bool)
+  {
+    return (authorizedBy[signer] == address(0) || authorizedBy[signer] == account);
+  }
+
+  /**
    * @notice Authorizes some role of `msg.sender`'s account to another address.
    * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -950,7 +968,7 @@ contract Accounts is
   function authorize(address authorized) private {
     require(isAccount(msg.sender), "Unknown account");
     require(
-      isNotAccount(authorized) && isNotAuthorizedSignerForAnotherAccount(authorized),
+      isNotAccount(authorized) && isNotAuthorizedSignerForAnotherAccount(msg.sender, authorized),
       "Cannot re-authorize address or locked gold account for another account"
     );
 
