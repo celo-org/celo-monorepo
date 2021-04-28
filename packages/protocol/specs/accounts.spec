@@ -37,7 +37,7 @@ invariant address_cant_be_both_account_and_signer(address x, address d)
  */
 invariant address_signer_if_authorizedby(address x, address d) 
   (x != d && x != 0 && d != 0  &&
-  (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d))
+  (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d) || sinvoke getIndexedSigner(x) == d)
     => (sinvoke isAccount(x) && sinvoke _getAuthorizedBy(d) == x)
 
 /**
