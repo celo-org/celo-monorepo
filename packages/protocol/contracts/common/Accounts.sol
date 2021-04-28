@@ -427,14 +427,14 @@ contract Accounts is
    * @param role The role to finish authorizing for.
    */
   function completeSignerAuthorization(address _account, bytes32 role) public {
-    Account storage account = accounts[_account];
+    require(isAccount(_account), "Unknown account");
     require(
-      account.signerAuthorizations[role][msg.sender].started == true,
+      accounts[_account].signerAuthorizations[role][msg.sender].started == true,
       "Signer authorization not started"
     );
 
     authorizedBy[msg.sender] = _account;
-    account.signerAuthorizations[role][msg.sender].completed = true;
+    accounts[_account].signerAuthorizations[role][msg.sender].completed = true;
     emit SignerAuthorizationCompleted(_account, msg.sender, role);
   }
 
