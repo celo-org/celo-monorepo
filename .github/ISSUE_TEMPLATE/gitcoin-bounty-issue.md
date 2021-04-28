@@ -51,10 +51,6 @@ Beginner, Intermediate or Advanced
 
 Bug, Feature, Improvement, Security, Documentation, Design, Code Review, Other
 
-### Funding Currency & Amount
-
-How much cUSD or CELO should be attached to this bounty?
-
 ### Expiration
 
 When does this bounty expire? (if applicable)
