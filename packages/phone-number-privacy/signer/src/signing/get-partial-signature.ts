@@ -15,7 +15,7 @@ import { Request, Response } from 'express'
 import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import { Counters, Histograms, Labels } from '../common/metrics'
+import { Counters, Histograms } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
@@ -105,7 +105,6 @@ export async function handleGetBlindedMessagePartialSig(
     }
 
     if (hadBlockchainError) {
-      Counters.blockchainErrors.labels(Labels.read).inc()
       errorMsgs.push(ErrorMessage.CONTRACT_GET_FAILURE)
     }
 

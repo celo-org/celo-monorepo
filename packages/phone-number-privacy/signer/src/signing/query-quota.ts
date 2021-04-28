@@ -18,7 +18,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import allSettled from 'promise.allsettled'
 import { respondWithError } from '../common/error-utils'
-import { Counters, Histograms } from '../common/metrics'
+import { Counters, Histograms, Labels } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { Endpoints } from '../server'
@@ -169,11 +169,12 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     new Promise((resolve) => {
       resolve(getCeloBalance(logger, account, walletAddress))
     }),
-  ]).then((values) => {
-    cUSDAccountBalance = values[0] as BigNumber
-    celoAccountBalance = values[1] as BigNumber
-  })
-  getBalancesMeter()
+  ])
+    .then((values) => {
+      cUSDAccountBalance = values[0] as BigNumber
+      celoAccountBalance = values[1] as BigNumber
+    })
+    .finally(getBalancesMeter)
 
   // Min balance can be in either cUSD or CELO
   if (
@@ -235,7 +236,10 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
           RETRY_DELAY_IN_MS,
           undefined,
           FULL_NODE_TIMEOUT_IN_MS
-        )
+        ).catch((err) => {
+          Counters.blockchainErrors.labels(Labels.read).inc()
+          throw err
+        })
       )
   ).then((values) => {
     logger.trace({ addresses, txCounts: values }, 'Fetched txCounts for addresses')
@@ -257,7 +261,10 @@ export async function getDollarBalance(logger: Logger, ...addresses: string[]): 
           RETRY_DELAY_IN_MS,
           undefined,
           FULL_NODE_TIMEOUT_IN_MS
-        )
+        ).catch((err) => {
+          Counters.blockchainErrors.labels(Labels.read).inc()
+          throw err
+        })
       )
   ).then((values) => {
     logger.trace(
@@ -280,7 +287,10 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
           RETRY_DELAY_IN_MS,
           undefined,
           FULL_NODE_TIMEOUT_IN_MS
-        )
+        ).catch((err) => {
+          Counters.blockchainErrors.labels(Labels.read).inc()
+          throw err
+        })
       )
   ).then((values) => {
     logger.trace(
@@ -306,6 +316,7 @@ export async function getWalletAddress(logger: Logger, account: string): Promise
     .catch((err: any) => {
       logger.error({ account }, 'failed to get wallet address for account')
       logger.error(err)
+      Counters.blockchainErrors.labels(Labels.read).inc()
       return NULL_ADDRESS
     })
     .finally(getWalletAddressMeter)

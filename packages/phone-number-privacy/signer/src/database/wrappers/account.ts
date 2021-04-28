@@ -37,8 +37,10 @@ async function getAccountExists(account: string): Promise<boolean> {
   const getAccountExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getAccountExists')
     .startTimer()
-  const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
-  getAccountExistsMeter()
+  const existingAccountRecord = await accounts()
+    .where(ACCOUNTS_COLUMNS.address, account)
+    .first()
+    .finally(getAccountExistsMeter)
   return !!existingAccountRecord
 }
 
@@ -101,38 +103,6 @@ export async function getDidMatchmaking(account: string, logger: Logger) {
     .labels('getDidMatchmaking')
     .startTimer()
   return _getDidMatchmaking(account, logger).finally(getDidMatchmakingMeter)
-}
-
-/*
- * Set did matchmaking to true in database.  If record doesn't exist, create one.
- */
-async function _setDidMatchmaking(account: string, logger: Logger) {
-  logger.debug({ account }, 'Setting did matchmaking')
-  try {
-    if (await getAccountExists(account)) {
-      return accounts()
-        .where(ACCOUNTS_COLUMNS.address, account)
-        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
-        .timeout(DB_TIMEOUT)
-        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date()) // TODO(Alec): add timeouts here?
-    } else {
-      const newAccount = new Account(account)
-      newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
-      return insertRecord(newAccount)
-    }
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    return null
-  }
-}
-
-export async function setDidMatchmaking(account: string, logger: Logger) {
-  const setDidMatchmakingMeter = Histograms.dbOpsInstrumentation
-    .labels('setDidMatchmaking')
-    .startTimer()
-  return _setDidMatchmaking(account, logger).finally(setDidMatchmakingMeter)
 }
 
 async function insertRecord(data: Account) {

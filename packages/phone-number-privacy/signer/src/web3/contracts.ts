@@ -5,7 +5,7 @@ import {
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
 } from '@celo/phone-number-privacy-common'
-import { Histograms } from '../common/metrics'
+import { Counters, Histograms, Labels } from '../common/metrics'
 import config from '../config'
 
 const contractKit = newKit(config.blockchain.provider)
@@ -27,7 +27,11 @@ export async function getBlockNumber(): Promise<number> {
     undefined,
     FULL_NODE_TIMEOUT_IN_MS
   )
+    .catch((err) => {
+      Counters.blockchainErrors.labels(Labels.read).inc()
+      throw err
+    })
+    .finally(getBlockNumberMeter)
 
-  getBlockNumberMeter()
   return res
 }
