@@ -20,7 +20,7 @@ Celo has [WIP QR code standard CIP16](https://github.com/celo-org/celo-proposals
 Please read more under [Custody](./custody.md), but here is a shortened version:
 
 ### Detect Transfers
-Stable-value currencies, currently cUSD and cEUR, are contracts, `StableToken` and `StableToken` respectively, that can be accessed via the ERC20 interface.  The native asset CELO can be accessed via the `GoldToken` ERC20 interface, or natively, similar to ETH on Ethereum.
+Stable-value currencies, currently cUSD and cEUR, are contracts, `StableToken` and `StableTokenEUR` respectively, that can be accessed via the ERC20 interface.  The native asset CELO can be accessed via the `GoldToken` ERC20 interface, or natively, similar to ETH on Ethereum.
 
 Addresses for those contracts can be found by querying the [registry](../contractkit/contracts-wrappers-registry.md) or in the (Listing Guide)[`./listings.md`].
 
