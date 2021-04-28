@@ -49,7 +49,7 @@ Let's create a migration to deploy the contract. For that, we need to create a f
 ```javascript
 var HelloWorld = artifacts.require('HelloWorld')
 
-module.exports = function(deployer) {
+module.exports = function (deployer) {
   deployer.deploy(HelloWorld)
 }
 ```

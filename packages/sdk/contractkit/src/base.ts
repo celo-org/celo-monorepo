@@ -6,8 +6,10 @@ export enum CeloContract {
   DowntimeSlasher = 'DowntimeSlasher',
   Election = 'Election',
   EpochRewards = 'EpochRewards',
+  ERC20 = 'ERC20',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
+  ExchangeEUR = 'ExchangeEUR',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -22,13 +24,15 @@ export enum CeloContract {
   Reserve = 'Reserve',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
+  StableTokenEUR = 'StableTokenEUR',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 
-export type StableTokenContract = CeloContract.StableToken
+export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
+export const stableTokenContractArray = [CeloContract.StableToken, CeloContract.StableTokenEUR]
 
-export type ExchangeContract = CeloContract.Exchange
+export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
 
 export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
 /**

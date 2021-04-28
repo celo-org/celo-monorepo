@@ -259,7 +259,7 @@ return (
 
 ## Best practices
 
-We've compiled a short list on best practices to follow when developing DApps. Following these will improve the end user experience and keep them more engaged with the Celo ecosystem. If you have any questions around these, feel free to [reach out on Discord](https://discord.gg/745Qntv), we're always there and happy to chat.
+We've compiled a short list on best practices to follow when developing DApps. Following these will improve the end user experience and keep them more engaged with the Celo ecosystem. If you have any questions around these, feel free to [reach out on Discord](https://chat.celo.org), we're always there and happy to chat.
 
 ### Last used address
 
@@ -296,4 +296,4 @@ Hopefully you have a better grasp on developing DApps against the Celo core cont
 - Calling simple functions on the core contracts
 - A brief word on best practices with regard to DApp development.
 
-This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://discord.gg/745Qntv) if you need any help (or just want to chat)!
+This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://chat.celo.org) if you need any help (or just want to chat)!

@@ -18,6 +18,7 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
+  'ExchangeEURProxy',
   'ExchangeProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
@@ -30,6 +31,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
+  'StableTokenEURProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
 ]
@@ -66,9 +68,11 @@ export const CoreContracts = [
 
   // stability
   'Exchange',
+  'ExchangeEUR',
   'Reserve',
   'ReserveSpenderMultiSig',
   'StableToken',
+  'StableTokenEUR',
   'SortedOracles',
 ]
 
@@ -80,7 +84,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const Interfaces = ['ICeloToken', 'IERC20']
+const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
@@ -112,7 +116,7 @@ function compile() {
         process.exit(1)
       }
     } catch (e) {
-      console.error(
+      console.debug(
         `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
     }

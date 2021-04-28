@@ -12,19 +12,18 @@ import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
 const helmChartPath = '../helm-charts/blockscout'
 
-export function getInstanceName(celoEnv: string) {
-  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+export function getInstanceName(celoEnv: string, dbSuffix: string) {
   return `${celoEnv}${dbSuffix}`
 }
 
-export function getReleaseName(celoEnv: string) {
-  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+export function getReleaseName(celoEnv: string, dbSuffix: string) {
   return `${celoEnv}-blockscout${dbSuffix}`
 }
 
 export async function installHelmChart(
   celoEnv: string,
   releaseName: string,
+  imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
@@ -35,10 +34,13 @@ export async function installHelmChart(
     helmChartPath,
     await helmParameters(
       celoEnv,
+      imageTag,
       blockscoutDBUsername,
       blockscoutDBPassword,
       blockscoutDBConnectionName
-    )
+    ),
+    true,
+    `values-${celoEnv}.yaml`
   )
 }
 
@@ -49,6 +51,7 @@ export async function removeHelmRelease(helmReleaseName: string, celoEnv: string
 export async function upgradeHelmChart(
   celoEnv: string,
   helmReleaseName: string,
+  imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
@@ -56,17 +59,25 @@ export async function upgradeHelmChart(
   console.info(`Upgrading helm release ${helmReleaseName}`)
   const params = await helmParameters(
     celoEnv,
+    imageTag,
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName
   )
-  await upgradeGenericHelmChart(celoEnv, helmReleaseName, helmChartPath, params)
+  await upgradeGenericHelmChart(
+    celoEnv,
+    helmReleaseName,
+    helmChartPath,
+    params,
+    `values-${celoEnv}.yaml`
+  )
 
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }
 
 async function helmParameters(
   celoEnv: string,
+  imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
@@ -80,18 +91,19 @@ async function helmParameters(
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.deployment.account="${currentGcloudAccount}"`,
+    `--set blockscout.deployment.timestamp="${new Date().toISOString()}"`,
     `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
-    `--set blockscout.image.tag=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)}`,
+    `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
-    `--set blockscout.replicas=${fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS)}`,
     `--set blockscout.subnetwork="${fetchEnvOrFallback(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
     `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
+    `--set blockscout.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
   ]
   if (useMetadataCrawler !== 'false') {
     params.push(

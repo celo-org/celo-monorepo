@@ -4,7 +4,7 @@ When a new version of the Celo node is available, you can follow this guide to u
 
 ## Recent Releases
 
-* [Blockchain Client 1.2.0](https://github.com/celo-org/celo-blockchain/releases/tag/v1.2.2) (Latest production release)
+* [Blockchain Client 1.3.0](https://github.com/celo-org/celo-blockchain/releases/tag/v1.3.0) (Latest production release)
 
 ## When an upgrade is required
 
@@ -54,6 +54,8 @@ A second option is to perform a hot-swap to switch over to a new validator node.
 {% hint style="info" %} Hotswap is being introduced in version 1.2.0. When upgrading nodes that are not yet on 1.2.0 refer to the guide to perform a key rotation. {% endhint %}
 
 Validators can be configured as primaries or replicas. By default validators start as primaries and will persist all changes around starting or stopping. Through the istanbul management RPC API the validator can be configured to start or stop at a specified block. The validator will participate in consensus for block numbers in the range `[start, stop)`.
+
+{% hint style="warning" %} Note that the replica node **must** use the same set of proxies as the primary node. If it does not it will not be able to switchover without downtime due to needing to the complete the announce protocol from scratch. Replicas behind the same set of proxies as the primary node will be able to switchover without downtime. {% endhint %}
 
 #### RPC Methods
 * `istanbul.start()` and `istanbul.startAtBlock()` start validating immediately or at a block

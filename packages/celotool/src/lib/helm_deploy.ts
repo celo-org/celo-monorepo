@@ -104,12 +104,8 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random()
-    .toString(36)
-    .slice(-8)
-  const blockscoutDBPassword = Math.random()
-    .toString(36)
-    .slice(-8)
+  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
+  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -312,6 +308,7 @@ export async function installCertManager() {
 
 export async function installAndEnableMetricsDeps(
   installPrometheus: boolean,
+  context?: string,
   clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
@@ -325,7 +322,7 @@ export async function installAndEnableMetricsDeps(
     )
   }
   if (installPrometheus) {
-    await installPrometheusIfNotExists(clusterConfig)
+    await installPrometheusIfNotExists(context, clusterConfig)
   }
 }
 
