@@ -16,6 +16,7 @@ import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
+import { newIerc20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
@@ -40,6 +41,7 @@ export const ContractFactories = {
   [CeloContract.DowntimeSlasher]: newDowntimeSlasher,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
+  [CeloContract.ERC20]: newIerc20,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.ExchangeEUR]: newExchangeEur,
@@ -97,6 +99,9 @@ export class Web3ContractCache {
   }
   getEpochRewards() {
     return this.getContract(CeloContract.EpochRewards)
+  }
+  getErc20(address: string) {
+    return this.getContract(CeloContract.ERC20, address)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
