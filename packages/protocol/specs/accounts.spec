@@ -16,15 +16,14 @@ methods {
 /**
  * If an address x is not an account then all mapping from x should be empty
  */
-invariant account_empty_if_not_exist(env e, address x) {
-  calldataarg arg;
+invariant account_empty_if_not_exist(env e, address x, bytes32 role)
   !sinvoke isAccount(x) => 
     sinvoke getWalletAddress(x) == 0 &&
     sinvoke _getAttestationSigner(x) == 0 &&
     sinvoke _getVoteSigner(x) == 0 &&
     sinvoke _getValidatorSigner(x) == 0 && 
-    sinvoke getIndexedSigner(x, arg) == 0
-}
+    sinvoke getIndexedSigner(x, role) == 0
+
 
 
 /**
@@ -38,12 +37,10 @@ invariant address_cant_be_both_account_and_signer(address x, address d)
 /**
  * A current signer d for account x should be authorizedby 
  */
-invariant address_signer_if_authorizedby(address x, address d) {
-  calldataarg arg;
+invariant address_signer_if_authorizedby(address x, address d, bytes32 role)
   (x != d && x != 0 && d != 0  &&
-  (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d) || sinvoke getIndexedSigner(x, arg) == d)
+  (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d) || sinvoke getIndexedSigner(x, role) == d)
     => (sinvoke isAccount(x) && sinvoke _getAuthorizedBy(d) == x)
-}
 
 /**
  * Given  account x address d a current signer, then d can not be a current signer of account y
