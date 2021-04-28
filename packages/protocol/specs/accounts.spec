@@ -10,18 +10,21 @@ methods {
 	_getAttestationSigner(address) returns address envfree
 	_getVoteSigner(address) returns address envfree
 	_getValidatorSigner(address) returns address envfree
+	getIndexedSigner(address,bytes32) returns address envfree
 }
 
 /**
  * If an address x is not an account then all mapping from x should be empty
  */
-invariant account_empty_if_not_exist(env e, address x) 
+invariant account_empty_if_not_exist(env e, address x) {
+  calldataarg arg;
   !sinvoke isAccount(x) => 
     sinvoke getWalletAddress(x) == 0 &&
     sinvoke _getAttestationSigner(x) == 0 &&
     sinvoke _getVoteSigner(x) == 0 &&
     sinvoke _getValidatorSigner(x) == 0 && 
-    sinvoke getIndexedSigner(x) == 0
+    sinvoke getIndexedSigner(x, arg) == 0
+}
 
 
 /**
@@ -35,10 +38,12 @@ invariant address_cant_be_both_account_and_signer(address x, address d)
 /**
  * A current signer d for account x should be authorizedby 
  */
-invariant address_signer_if_authorizedby(address x, address d) 
+invariant address_signer_if_authorizedby(address x, address d) {
+  calldataarg arg;
   (x != d && x != 0 && d != 0  &&
-  (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d) || sinvoke getIndexedSigner(x) == d)
+  (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d) || sinvoke getIndexedSigner(x, arg) == d)
     => (sinvoke isAccount(x) && sinvoke _getAuthorizedBy(d) == x)
+}
 
 /**
  * Given  account x address d a current signer, then d can not be a current signer of account y
@@ -48,18 +53,19 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
 	require(x != 0 && y != 0 && d != 0 && x != d && y != x && y != d);  
 	require(sinvoke isAccount(x) && sinvoke _getAuthorizedBy(d) == x, "x is not registered or authorized");
 	require(sinvoke isAccount(y), "y is not a registered account");
+  calldataarg arg;
 	require(
     sinvoke _getAttestationSigner(x) == d ||
     sinvoke _getVoteSigner(x) == d ||
     sinvoke _getValidatorSigner(x) == d ||
-    sinvoke getIndexedSigner(x) == d,
+    sinvoke getIndexedSigner(x, arg) == d,
     "d must be a signer of some capacity for x"
   );
 	require(
     sinvoke _getAttestationSigner(y) != d &&
     sinvoke _getVoteSigner(y) != d &&
     sinvoke _getValidatorSigner(y) != d,
-    sinvoke getIndexedSigner(y) != d,
+    sinvoke getIndexedSigner(y, arg) != d,
     "d must not be a signer of any capacity for y");
 	// Simulate all possible execution of all methods
 	env eF;
@@ -70,7 +76,7 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
     sinvoke _getAttestationSigner(y) != d &&
     sinvoke _getVoteSigner(y) != d &&
     sinvoke _getValidatorSigner(y) != d,
-    sinvoke getIndexedSigner(y) != d,
+    sinvoke getIndexedSigner(y, arg) != d,
     "d must still not be a signer of any capacity for y"
   );
 }
