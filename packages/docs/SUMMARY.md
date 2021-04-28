@@ -889,7 +889,7 @@
     - [Penalties](celo-codebase/protocol/proof-of-stake/penalties.md)
   - [Governance](celo-codebase/protocol/governance.md)
   - [Stability Mechanism](celo-codebase/protocol/stability/README.md)
-    - [Stability Algorithm \(CP-DOTO\)](celo-codebase/protocol/stability/doto.md)
+    - [Stability Algorithm \(Mento\)](celo-codebase/protocol/stability/doto.md)
     - [Oracles](celo-codebase/protocol/stability/oracles.md)
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
