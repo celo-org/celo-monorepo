@@ -20,7 +20,8 @@ invariant account_empty_if_not_exist(env e, address x)
     sinvoke getWalletAddress(x) == 0 &&
     sinvoke _getAttestationSigner(x) == 0 &&
     sinvoke _getVoteSigner(x) == 0 &&
-    sinvoke _getValidatorSigner(x) == 0
+    sinvoke _getValidatorSigner(x) == 0 && 
+    sinvoke getIndexedSigner(x) == 0
 
 
 /**
@@ -32,7 +33,7 @@ invariant address_cant_be_both_account_and_signer(address x, address d)
 
 
 /**
- * A current signer d or account x should be authorizedby 
+ * A current signer d for account x should be authorizedby 
  */
 invariant address_signer_if_authorizedby(address x, address d) 
   (x != d && x != 0 && d != 0  &&
@@ -50,13 +51,15 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
 	require(
     sinvoke _getAttestationSigner(x) == d ||
     sinvoke _getVoteSigner(x) == d ||
-    sinvoke _getValidatorSigner(x) == d,
+    sinvoke _getValidatorSigner(x) == d ||
+    sinvoke getIndexedSigner(x) == d,
     "d must be a signer of some capacity for x"
   );
 	require(
     sinvoke _getAttestationSigner(y) != d &&
     sinvoke _getVoteSigner(y) != d &&
     sinvoke _getValidatorSigner(y) != d,
+    sinvoke getIndexedSigner(y) != d,
     "d must not be a signer of any capacity for y");
 	// Simulate all possible execution of all methods
 	env eF;
@@ -67,6 +70,7 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
     sinvoke _getAttestationSigner(y) != d &&
     sinvoke _getVoteSigner(y) != d &&
     sinvoke _getValidatorSigner(y) != d,
+    sinvoke getIndexedSigner(y) != d,
     "d must still not be a signer of any capacity for y"
   );
 }
@@ -91,7 +95,7 @@ rule address_can_authorize_two_address(address x, address d1, address d2, method
 	bytes32 s2;
 	sinvoke authorizeValidatorSigner(e,d2,v2,r2,s2);  
 	
-	// Simulate all transacations from all possible users 
+	// Simulate all transactions from all possible users 
 	env eF;
 	calldataarg arg;	
 	sinvoke f(eF, arg);
