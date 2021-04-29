@@ -55,15 +55,15 @@ contract Accounts is
     bytes dataEncryptionKey;
     // The URL under which an account adds metadata and claims
     string metadataURL;
-    // Indexable signers by account
-    mapping(bytes32 => address) defaultSigners;
-    // All signers and their roles for a given account
-    mapping(bytes32 => mapping(address => SignerAuthorization)) signerAuthorizations;
   }
 
   mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
+  // Indexable signers by account
+  mapping(address => mapping(bytes32 => address)) defaultSigners;
+  // All signers and their roles for a given account
+  mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
 
   bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
   bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
@@ -248,7 +248,7 @@ contract Accounts is
     } else if (role == ValidatorSigner) {
       account.signers.validator = signer;
     } else {
-      account.defaultSigners[role] = signer;
+      defaultSigners[msg.sender][role] = signer;
     }
 
     emit DefaultSignerSet(msg.sender, signer, role);
@@ -267,9 +267,7 @@ contract Accounts is
     public
   {
     authorizeAddressWithRole(signer, role, v, r, s);
-
-    Account storage account = accounts[msg.sender];
-    account.signerAuthorizations[role][signer] = SignerAuthorization({
+    signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
       started: true,
       completed: true
     });
@@ -285,9 +283,7 @@ contract Accounts is
     bytes32 s
   ) private {
     authorizeAddress(signer, v, r, s);
-
-    Account storage account = accounts[msg.sender];
-    account.signerAuthorizations[role][signer] = SignerAuthorization({
+    signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
       started: true,
       completed: true
     });
@@ -417,7 +413,7 @@ contract Accounts is
       "Cannot re-authorize address signer"
     );
 
-    accounts[msg.sender].signerAuthorizations[role][signer] = SignerAuthorization({
+    signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
       started: true,
       completed: false
     });
@@ -436,12 +432,12 @@ contract Accounts is
       "Cannot re-authorize address signer"
     );
     require(
-      accounts[account].signerAuthorizations[role][msg.sender].started == true,
+      signerAuthorizations[account][role][msg.sender].started == true,
       "Signer authorization not started"
     );
 
     authorizedBy[msg.sender] = account;
-    accounts[account].signerAuthorizations[role][msg.sender].completed = true;
+    signerAuthorizations[account][role][msg.sender].completed = true;
     emit SignerAuthorizationCompleted(account, msg.sender, role);
   }
 
@@ -479,7 +475,7 @@ contract Accounts is
     view
     returns (bool)
   {
-    return accounts[account].defaultSigners[role] == signer;
+    return defaultSigners[account][role] == signer;
   }
 
   /**
@@ -508,7 +504,7 @@ contract Accounts is
   function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
     return
       isLegacySigner(account, signer, role) ||
-      accounts[account].signerAuthorizations[role][signer].completed;
+      signerAuthorizations[account][role][signer].completed;
   }
 
   /**
@@ -516,8 +512,8 @@ contract Accounts is
    * @param role The role that has been authorized.
    */
   function removeDefaultSigner(bytes32 role) public {
-    address signer = accounts[msg.sender].defaultSigners[role];
-    accounts[msg.sender].defaultSigners[role] = address(0);
+    address signer = defaultSigners[msg.sender][role];
+    defaultSigners[msg.sender][role] = address(0);
     emit DefaultSignerRemoved(msg.sender, signer, role);
   }
 
@@ -553,7 +549,7 @@ contract Accounts is
       removeIndexedSigner(role);
     }
 
-    delete accounts[msg.sender].signerAuthorizations[role][signer];
+    delete signerAuthorizations[msg.sender][role][signer];
     emit SignerRemoved(msg.sender, signer, role);
   }
 
@@ -683,7 +679,7 @@ contract Accounts is
    * @param role The role of the signer.
    */
   function getDefaultSigner(address account, bytes32 role) public view returns (address) {
-    address defaultSigner = accounts[account].defaultSigners[role];
+    address defaultSigner = defaultSigners[account][role];
     return defaultSigner == address(0) ? account : defaultSigner;
   }
 
