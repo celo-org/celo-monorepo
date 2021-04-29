@@ -18,4 +18,6 @@ Overall, a number of substantial changes and additions have been made in service
 
 {% page-ref page="identity/" %}
 
+{% page-ref page="optics.md" %}
+
 {% page-ref page="plumo.md" %}

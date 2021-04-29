@@ -121,6 +121,7 @@ spec:
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
 {{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
+{{ include "common.env-var" (dict "name" "GAS_PRICE_MULTIPLIER" "dict" .Values.oracle "value_name" "gasPriceMultiplier") | indent 8 }}
 {{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
 {{ include "common.env-var" (dict "name" "MAX_BLOCK_TIMESTAMP_AGE_MS" "dict" .Values.oracle "value_name" "maxBlockTimestampAgeMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.oracle.metrics "value_name" "enabled") | indent 8 }}

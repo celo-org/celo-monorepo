@@ -8,7 +8,7 @@ The function requires a few configuration variables to work:
 
 - nodeUrl: The url for the node the faucet server will use to send transactions
 - faucetGoldAmount: The amount of gold to faucet on each request
-- faucetDollarAmount: The amount of dollars to faucet on each request
+- faucetStableAmount: The amount of each stable token (cUSD, cEUR) to faucet on each request
 
 All these variables, are set using firebase function:config mechanism
 
@@ -18,6 +18,10 @@ The accounts are stored in firebase realtime DB. For each account it needs:
 - account address
 - account private key
 
+## Adding additional stable tokens to the faucet
+
+In addition to funding the faucet address with the new token, update the `contractkit` dependency (such that the new desired token is included in the `StableTokenConfig`) and then redeploy this function on firebase. (Note that the dependencies must be published packages; local `-dev` versions will not suffice.)
+
 ### Setting Faucet Amounts
 
 In directory: `packages/faucet`, run:
@@ -25,10 +29,12 @@ In directory: `packages/faucet`, run:
 Replace net with proper net
 
 ```
-yarn cli config:set --net alfajores --goldAmount 5000000000000000000 --dollarAmount 10000000000000000000
+yarn cli config:set --net alfajores --faucetGoldAmount 5000000000000000000 --faucetStableAmount 10000000000000000000
 ```
 
 You can verify with `yarn cli config:get --net alfajores`
+
+Alternatively, check which project is currently the default (`firebase projects:list`) and if necessary change this (for example, change to the staging project to test new changes via `firebase use celo-faucet-staging`. Then, use `firebase functions:config:get` and `firebase functions:config:set` to set specific parameters (for example: `firebase functions:config:set faucet.alfajores.faucet_stable_amount="1"` will set the `faucetStableAmount` parameter for the `alfajores` network).
 
 ### Setting Node Url
 

@@ -13,6 +13,9 @@ Shows information about reserve
 USAGE
   $ celocli reserve:status
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLE
   status
 ```
@@ -31,6 +34,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Spender's address
+  --globalHelp                                       View all available global flags
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Receiving address
 
   --useMultiSig                                      True means the request will be sent
