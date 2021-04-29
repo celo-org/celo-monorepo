@@ -42,9 +42,9 @@ contract Accounts is
 
   struct Account {
     bool exists;
-    // [Deprecated] Each account may authorize signing keys to use for voting,
-    // validating or attestation. These keys may not be keys of other accounts,
-    // and may not be authorized by any other account for any purpose.
+    // Each account may authorize signing keys to use for voting, valdiating or attestation.
+    // These keys may not be keys of other accounts, and may not be authorized by any other
+    // account for any purpose.
     Signers signers;
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
