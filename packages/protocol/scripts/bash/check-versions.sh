@@ -28,6 +28,10 @@ done
 [ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
 [ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
+# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
+# MultiSig contracts, and the ReleaseGold contract.
+CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles"
+
 REPORT_FLAG=""
 if [ ! -z "$REPORT" ]; then
   REPORT_FLAG="--output_file "$REPORT
@@ -47,7 +51,7 @@ NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 # MultiSig contracts, and the ReleaseGold contract.
 CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|UsingPrecompiles"
 yarn ts-node scripts/check-backward.ts sem_check \
-    --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
-    --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
-    --exclude $CONTRACT_EXCLUSION_REGEX \
-    $REPORT_FLAG
+  --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
+  --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
+  --exclude $CONTRACT_EXCLUSION_REGEX \
+  $REPORT_FLAG \
