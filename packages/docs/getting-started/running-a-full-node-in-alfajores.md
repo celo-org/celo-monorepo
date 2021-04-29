@@ -2,7 +2,7 @@
 
 This section explains how to get a full node running on the [Alfajores Network](alfajores-testnet.md), using a Docker image that was built for this purpose.
 
-If you'd prefer a one click, hosted setup for running a node on one of the major cloud providers (AWS and GCP), checkout our [hosted nodes](hosted-nodes.md) documentation.
+If you'd prefer a simple, one click hosted setup for running a node on one of the major cloud providers (AWS and GCP), checkout our [hosted nodes](hosted-nodes.md) documentation.
 
 {% hint style="info" %}
 If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list](https://celo.activehosted.com/f/15).

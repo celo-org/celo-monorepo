@@ -174,8 +174,8 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
 
 describe(`POST /getContactMatches endpoint`, () => {
   const validInput = {
-    userPhoneNumber: '+14155550123',
-    contactPhoneNumbers: ['+14155550123'],
+    userPhoneNumber: 'o+EZnvfWS3K9X1krfcuH68Ueg1OPzqSnTyFzgtpCGlY=',
+    contactPhoneNumbers: ['aXq4I31oe0pSQtl8nq7vTorY9ehCz0z0pN0UMePWK9Y='],
     account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
   }
@@ -270,6 +270,18 @@ describe(`POST /getContactMatches endpoint`, () => {
       getContactMatches(req, invalidResponseExpected(done, 400))
     })
 
+    it('invalid user number returns 400', (done) => {
+      const req = {
+        body: {
+          ...validInput,
+          userPhoneNumber: '+14155550123',
+        },
+        headers: mockHeaders,
+      } as Request
+
+      getContactMatches(req, invalidResponseExpected(done, 400))
+    })
+
     it('invalid account returns 400', (done) => {
       const req = {
         body: {
@@ -299,6 +311,18 @@ describe(`POST /getContactMatches endpoint`, () => {
         body: {
           ...validInput,
           contactPhoneNumbers: [],
+        },
+        headers: mockHeaders,
+      } as Request
+
+      getContactMatches(req, invalidResponseExpected(done, 400))
+    })
+
+    it('invalid contact phone numbers returns 400', (done) => {
+      const req = {
+        body: {
+          ...validInput,
+          contactPhoneNumbers: ['+14155550123'],
         },
         headers: mockHeaders,
       } as Request

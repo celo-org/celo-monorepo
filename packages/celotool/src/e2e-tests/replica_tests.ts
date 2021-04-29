@@ -102,13 +102,13 @@ describe('replica swap tests', () => {
   const hooks: any = getHooks(gethConfig)
   let web3: Web3
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -127,7 +127,7 @@ describe('replica swap tests', () => {
     let swapBlock: number
     const missed: any = []
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
 
       await restart()

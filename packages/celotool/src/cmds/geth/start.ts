@@ -235,6 +235,7 @@ export const handler = async (argv: StartArgv) => {
       port: port + x,
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
+      minerValidator: validators[x].address,
     }
 
     let proxy: GethInstanceConfig | null = null

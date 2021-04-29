@@ -18,6 +18,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -39,6 +40,8 @@ USAGE
 OPTIONS
   --from=from                Account whose balance to use for querying ODIS for the
                              pepper lookup
+
+  --globalHelp               View all available global flags
 
   --identifier=identifier    On-chain identifier
 
@@ -78,6 +81,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address from which
                                                      to perform the query
 
+  --globalHelp                                       View all available global flags
+
   --phoneNumber=+14152223333                         (required) The phone number for
                                                      which to query the identifier.
                                                      Should be in e164 format with
@@ -103,6 +108,8 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer
                                                      or account address
+
+  --globalHelp                                       View all available global flags
 
   --message=message                                  (required) The message of the SMS
 
@@ -134,6 +141,9 @@ OPTIONS
                                                              attestation signer address
                                                              or the underlying account
                                                              address
+
+  --globalHelp                                               View all available global
+                                                             flags
 
   --tokenAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  The address of the token
                                                              that will be withdrawn.

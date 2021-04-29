@@ -1,5 +1,6 @@
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address } from '@celo/connect'
+import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
@@ -161,6 +162,12 @@ class CheckBuilder {
       this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).executed)
     )
 
+  hotfixNotApproved = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix 0x${hash.toString('hex')} is not already approved`,
+      this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).approved)
+    )
+
   canSign = (account: Address) =>
     this.addCheck('Account can sign', async () => {
       try {
@@ -307,12 +314,26 @@ class CheckBuilder {
     )
   }
 
-  hasEnoughUsd = (account: Address, value: BigNumber) => {
+  hasEnoughStable = (
+    account: Address,
+    value: BigNumber,
+    stable: StableToken = StableToken.cUSD
+  ) => {
     const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} ${stable}`, () =>
       this.kit.contracts
-        .getStableToken()
+        .getStableToken(stable)
         .then((stableToken) => stableToken.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
+  hasEnoughErc20 = (account: Address, value: BigNumber, erc20: Address) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} erc20 token`, () =>
+      this.kit.contracts
+        .getErc20(erc20)
+        .then((goldToken) => goldToken.balanceOf(account))
         .then((balance) => balance.gte(value))
     )
   }

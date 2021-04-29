@@ -16,6 +16,8 @@ type AllArgv = UpgradeArgv & {
   reset: boolean
   useExistingGenesis: boolean
   skipFaucetting: boolean
+  tag: string
+  suffix: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -34,6 +36,16 @@ export const builder = (argv: yargs.Argv) => {
       describe: 'skips allocation of cUSD to any oracle or bot accounts',
       default: false,
       type: 'boolean',
+    })
+    .option('tag', {
+      type: 'string',
+      description: 'Docker image tag to deploy',
+      default: '',
+    })
+    .option('suffix', {
+      type: 'string',
+      description: 'Instance suffix',
+      default: '',
     })
 }
 

@@ -75,10 +75,7 @@ export const fileDownload = async (
   srcFileName: string,
   dstFileName: string
 ) => {
-  await client
-    .bucket(bucketName)
-    .file(srcFileName)
-    .download({
-      destination: dstFileName,
-    })
+  await client.bucket(bucketName).file(srcFileName).download({
+    destination: dstFileName,
+  })
 }

@@ -67,7 +67,8 @@ contract StableToken is
 
   InflationState inflationState;
 
-  // for differentiating between corresponding fiat pairs
+  // The registry ID of the exchange contract with permission to mint and burn this token.
+  // Unique per StableToken instance.
   bytes32 exchangeRegistryId;
 
   /**
@@ -392,6 +393,10 @@ contract StableToken is
   /**
    * @notice Returns the exchange id in the registry of the corresponding fiat pair exchange.
    * @dev When this storage is uninitialized, it falls back to the default EXCHANGE_REGISTRY_ID.
+   * exchangeRegistryId was introduced after the initial release of cUSD's StableToken,
+   * so exchangeRegistryId will be uninitialized for that contract. If cUSD's StableToken
+   * exchangeRegistryId were to be correctly initialized, this function could be deprecated
+   * in favor of using exchangeRegistryId directly.
    * @return Registry id for the corresponding exchange.
    */
   function getExchangeRegistryId() public view returns (bytes32) {

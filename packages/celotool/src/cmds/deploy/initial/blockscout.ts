@@ -5,6 +5,7 @@ import {
   installHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
@@ -20,8 +21,11 @@ export const command = 'blockscout'
 export const describe = 'deploy the blockscout package'
 
 export const handler = async (argv: InitialArgv) => {
-  const instanceName = getInstanceName(argv.celoEnv)
-  const helmReleaseName = getReleaseName(argv.celoEnv)
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const imageTag = fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)
+
+  const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
+  const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
   await switchToClusterFromEnv(argv.celoEnv)
   let blockscoutCredentials: string[] = [
     'dummyUser',
@@ -48,6 +52,7 @@ export const handler = async (argv: InitialArgv) => {
   await installHelmChart(
     argv.celoEnv,
     helmReleaseName,
+    imageTag,
     blockscoutCredentials[0],
     blockscoutCredentials[1],
     blockscoutCredentials[2]

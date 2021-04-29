@@ -102,7 +102,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     wallet.executeTransaction(wallet.address, value, data, { from: signer })
 
   beforeEach(async () => {
-    wallet = await MetaTransactionWallet.new()
+    wallet = await MetaTransactionWallet.new(true)
     initializeRes = await wallet.initialize(signer)
   })
 
