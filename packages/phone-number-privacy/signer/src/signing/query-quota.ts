@@ -88,10 +88,16 @@ export async function getRemainingQueryCount(
   const [totalQuota, performedQueryCount] = await Promise.all([
     getQueryQuota(logger, account, hashedPhoneNumber),
     getPerformedQueryCount(account, logger),
-  ])
+  ]).finally(meterGetRemainingQueryCount)
   Histograms.userRemainingQuotaAtRequest.observe(totalQuota - performedQueryCount)
-  meterGetRemainingQueryCount()
   return { performedQueryCount, totalQuota }
+}
+
+async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
+  const getQueryQuotaMeter = Histograms.getRemainingQueryCountInstrumentation
+    .labels('getQueryQuota')
+    .startTimer()
+  return _getQueryQuota(logger, account, hashedPhoneNumber).finally(getQueryQuotaMeter)
 }
 
 /*
@@ -99,11 +105,7 @@ export async function getRemainingQueryCount(
  * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
-async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
-  const getQueryQuotaMeter = Histograms.getRemainingQueryCountInstrumentation
-    .labels('getQueryQuota')
-    .startTimer()
-
+async function _getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
   const getWalletAddressAndIsVerifiedMeter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getWalletAddressAndIsVerified')
     .startTimer()
@@ -116,7 +118,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
           : false
       )
     ),
-  ])
+  ]).finally(getWalletAddressAndIsVerifiedMeter)
 
   let walletAddress = _walletAddress.status === 'fulfilled' ? _walletAddress.value : NULL_ADDRESS
   const isAccountVerified =
@@ -132,8 +134,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
   if (walletAddress !== NULL_ADDRESS) {
     Counters.requestsWithWalletAddress.inc()
   }
-
-  getWalletAddressAndIsVerifiedMeter()
 
   if (isAccountVerified) {
     Counters.requestsWithVerifiedAccount.inc()
@@ -152,7 +152,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       quota,
     })
 
-    getQueryQuotaMeter()
     return quota
   }
 
@@ -204,8 +203,6 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
       transactionCount,
       quota,
     })
-
-    getQueryQuotaMeter()
     return quota
   }
 
@@ -241,11 +238,12 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
           throw err
         })
       )
-  ).then((values) => {
-    logger.trace({ addresses, txCounts: values }, 'Fetched txCounts for addresses')
-    return values.reduce((a, b) => a + b)
-  })
-  getTransactionCountMeter()
+  )
+    .then((values) => {
+      logger.trace({ addresses, txCounts: values }, 'Fetched txCounts for addresses')
+      return values.reduce((a, b) => a + b)
+    })
+    .finally(getTransactionCountMeter)
   return res
 }
 

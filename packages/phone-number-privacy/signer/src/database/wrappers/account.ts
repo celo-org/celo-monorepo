@@ -37,10 +37,11 @@ async function getAccountExists(account: string): Promise<boolean> {
   const getAccountExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getAccountExists')
     .startTimer()
-  const existingAccountRecord = await accounts()
-    .where(ACCOUNTS_COLUMNS.address, account)
-    .first()
-    .finally(getAccountExistsMeter)
+  return _getAccountExists(account).finally(getAccountExistsMeter)
+}
+
+async function _getAccountExists(account: string): Promise<boolean> {
+  const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
   return !!existingAccountRecord
 }
 

@@ -130,9 +130,17 @@ export async function handleGetBlindedMessagePartialSig(
     const meterGenerateSignature = Histograms.getBlindedSigInstrumentation
       .labels('generateSignature')
       .startTimer()
-    const keyProvider = getKeyProvider()
-    const privateKey = keyProvider.getPrivateKey()
-    const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
+    let keyProvider
+    let privateKey
+    let signature
+    try {
+      keyProvider = getKeyProvider()
+      privateKey = keyProvider.getPrivateKey()
+      signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
+    } catch (err) {
+      meterGenerateSignature()
+      throw err
+    }
     meterGenerateSignature()
 
     if (await getRequestExists(request.body, logger)) {
@@ -148,7 +156,7 @@ export async function handleGetBlindedMessagePartialSig(
       const [requestStored, queryCountIncremented] = await Promise.all([
         storeRequest(request.body, logger),
         incrementQueryCount(account, logger),
-      ])
+      ]).finally(meterDbWriteOps)
       if (!requestStored) {
         logger.debug('Did not store request.')
         errorMsgs.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
@@ -159,7 +167,6 @@ export async function handleGetBlindedMessagePartialSig(
       } else {
         performedQueryCount++
       }
-      meterDbWriteOps()
     }
 
     let signMessageResponse: SignMessageResponse
