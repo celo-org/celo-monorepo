@@ -26,6 +26,7 @@ import {
   getProxiesPerValidator,
   getProxyName,
   uploadDataToGoogleStorage,
+  uploadGenesisBlockToGoogleStorage,
   uploadTestnetInfoToGoogleStorage,
 } from './testnet-utils'
 
@@ -138,8 +139,7 @@ export async function deploy(
       await generateAndUploadSecrets(celoEnv)
     }
   })
-  // TODO change this true value
-  await uploadTestnetInfoToGoogleStorage(celoEnv, !useExistingGenesis)
+  await uploadTestnetInfoToGoogleStorage(celoEnv)
 }
 
 export async function deployModule(
@@ -293,9 +293,13 @@ export function getTerraformBackendConfigVars(celoEnv: string, terraformModule: 
 }
 
 async function getTestnetVars(celoEnv: string, useExistingGenesis: boolean) {
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
+  let genesisContent: string = ''
+  if (useExistingGenesis) {
+    genesisContent = await getGenesisBlockFromGoogleStorage(celoEnv)
+  } else {
+    generateGenesisFromEnv()
+    await uploadGenesisBlockToGoogleStorage(genesisContent, celoEnv)
+  }
 
   const genesisBuffer = Buffer.from(genesisContent)
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)

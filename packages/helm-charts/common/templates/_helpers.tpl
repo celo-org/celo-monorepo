@@ -274,8 +274,10 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
 data:
-  networkid: {{ .Values.genesis.networkId | quote }}
-  genesis.json: {{ .Values.genesis.genesisFileBase64 | b64dec | quote }}
+  networkid: {{ $.Values.genesis.networkId | quote }}
+{{- if eq (default $.Values.genesis.useGenesisFileBase64 "true") "false" }}
+  genesis.json: {{ $.Values.genesis.genesisFileBase64 | b64dec | quote }}
+{{- end -}}
 {{- end -}}
 
 {{- define "common.celotool-validator-container" -}}
