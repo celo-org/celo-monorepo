@@ -134,6 +134,6 @@ const config: Config = {
     },
   },
   timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
-  test_quota_bypass_percentage: Number(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
+  test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
 }
 export default config
