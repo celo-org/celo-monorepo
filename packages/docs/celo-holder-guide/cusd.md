@@ -1,6 +1,6 @@
-# cUSD User Guide
+# Celo Asset Management Guide
 
-If you intend to hold Celo Dollars (cUSD), exchange CELO for cUSD, or send cUSD to others, this guide will help you access your account and manage your funds.
+If you intend to hold Celo Dollars (cUSD) or a similar stablecoin like Celo Euros (cEUR), exchange CELO for stablecoins, or send Celo native assets to others, this guide will help you access your account and manage your funds.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ After creating an account, record its address in environment variables:
 export CELO_ACCOUNT_ADDRESS=<YOUR-CELO-ACCOUNT-ADDRESS>
 ```
 
-## Exchange CELO for cUSD
+## Exchange CELO for Stablecoins
 
 Once you have deposited CELO to your account, you can check your balance:
 
@@ -34,15 +34,15 @@ Once you have deposited CELO to your account, you can check your balance:
 celocli account:balance $CELO_ACCOUNT_ADDRESSS
 ```
 
-You can exchange CELO for cUSD using the following command. Note that the unit of value is CELO Wei (1 CELO = 10^18 CELO Wei).
+As an example of a common stablecoin swap, you can exchange CELO for cUSD using the following command. This exchanges CELO for stable tokens (cUSD by default) via the stability mechanism. Note that the unit of value is CELO Wei (1 CELO = 10^18 CELO Wei).
 
 ```
 celocli exchange:celo --value <VALUE-TO-EXCHANGE> --from $CELO_ACCOUNT_ADDRESS
 ```
 
-## Transfer cUSD
+## Transfer Stablecoins
 
-When you have sufficient balance, you can send cUSD to other accounts. Note that the unit of value is cUSD Wei (1 cUSD = 10^18 cUSD Wei).
+When you have sufficient balance, you can send stablecoins such as cUSD to other accounts. Note that the unit of value is cUSD Wei (1 cUSD = 10^18 cUSD Wei).
 
 ```
 celocli transfer:dollars --from $CELO_ACCOUNT_ADDRESS --to <RECIPIENT-ADDRESS> --value <VALUE-TO-TRANSFER>

@@ -1,4 +1,4 @@
-import { StableTokenInfo } from '@celo/contractkit/src/celo-tokens'
+import { StableTokenInfo } from '@celo/contractkit/lib/celo-tokens'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'

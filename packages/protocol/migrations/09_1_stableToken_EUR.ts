@@ -34,7 +34,7 @@ const initializeArgs = async (): Promise<any[]> => {
 }
 
 // TODO make this general
-module.exports = deploymentForCoreContract<StableTokenEURInstance>( // TODO add EUR
+module.exports = deploymentForCoreContract<StableTokenEURInstance>(
   web3,
   artifacts,
   CeloContractName.StableTokenEUR,
