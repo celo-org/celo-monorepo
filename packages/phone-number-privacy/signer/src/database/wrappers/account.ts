@@ -76,35 +76,6 @@ export async function incrementQueryCount(account: string, logger: Logger) {
   return _incrementQueryCount(account, logger).finally(incrementQueryCountMeter)
 }
 
-/*
- * Returns whether account has already performed matchmaking
- */
-async function _getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
-  try {
-    const didMatchmaking = await accounts()
-      .where(ACCOUNTS_COLUMNS.address, account)
-      .select(ACCOUNTS_COLUMNS.didMatchmaking)
-      .first()
-      .timeout(DB_TIMEOUT)
-    if (!didMatchmaking) {
-      return false
-    }
-    return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    return false
-  }
-}
-
-export async function getDidMatchmaking(account: string, logger: Logger) {
-  const getDidMatchmakingMeter = Histograms.dbOpsInstrumentation
-    .labels('getDidMatchmaking')
-    .startTimer()
-  return _getDidMatchmaking(account, logger).finally(getDidMatchmakingMeter)
-}
-
 async function insertRecord(data: Account) {
   await accounts().insert(data).timeout(DB_TIMEOUT)
   return true
