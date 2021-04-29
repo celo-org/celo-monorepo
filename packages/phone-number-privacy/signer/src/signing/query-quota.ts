@@ -191,7 +191,6 @@ async function _getQueryQuota(logger: Logger, account: string, hashedPhoneNumber
       },
       'Account is not verified but meets min balance'
     )
-    // TODO consider granting these unverified users slightly less queryPerTx
     const transactionCount = await getTransactionCount(logger, account, walletAddress)
 
     const quota =

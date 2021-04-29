@@ -15,7 +15,7 @@ export async function getRequestExists(
 ): Promise<boolean> {
   if (!request.timestamp) {
     logger.debug('request does not have timestamp')
-    return false // TODO(Alec) make timestamps required
+    return false
   }
   logger.debug({ request }, 'Checking if request exists')
   const getRequestExistsMeter = Histograms.dbOpsInstrumentation
@@ -44,7 +44,7 @@ export async function getRequestExists(
 export async function storeRequest(request: GetBlindedMessagePartialSigRequest, logger: Logger) {
   if (!request.timestamp) {
     logger.debug('request does not have timestamp')
-    return true // TODO remove once backwards compatibility isn't necessary
+    return true
   }
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
