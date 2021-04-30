@@ -86,7 +86,7 @@ Savings Circles let you pool funds with your friends to save for large purchases
 
 ### Cent Wallet
 
-[Cent](https://cent.finance/) is a mobile wallet for buying and holding crypto as well as using Wallet Connect to authorise transactions on exchnages and other services. Cent is [open source on GitHub](https://github.com/centfinance/Cent.Wallet) and available on Android and iOS through the app store.
+[Cent](https://cent.finance/) is a mobile wallet for buying and holding crypto as well as using Wallet Connect to authorise transactions on exchanges and other services. Cent is [open source on GitHub](https://github.com/centfinance/Cent.Wallet) and available on Android and iOS through the app store.
 
 ### Symmetric
 
