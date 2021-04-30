@@ -2,7 +2,7 @@ import { ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-commo
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { VERSION } from './config'
+import config, { VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'
 
@@ -21,8 +21,9 @@ async function meterResponse(
   logger.fields.endpoint = endpoint
   logger.info({ req: req.body }, 'Request received')
   const eventLoopLagMeasurementStart = Date.now()
+  let eventLoopLag = 0
   setTimeout(() => {
-    const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
+    eventLoopLag = Date.now() - eventLoopLagMeasurementStart
     logger.info({ eventLoopLag }, 'Measure event loop lag')
   })
   const startMark = `Begin ${handler.name}`
@@ -50,6 +51,11 @@ async function meterResponse(
   performance.measure(entryName, startMark, endMark)
   performance.clearMarks()
   obs.disconnect()
+
+  if (eventLoopLag > config.eventLoopLagLimit || eventLoopLag === 0) {
+    logger.error(`Event loop lag is greater than ${config.eventLoopLagLimit}, exiting 1`)
+    process.exit(1)
+  }
 }
 
 // EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSig" -H "Authorization: 0xfc2ee61c4d18b93374fdd525c9de09d01398f7d153d17340b9ae156f94a1eb3237207d9aacb42e7f2f4ee0cf2621ab6d5a0837211665a99e16e3367f5209a56b1b" -d '{"blindedQueryPhoneNumber":"+Dzuylsdcv1ZxbRcQwhQ29O0UJynTNYufjWc4jpw2Zr9FLu5gSU8bvvDJ3r/Nj+B","account":"0xdd18d08f1c2619ede729c26cc46da19af0a2aa7f", "hashedPhoneNumber":"0x8fb77f2aff2ef0343706535dc702fc99f61a5d1b8e46d7c144c80fd156826a77"}' -H 'Content-Type: application/json'
