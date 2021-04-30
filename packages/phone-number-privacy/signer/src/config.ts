@@ -77,6 +77,8 @@ interface Config {
       secretKey: string
     }
   }
+  timeout: number
+  test_quota_bypass_percentage: number
 }
 
 const env = process.env as any
@@ -87,7 +89,7 @@ const config: Config = {
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   quota: {
-    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 2,
+    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 10,
     additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
     queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
     // Min balance is .01 cUSD
@@ -131,5 +133,7 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
+  timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
+  test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
 }
 export default config

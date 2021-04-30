@@ -102,7 +102,6 @@ async function requestSignatures(request: Request, response: Response) {
             data,
             res.status,
             response,
-            sentResult,
             responses,
             service.url,
             blsCryptoClient,
@@ -116,7 +115,6 @@ async function requestSignatures(request: Request, response: Response) {
             signers.length,
             failedRequests,
             response,
-            sentResult,
             controller,
             errorCodes
           )
@@ -143,7 +141,6 @@ async function requestSignatures(request: Request, response: Response) {
           signers.length,
           failedRequests,
           response,
-          sentResult,
           controller,
           errorCodes
         )
@@ -163,6 +160,9 @@ async function requestSignatures(request: Request, response: Response) {
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
   if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
     handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
+  } else {
+    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
+    response.json({ success: true, combinedSignature, version: VERSION })
   }
 }
 
@@ -170,7 +170,6 @@ async function handleSuccessResponse(
   data: string,
   status: number,
   response: Response,
-  sentResult: { sent: boolean },
   responses: SignMsgRespWithStatus[],
   serviceUrl: string,
   blsCryptoClient: BLSCryptographyClient,
@@ -194,16 +193,21 @@ async function handleSuccessResponse(
   }
   responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
+  logger.info({ signer: serviceUrl }, 'Add signature')
+  const signatureAdditionStart = Date.now()
   await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
+  logger.info(
+    {
+      signer: serviceUrl,
+      hasSufficientSignatures: blsCryptoClient.hasSufficientVerifiedSignatures(),
+      additionLatency: Date.now() - signatureAdditionStart,
+    },
+    'Added signature'
+  )
   // Send response immediately once we cross threshold
-  if (!sentResult.sent && blsCryptoClient.hasSufficientVerifiedSignatures()) {
+  if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
     // Close outstanding requests
     controller.abort()
-    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
-    if (!sentResult.sent) {
-      response.json({ success: true, combinedSignature, version: VERSION })
-      sentResult.sent = true
-    }
   }
 }
 
@@ -214,7 +218,6 @@ function handleFailedResponse(
   signerCount: number,
   failedRequests: Set<string>,
   response: Response,
-  sentResult: { sent: boolean },
   controller: AbortController,
   errorCodes: Map<number, number>
 ) {
@@ -227,12 +230,9 @@ function handleFailedResponse(
   failedRequests.add(service.url)
   const shouldFailFast = signerCount - failedRequests.size < config.thresholdSignature.threshold
   logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
-  if (!sentResult.sent && shouldFailFast) {
+  if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
-    const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
     controller.abort()
-    sentResult.sent = true
   }
 }
 
