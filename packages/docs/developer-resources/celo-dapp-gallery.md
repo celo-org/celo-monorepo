@@ -52,6 +52,14 @@ Tangany's custody solution [Wallet as a Service](https://docs.tangany.com/?versi
 
 At Dunia Payment, we are building an electronic wallet that will let people in Sub Saharan Africa send and receive money directly on their phone.The app will use the Celo light client to process transactions faster, even in low internet connection areas common in Africa. The wallet will be built on top of the Celo platform and also using a set of external open source smart contracts. [Github](https://github.com/duniapay/Dunia-Wallet-Celo)
 
+### Cryptum Woocommerce Checkout
+
+Based on Cryptum APIs, the open source Plugin connects to WordPress e-commerces checkouts, providing fast and easy integration for Celo and cUSD acceptance and management for merchants. [Github](https://github.com/blockforce-official/cryptum-checkout-woocommerce-plugin)
+
+### Cryptum Woocommerce NFT
+
+Based on Cryptum APIs, the open source Plugin connects to WordPress e-commerces, providing easy and fast Celo NFT creation and integration through a nocode interface - with marketplace goods for merchants, offering customers unique experiences and extending NFT possibilities for many marketplaces. [Github](https://github.com/blockforce-official/cryptum-nft-woocommerce-plugin)
+
 ## [Decentralized Impact Incubator](https://blockchainforsocialimpact.com/incubator-winners-2020/) Winners
 
 ### Multiply.Charity by Abundance
