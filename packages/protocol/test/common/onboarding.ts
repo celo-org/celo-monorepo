@@ -305,7 +305,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
           mtw = await MTW.at(proxy.address)
 
-          const { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
+          let { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
           const setAccount = {
             value: 0,
             destination: accounts.address,
