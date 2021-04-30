@@ -14,11 +14,7 @@ import { BLINDED_PHONE_NUMBER } from '../../common/src/test/values'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
-import {
-  getDidMatchmaking,
-  incrementQueryCount,
-  setDidMatchmaking,
-} from '../src/database/wrappers/account'
+import { incrementQueryCount } from '../src/database/wrappers/account'
 import { getRequestExists, storeRequest } from '../src/database/wrappers/request'
 import { getKeyProvider } from '../src/key-management/key-provider'
 import { createServer } from '../src/server'
@@ -47,8 +43,6 @@ const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
 
 jest.mock('../src/database/wrappers/account')
 const mockIncrementQueryCount = incrementQueryCount as jest.Mock
-const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
-const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 
 jest.mock('../src/database/wrappers/request')
 const mockStoreRequest = storeRequest as jest.Mock
@@ -76,8 +70,6 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     mockGetKeyProvider.mockReturnValue({ getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY) })
     mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
     mockIncrementQueryCount.mockReturnValue(true)
-    mockGetDidMatchmaking.mockReturnValue(false)
-    mockSetDidMatchmaking.mockImplementation()
     mockStoreRequest.mockReturnValue(true)
     mockGetRequestExists.mockReturnValue(false)
     mockGetWalletAddress.mockResolvedValue('0x0')
