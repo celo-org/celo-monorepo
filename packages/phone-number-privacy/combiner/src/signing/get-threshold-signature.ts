@@ -191,23 +191,27 @@ async function handleSuccessResponse(
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
-  responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
-  const partialSig = { url: serviceUrl, signature: signResponse.signature }
-  logger.info({ signer: serviceUrl }, 'Add signature')
-  const signatureAdditionStart = Date.now()
-  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
-  logger.info(
-    {
-      signer: serviceUrl,
-      hasSufficientSignatures: blsCryptoClient.hasSufficientVerifiedSignatures(),
-      additionLatency: Date.now() - signatureAdditionStart,
-    },
-    'Added signature'
-  )
-  // Send response immediately once we cross threshold
-  if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    // Close outstanding requests
-    controller.abort()
+
+  // Only process signatures if we still need more
+  // Signature verification takes around 500ms
+  if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
+    responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
+    const partialSig = { url: serviceUrl, signature: signResponse.signature }
+    logger.info({ signer: serviceUrl }, 'Add signature')
+    const signatureAdditionStart = Date.now()
+    await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
+    logger.info(
+      {
+        signer: serviceUrl,
+        hasSufficientSignatures: blsCryptoClient.hasSufficientVerifiedSignatures(),
+        additionLatency: Date.now() - signatureAdditionStart,
+      },
+      'Added signature'
+    )
+    if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
+      // Close outstanding requests
+      controller.abort()
+    }
   }
 }
 
