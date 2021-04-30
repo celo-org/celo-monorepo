@@ -1,3 +1,4 @@
+import { Signature } from '@celo/base/lib/signatureUtils'
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
@@ -506,7 +507,7 @@ export async function getVerificationCodeSignature(
   issuer: string,
   identifier: string,
   accounts: string[]
-): Promise<any> {
+): Promise<Signature> {
   const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
   return AttestationUtils.attestToIdentifier(identifier, account, privateKey)
 }

@@ -247,12 +247,12 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
         const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
         for (let i = 0; i < numAttestations; i++) {
           const issuer = issuers[i]
-          let { v, r, s } = await getVerificationCodeSignature(
+          ;({ v, r, s } = await getVerificationCodeSignature(
             mtw.address,
             issuer,
             identifier,
             _accounts
-          )
+          ))
           const complete = {
             value: 0,
             destination: attestations.address,
@@ -284,7 +284,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
       before(async () => {
         const proxy: ProxyInstance = await Proxy.new()
         proxyCloneFactory = await ProxyCloneFactory.new()
-        await proxyCloneFactory.setProxyAddress(proxy.address)
+        await proxyCloneFactory.setImplementationAddress(proxy.address)
         mtw = await MTW.new(false)
       })
 
@@ -305,7 +305,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
           mtw = await MTW.at(proxy.address)
 
-          let { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
+          const { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
           const setAccount = {
             value: 0,
             destination: accounts.address,
@@ -386,12 +386,12 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           const issuers = await attestations.getAttestationIssuers(identifier, mtw.address)
           for (let i = 0; i < numAttestations; i++) {
             const issuer = issuers[i]
-            let { v, r, s } = await getVerificationCodeSignature(
+            ;({ v, r, s } = await getVerificationCodeSignature(
               mtw.address,
               issuer,
               identifier,
               _accounts
-            )
+            ))
             const complete = {
               value: 0,
               destination: attestations.address,
