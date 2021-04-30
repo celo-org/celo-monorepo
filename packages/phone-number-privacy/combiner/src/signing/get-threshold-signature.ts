@@ -4,7 +4,6 @@ import {
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
-  hasValidTimestamp,
   isBodyReasonablySized,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   phoneNumberHashIsValidIfExists,
@@ -342,8 +341,7 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boo
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&
     phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody) &&
-    hasValidTimestamp(requestBody)
+    isBodyReasonablySized(requestBody)
   )
 }
 

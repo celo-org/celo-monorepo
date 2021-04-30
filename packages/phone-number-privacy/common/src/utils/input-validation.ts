@@ -5,7 +5,7 @@ import {
   GetContactMatchesRequest,
   GetQuotaRequest,
 } from '../interfaces'
-import { REASONABLE_BODY_CHAR_LIMIT, REQUEST_EXPIRY_WINDOW_MS } from './constants'
+import { REASONABLE_BODY_CHAR_LIMIT } from './constants'
 
 export function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && isValidAddress(requestBody.account)
@@ -36,14 +36,6 @@ export function hasValidQueryPhoneNumberParam(requestBody: GetBlindedMessageSigR
     !!requestBody.blindedQueryPhoneNumber &&
     requestBody.blindedQueryPhoneNumber.length === 64 &&
     isBase64(requestBody.blindedQueryPhoneNumber)
-  )
-}
-
-export function hasValidTimestamp(requestBody: any): boolean {
-  return (
-    !requestBody.timestamp ||
-    (typeof requestBody.timestamp === 'number' &&
-      requestBody.timestamp > Date.now() - REQUEST_EXPIRY_WINDOW_MS)
   )
 }
 

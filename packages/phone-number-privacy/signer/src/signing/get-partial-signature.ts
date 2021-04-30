@@ -3,7 +3,6 @@ import {
   ErrorMessage,
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
-  hasValidTimestamp,
   isBodyReasonablySized,
   phoneNumberHashIsValidIfExists,
   SignMessageResponse,
@@ -30,7 +29,6 @@ export interface GetBlindedMessagePartialSigRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
-  timestamp?: number
   sessionID?: string
 }
 
@@ -205,8 +203,7 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigReques
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&
     phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody) &&
-    hasValidTimestamp(requestBody)
+    isBodyReasonablySized(requestBody)
   )
 }
 
