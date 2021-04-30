@@ -403,7 +403,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
             logCost(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
             totalCost += completeTx.receipt.gasUsed
           }
-          const [completed, total] = await attestations.getAttestationStats(identifier, user)
+          const [completed, total] = await attestations.getAttestationStats(identifier, mtw.address)
           assertEqualBN(completed, numAttestations)
           assertEqualBN(total, numAttestations)
           logCost(`Onboarding a user takes ${totalCost} gas`)
