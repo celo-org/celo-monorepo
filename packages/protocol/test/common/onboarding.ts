@@ -264,7 +264,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           logCost(`Completing an attestation takes ${completeTx.receipt.gasUsed} gas`)
           totalCost += completeTx.receipt.gasUsed
         }
-        const [completed, total] = await attestations.getAttestationStats(identifier, user)
+        const [completed, total] = await attestations.getAttestationStats(identifier, mtw.address)
         assertEqualBN(completed, numAttestations)
         assertEqualBN(total, numAttestations)
         logCost(`Onboarding a user takes ${totalCost} gas`)
@@ -302,7 +302,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
           )
           logCost(`Deploying a proxy takes ${deploymentTx.receipt.gasUsed} gas`)
           totalCost += deploymentTx.receipt.gasUsed
-          const proxy = await Proxy.at(deploymentTx.logs[1].args.proxy)
+          const proxy = await Proxy.at(deploymentTx.logs[1].args.proxyClone)
           mtw = await MTW.at(proxy.address)
 
           let { v, r, s } = await getParsedSignatureOfAddress(web3, mtw.address, user)
