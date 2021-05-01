@@ -13,7 +13,12 @@ import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
 import { VERSION } from '../config'
-import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
+import {
+  getAccountIdentifier,
+  getDidMatchmaking,
+  setAccountIdentifier,
+  setDidMatchmaking,
+} from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { getContractKit } from '../web3/contracts'
 
@@ -42,10 +47,25 @@ export async function handleGetContactMatches(
       respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
       return
     }
+
     if (await getDidMatchmaking(account, logger)) {
-      respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
-      return
+      const hashedPhoneNumberFromDB = await getAccountIdentifier(account, logger)
+      if (hashedPhoneNumberFromDB !== hashedPhoneNumber) {
+        if (hashedPhoneNumberFromDB === 'empty') {
+          await setAccountIdentifier(account, hashedPhoneNumber, logger)
+        } else if (hashedPhoneNumberFromDB !== 'error') {
+          // fail open on db read error but don't update identifier
+          respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
+          return
+        }
+      } else {
+        logger.info(
+          { account },
+          'account has already performed matchmaking but is requerying its matches'
+        )
+      }
     }
+
     const matchedContacts: ContactMatch[] = (
       await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
     ).map((numberPair) => ({ phoneNumber: numberPair }))
@@ -57,7 +77,7 @@ export async function handleGetContactMatches(
       'measured percentage of contacts covered by matchmaking'
     )
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
-    await setDidMatchmaking(account, logger)
+    await setDidMatchmaking(account, hashedPhoneNumber, logger)
     response.json({ success: true, matchedContacts, version: VERSION })
   } catch (err) {
     logger.error('Failed to getContactMatches')

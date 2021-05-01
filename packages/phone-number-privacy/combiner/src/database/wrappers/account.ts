@@ -7,12 +7,52 @@ function accounts() {
   return getDatabase()<Account>(ACCOUNTS_TABLE)
 }
 
-async function getAccountExists(account: string): Promise<boolean> {
-  const existingAccountRecord = await accounts()
-    .where(ACCOUNTS_COLUMNS.address, account)
-    .first()
-    .timeout(DB_TIMEOUT)
-  return !!existingAccountRecord
+async function getAccountExists(account: string, logger: Logger): Promise<boolean> {
+  try {
+    const existingAccountRecord = await accounts()
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .first()
+      .timeout(DB_TIMEOUT)
+    return !!existingAccountRecord
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
+    return false
+  }
+}
+
+export async function getAccountIdentifier(account: string, logger: Logger): Promise<string> {
+  try {
+    const existingAccountIdentifierRecord = await accounts()
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .select(ACCOUNTS_COLUMNS.hashedPhoneNumber)
+      .first()
+      .timeout(DB_TIMEOUT)
+    return existingAccountIdentifierRecord
+      ? existingAccountIdentifierRecord[ACCOUNTS_COLUMNS.hashedPhoneNumber]
+      : 'empty'
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
+    return 'error'
+  }
+}
+
+export async function setAccountIdentifier(
+  account: string,
+  hashedPhoneNumber: string,
+  logger: Logger
+) {
+  try {
+    return accounts()
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .update(ACCOUNTS_COLUMNS.hashedPhoneNumber, hashedPhoneNumber)
+      .timeout(DB_TIMEOUT)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error(err)
+    return null
+  }
 }
 
 /*
@@ -39,27 +79,37 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
 /*
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
-export async function setDidMatchmaking(account: string, logger: Logger) {
+export async function setDidMatchmaking(
+  account: string,
+  hashedPhoneNumber: string,
+  logger: Logger
+) {
   logger.debug({ account }, 'Setting did matchmaking')
-  try {
-    if (await getAccountExists(account)) {
+  if (await getAccountExists(account, logger)) {
+    try {
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
         .timeout(DB_TIMEOUT)
-    } else {
-      const newAccount = new Account(account)
-      newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
-      return insertRecord(newAccount)
+    } catch (err) {
+      logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+      logger.error(err)
+      return null
     }
+  } else {
+    const newAccount = new Account(account, hashedPhoneNumber)
+    newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
+    return insertRecord(newAccount, logger)
+  }
+}
+
+async function insertRecord(data: Account, logger: Logger) {
+  try {
+    await accounts().insert(data).timeout(DB_TIMEOUT)
+    return true
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error(err)
     return null
   }
-}
-
-async function insertRecord(data: Account) {
-  await accounts().insert(data).timeout(DB_TIMEOUT)
-  return true
 }
