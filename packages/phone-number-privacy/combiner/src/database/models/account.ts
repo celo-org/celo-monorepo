@@ -8,7 +8,7 @@ export enum ACCOUNTS_COLUMNS {
 }
 export class Account {
   [ACCOUNTS_COLUMNS.address]: string;
-  [ACCOUNTS_COLUMNS.hashedPhoneNumber]: string;
+  [ACCOUNTS_COLUMNS.hashedPhoneNumber]: string; // TODO(Alec): This is wrong, we need to use the DEK blindedPhoneNumber bc we can't prove that the identifier maps to the phone number without querying ODIS
   [ACCOUNTS_COLUMNS.createdAt]: Date = new Date();
   [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
 
