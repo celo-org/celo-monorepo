@@ -19,7 +19,7 @@ Use these instructions to update non-validating nodes, such as your account node
 ### Pull the latest Docker image
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/geth:baklava
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 docker pull $CELO_IMAGE
 ```
 
