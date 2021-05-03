@@ -84,6 +84,14 @@ Savings Circles let you pool funds with your friends to save for large purchases
 
 [Lovecrypto](https://www.lovecrypto.net/) enables people to earn cUSD to do tasks in their phones. [Github](https://github.com/lucaszsd/LovecryptoAppScreenshots)
 
+### Cent Wallet
+
+[Cent](https://cent.finance/) is a mobile wallet for buying and holding crypto as well as using Wallet Connect to authorise transactions on exchanges and other services. Cent is [open source on GitHub](https://github.com/centfinance/Cent.Wallet) and available on Android and iOS through the app store.
+
+### Symmetric
+
+[Symmetric](https://symmetric.finance/) is a fork of Balancer for Celo. Symmetric is [open source on GitHub](https://github.com/centfinance), has a tokenomics model that includes a risk fund protecting traders, is to be DAO controlled and has a roadmap of new features.
+
 ## Add your app to this list
 
 _Are you building on Celo? To add your project, please submit a pull request updating this page!_
