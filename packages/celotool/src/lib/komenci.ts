@@ -44,9 +44,9 @@ interface KomenciIdentity {
  */
 interface KomenciConfig {
   relayerIdentities: KomenciIdentity[]
-  foundationRewardsIdentities: KomenciIdentity[]
+  // TODO: For Signup rewards
+  // foundationRewardsIdentities: KomenciIdentity[]
   cLabsRewardsIdentities: KomenciIdentity[]
-  rewardServiceInstanceCount: number
 }
 
 interface KomenciKeyVaultIdentityConfig {
@@ -55,6 +55,10 @@ interface KomenciKeyVaultIdentityConfig {
 
 interface KomenciMnemonicIdentityConfig {
   addressesFromMnemonicCount: string
+}
+
+interface KomenciRewardServiceConfig {
+  instanceCount: number
 }
 
 interface KomenciDatabaseConfig {
@@ -108,10 +112,10 @@ const contextKomenciCeloLabsRewardsKeyVaultIdentityConfigDynamicEnvVars: {
 /**
  * Env vars corresponding to each value for the KomenciCeloLabsRewardsKeyVaultIdentityConfig for a particular context
  */
-const contextKomenciRewardsServiceInstanceCountConfigDynamicEnvVars: {
-  [k in keyof KomenciKeyVaultIdentityConfig]: DynamicEnvVar
+const contextKomenciRewardsServiceConfigDynamicEnvVars: {
+  [k in keyof KomenciRewardServiceConfig]: DynamicEnvVar
 } = {
-  addressAzureKeyVaults: DynamicEnvVar.KOMENCI_REWARD_SERVICE_INSTANCE_COUNT,
+  instanceCount: DynamicEnvVar.KOMENCI_REWARD_SERVICE_INSTANCE_COUNT,
 }
 
 const contextDatabaseConfigDynamicEnvVars: { [k in keyof KomenciDatabaseConfig]: DynamicEnvVar } = {
@@ -121,16 +125,20 @@ const contextDatabaseConfigDynamicEnvVars: { [k in keyof KomenciDatabaseConfig]:
   passwordVaultName: DynamicEnvVar.KOMENCI_DB_PASSWORD_VAULT_NAME,
 }
 
+const contextRewardServiceDatabaseConfigDynamicEnvVars: {
+  [k in keyof KomenciDatabaseConfig]: DynamicEnvVar
+} = {
+  host: DynamicEnvVar.KOMENCI_REWARD_SERVICE_DB_HOST,
+  port: DynamicEnvVar.KOMENCI_REWARD_SERVICE_DB_PORT,
+  username: DynamicEnvVar.KOMENCI_REWARD_SERVICE_DB_USERNAME,
+  passwordVaultName: DynamicEnvVar.KOMENCI_REWARD_SERVICE_DB_PASSWORD_VAULT_NAME,
+}
+
 function releaseName(celoEnv: string) {
   return `${celoEnv}-komenci`
 }
 
-export async function installHelmChart(
-  celoEnv: string,
-  context: string,
-  useForno: boolean,
-  deployRewards: boolean
-) {
+export async function installHelmChart(celoEnv: string, context: string, useForno: boolean) {
   // First install the komenci-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // komenci pods can reach the K8s API server to change their aad labels
@@ -140,22 +148,17 @@ export async function installHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useForno, deployRewards)
+    await helmParameters(celoEnv, context, useForno)
   )
 }
 
-export async function upgradeKomenciChart(
-  celoEnv: string,
-  context: string,
-  useFullNodes: boolean,
-  deployRewards: boolean
-) {
+export async function upgradeKomenciChart(celoEnv: string, context: string, useFullNodes: boolean) {
   await upgradeKomenciRBACHelmChart(celoEnv, context)
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useFullNodes, deployRewards)
+    await helmParameters(celoEnv, context, useFullNodes)
   )
 }
 
@@ -187,18 +190,21 @@ async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: stri
   return password.replace(/\n|"/g, '')
 }
 
-async function helmParameters(
-  celoEnv: string,
-  context: string,
-  useForno: boolean,
-  deployRewards: boolean
-) {
+async function helmParameters(celoEnv: string, context: string, useForno: boolean) {
   const komenciConfig = getKomenciConfig(context)
 
-  const relayerCount = komenciConfig.relayerIdentities.length
-  const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, relayerCount)
+  const onboardingRelayerCount = komenciConfig.relayerIdentities.length
+  const rewardsRelayerCount = komenciConfig.cLabsRewardsIdentities.length
+  const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(
+    celoEnv,
+    onboardingRelayerCount
+  )
 
   const databaseConfig = getContextDynamicEnvVarValues(contextDatabaseConfigDynamicEnvVars, context)
+  const rewardDatabaseConfig = getContextDynamicEnvVarValues(
+    contextRewardServiceDatabaseConfigDynamicEnvVars,
+    context
+  )
   const vars = getContextDynamicEnvVarValues(
     {
       network: DynamicEnvVar.KOMENCI_NETWORK,
@@ -216,6 +222,10 @@ async function helmParameters(
     databaseConfig.passwordVaultName,
     'DB-PASSWORD'
   )
+  const rewardDatabasePassword = await getPasswordFromKeyVaultSecret(
+    rewardDatabaseConfig.passwordVaultName,
+    'DB-PASSWORD'
+  )
   const recaptchaToken = await getPasswordFromKeyVaultSecret(
     vars.appSecretsKeyVault,
     'RECAPTCHA-SECRET-KEY'
@@ -223,6 +233,10 @@ async function helmParameters(
   const loggerCredentials = await getPasswordFromKeyVaultSecret(
     vars.appSecretsKeyVault,
     'LOGGER-SERVICE-ACCOUNT'
+  )
+  const rewardServiceConfig = getContextDynamicEnvVarValues(
+    contextKomenciRewardsServiceConfigDynamicEnvVars,
+    context
   )
   const clusterConfig = getAksClusterConfig(context)
 
@@ -239,20 +253,21 @@ async function helmParameters(
     `--set komenci.azureHsm.initTryCount=5`,
     `--set komenci.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set onboarding.recaptchaToken=${recaptchaToken}`,
-    `--set onboarding.replicas=${relayerCount}`,
+    `--set onboarding.replicas=${onboardingRelayerCount}`,
     `--set onboarding.relayer.host=${celoEnv + '-relayer'}`,
     `--set onboarding.db.host=${databaseConfig.host}`,
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
-    `--set onboarding.publicUrl=${'https://' +
-      getPublicHostname(clusterConfig.regionName, celoEnv)}`,
+    `--set onboarding.publicUrl=${
+      'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)
+    }`,
     `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
     `--set onboarding.ruleConfig.captcha.bypassToken=${fetchEnv(
       envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN
     )}`,
-    `--set relayer.replicas=${relayerCount}`,
+    `--set relayer.replicas=${onboardingRelayerCount}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
@@ -263,7 +278,30 @@ async function helmParameters(
     )
       .split(',')
       .join('\\,')}'`,
-  ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
+    `--set rewards.replicas=${rewardServiceConfig.instanceCount}`,
+    `--set rewards.db.host=${rewardDatabaseConfig.host}`,
+    `--set rewards.db.port=${rewardDatabaseConfig.port}`,
+    `--set rewards.db.username=${rewardDatabaseConfig.username}`,
+    `--set rewards.db.password=${rewardDatabasePassword}`,
+    `--set rewards.metrics.enabled=true`,
+    `--set rewards.metrics.prometheusPort=9090`,
+    `--set rewards.relayer.replicas=${rewardsRelayerCount}`,
+    `--set rewards.relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
+    `--set rewards.relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
+    `--set rewards.relayer.metrics.enabled=true`,
+    `--set rewards.relayer.metrics.prometheusPort=9090`,
+    `--set rewards.relayer.host=${celoEnv + '-rewards-relayer'}`,
+  ]
+    .concat(
+      await komenciIdentityHelmParameters(context, komenciConfig.relayerIdentities, 'relayer')
+    )
+    .concat(
+      await komenciIdentityHelmParameters(
+        context,
+        komenciConfig.cLabsRewardsIdentities,
+        'rewards.relayer'
+      )
+    )
 }
 
 function getPublicHostname(regionName: string, celoEnv: string): string {
@@ -274,12 +312,16 @@ function getPublicHostname(regionName: string, celoEnv: string): string {
  * Returns an array of helm command line parameters for the komenci relayer identities.
  * Supports both private key and Azure HSM signing.
  */
-async function komenciIdentityHelmParameters(context: string, komenciConfig: KomenciConfig) {
-  const replicas = komenciConfig.relayerIdentities.length
+async function komenciIdentityHelmParameters(
+  context: string,
+  relayerIdentities: KomenciIdentity[],
+  envVarPrefix: string
+) {
+  const replicas = relayerIdentities.length
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
-    const komenciIdentity = komenciConfig.relayerIdentities[i]
-    const prefix = `--set relayer.identities[${i}]`
+    const komenciIdentity = relayerIdentities[i]
+    const prefix = `--set ${envVarPrefix}.identities[${i}]`
     params.push(`${prefix}.address=${komenciIdentity.address}`)
     // An komenci identity can specify either a private key or some information
     // about an Azure Key Vault that houses an HSM with the address provided.
@@ -308,13 +350,14 @@ async function komenciIdentityHelmParameters(context: string, komenciConfig: Kom
 }
 
 /**
- * Gives a config for all komencis for a particular context
+ * Gives a config for all komenci services for a particular context
  */
 function getKomenciConfig(context: string): KomenciConfig {
   return {
     relayerIdentities: getKomenciRelayerIdentities(context),
     cLabsRewardsIdentities: getKomenciRewardIdentities(context, RewardType.Foundation),
-    foundationRewardsIdentities: getKomenciRewardIdentities(context, RewardType.CeloLabs),
+    // TODO: For Signup rewards
+    // foundationRewardsIdentities: getKomenciRewardIdentities(context, RewardType.CeloLabs),
   }
 }
 
@@ -363,8 +406,6 @@ function getKomenciRewardIdentities(context: string, rewardType: RewardType): Ko
   const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(envVars, context, {
     addressAzureKeyVaults: '',
   })
-
-  const rewardServiceCount = getContextDynamicEnvVarValues()
 
   if (addressAzureKeyVaults) {
     return getAzureHsmKomenciIdentities(addressAzureKeyVaults)
@@ -453,7 +494,7 @@ function removeKomenciRBACHelmRelease(celoEnv: string) {
 function rbacHelmParameters(celoEnv: string, context: string) {
   const komenciConfig = getKomenciConfig(context)
   console.info(komenciConfig)
-  const replicas = komenciConfig.identities.length
+  const replicas = komenciConfig.relayerIdentities.length
   return [`--set environment.name=${celoEnv}`, `--set relayer.replicas=${replicas}`]
 }
 
