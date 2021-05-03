@@ -577,9 +577,9 @@ contract('Accounts', (accounts: string[]) => {
       assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
       assert.equal(await accountsInstance.getDefaultSigner(account, role), account)
 
-      await assertRevert(accountsInstance.setDefaultSigner(signer, role))
+      await assertRevert(accountsInstance.setIndexedSigner(signer, role))
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
-      await accountsInstance.setDefaultSigner(signer, role)
+      await accountsInstance.setIndexedSigner(signer, role)
 
       assert.isTrue(await accountsInstance.isSigner(account, signer, role))
       assert.isTrue(await accountsInstance.hasDefaultSigner(account, role))
@@ -588,7 +588,7 @@ contract('Accounts', (accounts: string[]) => {
 
     it('can remove the default signer for a role', async () => {
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
-      await accountsInstance.setDefaultSigner(signer, role)
+      await accountsInstance.setIndexedSigner(signer, role)
       await accountsInstance.removeDefaultSigner(role)
 
       assert.isTrue(await accountsInstance.isSigner(account, signer, role))
@@ -639,7 +639,7 @@ contract('Accounts', (accounts: string[]) => {
               s,
               ...rest
             )
-            const result2 = await accountsInstance.setDefaultSigner(signer, role, ...rest)
+            const result2 = await accountsInstance.setIndexedSigner(signer, role, ...rest)
             return {
               logs: [...result1.logs, ...result2.logs],
             }

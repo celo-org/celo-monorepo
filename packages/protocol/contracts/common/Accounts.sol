@@ -238,7 +238,7 @@ contract Accounts is
    * @param signer the address to set as default
    * @param role the role to register a default signer for
    */
-  function setDefaultSigner(address signer, bytes32 role) public {
+  function setIndexedSigner(address signer, bytes32 role) public {
     require(isAccount(msg.sender), "Not an account");
     require(isNotAccount(signer), "Cannot authorize account as signer");
     require(
@@ -311,7 +311,7 @@ contract Accounts is
     nonReentrant
   {
     legacyAuthorizeSignerWithSignature(signer, VoteSigner, v, r, s);
-    setDefaultSigner(signer, VoteSigner);
+    setIndexedSigner(signer, VoteSigner);
 
     emit VoteSignerAuthorized(msg.sender, signer);
   }
@@ -329,7 +329,7 @@ contract Accounts is
     nonReentrant
   {
     legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
-    setDefaultSigner(signer, ValidatorSigner);
+    setIndexedSigner(signer, ValidatorSigner);
 
     require(!getValidators().isValidator(msg.sender), "Cannot authorize validator signer");
     emit ValidatorSignerAuthorized(msg.sender, signer);
@@ -352,7 +352,7 @@ contract Accounts is
     bytes calldata ecdsaPublicKey
   ) external nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
-    setDefaultSigner(signer, ValidatorSigner);
+    setIndexedSigner(signer, ValidatorSigner);
 
     require(
       getValidators().updateEcdsaPublicKey(msg.sender, signer, ecdsaPublicKey),
@@ -384,7 +384,7 @@ contract Accounts is
     bytes calldata blsPop
   ) external nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
-    setDefaultSigner(signer, ValidatorSigner);
+    setIndexedSigner(signer, ValidatorSigner);
 
     require(
       getValidators().updatePublicKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
@@ -403,7 +403,7 @@ contract Accounts is
    */
   function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s) public {
     legacyAuthorizeSignerWithSignature(signer, AttestationSigner, v, r, s);
-    setDefaultSigner(signer, AttestationSigner);
+    setIndexedSigner(signer, AttestationSigner);
 
     emit AttestationSignerAuthorized(msg.sender, signer);
   }
