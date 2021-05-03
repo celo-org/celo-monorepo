@@ -239,6 +239,7 @@ contract Accounts is
    * @param role the role to register a default signer for
    */
   function setDefaultSigner(address signer, bytes32 role) public {
+    require(isAccount(msg.sender), "Not an account");
     require(isNotAccount(signer), "Cannot authorize account as signer");
     require(
       isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
