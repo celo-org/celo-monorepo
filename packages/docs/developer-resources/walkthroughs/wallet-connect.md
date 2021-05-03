@@ -99,7 +99,7 @@ connect()
 
 ## Initialise ContractKit
 
-As a final step, `WalletConnectWallet` (and any library that implements the `Wallet` interface we mentioned earlier) integrates natively with [@elo/contractkit](https://docs.celo.org/developer-guide/contractkit). This means you can start sending various transactions as soon as the wallet is initialised. Here's a full example displaying the end-to-end flow of connecting and sending transferring some CELO.
+As a final step, `WalletConnectWallet` (and any library that implements the `Wallet` interface we mentioned earlier) integrates natively with [@celo/contractkit](https://docs.celo.org/developer-guide/contractkit). This means you can start sending various transactions as soon as the wallet is initialised. Here's a full example displaying the end-to-end flow of connecting and sending transferring some CELO.
 
 ```javascript
 import { newKit } from '@celo/contractkit'
