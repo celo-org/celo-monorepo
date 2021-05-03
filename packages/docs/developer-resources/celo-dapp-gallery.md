@@ -54,7 +54,7 @@ At Dunia Payment, we are building an electronic wallet that will let people in S
 
 ### Bloinx by BX Smart Labs
 
-Descentralized app that boosts users to create save up reliable communities by using smart contracts, in a transparent, verifiable and trustworthy enviroment. [Bloinx](https://bloinx.io/) is upgrading the way to manage TANDAS,   Rotating, saving and credit associations, used in latinamerican communities. [Github](https://github.com/Bloinx/bloinx-mobile)
+A decentralized app that helps users to create reliable savings communities by using smart contracts, in a transparent, verifiable, and trustworthy environment. [Bloinx](https://bloinx.io/) is upgrading the way to manage TANDAS, which are rotating, saving, and credit associations, used in Latin American communities. [Github](https://github.com/Bloinx/bloinx-mobile)
 
 ## [Decentralized Impact Incubator](https://blockchainforsocialimpact.com/incubator-winners-2020/) Winners
 
