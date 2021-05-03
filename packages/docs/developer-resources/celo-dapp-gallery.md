@@ -6,6 +6,10 @@ Additionally, head over to [Celo Hub](https://celohub.org) and [Electric Capital
 
 ## [Celo Camp](https://www.celocamp.com/) Projects
 
+### Infibridge
+
+[Infibridge](https://www.infibridge.com) is a "Metamask like" browser extension wallet for Celo. It will support payment of gas fees in Celo or stable currencies like cUSD and cEUR. It has deep integration with Celo to allow staking, voting and token swaps. [Github](https://github.com/infibridge/browser-extension-wallet)
+
 ### Biscoint DollarSave
 
 [Biscoint](https://biscoint.io) is working on an out-of-the-box [CELO and Celo Dollar hot wallet](https://github.com/Biscoint/celo-hot-wallet) to be used by projects that require automated processing of withdrawals. They also created a cUSD SPV client written in Typescript ([GitHub link](https://github.com/Biscoint/celo-spv))
