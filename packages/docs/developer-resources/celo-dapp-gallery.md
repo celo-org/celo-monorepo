@@ -6,6 +6,10 @@ Additionally, head over to [Celo Hub](https://celohub.org) and [Electric Capital
 
 ## [Celo Camp](https://www.celocamp.com/) Projects
 
+### Infibridge
+
+[Infibridge](https://www.infibridge.com) is a "Metamask like" browser extension wallet for Celo. It will support payment of gas fees in Celo or stable currencies like cUSD and cEUR. It has deep integration with Celo to allow staking, voting and token swaps. [Github](https://github.com/infibridge/browser-extension-wallet)
+
 ### Biscoint DollarSave
 
 [Biscoint](https://biscoint.io) is working on an out-of-the-box [CELO and Celo Dollar hot wallet](https://github.com/Biscoint/celo-hot-wallet) to be used by projects that require automated processing of withdrawals. They also created a cUSD SPV client written in Typescript ([GitHub link](https://github.com/Biscoint/celo-spv))
@@ -87,6 +91,14 @@ Savings Circles let you pool funds with your friends to save for large purchases
 ### Lovecrypto
 
 [Lovecrypto](https://www.lovecrypto.net/) enables people to earn cUSD to do tasks in their phones. [Github](https://github.com/lucaszsd/LovecryptoAppScreenshots)
+
+### Cent Wallet
+
+[Cent](https://cent.finance/) is a mobile wallet for buying and holding crypto as well as using Wallet Connect to authorise transactions on exchanges and other services. Cent is [open source on GitHub](https://github.com/centfinance/Cent.Wallet) and available on Android and iOS through the app store.
+
+### Symmetric
+
+[Symmetric](https://symmetric.finance/) is a fork of Balancer for Celo. Symmetric is [open source on GitHub](https://github.com/centfinance), has a tokenomics model that includes a risk fund protecting traders, is to be DAO controlled and has a roadmap of new features.
 
 ## Add your app to this list
 
