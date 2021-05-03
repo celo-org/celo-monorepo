@@ -56,6 +56,10 @@ Tangany's custody solution [Wallet as a Service](https://docs.tangany.com/?versi
 
 At Dunia Payment, we are building an electronic wallet that will let people in Sub Saharan Africa send and receive money directly on their phone.The app will use the Celo light client to process transactions faster, even in low internet connection areas common in Africa. The wallet will be built on top of the Celo platform and also using a set of external open source smart contracts. [Github](https://github.com/duniapay/Dunia-Wallet-Celo)
 
+### Bloinx by BX Smart Labs
+
+A decentralized app that helps users to create reliable savings communities by using smart contracts, in a transparent, verifiable, and trustworthy environment. [Bloinx](https://bloinx.io/) is upgrading the way to manage TANDAS, which are rotating, saving, and credit associations, used in Latin American communities. [Github](https://github.com/Bloinx/bloinx-mobile)
+
 ## [Decentralized Impact Incubator](https://blockchainforsocialimpact.com/incubator-winners-2020/) Winners
 
 ### Multiply.Charity by Abundance
