@@ -63,6 +63,7 @@ contract Accounts is
   // Default signers by account (replaces the legacy Signers struct on Account)
   mapping(address => mapping(bytes32 => address)) defaultSigners;
   // All signers and their roles for a given account
+  // solhint-disable-next-line max-line-length
   mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
 
   bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
@@ -238,6 +239,7 @@ contract Accounts is
    * @param role the role to register a default signer for
    */
   function setDefaultSigner(address signer, bytes32 role) public {
+    require(isNotAccount(signer), "Cannot authorize account as signer");
     require(
       isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
       "Not a signer for this account"
