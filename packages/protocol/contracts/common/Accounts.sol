@@ -60,7 +60,7 @@ contract Accounts is
   mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
-  // Indexable signers by account
+  // Default signers by account (replaces the legacy Signers struct on Account)
   mapping(address => mapping(bytes32 => address)) defaultSigners;
   // All signers and their roles for a given account
   mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
@@ -238,6 +238,10 @@ contract Accounts is
    * @param role the role to register a default signer for
    */
   function setDefaultSigner(address signer, bytes32 role) public {
+    require(
+      isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
+      "Not a signer for this account"
+    );
     require(isSigner(msg.sender, signer, role), "Must authorize signer before setting as default");
 
     Account storage account = accounts[msg.sender];
@@ -502,9 +506,8 @@ contract Accounts is
    * @param role The role that has been authorized.
    */
   function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
-    return
-      isLegacySigner(account, signer, role) ||
-      signerAuthorizations[account][role][signer].completed;
+    return (isLegacySigner(account, signer, role) ||
+      signerAuthorizations[account][role][signer].completed);
   }
 
   /**
@@ -534,6 +537,11 @@ contract Accounts is
     }
   }
 
+  /**
+   * @notice Removes the currently authorized and indexed signer 
+   * for a specific role
+   * @param role The role of the signer.
+   */
   function removeIndexedSigner(bytes32 role) public {
     isLegacyRole(role) ? removeLegacySigner(role) : removeDefaultSigner(role);
   }
@@ -559,7 +567,7 @@ contract Accounts is
    */
   function removeVoteSigner() public {
     address signer = getLegacySigner(msg.sender, VoteSigner);
-    removeLegacySigner(VoteSigner);
+    removeSigner(signer, VoteSigner);
     emit VoteSignerRemoved(msg.sender, signer);
   }
 
@@ -569,7 +577,7 @@ contract Accounts is
    */
   function removeValidatorSigner() public {
     address signer = getLegacySigner(msg.sender, ValidatorSigner);
-    removeLegacySigner(ValidatorSigner);
+    removeSigner(signer, ValidatorSigner);
     emit ValidatorSignerRemoved(msg.sender, signer);
   }
 
@@ -579,13 +587,12 @@ contract Accounts is
    */
   function removeAttestationSigner() public {
     address signer = getLegacySigner(msg.sender, AttestationSigner);
-    removeLegacySigner(AttestationSigner);
+    removeSigner(signer, AttestationSigner);
     emit AttestationSignerRemoved(msg.sender, signer);
   }
 
   function signerToAccountWithRole(address signer, bytes32 role) internal view returns (address) {
     address account = authorizedBy[signer];
-
     if (account != address(0)) {
       require(isSigner(account, signer, role), "not active authorized signer for role");
       return account;
