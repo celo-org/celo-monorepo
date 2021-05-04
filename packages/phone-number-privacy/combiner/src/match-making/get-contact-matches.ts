@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   GetContactMatchesRequest,
   hasValidAccountParam,
+  hasValidBlindedPhoneNumberParam,
   hasValidContactPhoneNumbersParam,
   hasValidUserPhoneNumberParam,
   isVerified,
@@ -94,7 +95,7 @@ export async function handleGetContactMatches(
 
 function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): boolean {
   return (
-    // TODO(Alec): add check for blindedPhoneNumber
+    hasValidBlindedPhoneNumberParam(requestBody) &&
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
     hasValidContactPhoneNumbersParam(requestBody) &&
