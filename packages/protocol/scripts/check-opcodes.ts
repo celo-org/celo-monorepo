@@ -9,12 +9,12 @@ const UNSAFE_OPCODES = ['selfdestruct', 'delegatecall']
 const IGNORE_CONTRACTS = ['ReleaseGold', 'TransferWhitelist']
 const CHECK_CONTRACTS = CoreContracts.filter((c) => !IGNORE_CONTRACTS.includes(c))
 
-const handleRgOutput = (err: ExecException, rgOutput: string, stderr: string) => {
+const handleGrepOutput = (err: ExecException, grepOutput: string, stderr: string) => {
   if (err || stderr) {
-    throw new Error('ripgrep failed')
+    throw new Error('grep failed')
   }
 
-  const opcodeLines = rgOutput.toString().split('\n')
+  const opcodeLines = grepOutput.toString().split('\n')
 
   let safe = true
   opcodeLines.forEach((line) => {
@@ -34,7 +34,5 @@ const handleRgOutput = (err: ExecException, rgOutput: string, stderr: string) =>
   }
 }
 
-exec(
-  `rg --no-heading "${UNSAFE_OPCODES.join('|')}" ${path.join(__dirname, '../contracts')}`,
-  handleRgOutput
-)
+const cmd = `egrep -r "(${UNSAFE_OPCODES.join('|')})\\(" ${path.join(__dirname, '../contracts')}`
+exec(cmd, handleGrepOutput)
