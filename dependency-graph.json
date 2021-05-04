@@ -130,6 +130,7 @@
   "@celo/phone-number-privacy-signer": {
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/flake-tracker",
       "@celo/identity",
