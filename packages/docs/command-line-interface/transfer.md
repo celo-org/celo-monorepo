@@ -55,6 +55,40 @@ EXAMPLE
 
 _See code: [src/commands/transfer/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/dollars.ts)_
 
+## `celocli transfer:erc20`
+
+Transfer ERC20 to a specified address
+
+```
+Transfer ERC20 to a specified address
+
+USAGE
+  $ celocli transfer:erc20
+
+OPTIONS
+  --erc20Address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Custom erc20 to
+                                                             check it's balance too
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          (required) Address of the
+                                                             sender
+
+  --globalHelp                                               View all available global
+                                                             flags
+
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d            (required) Address of the
+                                                             receiver
+
+  --value=value                                              (required) Amount to
+                                                             transfer (in wei)
+
+EXAMPLE
+  erc20 --erc20Address 0x765DE816845861e75A25fCA122bb6898B8B1282a --from
+  0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to
+  0x5409ed021d9299bf6814279a6a1411a7e866a631 --value 10000000000000000000
+```
+
+_See code: [src/commands/transfer/erc20.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/erc20.ts)_
+
 ## `celocli transfer:euros`
 
 Transfer Celo Euros (cEUR) to a specified address.

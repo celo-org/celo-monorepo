@@ -57,19 +57,27 @@ _See code: [src/commands/account/authorize.ts](https://github.com/celo-org/celo-
 
 ## `celocli account:balance ADDRESS`
 
-View Celo Dollar and Gold balances for an address
+View Celo Stables and CELO balances for an address
 
 ```
-View Celo Dollar and Gold balances for an address
+View Celo Stables and CELO balances for an address
 
 USAGE
   $ celocli account:balance ADDRESS
 
 OPTIONS
-  --globalHelp  View all available global flags
+  --erc20Address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Address of generic ERC-20
+                                                             token to also check balance
+                                                             for
 
-EXAMPLE
+  --globalHelp                                               View all available global
+                                                             flags
+
+EXAMPLES
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
+
+  balance 0x5409ed021d9299bf6814279a6a1411a7e866a631 --erc20Address
+  0x765DE816845861e75A25fCA122bb6898B8B1282a
 ```
 
 _See code: [src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
