@@ -19,6 +19,11 @@ export function hasValidUserPhoneNumberParam(requestBody: GetContactMatchesReque
   return !!requestBody.userPhoneNumber && isValidPhoneNumberHash(requestBody.userPhoneNumber)
 }
 
+export function hasValidBlindedPhoneNumberParam(requestBody: GetContactMatchesRequest): boolean {
+  // TODO (Alec)
+  // return !!requestBody.userPhoneNumber && isValidPhoneNumberHash(requestBody.userPhoneNumber)
+}
+
 export function hasValidContactPhoneNumbersParam(requestBody: GetContactMatchesRequest): boolean {
   return (
     Array.isArray(requestBody.contactPhoneNumbers) &&

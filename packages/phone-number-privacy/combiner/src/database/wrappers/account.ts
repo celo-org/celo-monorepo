@@ -21,15 +21,18 @@ async function getAccountExists(account: string, logger: Logger): Promise<boolea
   }
 }
 
-export async function getAccountIdentifier(account: string, logger: Logger): Promise<string> {
+export async function getAccountBlindedPhoneNumber(
+  account: string,
+  logger: Logger
+): Promise<string> {
   try {
-    const existingAccountIdentifierRecord = await accounts()
+    const blindedPhoneNumberRecord = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
-      .select(ACCOUNTS_COLUMNS.hashedPhoneNumber)
+      .select(ACCOUNTS_COLUMNS.blindedPhoneNumber)
       .first()
       .timeout(DB_TIMEOUT)
-    return existingAccountIdentifierRecord
-      ? existingAccountIdentifierRecord[ACCOUNTS_COLUMNS.hashedPhoneNumber]
+    return blindedPhoneNumberRecord
+      ? blindedPhoneNumberRecord[ACCOUNTS_COLUMNS.blindedPhoneNumber]
       : 'empty'
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
@@ -38,15 +41,15 @@ export async function getAccountIdentifier(account: string, logger: Logger): Pro
   }
 }
 
-export async function setAccountIdentifier(
+export async function setAccountBlindedPhoneNumber(
   account: string,
-  hashedPhoneNumber: string,
+  blindedPhoneNumber: string,
   logger: Logger
 ) {
   try {
     return accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
-      .update(ACCOUNTS_COLUMNS.hashedPhoneNumber, hashedPhoneNumber)
+      .update(ACCOUNTS_COLUMNS.blindedPhoneNumber, blindedPhoneNumber)
       .timeout(DB_TIMEOUT)
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
@@ -81,7 +84,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
  */
 export async function setDidMatchmaking(
   account: string,
-  hashedPhoneNumber: string,
+  blindedPhoneNumber: string,
   logger: Logger
 ) {
   logger.debug({ account }, 'Setting did matchmaking')
@@ -97,7 +100,7 @@ export async function setDidMatchmaking(
       return null
     }
   } else {
-    const newAccount = new Account(account, hashedPhoneNumber)
+    const newAccount = new Account(account, blindedPhoneNumber)
     newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
     return insertRecord(newAccount, logger)
   }

@@ -5,11 +5,13 @@ export interface GetBlindedMessageSigRequest {
   sessionID?: string
 }
 
+// TODO(Alec): add comment explaining the naming conventions below
 export interface GetContactMatchesRequest {
   account: string
   userPhoneNumber: string
   contactPhoneNumbers: string[]
   hashedPhoneNumber: string
+  blindedPhoneNumber: string
   sessionID?: string
 }
 
