@@ -73,6 +73,7 @@ export async function getBlindedPhoneNumber(
   blsBlindingClient: WasmBlsBlindingClient
 ): Promise<string> {
   debug('Retrieving blinded message')
+  // TODO(Alec): should this just be signing with DEK now?
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
   return blsBlindingClient.blindMessage(base64PhoneNumber)
 }
