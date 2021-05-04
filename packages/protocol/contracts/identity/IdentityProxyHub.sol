@@ -6,6 +6,7 @@ import "./IdentityProxy.sol";
 
 contract IdentityProxyHub is UsingRegistry {
   bytes32 public constant identityProxyCodeHash = keccak256(
+    // solhint-disable-next-line indent
     abi.encodePacked(type(IdentityProxy).creationCode)
   );
 
@@ -89,6 +90,7 @@ contract IdentityProxyHub is UsingRegistry {
   }
 
   function deployIdentityProxy(bytes32 identifier) internal returns (IdentityProxy) {
+    // solhint-disable-next-line indent
     return IdentityProxy(Create2.deploy(identifier, type(IdentityProxy).creationCode));
   }
 }
