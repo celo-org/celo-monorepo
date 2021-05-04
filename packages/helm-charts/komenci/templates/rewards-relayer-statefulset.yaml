@@ -110,8 +110,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.rewards.relayer.azureHsm "value_name" "initTryCount") | indent 8 }}
-{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.rewards.relayer.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
+{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.komenci.azureHsm "value_name" "initTryCount") | indent 8 }}
+{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.komenci.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
 {{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.rewards.relayer.metrics "value_name" "enabled") | indent 8 }}
 {{ include "common.env-var" (dict "name" "OVERRIDE_INDEX" "dict" .Values.rewards.relayer "value_name" "overrideIndex" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.rewards.relayer "value_name" "privateKeyPath" "optional" true) | indent 8 }}
@@ -138,4 +138,4 @@ spec:
       volumes:
         - name: private-key-volume
           secret:
-            secretName: pkey-secret
+            secretName: rewards-pkey-secret

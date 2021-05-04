@@ -9,6 +9,10 @@ The name of the deployment
 {{- .Values.environment.name -}}-onboarding
 {{- end -}}
 
+{{- define "komenci-rewards-fullname" -}}
+{{- .Values.environment.name -}}-rewards
+{{- end -}}
+
 {{/*
 Common labels that are recommended to be used by Helm and Kubernetes
 */}}
@@ -46,6 +50,13 @@ Label specific to the komenci rewards component
 */}}
 {{- define "komenci-rewards-component-label" -}}
 app.kubernetes.io/component: komenci-rewards
+{{- end -}}
+
+{{/*
+Label specific to the komenci rewards relayer component
+*/}}
+{{- define "komenci-rewards-relayer-component-label" -}}
+app.kubernetes.io/component: komenci-rewards-relayer
 {{- end -}}
 
 {{/*

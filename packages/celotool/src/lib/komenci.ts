@@ -97,7 +97,7 @@ const contextKomenciMnemonicIdentityConfigDynamicEnvVars: {
 const contextKomenciFoundationRewardsKeyVaultIdentityConfigDynamicEnvVars: {
   [k in keyof KomenciKeyVaultIdentityConfig]: DynamicEnvVar
 } = {
-  addressAzureKeyVaults: DynamicEnvVar.KOMENCI_FOUNDATION_REWARDS_ADDRESS_AZURE_KEY_VAULT,
+  addressAzureKeyVaults: DynamicEnvVar.KOMENCI_FOUNDATION_REWARDS_ADDRESS_AZURE_KEY_VAULTS,
 }
 
 /**
@@ -106,7 +106,7 @@ const contextKomenciFoundationRewardsKeyVaultIdentityConfigDynamicEnvVars: {
 const contextKomenciCeloLabsRewardsKeyVaultIdentityConfigDynamicEnvVars: {
   [k in keyof KomenciKeyVaultIdentityConfig]: DynamicEnvVar
 } = {
-  addressAzureKeyVaults: DynamicEnvVar.KOMENCI_CELOLABS_REWARDS_ADDRESS_AZURE_KEY_VAULT,
+  addressAzureKeyVaults: DynamicEnvVar.KOMENCI_CELOLABS_REWARDS_ADDRESS_AZURE_KEY_VAULTS,
 }
 
 /**
@@ -355,9 +355,8 @@ async function komenciIdentityHelmParameters(
 function getKomenciConfig(context: string): KomenciConfig {
   return {
     relayerIdentities: getKomenciRelayerIdentities(context),
-    cLabsRewardsIdentities: getKomenciRewardIdentities(context, RewardType.Foundation),
-    // TODO: For Signup rewards
-    // foundationRewardsIdentities: getKomenciRewardIdentities(context, RewardType.CeloLabs),
+    cLabsRewardsIdentities: getKomenciRewardIdentities(context, RewardType.CeloLabs),
+    // foundationRewardsIdentities: getKomenciRewardIdentities(context, RewardType.Foundation),
   }
 }
 
@@ -411,7 +410,7 @@ function getKomenciRewardIdentities(context: string, rewardType: RewardType): Ko
     return getAzureHsmKomenciIdentities(addressAzureKeyVaults)
   }
 
-  throw Error('No komenci identity env vars specified')
+  throw Error('No komenci reward identity env vars specified')
 }
 
 /**
