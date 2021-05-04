@@ -40,7 +40,6 @@ export function hasValidQueryPhoneNumberParam(requestBody: GetBlindedMessageSigR
 }
 
 export function hasValidTimestamp(requestBody: any): boolean {
-  // TODO(Alec): make timestamp required
   return (
     !requestBody.timestamp ||
     (typeof requestBody.timestamp === 'number' &&

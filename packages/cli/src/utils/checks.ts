@@ -328,6 +328,16 @@ class CheckBuilder {
     )
   }
 
+  hasEnoughErc20 = (account: Address, value: BigNumber, erc20: Address) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} erc20 token`, () =>
+      this.kit.contracts
+        .getErc20(erc20)
+        .then((goldToken) => goldToken.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
   exceedsProposalMinDeposit = (deposit: BigNumber) =>
     this.addCheck(
       `Deposit is greater than or equal to governance proposal minDeposit`,

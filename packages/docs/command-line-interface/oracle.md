@@ -16,6 +16,9 @@ USAGE
 ARGUMENTS
   TOKEN  [default: StableToken] Token to list the oracles for
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLES
   list StableToken
 
@@ -42,6 +45,8 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account
                                                      removing oracle reports
+
+  --globalHelp                                       View all available global flags
 
 EXAMPLES
   remove-expired-reports StableToken --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
@@ -70,6 +75,8 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle
                                                      account
+
+  --globalHelp                                       View all available global flags
 
   --value=value                                      (required) Amount of the specified
                                                      token equal to 1 CELO
@@ -102,6 +109,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
