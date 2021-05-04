@@ -509,8 +509,9 @@ contract Accounts is
    * @param role The role that has been authorized.
    */
   function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
-    return (isLegacySigner(account, signer, role) ||
-      signerAuthorizations[account][role][signer].completed);
+    return
+      isLegacySigner(account, signer, role) ||
+      (signerAuthorizations[account][role][signer].completed && authorizedBy[signer] == account);
   }
 
   /**
