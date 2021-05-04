@@ -1,4 +1,5 @@
-import { randomBytes } from 'crypto'
+import { hexToBuffer } from '@celo/base'
+import { EncryptionKeySigner } from './query'
 
 export interface BlsBlindingClient {
   blindMessage: (base64PhoneNumber: string) => Promise<string>
@@ -21,11 +22,13 @@ interface BlindedMessage {
 export class WasmBlsBlindingClient implements BlsBlindingClient {
   private thresholdBls: ThresholdBlsLib
   private odisPubKey: Uint8Array
+  private dekSigner: EncryptionKeySigner
   private blindedValue: BlindedMessage | undefined
   private rawMessage: Buffer | undefined
 
-  constructor(odisPubKey: string) {
+  constructor(odisPubKey: string, dekSigner: EncryptionKeySigner) {
     this.odisPubKey = Buffer.from(odisPubKey, 'base64')
+    this.dekSigner = dekSigner
     // Dynamically load the Wasm library
     if (!this.isReactNativeEnvironment()) {
       this.thresholdBls = require('blind-threshold-bls')
@@ -37,7 +40,7 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
   }
 
   async blindMessage(base64PhoneNumber: string): Promise<string> {
-    const userSeed = randomBytes(32)
+    const userSeed = hexToBuffer(this.dekSigner.rawKey)
     this.rawMessage = Buffer.from(base64PhoneNumber, 'base64')
     this.blindedValue = await this.thresholdBls.blind(this.rawMessage, userSeed)
     const blindedMessage = this.blindedValue.message

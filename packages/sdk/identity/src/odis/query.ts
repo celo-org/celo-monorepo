@@ -51,6 +51,7 @@ export interface MatchmakingRequest extends PhoneNumberPrivacyRequest {
   userPhoneNumber: string
   contactPhoneNumbers: string[]
   hashedPhoneNumber: string
+  blindedPhoneNumber: string
 }
 
 export interface SignMessageResponse {

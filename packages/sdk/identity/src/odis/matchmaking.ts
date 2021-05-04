@@ -1,6 +1,8 @@
 import { E164Number } from '@celo/utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
+import { WasmBlsBlindingClient } from './bls-blinding-client'
+import { getBlindedPhoneNumber } from './phone-number-identifier'
 import {
   AuthSigner,
   MatchmakingRequest,
@@ -24,17 +26,20 @@ export async function getContactMatches(
   phoneNumberIdentifier: string,
   signer: AuthSigner,
   context: ServiceContext,
+  blsBlindingClient: WasmBlsBlindingClient,
   clientVersion?: string,
   sessionID?: string
 ): Promise<E164Number[]> {
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
+  const blindedPhoneNumber = await getBlindedPhoneNumber(e164NumberCaller, blsBlindingClient)
 
   const body: MatchmakingRequest = {
     account,
     userPhoneNumber: selfPhoneNumObfuscated,
     contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
     hashedPhoneNumber: phoneNumberIdentifier,
+    blindedPhoneNumber,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
   }
