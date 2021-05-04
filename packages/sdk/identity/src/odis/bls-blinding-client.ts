@@ -33,6 +33,7 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
     if (!this.isReactNativeEnvironment()) {
       this.thresholdBls = require('blind-threshold-bls')
     } else {
+      // TODO (Alec) Do we need to add DEK blinding to this library as well?
       // When using react instead rely upon this library instead
       // https://github.com/celo-org/react-native-blind-threshold-bls#cc36392
       throw new Error('Cannot use WasmBlsBlindingClient in a React Native app')

@@ -2,9 +2,9 @@ import {
   authenticateUser,
   ErrorMessage,
   hasValidAccountParam,
-  hasValidQueryPhoneNumberParam,
+  hasValidBlindedPhoneNumberParam,
+  identifierIsValidIfExists,
   isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -201,8 +201,8 @@ export async function handleGetBlindedMessagePartialSig(
 function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody) &&
-    phoneNumberHashIsValidIfExists(requestBody) &&
+    hasValidBlindedPhoneNumberParam(requestBody) &&
+    identifierIsValidIfExists(requestBody) &&
     isBodyReasonablySized(requestBody)
   )
 }

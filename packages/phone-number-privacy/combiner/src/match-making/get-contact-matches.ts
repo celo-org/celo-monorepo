@@ -5,9 +5,9 @@ import {
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   hasValidContactPhoneNumbersParam,
+  hasValidIdentifier,
   hasValidUserPhoneNumberParam,
   isVerified,
-  phoneNumberHashIsValidIfExists,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -47,7 +47,7 @@ export async function handleGetContactMatches(
       userPhoneNumber,
       contactPhoneNumbers,
       hashedPhoneNumber,
-      blindedPhoneNumber,
+      blindedQueryPhoneNumber,
     } = request.body
 
     if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
@@ -57,9 +57,9 @@ export async function handleGetContactMatches(
 
     if (await getDidMatchmaking(account, logger)) {
       const blindedPhoneNumberRecord = await getAccountBlindedPhoneNumber(account, logger)
-      if (blindedPhoneNumberRecord !== blindedPhoneNumber) {
+      if (blindedPhoneNumberRecord !== blindedQueryPhoneNumber) {
         if (blindedPhoneNumberRecord === 'empty') {
-          await setAccountBlindedPhoneNumber(account, blindedPhoneNumber, logger)
+          await setAccountBlindedPhoneNumber(account, blindedQueryPhoneNumber, logger)
         } else if (blindedPhoneNumberRecord !== 'error') {
           // fail open on db read error but don't update blinded phone number
           respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
@@ -84,7 +84,7 @@ export async function handleGetContactMatches(
       'measured percentage of contacts covered by matchmaking'
     )
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
-    await setDidMatchmaking(account, blindedPhoneNumber, logger)
+    await setDidMatchmaking(account, blindedQueryPhoneNumber, logger)
     response.json({ success: true, matchedContacts, version: VERSION })
   } catch (err) {
     logger.error('Failed to getContactMatches')
@@ -99,7 +99,6 @@ function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): b
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
     hasValidContactPhoneNumbersParam(requestBody) &&
-    !!requestBody.hashedPhoneNumber &&
-    phoneNumberHashIsValidIfExists(requestBody)
+    hasValidIdentifier(requestBody)
   )
 }

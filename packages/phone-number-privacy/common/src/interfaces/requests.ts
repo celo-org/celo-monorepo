@@ -1,22 +1,23 @@
 export interface GetBlindedMessageSigRequest {
   account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
+  blindedQueryPhoneNumber: string // blinded with DEK
+  hashedPhoneNumber?: string // on-chain identifier
   sessionID?: string
 }
 
-// TODO(Alec): add comment explaining the naming conventions below
 export interface GetContactMatchesRequest {
   account: string
-  userPhoneNumber: string
-  contactPhoneNumbers: string[]
-  hashedPhoneNumber: string
-  blindedPhoneNumber: string
+  userPhoneNumber: string // obfuscated with deterministic salt
+  contactPhoneNumbers: string[] // obfuscated with deterministic salt
+  hashedPhoneNumber: string // on-chain identifier
+  blindedQueryPhoneNumber: string // blinded with DEK
   sessionID?: string
 }
 
 export interface GetQuotaRequest {
   account: string
-  hashedPhoneNumber?: string
+  hashedPhoneNumber?: string // on-chain identifier
   sessionID?: string
 }
+
+export type OdisRequest = GetBlindedMessageSigRequest | GetQuotaRequest | GetContactMatchesRequest
