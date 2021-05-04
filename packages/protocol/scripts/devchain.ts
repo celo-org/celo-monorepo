@@ -242,15 +242,17 @@ function deployReleaseGold(releaseGoldContracts: string) {
 }
 
 async function runDevChainFromTar(filename: string, saveToDir?: string) {
-  const save = saveToDir !== undefined
-  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: save, unsafeCleanup: !save, dir: saveToDir })
-  // tslint:disable-next-line: no-console
-  console.log(`Creating tmp folder: ${chainCopy.name}`)
-
-  await decompressChain(filename, chainCopy.name)
-
-  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
-  return stopGanache
+  let datadir: string
+  if (!saveToDir) {
+    const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+    // tslint:disable-next-line: no-console
+    console.log(`Creating tmp folder: ${chainCopy.name}`)
+    datadir = chainCopy.name
+  } else {
+    datadir = saveToDir
+  }
+  await decompressChain(filename, datadir)
+  return runDevChain(datadir)
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
