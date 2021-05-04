@@ -132,11 +132,3 @@ spec:
             port: 3000
           initialDelaySeconds: 15
           periodSeconds: 20
-        volumeMounts:
-        - name: private-key-volume
-          readOnly: true
-          mountPath: "/private-keys"
-      volumes:
-        - name: private-key-volume
-          secret:
-            secretName: pkey-secret
