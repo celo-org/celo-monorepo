@@ -6,6 +6,10 @@ Additionally, head over to [Celo Hub](https://celohub.org) and [Electric Capital
 
 ## [Celo Camp](https://www.celocamp.com/) Projects
 
+### Infibridge
+
+[Infibridge](https://www.infibridge.com) is a "Metamask like" browser extension wallet for Celo. It will support payment of gas fees in Celo or stable currencies like cUSD and cEUR. It has deep integration with Celo to allow staking, voting and token swaps. [Github](https://github.com/infibridge/browser-extension-wallet)
+
 ### Biscoint DollarSave
 
 [Biscoint](https://biscoint.io) is working on an out-of-the-box [CELO and Celo Dollar hot wallet](https://github.com/Biscoint/celo-hot-wallet) to be used by projects that require automated processing of withdrawals. They also created a cUSD SPV client written in Typescript ([GitHub link](https://github.com/Biscoint/celo-spv))
@@ -51,6 +55,19 @@ Tangany's custody solution [Wallet as a Service](https://docs.tangany.com/?versi
 ### Dunia Pay Wallet
 
 At Dunia Payment, we are building an electronic wallet that will let people in Sub Saharan Africa send and receive money directly on their phone.The app will use the Celo light client to process transactions faster, even in low internet connection areas common in Africa. The wallet will be built on top of the Celo platform and also using a set of external open source smart contracts. [Github](https://github.com/duniapay/Dunia-Wallet-Celo)
+
+
+### Cryptum Woocommerce Checkout
+
+Based on Cryptum APIs, the open source Plugin connects to WordPress e-commerces checkouts, providing fast and easy integration for Celo and cUSD acceptance and management for merchants. [Github](https://github.com/blockforce-official/cryptum-checkout-wordpress-plugin)
+
+### Cryptum Woocommerce NFT
+
+Based on Cryptum APIs, the open source Plugin connects to WordPress e-commerces, providing easy and fast Celo NFT creation and integration through a nocode interface - with marketplace goods for merchants, offering customers unique experiences and extending NFT possibilities for many marketplaces. [Github](https://github.com/blockforce-official/cryptum-nft-wordpress-plugin)
+
+### Bloinx by BX Smart Labs
+
+A decentralized app that helps users to create reliable savings communities by using smart contracts, in a transparent, verifiable, and trustworthy environment. [Bloinx](https://bloinx.io/) is upgrading the way to manage TANDAS, which are rotating, saving, and credit associations, used in Latin American communities. [Github](https://github.com/Bloinx/bloinx-mobile)
 
 ## [Decentralized Impact Incubator](https://blockchainforsocialimpact.com/incubator-winners-2020/) Winners
 
