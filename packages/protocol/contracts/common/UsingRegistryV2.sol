@@ -34,8 +34,7 @@ contract UsingRegistryV2 {
   );
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
-  bytes32 constant EXCHANGE_DOLLAR_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeDollar"));
-  bytes32 constant EXCHANGE_EURO_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeEuro"));
+  bytes32 constant EXCHANGE_EURO_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeEUR"));
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );
@@ -50,10 +49,7 @@ contract UsingRegistryV2 {
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
-  bytes32 constant STABLE_DOLLOR_TOKEN_REGISTRY_ID = keccak256(
-    abi.encodePacked("StableDollarToken")
-  );
-  bytes32 constant STABLE_EURO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableEuroToken"));
+  bytes32 constant STABLE_EURO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableTokenEUR"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
   // solhint-enable state-visibility
 
@@ -84,7 +80,7 @@ contract UsingRegistryV2 {
   }
 
   function getExchangeDollar() internal view returns (IExchange) {
-    return IExchange(registry.getAddressForOrDie(EXCHANGE_DOLLAR_REGISTRY_ID));
+    return getExchange();
   }
 
   function getExchangeEuro() internal view returns (IExchange) {
@@ -128,7 +124,7 @@ contract UsingRegistryV2 {
   }
 
   function getStableDollarToken() internal view returns (IStableToken) {
-    return IStableToken(registry.getAddressForOrDie(STABLE_DOLLOR_TOKEN_REGISTRY_ID));
+    return getStableToken();
   }
 
   function getStableEuroToken() internal view returns (IStableToken) {
