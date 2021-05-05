@@ -7,7 +7,7 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/ILockedGold.sol";
 
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
@@ -17,7 +17,7 @@ contract LockedGold is
   ILockedGold,
   ICeloVersionedContract,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry
 {
   using SafeMath for uint256;
@@ -83,6 +83,12 @@ contract LockedGold is
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 1);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
