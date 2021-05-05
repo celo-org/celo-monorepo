@@ -110,6 +110,7 @@ contract LockedGold is
    */
   function lock() external payable nonReentrant {
     require(getAccounts().isAccount(msg.sender), "not account");
+    require(msg.value > 0, "Value is equal to zero");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
@@ -166,6 +167,7 @@ contract LockedGold is
    */
   function unlock(uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender), "Unknown account");
+    require(value > 0, "Value is equal to zero");
     Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
@@ -190,6 +192,7 @@ contract LockedGold is
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender), "Unknown account");
+    require(value > 0, "Value is equal to zero");
     Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
@@ -214,6 +217,7 @@ contract LockedGold is
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
+    require(value > 0, "Value is equal to zero");
     deletePendingWithdrawal(account.pendingWithdrawals, index);
     require(value <= address(this).balance, "Inconsistent balance");
     msg.sender.sendValue(value);
