@@ -34,6 +34,8 @@ contract UsingRegistryV2 {
   );
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
+  bytes32 constant EXCHANGE_DOLLAR_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeDollar"));
+  bytes32 constant EXCHANGE_EURO_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeEuro"));
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );
@@ -79,6 +81,14 @@ contract UsingRegistryV2 {
 
   function getExchange() internal view returns (IExchange) {
     return IExchange(registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID));
+  }
+
+  function getExchangeDollar() internal view returns (IExchange) {
+    return IExchange(registry.getAddressForOrDie(EXCHANGE_DOLLAR_REGISTRY_ID));
+  }
+
+  function getExchangeEuro() internal view returns (IExchange) {
+    return IExchange(registry.getAddressForOrDie(EXCHANGE_EURO_REGISTRY_ID));
   }
 
   function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
