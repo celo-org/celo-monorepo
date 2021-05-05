@@ -21,9 +21,9 @@ import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
-contract UsingRegistryV2 is Ownable {
+contract UsingRegistryV2 {
   address constant registryAddress = 0x000000000000000000000000000000000000ce10;
-  IRegistry public registry = IRegistry(registryAddress);
+  IRegistry public constant registry = IRegistry(registryAddress);
 
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
@@ -48,6 +48,10 @@ contract UsingRegistryV2 is Ownable {
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
+  bytes32 constant STABLE_DOLLOR_TOKEN_REGISTRY_ID = keccak256(
+    abi.encodePacked("StableDollarToken")
+  );
+  bytes32 constant STABLE_EURO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableEuroToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
   // solhint-enable state-visibility
 
@@ -111,6 +115,14 @@ contract UsingRegistryV2 is Ownable {
 
   function getStableToken() internal view returns (IStableToken) {
     return IStableToken(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
+  }
+
+  function getStableDollarToken() internal view returns (IStableToken) {
+    return IStableToken(registry.getAddressForOrDie(STABLE_DOLLOR_TOKEN_REGISTRY_ID));
+  }
+
+  function getStableEuroToken() internal view returns (IStableToken) {
+    return IStableToken(registry.getAddressForOrDie(STABLE_EURO_TOKEN_REGISTRY_ID));
   }
 
   function getValidators() internal view returns (IValidators) {
