@@ -759,6 +759,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
+    `--set genesis.network=${celoEnv}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
