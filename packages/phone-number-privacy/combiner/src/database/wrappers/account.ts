@@ -24,7 +24,7 @@ async function getAccountExists(account: string, logger: Logger): Promise<boolea
 export async function getAccountBlindedPhoneNumber(
   account: string,
   logger: Logger
-): Promise<string> {
+): Promise<string | undefined> {
   try {
     const blindedPhoneNumberRecord = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -33,11 +33,11 @@ export async function getAccountBlindedPhoneNumber(
       .timeout(DB_TIMEOUT)
     return blindedPhoneNumberRecord
       ? blindedPhoneNumberRecord[ACCOUNTS_COLUMNS.blindedPhoneNumber]
-      : 'empty'
+      : ''
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    return 'error'
+    return undefined
   }
 }
 

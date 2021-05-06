@@ -57,19 +57,16 @@ export async function handleGetContactMatches(
 
     if (await getDidMatchmaking(account, logger)) {
       const blindedPhoneNumberRecord = await getAccountBlindedPhoneNumber(account, logger)
-      if (blindedPhoneNumberRecord !== blindedQueryPhoneNumber) {
-        if (blindedPhoneNumberRecord === 'empty') {
-          await setAccountBlindedPhoneNumber(account, blindedQueryPhoneNumber, logger)
-        } else if (blindedPhoneNumberRecord !== 'error') {
-          // fail open on db read error but don't update blinded phone number
-          respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
-          return
-        }
-      } else {
+      if (blindedPhoneNumberRecord === blindedQueryPhoneNumber) {
         logger.info(
           { account },
           'account has already performed matchmaking but is requerying its matches'
         )
+      } else if (blindedPhoneNumberRecord) {
+        respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
+        return
+      } else if (blindedPhoneNumberRecord === '') {
+        await setAccountBlindedPhoneNumber(account, blindedQueryPhoneNumber, logger)
       }
     }
 
