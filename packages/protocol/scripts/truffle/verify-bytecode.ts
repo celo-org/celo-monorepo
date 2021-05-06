@@ -1,7 +1,7 @@
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
-import { readJsonSync } from 'fs-extra'
+import { readJsonSync, writeJsonSync } from 'fs-extra'
 import { ProxyInstance, RegistryInstance } from 'types'
 
 /*
@@ -26,7 +26,7 @@ const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network'],
+  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'output_libraries'],
   boolean: ['before_release_1'],
 })
 
@@ -34,12 +34,13 @@ const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './buil
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
+const libraryOutput = argv.output_libraries ?? 'library_record.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
-    await verifyBytecodes(
+    const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
       buildArtifacts,
       registry,
@@ -52,6 +53,8 @@ module.exports = async (callback: (error?: any) => number) => {
 
     // tslint:disable-next-line: no-console
     console.log('Success, no bytecode mismatches found!')
+
+    writeJsonSync(libraryOutput, libraryAddresses.addresses)
   } catch (error) {
     callback(error)
   }
