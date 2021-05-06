@@ -141,6 +141,8 @@ contract Governance is
 
   event ProposalApproved(uint256 indexed proposalId);
 
+  event ProposalUnApproved(uint256 indexed proposalId);
+
   event ProposalVoted(
     uint256 indexed proposalId,
     address indexed account,
@@ -619,6 +621,29 @@ contract Governance is
   }
 
   /**
+   * @notice Unapproves a proposal only if it is in approved stage.
+   * @param proposalId The ID of the proposal to unapprove.
+   * @param index The index of the proposal ID in `dequeued`.
+   * @return Whether or not the unapproval was made successfully.
+   */
+  function unapprove(uint256 proposalId, uint256 index) external onlyApprover returns (bool) {
+    dequeueProposalsIfReady();
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
+      proposalId,
+      index
+    );
+    if (!proposal.exists()) {
+      return false;
+    }
+
+    require(proposal.isApproved(), "Proposal is not approved");
+    require(stage == Proposals.Stage.Referendum, "Proposal not in Referendum stage");
+    proposal.approved = false;
+    emit ProposalUnApproved(proposalId);
+    return true;
+  }
+
+  /**
    * @notice Votes on a proposal in the referendum stage.
    * @param proposalId The ID of the proposal to vote on.
    * @param index The index of the proposal ID in `dequeued`.
@@ -704,6 +729,7 @@ contract Governance is
       proposalId,
       index
     );
+    require(proposal.isApproved(), "Proposal not approved");
     bool notExpired = proposal.exists();
     if (notExpired) {
       require(
