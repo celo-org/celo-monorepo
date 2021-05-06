@@ -26,7 +26,7 @@ const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'library_mapping'],
+  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'libraries'],
   boolean: ['before_release_1'],
 })
 
@@ -34,7 +34,7 @@ const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './buil
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
-const libraryMapping = argv.library_mapping ?? 'library_mapping.json'
+const libraries = argv.libraries ?? 'libraries.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -54,7 +54,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // tslint:disable-next-line: no-console
     console.log('Success, no bytecode mismatches found!')
 
-    writeJsonSync(libraryMapping, libraryAddresses.addresses, { spaces: 2 })
+    writeJsonSync(libraries, libraryAddresses.addresses, { spaces: 2 })
   } catch (error) {
     callback(error)
   }
