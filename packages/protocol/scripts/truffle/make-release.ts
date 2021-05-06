@@ -7,6 +7,7 @@ import { checkImports } from '@celo/protocol/lib/web3-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { LibraryAddresses } from 'lib/bytecode'
 import { basename, join } from 'path'
 import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
@@ -26,7 +27,11 @@ import { RegistryInstance } from 'types'
  */
 
 class ContractAddresses {
-  static async create(contracts: string[], registry: RegistryInstance) {
+  static async create(
+    contracts: string[],
+    registry: RegistryInstance,
+    libraryAddresses: LibraryAddresses['addresses']
+  ) {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
@@ -35,6 +40,9 @@ class ContractAddresses {
           addresses.set(contract, registeredAddress)
         }
       })
+    )
+    Object.entries(libraryAddresses).forEach(([library, address]) =>
+      addresses.set(library, address)
     )
     return new ContractAddresses(addresses)
   }
@@ -224,6 +232,7 @@ module.exports = async (callback: (error?: any) => number) => {
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(argv.libraries)
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
@@ -231,7 +240,7 @@ module.exports = async (callback: (error?: any) => number) => {
       basename(x, '.json')
     )
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
-    const addresses = await ContractAddresses.create(contracts, registry)
+    const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
 
