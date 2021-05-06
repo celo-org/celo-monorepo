@@ -109,6 +109,15 @@ export class LibraryPositions {
   }
 }
 
+// options for fixing mismatched library addresses with matching bytecode...
+// 
+// 1. only ever have 1 address for a linked library in use
+//  a. maintain historical record of canonical library addresses and link newly deployed contracts to existing deployment
+//  b. redeploy all linking contracts everytime library is deployed
+// 2. allow a single linked library to exist across multiple addresses
+//  a. guarantee that bytecode matches across instances
+//  b. allow linking contracts to consume different versions of library bytecode
+
 export class LibraryAddresses {
   addresses: { [library: string]: string }
 
