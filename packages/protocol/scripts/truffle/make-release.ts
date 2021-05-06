@@ -248,7 +248,7 @@ module.exports = async (callback: (error?: any) => number) => {
       if (released.has(contractName)) {
         return
       }
-      // 1. Release all dependencies.
+      // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
       const contractDependencies = dependencies.get(contractName)
       for (const dependency of contractDependencies) {
         await release(dependency)

@@ -54,7 +54,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // tslint:disable-next-line: no-console
     console.log('Success, no bytecode mismatches found!')
 
-    writeJsonSync(libraryMapping, libraryAddresses.addresses)
+    writeJsonSync(libraryMapping, libraryAddresses.addresses, { spaces: 2 })
   } catch (error) {
     callback(error)
   }
