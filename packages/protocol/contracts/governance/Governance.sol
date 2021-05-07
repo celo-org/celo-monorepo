@@ -141,7 +141,7 @@ contract Governance is
 
   event ProposalApproved(uint256 indexed proposalId);
 
-  event ProposalUnApproved(uint256 indexed proposalId);
+  event ProposalUnapproved(uint256 indexed proposalId);
 
   event ProposalVoted(
     uint256 indexed proposalId,
@@ -637,9 +637,9 @@ contract Governance is
     }
 
     require(proposal.isApproved(), "Proposal is not approved");
-    require(stage == Proposals.Stage.Referendum, "Proposal not in Referendum stage");
+    require(stage < Proposals.Stage.Execution, "Proposal not in Referendum stage");
     proposal.approved = false;
-    emit ProposalUnApproved(proposalId);
+    emit ProposalUnapproved(proposalId);
     return true;
   }
 
@@ -729,9 +729,9 @@ contract Governance is
       proposalId,
       index
     );
-    require(proposal.isApproved(), "Proposal not approved");
     bool notExpired = proposal.exists();
-    if (notExpired) {
+    bool isApproved = proposal.isApproved();
+    if (notExpired && isApproved) {
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
         "Proposal not in execution stage or not passing"
@@ -740,7 +740,7 @@ contract Governance is
       emit ProposalExecuted(proposalId);
       deleteDequeuedProposal(proposal, proposalId, index);
     }
-    return notExpired;
+    return notExpired && isApproved;
   }
 
   /**

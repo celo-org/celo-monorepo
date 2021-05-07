@@ -1608,6 +1608,47 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  describe.only('#unapprove()', () => {
+    const proposalId = 1
+    const index = 0
+    beforeEach(async () => {
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        // @ts-ignore bytes type
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        descriptionUrl,
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await timeTravel(dequeueFrequency, web3)
+      await governance.approve(proposalId, index)
+    })
+
+    it('should return true', async () => {
+      const success = await governance.unapprove.call(proposalId, index)
+      assert.isTrue(success)
+    })
+
+    it('should set the proposal to unapproved', async () => {
+      await governance.unapprove(proposalId, index)
+      assert.isFalse(await governance.isApproved(proposalId))
+    })
+
+    it('should emit the ProposalUnapproved event', async () => {
+      const resp = await governance.unapprove(proposalId, index)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'ProposalUnapproved',
+        args: {
+          proposalId: new BigNumber(proposalId),
+        },
+      })
+    })
+  })
+
   describe('#vote()', () => {
     const proposalId = 1
     const index = 0
