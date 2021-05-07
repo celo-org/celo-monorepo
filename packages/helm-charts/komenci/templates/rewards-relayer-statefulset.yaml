@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "name" . }}
+  name: {{ template "komenci-rewards-relayer-fullname" . }}
   labels:
 {{ include "labels" . | indent 4 }}
 {{ include "komenci-rewards-relayer-component-label" . | indent 4 }}
@@ -16,7 +16,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "name" . }}
+  name: {{ template "komenci-rewards-relayer-fullname" . }}
   labels:
 {{ include "labels" . | indent 4 }}
 {{ include "komenci-rewards-relayer-component-label" . | indent 4 }}

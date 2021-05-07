@@ -5,6 +5,10 @@ The name of the deployment
 {{- .Values.environment.name -}}-relayer
 {{- end -}}
 
+{{- define "komenci-rewards-relayer-fullname" -}}
+{{- .Values.environment.name -}}-rewards-relayer
+{{- end -}}
+
 {{- define "komenci-onboarding-fullname" -}}
 {{- .Values.environment.name -}}-onboarding
 {{- end -}}
