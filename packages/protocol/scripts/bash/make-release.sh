@@ -21,9 +21,9 @@ INITIALIZE_DATA=""
 REPORT=""
 DRYRUN=""
 FROM=""
-LIBRARIES=""
+FORNO=""
 
-while getopts 'b:n:p:i:r:df:l:' flag; do
+while getopts 'b:n:p:i:r:drf:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
@@ -31,6 +31,7 @@ while getopts 'b:n:p:i:r:df:l:' flag; do
     i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     d) DRYRUN="--dry_run" ;;
+    r) FORNO="--forno" ;;
     f) FROM="${OPTARG}" ;;
     l) LIBRARIES="${OPTARG}" ;;
     forno) FORNO="--forno" ;;
@@ -55,5 +56,4 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --librariesFile $LIBRARIES \
   --proposal $PROPOSAL \
   --from $FROM \
-  --initialize_data $INITIALIZE_DATA $DRYRUN
-  $FORNO;
+  --initialize_data $INITIALIZE_DATA $DRYRUN $FORNO;
