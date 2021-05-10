@@ -1,0 +1,26 @@
+name: core-contracts-release
+
+# Run this workflow manually
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Version number of the release to be deployed'
+        required: true
+      network:
+        description: 'Network to deploy core contracts release on'
+        required: true
+
+jobs:
+  core_contracts_release:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Runs the CD core contracts release script
+      - name: Run the core contract release script
+        run: sh ./scripts/github_actions_test.sh ${{ github.event.inputs.release_version }} ${{ github.event.inputs.network }}
+        shell: bash
