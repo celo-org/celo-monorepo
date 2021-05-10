@@ -1,5 +1,6 @@
 import { isVerified, rootLogger } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
+import allSettled from 'promise.allsettled'
 import {
   ContractRetrieval,
   createMockAccounts,
@@ -12,7 +13,6 @@ import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit } from '../../src/web3/contracts'
-import allSettled from 'promise.allsettled'
 
 allSettled.shim()
 
@@ -43,7 +43,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 2,
-      totalQuota: 52,
+      totalQuota: 60,
     })
   })
   it('Calculates remaining query count for unverified account', async () => {
@@ -61,7 +61,7 @@ describe(getRemainingQueryCount, () => {
     mockIsVerified.mockReturnValue(false)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
   it('Calculates remaining query count for verified account with many txs', async () => {
@@ -79,7 +79,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 10,
-      totalQuota: 432,
+      totalQuota: 440,
     })
   })
   it('Calculates remaining query count for unverified account with many txs', async () => {
@@ -97,7 +97,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 0,
-      totalQuota: 402,
+      totalQuota: 410,
     })
   })
   it('Calculates remaining query count for unverified account without any balance', async () => {
@@ -133,7 +133,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
   it('Calculates remaining query count for unverified account with only CELO balance', async () => {
@@ -151,7 +151,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
   it('No phone number hash when request own phone number', async () => {
@@ -168,7 +168,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, undefined)).toEqual({
       performedQueryCount: 0,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
 })
