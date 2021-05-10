@@ -10,7 +10,7 @@ source ./scripts/bash/utils.sh
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
-BUILD_DIR=""
+DEVCHAIN_DIR=""
 RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
@@ -18,22 +18,16 @@ while getopts 'b:l:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
-    d) BUILD_DIR="${OPTARG}" ;;
+    d) DEVCHAIN_DIR="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
-
-# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
-if [ -z "$BUILD_DIR" ]
-then
-    RE_BUILD_REPO="yes"
-    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-fi
+[ -z "$DEVCHAIN_DIR" ] && echo "Need to set the devchain build dir via the -d flag" && exit 1;
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$DEVCHAIN_DIR/devchain.tar.gz >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
@@ -42,22 +36,22 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
-yarn build >> $LOG_FILE
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --librariesFile libraries.json
+./scripts/bash/verify-deployed.sh -n development -b $BRANCH -l $LOG_FILE
+
+CURR_BRANCH=`git symbolic-ref -q HEAD --short`
 
 echo "- Check versions of current branch"
 # From check-versions.sh
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles"
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
+./scripts/bash/check-versions.sh -a $BRANCH -b $CURR_BRANCH -r "report.json" -l $LOG_FILE
 
-# From make-release.sh
-echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls -1 releaseData/initializationData/* | tail -n 1 | xargs realpath`
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
+
+echo "- Deploy release of current branch"
+./scripts/bash/make-release.sh -b $CURR_BRANCH -n development -r "report.json" -p "proposal.json" -i $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --initialize_data $INITIALIZATION_FILE
+./scripts/bash/verify-release.sh -b $CURR_BRANCH -n development -p "proposal.json" -i $INITIALIZATION_FILE
 
 if [[ -n $GANACHE_PID ]]; then
     kill $GANACHE_PID
