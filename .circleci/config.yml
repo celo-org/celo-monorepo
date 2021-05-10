@@ -288,7 +288,7 @@ jobs:
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
             BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d packages/protocol/$BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-release-snapshots:
     <<: *defaults

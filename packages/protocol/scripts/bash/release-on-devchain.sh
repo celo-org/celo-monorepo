@@ -27,7 +27,7 @@ done
 [ -z "$DEVCHAIN_DIR" ] && echo "Need to set the devchain build dir via the -d flag" && exit 1;
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$DEVCHAIN_DIR/devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar $DEVCHAIN_DIR/devchain.tar.gz >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
