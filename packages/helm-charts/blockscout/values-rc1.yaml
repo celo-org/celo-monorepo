@@ -30,6 +30,7 @@ blockscout:
         memory: 500Mi
         cpu: 500m
   web:
+    host: explorer.celo.org
     autoscaling:
       maxReplicas: 10
       minReplicas: 2
@@ -42,6 +43,10 @@ blockscout:
             memory: 500Mi
             cpu: 700m
     pool_size: 10
+    sourcify:
+      enabled: true
+      serverUrl: https://sourcify.dev/server
+      repoUrl: https://repo.sourcify.dev/contracts/full_match/
     resources:
       requests:
         memory: 250M

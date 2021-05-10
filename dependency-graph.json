@@ -111,6 +111,7 @@
   "@celo/phone-number-privacy-common": {
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/identity",
       "@celo/utils"
@@ -129,6 +130,7 @@
   "@celo/phone-number-privacy-signer": {
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/flake-tracker",
       "@celo/identity",

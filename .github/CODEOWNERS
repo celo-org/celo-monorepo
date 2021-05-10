@@ -15,7 +15,6 @@
 /packages/dev-utils/ @mcortesi
 /packages/docs/ @timmoreton @barbaraliau @critesjosh 
 /packages/faucet/ @eelanagaraj @celo-org/devx
-/packages/helm-charts/ @nambrot @timmoreton
 /packages/mobile/ @celo-org/wallet 
 /packages/moonpay-auth/ @annakaz @i1skn 
 /packages/notification-service/ @annakaz @cmcewen @i1skn @jeanregisser
@@ -36,3 +35,7 @@
 /packages/typescript/ @cmcewen
 /packages/sdk/utils/ @barbaraliau @medhak1 @celo-org/devx
 /packages/sdk/base/ @barbaraliau @medhak1 @celo-org/devx
+
+# helm-charts rules.
+/packages/helm-charts/ @nambrot @timmoreton
+/packages/helm-charts/oracle/ @celo-org/platform-economics

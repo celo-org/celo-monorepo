@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.1.2--dev]**
+### **[1.2.1--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -15,6 +15,15 @@ Bug Fixes
 Other Changes
 - [one-line summary] - [link PR]
 ## Published
+
+### **[1.2.0]** -- 2021-04-22
+Features
+- cEUR support - [#7524](https://github.com/celo-org/celo-monorepo/pull/7524)
+- Add more info to network:contracts - [#7379](https://github.com/celo-org/celo-monorepo/pull/7379)
+- Approvehotfix to support multisigs - [#7671](https://github.com/celo-org/celo-monorepo/pull/7671)
+
+Other Changes
+- Add --globalHelp option to BaseCommand - [#7669](https://github.com/celo-org/celo-monorepo/pull/7669)
 
 ### **[1.1.1--beta]** -- 2021-03-22
 Features

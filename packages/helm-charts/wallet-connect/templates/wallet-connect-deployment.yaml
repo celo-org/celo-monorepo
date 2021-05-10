@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
 {{ include "walletconnect.selectorLabels" .  | indent 8 }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '5000'
+        prometheus.io/path: "/metrics"
     spec:
       containers:
       - name: walletconnect

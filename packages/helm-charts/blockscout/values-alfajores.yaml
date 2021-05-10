@@ -30,6 +30,7 @@ blockscout:
         memory: 250Mi
         cpu: 500m
   web:
+    host: alfajores-blockscout.celo-testnet.org
     autoscaling:
       maxReplicas: 3
       minReplicas: 2
@@ -42,6 +43,10 @@ blockscout:
             memory: 250Mi
             cpu: 500m
     pool_size: 10
+    sourcify:
+      enabled: true
+      serverUrl: https://sourcify.dev/server
+      repoUrl: https://repo.sourcify.dev/contracts/full_match/
     resources:
       requests:
         memory: 250M

@@ -2,6 +2,7 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
+import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import CreateAccount from './create-account'
 import SetLiquidityProvision from './set-liquidity-provision'
@@ -31,10 +32,13 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await timeTravel(100000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
     const beneficiary = await releaseGoldWrapper.getBeneficiary()
-    const balanceBefore = await kit.getTotalBalance(beneficiary)
-    await Withdraw.run(['--contract', contractAddress, '--value', '10000000000000000000000'])
-    const balanceAfter = await kit.getTotalBalance(beneficiary)
-    expect(balanceBefore.CELO!.toNumber()).toBeLessThan(balanceAfter.CELO!.toNumber())
+    const balanceBefore = (await kit.getTotalBalance(beneficiary)).CELO!
+    // Use a value which would lose precision if converted to a normal javascript number
+    const withdrawalAmount = '10000000000000000000005'
+    await Withdraw.run(['--contract', contractAddress, '--value', withdrawalAmount])
+    const balanceAfter = (await kit.getTotalBalance(beneficiary)).CELO!
+    const difference = balanceAfter.minus(balanceBefore)
+    expect(difference).toEqBigNumber(new BigNumber(withdrawalAmount))
   })
 
   test("can't withdraw the whole balance if there is a cUSD balance", async () => {

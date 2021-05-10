@@ -42,9 +42,9 @@ To make sure teams are making progress on projects, send us bi-weekly updates to
 
 ### Chat
 
-- Make sure to ask questions in a relevant Discord channel. [You can join the Celo Discord here.](https://discord.gg/vRbExjv) The cLabs protocol and product teams are all there and available for questions. Try not to take conversations to direct messages -- by having conversations in an open channel, other groups can also benefit from the technical discussions and learnings. You can tag mentors in public channel messages to ensure your messages are seen. cLabs mentors handles are:  `@joshc | cLabs`, `@Henry | cLabs`
+- Make sure to ask questions in a relevant Discord channel. [You can join the Celo Discord here.](https://chat.celo.org) The cLabs protocol and product teams are all there and available for questions. Try not to take conversations to direct messages -- by having conversations in an open channel, other groups can also benefit from the technical discussions and learnings. You can tag mentors in public channel messages to ensure your messages are seen. cLabs mentors handles are:  `@joshc | cLabs`
 
-- Please make an effort to remain visible on [#developerchat](https://discord.gg/kzsb82) and/or [#dapps](https://discord.gg/vRbExjv) channels. These channels are dedicated to teams working on projects on the Celo ecosystem. There is a good chance someone has encountered similar challenges. It’s also a great way to find ways to integrate with other projects in the space.
+- Please make an effort to remain visible on #general-applications and/or #mobile-development channels in the App Developer section. These channels are dedicated to teams working on projects on the Celo ecosystem. There is a good chance someone has encountered similar challenges. It’s also a great way to find ways to integrate with other projects in the space.
 - Please make sure your entire team is in this chat room.
 - Also please post your tweets and blog posts so that other grantees can share social media.
 
