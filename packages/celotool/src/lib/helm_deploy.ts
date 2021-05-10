@@ -6,6 +6,7 @@ import os from 'os'
 import path from 'path'
 import sleep from 'sleep-promise'
 import { generateGenesisFromEnv } from 'src/lib/generate_utils'
+import { stringToBoolean } from 'src/lib/utils'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import {
   execCmd,
@@ -750,7 +751,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
         ]
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
-  const useMyCelo = true
+  const useMyCelo = stringToBoolean(fetchEnvOrFallback(envVar.GETH_USE_MYCELO, 'false'))
   await getGenesis(celoEnv, !useExistingGenesis, useMyCelo)
 
   const bootnodeOverwritePkey =
@@ -773,7 +774,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    // `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.useGenesisFileBase64="false"`,
     `--set genesis.network=${celoEnv}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
@@ -1110,11 +1110,10 @@ export async function getGenesis(celoEnv: string, reset: boolean, useMyCelo: boo
   if (!isCelotoolHelmDryRun()) {
     await uploadGenesisBlockToGoogleStorage(celoEnv, genesis)
   }
-  // createGethConfigConfigMap(celoEnv, genesis)
 }
 
 async function generateMyCeloGenesis(): Promise<string> {
-  // Clean up the tmp dir as it's no longer needed
+  // Clean up the tmp dir
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
   fs.mkdirSync(celoBlockchainDir)
   const gethTag = fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
@@ -1164,8 +1163,8 @@ async function generateMyCeloGenesis(): Promise<string> {
   const genesisContent = fs.readFileSync(genesisPath).toString()
   return genesisContent
 
-  // // Clean up the tmp dir as it's no longer needed
-  // await spawnCmd('rm', ['-rf', tmpDir], { silent: true })
+  // Clean up the tmp dir as it's no longer needed
+  await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
 }
 
 export async function createGethConfigConfigMap(celoEnv: string, genesisJson: string) {
