@@ -33,6 +33,7 @@ while getopts 'b:n:p:i:r:df:l:' flag; do
     d) DRYRUN="--dry_run" ;;
     f) FROM="${OPTARG}" ;;
     l) LIBRARIES="${OPTARG}" ;;
+    forno) FORNO="--forno" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -55,3 +56,4 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --proposal $PROPOSAL \
   --from $FROM \
   --initialize_data $INITIALIZE_DATA $DRYRUN
+  $FORNO;
