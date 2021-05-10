@@ -19,9 +19,6 @@ const bootnodesBucketName = 'env_bootnodes'
 
 // uploads genesis block, static nodes, env file, and bootnode to GCS
 export async function uploadTestnetInfoToGoogleStorage(networkName: string) {
-  // if (uploadGenesis) {
-  //   await uploadGenesisBlockToGoogleStorage(networkName)
-  // }
   await uploadTestnetStaticNodesToGoogleStorage(networkName)
   await uploadBootnodeToGoogleStorage(networkName)
   await uploadEnvFileToGoogleStorage(networkName)
