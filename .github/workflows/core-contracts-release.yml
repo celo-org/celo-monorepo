@@ -23,5 +23,5 @@ jobs:
 
       # Runs the CD core contracts release script
       - name: Run the core contract release script
-        run: sh ./scripts/github_actions_test.sh ${{ github.event.inputs.release_version }} ${{ github.event.inputs.network }}
+        run: sh ./scripts/github_actions_test.sh celo-core-contracts.v3 alfajores # ${{ github.event.inputs.release_version }} ${{ github.event.inputs.network }}
         shell: bash
