@@ -1,15 +1,16 @@
 name: core-contracts-release
 
 # Run this workflow manually
-on:
-  workflow_dispatch:
-    inputs:
-      release_version:
-        description: 'Version number of the release to be deployed'
-        required: true
-      network:
-        description: 'Network to deploy core contracts release on'
-        required: true
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       release_version:
+#         description: 'Version number of the release to be deployed'
+#         required: true
+#       network:
+#         description: 'Network to deploy core contracts release on'
+#         required: true
+on: push
 
 jobs:
   core_contracts_release:
