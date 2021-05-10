@@ -11,6 +11,8 @@ OLD_RELEASE=celo-core-contracts-v$((VERSION-1))
 NEW_BRANCH=alexbharley/github-actions-deployment # $NEW_RELEASE.$NETWORK
 OLD_BRANCH=$OLD_RELEASE.$NETWORK
 
+yarn;
+
 echo "Verify deployed...";
 yarn --cwd packages/protocol run verify-deployed -b $OLD_BRANCH -n $NETWORK -f; 
 echo "Verify deployed complete!";
