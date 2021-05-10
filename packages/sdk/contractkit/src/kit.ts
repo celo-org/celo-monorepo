@@ -16,6 +16,7 @@ import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { WrapperCache } from './contract-cache'
+import { MultiplyContractsGasPriceStrategy } from './utils/contracts-gas-price-strategy'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
@@ -83,14 +84,19 @@ export class ContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  gasPriceSuggestionMultiplier = 5
+  // Note: 5 just following the same as the node does
+  // https://github.com/celo-org/celo-blockchain/blob/master/contract_comm/gasprice_minimum/gasprice_minimum.go#L90
+  private gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
     this.celoTokens = new CeloTokens(this)
+    this.connection.gasPriceStrategy = new MultiplyContractsGasPriceStrategy(
+      this,
+      this.gasPriceSuggestionMultiplier
+    )
   }
 
   getWallet() {
@@ -216,18 +222,19 @@ export class ContractKit {
       tokenContract === CeloContract.GoldToken
         ? undefined
         : await this.registry.addressFor(tokenContract)
-    if (address) {
-      await this.updateGasPriceInConnectionLayer(address)
-    }
+    // if (address) {
+    //   await this.updateGasPriceInConnectionLayer(address)
+    // }
     this.connection.defaultFeeCurrency = address
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  async updateGasPriceInConnectionLayer(currency: Address) {
-    const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
-    const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
-    const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
-    await this.connection.setGasPriceForCurrency(currency, gasPrice)
+  // TODO: remove once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
+  async updateGasPriceInConnectionLayer(_currency: Address) {
+    // const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
+    // const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
+    // const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
+    // await this.connection.setGasPriceForCurrency(currency, gasPrice)
+    console.log('Deprecation warning. Gas price for stables calculated using Gas Price Strategies')
   }
 
   async getEpochSize(): Promise<number> {

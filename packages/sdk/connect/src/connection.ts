@@ -28,6 +28,11 @@ import {
   outputCeloTxFormatter,
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
+import {
+  FixedGasPriceStrategy,
+  GasPriceStrategy,
+  NodeGasPriceStrategy,
+} from './utils/gas-price-strategy'
 import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, getRandomId, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
@@ -108,11 +113,22 @@ export class Connection {
   }
 
   set defaultGasPrice(price: number) {
+    console.log('defaultGasPrice -> Deprecation warning: set a FixedGasStrategy instead')
     this.config.gasPrice = price.toString(10)
+    if (price <= 0) {
+      this.paramsPopulator.gasPriceStrategy = new NodeGasPriceStrategy()
+    } else {
+      this.paramsPopulator.gasPriceStrategy = new FixedGasPriceStrategy(price)
+    }
   }
 
   get defaultGasPrice() {
+    console.log('defaultGasPrice -> Deprecation warning')
     return parseInt(this.config.gasPrice, 10)
+  }
+
+  set gasPriceStrategy(gps: GasPriceStrategy) {
+    this.paramsPopulator.gasPriceStrategy = gps
   }
 
   /**
@@ -460,7 +476,6 @@ export class Connection {
     const defaultTx: CeloTx = {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
-      gasPrice: this.config.gasPrice,
     }
 
     return {

@@ -1,5 +1,7 @@
+import { BigNumber } from 'bignumber.js'
 import { Connection } from '../connection'
 import { CeloTx } from '../types'
+import { GasPriceStrategy, NodeGasPriceStrategy } from './gas-price-strategy'
 
 function isEmpty(value: string | undefined) {
   return (
@@ -14,6 +16,7 @@ function isEmpty(value: string | undefined) {
 export class TxParamsNormalizer {
   private chainId: number | null = null
   private gatewayFeeRecipient: string | null = null
+  public gasPriceStrategy: GasPriceStrategy = new NodeGasPriceStrategy()
 
   constructor(readonly connection: Connection) {}
 
@@ -33,7 +36,19 @@ export class TxParamsNormalizer {
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
-      txParams.gasPrice = await this.connection.gasPrice(txParams.feeCurrency)
+      let baseGasPrice
+      try {
+        baseGasPrice = new BigNumber(await this.connection.gasPrice(txParams.feeCurrency))
+      } catch {
+        // TODO: remove once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
+        baseGasPrice = new BigNumber(0)
+      }
+      txParams.gasPrice = (
+        await this.gasPriceStrategy.caculateGasPrice(
+          { ...txParams }, // Shallow copy to avoid changing parameters
+          baseGasPrice
+        )
+      ).toString()
     }
 
     return txParams
