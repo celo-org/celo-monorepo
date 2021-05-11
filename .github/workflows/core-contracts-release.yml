@@ -34,7 +34,7 @@ jobs:
         run: yarn
 
       - name: Build required packages
-        run: yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-local
+        run: yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local
 
       - name: Verify deployed
         run: yarn --cwd packages/protocol run verify-deployed -b NEW_BRANCH=alexbharley/github-actions-deployment -n ${{ env.DAY_OF_WEEK }} -f
