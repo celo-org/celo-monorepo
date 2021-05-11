@@ -240,6 +240,9 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
+          name: Opcode tests
+          command: yarn --cwd packages/protocol check-opcodes
+      - run:
           name: Generate devchain of previous release
           command: |
             mkdir -p ~/.ssh

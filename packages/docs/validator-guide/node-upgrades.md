@@ -4,7 +4,7 @@ When a new version of the Celo node is available, you can follow this guide to u
 
 ## Recent Releases
 
-* [Blockchain Client 1.2.0](https://github.com/celo-org/celo-blockchain/releases/tag/v1.2.2) (Latest production release)
+* [Blockchain Client 1.3.0](https://github.com/celo-org/celo-blockchain/releases/tag/v1.3.0) (Latest production release)
 
 ## When an upgrade is required
 
@@ -19,7 +19,7 @@ Use these instructions to update non-validating nodes, such as your account node
 ### Pull the latest Docker image
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/geth:baklava
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 docker pull $CELO_IMAGE
 ```
 
@@ -27,8 +27,10 @@ docker pull $CELO_IMAGE
 
 Stop and remove the existing node. Make sure to stop the node gracefully (i.e. giving it time to shut down and complete any writes to disk) or your chain data may become corrupted.
 
+Note: The `docker run` commands in the documentation have been updated to now include `--stop-timeout 300`, which should make the `-t 300` in `docker stop` below redundant. However, it is still recommended to include it just in case.
+
 ```bash
-docker stop -t 60 celo-fullnode
+docker stop -t 300 celo-fullnode
 docker rm celo-fullnode
 ```
 
@@ -54,6 +56,8 @@ A second option is to perform a hot-swap to switch over to a new validator node.
 {% hint style="info" %} Hotswap is being introduced in version 1.2.0. When upgrading nodes that are not yet on 1.2.0 refer to the guide to perform a key rotation. {% endhint %}
 
 Validators can be configured as primaries or replicas. By default validators start as primaries and will persist all changes around starting or stopping. Through the istanbul management RPC API the validator can be configured to start or stop at a specified block. The validator will participate in consensus for block numbers in the range `[start, stop)`.
+
+{% hint style="warning" %} Note that the replica node **must** use the same set of proxies as the primary node. If it does not it will not be able to switchover without downtime due to needing to the complete the announce protocol from scratch. Replicas behind the same set of proxies as the primary node will be able to switchover without downtime. {% endhint %}
 
 #### RPC Methods
 * `istanbul.start()` and `istanbul.startAtBlock()` start validating immediately or at a block
@@ -84,7 +88,7 @@ On startup, nodes will look to see if there is a `replicastate` folder inside it
 5. In the geth console of the replica run `istanbul.startAtBlock(xxxx)`
     * You can check what the start block is with `istanbul.replicaState` in the geth console.
     * You can run `istanbul.stop()` to clear the start block
-6. Confirm that the transition occurred with `istanbul.replicaState` 
+6. Confirm that the transition occurred with `istanbul.replicaState`
     * The last block that the old primary will sign is block number `xxxx - 1`
     * The first block that the new primary will sign is block number `xxxx`
 7. Tear down the old primary once the transition has occurred.
@@ -100,7 +104,7 @@ Example geth console on the old primary.
 }
 > istanbul.stopAtBlock(21000)
 null
-> istanbul.replicaState  
+> istanbul.replicaState
 {
   isPrimary: true,
   startValidatingBlock: null,

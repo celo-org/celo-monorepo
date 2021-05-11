@@ -24,5 +24,6 @@ export enum WarningMessage {
   DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG = `CELO_ODIS_WARN_06 BAD_INPUT Attempt to replay partial sig request`,
   INCONSISTENT_SIGNER_BLOCK_NUMBERS = `CELO_ODIS_WARN_07 SIGNER Discrepancy found in signers' latest block number that exceeds threshold`,
   INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS = `CELO_ODIS_WARN_08 SIGNER Discrepency found in signers' quota measurements`,
+  MISSING_SESSION_ID = `CELO_ODIS_WARN_09 BAD_INPUT Client did not provide sessionID in request`,
   CANCELLED_REQUEST_TO_SIGNER = 'CELO_ODIS_WARN_09 SIGNER Cancelled request to signer',
 }
