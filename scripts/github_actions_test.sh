@@ -21,4 +21,6 @@ echo "Check versions...";
 yarn --cwd packages/protocol run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json; 
 echo "Check versions complete!";
 
-yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n $NETWORK -p proposal.json -r report.json -i packages/protocol/releaseData/initializationData/release$VERSION.json --r;
+echo "Make release...";
+yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n $NETWORK -p proposal.json -r report.json -i ./releaseData/initializationData/release$VERSION.json -z -f 0x85F1f7b4106929B368e33421DAcdFa6aB30d54Fb;
+echo "Make release complete!";
