@@ -12,10 +12,6 @@ name: core-contracts-release
 #         required: true
 on: push
 
-env:
-  NETWORK: baklava
-  VERSION: 4
-
 jobs:
   core_contracts_release:
     runs-on: ubuntu-latest
@@ -35,9 +31,6 @@ jobs:
 
       - name: Build required packages
         run: yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local
-
-      - name: Verify deployed
-        run: yarn --cwd packages/protocol run verify-deployed -b alexbharley/github-actions-deployment -n ${{ env.NETWORK }} -f
 
       # Runs the CD core contracts release script
       - name: Run the core contract release script
