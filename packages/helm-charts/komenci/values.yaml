@@ -33,13 +33,11 @@ relayer:
   port: 3000
   identities:
   - address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
-    privateKey: 0x000
     azure:
       id: defaultId
       clientId: defaultClientId
       keyVaultName: staging-komenci-eus
   - address: 0xc6f0f9bfb1aed83620ece3eac0add98a65a8574e
-    privateKey: 0x001
     azure:
       id: defaultId1
       clientId: defaultClientId1
@@ -52,6 +50,8 @@ relayer:
     prometheusPort: 9090
   walletType: azure-hsm
   gasPriceUpdateIntervalMs: "1200000"
+  gasPriceMultiplier: 5
+  maxGasPrice: "30000000000" # 30 gwei
 
 onboarding:
   node_env: production
@@ -59,6 +59,9 @@ onboarding:
     repository: celotestnet.azurecr.io/komenci/onboarding
     tag: dae43ddce108a73da07dce73875b980ff077c7d4
   replicas: 2
+  throttle:
+    ttl: 60
+    limit: 25
   ruleEnabled:
     signature: true
     captcha: true
@@ -74,7 +77,7 @@ onboarding:
   relayer:
     host: alfajores-relayer
     port: 3000
-    rpcTimeoutMs: 7000
+    rpcTimeoutMs: 12000
   db:
     host: komenci-komenci-postgresql
     port: 5432
