@@ -35,14 +35,6 @@ fi
 echo "- Run local network"
 startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
-if [ -n "$RE_BUILD_REPO" ]
-then
-    # Move back to branch from which we started
-    git checkout -
-    yarn install >> $LOG_FILE
-    yarn build >> $LOG_FILE
-fi
-
 GANACHE_PID=
 if command -v lsof; then
     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
@@ -50,11 +42,8 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
-git checkout $BRANCH >> $LOG_FILE
 yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --librariesFile libraries.json
-git checkout - >> $LOG_FILE
-yarn build >> $LOG_FILE
 
 echo "- Check versions of current branch"
 # From check-versions.sh
