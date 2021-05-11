@@ -118,8 +118,8 @@ export class Connection {
     return this.config.gasInflationFactor
   }
 
+  // defaultGasPrice -> Deprecation warning: set a FixedGasStrategy instead
   set defaultGasPrice(price: number) {
-    console.log('defaultGasPrice -> Deprecation warning: set a FixedGasStrategy instead')
     this.config.gasPrice = price.toString(10)
     if (price <= 0) {
       // TODO: once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
@@ -132,8 +132,8 @@ export class Connection {
     }
   }
 
+  // defaultGasPrice -> Deprecation warning
   get defaultGasPrice() {
-    console.log('defaultGasPrice -> Deprecation warning')
     return parseInt(this.config.gasPrice, 10)
   }
 
