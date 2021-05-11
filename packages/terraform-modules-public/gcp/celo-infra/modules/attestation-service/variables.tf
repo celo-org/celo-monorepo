@@ -76,7 +76,7 @@ variable celo_provider {
 
 variable sms_providers {
   type        = string
-  description = "The SMS Service provider. Must be nexmo or twilio"
+  description = "The SMS Service provider. eg 'nexmo,messagebird,twilio'"
 }
 
 variable nexmo_key {
@@ -124,6 +124,17 @@ variable twilio_unsupported_regions {
   description = "Twilio unsupported country codes, separated by comma  (check twilio documentation)"
 }
 
+variable messagebird_api_key {
+  type        = string
+  description = "Messagebird API key"
+  default     = ""
+}
+
+variable messagebird_unsupported_regions {
+  type        = string
+  description = "Messagebird unsupported country codes, separated by comma  (check Messagebird documentation)"
+  default     = ""
+}
 
 variable "service_account_scopes" {
   description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
