@@ -74,7 +74,7 @@ attestation_service_credentials = {
     twilio_auth_token            = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     twilio_blacklist             = "CU,SY,KP,IR,SD"
     twilio_unsupported_regions   = "CU,SY,KP,IR,SD"
-    messagebird_api_key             = "IOHELy2zs6vs3r4EFaEROQFeO"
+    messagebird_api_key             = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     messagebird_unsupported_regions = "CU,SY,KP,IR,SD"
 }
 
