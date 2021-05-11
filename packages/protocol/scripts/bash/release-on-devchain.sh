@@ -2,36 +2,46 @@
 set -euo pipefail
 
 source ./scripts/bash/utils.sh
-source ./scripts/bash/release-lib.sh
 
 # Simulates a release of the current contracts against a target git ref on a local network
 #
 # Flags:
-# -b: Branch containing smart contracts that currently comprise the Celo protocol.
-# -d: Devchain directory containing current network archive.
+# -b: Branch containing smart contracts that currently comprise the Celo protocol
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
-DEVCHAIN_DIR=""
+BUILD_DIR=""
+RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
 while getopts 'b:l:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
-    d) DEVCHAIN_DIR="${OPTARG}" ;;
+    d) BUILD_DIR="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
-[ -z "$DEVCHAIN_DIR" ] && echo "Need to set the devchain build dir via the -d flag" && exit 1;
 
-# build previous release branch contracts (sets $BUILD_DIR)
-build_tag $BRANCH $LOG_FILE
+# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
+if [ -z "$BUILD_DIR" ]
+then
+    RE_BUILD_REPO="yes"
+    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+fi
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar $DEVCHAIN_DIR/devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+
+if [ -n "$RE_BUILD_REPO" ]
+then
+    # Move back to branch from which we started
+    git checkout -
+    yarn install >> $LOG_FILE
+    yarn build >> $LOG_FILE
+fi
 
 GANACHE_PID=
 if command -v lsof; then
@@ -40,7 +50,11 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
+git checkout $BRANCH >> $LOG_FILE
+yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts
+git checkout - >> $LOG_FILE
+yarn build >> $LOG_FILE
 
 echo "- Check versions of current branch"
 # From check-versions.sh
@@ -50,11 +64,11 @@ yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/cont
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls -t releaseData/initializationData/* | head -n 1 | xargs realpath`
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --librariesFiles libraries.json --initialize_data $INITIALIZATION_FILE
+yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --initialize_data $INITIALIZATION_FILE
+yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --librariesFiles libraries.json --initialize_data $INITIALIZATION_FILE
 
 if [[ -n $GANACHE_PID ]]; then
     kill $GANACHE_PID
