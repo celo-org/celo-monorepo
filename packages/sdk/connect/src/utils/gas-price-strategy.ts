@@ -18,3 +18,18 @@ export class FixedGasPriceStrategy implements GasPriceStrategy {
     return new BigNumber(this.gasPriceConstant)
   }
 }
+
+// This strategy should be remove once stables gasPrice are available on minimumClientVersion
+// node rpc (1.1.0)
+export class NodeOrStoredValueGasPriceStrategy implements GasPriceStrategy {
+  constructor(private gasPriceMap: Map<string, string>) {}
+  async caculateGasPrice(tx: CeloTx, nodeGasPriceSuggestion: BigNumber): Promise<BigNumber> {
+    if (nodeGasPriceSuggestion.gt(0)) {
+      return nodeGasPriceSuggestion
+    }
+    if (tx.feeCurrency && this.gasPriceMap.has(tx.feeCurrency)) {
+      return new BigNumber(this.gasPriceMap.get(tx.feeCurrency)!)
+    }
+    throw new Error('Currency price not set in the connection layer')
+  }
+}

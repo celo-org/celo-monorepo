@@ -34,10 +34,8 @@ export class MultiplyContractsGasPriceStrategy extends ContractsGasPriceStrategy
   constructor(kit: ContractKit, public fixNumber: BigNumber.Value) {
     super(
       kit,
-      async (_tx: CeloTx, gasPriceMinimum: BigNumber): Promise<BigNumber> => {
-        const bla = gasPriceMinimum.multipliedBy(this.fixNumber)
-        return bla
-      }
+      async (_tx: CeloTx, gasPriceMinimum: BigNumber): Promise<BigNumber> =>
+        gasPriceMinimum.multipliedBy(this.fixNumber)
     )
   }
 }

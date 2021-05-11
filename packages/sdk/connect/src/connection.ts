@@ -1,6 +1,7 @@
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
+import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
@@ -31,7 +32,7 @@ import {
 import {
   FixedGasPriceStrategy,
   GasPriceStrategy,
-  NodeGasPriceStrategy,
+  NodeOrStoredValueGasPriceStrategy,
 } from './utils/gas-price-strategy'
 import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, getRandomId, RpcCaller } from './utils/rpc-caller'
@@ -71,6 +72,11 @@ export class Connection {
     // this.wallet = _wallet ?? new LocalWallet()
     this.config.from = web3.eth.defaultAccount ?? undefined
     this.paramsPopulator = new TxParamsNormalizer(this)
+    // TODO: once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
+    //       change the strategy to NodeGasPriceStrategy
+    this.paramsPopulator.gasPriceStrategy = new NodeOrStoredValueGasPriceStrategy(
+      this.currencyGasPrice
+    )
   }
 
   setProvider(provider: Provider) {
@@ -116,7 +122,11 @@ export class Connection {
     console.log('defaultGasPrice -> Deprecation warning: set a FixedGasStrategy instead')
     this.config.gasPrice = price.toString(10)
     if (price <= 0) {
-      this.paramsPopulator.gasPriceStrategy = new NodeGasPriceStrategy()
+      // TODO: once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
+      //       change the strategy to NodeGasPriceStrategy
+      this.paramsPopulator.gasPriceStrategy = new NodeOrStoredValueGasPriceStrategy(
+        this.currencyGasPrice
+      )
     } else {
       this.paramsPopulator.gasPriceStrategy = new FixedGasPriceStrategy(price)
     }
@@ -222,19 +232,14 @@ export class Connection {
    */
   sendTransaction = async (tx: CeloTx): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    tx = this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
       gas = await this.estimateGasWithInflationFactor(tx)
     }
 
-    return toTxResult(
-      this.web3.eth.sendTransaction({
-        ...tx,
-        gas,
-      })
-    )
+    tx = await this.paramsPopulator.populate({ ...tx, gas })
+    return toTxResult(this.web3.eth.sendTransaction(tx))
   }
 
   sendTransactionObject = async (
@@ -242,7 +247,6 @@ export class Connection {
     tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    tx = this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -255,12 +259,8 @@ export class Connection {
       gas = await this.estimateGasWithInflationFactor(tx, gasEstimator, caller)
     }
 
-    return toTxResult(
-      txObj.send({
-        ...tx,
-        gas,
-      })
-    )
+    tx = await this.paramsPopulator.populate({ ...tx, gas })
+    return toTxResult(txObj.send(tx))
   }
 
   signTypedData = async (signer: string, typedData: EIP712TypedData): Promise<Signature> => {
@@ -322,19 +322,19 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  fillGasPrice(tx: CeloTx): CeloTx {
-    if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
-      return {
-        ...tx,
-        gasPrice: this.currencyGasPrice.get(tx.feeCurrency),
-      }
-    }
+  // Keeping this for backwards compatibility
+  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
+    tx.gasPrice = (await this.calculateGasPrice(tx)).toString()
     return tx
   }
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  // TODO: remove once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
+  }
+
+  // Gas price calculated from the gas strategy set
+  async calculateGasPrice(tx: CeloTx): Promise<BigNumber> {
+    return this.paramsPopulator.calculateGasPrice(tx)
   }
 
   estimateGas = async (
@@ -407,6 +407,7 @@ export class Connection {
     return response.result.toString()
   }
 
+  // Gas price suggestion retrieved from the node
   gasPrice = async (feeCurrency?: Address): Promise<string> => {
     // Required otherwise is not backward compatible
     const parameter = feeCurrency ? [feeCurrency] : []

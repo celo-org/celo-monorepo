@@ -36,22 +36,24 @@ export class TxParamsNormalizer {
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
-      let baseGasPrice
-      try {
-        baseGasPrice = new BigNumber(await this.connection.gasPrice(txParams.feeCurrency))
-      } catch {
-        // TODO: remove once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
-        baseGasPrice = new BigNumber(0)
-      }
-      txParams.gasPrice = (
-        await this.gasPriceStrategy.caculateGasPrice(
-          { ...txParams }, // Shallow copy to avoid changing parameters
-          baseGasPrice
-        )
-      ).toString()
+      txParams.gasPrice = (await this.calculateGasPrice(txParams)).toString()
     }
 
     return txParams
+  }
+
+  public async calculateGasPrice(celoTxParams: CeloTx): Promise<BigNumber> {
+    let baseGasPrice
+    try {
+      baseGasPrice = new BigNumber(await this.connection.gasPrice(celoTxParams.feeCurrency))
+    } catch {
+      // TODO: remove once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
+      baseGasPrice = new BigNumber(0)
+    }
+    return this.gasPriceStrategy.caculateGasPrice(
+      { ...celoTxParams }, // Shallow copy to avoid changing parameters
+      baseGasPrice
+    )
   }
 
   private async getChainId(): Promise<number> {
