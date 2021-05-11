@@ -52,7 +52,7 @@ fi
 echo "- Verify bytecode of the network"
 git checkout $BRANCH >> $LOG_FILE
 yarn build >> $LOG_FILE
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --librariesFile libraries.json
 git checkout - >> $LOG_FILE
 yarn build >> $LOG_FILE
 
@@ -64,11 +64,11 @@ yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/cont
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls -t releaseData/initializationData/* | head -n 1 | xargs realpath`
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data $INITIALIZATION_FILE
+yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --librariesFiles libraries.json --initialize_data $INITIALIZATION_FILE
+yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --initialize_data $INITIALIZATION_FILE
 
 if [[ -n $GANACHE_PID ]]; then
     kill $GANACHE_PID

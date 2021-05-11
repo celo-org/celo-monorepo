@@ -232,7 +232,9 @@ module.exports = async (callback: (error?: any) => number) => {
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
-    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(argv.librariesFile)
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(
+      argv.librariesFile ?? 'libraries.json'
+    )
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
