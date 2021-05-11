@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { Connection } from '../connection'
 import { CeloTx } from '../types'
@@ -36,7 +37,7 @@ export class TxParamsNormalizer {
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
-      txParams.gasPrice = (await this.calculateGasPrice(txParams)).toString()
+      txParams.gasPrice = ensureLeading0x((await this.calculateGasPrice(txParams)).toString(16))
     }
 
     return txParams
