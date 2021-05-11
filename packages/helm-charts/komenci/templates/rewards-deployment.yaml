@@ -39,3 +39,4 @@ spec:
 {{ include "common.env-var" (dict "name" "DB_SSL" "dict" .Values.rewards.db "value_name" "ssl") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.rewards.relayer "value_name" "host") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.rewards.relayer "value_name" "port") | indent 10 }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 10 }}
