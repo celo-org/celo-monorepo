@@ -12,7 +12,12 @@ NEW_BRANCH=alexbharley/github-actions-deployment # $NEW_RELEASE.$NETWORK
 OLD_BRANCH=$OLD_RELEASE.$NETWORK
 
 yarn;
+yarn lerna bootstrap;
 yarn global add ts-node;
+
+echo "Building protocol...";
+yarn --cwd packages/protocol build;
+echo "Building protocol complete!";
 
 echo "Verify deployed...";
 yarn --cwd packages/protocol run verify-deployed -b $OLD_BRANCH -n $NETWORK -f; 
