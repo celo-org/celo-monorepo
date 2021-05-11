@@ -51,7 +51,7 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \
   --build_directory $BUILD_DIR \
   --report $REPORT \
-  --libraries $LIBRARIES \
+  --librariesFile $LIBRARIES \
   --proposal $PROPOSAL \
   --from $FROM \
   --initialize_data $INITIALIZE_DATA $DRYRUN

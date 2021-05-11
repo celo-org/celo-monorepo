@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source ./scripts/bash/utils.sh
+source ./scripts/bash/release-lib.sh
 
 # Simulates a release of the current contracts against a target git ref on a local network
 #
@@ -27,7 +28,6 @@ done
 [ -z "$DEVCHAIN_DIR" ] && echo "Need to set the devchain build dir via the -d flag" && exit 1;
 
 # build previous release branch contracts (sets $BUILD_DIR)
-source scripts/bash/release-lib.sh
 build_tag $BRANCH $LOG_FILE
 
 echo "- Run local network"
@@ -50,7 +50,7 @@ yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/cont
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls -t releaseData/initializationData/* | head -n 1 | xargs realpath`
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --libraries libraries.json --initialize_data $INITIALIZATION_FILE
+yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --librariesFiles libraries.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"
