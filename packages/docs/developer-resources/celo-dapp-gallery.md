@@ -79,6 +79,10 @@ A decentralized app that helps users to create reliable savings communities by u
 
 Decentralized application to help coordinate and improve the impact metric of non-profit organizations that work with migrants in Latin America. [GitHub](https://github.com/nestorbonilla/bienvenir)
 
+### Poof.cash
+
+[Poof.cash](https://poof.cash) is a protocol for decentralized, private transactions. It is the first native privacy tool for Celo users. [GitHub](https://github.com/poofcash)
+
 ## Additional DApps
 
 ### Ubeswap
