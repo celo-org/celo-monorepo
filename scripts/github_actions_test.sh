@@ -12,7 +12,6 @@ NEW_BRANCH=alexbharley/github-actions-deployment # $NEW_RELEASE.$NETWORK
 OLD_BRANCH=$OLD_RELEASE.$NETWORK
 
 yarn;
-yarn lerna bootstrap;
 yarn global add ts-node;
 
 echo "Building protocol...";
