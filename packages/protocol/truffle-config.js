@@ -7,7 +7,7 @@ const { CoverageSubprovider } = require('@0x/sol-coverage')
 const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
 var Web3 = require('web3')
 var net = require('net')
-const { newKit } = require('../sdk/contractkit')
+const { newKit } = require('../sdk/contractkit/src')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
