@@ -5,9 +5,12 @@ import {
   assertLogMatches2,
   assertRevert,
   assertSameAddress,
+  getDerivedKey,
+  getVerificationCodeSignature,
+  KeyOffsets,
   mineBlocks,
+  unlockAndAuthorizeKey,
 } from '@celo/protocol/lib/test-utils'
-import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
@@ -31,7 +34,6 @@ import {
   RegistryInstance,
 } from 'types'
 import Web3 from 'web3'
-import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 import { beforeEachWithRetries } from '../customHooks'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -60,19 +62,6 @@ contract('Attestations', (accounts: string[]) => {
   const web3: Web3 = new Web3('http://localhost:8545')
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
-  // Private keys of each of the 10 miners, in the same order as their addresses in 'accounts'.
-  const accountPrivateKeys: string[] = [
-    '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
-    '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72',
-    '0xdf02719c4df8b9b8ac7f551fcb5d9ef48fa27eef7a66453879f4d8fdc6e78fb1',
-    '0xff12e391b79415e941a94de3bf3a9aee577aed0731e297d5cfa0b8a1e02fa1d0',
-    '0x752dd9cf65e68cfaba7d60225cbdbc1f4729dd5e5507def72815ed0d8abc6249',
-    '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
-    '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f',
-    '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
-    '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
-    '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
-  ]
 
   const phoneHash: string = getPhoneHash(phoneNumber)
 
@@ -81,15 +70,6 @@ contract('Attestations', (accounts: string[]) => {
   const selectIssuersWaitBlocks = 4
   const maxAttestations = 20
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
-
-  async function getVerificationCodeSignature(
-    account: string,
-    issuer: string
-  ): Promise<[number, string, string]> {
-    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
-    const { v, r, s } = AttestationUtils.attestToIdentifier(phoneHash, account, privateKey)
-    return [v, r, s]
-  }
 
   async function setAccountWalletAddress() {
     return accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0')
@@ -102,33 +82,6 @@ contract('Attestations', (accounts: string[]) => {
       nonIssuerIndex++
     }
     return accounts[nonIssuerIndex]
-  }
-
-  enum KeyOffsets {
-    VALIDATING_KEY_OFFSET,
-    ATTESTING_KEY_OFFSET,
-    NEW_VALIDATING_KEY_OFFSET,
-    VOTING_KEY_OFFSET,
-  }
-
-  const getDerivedKey = (offset: number, address: string) => {
-    const pKey = accountPrivateKeys[accounts.indexOf(address)]
-    const aKey = Buffer.from(pKey.slice(2), 'hex')
-    aKey.write((aKey[0] + offset).toString(16))
-    return '0x' + aKey.toString('hex')
-  }
-
-  const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, account: string) => {
-    const key = getDerivedKey(offset, account)
-    const addr = privateKeyToAddress(key)
-    // @ts-ignore
-    await web3.eth.personal.importRawKey(key, 'passphrase')
-    await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
-
-    const signature = await getParsedSignatureOfAddress(web3, account, addr)
-    return authorizeFn(addr, signature.v, signature.r, signature.s, {
-      from: account,
-    })
   }
 
   beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
@@ -151,12 +104,14 @@ contract('Attestations', (accounts: string[]) => {
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,
           accountsInstance.authorizeValidatorSigner,
-          account
+          account,
+          accounts
         )
         await unlockAndAuthorizeKey(
           KeyOffsets.ATTESTING_KEY_OFFSET,
           accountsInstance.authorizeAttestationSigner,
-          account
+          account,
+          accounts
         )
       })
     )
@@ -164,7 +119,7 @@ contract('Attestations', (accounts: string[]) => {
     mockElection = await MockElection.new()
     await mockElection.setElectedValidators(
       accounts.map((account) =>
-        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
+        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account, accounts))
       )
     )
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
@@ -182,7 +137,7 @@ contract('Attestations', (accounts: string[]) => {
 
     await attestations.__setValidators(
       accounts.map((account) =>
-        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
+        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account, accounts))
       )
     )
   })
@@ -591,7 +546,8 @@ contract('Attestations', (accounts: string[]) => {
                 unlockAndAuthorizeKey(
                   KeyOffsets.NEW_VALIDATING_KEY_OFFSET,
                   accountsInstance.authorizeValidatorSigner,
-                  account
+                  account,
+                  accounts
                 )
               )
             )
@@ -624,12 +580,13 @@ contract('Attestations', (accounts: string[]) => {
   describe('#complete()', () => {
     let issuer: string
     let v: number
-    let r: string, s: string
+    let r: string
+    let s: string
 
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
+      ;({ v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts))
     })
 
     it('should add the account to the list upon completion', async () => {
@@ -645,7 +602,7 @@ contract('Attestations', (accounts: string[]) => {
     it('should not add the account twice to the list', async () => {
       await attestations.complete(phoneHash, v, r, s)
       const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
-      ;[v, r, s] = await getVerificationCodeSignature(caller, secondIssuer)
+      ;({ v, r, s } = await getVerificationCodeSignature(caller, secondIssuer, phoneHash, accounts))
 
       await attestations.complete(phoneHash, v, r, s)
       const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
@@ -710,12 +667,17 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when an invalid attestation code is provided', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(accounts[1], issuer)
+      ;({ v, r, s } = await getVerificationCodeSignature(accounts[1], issuer, phoneHash, accounts))
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
     it('should revert with a non-requested issuer', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(caller, await getNonIssuer())
+      ;({ v, r, s } = await getVerificationCodeSignature(
+        caller,
+        await getNonIssuer(),
+        phoneHash,
+        accounts
+      ))
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
@@ -735,7 +697,7 @@ contract('Attestations', (accounts: string[]) => {
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
+      const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
       await attestations.complete(phoneHash, v, r, s)
       await mockStableToken.mint(attestations.address, attestationFee)
     })
@@ -767,7 +729,8 @@ contract('Attestations', (accounts: string[]) => {
       await unlockAndAuthorizeKey(
         KeyOffsets.VOTING_KEY_OFFSET,
         accountsInstance.authorizeVoteSigner,
-        issuer
+        issuer,
+        accounts
       )
       const signer = await accountsInstance.getVoteSigner(issuer)
       await assertRevert(attestations.withdraw(mockStableToken.address, { from: signer }))
@@ -805,7 +768,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
+    const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -911,7 +874,12 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.selectIssuers(phoneHash, { from: other })
 
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const [v, r, s] = await getVerificationCodeSignature(other, issuer)
+            const { v, r, s } = await getVerificationCodeSignature(
+              other,
+              issuer,
+              phoneHash,
+              accounts
+            )
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
           })
@@ -1136,7 +1104,12 @@ contract('Attestations', (accounts: string[]) => {
             from: replacementAddress,
           })
         )[0]
-        const [v, r, s] = await getVerificationCodeSignature(replacementAddress, issuer)
+        const { v, r, s } = await getVerificationCodeSignature(
+          replacementAddress,
+          issuer,
+          phoneHash,
+          accounts
+        )
         await attestations.complete(phoneHash, v, r, s, { from: replacementAddress })
         await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
           from: replacementAddress,

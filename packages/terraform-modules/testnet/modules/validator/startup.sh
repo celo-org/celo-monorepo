@@ -202,7 +202,7 @@ if [[ ${proxied} == "true" ]]; then
 
     PROXY_INDEX=$(($PROXY_INDEX + 1))
   done
-  if docker run --rm --entrypoint=geth $GETH_NODE_DOCKER_IMAGE --help | grep -q 'proxy.proxyenodeurlpairs'; then
+  if docker run --rm --entrypoint=geth $GETH_NODE_DOCKER_IMAGE --help | grep 'proxy.proxyenodeurlpairs' >/dev/null; then
     PROXY_FLAG_NAME="--proxy.proxyenodeurlpairs"
   else
     PROXY_FLAG_NAME="--proxy.proxyenodeurlpair"

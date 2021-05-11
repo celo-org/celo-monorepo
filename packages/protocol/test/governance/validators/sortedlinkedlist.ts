@@ -208,13 +208,7 @@ contract('IntegerSortedLinkedListTest', () => {
     }
 
     const randomElement = (list: any[]) => {
-      return list[
-        Math.floor(
-          BigNumber.random()
-            .times(list.length)
-            .toNumber()
-        )
-      ]
+      return list[Math.floor(BigNumber.random().times(list.length).toNumber())]
     }
 
     const makeActionSequence = (length: number, numKeys: number): SortedLinkedListAction[] => {

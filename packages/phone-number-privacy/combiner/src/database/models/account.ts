@@ -11,7 +11,6 @@ export class Account {
   [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
 
   constructor(address: string) {
-    // TODO validate address
     this.address = address
   }
 }

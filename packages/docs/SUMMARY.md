@@ -6,6 +6,7 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
+- [Wallets](getting-started/wallets.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
@@ -888,7 +889,7 @@
     - [Penalties](celo-codebase/protocol/proof-of-stake/penalties.md)
   - [Governance](celo-codebase/protocol/governance.md)
   - [Stability Mechanism](celo-codebase/protocol/stability/README.md)
-    - [Stability Algorithm \(CP-DOTO\)](celo-codebase/protocol/stability/doto.md)
+    - [Stability Algorithm \(Mento\)](celo-codebase/protocol/stability/doto.md)
     - [Oracles](celo-codebase/protocol/stability/oracles.md)
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
@@ -903,6 +904,7 @@
     - [Phone Number Privacy](celo-codebase/protocol/identity/phone-number-privacy.md)
     - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
+  - [Optics](celo-codebase/protocol/optics.md)
   - [Plumo Ultralight Sync](celo-codebase/protocol/plumo.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)

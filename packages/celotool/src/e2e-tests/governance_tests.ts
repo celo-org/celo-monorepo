@@ -235,13 +235,13 @@ describe('governance tests', () => {
   let accounts: any
   let kit: ContractKit
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -336,14 +336,7 @@ describe('governance tests', () => {
     } else {
       const difference = currentTarget.minus(previousTarget)
       // Assert equal to 9 decimal places due to rounding errors.
-      assert.equal(
-        fromFixed(difference)
-          .dp(9)
-          .toFixed(),
-        fromFixed(expected)
-          .dp(9)
-          .toFixed()
-      )
+      assert.equal(fromFixed(difference).dp(9).toFixed(), fromFixed(expected).dp(9).toFixed())
     }
   }
 
@@ -372,7 +365,7 @@ describe('governance tests', () => {
     let epoch: number
     let validatorAccounts: string[]
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
 
       await restart()
@@ -486,7 +479,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function(this: any) {
+    it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function (this: any) {
       this.timeout(0)
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
@@ -522,7 +515,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should update the validator scores at the end of each epoch', async function(this: any) {
+    it('should update the validator scores at the end of each epoch', async function (this: any) {
       this.timeout(0)
       const scoreParams = await validators.methods.getValidatorScoreParameters().call()
       const exponent = new BigNumber(scoreParams[0])
@@ -592,7 +585,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should distribute epoch payments at the end of each epoch', async function(this: any) {
+    it('should distribute epoch payments at the end of each epoch', async function (this: any) {
       this.timeout(0)
       const commission = 0.1
       const targetValidatorEpochPayment = new BigNumber(
@@ -652,7 +645,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should distribute epoch rewards at the end of each epoch', async function(this: any) {
+    it('should distribute epoch rewards at the end of each epoch', async function (this: any) {
       this.timeout(0)
       const lockedGold = await kit._web3Contracts.getLockedGold()
       const governance = await kit._web3Contracts.getGovernance()
@@ -897,7 +890,7 @@ describe('governance tests', () => {
     let epoch: number
     let validatorAccounts: string[]
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
 
       await restart()
@@ -1055,7 +1048,7 @@ describe('governance tests', () => {
     let blockFrozen: number
     let latestBlock: number
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0)
       await restart()
       const validator = (await kit.connection.getAccounts())[0]
@@ -1083,7 +1076,7 @@ describe('governance tests', () => {
 
   describe('after the gold token smart contract is registered', () => {
     let goldGenesisSupply = new BigNumber(0)
-    beforeEach(async function(this: any) {
+    beforeEach(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
       const genesis = await importGenesis(path.join(gethConfig.runPath, 'genesis.json'))
@@ -1092,7 +1085,7 @@ describe('governance tests', () => {
       })
     })
 
-    it('should initialize the Celo Gold total supply correctly', async function(this: any) {
+    it('should initialize the Celo Gold total supply correctly', async function (this: any) {
       const events = await registry.getPastEvents('RegistryUpdated', { fromBlock: 0 })
       let blockNumber = 0
       for (const e of events) {

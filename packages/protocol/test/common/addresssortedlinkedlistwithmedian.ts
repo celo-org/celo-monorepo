@@ -198,13 +198,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     }
 
     const randomElement = <A>(list: A[]): A => {
-      return list[
-        Math.floor(
-          BigNumber.random()
-            .times(list.length)
-            .toNumber()
-        )
-      ]
+      return list[Math.floor(BigNumber.random().times(list.length).toNumber())]
     }
 
     const randomElementOrNullAddress = (list: string[]): string => {

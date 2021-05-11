@@ -12,6 +12,17 @@ Lists Celo core contracts and their addesses.
 
 USAGE
   $ celocli network:contracts
+
+OPTIONS
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 ```
 
 _See code: [src/commands/network/contracts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/contracts.ts)_
@@ -28,6 +39,7 @@ USAGE
 
 OPTIONS
   -n, --lastN=lastN  [default: 1] Fetch info about the last n epochs
+  --globalHelp       View all available global flags
 ```
 
 _See code: [src/commands/network/info.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/info.ts)_
@@ -43,7 +55,8 @@ USAGE
   $ celocli network:parameters
 
 OPTIONS
-  --raw  Display raw numerical configuration
+  --globalHelp  View all available global flags
+  --raw         Display raw numerical configuration
 ```
 
 _See code: [src/commands/network/parameters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/parameters.ts)_

@@ -55,7 +55,7 @@ Test that yarn is installed by running `$ yarn --version`.
 You can now start working on your projects in your Linux environment. Install [the WSL VS Code extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) for a seamless integration between VS Code and WSL.
 
 Be aware that networking will be different depending on which version of WSL you are using. The details of managing network interfaces goes beyond the scope of this guide, but you can [learn more here](https://adamtheautomator.com/windows-subsystem-for-linux/#developing-on-wsl-with-visual-studio-code-vs-code-).  
-You are good to go! If you have any questions, [join our Discord server](https://discord.gg/xXrvmb6) and just ask.
+You are good to go! If you have any questions, [join our Discord server](https://chat.celo.org) and just ask.
 
 ### Additional Resources
 
