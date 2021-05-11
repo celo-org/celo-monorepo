@@ -259,6 +259,7 @@ jobs:
     resource_class: large
     environment:
       RELEASE_TAG: celo-core-contracts-v3.rc0
+      DEVCHAIN_DIR: build/$RELEASE_TAG
     steps:
       - attach_workspace:
           at: ~/app
@@ -269,16 +270,14 @@ jobs:
       - run:
           name: Copy DevChain and Build generated from released tag
           command: |
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+            (cp -r packages/protocol/.tmp/released_chain packages/protocol/$DEVCHAIN_DIR)
       - run:
           name: Test against current release
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d packages/protocol/$DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-release-snapshots:
     <<: *defaults
