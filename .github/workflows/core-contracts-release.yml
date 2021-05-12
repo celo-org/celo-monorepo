@@ -12,12 +12,15 @@ name: core-contracts-release
 #         required: true
 on: push
 
+env:
+  NETWORK: baklava
+  VERSION: 4
+
 jobs:
   core_contracts_release:
     runs-on: ubuntu-latest
     environment: test
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -30,7 +33,17 @@ jobs:
         run: yarn
 
       - name: Build required packages
+        # this is a bit grsoss
         run: yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local
+
+      - name: Verify previous release
+        run: yarn --cwd packages/protocol run verify-deployed -b celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
+
+      - name: Verify version compatibility
+        run: echo "Verify version compatibility"
+
+      - name: Make release
+        run: echo "Make release"
 
       # Runs the CD core contracts release script
       - name: Run the core contract release script
