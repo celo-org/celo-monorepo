@@ -2,7 +2,7 @@ locals {
   name_prefix = "${var.gcloud_project}-attestation-svc"
 }
 
-resource "google_sql_database_instance" "master" {
+resource "google_sql_database_instance" "main" {
   count            = var.attestation_service_count > 0 ? 1 : 0
   name             = "${local.name_prefix}-db-${random_id.db_name.hex}"
   database_version = "POSTGRES_9_6"
@@ -16,7 +16,7 @@ resource "google_sql_database_instance" "master" {
 resource "google_sql_user" "celo" {
   count    = var.attestation_service_count > 0 ? 1 : 0
   name     = var.db_username
-  instance = google_sql_database_instance.master[0].name
+  instance = google_sql_database_instance.main[0].name
   password = var.db_password
 }
 
@@ -70,7 +70,7 @@ resource "google_compute_instance" "attestation_service" {
       attestation_service_docker_image_tag : var.attestation_service_docker_image_tag,
       db_username : google_sql_user.celo[0].name,
       db_password : google_sql_user.celo[0].password,
-      db_connection_name : google_sql_database_instance.master[0].connection_name,
+      db_connection_name : google_sql_database_instance.main[0].connection_name,
       sms_providers : var.sms_providers,
       nexmo_key : var.nexmo_key,
       nexmo_secret : var.nexmo_secret,
@@ -80,7 +80,9 @@ resource "google_compute_instance" "attestation_service" {
       twilio_messaging_service_sid : var.twilio_messaging_service_sid,
       twilio_auth_token : var.twilio_auth_token,
       twilio_blacklist : var.twilio_blacklist,
-      twilio_unsupported_regions : var.twilio_unsupported_regions
+      twilio_unsupported_regions : var.twilio_unsupported_regions,
+      messagebird_api_key : var.messagebird_api_key,
+      messagebird_unsupported_regions : var.messagebird_unsupported_regions
     }
   )
 
@@ -91,5 +93,5 @@ resource "google_compute_instance" "attestation_service" {
 }
 
 resource "random_id" "db_name" {
-  byte_length = 8
+  byte_length = 4
 }
