@@ -36,7 +36,7 @@ contract Accounts is
   }
 
   struct SignerAuthorization {
-    address signer;
+    bool started;
     bool completed;
   }
 
@@ -756,6 +756,15 @@ contract Accounts is
   }
 
   /**
+   * @notice Checks whether or not the account has a signer
+   * registered for the plaintext role.
+   * @dev See `hasIndexedSigner` for more gas efficient call.
+   */
+  function hasAuthorizedSigner(address account, string calldata role) external view returns (bool) {
+    return hasIndexedSigner(account, keccak256(abi.encodePacked(role)));
+  }
+
+  /**
    * @notice Returns if account has specified a dedicated vote signer.
    * @param account The address of the account.
    * @return Whether the account has specified a dedicated vote signer.
@@ -780,32 +789,6 @@ contract Accounts is
    */
   function hasAuthorizedAttestationSigner(address account) external view returns (bool) {
     return hasLegacySigner(account, AttestationSigner);
-  }
-
-  /**
-   * @notice Returns if account has specified a dedicated attestation signer.
-   * @param account The address of the account.
-   * @return Whether the account has specified a dedicated attestation signer.
-   */
-  function hasAuthorizedSigner(address account, string calldata role) external view returns (bool) {
-    require(isAccount(account));
-
-    SignerAuthorization storage signer = accounts[account].signerAuthorizations[role];
-    if (signer.completed) {
-      return true;
-    }
-
-    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
-      return this.hasAuthorizedValidatorSigner(account);
-    } else if (
-      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
-    ) {
-      return this.hasAuthorizedAttestationSigner(account);
-    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
-      return this.hasAuthorizedVoteSigner(account);
-    }
-
-    return false;
   }
 
   /**
