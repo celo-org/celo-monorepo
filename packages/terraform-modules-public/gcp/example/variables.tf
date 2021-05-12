@@ -68,7 +68,7 @@ variable geth_node_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-org/geth"
-    tag        = "1.2.3"
+    tag        = "1.3.2"
   }
 }
 
@@ -181,16 +181,19 @@ variable attestation_service_credentials {
   type        = map(string)
 
   default = {
-    sms_providers                = "twilio"
-    nexmo_key                    = ""
-    nexmo_secret                 = ""
-    nexmo_blacklist              = "CU,SY,KP,IR,SD"
-    nexmo_unsupported_regions    = "CU,SY,KP,IR,SD"
-    twilio_account_sid           = "secret in terraform.tfvars"
-    twilio_messaging_service_sid = "secret in terraform.tfvars"
-    twilio_auth_token            = "secret in terraform.tfvars"
-    twilio_blacklist             = "CU,SY,KP,IR,SD"
-    twilio_unsupported_regions   = "CU,SY,KP,IR,SD"
+    sms_providers                   = "twilio"
+    #sms_providers                   = "twilio,messagebird"
+    nexmo_key                       = ""
+    nexmo_secret                    = ""
+    nexmo_blacklist                 = "CU,SY,KP,IR,SD"
+    nexmo_unsupported_regions       = "CU,SY,KP,IR,SD"
+    twilio_account_sid              = "secret in terraform.tfvars"
+    twilio_messaging_service_sid    = "secret in terraform.tfvars"
+    twilio_auth_token               = "secret in terraform.tfvars"
+    twilio_blacklist                = "CU,SY,KP,IR,SD,BY,TD,CZ,EG,ID,IL,CI,JP,JO,KZ,KE,KW,LB,MW,MX,MA,NP,NG,OM,PK,PS,PH,QA,RU,SA,LK,TZ,TH,TN,TR,AE,UA,VN,ZM,ZW"
+    twilio_unsupported_regions      = "CU,SY,KP,IR,SD,BY,TD,CZ,EG,ID,IL,CI,JP,JO,KZ,KE,KW,LB,MW,MX,MA,NP,NG,OM,PK,PS,PH,QA,RU,SA,LK,TZ,TH,TN,TR,AE,UA,VN,ZM,ZW"
+    messagebird_api_key             = "secret in terraform.tfvars"
+    messagebird_unsupported_regions = "CU,SY,KP,IR,SD"
   }
 }
 

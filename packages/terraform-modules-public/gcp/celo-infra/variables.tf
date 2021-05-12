@@ -256,6 +256,18 @@ variable attestation_service_twilio_unsupported_regions {
   default     = ""
 }
 
+variable attestation_service_messagebird_api_key {
+  type        = string
+  description = "Messagebird API key"
+  default     = ""
+}
+
+variable attestation_service_messagebird_unsupported_regions {
+  type        = string
+  description = "Messagebird unsupported country codes, separated by comma  (check Messagebird documentation)"
+  default     = ""
+}
+
 variable validator_name {
   type        = string
   description = "The validator Name for ethstats"
