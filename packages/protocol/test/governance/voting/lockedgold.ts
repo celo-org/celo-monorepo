@@ -62,7 +62,7 @@ contract('LockedGold', (accounts: string[]) => {
 
   beforeEach(async () => {
     mockGoldToken = await MockGoldToken.new()
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     lockedGold = await LockedGold.new()
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()

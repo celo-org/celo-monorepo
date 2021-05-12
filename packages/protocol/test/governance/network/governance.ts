@@ -121,7 +121,7 @@ contract('Governance', (accounts: string[]) => {
   let hotfixHash: Buffer
   let hotfixHashStr: string
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()

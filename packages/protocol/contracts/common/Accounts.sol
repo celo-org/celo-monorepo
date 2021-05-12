@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
@@ -16,7 +16,7 @@ contract Accounts is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry
 {
   using SafeMath for uint256;
@@ -73,7 +73,7 @@ contract Accounts is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 1, 2);
   }
 
   /**
@@ -83,6 +83,17 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+  }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
+  modifier onlyRegisteredAccount(address account) {
+    require(isAccount(account), "Account is not a registered");
+    _;
   }
 
   /**
@@ -128,8 +139,7 @@ contract Accounts is
    * @notice Setter for the name of an account.
    * @param name The name to set.
    */
-  function setName(string memory name) public {
-    require(isAccount(msg.sender), "Unknown account");
+  function setName(string memory name) public onlyRegisteredAccount(msg.sender) {
     Account storage account = accounts[msg.sender];
     account.name = name;
     emit AccountNameSet(msg.sender, name);
@@ -147,8 +157,10 @@ contract Accounts is
    * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
    *      is 0x0 or msg.sender).
    */
-  function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public {
-    require(isAccount(msg.sender), "Unknown account");
+  function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s)
+    public
+    onlyRegisteredAccount(msg.sender)
+  {
     if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
       address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
       require(signer == walletAddress, "Invalid signature");
@@ -173,8 +185,7 @@ contract Accounts is
    * @notice Setter for the metadata of an account.
    * @param metadataURL The URL to access the metadata.
    */
-  function setMetadataURL(string calldata metadataURL) external {
-    require(isAccount(msg.sender), "Unknown account");
+  function setMetadataURL(string calldata metadataURL) external onlyRegisteredAccount(msg.sender) {
     Account storage account = accounts[msg.sender];
     account.metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
@@ -401,8 +412,12 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can sign votes.
    */
-  function getVoteSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
+  function getVoteSigner(address account)
+    public
+    view
+    onlyRegisteredAccount(account)
+    returns (address)
+  {
     address signer = accounts[account].signers.vote;
     return signer == address(0) ? account : signer;
   }
@@ -412,8 +427,12 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  function getValidatorSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
+  function getValidatorSigner(address account)
+    public
+    view
+    onlyRegisteredAccount(account)
+    returns (address)
+  {
     address signer = accounts[account].signers.validator;
     return signer == address(0) ? account : signer;
   }
@@ -423,8 +442,12 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can sign attestations.
    */
-  function getAttestationSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
+  function getAttestationSigner(address account)
+    public
+    view
+    onlyRegisteredAccount(account)
+    returns (address)
+  {
     address signer = accounts[account].signers.attestation;
     return signer == address(0) ? account : signer;
   }
@@ -574,8 +597,10 @@ contract Accounts is
    * @dev Note that once an address is authorized, it may never be authorized again.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
-  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {
-    require(isAccount(msg.sender), "Unknown account");
+  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s)
+    private
+    onlyRegisteredAccount(msg.sender)
+  {
     require(
       isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
       "Cannot re-authorize address or locked gold account."

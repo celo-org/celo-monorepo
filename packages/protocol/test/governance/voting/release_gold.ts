@@ -174,7 +174,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3.eth.getBlock('latest').then((block) => Number(block.timestamp))
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     freezerInstance = await Freezer.new()
     goldTokenInstance = await GoldToken.new(true)
     lockedGoldInstance = await LockedGold.new()

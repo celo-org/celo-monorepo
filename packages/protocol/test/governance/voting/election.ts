@@ -61,7 +61,7 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = toFixed(1 / 100)
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
     freezer = await Freezer.new()
