@@ -21,12 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:
+      - name: PWD
+        run: echo $PWD
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
           node-version: '10'
+
+      - name: PWD
+        run: echo $PWD
 
       - name: yarn
         run: |
