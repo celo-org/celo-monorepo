@@ -112,6 +112,11 @@ Savings Circles let you pool funds with your friends to save for large purchases
 
 [Symmetric](https://symmetric.finance/) is a fork of Balancer for Celo. Symmetric is [open source on GitHub](https://github.com/centfinance), has a tokenomics model that includes a risk fund protecting traders, is to be DAO controlled and has a roadmap of new features.
 
+## Umoja
+
+UMOJA is an open banking platform that enables NGOs and FSPs to provide flexible micro-financing to anyone with a phone. Umoja is [open source on GitHub](https://github.com/Emerging-Impact) and consists of a suite of APIs and products to make digital money accounts more accessible (and more easily to develop for other financial applications). 
+
+
 ## Add your app to this list
 
 _Are you building on Celo? To add your project, please submit a pull request updating this page!_
