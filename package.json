@@ -75,6 +75,7 @@
   },
   "resolutions": {
     "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#piersy/node12_compatibility",
+    "@grpc/grpc-js": "^1.1.8",
     "@types/prettier": "^2.2.1",
     "**/axios": "0.21.1",
     "**/cross-fetch": "^3.0.2",
@@ -98,6 +99,7 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.21",
     "logkitty": "^0.7.1",
+    "mathjs": "^7.5.1",
     "minimist": "^1.2.5",
     "mixin-deep": "^2.0.1",
     "node-forge": "^0.10.0",
