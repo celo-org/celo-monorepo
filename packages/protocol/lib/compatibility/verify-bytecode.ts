@@ -252,4 +252,6 @@ export const verifyBytecodes = async (
   while (queue.length > 0) {
     await dfsStep(queue, visited, context)
   }
+
+  return context.libraryAddresses
 }
