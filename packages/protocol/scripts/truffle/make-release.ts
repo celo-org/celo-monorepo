@@ -5,7 +5,6 @@ import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/rep
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { checkImports } from '@celo/protocol/lib/web3-utils'
-import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
@@ -247,6 +246,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const proposal: ProposalTx[] = []
 
     const release = async (contractName: string) => {
+      // 0. Skip already released dependencies
       if (released.has(contractName)) {
         return
       }
@@ -259,12 +259,10 @@ module.exports = async (callback: (error?: any) => number) => {
       const contractArtifact = await artifacts.require(contractName)
       await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
 
-      // 3. Deploy new versions of the contract, if needed.
-      const shouldDeployCoreContractImplementation = Object.keys(report.contracts).includes(
-        contractName
-      )
-      const isLibrary = linkedLibraries[contractName]
-      if (shouldDeployCoreContractImplementation) {
+      // 3. Deploy new versions of the contract or library, if indicated by the report.
+      const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
+      const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
+      if (shouldDeployContract) {
         await deployCoreContract(
           contractName,
           contractArtifact,
@@ -275,10 +273,11 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.dry_run,
           argv.from
         )
-      } else if (isLibrary) {
+      } else if (shouldDeployLibrary) {
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
       }
-      // Mark the contract as released
+
+      // 4. Mark the contract as released
       released.add(contractName)
     }
     for (const contractName of contracts) {
