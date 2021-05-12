@@ -1,5 +1,6 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
+import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
@@ -26,7 +27,11 @@ import { RegistryInstance } from 'types'
  */
 
 class ContractAddresses {
-  static async create(contracts: string[], registry: RegistryInstance) {
+  static async create(
+    contracts: string[],
+    registry: RegistryInstance,
+    libraryAddresses: LibraryAddresses['addresses']
+  ) {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
@@ -35,6 +40,9 @@ class ContractAddresses {
           addresses.set(contract, registeredAddress)
         }
       })
+    )
+    Object.entries(libraryAddresses).forEach(([library, address]) =>
+      addresses.set(library, address)
     )
     return new ContractAddresses(addresses)
   }
@@ -220,10 +228,13 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'from', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
+      string: ['report', 'from', 'proposal', 'librariesFile', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(
+      argv.librariesFile ?? 'libraries.json'
+    )
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
@@ -231,7 +242,7 @@ module.exports = async (callback: (error?: any) => number) => {
       basename(x, '.json')
     )
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
-    const addresses = await ContractAddresses.create(contracts, registry)
+    const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
 
@@ -239,7 +250,7 @@ module.exports = async (callback: (error?: any) => number) => {
       if (released.has(contractName)) {
         return
       }
-      // 1. Release all dependencies.
+      // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
       const contractDependencies = dependencies.get(contractName)
       for (const dependency of contractDependencies) {
         await release(dependency)
