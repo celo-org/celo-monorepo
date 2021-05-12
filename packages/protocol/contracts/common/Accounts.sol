@@ -757,7 +757,7 @@ contract Accounts is
 
   /**
    * @notice Returns if account has specified a dedicated vote signer.
-   * @param _account The address of the account.
+   * @param account The address of the account.
    * @return Whether the account has specified a dedicated vote signer.
    */
   function hasAuthorizedVoteSigner(address account) external view returns (bool) {
