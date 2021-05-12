@@ -1,6 +1,7 @@
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { assert } from 'chai'
+import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
@@ -15,6 +16,10 @@ describe('attestations tests', () => {
     networkId: 1101,
     network: 'local',
     migrate: true,
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator0',
@@ -58,35 +63,35 @@ describe('attestations tests', () => {
   let contractKit: ContractKit
   let Attestations: AttestationsWrapper
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     await context.hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await context.hooks.after()
   })
 
   const restart = async () => {
     await context.hooks.restart()
-    contractKit = newKit('http://localhost:8545')
+    contractKit = newKitFromWeb3(new Web3('http://localhost:8545'))
     contractKit.defaultAccount = validatorAddress
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
-    await contractKit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    await contractKit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
     Attestations = await contractKit.contracts.getAttestations()
   }
 
   describe('Attestations', () => {
-    before(async function() {
+    before(async function () {
       this.timeout(0)
       await restart()
     })
 
-    it('requests an attestation', async function(this: any) {
+    it('requests an attestation', async function (this: any) {
       this.timeout(10000)
 
       const approve = await Attestations.approveAttestationFee(2)
@@ -94,8 +99,7 @@ describe('attestations tests', () => {
       const request = await Attestations.request(phoneNumber, 2)
       await request.sendAndWaitForReceipt()
 
-      await Attestations.waitForSelectingIssuers(phoneNumber, validatorAddress)
-      const selectIssuers = await Attestations.selectIssuers(phoneNumber)
+      const selectIssuers = await Attestations.selectIssuersAfterWait(phoneNumber, validatorAddress)
       await selectIssuers.sendAndWaitForReceipt()
 
       const stats = await Attestations.getAttestationStat(phoneNumber, validatorAddress)

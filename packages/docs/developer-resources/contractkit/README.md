@@ -13,6 +13,7 @@ ContractKit supports the following functionality:
 - Simple interface to interact with Celo Core contracts
 - Local sign transactions
 - Utilities
+- Query on-chain identifier for a phone number
 
 {% page-ref page="setup.md" %}
 

@@ -1,5 +1,7 @@
 import {
+  authenticateUser,
   ErrorMessage,
+  GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
   hasValidTimestamp,
@@ -12,25 +14,18 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
+import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import { authenticateUser } from '../common/identity'
-import logger from '../common/logger'
 import config, { VERSION } from '../config'
+import { getContractKit } from '../web3/contracts'
 
-// TODO change to /getBlindedMessagePartialSig when all signers are running 1.1.0
-const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
-
-interface GetBlindedMessageSigRequest {
-  account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-  timestamp?: number
-}
 
 interface SignerService {
   url: string
@@ -46,108 +41,202 @@ export async function handleGetBlindedMessageSig(
   request: Request<{}, {}, GetBlindedMessageSigRequest>,
   response: Response
 ) {
+  const logger: Logger = response.locals.logger
+
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
-    if (!(await authenticateUser(request))) {
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
+    if (!(await authenticateUser(request, getContractKit(), logger))) {
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
     logger.debug('Requesting signatures')
     await requestSignatures(request, response)
-  } catch (e) {
-    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
+  } catch (err) {
+    logger.error('Unknown error in handleGetBlindedMessageSig')
+    logger.error(err)
+    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }
 
 async function requestSignatures(request: Request, response: Response) {
   const responses: SignMsgRespWithStatus[] = []
   const sentResult = { sent: false }
+  const failedRequests = new Set<string>()
   const errorCodes: Map<number, number> = new Map()
   const blsCryptoClient = new BLSCryptographyClient()
 
-  const signers = JSON.parse(config.odisServices.signers) as SignerService[]
-  const signerReqs = signers.map((service) => {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => {
-      controller.abort()
-    }, config.odisServices.timeoutMilliSeconds)
+  const logger: Logger = response.locals.logger
 
-    return requestSignature(service, request, controller)
+  const obs = new PerformanceObserver((list) => {
+    const entry = list.getEntries()[0]
+    logger.info({ latency: entry, signer: entry!.name }, 'Signer response latency measured')
+  })
+  obs.observe({ entryTypes: ['measure'], buffered: true })
+
+  const signers = JSON.parse(config.odisServices.signers) as SignerService[]
+  let timedOut = false
+  const controller = new AbortController()
+  const timeout = setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, config.odisServices.timeoutMilliSeconds)
+
+  const signerReqs = signers.map((service) => {
+    const startMark = `Begin requestSignature ${service.url}`
+    const endMark = `End requestSignature ${service.url}`
+    const entryName = service.url
+    performance.mark(startMark)
+
+    return requestSignature(service, request, controller, logger)
       .then(async (res: FetchResponse) => {
-        const status = res.status
-        const url = service.url
-        logger.info(`Service ${url} returned status ${status}`)
+        const data = await res.text()
+        logger.info(
+          { signer: service, res: data, status: res.status },
+          'received requestSignature response from signer'
+        )
         if (res.ok) {
           await handleSuccessResponse(
-            res,
+            data,
             res.status,
             response,
-            sentResult,
             responses,
             service.url,
             blsCryptoClient,
-            request.body.blindedQueryPhoneNumber
+            request.body.blindedQueryPhoneNumber,
+            controller
           )
         } else {
-          errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
+          handleFailedResponse(
+            service,
+            res.status,
+            signers.length,
+            failedRequests,
+            response,
+            controller,
+            errorCodes
+          )
         }
       })
-      .catch((e) => {
-        if (e.name === 'AbortError') {
-          logger.error(`${ErrorMessage.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
+      .catch((err) => {
+        let status: number | undefined = 500
+        if (err.name === 'AbortError') {
+          if (timedOut) {
+            status = 408
+            logger.error({ signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+          } else {
+            // Request was cancelled, assuming it would have been successful
+            status = undefined
+            logger.info({ signer: service }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
+          }
         } else {
-          logger.error(`${ErrorMessage.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
+          logger.error({ signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
         }
+        logger.error(err)
+        handleFailedResponse(
+          service,
+          status,
+          signers.length,
+          failedRequests,
+          response,
+          controller,
+          errorCodes
+        )
       })
       .finally(() => {
-        clearTimeout(timeout)
+        performance.mark(endMark)
+        performance.measure(entryName, startMark, endMark)
       })
   })
 
   await Promise.all(signerReqs)
+  clearTimeout(timeout)
+  performance.clearMarks()
+  obs.disconnect()
 
-  logResponseDiscrepancies(responses)
-  const majorityErrorCode = getMajorityErrorCode(errorCodes)
+  logResponseDiscrepancies(responses, logger)
+  const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
   if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    handleMissingSignatures(majorityErrorCode, response)
+    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
+  } else {
+    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
+    response.json({ success: true, combinedSignature, version: VERSION })
   }
 }
 
 async function handleSuccessResponse(
-  res: FetchResponse,
+  data: string,
   status: number,
   response: Response,
-  sentResult: { sent: boolean },
   responses: SignMsgRespWithStatus[],
   serviceUrl: string,
   blsCryptoClient: BLSCryptographyClient,
-  blindedQueryPhoneNumber: string
+  blindedQueryPhoneNumber: string,
+  controller: AbortController
 ) {
-  const signResponse = (await res.json()) as SignerResponse
+  const logger: Logger = response.locals.logger
+  const signResponse = JSON.parse(data) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
-    logger.error(`${signResponse.error} from signer ${serviceUrl}`)
+    logger.error(
+      {
+        error: signResponse.error,
+        signer: serviceUrl,
+      },
+      'Signer responded with error'
+    )
   }
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
   responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
-  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber)
+  logger.info({ signer: serviceUrl }, 'Add signature')
+  const signatureAdditionStart = Date.now()
+  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
+  logger.info(
+    {
+      signer: serviceUrl,
+      hasSufficientSignatures: blsCryptoClient.hasSufficientVerifiedSignatures(),
+      additionLatency: Date.now() - signatureAdditionStart,
+    },
+    'Added signature'
+  )
   // Send response immediately once we cross threshold
-  if (!sentResult.sent && blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
-    if (!sentResult.sent) {
-      response.json({ success: true, combinedSignature, version: VERSION })
-      sentResult.sent = true
-    }
+  if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
+    // Close outstanding requests
+    controller.abort()
   }
 }
 
-function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
+// Fail fast if a sufficient number of signatures cannot be collected
+function handleFailedResponse(
+  service: SignerService,
+  status: number | undefined,
+  signerCount: number,
+  failedRequests: Set<string>,
+  response: Response,
+  controller: AbortController,
+  errorCodes: Map<number, number>
+) {
+  if (status) {
+    errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
+  }
+  const logger: Logger = response.locals.logger
+  // Tracking failed request count via signer url prevents
+  // double counting the same failed request by mistake
+  failedRequests.add(service.url)
+  const shouldFailFast = signerCount - failedRequests.size < config.thresholdSignature.threshold
+  logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
+  if (shouldFailFast) {
+    logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
+    controller.abort()
+  }
+}
+
+function logResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Logger) {
   // Only compare responses which have values for the quota fields
   const successfulResponses = responses.filter(
     (response) =>
@@ -180,7 +269,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
           totalQuota: response.signMessageResponse.totalQuota,
         }
       })
-      logger.error(`Discrepancy found in signers' measured quota values ${values}`)
+      logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
       discrepancyFound = true
     }
     if (
@@ -193,9 +282,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
           blockNumber: response.signMessageResponse.blockNumber,
         }
       })
-      logger.error(
-        `Discrepancy found in signers' latest block number that exceeds threshold ${values}`
-      )
+      logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
       discrepancyFound = true
     }
     if (discrepancyFound) {
@@ -207,10 +294,11 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
 function requestSignature(
   service: SignerService,
   request: Request,
-  controller: AbortController
+  controller: AbortController,
+  logger: Logger
 ): Promise<FetchResponse> {
+  logger.debug({ signer: service.url }, `Requesting partial sig`)
   const url = service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT
-  logger.debug(`Requesting sig from ${url}`)
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -223,9 +311,17 @@ function requestSignature(
   })
 }
 
-function getMajorityErrorCode(errorCodes: Map<number, number>) {
-  if (errorCodes.size > 1) {
-    logger.error(ErrorMessage.INCONSISTENT_SIGNER_RESPONSES)
+function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
+  // Ignore timeouts
+  const ignoredErrorCodes = [408]
+  const uniqueErrorCount = Array.from(errorCodes.keys()).filter(
+    (status) => !ignoredErrorCodes.includes(status)
+  ).length
+  if (uniqueErrorCount > 1) {
+    logger.error(
+      { errorCodes: JSON.stringify([...errorCodes]) },
+      ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
+    )
   }
 
   let maxErrorCode = -1
@@ -251,10 +347,23 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boo
   )
 }
 
-function handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
+function handleMissingSignatures(
+  majorityErrorCode: number | null,
+  response: Response,
+  logger: Logger,
+  sentResult: { sent: boolean }
+) {
+  if (sentResult.sent) {
+    return
+  }
   if (majorityErrorCode === 403) {
-    respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA)
+    respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
   } else {
-    respondWithError(response, majorityErrorCode || 500, ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
+    respondWithError(
+      response,
+      majorityErrorCode || 500,
+      ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+      logger
+    )
   }
 }

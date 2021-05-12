@@ -9,7 +9,7 @@ export default class ElectionShow extends BaseCommand {
   static description = 'Show election information about a voter or registered Validator Group'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     voter: flags.boolean({
       exclusive: ['group'],
       description: 'Show information about an account voting in Validator elections',
@@ -35,15 +35,11 @@ export default class ElectionShow extends BaseCommand {
     const election = await this.kit.contracts.getElection()
 
     if (res.flags.group) {
-      await newCheckBuilder(this)
-        .isValidatorGroup(address)
-        .runChecks()
+      await newCheckBuilder(this).isValidatorGroup(address).runChecks()
       const groupVotes = await election.getValidatorGroupVotes(address)
       printValueMapRecursive(groupVotes)
     } else if (res.flags.voter) {
-      await newCheckBuilder(this)
-        .isAccount(address)
-        .runChecks()
+      await newCheckBuilder(this).isAccount(address).runChecks()
       const voter = await election.getVoter(address)
       printValueMapRecursive(voter)
     } else {

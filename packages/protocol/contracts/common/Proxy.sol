@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 /* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */
 
 import "openzeppelin-solidity/contracts/utils/Address.sol";
@@ -151,7 +151,7 @@ contract Proxy {
     }
   }
 
-  function _setOwner(address newOwner) private {
+  function _setOwner(address newOwner) internal {
     require(newOwner != address(0), "owner cannot be 0");
     bytes32 position = OWNER_POSITION;
     // Store the address of the contract owner in an explicit storage slot.

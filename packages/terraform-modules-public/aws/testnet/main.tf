@@ -185,8 +185,11 @@ module "celo_attestation_service_az1" {
   database_url                                  = local.attestation_db_url
   twilio_messaging_service_sid                  = var.twilio_messaging_service_sid
   twilio_account_sid                            = var.twilio_account_sid
-  twilio_blacklist                              = var.twilio_blacklist
+  twilio_unsupported_regions                    = var.twilio_unsupported_regions
   twilio_auth_token                             = var.twilio_auth_token
+  nexmo_api_key                                 = var.nexmo_api_key
+  nexmo_api_secret                              = var.nexmo_api_secret
+  nexmo_unsupported_regions                     = var.nexmo_unsupported_regions
   iam_instance_profile                          = var.iam_instance_profiles.attestation_service
   cloudwatch_attestation_node_log_group_name    = var.cloudwatch_log_group_names.attestation_node
   cloudwatch_attestation_service_log_group_name = var.cloudwatch_log_group_names.attestation_service
@@ -208,8 +211,11 @@ module "celo_attestation_service_az2" {
   database_url                                  = local.attestation_db_url
   twilio_messaging_service_sid                  = var.twilio_messaging_service_sid
   twilio_account_sid                            = var.twilio_account_sid
-  twilio_blacklist                              = var.twilio_blacklist
+  twilio_unsupported_regions                    = var.twilio_unsupported_regions
   twilio_auth_token                             = var.twilio_auth_token
+  nexmo_api_key                                 = var.nexmo_api_key
+  nexmo_api_secret                              = var.nexmo_api_secret
+  nexmo_unsupported_regions                     = var.nexmo_unsupported_regions
   iam_instance_profile                          = var.iam_instance_profiles.attestation_service
   cloudwatch_attestation_node_log_group_name    = var.cloudwatch_log_group_names.attestation_node
   cloudwatch_attestation_service_log_group_name = var.cloudwatch_log_group_names.attestation_service

@@ -1,13 +1,14 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -19,12 +20,13 @@ contract Reserve is
   IReserve,
   ICeloVersionedContract,
   Ownable,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   ReentrancyGuard
 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using Address for address payable; // prettier-ignore
 
   struct TobinTaxCache {
     uint128 numerator;
@@ -53,6 +55,9 @@ contract Reserve is
   uint256 public frozenReserveGoldStartDay;
   uint256 public frozenReserveGoldDays;
 
+  mapping(address => bool) public isExchangeSpender;
+  address[] public exchangeSpenderAddresses;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
@@ -65,6 +70,14 @@ contract Reserve is
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
   event TobinTaxSet(uint256 value);
   event TobinTaxReserveRatioSet(uint256 value);
+  event ExchangeSpenderAdded(address indexed exchangeSpender);
+  event ExchangeSpenderRemoved(address indexed exchangeSpender);
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -76,7 +89,7 @@ contract Reserve is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 1);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -163,8 +176,8 @@ contract Reserve is
 
   /**
    * @notice Sets the balance of reserve gold frozen from transfer.
-   * @param frozenGold The amount of cGLD frozen.
-   * @param frozenDays The number of days the frozen cGLD thaws over.
+   * @param frozenGold The amount of CELO frozen.
+   * @param frozenDays The number of days the frozen CELO thaws over.
    */
   function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
     require(frozenGold <= address(this).balance, "Cannot freeze more than balance");
@@ -174,7 +187,7 @@ contract Reserve is
   }
 
   /**
-   * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
+   * @notice Sets target allocations for CELO and a diversified basket of non-Celo assets.
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
@@ -196,6 +209,11 @@ contract Reserve is
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
+    // NOTE: The CELO asset launched as "Celo Gold" (cGLD), but was renamed to
+    // just CELO by the community.
+    // TODO: Change "cGLD" to "CELO" in this file, after ensuring that any
+    // off chain tools working with asset allocation weights are aware of this
+    // change.
     require(assetAllocationWeights["cGLD"] != 0, "Must set cGLD asset weight");
     emit AssetAllocationSet(symbols, weights);
   }
@@ -291,6 +309,7 @@ contract Reserve is
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
     isSpender[spender] = true;
     emit SpenderAdded(spender);
   }
@@ -302,6 +321,64 @@ contract Reserve is
   function removeSpender(address spender) external onlyOwner {
     isSpender[spender] = false;
     emit SpenderRemoved(spender);
+  }
+
+  /**
+   * @notice Checks if an address is able to spend as an exchange.
+   * @dev isExchangeSpender was introduced after cUSD, so the cUSD Exchange is not included in it.
+   * If cUSD's Exchange were to be added to isExchangeSpender, the check with the
+   * registry could be removed.
+   * @param spender The address to be checked.
+   */
+  modifier isAllowedToSpendExchange(address spender) {
+    require(
+      isExchangeSpender[spender] || (registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == spender),
+      "Address not allowed to spend"
+    );
+    _;
+  }
+
+  /**
+   * @notice Gives an address permission to spend Reserve without limit.
+   * @param spender The address that is allowed to spend Reserve funds.
+   */
+  function addExchangeSpender(address spender) external onlyOwner {
+    require(address(0) != spender, "Spender can't be null");
+    require(!isExchangeSpender[spender], "Address is already Exchange Spender");
+    isExchangeSpender[spender] = true;
+    exchangeSpenderAddresses.push(spender);
+    emit ExchangeSpenderAdded(spender);
+  }
+
+  /**
+   * @notice Takes away an address's permission to spend Reserve funds without limits.
+   * @param spender The address that is to be no longer allowed to spend Reserve funds.
+   * @param index The index in exchangeSpenderAddresses of spender.
+   */
+  function removeExchangeSpender(address spender, uint256 index) external onlyOwner {
+    isExchangeSpender[spender] = false;
+    uint256 numAddresses = exchangeSpenderAddresses.length;
+    require(index < numAddresses, "Index is invalid");
+    require(spender == exchangeSpenderAddresses[index], "Index does not match spender");
+    uint256 newNumAddresses = numAddresses.sub(1);
+
+    if (index != newNumAddresses) {
+      exchangeSpenderAddresses[index] = exchangeSpenderAddresses[newNumAddresses];
+    }
+
+    exchangeSpenderAddresses[newNumAddresses] = address(0x0);
+    exchangeSpenderAddresses.length = newNumAddresses;
+    emit ExchangeSpenderRemoved(spender);
+  }
+
+  /**
+   * @notice Returns addresses of exchanges permitted to spend Reserve funds.
+   * Because exchangeSpenderAddresses was introduced after cUSD, cUSD's exchange
+   * is not included in this list.
+   * @return An array of addresses permitted to spend Reserve funds.
+   */
+  function getExchangeSpenders() external view returns (address[] memory) {
+    return exchangeSpenderAddresses;
   }
 
   /**
@@ -332,7 +409,7 @@ contract Reserve is
    */
   function _transferGold(address payable to, uint256 value) internal returns (bool) {
     require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
-    to.transfer(value);
+    to.sendValue(value);
     emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
@@ -345,7 +422,7 @@ contract Reserve is
    */
   function transferExchangeGold(address payable to, uint256 value)
     external
-    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    isAllowedToSpendExchange(msg.sender)
     returns (bool)
   {
     return _transferGold(to, value);
@@ -401,8 +478,8 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of unfrozen Celo Gold in the reserve.
-   * @return The total unfrozen Celo Gold in the reserve.
+   * @notice Returns the amount of unfrozen CELO in the reserve.
+   * @return The total unfrozen CELO in the reserve.
    */
   function getUnfrozenBalance() public view returns (uint256) {
     uint256 balance = address(this).balance;
@@ -411,16 +488,16 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of Celo Gold included in the reserve.
-   * @return The Celo Gold amount included in the reserve.
+   * @notice Returns the amount of CELO included in the reserve.
+   * @return The CELO amount included in the reserve.
    */
   function getReserveGoldBalance() public view returns (uint256) {
     return address(this).balance.add(getOtherReserveAddressesGoldBalance());
   }
 
   /**
-   * @notice Returns the amount of Celo Gold included in other reserve addresses.
-   * @return The Celo Gold amount included in other reserve addresses.
+   * @notice Returns the amount of CELO included in other reserve addresses.
+   * @return The CELO amount included in other reserve addresses.
    */
   function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
     uint256 reserveGoldBalance = 0;
@@ -431,16 +508,16 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of unfrozen Celo Gold included in the reserve.
-   * @return The unfrozen Celo Gold amount included in the reserve.
+   * @notice Returns the amount of unfrozen CELO included in the reserve.
+   * @return The unfrozen CELO amount included in the reserve.
    */
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
     return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
   }
 
   /**
-   * @notice Returns the amount of frozen Celo Gold in the reserve.
-   * @return The total frozen Celo Gold in the reserve.
+   * @notice Returns the amount of frozen CELO in the reserve.
+   * @return The total frozen CELO in the reserve.
    */
   function getFrozenReserveGoldBalance() public view returns (uint256) {
     uint256 currentDay = now / 1 days;

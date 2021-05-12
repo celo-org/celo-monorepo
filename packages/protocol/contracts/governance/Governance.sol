@@ -1,14 +1,15 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -16,7 +17,6 @@ import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-// TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
@@ -24,7 +24,7 @@ contract Governance is
   IGovernance,
   ICeloVersionedContract,
   Ownable,
-  Initializable,
+  InitializableV2,
   ReentrancyGuard,
   UsingRegistry,
   UsingPrecompiles
@@ -34,6 +34,7 @@ contract Governance is
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
+  using Address for address payable; // prettier-ignore
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
@@ -147,6 +148,13 @@ contract Governance is
     uint256 weight
   );
 
+  event ProposalVoteRevoked(
+    uint256 indexed proposalId,
+    address indexed account,
+    uint256 value,
+    uint256 weight
+  );
+
   event ProposalExecuted(uint256 indexed proposalId);
 
   event ProposalExpired(uint256 indexed proposalId);
@@ -177,6 +185,12 @@ contract Governance is
     _;
   }
 
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
+
   function() external payable {
     require(msg.data.length == 0, "unknown method");
   }
@@ -186,7 +200,7 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 1, 0);
   }
 
   /**
@@ -194,7 +208,7 @@ contract Governance is
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
    * @param _concurrentProposals The number of proposals to dequeue at once.
-   * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
+   * @param _minDeposit The minimum CELO deposit needed to make a proposal.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
@@ -267,7 +281,7 @@ contract Governance is
 
   /**
    * @notice Updates the minimum deposit needed to make a proposal.
-   * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
+   * @param _minDeposit The minimum CELO deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) public onlyOwner {
     require(_minDeposit > 0, "minDeposit must be larger than 0");
@@ -432,7 +446,7 @@ contract Governance is
 
   /**
    * @notice Creates a new proposal and adds it to end of the queue with no upvotes.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -463,15 +477,15 @@ contract Governance is
   /**
    * @notice Removes a proposal if it is queued and expired.
    * @param proposalId The ID of the proposal to remove.
-   * @return Whether the proposal was expired.
+   * @return Whether the proposal was removed.
    */
   function removeIfQueuedAndExpired(uint256 proposalId) private returns (bool) {
-    bool expired = queue.contains(proposalId) && isQueuedProposalExpired(proposalId);
-    if (expired) {
+    if (isQueued(proposalId) && isQueuedProposalExpired(proposalId)) {
       queue.remove(proposalId);
       emit ProposalExpired(proposalId);
+      return true;
     }
-    return expired;
+    return false;
   }
 
   /**
@@ -506,8 +520,6 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
-    // and return false?
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
@@ -541,10 +553,14 @@ contract Governance is
   function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
-    } else if (isQueued(proposalId)) {
-      return Proposals.Stage.Queued;
+    }
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    if (isQueued(proposalId)) {
+      return
+        _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      return proposals[proposalId].getDequeuedStage(stageDurations);
+      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+      return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
 
@@ -562,7 +578,6 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
-    // TODO(yorke): clean up redundant computation
     require(proposalId != 0, "Account has no historical upvote");
     removeIfQueuedAndExpired(proposalId);
     if (queue.contains(proposalId)) {
@@ -578,8 +593,6 @@ contract Governance is
     return true;
   }
 
-  // TODO(asa): Consider allowing approval to be revoked.
-  // TODO(asa): Everywhere we use an index, require it's less than the array length
   /**
    * @notice Approves a proposal in the approval stage.
    * @param proposalId The ID of the proposal to approve.
@@ -643,13 +656,40 @@ contract Governance is
     );
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
     voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
-    if (proposal.timestamp > voter.mostRecentReferendumProposal) {
+    if (proposal.timestamp > proposals[voter.mostRecentReferendumProposal].timestamp) {
       voter.mostRecentReferendumProposal = proposalId;
     }
     emit ProposalVoted(proposalId, account, uint256(value), weight);
     return true;
   }
+
   /* solhint-enable code-complexity */
+
+  /**
+   * @notice Revoke votes on all proposal of sender in the referendum stage.
+   * @return Whether or not all votes of an account was successfully revoked.
+   */
+  function revokeVotes() external nonReentrant returns (bool) {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    Voter storage voter = voters[account];
+    for (
+      uint256 dequeueIndex = 0;
+      dequeueIndex < dequeued.length;
+      dequeueIndex = dequeueIndex.add(1)
+    ) {
+      VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
+      (Proposals.Proposal storage proposal, Proposals.Stage stage) =
+        requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
+      require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+      Proposals.VoteValue value = voteRecord.value;
+      proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
+      proposal.networkWeight = getLockedGold().getTotalLockedGold();
+      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
+      delete voter.referendumVotes[dequeueIndex];
+    }
+    voter.mostRecentReferendumProposal = 0;
+    return true;
+  }
 
   /**
    * @notice Executes a proposal in the execution stage, removing it from `dequeued`.
@@ -718,7 +758,7 @@ contract Governance is
 
   /**
    * @notice Executes a whitelisted proposal.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -746,7 +786,7 @@ contract Governance is
   }
 
   /**
-   * @notice Withdraws refunded Celo Gold deposits.
+   * @notice Withdraws refunded CELO deposits.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {
@@ -754,7 +794,7 @@ contract Governance is
     require(value > 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.transfer(value);
+    msg.sender.sendValue(value);
     return true;
   }
 
@@ -766,7 +806,9 @@ contract Governance is
   function isVoting(address account) external view returns (bool) {
     Voter storage voter = voters[account];
     uint256 upvotedProposal = voter.upvote.proposalId;
-    bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
+    bool isVotingQueue = upvotedProposal != 0 &&
+      isQueued(upvotedProposal) &&
+      !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
     bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
       Proposals.Stage.Referendum);
@@ -999,7 +1041,6 @@ contract Governance is
         if (emptyIndices.length > 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
-          // TODO(asa): We can save gas by not deleting here
           delete emptyIndices[indexOfLastEmptyIndex];
           emptyIndices.length = indexOfLastEmptyIndex;
         } else {
@@ -1015,11 +1056,12 @@ contract Governance is
 
   /**
    * @notice Returns whether or not a proposal is in the queue.
+   * @dev NOTE: proposal may be expired
    * @param proposalId The ID of the proposal.
    * @return Whether or not the proposal is in the queue.
    */
   function isQueued(uint256 proposalId) public view returns (bool) {
-    return queue.contains(proposalId) && !isQueuedProposalExpired(proposalId);
+    return queue.contains(proposalId);
   }
 
   /**
@@ -1091,7 +1133,6 @@ contract Governance is
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
-
   }
 
   /**

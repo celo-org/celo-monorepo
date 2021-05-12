@@ -1,28 +1,30 @@
 // tslint:disable:no-console
-// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 import { assert } from 'chai'
+import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const rpcURL = 'http://localhost:8545'
 
-describe('Blockchain parameters tests', function(this: any) {
+describe('Blockchain parameters tests', function (this: any) {
   this.timeout(0)
 
   let kit: ContractKit
   let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethRunConfig = {
-    migrateTo: 20,
+    useMycelo: true,
     runPath: TMP_PATH,
     keepData: false,
     networkId: 1101,
     network: 'local',
+    genesisConfig: {
+      churritoBlock: 0,
+      donutBlock: 0,
+    },
     instances: [
       {
         name: 'validator',
@@ -36,12 +38,12 @@ describe('Blockchain parameters tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -55,9 +57,9 @@ describe('Blockchain parameters tests', function(this: any) {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
 
-    kit = newKit(rpcURL)
+    kit = newKitFromWeb3(new Web3(rpcURL))
 
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
+    await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
     parameters = await kit.contracts.getBlockchainParameters()
   }
 
@@ -72,22 +74,24 @@ describe('Blockchain parameters tests', function(this: any) {
     it('block limit should have been set using governance', async () => {
       this.timeout(0)
       const res = await parameters.getBlockGasLimit()
-      assert.equal(res, 10000000)
+      assert.equal(0, res.comparedTo(13000000))
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)
       await parameters.setBlockGasLimit(23000000).send({ from: validatorAddress })
-      await sleep(5)
+      await sleep(2)
       const res = await parameters.getBlockGasLimit()
-      assert.equal(res, 23000000)
+      assert.equal(0, res.comparedTo(23000000))
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
       await setMinimumClientVersion(1, 9, 99)
-      await sleep(120, true)
+      // The client checks every 60 seconds and then waits 10 seconds before quitting, so we
+      // may have to wait a little over 70 seconds
+      await sleep(75, true)
       try {
         // It should have exited by now, call RPC to trigger error
-        await kit.web3.eth.getBlockNumber()
+        await kit.connection.getBlockNumber()
       } catch (_) {
         return
       }

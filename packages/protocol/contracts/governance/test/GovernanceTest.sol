@@ -1,8 +1,8 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "../Governance.sol";
 
-contract GovernanceTest is Governance {
+contract GovernanceTest is Governance(true) {
   address[] validatorSet;
 
   // Minimally override core functions from UsingPrecompiles

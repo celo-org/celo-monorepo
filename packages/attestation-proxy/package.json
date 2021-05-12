@@ -14,12 +14,13 @@
   },
   "dependencies": {
     "firebase-functions": "^3.6.0",
-    "node-fetch": "^2.6.0"
+    "firebase-admin": "^8.10.0",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.2.0"
   },
   "engines": {
-    "node": "10"
+    "node": ">=10"
   }
 }

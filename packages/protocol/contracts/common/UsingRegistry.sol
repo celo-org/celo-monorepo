@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -20,11 +20,6 @@ import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
-
-// Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
-// setRegistry(). TypeChain currently has problems resolving overloaded functions, so this is not
-// possible right now.
-// TODO(amy): Fix this when the TypeChain issue resolves.
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);

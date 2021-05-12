@@ -1,14 +1,12 @@
-import { CeloTransactionObject } from '@celo/contractkit'
-import { parseDecodedParams } from '@celo/contractkit/lib/utils/web3-utils'
+import { CeloTransactionObject, CeloTx, EventLog, parseDecodedParams } from '@celo/connect'
 import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import Table from 'cli-table'
 import { cli } from 'cli-ux'
-import { EventLog, Tx } from 'web3-core'
 
 // TODO: How can we deploy contracts with the Celo provider w/o a CeloTransactionObject?
-export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'data'>) {
+export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<CeloTx, 'data'>) {
   cli.action.start(`Sending Transaction: ${name}`)
   const result = await txObj.send(tx)
   console.log(result)
@@ -18,37 +16,46 @@ export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'dat
 export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
-  tx?: Omit<Tx, 'data'>,
+  tx?: Omit<CeloTx, 'data'>,
   displayEventName?: string
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
-  const txResult = await txObj.send(tx)
+  try {
+    const txResult = await txObj.send(tx)
 
-  const txHash = await txResult.getHash()
+    const txHash = await txResult.getHash()
 
-  console.log(chalk`SendTransaction: {red.bold ${name}}`)
-  printValueMap({ txHash })
+    console.log(chalk`SendTransaction: {red.bold ${name}}`)
+    printValueMap({ txHash })
 
-  const txReceipt = await txResult.waitReceipt()
-  cli.action.stop()
+    const txReceipt = await txResult.waitReceipt()
+    cli.action.stop()
 
-  if (displayEventName && txReceipt.events) {
-    Object.entries(txReceipt.events)
-      .filter(([eventName]) => eventName === displayEventName)
-      .forEach(([eventName, log]) => {
-        const { params } = parseDecodedParams((log as EventLog).returnValues)
-        console.log(chalk.magenta.bold(`${eventName}:`))
-        printValueMap(params, chalk.magenta)
-      })
+    if (displayEventName && txReceipt.events) {
+      Object.entries(txReceipt.events)
+        .filter(([eventName]) => eventName === displayEventName)
+        .forEach(([eventName, log]) => {
+          const { params } = parseDecodedParams((log as EventLog).returnValues)
+          console.log(chalk.magenta.bold(`${eventName}:`))
+          printValueMap(params, chalk.magenta)
+        })
+    }
+  } catch (e) {
+    cli.action.stop(`failed: ${e.message}`)
+    throw e
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>, color = chalk.red.bold) {
+export function printValueMap(valueMap: Record<string, any>, color = chalk.yellowBright.bold) {
   console.log(
     Object.keys(valueMap)
       .map((key) => color(`${key}: `) + valueMap[key])
       .join('\n')
   )
+}
+
+export function printValueMap2(valueMap: Map<any, any>, color = chalk.yellowBright.bold) {
+  valueMap.forEach((value, key) => console.log(color(`${key}: `) + value))
 }
 
 export function printValueMapRecursive(valueMap: Record<string, any>) {
@@ -59,8 +66,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
   const printValue = (v: any): string => {
     if (typeof v === 'object' && v != null) {
       if (BigNumber.isBigNumber(v)) {
-        const factor = new BigNumber(10).pow(18)
-        const extra = v.isGreaterThan(factor) ? `(~${v.div(factor).decimalPlaces(2)} 10^18)` : ''
+        const extra = v.isGreaterThan(new BigNumber(10).pow(3)) ? `(~${v.toExponential(3)})` : ''
         return `${v.toFixed()} ${extra}`
       }
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
@@ -68,7 +74,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
     return chalk`${v}`
   }
   return Object.keys(valueMap)
-    .map((key) => prefix + chalk`{red.bold ${key}:} ${printValue(valueMap[key])}`)
+    .map((key) => prefix + chalk.yellowBright.bold(`${key}: `) + printValue(valueMap[key]))
     .join('\n')
 }
 

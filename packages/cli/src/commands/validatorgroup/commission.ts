@@ -39,7 +39,6 @@ export default class ValidatorGroupCommission extends BaseCommand {
       return
     }
 
-    this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
 
     if (res.flags['queue-update']) {

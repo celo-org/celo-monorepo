@@ -43,7 +43,7 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
     ])
     // RG cUSD balance should match the amount sent
     const contractBalance = await kit.getTotalBalance(contractAddress)
-    expect(contractBalance.cUSD.toFixed()).toEqual(cUSDToTransfer)
+    expect(contractBalance.cUSD!.toFixed()).toEqual(cUSDToTransfer)
     // Attempt to send cUSD back
     await RGTransferDollars.run([
       '--contract',

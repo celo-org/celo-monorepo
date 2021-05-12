@@ -8,7 +8,7 @@ export default class Show extends BaseCommand {
     'Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
   }
 
   static args = [Args.address('account')]
@@ -20,9 +20,7 @@ export default class Show extends BaseCommand {
 
     const lockedGold = await this.kit.contracts.getLockedGold()
 
-    await newCheckBuilder(this)
-      .isAccount(args.account)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(args.account).runChecks()
 
     printValueMapRecursive(await lockedGold.getAccountSummary(args.account))
   }

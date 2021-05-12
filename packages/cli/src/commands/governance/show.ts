@@ -1,17 +1,32 @@
-import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
+import { proposalToJSON } from '@celo/governance'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
+import chalk from 'chalk'
 import { toBuffer } from 'ethereumjs-util'
+import { writeFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap, printValueMapRecursive } from '../../utils/cli'
 
 export default class Show extends BaseCommand {
+  static aliases = [
+    'governance:show',
+    'governance:showhotfix',
+    'governance:showaccount',
+    'governance:view',
+    'governance:viewhotfix',
+    'governance:viewaccount',
+  ]
+
   static description = 'Show information about a governance proposal, hotfix, or account.'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
     raw: flags.boolean({ required: false, description: 'Display proposal in raw bytes format' }),
+    jsonTransactions: flags.string({
+      required: false,
+      description: 'Output proposal JSON to provided file',
+    }),
     proposalID: flags.string({
       exclusive: ['account', 'hotfix'],
       description: 'UUID of proposal to view',
@@ -55,36 +70,42 @@ export default class Show extends BaseCommand {
 
     const governance = await this.kit.contracts.getGovernance()
     if (id) {
-      await newCheckBuilder(this)
-        .proposalExists(id)
-        .runChecks()
+      await newCheckBuilder(this).proposalExists(id).runChecks()
 
       const record = await governance.getProposalRecord(id)
+      const proposal = record.proposal
       if (!raw) {
         try {
-          const jsonproposal = await proposalToJSON(this.kit, record.proposal)
+          const jsonproposal = await proposalToJSON(this.kit, proposal)
           record.proposal = jsonproposal as any
+
+          if (res.flags.jsonTransactions) {
+            console.log(
+              chalk.yellowBright(`Outputting proposal JSON to ${res.flags.jsonTransactions}`)
+            )
+            writeFileSync(res.flags.jsonTransactions, JSON.stringify(jsonproposal, null, 2))
+          }
         } catch (error) {
           console.warn(`Could not decode proposal, displaying raw data: ${error}`)
         }
       }
 
-      // Identify the transaction with the highest constitutional requirement.
-      const proposal = await governance.getProposal(id)
+      let requirements = {}
+      if (record.stage === 'Referendum' || record.stage === 'Execution') {
+        // Identify the transaction with the highest constitutional requirement.
+        const constitutionThreshold = await governance.getConstitution(proposal)
+        const support = await governance.getSupport(id)
+        requirements = {
+          constitutionThreshold,
+          ...support,
+        }
+      }
 
-      // Get the minimum participation and agreement required to pass a proposal.
-      const participationParams = await governance.getParticipationParameters()
-      const constitution = await governance.getConstitution(proposal)
-
+      const schedule = await governance.humanReadableProposalSchedule(id)
       printValueMapRecursive({
         ...record,
-        requirements: {
-          participation: participationParams.baseline,
-          agreement: constitution.times(100).toString() + '%',
-        },
-        isApproved: await governance.isApproved(id),
-        isProposalPassing: await governance.isProposalPassing(id),
-        secondsUntilStages: await governance.timeUntilStages(id),
+        schedule,
+        requirements,
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer

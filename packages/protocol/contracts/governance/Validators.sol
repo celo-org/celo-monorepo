@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -6,8 +6,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
-
-import "../identity/interfaces/IRandom.sol";
 
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
@@ -122,6 +120,7 @@ contract Validators is
   // The number of blocks to delay a ValidatorGroup's commission update
   uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
+  uint256 public downtimeGracePeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
@@ -164,7 +163,7 @@ contract Validators is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -193,7 +192,8 @@ contract Validators is
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
-    uint256 _commissionUpdateDelay
+    uint256 _commissionUpdateDelay,
+    uint256 _downtimeGracePeriod
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -204,6 +204,7 @@ contract Validators is
     setCommissionUpdateDelay(_commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
+    setDowntimeGracePeriod(_downtimeGracePeriod);
   }
 
   /**
@@ -351,8 +352,14 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account);
@@ -398,6 +405,7 @@ contract Validators is
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
+    uptime = Math.min(uptime.add(downtimeGracePeriod), FixidityLib.fixed1().unwrap());
     (numerator, denominator) = fractionMulExp(
       FixidityLib.fixed1().unwrap(),
       FixidityLib.fixed1().unwrap(),
@@ -502,8 +510,9 @@ contract Validators is
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      getStableToken().mint(group, groupPayment);
-      getStableToken().mint(account, validatorPayment);
+      IStableToken stableToken = getStableToken();
+      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
+      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
@@ -916,8 +925,8 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in a 1
-    // wei rounding error.
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
+    // wei rounding errors. Using 10 as an additional margin of safety.
     return balance.add(10) >= getAccountLockedGoldRequirement(account);
   }
 
@@ -1271,6 +1280,14 @@ contract Validators is
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
     slashingMultiplierResetPeriod = value;
+  }
+
+  /**
+   * @notice Sets the downtimeGracePeriod property if called by owner.
+   * @param value New downtime grace period for calculating epoch scores.
+   */
+  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
+    downtimeGracePeriod = value;
   }
 
   /**

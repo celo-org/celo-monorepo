@@ -1,4 +1,4 @@
-import logger from './common/logger'
+import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import config, { DEV_MODE } from './config'
 import { initDatabase } from './database/database'
 import { initKeyProvider } from './key-management/key-provider'
@@ -12,12 +12,16 @@ async function start() {
   const server = createServer()
   logger.info('Starting server')
   const port = config.server.port
-  server.listen(port, () => {
-    logger.info(`Server is listening on port ${port}`)
-  })
+  const backupTimeout = config.timeout * 1.2
+  server
+    .listen(port, () => {
+      logger.info(`Server is listening on port ${port}`)
+    })
+    .setTimeout(backupTimeout)
 }
 
-start().catch((e) => {
-  logger.error('Fatal error occured. Exiting', e)
+start().catch((err) => {
+  logger.info('Fatal error occured. Exiting')
+  logger.error(err)
   process.exit(1)
 })

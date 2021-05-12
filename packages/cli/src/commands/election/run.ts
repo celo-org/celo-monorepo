@@ -19,7 +19,8 @@ export default class ElectionRun extends BaseCommand {
     'Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.'
 
   static flags = {
-    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...BaseCommand.flags,
+    ...(cli.table.flags() as object),
   }
 
   async run() {
@@ -33,6 +34,6 @@ export default class ElectionRun extends BaseCommand {
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
     cli.action.stop()
-    cli.table(validatorList, validatorTable, { 'no-truncate': !res.flags.truncate })
+    cli.table(validatorList, validatorTable, res.flags)
   }
 }

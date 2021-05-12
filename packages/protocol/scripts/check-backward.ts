@@ -1,10 +1,11 @@
 import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast-version'
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
+import { checkImports } from '@celo/protocol/lib/web3-utils'
 import { writeJsonSync } from 'fs-extra'
-import * as path from 'path'
-import * as tmp from 'tmp'
-import * as yargs from 'yargs'
+import path from 'path'
+import tmp from 'tmp'
+import yargs from 'yargs'
 
 const COMMAND_REPORT = 'report'
 const COMMAND_SEM_CHECK = 'sem_check'
@@ -17,7 +18,7 @@ const argv = yargs
   )
   .option('exclude', {
     alias: 'e',
-    description: 'Contract name exclusion pattern',
+    description: 'Contract name exclusion regex',
     type: 'string',
   })
   .option('old_contracts', {
@@ -28,7 +29,7 @@ const argv = yargs
   })
   .option('new_contracts', {
     alias: 'n',
-    description: 'Old contracts build artifacts folder',
+    description: 'New contracts build artifacts folder',
     type: 'string',
     demandOption: true,
   })
@@ -40,6 +41,11 @@ const argv = yargs
   .option('quiet', {
     alias: 'q',
     description: 'Run in quiet mode (no logs)',
+    default: false,
+    type: 'boolean',
+  })
+  .option('ignore_initializable_v2', {
+    description: 'Skip check for InitializableV2 inheritance',
     default: false,
     type: 'boolean',
   })
@@ -73,6 +79,22 @@ try {
     new DefaultCategorizer(),
     out
   )
+
+  if (!argv.ignore_initializable_v2) {
+    const versionDeltas = backward.report.versionDeltas()
+    Object.entries(versionDeltas).forEach(([contract, delta]) => {
+      if (
+        delta.isVersionIncremented() &&
+        checkImports('Initializable', newArtifacts.getArtifactByName(contract), newArtifacts)
+      ) {
+        console.error(
+          `Contract ${contract} has positive version delta but is not using InitializableV2`
+        )
+        process.exit(1)
+      }
+    })
+  }
+
   out(`Writing compatibility report to ${outFile} ...`)
   writeJsonSync(outFile, backward, { spaces: 2 })
   out('Done\n')
@@ -88,7 +110,7 @@ try {
       )
       const mismatches = versionChecker.excluding(exclude).mismatches()
       if (mismatches.isEmpty()) {
-        out('Actual version numbers match expected\n')
+        out('Success! Actual version numbers match expected\n')
         process.exit(0)
       } else {
         console.error(`Version mismatch detected:\n${JSON.stringify(mismatches, null, 4)}`)

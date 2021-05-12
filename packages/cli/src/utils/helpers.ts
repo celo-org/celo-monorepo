@@ -1,6 +1,15 @@
+import { Block } from '@celo/connect'
 import Web3 from 'web3'
-import { Block } from 'web3-eth'
 import { failWith } from './cli'
+
+export function enumEntriesDupWithLowercase<T>(entries: Array<[string, T]>) {
+  const enumMap: { [key: string]: T } = {}
+  entries.forEach((value) => {
+    enumMap[value[0]] = value[1]
+    enumMap[value[0].toLowerCase()] = value[1]
+  })
+  return enumMap
+}
 
 export async function nodeIsSynced(web3: Web3): Promise<boolean> {
   if (process.env.NO_SYNCCHECK) {
@@ -44,5 +53,3 @@ export async function requireNodeIsSynced(web3: Web3) {
     failWith('Node is not currently synced. Run node:synced to check its status.')
   }
 }
-
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'

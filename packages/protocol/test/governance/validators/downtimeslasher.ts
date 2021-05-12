@@ -282,6 +282,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       assertLogMatches2(resp.logs[0], {
         event: 'BitmapSetForInterval',
         args: {
+          sender: accounts[0],
           startBlock: blockNumber,
           endBlock: blockNumber + 1,
           bitmap: '0x0000000000000000000000000000000000000000000000000000000000000003',

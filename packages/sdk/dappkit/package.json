@@ -1,0 +1,23 @@
+{
+  "name": "@celo/dappkit",
+  "version": "1.2.2-dev",
+  "scripts": {
+    "build": "tsc",
+    "clean": "tsc -b . --clean",
+    "prepublishOnly": "yarn build"
+  },
+  "dependencies": {
+    "@celo/connect": "1.2.2-dev",
+    "@celo/contractkit": "1.2.2-dev",
+    "@celo/utils": "1.2.2-dev",
+    "react-native": "^0.63.4"
+  },
+  "devDependencies": {
+    "@types/react-native": "0.63.50"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ]
+}

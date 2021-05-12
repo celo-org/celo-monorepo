@@ -2,6 +2,26 @@
 
 Tool for interacting with the Celo Protocol.
 
+## Installation
+
+We are currently deploying the CLI with only Node v10.x LTS support.
+
+To install globally, run:
+
+```
+npm install -g @celo/celocli
+```
+
+If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
+
+### Plugins
+
+Additional plugins can be installed which make the CLI experience smoother. Currently, `celocli` only supports installing plugins published on NPM within the `@celo/*` and `@clabs/*` scopes.
+
+> ⚠️ **Warning**
+>  
+> Installing a 3rd party plugin can be dangerous! Please always be sure that you trust the plugin provider.
+
 ## Development
 
 ### Build
@@ -13,8 +33,6 @@ Use `yarn build` to compile the CLI.
 ### Generate docs
 
 Use `yarn docs` to populate `packages/docs` with generated documentation. Generated files should be checked in, and CI will fail if CLI modifications cause changes in the docs which were not checked in.
-
-_See [@celo/dev-cli](https://github.com/celo-org/dev-cli) for how we customize doc generation._
 
 ### Known build issues on Linux
 

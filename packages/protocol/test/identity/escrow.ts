@@ -1,5 +1,6 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils'
+import { assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
 import {
   EscrowContract,
   EscrowInstance,

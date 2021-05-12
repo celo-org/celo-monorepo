@@ -1,4 +1,4 @@
-# External module: "wrappers/DowntimeSlasher"
+# Module: "wrappers/DowntimeSlasher"
 
 ## Index
 
@@ -9,4 +9,4 @@
 ### Interfaces
 
 * [DowntimeSlasherConfig](../interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)
-* [DowntimeWindow](../interfaces/_wrappers_downtimeslasher_.downtimewindow.md)
+* [Interval](../interfaces/_wrappers_downtimeslasher_.interval.md)

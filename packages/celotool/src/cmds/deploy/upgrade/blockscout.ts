@@ -7,9 +7,13 @@ import {
   upgradeHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { execCmd } from 'src/lib/cmd-utils'
 import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
-import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
+import {
+  isCelotoolHelmDryRun,
+  resetCloudSQLInstance,
+  retrieveCloudSQLConnectionInfo,
+} from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
@@ -17,22 +21,38 @@ export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('reset', {
-    type: 'boolean',
-    description:
-      'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
-    default: false,
-  })
+  return argv
+    .option('reset', {
+      type: 'boolean',
+      description:
+        'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
+      default: false,
+    })
+    .option('tag', {
+      type: 'string',
+      description: 'Docker image tag to deploy',
+    })
+    .option('suffix', {
+      type: 'string',
+      description: 'Instance suffix',
+      default: '',
+    })
+    .demandOption(['tag'])
 }
 
-type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
+type BlockscoutUpgradeArgv = UpgradeArgv & {
+  reset: boolean
+  tag: string
+  suffix: string
+}
 
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
-  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
-  const instanceName = getInstanceName(argv.celoEnv)
-  const helmReleaseName = getReleaseName(argv.celoEnv)
+  const dbSuffix = argv.suffix || fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const imageTag = argv.tag
+  const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
+  const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
 
   const [
     blockscoutDBUsername,
@@ -40,31 +60,42 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutDBConnectionName,
   ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName, dbSuffix)
 
-  if (argv.reset === true) {
-    console.info(
-      'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
-    )
+  if (!isCelotoolHelmDryRun()) {
+    if (argv.reset === true) {
+      console.info(
+        'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
+      )
 
-    await removeHelmRelease(helmReleaseName)
+      await removeHelmRelease(helmReleaseName, argv.celoEnv)
 
-    console.info('Sleep for 30 seconds to have all connections killed')
-    await sleep(30000)
-    await resetCloudSQLInstance(instanceName)
-  } else {
-    console.info(`Delete blockscout-migration`)
-    try {
-      const jobName = `${argv.celoEnv}-blockscout${dbSuffix}-migration`
-      await execCmdWithExitOnFailure(`kubectl delete job ${jobName} -n ${argv.celoEnv}`)
-    } catch (error) {
-      console.error(error)
+      console.info('Sleep for 30 seconds to have all connections killed')
+      await sleep(30000)
+      await resetCloudSQLInstance(instanceName)
+    } else {
+      console.info(`Delete blockscout-migration`)
+      try {
+        const jobName = `${argv.celoEnv}-blockscout${dbSuffix}-migration`
+        await execCmd(`kubectl delete job ${jobName} -n ${argv.celoEnv}`)
+      } catch (error) {
+        console.error(error)
+      }
     }
+  } else {
+    console.info(
+      `Skipping Cloud SQL Database upgrade process (recreation or kubernetes job removal). Please check if you can execute the skipped steps.`
+    )
   }
+
   await upgradeHelmChart(
     argv.celoEnv,
     helmReleaseName,
+    imageTag,
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName
   )
-  await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
+
+  if (!isCelotoolHelmDryRun()) {
+    await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
+  }
 }

@@ -1,5 +1,5 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import Logger from 'bunyan'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -11,24 +11,27 @@ async function getAccountExists(account: string): Promise<boolean> {
   const existingAccountRecord = await accounts()
     .where(ACCOUNTS_COLUMNS.address, account)
     .first()
+    .timeout(DB_TIMEOUT)
   return !!existingAccountRecord
 }
 
 /*
  * Returns whether account has already performed matchmaking
  */
-export async function getDidMatchmaking(account: string): Promise<boolean> {
+export async function getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
   try {
     const didMatchmaking = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
+      .timeout(DB_TIMEOUT)
     if (!didMatchmaking) {
       return false
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
     return false
   }
 }
@@ -36,27 +39,27 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
 /*
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
-export async function setDidMatchmaking(account: string) {
-  logger.debug('Setting did matchmaking')
+export async function setDidMatchmaking(account: string, logger: Logger) {
+  logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+        .timeout(DB_TIMEOUT)
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
       return insertRecord(newAccount)
     }
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error(err)
     return null
   }
 }
 
 async function insertRecord(data: Account) {
-  await accounts()
-    .insert(data)
-    .timeout(DB_TIMEOUT)
+  await accounts().insert(data).timeout(DB_TIMEOUT)
   return true
 }

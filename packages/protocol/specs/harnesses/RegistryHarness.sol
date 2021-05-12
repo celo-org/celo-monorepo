@@ -1,8 +1,11 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./IRegistryExtended.sol";
 
 contract RegistryHarness is IRegistryExtended {
+  using SafeMath for uint256;
+
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
   bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
@@ -123,23 +126,23 @@ contract RegistryHarness is IRegistryExtended {
   }
 
   function transfer(address recipient, uint256 value) external returns (bool) {
-    goldToken_balanceOf[msg.sender] = getRandomUInt256() - value;
-    goldToken_balanceOf[recipient] = getRandomUInt256() + value;
+    goldToken_balanceOf[msg.sender] = getRandomUInt256().sub(value);
+    goldToken_balanceOf[recipient] = getRandomUInt256().add(value);
     return getRandomBool();
   }
 
   function getRandomBool() public returns (bool) {
-    randomIndex++;
+    randomIndex = randomIndex.add(1);
     return randomBoolMap[randomIndex];
   }
 
   function getRandomUInt256() public returns (uint256) {
-    randomIndex++;
+    randomIndex = randomIndex.add(1);
     return randomUInt256Map[randomIndex];
   }
 
   function getRandomAddress() public returns (address) {
-    randomIndex++;
+    randomIndex = randomIndex.add(1);
     return randomAddressMap[randomIndex];
   }
 

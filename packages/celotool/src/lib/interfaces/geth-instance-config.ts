@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 export interface GethInstanceConfig {
   name: string
   validating?: boolean
+  replica?: boolean
   validatingGasPrice?: number
   syncmode: string
   port: number
@@ -10,16 +11,19 @@ export interface GethInstanceConfig {
   rpcport?: number
   wsport?: number
   lightserv?: boolean
+  gatewayFee?: BigNumber
   privateKey?: string
-  etherbase?: string
+  minerValidator?: string
+  txFeeRecipient?: string
   proxies?: Array<string[2]>
-  pid?: number
   isProxied?: boolean
   isProxy?: boolean
   bootnodeEnode?: string
+  nodekey?: string
   proxy?: string
   proxiedValidatorAddress?: string
   proxyAllowPrivateIp?: boolean
   ethstats?: string
-  gatewayFee?: BigNumber
+  pid?: number
+  args?: string[]
 }

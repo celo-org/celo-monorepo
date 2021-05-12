@@ -1,10 +1,10 @@
 import {
   Change,
   ChangeVisitor,
-  ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
-  MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
+  ContractKindChange, DeployedBytecodeChange, LibraryLinkingChange,
+  MethodAddedChange, MethodMutabilityChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange
-} from '@celo/protocol/lib/compatibility/ast-code'
+} from '@celo/protocol/lib/compatibility/change'
 
 /**
  * Change type categories according to semantic versioning standards
@@ -40,7 +40,6 @@ export function categorize(changes: Change[], categorizer: Categorizer): Change[
 export class DefaultCategorizer implements Categorizer {
   onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Major
   onMethodMutability = (_change: MethodMutabilityChange): ChangeType => ChangeType.Major
-  onMethodParameters = (_change: MethodParametersChange): ChangeType => ChangeType.Major
   onMethodReturn = (_change: MethodReturnChange): ChangeType => ChangeType.Major
   onMethodRemoved = (_change: MethodRemovedChange): ChangeType => ChangeType.Major
   onContractKind = (_change: ContractKindChange): ChangeType => ChangeType.Major
@@ -49,4 +48,6 @@ export class DefaultCategorizer implements Categorizer {
   // Changing between public and external visibility has no impact.
   onMethodVisibility = (_change: MethodVisibilityChange): ChangeType => ChangeType.Patch
   onDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch
+
+  onLibraryLinking = (_change: LibraryLinkingChange): ChangeType => ChangeType.Patch
 }

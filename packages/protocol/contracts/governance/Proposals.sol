@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
@@ -24,7 +24,6 @@ library Proposals {
     uint256 execution;
   }
 
-  // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 yes;
     uint256 no;
@@ -59,7 +58,7 @@ library Proposals {
   /**
    * @notice Constructs a proposal.
    * @param proposal The proposal struct to be constructed.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -103,7 +102,7 @@ library Proposals {
 
   /**
    * @notice Constructs a proposal for use in memory.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -354,10 +353,9 @@ library Proposals {
 
   // call has been separated into its own function in order to take advantage
   // of the Solidity's code generator to produce a loop that copies tx.data into memory.
-  // TODO: Move to Transaction.execute whenever the next change to Governance is made.
   /**
    * @notice Executes a function call.
-   * @param value The value of Celo Gold to be sent with the function call.
+   * @param value The value of CELO to be sent with the function call.
    * @param destination The destination address of the function call.
    * @param dataLength The length of the data to be included in the function call.
    * @param data The data to be included in the function call.

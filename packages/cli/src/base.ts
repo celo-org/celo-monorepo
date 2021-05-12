@@ -1,68 +1,58 @@
-import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
-import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
-import {
-  AddressValidation,
-  newLedgerWalletWithSetup,
-} from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { ReadOnlyWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { ReadOnlyWallet } from '@celo/connect'
+import { ContractKit, newKitFromWeb3, StableToken, Token } from '@celo/contractkit'
+import { stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
+import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
+import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
+import { LocalWallet } from '@celo/wallet-local'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
+import chalk from 'chalk'
 import net from 'net'
 import Web3 from 'web3'
-import { getNodeUrl } from './utils/config'
-import { requireNodeIsSynced } from './utils/helpers'
+import { getGasCurrency, getNodeUrl } from './utils/config'
+import { enumEntriesDupWithLowercase, requireNodeIsSynced } from './utils/helpers'
 
-// Base for commands that do not need web3.
-export abstract class LocalCommand extends Command {
-  static flags = {
-    logLevel: flags.string({ char: 'l', hidden: true }),
-    help: flags.help({ char: 'h', hidden: true }),
-    truncate: flags.boolean({
-      default: true,
-      hidden: true,
-      allowNo: true,
-      description: 'Truncate fields to fit line',
-    }),
-  }
-
-  // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
-  log(msg: string, logLevel: string = 'info') {
-    if (logLevel === 'info') {
-      console.debug(msg)
-    } else if (logLevel === 'error') {
-      console.error(msg)
-    }
-  }
+export const gasOptions = {
+  auto: 'auto',
+  Auto: 'auto',
+  ...enumEntriesDupWithLowercase(Object.entries(Token)),
+  ...enumEntriesDupWithLowercase(Object.entries(StableToken)),
 }
 
 // tslint:disable-next-line:max-classes-per-file
-export abstract class BaseCommand extends LocalCommand {
+export abstract class BaseCommand extends Command {
   static flags = {
-    ...LocalCommand.flags,
-    privateKey: flags.string({ hidden: true }),
-    node: flags.string({ char: 'n', hidden: true }),
-    usdGas: flags.boolean({
-      default: false,
-      description: 'If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD',
-      // TODO: remove once feeCurrency is implemented in ledger app
-      exclusive: ['useLedger'],
+    privateKey: flags.string({
+      char: 'k',
+      description: 'Use a private key to sign local transactions with',
+      hidden: true,
+    }),
+    node: flags.string({
+      char: 'n',
+      description: "URL of the node to run commands against (defaults to 'http://localhost:8545')",
+      hidden: true,
+    }),
+    gasCurrency: flags.enum({
+      options: Object.keys(gasOptions),
+      description:
+        "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
+      hidden: true,
     }),
     useLedger: flags.boolean({
       default: false,
-      hidden: false,
+      hidden: true,
       description: 'Set it to use a ledger wallet',
     }),
     ledgerAddresses: flags.integer({
       default: 1,
-      hidden: false,
+      hidden: true,
       exclusive: ['ledgerCustomAddresses'],
       description: 'If --useLedger is set, this will get the first N addresses for local signing',
     }),
     ledgerCustomAddresses: flags.string({
       default: '[0]',
-      hidden: false,
+      hidden: true,
       exclusive: ['ledgerAddresses'],
       description:
         'If --useLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
@@ -78,20 +68,14 @@ export abstract class BaseCommand extends LocalCommand {
     }),
     ledgerConfirmAddress: flags.boolean({
       default: false,
-      hidden: false,
+      hidden: true,
       description: 'Set it to ask confirmation for the address of the transaction from the ledger',
     }),
-  }
-
-  static flagsWithoutLocalAddresses() {
-    return {
-      ...BaseCommand.flags,
-      privateKey: flags.string({ hidden: true }),
-      useLedger: flags.boolean({ hidden: true }),
-      ledgerAddresses: flags.integer({ hidden: true, default: 1 }),
-      ledgerCustomAddresses: flags.string({ hidden: true, default: '[0]' }),
-      ledgerConfirmAddress: flags.boolean({ hidden: true }),
-    }
+    globalHelp: flags.boolean({
+      default: false,
+      hidden: false,
+      description: 'View all available global flags',
+    }),
   }
   // This specifies whether the node needs to be synced before the command
   // can be run. In most cases, this should be `true`, so that's the default.
@@ -126,12 +110,13 @@ export abstract class BaseCommand extends LocalCommand {
 
   get kit() {
     if (!this._kit) {
-      this._kit = newKitFromWeb3(this.web3, this._wallet)
+      this._kit = newKitFromWeb3(this.web3)
+      this._kit.connection.wallet = this._wallet
     }
 
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
-      this._kit.addAccount(res.flags.privateKey)
+      this._kit.connection.addAccount(res.flags.privateKey)
     }
     return this._kit
   }
@@ -140,7 +125,16 @@ export abstract class BaseCommand extends LocalCommand {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
     }
+
     const res: ParserOutput<any, any> = this.parse()
+    if (res.flags.globalHelp) {
+      console.log(chalk.red.bold('GLOBAL OPTIONS'))
+      Object.entries(BaseCommand.flags).forEach(([name, flag]) => {
+        console.log(chalk.black(`  --${name}`).padEnd(40) + chalk.gray(`${flag.description}`))
+      })
+      process.exit(0)
+    }
+
     if (res.flags.useLedger) {
       let transport: Transport
       try {
@@ -176,15 +170,46 @@ export abstract class BaseCommand extends LocalCommand {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
+    } else {
+      this._wallet = new LocalWallet()
     }
-    await this.kit.setFeeCurrency(
-      res.flags.usdGas ? CeloContract.StableToken : CeloContract.GoldToken
-    )
+
+    if (res.flags.from) {
+      this.kit.defaultAccount = res.flags.from
+    }
+
+    const gasCurrencyConfig = res.flags.gasCurrency
+      ? (gasOptions as any)[res.flags.gasCurrency]
+      : getGasCurrency(this.config.configDir)
+
+    const setStableTokenGas = async (stable: StableToken) => {
+      await this.kit.setFeeCurrency(stableTokenInfos[stable].contract)
+      await this.kit.updateGasPriceInConnectionLayer(
+        await this.kit.registry.addressFor(stableTokenInfos[stable].contract)
+      )
+    }
+    if (Object.keys(StableToken).includes(gasCurrencyConfig)) {
+      await setStableTokenGas(StableToken[gasCurrencyConfig as keyof typeof StableToken])
+    } else if (gasCurrencyConfig === gasOptions.auto && this.kit.defaultAccount) {
+      const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
+      if (balances.CELO!.isZero()) {
+        const stables = Object.entries(StableToken)
+        for (const stable of stables) {
+          const stableName = stable[0]
+          const stableToken = stable[1]
+          // has balance
+          if ((balances as any)[stableName] && !(balances as any)[stableName].isZero()) {
+            await setStableTokenGas(stableToken)
+            break
+          }
+        }
+      }
+    }
   }
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      stopProvider(this.web3.currentProvider)
+      this.kit.connection.stop()
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

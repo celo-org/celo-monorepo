@@ -1,10 +1,12 @@
-import { Address } from '@celo/contractkit'
+import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import { Address } from '@celo/connect'
+import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
-import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
+import { isValidAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -135,8 +137,8 @@ class CheckBuilder {
       this.withGovernance(async (governance) => {
         const match = (await governance.getProposalStage(proposalID)) === stage
         if (!match) {
-          const timeUntilStages = await governance.timeUntilStages(proposalID)
-          printValueMapRecursive({ timeUntilStages })
+          const schedule = await governance.proposalSchedule(proposalID)
+          printValueMapRecursive(schedule)
         }
         return match
       })
@@ -160,11 +162,17 @@ class CheckBuilder {
       this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).executed)
     )
 
+  hotfixNotApproved = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix 0x${hash.toString('hex')} is not already approved`,
+      this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).approved)
+    )
+
   canSign = (account: Address) =>
     this.addCheck('Account can sign', async () => {
       try {
         const message = 'test'
-        const signature = await this.kit.web3.eth.sign(message, account)
+        const signature = await this.kit.connection.sign(message, account)
         return verifySignature(message, signature, account)
       } catch (error) {
         console.error(error)
@@ -195,10 +203,10 @@ class CheckBuilder {
       this.withValidators((validators, _s, account) => validators.isValidatorGroup(account))
     )
 
-  isValidator = (account: Address) =>
+  isValidator = (account?: Address) =>
     this.addCheck(
       `${account} is Validator`,
-      this.withValidators((validators) => validators.isValidator(account))
+      this.withValidators((validators, _, _account) => validators.isValidator(account ?? _account))
     )
 
   isValidatorGroup = (account: Address) =>
@@ -207,18 +215,18 @@ class CheckBuilder {
       this.withValidators((validators) => validators.isValidatorGroup(account))
     )
 
-  isNotValidator = () =>
+  isNotValidator = (account?: Address) =>
     this.addCheck(
       `${this.signer!} is not a registered Validator`,
-      this.withValidators((validators, _signer, account) => negate(validators.isValidator(account)))
+      this.withValidators((validators, _, _account) =>
+        negate(validators.isValidator(account ?? _account))
+      )
     )
 
   isNotValidatorGroup = () =>
     this.addCheck(
       `${this.signer!} is not a registered ValidatorGroup`,
-      this.withValidators((validators, _signer, account) =>
-        negate(validators.isValidatorGroup(account))
-      )
+      this.withValidators((validators, _, account) => negate(validators.isValidatorGroup(account)))
     )
 
   signerMeetsValidatorBalanceRequirements = () =>
@@ -251,6 +259,9 @@ class CheckBuilder {
       )
     )
 
+  isValidAddress = (address: Address) =>
+    this.addCheck(`${address} is a valid address`, () => isValidAddress(address))
+
   isNotAccount = (address: Address) =>
     this.addCheck(
       `${address} is not a registered Account`,
@@ -264,7 +275,8 @@ class CheckBuilder {
         const res =
           (await accounts.isAccount(this.signer!)) || (await accounts.isSigner(this.signer!))
         return res
-      })
+      }),
+      `${this.signer} is not a signer or registered as an account. Try authorizing as a signer or running account:register.`
     )
 
   isVoteSignerOrAccount = () =>
@@ -292,8 +304,8 @@ class CheckBuilder {
       `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
     )
 
-  hasEnoughGold = (account: Address, value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+  hasEnoughCelo = (account: Address, value: BigNumber) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(`Account has at least ${valueInEth} CELO`, () =>
       this.kit.contracts
         .getGoldToken()
@@ -302,12 +314,26 @@ class CheckBuilder {
     )
   }
 
-  hasEnoughUsd = (account: Address, value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
+  hasEnoughStable = (
+    account: Address,
+    value: BigNumber,
+    stable: StableToken = StableToken.cUSD
+  ) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} ${stable}`, () =>
       this.kit.contracts
-        .getStableToken()
+        .getStableToken(stable)
         .then((stableToken) => stableToken.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
+  hasEnoughErc20 = (account: Address, value: BigNumber, erc20: Address) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} erc20 token`, () =>
+      this.kit.contracts
+        .getErc20(erc20)
+        .then((goldToken) => goldToken.balanceOf(account))
         .then((balance) => balance.gte(value))
     )
   }
@@ -327,7 +353,7 @@ class CheckBuilder {
     )
 
   hasEnoughLockedGold = (value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} Locked Gold`,
       this.withLockedGold(async (lockedGold, _signer, account) =>
@@ -337,7 +363,7 @@ class CheckBuilder {
   }
 
   hasEnoughNonvotingLockedGold = (value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold`,
       this.withLockedGold(async (lockedGold, _signer, account) =>
@@ -347,7 +373,7 @@ class CheckBuilder {
   }
 
   hasEnoughLockedGoldToUnlock = (value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold over requirement`,
       this.withLockedGold(async (lockedGold, _signer, account, validators) => {

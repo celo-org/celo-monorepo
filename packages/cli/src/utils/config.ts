@@ -2,13 +2,16 @@
 // TODO: investigate tslint issues
 import * as fs from 'fs-extra'
 import * as path from 'path'
+import { gasOptions } from '../base'
 
 export interface CeloConfig {
-  nodeUrl: string
+  node: string
+  gasCurrency: string
 }
 
-export const localGeth: CeloConfig = {
-  nodeUrl: 'http://localhost:8545',
+export const defaultConfig: CeloConfig = {
+  node: 'http://localhost:8545',
+  gasCurrency: 'auto',
 }
 
 const configFile = 'config.json'
@@ -19,16 +22,28 @@ export function configPath(configDir: string) {
 
 export function readConfig(configDir: string): CeloConfig {
   if (fs.pathExistsSync(configPath(configDir))) {
-    return fs.readJSONSync(configPath(configDir))
+    const existingConfig = fs.readJSONSync(configPath(configDir))
+    const combinedConfig = { ...defaultConfig, ...existingConfig }
+    if (combinedConfig.hasOwnProperty('nodeUrl')) {
+      combinedConfig.node = combinedConfig.nodeUrl
+    }
+    return combinedConfig
   } else {
-    return localGeth
+    return defaultConfig
   }
 }
 
 export function getNodeUrl(configDir: string): string {
-  return readConfig(configDir).nodeUrl
+  return readConfig(configDir).node
+}
+
+export function getGasCurrency(configDir: string): string {
+  return readConfig(configDir).gasCurrency
 }
 
 export function writeConfig(configDir: string, configObj: CeloConfig) {
+  if (!Object.keys(gasOptions).includes(configObj.gasCurrency)) {
+    throw new Error('Invalid gas option')
+  }
   fs.outputJSONSync(configPath(configDir), configObj)
 }

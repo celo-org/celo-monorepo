@@ -1,14 +1,16 @@
 import sleep from 'sleep-promise'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
+import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
+  checkHelmVersion,
   createAndUploadBackupSecretIfNotExists,
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
-  redeployTiller,
-  uploadStorageClass
+  installGCPSSDStorageClass,
+  isCelotoolHelmDryRun,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -21,12 +23,28 @@ const SYSTEM_HELM_RELEASES = [
 ]
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
 
-export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction = true) {
+export async function switchToClusterFromEnv(
+  celoEnv: string,
+  checkOrPromptIfStagingOrProduction = true,
+  skipClusterSetup = true
+) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
+  await checkHelmVersion()
 
   await switchToProjectFromEnv()
+
+  if (!skipClusterSetup) {
+    if (!isCelotoolHelmDryRun()) {
+      // In this case we create the cluster if it does not exist
+      const createdCluster = await createClusterIfNotExists()
+      // Install common helm charts
+      await setupCluster(celoEnv, createdCluster)
+    } else {
+      console.info(`Skipping cluster setup due to --helmdryrun`)
+    }
+  }
 
   let currentCluster = null
   try {
@@ -88,6 +106,8 @@ export async function createNamespaceIfNotExists(namespace: string) {
 export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   const envType = fetchEnv(envVar.ENV_TYPE)
 
+  await checkHelmVersion()
+
   await createNamespaceIfNotExists(celoEnv)
 
   const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
@@ -102,7 +122,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   // Source: https://cloud.google.com/kubernetes-engine/docs/how-to/iam
   await grantRoles(blockchainBackupServiceAccountName, 'roles/container.viewer')
 
-  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName)
+  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName, celoEnv)
 
   // poll for cluster availability
   if (createdCluster) {
@@ -111,10 +131,9 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
 
   console.info('Deploying Tiller and Cert Manager Helm chart...')
 
-  await uploadStorageClass()
-  await redeployTiller()
+  await installGCPSSDStorageClass()
 
-  await installCertManagerAndNginx()
+  await installCertManagerAndNginx(celoEnv)
 
   if (envType !== EnvTypes.DEVELOPMENT) {
     console.info('Installing metric tools installation')
@@ -182,8 +201,10 @@ export async function setClusterLabels(celoEnv: string) {
   await labelfn('envinstance', celoEnv)
 }
 
-export function getKubernetesClusterRegion(): string {
-  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+export function getKubernetesClusterRegion(zone?: string): string {
+  if (!zone) {
+    zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  }
   const matches = zone.match('^[a-z]+-[a-z]+[0-9]')
   if (matches) {
     return matches[0]
@@ -203,7 +224,7 @@ export interface HelmRelease {
 }
 
 export async function getNonSystemHelmReleases(): Promise<HelmRelease[]> {
-  const [json] = await execCmdWithExitOnFailure(`helm list --output json`)
+  const [json] = await execCmdWithExitOnFailure(`helm list -A --output json`)
   const releases: HelmRelease[] = JSON.parse(json).Releases
   return releases.filter((release) => !SYSTEM_HELM_RELEASES.includes(release.Name))
 }
@@ -215,4 +236,14 @@ export function getPackageName(name: string) {
   }
 
   return prefix[1] === 'ethereum' ? 'testnet' : prefix[1]
+}
+
+export async function switchToClusterFromEnvOrContext(argv: any, skipClusterSetup = false) {
+  if (argv.context === undefined) {
+    // GCP top level cluster.
+    await switchToClusterFromEnv(argv.celoEnv, true, skipClusterSetup)
+  } else {
+    await switchToContextCluster(argv.celoEnv, argv.context, skipClusterSetup)
+    return getClusterConfigForContext(argv.context)
+  }
 }

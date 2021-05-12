@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -7,9 +7,8 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
 import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
-import "../common/Freezable.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
@@ -22,10 +21,9 @@ contract Election is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   UsingPrecompiles,
-  Freezable,
   CalledByVm
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
@@ -34,7 +32,7 @@ contract Election is
 
   // 1e20 ensures that units can be represented as precisely as possible to avoid rounding errors
   // when translating to votes, without risking integer overflow.
-  // A maximum of 1,000,000,000 cGLD (1e27) yields a maximum of 1e47 units, whose product is at
+  // A maximum of 1,000,000,000 CELO (1e27) yields a maximum of 1e47 units, whose product is at
   // most 1e74, which is less than 2^256.
   uint256 private constant UNIT_PRECISION_FACTOR = 100000000000000000000;
 
@@ -138,7 +136,7 @@ contract Election is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -163,6 +161,12 @@ contract Election is
     setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
     setElectabilityThreshold(_electabilityThreshold);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Updates the minimum and maximum number of validators that can be elected.
@@ -272,6 +276,21 @@ contract Election is
    */
   function activate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
+    return _activate(group, account);
+  }
+
+  /**
+   * @notice Converts `account`'s pending votes for `group` to active votes.
+   * @param group The validator group to vote for.
+   * @param account The validateor group account's pending votes to active votes
+   * @return True upon success.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
+    return _activate(group, account);
+  }
+
+  function _activate(address group, address account) internal returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;
@@ -836,7 +855,6 @@ contract Election is
    * @param index The index of `element` in the list.
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
-    // TODO(asa): Move this to a library to be shared.
     require(index < list.length && list[index] == element, "Bad index");
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
@@ -926,7 +944,7 @@ contract Election is
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view onlyWhenNotFrozen returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
@@ -962,7 +980,7 @@ contract Election is
     FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
       electionGroups.length
     );
-    for (uint256 i = 0; i < electionGroups.length; i++) {
+    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
       keys[i] = i;
       votesForNextMember[i] = FixidityLib.newFixed(
         votes.total.eligible.getValue(electionGroups[i])

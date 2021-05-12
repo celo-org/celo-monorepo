@@ -16,9 +16,10 @@ variable replicas {
   type        = map(number)
 
   default = {
-    validator           = 1 # Also used for proxy
-    txnode              = 1
-    attestation_service = 1
+    validator           = 1 # Each validator will create a dedicated proxy that is exposed to the Internet
+    txnode              = 1 
+    backup_node         = 1 
+    attestation_service = 1 # Attestation service requires >= 1 txnode
   }
 }
 
@@ -30,6 +31,7 @@ variable instance_types {
     validator           = "n1-standard-2"   #use n1-standard-2 or better for production
     proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
+    backup_node         = "n1-standard-1"
     attestation_service = "n1-standard-1"
   }
 }
@@ -45,7 +47,7 @@ variable celo_env {
   description = "The celo network to connect with"
   type        = string
 
-  default = "rc1"
+  default = "mainnet"
 }
 
 variable network_id {
@@ -65,8 +67,8 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-org/celo-node"
-    tag        = "mainnet"
+    repository = "us.gcr.io/celo-org/geth"
+    tag        = "1.3.2"
   }
 }
 
@@ -169,7 +171,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-mainnet"
+    tag        = "attestation-service-v1.2.0"
   }
 }
 
@@ -179,14 +181,19 @@ variable attestation_service_credentials {
   type        = map(string)
 
   default = {
-    sms_providers                = "twilio"
-    nexmo_key                    = ""
-    nexmo_secret                 = ""
-    nexmo_blacklist              = ""
-    twilio_account_sid           = "secret in terraform.tfvars"
-    twilio_messaging_service_sid = "secret in terraform.tfvars"
-    twilio_auth_token            = "secret in terraform.tfvars"
-    twilio_blacklist             = ""
+    sms_providers                   = "twilio"
+    #sms_providers                   = "twilio,messagebird"
+    nexmo_key                       = ""
+    nexmo_secret                    = ""
+    nexmo_blacklist                 = "CU,SY,KP,IR,SD"
+    nexmo_unsupported_regions       = "CU,SY,KP,IR,SD"
+    twilio_account_sid              = "secret in terraform.tfvars"
+    twilio_messaging_service_sid    = "secret in terraform.tfvars"
+    twilio_auth_token               = "secret in terraform.tfvars"
+    twilio_blacklist                = "CU,SY,KP,IR,SD,BY,TD,CZ,EG,ID,IL,CI,JP,JO,KZ,KE,KW,LB,MW,MX,MA,NP,NG,OM,PK,PS,PH,QA,RU,SA,LK,TZ,TH,TN,TR,AE,UA,VN,ZM,ZW"
+    twilio_unsupported_regions      = "CU,SY,KP,IR,SD,BY,TD,CZ,EG,ID,IL,CI,JP,JO,KZ,KE,KW,LB,MW,MX,MA,NP,NG,OM,PK,PS,PH,QA,RU,SA,LK,TZ,TH,TN,TR,AE,UA,VN,ZM,ZW"
+    messagebird_api_key             = "secret in terraform.tfvars"
+    messagebird_unsupported_regions = "CU,SY,KP,IR,SD"
   }
 }
 
@@ -292,6 +299,7 @@ variable "stackdriver_logging_metrics" {
       filter      = "resource.type=gce_instance AND \"blocks\" AND \"Imported new chain segment\""
     }
 
+    # note that this log isn't firing anymore on successfully proposing a block (on 1.1.0) FIXME
     tf_eth_block_mined = {
       description = "Block mined"
       filter = "resource.type=gce_instance AND \"Successfully sealed new block\""

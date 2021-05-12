@@ -1,11 +1,11 @@
-import * as ganache from '@celo/ganache-cli'
+import ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
-import * as fs from 'fs-extra'
-import * as path from 'path'
-import * as targz from 'targz'
-import * as tmp from 'tmp'
-import * as yargs from 'yargs'
+import fs from 'fs-extra'
+import path from 'path'
+import targz from 'targz'
+import tmp from 'tmp'
+import yargs from 'yargs'
 
 tmp.setGracefulCleanup()
 
@@ -88,7 +88,7 @@ yargs
         })
         .option('release_gold_contracts', {
           type: 'string',
-          description: 'JSON list of release gold contracts',
+          description: 'Path to JSON containing list of release gold contracts',
         }),
     (args) =>
       exitOnError(
@@ -197,7 +197,7 @@ function createDirIfMissing(dir: string) {
 }
 
 function runMigrations(opts: { upto?: number; migrationOverride?: string } = {}) {
-  const cmdArgs = ['truffle', 'migrate', '--reset']
+  const cmdArgs = ['truffle', 'migrate', '--reset', '--network', 'development']
 
   if (opts.upto) {
     cmdArgs.push('--to')

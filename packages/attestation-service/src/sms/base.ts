@@ -1,30 +1,8 @@
 import { E164Number } from '@celo/utils/lib/io'
+import Logger from 'bunyan'
 import express from 'express'
 import { fetchEnvOrDefault } from '../env'
-
-// State for an ongoing cross-provider delivery attempt
-export interface SmsDelivery {
-  countryCode: string
-  phoneNumber: E164Number
-  message: string
-  attemptsForThisProvider: number
-  providers: SmsProvider[]
-  ongoingDeliveryId: string | null
-  status: DeliveryStatus
-  createdCallback?: (createdWithProvider: SmsProviderType) => void
-  finallyFailedCallback?: () => void
-  finallyBelievedDeliveredCallback?: () => void
-}
-
-export enum DeliveryStatus {
-  NotCreated, // Not yet received ok by a provider
-  Created, // Received ok by provider
-  Queued, // Buffered or queued, but still in flight
-  Upstream, // Reached upstream carrier
-  Other,
-  Delivered, // Success!
-  Failed, // We will try to retransmit.
-}
+import { AttestationModel } from '../models/attestation'
 
 export abstract class SmsProvider {
   abstract type: SmsProviderType
@@ -34,21 +12,23 @@ export abstract class SmsProvider {
     return !this.unsupportedRegionCodes.includes(countryCode.toUpperCase())
   }
   // Should throw Error when unsuccesful, return if successful
-  abstract sendSms(delivery: SmsDelivery): Promise<string>
+  abstract sendSms(attestation: AttestationModel): Promise<string>
 
-  // True if this provider supports delivery status updates as POSTs to an endpoint delivery_<providername>/
-  abstract supportsDeliveryStatus(): boolean
+  // if this provider supports delivery status updates to an endpoint delivery_<providername>/, should return 'GET' or 'POST'
+  abstract deliveryStatusMethod(): string | null
 
   abstract deliveryStatusHandlers(): express.Handler[]
 
   // Should throw Error when unsuccesful, return if successful
-  abstract receiveDeliveryStatusReport(req: express.Request): Promise<void>
+  abstract receiveDeliveryStatusReport(req: express.Request, logger: Logger): Promise<void>
 }
 
 export enum SmsProviderType {
   NEXMO = 'nexmo',
   UNKNOWN = 'unknown',
   TWILIO = 'twilio',
+  MESSAGEBIRD = 'messagebird',
+  TELEKOM = 'telekom',
 }
 
 export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {

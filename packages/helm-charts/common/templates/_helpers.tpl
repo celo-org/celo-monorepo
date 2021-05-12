@@ -39,6 +39,13 @@ app: {{ template "common.name" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "common.conditional-init-genesis-container" -}}
+{{- $production_envs := list "rc1" "baklava" "alfajores" -}}
+{{- if not (has .Values.genesis.network $production_envs) -}}
+{{ include "common.init-genesis-container" . }}
+{{- end -}}
+{{- end -}}
+
 {{- define "common.init-genesis-container" -}}
 - name: init-genesis
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -48,14 +55,19 @@ release: {{ .Release.Name }}
   - -c
   args:
   - |
-      mkdir -p /var/geth /root/celo
+      mkdir -p /var/geth /root/.celo
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
         wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
         wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
       fi
-      geth init /root/.celo/genesis.json
+      # There are issues with running geth init over existing chaindata around the use of forks.
+      # The case that this could cause problems is when a network is set up with Base64 genesis files & chaindata
+      # as that could interfere with accessing bootnodes for newly created nodes.
+      if [ "{{ .Values.geth.use_gstorage_data | default false }}" == "false" ]; then
+        geth init /root/.celo/genesis.json
+      fi
   volumeMounts:
   - name: data
     mountPath: /root/.celo
@@ -82,6 +94,14 @@ release: {{ .Release.Name }}
     readOnly: true
 {{- end -}}
 
+{{- define "common.bootnode-flag-script" -}}
+if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
+  BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
+else
+  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+fi
+{{- end -}}
+
 {{- define "common.full-node-container" -}}
 - name: geth
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -100,11 +120,12 @@ release: {{ .Release.Name }}
       NAT_IP=$(cat /root/.celo/ipAddress)
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
+
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
     if [[ -f /root/.celo/pkey ]]; then
       NODE_KEY=$(cat /root/.celo/pkey)
       if [[ ! -z ${NODE_KEY} ]]; then
-        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey" && echo "Node key: ${NODE_KEY}"
+        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey"
       fi
     fi
     {{ if .proxy | default false }}
@@ -134,7 +155,14 @@ release: {{ .Release.Name }}
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    {{- if .proxy | default false }}
+    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- else }}
+    {{- if not (.proxied | default false) }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- end }}
+    {{- end }}
     {{- end }}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -142,13 +170,24 @@ release: {{ .Release.Name }}
     {{- if .pprof | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
     {{- end }}
+    PORT=30303
+    {{- if .ports }}
+    PORTS_PER_RID={{ join "," .ports }}
+    PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
+    {{- end }}
+
+{{ include  "common.bootnode-flag-script" . | indent 4 }}
+
+{{ .extra_setup }}
 
     exec geth \
-      --bootnodes=$(cat /root/.celo/bootnodeEnode) \
-      --light.serve {{ .light_serve | default 90 }} \
-      --light.maxpeers {{ .light_maxpeers | default 1000 }} \
-      --maxpeers {{ .maxpeers | default 1100 }} \
-      --networkid=${NETWORK_ID} \
+      --port $PORT  \
+{{- if not (contains "rc1" .Values.genesis.network) }}
+      $BOOTNODE_FLAG \
+{{- end }}
+      --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
+      --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
+      --maxpeers {{ .maxpeers | default 1200 }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -157,7 +196,8 @@ release: {{ .Release.Name }}
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
-      --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
+      --datadir=/root/.celo \
+      --ipcpath=geth.ipc \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -170,6 +210,12 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
+{{- if .Values.aws }}
+  - name: HOST_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+{{- end }}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:
@@ -178,39 +224,26 @@ release: {{ .Release.Name }}
       - /bin/sh
       - "-c"
       - |
-        # fail if any wgets fail
-        set -euo pipefail
-        RPC_URL=http://localhost:8545
-        # first check if it's syncing
-        SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
-        NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-        if [ ! $NOT_SYNCING ]; then
-          echo "Node is syncing: $SYNCING"
-          exit 1
-        fi
-
-        # then make sure that the latest block is new
-        MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
-        LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
-        BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-        BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
-        CURRENT_TIMESTAMP=$(date +%s)
-        BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
-        # if the most recent block is too old, then indicate the node is not ready
-        if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
-          echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
-          exit 1
-        fi
-        exit 0
+{{ include "common.node-health-check" . | indent 8 }}
     initialDelaySeconds: 20
     periodSeconds: 10
 {{- end }}
   ports:
+{{- if .ports }}
+{{- range $index, $port := .ports }}
+  - name: discovery-{{ $port }}
+    containerPort: {{ $port }}
+    protocol: UDP
+  - name: ethereum-{{ $port }}
+    containerPort: {{ $port }}
+{{- end }}
+{{- else }}
   - name: discovery
     containerPort: 30303
     protocol: UDP
   - name: ethereum
     containerPort: 30303
+{{- end }}
 {{- if .expose }}
   - name: rpc
     containerPort: 8545
@@ -328,6 +361,49 @@ data:
     mountPath: /root/.celo
 {{- end -}}
 
+{{- define "common.node-health-check" -}}
+# fail if any wgets fail
+set -euo pipefail
+RPC_URL=http://localhost:8545
+MAX_LATEST_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_age_seconds | default 30 }}"
+MAX_EPOCH_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_epoch_age_seconds | default 300 }}"
+EPOCH_SIZE="{{ .Values.genesis.epoch_size | default 17280 }}"
+EPOCH_SIZE_LESS_ONE="$(( $EPOCH_SIZE - 1 ))"
+
+# first check if it's syncing
+SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
+NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
+if [ ! $NOT_SYNCING ]; then
+  echo "Node is syncing: $SYNCING"
+  exit 1
+fi
+
+{{ if .Values.geth.fullnodeCheckBlockAge }}
+# then make sure that the latest block is new
+LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
+BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
+BLOCK_NUMBER_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"number":"[^"]*' | grep -o '[a-fA-F0-9]*$')
+BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
+BLOCK_NUMBER=$(( 16#$BLOCK_NUMBER_HEX ))
+CURRENT_TIMESTAMP=$(date +%s)
+
+# different age allowed for epoch and epoch+1 blocks
+BLOCK_EPOCH_DIFFERENCE=$(( BLOCK_NUMBER % EPOCH_SIZE ))
+case "$BLOCK_EPOCH_DIFFERENCE" in
+  0|$EPOCH_SIZE_LESS_ONE) ALLOWED_AGE="$MAX_EPOCH_BLOCK_AGE_SECONDS" ;;
+  *) ALLOWED_AGE="$MAX_LATEST_BLOCK_AGE_SECONDS" ;;
+esac
+
+# if the most recent block is too old, then indicate the node is not ready
+BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
+if [ $BLOCK_AGE_SECONDS -gt $ALLOWED_AGE ]; then
+  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
+  exit 1
+fi
+exit 0
+{{- end }}
+{{- end }}
+
 {{- define "common.geth-exporter-container" -}}
 - name: geth-exporter
   image: "{{ .Values.gethexporter.image.repository }}:{{ .Values.gethexporter.image.tag }}"
@@ -395,3 +471,52 @@ prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}
 
+{{- define "common.remove-old-chaindata" -}}
+- name: remove-old-chaindata
+  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+  imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
+  command: ["/bin/sh"]
+  args:
+  - "-c"
+  - |
+    if [ -d /root/.celo/celo/chaindata ]; then
+      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      day=$(date +%s)
+      diff=$(($day - $lastBlockTimestamp))
+      # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
+      if [ "$diff" -gt 86400 ]; then
+        echo Chaindata is more than one day out of date. Wiping existing chaindata.
+        rm -rf /root/.celo/celo/chaindata
+      else
+        echo Chaindata is less than one day out of date. Using existing chaindata.
+      fi
+    else
+      echo No chaindata at all.
+    fi
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}
+
+{{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
+{{- define "common.gsutil-sync-data-init-container" -}}
+- name: gsutil-sync-data
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+  imagePullPolicy: Always
+  command:
+  - /bin/sh
+  - -c
+  args:
+  - |
+     if [ -d /root/.celo/celo/chaindata ]; then
+       echo Using pre-existing chaindata
+       exit 0
+     fi
+     mkdir -p /root/.celo/celo
+     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
+     tar -xzvf chaindata.tar.gz -C /root/.celo/celo
+     rm chaindata.tar.gz
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}

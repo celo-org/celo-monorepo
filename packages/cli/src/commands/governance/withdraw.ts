@@ -15,10 +15,8 @@ export default class Withdraw extends BaseCommand {
 
   async run() {
     const res = this.parse(Withdraw)
-    this.kit.defaultAccount = res.flags.from
-    await newCheckBuilder(this, res.flags.from)
-      .hasRefundedDeposits(res.flags.from)
-      .runChecks()
+
+    await newCheckBuilder(this, res.flags.from).hasRefundedDeposits(res.flags.from).runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx('withdraw', governance.withdraw(), {}, 'DepositWithdrawn')

@@ -1,27 +1,18 @@
-pragma solidity ^0.5.3;
-
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "./interfaces/ISortedOracles.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
-
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+
+import "../common/FixidityLib.sol";
+import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
 /**
- * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
+ * @title Maintains a sorted list of oracle exchange rates between CELO and other currencies.
  */
 contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
   using SafeMath for uint256;
@@ -37,7 +28,13 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   mapping(address => mapping(address => bool)) public isOracle;
   mapping(address => address[]) public oracles;
 
+  // `reportExpirySeconds` is the fallback value used to determine reporting
+  // frequency. Initially it was the _only_ value but we later introduced
+  // the per token mapping in `tokenReportExpirySeconds`. If a token
+  // doesn't have a value in the mapping (i.e. it's 0), the fallback is used.
+  // See: #getTokenReportExpirySeconds
   uint256 public reportExpirySeconds;
+  mapping(address => uint256) public tokenReportExpirySeconds;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -50,6 +47,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event OracleReportRemoved(address indexed token, address indexed oracle);
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
+  event TokenReportExpirySet(address token, uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -61,7 +59,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -82,6 +80,21 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
     reportExpirySeconds = _reportExpirySeconds;
     emit ReportExpirySet(_reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the report expiry parameter for a token.
+   * @param _token The address of the token to set expiry for.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
+   */
+  function setTokenReportExpiry(address _token, uint256 _reportExpirySeconds) external onlyOwner {
+    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
+    require(
+      _reportExpirySeconds != tokenReportExpirySeconds[_token],
+      "token reportExpirySeconds hasn't changed"
+    );
+    tokenReportExpirySeconds[_token] = _reportExpirySeconds;
+    emit TokenReportExpirySet(_token, _reportExpirySeconds);
   }
 
   /**
@@ -124,7 +137,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Removes a report that is expired.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @param n The number of expired reports to remove, at most (deterministic upper gas bound).
    */
   function removeExpiredReports(address token, uint256 n) external {
@@ -144,7 +157,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Check if last report is expired.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return bool isExpired and the address of the last report
    */
   function isOldestReportExpired(address token) public view returns (bool, address) {
@@ -152,7 +165,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
-    if (now.sub(timestamp) >= reportExpirySeconds) {
+    if (now.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
       return (true, oldest);
     }
     return (false, oldest);
@@ -160,8 +173,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Updates an oracle value and the median.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param value The amount of `token` equal to one Celo Gold, expressed as a fixidity value.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
+   * @param value The amount of `token` equal to one CELO, expressed as a fixidity value.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
@@ -204,7 +217,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the number of rates.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return The number of reported oracle rates for `token`.
    */
   function numRates(address token) public view returns (uint256) {
@@ -213,7 +226,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the median rate.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return The median exchange rate for `token`.
    */
   function medianRate(address token) external view returns (uint256, uint256) {
@@ -222,7 +235,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Gets all elements from the doubly linked list.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getRates(address token)
@@ -235,7 +248,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the number of timestamps.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return The number of oracle report timestamps for `token`.
    */
   function numTimestamps(address token) public view returns (uint256) {
@@ -244,7 +257,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the median timestamp.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return The median report timestamp for `token`.
    */
   function medianTimestamp(address token) external view returns (uint256) {
@@ -253,7 +266,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Gets all elements from the doubly linked list.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getTimestamps(address token)
@@ -266,7 +279,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns whether a report exists on token from oracle.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @param oracle The oracle whose report should be checked.
    */
   function reportExists(address token, address oracle) internal view returns (bool) {
@@ -283,8 +296,21 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
+   * @notice Returns the expiry for the token if exists, if not the default.
+   * @param token The address of the token.
+   * @return The report expiry in seconds.
+   */
+  function getTokenReportExpirySeconds(address token) public view returns (uint256) {
+    if (tokenReportExpirySeconds[token] == 0) {
+      return reportExpirySeconds;
+    }
+
+    return tokenReportExpirySeconds[token];
+  }
+
+  /**
    * @notice Removes an oracle value and updates the median.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The address of the token for which the CELO exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
    * However, a > 1 elements reports list should always be maintained

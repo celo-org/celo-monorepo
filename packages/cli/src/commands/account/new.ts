@@ -1,4 +1,5 @@
 import {
+  formatNonAccentedCharacters,
   generateKeys,
   generateMnemonic,
   MnemonicLanguages,
@@ -9,17 +10,17 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
 import * as fs from 'fs-extra'
-import { LocalCommand } from '../../base'
+import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 
 const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'"
 
-export default class NewAccount extends LocalCommand {
+export default class NewAccount extends BaseCommand {
   static description =
     "Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)"
 
   static flags = {
-    ...LocalCommand.flags,
+    ...BaseCommand.flags,
     passphrasePath: flags.string({
       description:
         'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet address.',
@@ -53,7 +54,7 @@ export default class NewAccount extends LocalCommand {
     }),
     derivationPath: flags.string({
       description:
-        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'/0\"). Use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'/0/\"). Recreating the same account requires knowledge of the mnemonic, passphrase (if any), and the derivation path",
+        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'\"). Use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'\"). Recreating the same account requires knowledge of the mnemonic, passphrase (if any), and the derivation path",
     }),
   }
 
@@ -94,11 +95,14 @@ export default class NewAccount extends LocalCommand {
     throw new Error(`Invalid path: ${file}`)
   }
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(NewAccount)
     let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
     if (mnemonic) {
-      if (!validateMnemonic(mnemonic, NewAccount.languageOptions(res.flags.language!))) {
+      mnemonic = formatNonAccentedCharacters(mnemonic)
+      if (!validateMnemonic(mnemonic)) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }
     } else {
@@ -112,8 +116,8 @@ export default class NewAccount extends LocalCommand {
     const keys = await generateKeys(
       mnemonic,
       passphrase,
-      res.flags.addressIndex,
       res.flags.changeIndex,
+      res.flags.addressIndex,
       undefined,
       derivationPath
     )

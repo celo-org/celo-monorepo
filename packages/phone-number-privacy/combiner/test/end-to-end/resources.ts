@@ -4,11 +4,13 @@ import {
   EncryptionKeySigner,
   ServiceContext,
   WalletKeySigner,
-} from '@celo/contractkit/lib/identity/odis/query'
+} from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { getBlindedPhoneNumber } from '../../../common/test/utils'
+import { getBlindedPhoneNumber } from '../../../common/src/test/utils'
+
+require('dotenv').config()
 
 /**
  * CONSTS
@@ -27,7 +29,7 @@ export const PRIVATE_KEY_NO_QUOTA =
 export const ACCOUNT_ADDRESS_NO_QUOTA = privateKeyToAddress(PRIVATE_KEY_NO_QUOTA)
 
 export const PHONE_NUMBER = '+14155550123'
-export const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
+export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 export const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 
 export const SERVICE_CONTEXT: ServiceContext = {
