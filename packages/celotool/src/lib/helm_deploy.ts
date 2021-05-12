@@ -1100,11 +1100,7 @@ export async function getGenesis(celoEnv: string, reset: boolean, useMyCelo: boo
     console.debug(`Genesis file not found in GCP. Creating a new one`)
   }
   if (genesis === '' || reset === true) {
-    if (useMyCelo) {
-      genesis = await generateMyCeloGenesis()
-    } else {
-      genesis = generateGenesisFromEnv()
-    }
+    genesis = useMyCelo ? await generateMyCeloGenesis() : generateGenesisFromEnv()
   }
   // Upload the new genesis file to gcp
   if (!isCelotoolHelmDryRun()) {
