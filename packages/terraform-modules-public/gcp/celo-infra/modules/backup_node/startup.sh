@@ -180,6 +180,8 @@ then
   echo "stopping geth to untar chaindata" | logger
   systemctl stop geth.service
   sleep 3
+  echo "Deleting old chaindata" | logger
+  rm -rf /root/.celo/celo/chaindata/*
   echo "untarring chaindata" | logger
   tar zxvf /root/.celo/celo/restore/chaindata.tgz --directory /root/.celo/celo
   echo "removing chaindata tarball" | logger
@@ -241,13 +243,7 @@ apt install -y google-fluentd
 apt install -y google-fluentd-catch-all-config-structured
 systemctl restart google-fluentd
 
-# ---- Setup swap
-echo "Setting up swapfile" | logger
-fallocate -l 1G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-swapon -s
+
 
 # ---- Set Up Persistent Disk ----
 
@@ -277,6 +273,14 @@ mkdir -p $DATA_DIR
 DISK_UUID=$(blkid $DISK_PATH | cut -d '"' -f2)
 echo "UUID=$DISK_UUID     $DATA_DIR   auto    discard,defaults    0    0" >> /etc/fstab
 mount $DATA_DIR
+
+# ---- Setup swap
+echo "Setting up swapfile" | logger
+fallocate -l 4G /root/.celo/swapfile
+chmod 600 /root/.celo/swapfile
+mkswap /root/.celo/swapfile
+swapon /root/.celo/swapfile
+swapon -s
 
 # Remove existing chain data
 [[ ${reset_geth_data} == "true" ]] && rm -rf $DATA_DIR/geth
@@ -374,7 +378,7 @@ ExecStart=/usr/bin/docker run \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
       --light.serve 0 \\
   "
-ExecStop=/usr/bin/docker stop -t 60 %N
+ExecStop=/usr/bin/docker stop -t 300 %N
 
 [Install]
 WantedBy=default.target
