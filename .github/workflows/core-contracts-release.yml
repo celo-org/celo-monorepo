@@ -21,26 +21,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node 10
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
           node-version: '10'
 
       - name: yarn
-        run: yarn
+        run: |
+          npm install --global yarn
+          yarn
 
       - name: Build required packages
-        # this is a bit grsoss
         run: yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local
 
       - name: Verify previous release
         run: yarn --cwd packages/protocol run verify-deployed -b celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
 
       - name: Verify version compatibility
-        run: echo "Verify version compatibility"
+        run: |
+          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION}}-1)).${{ env.NETWORK }}
+          NEW_BRANCH=alexbharley/github-actions-deployment
+          yarn --cwd packages/protocol run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json;
 
       - name: Make release
         run: echo "Make release"
