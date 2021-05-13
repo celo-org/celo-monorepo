@@ -108,7 +108,7 @@
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
     "merkle-patricia-tree": "4.0.0",
-    "nodemailer": "^4.6.8",
+    "nodemailer": "^6.4.16",
     "targz": "^1.0.1",
     "tmp": "^0.1.0",
     "truffle-typings": "^1.0.6",
