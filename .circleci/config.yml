@@ -842,9 +842,6 @@ workflows:
       - transactions-uri-tests:
           requires:
             - contractkit-test
-      - pre-protocol-test-release:
-          requires:
-            - lint-checks
       - protocol-test-release:
           requires:
             - lint-checks
