@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source ./scripts/bash/utils.sh
 source ./scripts/bash/release-lib.sh
 
 # Generates a local network of a target git ref
@@ -25,13 +24,9 @@ done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-build_tag $BRANCH $LOG_FILE
-
-# populate build/contracts for devchain truffle migrate 
-mv $BUILD_DIR build/contracts
+checkout_tag $BRANCH $LOG_FILE
 
 echo "- Create local network"
-yarn devchain generate-tar "$BUILD_DIR/devchain.tar.gz" $GRANTS_FLAG >> $LOG_FILE
+yarn devchain generate-tar "build/$BRANCH/devchain.tar.gz" $GRANTS_FLAG >> $LOG_FILE
 
-# restore BUILD_DIR contents
-mv build/contracts $BUILD_DIR 
+checkout_tag - $LOG_FILE
