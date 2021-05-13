@@ -21,7 +21,14 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud:v3
+    - image: gcr.io/$GOOGLE_PROJECT_ID/circleci:0.0.1
+      auth:
+        # _json_key is not a username, it looks like it is a hack which lets circleci know that the corresponding
+        # `password` is actually a json encoded key. _json_key is used when authenticating with a gcloud
+        # service account, because service accounts require only a json key file to authenticate.
+        # This is badly documented here - https://circleci.com/docs/2.0/google-auth/#creating-and-storing-a-service-account
+        username: _json_key
+        password: $GCLOUD_SERVICE_KEY
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
