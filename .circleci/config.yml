@@ -67,6 +67,9 @@ commands:
               # Dependencies have changed, create beacon file used by the install and check licenses steps
               touch ~/.tmp/yarn_deps_have_changed
             fi
+      - run:
+          name: Add github.com to known hosts
+          command: ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - run:
           name: Install dependencies
@@ -114,6 +117,7 @@ commands:
           key: node_modules-<< pipeline.parameters.node-modules-cache-version >>-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
+    
 
 jobs:
   install_dependencies:
@@ -227,68 +231,23 @@ jobs:
           name: Run Tests
           command: yarn run lerna --scope '@celo/wallet-*' run test
 
-  # Split from the original script. The original script was assuming not big changes in dependencies.
-  # As that's a possibility, we require to install the old and re-install the new one, and circle
-  # crashes on the second re-install.
-  # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
-  # other script
-  pre-protocol-test-release:
-    <<: *defaults
-    docker:
-      # We override the default docker image here because this job builds the
-      # previous release and requires node 10 rather than node 12 to build
-      # properly.
-      - image: celohq/node10-gcloud:v3
-    resource_class: large
-    environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-      - run:
-          name: Opcode tests
-          command: yarn --cwd packages/protocol check-opcodes
-      - run:
-          name: Generate devchain of previous release
-          command: |
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against $RELEASE_TAG"
-            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
-      - persist_to_workspace:
-          root: .
-          paths:
-            - 'packages/protocol/.tmp/released_chain/*'
-
   protocol-test-release:
     <<: *defaults
     resource_class: large
     environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
+      RELEASE_TAG: celo-core-contracts-v3.mainnet
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+          command: ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Copy DevChain and Build generated from released tag
-          command: |
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+          name: Generate devchain of previous release
+          command: yarn --cwd packages/protocol test:generate-devchain -b $RELEASE_TAG -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
       - run:
           name: Test against current release
-          command: |
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against $RELEASE_TAG"
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d packages/protocol/$BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+          command: yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -l /dev/stdout
 
   protocol-test-release-snapshots:
     <<: *defaults
@@ -326,6 +285,9 @@ jobs:
       - run:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
+      - run:
+          name: Opcode tests
+          command: yarn --cwd packages/protocol check-opcodes
 
   protocol-test-compatibility:
     <<: *defaults
@@ -886,7 +848,6 @@ workflows:
       - protocol-test-release:
           requires:
             - lint-checks
-            - pre-protocol-test-release
       - protocol-test-release-snapshots:
           requires:
             - lint-checks

@@ -10,24 +10,20 @@ source ./scripts/bash/utils.sh
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
-DEVCHAIN_DIR=""
-RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
 
 while getopts 'b:l:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
-    d) DEVCHAIN_DIR="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
-[ -z "$DEVCHAIN_DIR" ] && echo "Need to set the devchain build dir via the -d flag" && exit 1;
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar $DEVCHAIN_DIR/devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar "build/$BRANCH/devchain.tar.gz" >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
