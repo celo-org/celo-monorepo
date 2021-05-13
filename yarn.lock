@@ -1426,9 +1426,9 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/ganache-core@git+https://github.com/celo-org/ganache-core.git#piersy/node12_compatibility", ganache-core@^2.6.0, "ganache-core@git+https://github.com/celo-org/ganache-core.git#piersy/node12_compatibility":
+"@celo/ganache-core@git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0", ganache-core@^2.6.0, "ganache-core@git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0":
   version "2.10.2"
-  resolved "git+https://github.com/celo-org/ganache-core.git#a8a73a585bf07d5116494908181788de0aa448b4"
+  resolved "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0"
   dependencies:
     "@celo/utils" "0.1.17"
     abstract-leveldown "3.0.0"
