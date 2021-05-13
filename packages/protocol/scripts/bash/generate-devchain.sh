@@ -13,7 +13,7 @@ BRANCH=""
 LOG_FILE="/dev/null"
 GRANTS_FLAG=""
 
-while getopts ':b:rl:d:g:' flag; do
+while getopts 'b:l:g:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;

@@ -12,7 +12,7 @@ source ./scripts/bash/utils.sh
 BRANCH=""
 LOG_FILE="/dev/null"
 
-while getopts 'b:l:d:' flag; do
+while getopts 'b:l:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
