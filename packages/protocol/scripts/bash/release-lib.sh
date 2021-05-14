@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 
-# USAGE: checkout_tag <branch> <log file>
+# USAGE: checkout_tag <branch> <log file> <?directory>
 # This function:
-# 1. checks out the given branch's contracts
+# 1. checks out the given branch's <directory=contracts>
 # piping output of any commands to the specified log file.
 function checkout_tag() {
   local BRANCH="$1"
   local LOG_FILE="$2"
+  local DIRECTORY="$3"
 
-  echo " - Checkout contracts source code at $BRANCH"
-  [ -d contracts ] && rm -r contracts
-  git checkout $BRANCH -- contracts >> $LOG_FILE
+  [ -z "$DIRECTORY" ] && $DIRECTORY="contracts" ;
+
+  echo " - Checkout $DIRECTORY source code at $BRANCH"
+  [ -d $DIRECTORY ] && rm -r $DIRECTORY
+  git checkout $BRANCH -- $DIRECTORY >> $LOG_FILE
 }
 
 # USAGE: build_tag <branch> <log file>

@@ -24,9 +24,15 @@ done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-checkout_tag $BRANCH $LOG_FILE
+CURR_BRANCH=`git symbolic-ref -q HEAD --short`
+
+checkout_tag $BRANCH $LOG_FILE contracts
+checkout_tag $BRANCH $LOG_FILE migrations
+# build migrations
+yarn build:ts
 
 echo "- Create local network"
 yarn devchain generate-tar "build/$BRANCH/devchain.tar.gz" $GRANTS_FLAG >> $LOG_FILE
 
-checkout_tag - $LOG_FILE
+checkout_tag $CURR_BRANCH $LOG_FILE contracts
+checkout_tag $CURR_BRANCH $LOG_FILE migrations
