@@ -22,8 +22,12 @@ done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
+DEVCHAIN="releaseData/devchainArchives/$BRANCH.tar.gz"
+
+[ ! -f $DEVCHAIN ] && echo "No devchain archive found at $DEVCHAIN" && exit 1;
+
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar "build/$BRANCH/devchain.tar.gz" >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar $DEVCHAIN >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
