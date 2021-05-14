@@ -878,7 +878,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
         ' '
       )}`,
       true
