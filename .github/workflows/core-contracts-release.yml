@@ -41,8 +41,9 @@ jobs:
 
       - name: Build required packages
         run: |
-          yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local --scope=@celo/contractkit
+          yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local
           yarn lerna run build --scope=@celo/protocol
+          yarn lerna run build --scope=@celo/contractkit
 
       - name: Verify previous release
         run: yarn --cwd packages/protocol run verify-deployed -b celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
