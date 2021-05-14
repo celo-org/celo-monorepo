@@ -517,10 +517,14 @@ function rbacReleaseName(celoEnv: string, prefix: string) {
 
 async function rbacServiceAccountSecretNames(celoEnv: string, prefix: string, replicas: number) {
   const names = [...Array(replicas).keys()].map((i) => `${rbacReleaseName(celoEnv, prefix)}-${i}`)
+  let jsonSecretPath = '"{.items[*].secrets[0][\'name\']}"'
+  if (names.length === 1) {
+    jsonSecretPath = '"{.secrets[0][\'name\']}"'
+  }
   const [tokenName] = await execCmdWithExitOnFailure(
     `kubectl get serviceaccount --namespace=${celoEnv} ${names.join(
       ' '
-    )} -o=jsonpath="{.items[*].secrets[0]['name']}"`
+    )} -o=jsonpath=${jsonSecretPath}`
   )
   const tokenNames = tokenName.trim().split(' ')
   return tokenNames
