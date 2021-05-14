@@ -24,7 +24,7 @@ spec:
             - bash
             - "-c"
             - |
-              node dist/apps/rewards/main.js
+              node packages/apps/rewards/dist/main.js
           env:
           - name: REPLICA_NAME
             valueFrom:

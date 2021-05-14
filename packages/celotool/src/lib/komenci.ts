@@ -197,7 +197,13 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const rewardsRelayerCount = komenciConfig.cLabsRewardsIdentities.length
   const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(
     celoEnv,
+    '',
     onboardingRelayerCount
+  )
+  const kubeRewardsServiceAccountSecretNames = await rbacServiceAccountSecretNames(
+    celoEnv,
+    'rewards-',
+    rewardsRelayerCount
   )
 
   const databaseConfig = getContextDynamicEnvVarValues(contextDatabaseConfigDynamicEnvVars, context)
@@ -291,6 +297,9 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set rewards.relayer.metrics.enabled=true`,
     `--set rewards.relayer.metrics.prometheusPort=9090`,
     `--set rewards.relayer.host=${celoEnv + '-rewards-relayer'}`,
+    `--set kube.rewardsServiceAccountSecretNames='{${kubeRewardsServiceAccountSecretNames.join(
+      ','
+    )}}'`,
   ]
     .concat(
       await komenciIdentityHelmParameters(context, komenciConfig.relayerIdentities, 'relayer')
@@ -471,7 +480,7 @@ function getKomenciAzureIdentityName(keyVaultName: string, address: string) {
 async function installKomenciRBACHelmChart(celoEnv: string, context: string) {
   return installGenericHelmChart(
     celoEnv,
-    rbacReleaseName(celoEnv),
+    rbacReleaseName(celoEnv, ''),
     rbacHelmChartPath,
     rbacHelmParameters(celoEnv, context)
   )
@@ -480,29 +489,34 @@ async function installKomenciRBACHelmChart(celoEnv: string, context: string) {
 async function upgradeKomenciRBACHelmChart(celoEnv: string, context: string) {
   return upgradeGenericHelmChart(
     celoEnv,
-    rbacReleaseName(celoEnv),
+    rbacReleaseName(celoEnv, ''),
     rbacHelmChartPath,
     rbacHelmParameters(celoEnv, context)
   )
 }
 
 function removeKomenciRBACHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(rbacReleaseName(celoEnv), celoEnv)
+  return removeGenericHelmChart(rbacReleaseName(celoEnv, ''), celoEnv)
 }
 
 function rbacHelmParameters(celoEnv: string, context: string) {
   const komenciConfig = getKomenciConfig(context)
   console.info(komenciConfig)
-  const replicas = komenciConfig.relayerIdentities.length
-  return [`--set environment.name=${celoEnv}`, `--set relayer.replicas=${replicas}`]
+  const relayerReplicas = komenciConfig.relayerIdentities.length
+  const rewardsRelayerReplicas = komenciConfig.cLabsRewardsIdentities.length
+  return [
+    `--set environment.name=${celoEnv}`,
+    `--set relayer.replicas=${relayerReplicas}`,
+    `--set rewards.relayer.replicas=${rewardsRelayerReplicas}`,
+  ]
 }
 
-function rbacReleaseName(celoEnv: string) {
-  return `${celoEnv}-komenci-rbac`
+function rbacReleaseName(celoEnv: string, prefix: string) {
+  return `${celoEnv}-komenci-${prefix}rbac`
 }
 
-async function rbacServiceAccountSecretNames(celoEnv: string, replicas: number) {
-  const names = [...Array(replicas).keys()].map((i) => `${rbacReleaseName(celoEnv)}-${i}`)
+async function rbacServiceAccountSecretNames(celoEnv: string, prefix: string, replicas: number) {
+  const names = [...Array(replicas).keys()].map((i) => `${rbacReleaseName(celoEnv, prefix)}-${i}`)
   const [tokenName] = await execCmdWithExitOnFailure(
     `kubectl get serviceaccount --namespace=${celoEnv} ${names.join(
       ' '

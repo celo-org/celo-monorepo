@@ -5,7 +5,7 @@ The name of the deployment
 {{- .Values.environment.name -}}-relayer
 {{- end -}}
 
-{{- define "komenci-rewards-relayer-fullname" -}}
+{{- define "rewards-name" -}}
 {{- .Values.environment.name -}}-rewards-relayer
 {{- end -}}
 
@@ -71,8 +71,22 @@ The name of the azure identity binding for all relayers
 {{- end -}}
 
 {{/*
-The name of the azure identity for all oracles
+The name of the azure identity binding for all rewards relayers
+*/}}
+{{- define "azure-rewards-identity-binding-name" -}}
+{{- with .dot -}}{{ template "rewards-name" . }}{{- end -}}-{{ .index }}-identity-binding
+{{- end -}}
+
+{{/*
+The name of the azure identity for all relayers
 */}}
 {{- define "azure-identity-name" -}}
 {{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity
+{{- end -}}
+
+{{/*
+The name of the azure identity for all rewards relayers
+*/}}
+{{- define "azure-rewards-identity-name" -}}
+{{- with .dot -}}{{ template "rewards-name" . }}{{- end -}}-{{ .index }}-identity
 {{- end -}}
