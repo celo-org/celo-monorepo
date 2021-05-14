@@ -41,7 +41,7 @@ jobs:
 
       - name: Build required packages
         run: |
-          yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local --scope=@celo-contractkit
+          yarn lerna run build --scope=@celo/base --scope=@celo/utils --@celo/dev-utils --scope=@celo/connect --scope=@celo/wallet-base --scope=@celo/wallet-local --scope=@celo/contractkit
           yarn lerna run build --scope=@celo/protocol
 
       - name: Verify previous release
