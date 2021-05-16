@@ -16,7 +16,7 @@ git clone https://github.com/celo-org/celo-monorepo.git
 
 See [this page](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md#building-celo-monorepo) for instructions on how to build the monorepo. 
 
-Once those are installed, move into the `contractkit` directory. 
+Once the monorepo is built, move into the `contractkit` directory. 
 
 ```
 cd packages/sdk/contractkit
