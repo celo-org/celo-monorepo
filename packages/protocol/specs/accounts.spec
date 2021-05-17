@@ -57,7 +57,7 @@ invariant address_signer_if_authroizedby_new(address x, address d, bytes32 role)
 /**
  * Given account x, address d a current signer, then d can not be a current signer of account y
  */
-rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, method f) { 
+rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, method f) filtered { f -> !f.isView } { 
 	// x and y are accounts d is authorizedby
 	require x != 0 && y != 0 && d != 0 && x != d && y != x && y != d;  
 	// x is not registered or authorized
@@ -109,7 +109,7 @@ rule address_can_authorize_two_address(address x, address d1, address d2)
 /**
  * Either the account's authorized signer doesn't change, or it gets set from nothing.
  */
-rule authorizedBy_can_not_be_removed(method f, address signer) {
+rule authorizedBy_can_not_be_removed(method f, address signer) filtered { f -> !f.isView } {
 	address _account = _getAuthorizedBy(signer); 
 	callArbitrary(f);
 	address account_ = _getAuthorizedBy(signer); 
@@ -136,9 +136,11 @@ rule initializableOnlyOnce {
 /**
  * Only `createAccount` should be creating an account
  */
-rule createsAccount(method f, address a) {
+rule createsAccount(method f, address a) filtered { f ->
+	!f.isView
+		&& f.selector != createAccount().selector
+} {
 	bool _isAccount = isAccount(a);
-	require f.selector != createAccount().selector;
 	callArbitrary(f);
 	bool isAccount_ = isAccount(a);
 
@@ -154,19 +156,24 @@ invariant legacyRolesAreNotUsedInNewRoles(address account, bytes32 role)
 /**
  * Once we set d as being authorized by an account x (some non-zero address),
  * This can never be overridden.
+ * Note: this cannot be an invariant because in the initial state no authorizedBy is set.
  */
 rule onceSetAuthorizedByIsNeverOverridden(address d, address x, method f) {
-	require x != 0 => _getAuthorizedBy(d) == x;
+       require x != 0 => _getAuthorizedBy(d) == x;
 
-	callArbitrary(f);
+       callArbitrary(f);
 
-	assert x != 0 => _getAuthorizedBy(d) == x, "for an account x, if was previously the authorizer of d, should still be authorizer of d";
+       assert x != 0 => _getAuthorizedBy(d) == x, "for an account x, if was previously the authorizer of d, should still be authorizer of d";
 }
 
-rule viewFunctionsDoNotRevert(method f)	filtered { f -> f.isView } {
+/**
+ * view functions in general should not revert.
+ * Some exceptions and more refined revert-characteristics are provided.
+ */
+rule viewFunctionsDoNotRevert(method f) filtered { f -> f.isView } {
 	env e;
-	require e.msg.value == 0;
-	calldataarg arg;
+	require e.msg.value == 0; // view functions are not payable
+	
 	// some functions we ignore, and why:
 	require f.selector != hasAuthorizedSigner(address,string).selector; // Calldatasize may not match
 	require f.selector != batchGetMetadataURL(address[]).selector; // Calldatasize may not match
@@ -192,30 +199,51 @@ rule viewFunctionsDoNotRevert(method f)	filtered { f -> f.isView } {
 	} else if (f.selector == voteSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
-		require isSigner(authBy, a, _getVoteRole()) || isAccount(a);
+		requireInvariant authorizedByIsNeverReflexive(a);
+		require (authBy != 0 && isSigner(authBy, a, _getVoteRole())) || (authBy == 0 && isAccount(a));
 		voteSignerToAccount@withrevert(e,a);
 	} else if (f.selector == validatorSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
-		require isSigner(authBy, a, _getValidatorRole()) || isAccount(a);
+		requireInvariant authorizedByIsNeverReflexive(a);
+		require (authBy != 0 && isSigner(authBy, a, _getValidatorRole())) || (authBy == 0 && isAccount(a));
 		validatorSignerToAccount@withrevert(e,a);
 	} else if (f.selector == attestationSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
-		require isSigner(authBy, a, _getAttestationRole()) || isAccount(a);
+		requireInvariant authorizedByIsNeverReflexive(a);
+		require (authBy != 0 && isSigner(authBy, a, _getAttestationRole())) || (authBy == 0 && isAccount(a));
 		attestationSignerToAccount@withrevert(e,a);
 	} else {
+		calldataarg arg;
 		f@withrevert(e, arg);
 	}
+
 	assert !lastReverted, "View functions should not revert";
 }
 
+/**
+ * the authorizedBy should never be reflexive, i.e. an account cannot be its own signer, or a signer cannot be authroize itself.
+ */
+invariant authorizedByIsNeverReflexive(address a)
+	a != 0 => _getAuthorizedBy(a) != a
+
+/**
+ * If we set signerAuthroization to be completed, it means the signer is marked as authorizedBy the account.
+ * The other direction may not be correct because authorizedBy is persistent while signer authorizations can be removed. 
+ */
 invariant mustHaveAuthorizedByIfCompletedSignerAuthorization(address account, bytes32 role, address signer) 
 	account != 0 => (isCompletedSignerAuthorization(account,role,signer) => _getAuthorizedBy(signer) == account)
 
+/**
+ * Once signer authorization is completed, it must mean authorizedBy was also set.
+ */
 invariant completedSignerAuthMeansAuthByIsSet(address account, bytes32 role, address signer)
 	account != 0 => (isCompletedSignerAuthorization(account, role, signer) => _getAuthorizedBy(signer) == account)
 
+/**
+ * For signerAuthorization, a signer can only appear as a signer of a single account.
+ */
 invariant noMultipleAccountsPerSignerInARole(address account, address account2, bytes32 role, bytes32 role2, address signer)
 	account != 0 && account2 != 0
 		=> (isCompletedSignerAuthorization(account,role,signer) && isCompletedSignerAuthorization(account2,role2,signer) 
@@ -225,24 +253,35 @@ invariant noMultipleAccountsPerSignerInARole(address account, address account2, 
 		requireInvariant completedSignerAuthMeansAuthByIsSet(account,role,signer);
 		requireInvariant completedSignerAuthMeansAuthByIsSet(account2,role2,signer);
 	}
-
 }
 
-rule cantGoFromNoAuthorizationToCompletedInOneStepUnlessRoleIsLegacy(method f) {
+/**
+ * Only legacy roles allow to jump from no signer authorization being started, to being completed, in one single invocation.
+ */
+rule cantGoFromNoAuthorizationToCompletedInOneStepUnlessRoleIsLegacy(method f) filtered { f -> 
+	!f.isView 
+		// the authorizeSignerWithSignature allows the signer to provide a signature to the account, so we exclude this option
+		&& f.selector != authorizeSignerWithSignature(address,bytes32,uint8,bytes32,bytes32).selector
+} {
 	address account;
 	bytes32 role;
 	address signer;
-	require !isLegacyRole(role);
-	require !isStartedSignerAuthorization(account,role,signer) && !isCompletedSignerAuthorization(account,role,signer);
+	require !isStartedSignerAuthorization(account, role, signer) && !isCompletedSignerAuthorization(account, role, signer);
 
-	// the authorizeSignerWithSignature allows the signer to provide a signature to the account, so we exclude this option
-	require f.selector != authorizeSignerWithSignature(address,bytes32,uint8,bytes32,bytes32).selector;
 	callArbitrary(f);
 
-	assert !isCompletedSignerAuthorization(account,role,signer);
+	assert isCompletedSignerAuthorization(account, role, signer) => isLegacyRole(role);
 }
 
-rule cantMakeASignerForNonLegacyRoleWithoutApprovalOfSigner(method f) {
+/**
+ * One cannot complete the signer authorization process unless the signer itself signs on the transaction,
+ * or the signer provided a signature.
+ */
+rule cantMakeASignerForNonLegacyRoleWithoutApprovalOfSigner(method f) filtered { f -> 
+	!f.isView 
+		// the authorizeSignerWithSignature allows the signer to provide a signature to the account, so we exclude this option
+		&& f.selector != authorizeSignerWithSignature(address,bytes32,uint8,bytes32,bytes32).selector	
+} {
 	address account;
 	bytes32 role;
 	
@@ -254,8 +293,6 @@ rule cantMakeASignerForNonLegacyRoleWithoutApprovalOfSigner(method f) {
 	// not completed signer auth yet (but may have started)
 	require !isCompletedSignerAuthorization(account,role,signer);
 
-	// the authorizeSignerWithSignature allows the signer to provide a signature to the account, so we exclude this option
-	require f.selector != authorizeSignerWithSignature(address,bytes32,uint8,bytes32,bytes32).selector;
 	env e;
 	calldataarg arg;
 	f(e, arg);
@@ -263,6 +300,47 @@ rule cantMakeASignerForNonLegacyRoleWithoutApprovalOfSigner(method f) {
 	assert isCompletedSignerAuthorization(account,role,signer) => e.msg.sender == signer;
 }
 
+/**
+ * One cannot start a signer authorization on behalf of another account.
+ */
+rule cannotStartSignerAuthorizationsForOtherAccounts(method f) filtered { f -> !f.isView } {
+	address account;
+	bytes32 role;
+	address signer;
+	require !isStartedSignerAuthorization(account, role, signer);
+
+	env e;
+	calldataarg arg;
+	f(e,arg);
+
+	assert isStartedSignerAuthorization(account, role, signer) => e.msg.sender == account;
+}
+
+/**
+ * The only way authorizedBy should be set is using a signature [TODO: or by the signer being the caller]
+ */
+rule cannotSetAuthorizedByWithoutSignatures(method f) filtered { f -> 
+	!f.isView 
+		&& f.selector != authorizeSignerWithSignature(address,bytes32,uint8,bytes32,bytes32).selector
+		&& f.selector != authorizeAttestationSigner(address,uint8,bytes32,bytes32).selector
+		&& f.selector != authorizeValidatorSigner(address,uint8,bytes32,bytes32).selector
+		&& f.selector != authorizeValidatorSignerWithKeys(address,uint8,bytes32,bytes32,bytes,bytes,bytes).selector
+		&& f.selector != authorizeValidatorSignerWithPublicKey(address,uint8,bytes32,bytes32,bytes).selector
+		&& f.selector != authorizeVoteSigner(address,uint8,bytes32,bytes32).selector
+} {
+	address d;
+	require _getAuthorizedBy(d) == 0;
+
+	env e;
+	calldataarg arg;
+	f(e, arg);
+
+	assert _getAuthorizedBy(d) == 0 || e.msg.sender == d;
+} 
+
+/**
+ * A utility for shortening calls to arbitrary functions in which we do not care about the environment.
+ */
 function callArbitrary(method f) {
 	env e;
 	calldataarg arg;
