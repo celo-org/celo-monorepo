@@ -48,4 +48,14 @@ contract AccountsHarness is Accounts {
   {
     return signerAuthorizations[account][role][signer].started;
   }
+
+  function _getValidatorRole() public view returns (bytes32) {
+    return ValidatorSigner;
+  }
+  function _getVoteRole() public view returns (bytes32) {
+    return VoteSigner;
+  }
+  function _getAttestationRole() public view returns (bytes32) {
+    return AttestationSigner;
+  }
 }
