@@ -99,7 +99,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     // Set up the required mocks that will allow verification to work with ganache.
     registry = await getDeployedProxiedContract('Registry', artifacts)
     random = await Random.new()
-    accounts = await Accounts.new()
+    accounts = await Accounts.new(true)
     await accounts.initialize(registry.address)
     // Take ownership of the registry contract to point it to the mocks.
     await assumeOwnership(['Registry'], _accounts[0])

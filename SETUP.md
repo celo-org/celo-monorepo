@@ -56,11 +56,9 @@ Once `nvm` is successfully installed, restart the terminal and run the following
 
 ```bash
 # restart the terminal after installing nvm
-nvm install 8
-nvm install 10
-nvm alias default 10
+nvm install 12
+nvm alias default 12
 ```
-*Note: attestation-proxy, phone-number-privacy and faucet packages explicitly define 'node 10' in the engines section of their package.json, this means we need to use node 10 for building the project.* 
 
 ### MacOS
 

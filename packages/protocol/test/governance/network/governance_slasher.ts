@@ -34,7 +34,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
   const validator = accounts[1]
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
