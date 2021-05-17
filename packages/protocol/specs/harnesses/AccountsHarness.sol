@@ -3,6 +3,8 @@ pragma solidity ^0.5.13;
 import "contracts/common/Accounts.sol";
 
 contract AccountsHarness is Accounts {
+  constructor(bool test) public Accounts(test) {}
+
   function _getAuthorizedBy(address signer) public view returns (address) {
     return authorizedBy[signer];
   }
