@@ -5,8 +5,6 @@ import { entries, range } from 'lodash'
 import os from 'os'
 import path from 'path'
 import sleep from 'sleep-promise'
-import { generateGenesisFromEnv } from 'src/lib/generate_utils'
-import { stringToBoolean } from 'src/lib/utils'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import {
   execCmd,
@@ -24,6 +22,7 @@ import {
   monorepoRoot,
 } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
+import { generateGenesisFromEnv } from './generate_utils'
 import { buildGethAll, checkoutGethRepo, retrieveBootnodeIPAddress } from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
@@ -34,6 +33,7 @@ import {
   getProxyName,
   uploadGenesisBlockToGoogleStorage,
 } from './testnet-utils'
+import { stringToBoolean } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
