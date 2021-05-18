@@ -108,7 +108,7 @@ variable proxy_addresses {
 variable proxy_max_peers {
   type        = number
   description = "Max number of peers to connect with"
-  default     = 250
+  default     = 125
   #note this does not behave as expected.  120 means we get 20 (unelected).
 }
 
