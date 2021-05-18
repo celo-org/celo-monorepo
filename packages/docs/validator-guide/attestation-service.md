@@ -61,13 +61,21 @@ Next, adjust the Geo settings to serve phone numbers globally under [https://www
 
 To actually be able to send SMS, you need to create a messaging service under [Programmable SMS > SMS](https://www.twilio.com/console/sms/services). Provide the resulting `SID` in the `TWILIO_MESSAGING_SERVICE_SID` configuration variable.
 
-Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. It is strongly recommended that you purchase at least a US (`+1`) number which seem to provide high delivery success rates.  If you purchase numbers in other locales, Twilio will intelligently select the best number to send each SMS.
+Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. It is strongly recommended that you purchase at least a [US toll-free](https://www.twilio.com/console/phone-numbers/search/buy/results?Country=US&searchType=number&searchTerm=&align=left&capability%5B%5D=sms&type%5B%5D=tollfree&requirement%5B%5D=any&x-target-region=us1) (`+1`) number which seem to provide high delivery success rates.  If you purchase numbers in other locales, Twilio will intelligently select the best number to send each SMS.
+
+{% hint style="warning" %}
+Note that US non toll-free numbers are required to register to use [A2P 10DLC as outlined here](https://support.twilio.com/hc/en-us/articles/1260801864489-How-do-I-register-to-use-A2P-10DLC-messaging-).
+{% endhint %}
 
 ### Nexmo
 
 After signing up for [Nexmo](https://dashboard.nexmo.com/sign-up), click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you use a credit or debit card (as opposed to other forms of payment) as you will then be able to enable `Auto reload`. You should also enable `Low balance alerts`. Both of these will help avoid failing to deliver SMS when your funds are exhausted. It appears that these options may not be immediately available for all new accounts due to fraud checks: try sending a few SMS, checking back after a few days, or raising a support ticket.
 
-Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS. Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
+Create a [toll-free US number](https://dashboard.nexmo.com/buy-numbers) and ensure that is enabled for SMS. Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
+
+{% hint style="warning" %}
+Note that US non toll-free numbers are required to register to use [A2P 10DLC as outlined here](https://help.nexmo.com/hc/en-us/articles/360050098252-United-States-A2P-10DLC-Campaign-Use-Cases) and will incur additional charges for campaign registration.
+{% endhint %}
 
 Under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`.
 
