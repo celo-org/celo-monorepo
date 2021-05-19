@@ -1608,43 +1608,94 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#unapprove()', () => {
+  describe('#unapprove()', () => {
     const proposalId = 1
     const index = 0
-    beforeEach(async () => {
-      await governance.propose(
-        [transactionSuccess1.value],
-        [transactionSuccess1.destination],
-        // @ts-ignore bytes type
-        transactionSuccess1.data,
-        [transactionSuccess1.data.length],
-        descriptionUrl,
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: minDeposit }
-      )
-      await timeTravel(dequeueFrequency, web3)
-      await governance.approve(proposalId, index)
+    const value = VoteValue.Yes
+
+    describe('when the proposal is approved', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.unapprove.call(proposalId, index)
+        assert.isTrue(success)
+      })
+
+      it('should set the proposal to unapproved', async () => {
+        await governance.unapprove(proposalId, index)
+        assert.isFalse(await governance.isApproved(proposalId))
+      })
+
+      it('should emit the ProposalUnapproved event', async () => {
+        const resp = await governance.unapprove(proposalId, index)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalUnapproved',
+          args: {
+            proposalId: new BigNumber(proposalId),
+          },
+        })
+      })
     })
 
-    it('should return true', async () => {
-      const success = await governance.unapprove.call(proposalId, index)
-      assert.isTrue(success)
-    })
+    describe('when the proposal can execute successfully', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await timeTravel(approvalStageDuration, web3)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+        await governance.vote(proposalId, index, value)
+        await timeTravel(referendumStageDuration, web3)
+      })
 
-    it('should set the proposal to unapproved', async () => {
-      await governance.unapprove(proposalId, index)
-      assert.isFalse(await governance.isApproved(proposalId))
-    })
+      it('should return true', async () => {
+        const success = await governance.unapprove.call(proposalId, index)
+        assert.isTrue(success)
+      })
 
-    it('should emit the ProposalUnapproved event', async () => {
-      const resp = await governance.unapprove(proposalId, index)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'ProposalUnapproved',
-        args: {
-          proposalId: new BigNumber(proposalId),
-        },
+      it('should set the proposal to unapproved', async () => {
+        await governance.unapprove(proposalId, index)
+        assert.isFalse(await governance.isApproved(proposalId))
+      })
+
+      it('should emit the ProposalUnapproved event', async () => {
+        const resp = await governance.unapprove(proposalId, index)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalUnapproved',
+          args: {
+            proposalId: new BigNumber(proposalId),
+          },
+        })
+      })
+
+      it('should revert when proposal is unapproved', async () => {
+        await assertRevert(governance.execute(proposalId, index))
       })
     })
   })

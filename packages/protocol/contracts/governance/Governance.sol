@@ -637,7 +637,7 @@ contract Governance is
     }
 
     require(proposal.isApproved(), "Proposal is not approved");
-    require(stage < Proposals.Stage.Execution, "Proposal not in Referendum stage");
+    require(stage <= Proposals.Stage.Execution, "Cannot unapprove the proposal");
     proposal.approved = false;
     emit ProposalUnapproved(proposalId);
     return true;
@@ -729,9 +729,9 @@ contract Governance is
       proposalId,
       index
     );
-    bool notExpired = proposal.exists();
-    bool isApproved = proposal.isApproved();
-    if (notExpired && isApproved) {
+    require(proposal.isApproved(), "Proposal not approved");
+    bool executable = proposal.exists();
+    if (executable) {
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
         "Proposal not in execution stage or not passing"
@@ -740,7 +740,7 @@ contract Governance is
       emit ProposalExecuted(proposalId);
       deleteDequeuedProposal(proposal, proposalId, index);
     }
-    return notExpired && isApproved;
+    return executable && isApproved;
   }
 
   /**
