@@ -6,7 +6,7 @@ description: >-
 
 # Programmatic Setup
 
-### **Summary**
+## **Summary**
 
 For dApp Developers interested in using MetaMask with Celo, we encourage doing the following 4 things, which are described in detail in the below sections.
 
@@ -15,7 +15,7 @@ For dApp Developers interested in using MetaMask with Celo, we encourage doing t
 3. Explicitly choose the gas price
 4. Handle cases where MetaMask is connected to a different network
 
-### **Adding a Celo Network to MetaMask**
+## **Adding a Celo Network to MetaMask**
 
 To add a Celo Network to your dApp, you can use MetaMask's RPC API's `wallet_addEthereumChain` method. \([See documentation](https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain)\).
 
@@ -30,18 +30,22 @@ Here is a JavaScript snippet you can use:
 
 Where it says `INSERT_NETWORK_PARAMS_HERE`, please replace with any of the following constants, depending on which network you'd like to connect to.
 
-```jsx
-  // For Celo Mainnet:
-  const CELO_PARAMS = {
+{% tabs %}
+{% tab title="Celo Mainnet" %}
+```javascript
+const CELO_PARAMS = {
       chainId: '0xa4ec',
       chainName: 'Celo',
       nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 }, rpcUrls: ['https://forno.celo.org'],
       blockExplorerUrls: ['https://explorer.celo.org/'],
       iconUrls: ['future'],
-    };  
+ };  
+```
+{% endtab %}
 
-  // For Celo Alfajores:
-  const ALFAJORES_PARAMS = {
+{% tab title="Alfajores Testnet" %}
+```javascript
+const ALFAJORES_PARAMS = {
       chainId: '0xaef3',
       chainName: 'Alfajores Testnet',
       nativeCurrency: { name: "Alfajores Celo", symbol: 'A-CELO', decimals: 18 },
@@ -49,8 +53,11 @@ Where it says `INSERT_NETWORK_PARAMS_HERE`, please replace with any of the follo
       blockExplorerUrls: ['https://alfajores-blockscout.celo-testnet.org/'],
       iconUrls: ['future'],
     };  
+```
+{% endtab %}
 
-  // For Celo Baklava:
+{% tab title="Baklava Testnet" %}
+```javascript
   const BAKLAVA_PARAMS = {
       chainId: '0xf370',
       chainName: 'Baklava Testnet',
@@ -60,8 +67,10 @@ Where it says `INSERT_NETWORK_PARAMS_HERE`, please replace with any of the follo
       iconUrls: ['future'],
     };
 ```
+{% endtab %}
+{% endtabs %}
 
-### **Adding Tokens \(e.g. cUSD, cEUR\)**
+## **Adding Tokens \(e.g. cUSD, cEUR\)**
 
 To watch an asset on a Celo netowork \(e.g. cUSD, cEUR\) in your dApp, you can use MetaMask's RPC API's `wallet_watchAsset` method. \([See documentation](https://docs.metamask.io/guide/rpc-api.html#wallet-watchasset)\).
 
@@ -86,28 +95,36 @@ Where it says `INSERT_ADDRESS_HERE`, please replace with any of the following co
 
 The following are examples for cUSD and cEUR.
 
-_To double-check that these values are up-to-date, please verify using the `celocli network:contracts` command \(_[_see documentation_](https://docs.celo.org/command-line-interface/commands/network#celocli-network-contracts)_\)._
+{% tabs %}
+{% tab title="Celo Mainnet" %}
+* Token Contract Address for cUSD: `0x765de816845861e75a25fca122bb6898b8b1282a`
+* Token Contract Address for cEUR: `0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73`
+{% endtab %}
 
-* Celo Mainnet
-  * Contract Address for cUSD: `0x765de816845861e75a25fca122bb6898b8b1282a`
-  * Contract Address for cEUR: `0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73`
-* Celo Alfajores
-  * Contract Address for cUSD: `0x874069fa1eb16d44d622f2e0ca25eea172369bc1`
-  * Contract Address for cEUR: `0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f`
-* Celo Baklava
+{% tab title="Alfajores Testnet" %}
+* Token Contract Address for cUSD: `0x874069fa1eb16d44d622f2e0ca25eea172369bc1`
+* Token Contract Address for cEUR: `0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f`
+{% endtab %}
 
-  * Contract Address for cUSD: `0x62492A644A588FD904270BeD06ad52B9abfEA1aE`
-  * Contract Address for cEUR: `0xf9ecE301247aD2CE21894941830A2470f4E774ca`
+{% tab title="Baklava Testnet" %}
+* Token Contract Address for cUSD: `0x62492A644A588FD904270BeD06ad52B9abfEA1aE`
+* Token Contract Address for cEUR: `0xf9ecE301247aD2CE21894941830A2470f4E774ca`
+{% endtab %}
+{% endtabs %}
 
-  Where it says `INSERT_SYMBOL_HERE`, please replace with the correct symbol for the asset you'd like to watch. For Celo Dollars, it's `cUSD` and for Celo Euros, it's `cEUR`.
+{% hint style="info" %}
+To double-check that the above values are up-to-date, please verify using the `celocli network:contracts` command  __\([see documentation](https://docs.celo.org/command-line-interface/commands/network#celocli-network-contracts)\).
+{% endhint %}
 
-### **Explicitly choosing the gas price**
+* Where it says `INSERT_SYMBOL_HERE`, please replace with the correct symbol for the asset you'd like to watch. For Celo Dollars, it's `cUSD` and for Celo Euros, it's `cEUR`.
+
+## **Explicitly choosing the gas price**
 
 See the next page for this information:
 
 {% page-ref page="choosing-the-right-gas-price.md" %}
 
-### **Handling cases where MetaMask is connected to a different network**
+## **Handling cases where MetaMask is connected to a different network**
 
 We strongly suggest that you disable your dApp's functionality when MetaMask is connected to a non-Celo network.
 
