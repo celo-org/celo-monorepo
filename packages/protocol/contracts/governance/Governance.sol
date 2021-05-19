@@ -740,7 +740,7 @@ contract Governance is
       emit ProposalExecuted(proposalId);
       deleteDequeuedProposal(proposal, proposalId, index);
     }
-    return executable && isApproved;
+    return executable;
   }
 
   /**
