@@ -91,7 +91,7 @@ rule address_can_authorize_two_address(address x, address d1, address d2)
 	uint8 v2;
 	bytes32 r2;
 	bytes32 s2;
-	authorizeValidatorSigner(e,d2,v2,r2,s2);  
+	authorizeValidatorSigner(e, d2, v2, r2, s2);  
 
 	// Authorize d1 as a Vote signer (alternative execution path - start from the state where validator authorization started)
 	uint8 v1;
@@ -100,7 +100,7 @@ rule address_can_authorize_two_address(address x, address d1, address d2)
 	authorizeVoteSigner(e, d1, v1, r1, s1) at init;
 	
 	// Even after authorizing d1, the authorization of d2 as a Validation signer should succeed
-	authorizeValidatorSigner(e,d2,v2,r2,s2);  
+	authorizeValidatorSigner(e, d2, v2, r2, s2);  
 		
 	// AuthorizedBy(d1) and AuthorizedBy(d2) should still be x
 	assert _getAuthorizedBy(d1) == x && _getAuthorizedBy(d2) == x, "Authorizedby should both be x";
@@ -195,25 +195,25 @@ rule viewFunctionsDoNotRevert(method f) filtered { f -> f.isView } {
 		// will fail if address is not authorized by anyone, and is not an account.
 		address a;
 		require _getAuthorizedBy(a) != 0 || isAccount(a);
-		signerToAccount@withrevert(e,a);
+		signerToAccount@withrevert(e, a);
 	} else if (f.selector == voteSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
 		requireInvariant authorizedByIsNeverReflexive(a);
 		require (authBy != 0 && isSigner(authBy, a, _getVoteRole())) || (authBy == 0 && isAccount(a));
-		voteSignerToAccount@withrevert(e,a);
+		voteSignerToAccount@withrevert(e, a);
 	} else if (f.selector == validatorSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
 		requireInvariant authorizedByIsNeverReflexive(a);
 		require (authBy != 0 && isSigner(authBy, a, _getValidatorRole())) || (authBy == 0 && isAccount(a));
-		validatorSignerToAccount@withrevert(e,a);
+		validatorSignerToAccount@withrevert(e, a);
 	} else if (f.selector == attestationSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
 		requireInvariant authorizedByIsNeverReflexive(a);
 		require (authBy != 0 && isSigner(authBy, a, _getAttestationRole())) || (authBy == 0 && isAccount(a));
-		attestationSignerToAccount@withrevert(e,a);
+		attestationSignerToAccount@withrevert(e, a);
 	} else {
 		calldataarg arg;
 		f@withrevert(e, arg);
@@ -233,7 +233,7 @@ invariant authorizedByIsNeverReflexive(address a)
  * The other direction may not be correct because authorizedBy is persistent while signer authorizations can be removed. 
  */
 invariant mustHaveAuthorizedByIfCompletedSignerAuthorization(address account, bytes32 role, address signer) 
-	account != 0 => (isCompletedSignerAuthorization(account,role,signer) => _getAuthorizedBy(signer) == account)
+	account != 0 => (isCompletedSignerAuthorization(account, role, signer) => _getAuthorizedBy(signer) == account)
 
 /**
  * Once signer authorization is completed, it must mean authorizedBy was also set.
@@ -246,12 +246,12 @@ invariant completedSignerAuthMeansAuthByIsSet(address account, bytes32 role, add
  */
 invariant noMultipleAccountsPerSignerInARole(address account, address account2, bytes32 role, bytes32 role2, address signer)
 	account != 0 && account2 != 0
-		=> (isCompletedSignerAuthorization(account,role,signer) && isCompletedSignerAuthorization(account2,role2,signer) 
+		=> (isCompletedSignerAuthorization(account, role, signer) && isCompletedSignerAuthorization(account2, role2, signer) 
 			=> account == account2) {
 	
 	preserved {
-		requireInvariant completedSignerAuthMeansAuthByIsSet(account,role,signer);
-		requireInvariant completedSignerAuthMeansAuthByIsSet(account2,role2,signer);
+		requireInvariant completedSignerAuthMeansAuthByIsSet(account, role, signer);
+		requireInvariant completedSignerAuthMeansAuthByIsSet(account2, role2, signer);
 	}
 }
 
@@ -291,13 +291,13 @@ rule cantMakeASignerForNonLegacyRoleWithoutApprovalOfSigner(method f) filtered {
 	address signer;
 
 	// not completed signer auth yet (but may have started)
-	require !isCompletedSignerAuthorization(account,role,signer);
+	require !isCompletedSignerAuthorization(account, role, signer);
 
 	env e;
 	calldataarg arg;
 	f(e, arg);
 
-	assert isCompletedSignerAuthorization(account,role,signer) => e.msg.sender == signer;
+	assert isCompletedSignerAuthorization(account, role, signer) => e.msg.sender == signer;
 }
 
 /**
@@ -344,15 +344,15 @@ rule cannotSetAuthorizedByWithoutSignatures(method f) filtered { f ->
 rule signerAuthorizationChangePrivileges(address a, bytes32 r, address s, method f) filtered { f ->
 	!f.isView 
 } {
-	bool _started = isStartedSignerAuthorization(a,r,s);
-	bool _completed = isCompletedSignerAuthorization(a,r,s);
+	bool _started = isStartedSignerAuthorization(a, r, s);
+	bool _completed = isCompletedSignerAuthorization(a, r, s);
 
 	env e;
 	calldataarg arg;
 	f(e, arg);
 
-	bool started_ = isStartedSignerAuthorization(a,r,s);
-	bool completed_ = isCompletedSignerAuthorization(a,r,s);
+	bool started_ = isStartedSignerAuthorization(a, r, s);
+	bool completed_ = isCompletedSignerAuthorization(a, r, s);
 	assert _started != started_ => e.msg.sender == a, "Only account can start a signer authorization";
 	assert _completed && !completed_ => e.msg.sender == a, "Only account can remove a signer authorization";
 	assert !_completed && completed_ => e.msg.sender == a || e.msg.sender == s, "Only signer or account can complete a signer authorization";
