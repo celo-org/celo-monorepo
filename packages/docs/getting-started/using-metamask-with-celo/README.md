@@ -1,7 +1,7 @@
 # Using MetaMask with Celo
 
 {% hint style="warning" %}
-MetaMask is primarily used for interacting with the Ethereum blockchain, and does not natively support Celo compatibility. As such, we recommend only sophisticated users and developers use it, at your own risk.
+MetaMask is primarily used for interacting with the Ethereum blockchain, and does not natively support Celo compatibility. As such, we recommend only sophisticated users and developers use it, at your own risk. Please check out options for Celo native wallets [here](https://docs.celo.org/getting-started/wallets). 
 {% endhint %}
 
 {% hint style="danger" %}
