@@ -26,17 +26,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: gcr.io/celo-testnet/circleci-node12:1.0.0
-      auth:
-        # _json_key is not a username, it looks like it is a hack which lets
-        # circleci know that the corresponding `password` is actually a json
-        # encoded key. _json_key is used when authenticating with a gcloud
-        # service account, because service accounts require only a json key
-        # file to authenticate. This is badly documented here -
-        # https://circleci.com/docs/2.0/google-auth/#creating-and-storing-a-service-account
-        username: _json_key
-        #This is an env variable configured through the project web-ui
-        password: $GCLOUD_SERVICE_KEY 
+    - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -744,7 +734,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -757,7 +747,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -770,7 +760,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -786,7 +776,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
