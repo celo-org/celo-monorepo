@@ -339,6 +339,26 @@ rule cannotSetAuthorizedByWithoutSignatures(method f) filtered { f ->
 } 
 
 /**
+ * Can only change signerAuthorization of your own account: nothing -> started, started&completed -> nothing
+ */
+rule signerAuthorizationChangePrivileges(address a, bytes32 r, address s, method f) filtered { f ->
+	!f.isView 
+} {
+	bool _started = isStartedSignerAuthorization(a,r,s);
+	bool _completed = isCompletedSignerAuthorization(a,r,s);
+
+	env e;
+	calldataarg arg;
+	f(e, arg);
+
+	bool started_ = isStartedSignerAuthorization(a,r,s);
+	bool completed_ = isCompletedSignerAuthorization(a,r,s);
+	assert _started != started_ => e.msg.sender == a, "Only account can start a signer authorization";
+	assert _completed && !completed_ => e.msg.sender == a, "Only account can remove a signer authorization";
+	assert !_completed && completed_ => e.msg.sender == a || e.msg.sender == s, "Only signer or account can complete a signer authorization";
+} 
+
+/**
  * A utility for shortening calls to arbitrary functions in which we do not care about the environment.
  */
 function callArbitrary(method f) {
