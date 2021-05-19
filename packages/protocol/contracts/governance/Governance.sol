@@ -730,7 +730,7 @@ contract Governance is
       index
     );
     require(proposal.isApproved(), "Proposal not approved");
-    bool executable = proposal.exists();
+    bool executable = proposal.exists() && proposal.isApproved();
     if (executable) {
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
