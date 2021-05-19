@@ -1,6 +1,7 @@
 export enum CURRENCY_ENUM {
   GOLD = 'Celo Gold',
   DOLLAR = 'Celo Dollar',
+  EURO = 'Celo Euro',
 }
 
 interface Currency {
@@ -22,11 +23,18 @@ export const CURRENCIES: CurrencyObject = {
     code: 'cUSD',
     displayDecimals: 2,
   },
+  [CURRENCY_ENUM.EURO]: {
+    symbol: '€',
+    code: 'cEUR',
+    displayDecimals: 2,
+  },
 }
 
 export const resolveCurrency = (label: string): CURRENCY_ENUM => {
   if (label && label.toLowerCase().includes('dollar')) {
     return CURRENCY_ENUM.DOLLAR
+  } else if (label && label.toLowerCase().includes('euro')) {
+    return CURRENCY_ENUM.EURO
   } else if (label && label.toLowerCase().includes('gold')) {
     return CURRENCY_ENUM.GOLD
   } else {
@@ -38,9 +46,11 @@ export const resolveCurrency = (label: string): CURRENCY_ENUM => {
 export enum SHORT_CURRENCIES {
   DOLLAR = 'dollar',
   GOLD = 'gold',
+  EURO = 'euro',
 }
 
 export const currencyToShortMap = {
   [CURRENCY_ENUM.DOLLAR]: SHORT_CURRENCIES.DOLLAR,
   [CURRENCY_ENUM.GOLD]: SHORT_CURRENCIES.GOLD,
+  [CURRENCY_ENUM.EURO]: SHORT_CURRENCIES.EURO,
 }

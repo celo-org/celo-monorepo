@@ -2,6 +2,11 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+parameters:
+  # When you need to force a rebuild of the node modules cache then bump this version
+  node-modules-cache-version:
+    type: integer
+    default: 7
 reference:
   workspace: &workspace ~/app
   ## Configurations
@@ -21,7 +26,17 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud:v3
+    - image: gcr.io/celo-testnet/circleci-node12:1.0.0
+      auth:
+        # _json_key is not a username, it looks like it is a hack which lets
+        # circleci know that the corresponding `password` is actually a json
+        # encoded key. _json_key is used when authenticating with a gcloud
+        # service account, because service accounts require only a json key
+        # file to authenticate. This is badly documented here -
+        # https://circleci.com/docs/2.0/google-auth/#creating-and-storing-a-service-account
+        username: _json_key
+        #This is an env variable configured through the project web-ui
+        password: $GCLOUD_SERVICE_KEY 
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -52,7 +67,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-<< pipeline.parameters.node-modules-cache-version >>-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: |
@@ -101,11 +116,12 @@ commands:
           name: Create cached node_modules (if necessary)
           command: |
             if [ ! -e ~/.tmp/node_modules.tgz ]; then
-              tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              # This find command finds all top level node_modules directories, I.E all node modules that are not contained in a node_modules directory.
+              tar -c `find -type d -name node_modules | grep -v "node_modules.*node_modules"` | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-<< pipeline.parameters.node-modules-cache-version >>-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
@@ -228,6 +244,11 @@ jobs:
   # other script
   pre-protocol-test-release:
     <<: *defaults
+    docker:
+      # We override the default docker image here because this job builds the
+      # previous release and requires node 10 rather than node 12 to build
+      # properly.
+      - image: celohq/node10-gcloud:v3
     resource_class: large
     environment:
       RELEASE_TAG: celo-core-contracts-v3.rc0
@@ -238,6 +259,9 @@ jobs:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Opcode tests
+          command: yarn --cwd packages/protocol check-opcodes
       - run:
           name: Generate devchain of previous release
           command: |
@@ -275,6 +299,29 @@ jobs:
             echo "Comparing against $RELEASE_TAG"
             BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
             yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+
+  protocol-test-release-snapshots:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Run check-versions on exhaustive history of releases and compare to snapshots
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            yarn --cwd packages/protocol test:release-snapshots
+            if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
+              git --no-pager diff packages/protocol/releaseData/versionReports
+              echo "There are git differences after generating release version report snapshots"
+              echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
+              exit 1
+            fi
 
   protocol-test-common:
     <<: *defaults
@@ -697,7 +744,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -710,7 +757,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -723,7 +770,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -739,7 +786,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -794,12 +841,12 @@ jobs:
           name: Build and run - Locked Gold
           command: |
             cd packages/protocol
-            certoraRun specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarness.sol --link LockedGoldHarness:goldToken=GoldTokenHarness --verify LockedGoldHarness:specs/lockedGold.spec --settings -assumeUnwindCond
+            certoraRun specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarness.sol --link LockedGoldHarness:goldToken=GoldTokenHarness --verify LockedGoldHarness:specs/lockedGold.spec --settings -assumeUnwindCond --solc_args "['--evm-version', 'istanbul']"
       - run:
           name: Build and run - Accounts
           command: |
             cd packages/protocol
-            certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond
+            certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond --solc_args "['--evm-version', 'istanbul']"
 
   flakey-test-summary:
     <<: *defaults
@@ -850,6 +897,9 @@ workflows:
           requires:
             - lint-checks
             - pre-protocol-test-release
+      - protocol-test-release-snapshots:
+          requires:
+            - lint-checks
       - protocol-test-common:
           requires:
             - lint-checks

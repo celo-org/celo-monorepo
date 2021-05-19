@@ -2,7 +2,7 @@
 
 ## Setup
 
-The app uses [React Native](https://facebook.github.io/react-native/) and a [light node](https://github.com/ethereum/wiki/wiki/Light-client-protocol) running the [celo client](https://github.com/celo-org/celo-blockchain). You will need to install Java 8, the Android SDK, Yarn, and Node 8 to run the app.
+The app uses [React Native](https://facebook.github.io/react-native/) and a [light node](https://github.com/ethereum/wiki/wiki/Light-client-protocol) running the [celo client](https://github.com/celo-org/celo-blockchain). You will need to install Java 8, the Android SDK, Yarn, and Node.js v12.x to run the app.
 
 To do this, follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md).
 

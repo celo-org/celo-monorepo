@@ -54,6 +54,8 @@ spec:
 {{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
+{{ include "common.env-var" (dict "name" "THROTTLE_TTL" "dict" .Values.onboarding.throttle "value_name" "ttl") | indent 10 }}
+{{ include "common.env-var" (dict "name" "THROTTLE_LIMIT" "dict" .Values.onboarding.throttle "value_name" "limit") | indent 10 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 10 }}
 {{ include "common.env-var" (dict "name" "PUBLIC_URL" "dict" .Values.onboarding "value_name" "publicUrl") | indent 10 }}
           readinessProbe:

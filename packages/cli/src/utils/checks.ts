@@ -162,6 +162,12 @@ class CheckBuilder {
       this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).executed)
     )
 
+  hotfixNotApproved = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix 0x${hash.toString('hex')} is not already approved`,
+      this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).approved)
+    )
+
   canSign = (account: Address) =>
     this.addCheck('Account can sign', async () => {
       try {
@@ -318,6 +324,16 @@ class CheckBuilder {
       this.kit.contracts
         .getStableToken(stable)
         .then((stableToken) => stableToken.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
+  hasEnoughErc20 = (account: Address, value: BigNumber, erc20: Address) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} erc20 token`, () =>
+      this.kit.contracts
+        .getErc20(erc20)
+        .then((goldToken) => goldToken.balanceOf(account))
         .then((balance) => balance.gte(value))
     )
   }
