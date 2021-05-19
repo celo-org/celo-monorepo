@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-monitor",
-  "version": "1.0.1",
+  "version": "1.0.2-dev",
   "description": "Regularly queries ODIS to ensure the system is functioning properly",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -24,7 +24,7 @@
     "@celo/contractkit": "1.0.2",
     "@celo/identity": "1.0.2",
     "@celo/wallet-local": "1.0.2",
-    "@celo/phone-number-privacy-common": "1.0.30",
+    "@celo/phone-number-privacy-common": "1.0.33",
     "@celo/utils": "1.0.0-beta3",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0"

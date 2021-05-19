@@ -219,6 +219,12 @@ const NetworkConfigs = {
       minElectableValidators: '10',
       frozen: false,
     },
+    stableToken: {
+      initialBalances: {
+        addresses: ['0x5409ED021D9299bf6814279A6A1411A7e866A631'],
+        values: ['10000000000000000000'],
+      },
+    },
     epochRewards: {
       frozen: false,
     },
