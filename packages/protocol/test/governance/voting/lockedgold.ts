@@ -182,6 +182,12 @@ contract('LockedGold', (accounts: string[]) => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await assertRevert(lockedGold.lock({ value, from: accounts[1] }))
     })
+
+    it('should not emit GoldLocked event when value is 0', async () => {
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+      const resp = await lockedGold.lock({ value: 0 })
+      assert.equal(resp.logs.length, 0)
+    })
   })
 
   describe('#unlock()', () => {
@@ -193,6 +199,13 @@ contract('LockedGold', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
       })
+
+      it('should not emit GoldUnlocked event when value is 0', async () => {
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        resp = await lockedGold.unlock({ value: 0 })
+        assert.equal(resp.logs.length, 0)
+      })
+
       describe('when the account is not voting in governance', () => {
         beforeEach(async () => {
           resp = await lockedGold.unlock(value)
@@ -280,6 +293,12 @@ contract('LockedGold', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value: pendingWithdrawalValue })
         await lockedGold.unlock(pendingWithdrawalValue)
+      })
+
+      it('should not emit GoldRelocked event when value is 0', async () => {
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        resp = await lockedGold.unlock({ value: 0 })
+        assert.equal(resp.logs.length, 0)
       })
 
       describe('when relocking value equal to the value of the pending withdrawal', () => {
