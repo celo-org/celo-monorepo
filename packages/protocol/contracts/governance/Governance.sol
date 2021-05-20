@@ -729,7 +729,6 @@ contract Governance is
       proposalId,
       index
     );
-    require(proposal.isApproved(), "Proposal not approved");
     bool executable = proposal.exists() && proposal.isApproved();
     if (executable) {
       require(

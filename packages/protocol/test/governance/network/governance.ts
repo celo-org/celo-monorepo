@@ -1694,8 +1694,9 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      it('should revert when proposal is unapproved', async () => {
-        await assertRevert(governance.execute(proposalId, index))
+      it('should return false proposal is unapproved', async () => {
+        const success = await governance.execute.call(proposalId, index)
+        assert.isFalse(success)
       })
     })
   })
