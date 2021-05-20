@@ -12,11 +12,12 @@ methods {
 	_getValidatorSigner(address) returns address envfree
 	_getDefaultSigner(address,bytes32) returns address envfree
 	isLegacyRole(bytes32) returns bool envfree
-	isCompletedSignerAuthorization(address,bytes32,address) returns (bool) envfree
-	isStartedSignerAuthorization(address,bytes32,address) returns (bool) envfree
+	isCompletedSignerAuthorization(address,bytes32,address) returns bool envfree
+	isStartedSignerAuthorization(address,bytes32,address) returns bool envfree
 	_getValidatorRole() returns bytes32 envfree
 	_getAttestationRole() returns bytes32 envfree
 	_getVoteRole() returns bytes32 envfree
+	getIndexedSigner(address,bytes32) returns address envfree
 }
 
 /**
@@ -56,8 +57,9 @@ invariant address_signer_if_authroizedby_new(address x, address d, bytes32 role)
 
 /**
  * Given account x, address d a current signer, then d can not be a current signer of account y
+ * (Expensive rule)
  */
-rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, method f) filtered { f -> !f.isView } { 
+rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, bytes32 r1, bytes32 r2, method f) filtered { f -> !f.isView } { 
 	// x and y are accounts d is authorizedby
 	require x != 0 && y != 0 && d != 0 && x != d && y != x && y != d;  
 	// x is not registered or authorized
@@ -65,22 +67,22 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
 	// y is not a registered account
 	require isAccount(y); 
 	// d must be a signer of some capacity for x
-	require _getAttestationSigner(x) == d || _getVoteSigner(x) == d || _getValidatorSigner(x) == d; 
+	require getIndexedSigner(x, r1) == d; 
 	// d must not be a signer of any capacity for y
-	require _getAttestationSigner(y) != d && _getVoteSigner(y) != d && _getValidatorSigner(y) != d; 
+	require getIndexedSigner(y, r2) != d; 
 
 	// Simulate all possible execution of all methods
 	callArbitrary(f);
 
 	// Check that d is still not a current signer of y of any type
-	assert _getAttestationSigner(y) != d && _getVoteSigner(y) != d && _getValidatorSigner(y) != d,
+	assert getIndexedSigner(y, r2) != d,
     	"d must still not be a signer of any capacity for y";
 }
 
 /**
- * Account x can have two authorized addresses
+ * Account x can have two authorized addresses - legacy
  */
-rule address_can_authorize_two_address(address x, address d1, address d2)
+rule address_can_authorize_two_addresses_legacy(address x, address d1, address d2)
 { 
 	require x != 0 && d1 != 0 && d2 != 0 && x != d1 && x != d2 && d1 != d2 && isAccount(x); 
 	env e;
@@ -107,7 +109,36 @@ rule address_can_authorize_two_address(address x, address d1, address d2)
 }
 
 /**
- * Either the account's authorized signer doesn't change, or it gets set from nothing.
+ * Account x can have two authorized addresses - new
+ */
+rule address_can_authorize_two_addresses(address x, address d1, address d2, bytes32 role1, bytes32 role2)
+{ 
+	require x != 0 && d1 != 0 && d2 != 0 && x != d1 && x != d2 && d1 != d2 && isAccount(x); 
+	env e;
+	require e.msg.sender == x;
+  	
+	storage init = lastStorage;
+	// first, authorizing d2 as a validation signer should succeed
+	uint8 v2;
+	bytes32 r2;
+	bytes32 s2;
+	authorizeSignerWithSignature(e, d2, role2, v2, r2, s2);  
+
+	// Authorize d1 as a Vote signer (alternative execution path - start from the state where validator authorization started)
+	uint8 v1;
+	bytes32 r1;
+	bytes32 s1;
+	authorizeSignerWithSignature(e, d1, role1, v1, r1, s1) at init;
+	
+	// Even after authorizing d1, the authorization of d2 as a Validation signer should succeed
+	authorizeSignerWithSignature(e, d2, role2, v2, r2, s2);  
+		
+	// AuthorizedBy(d1) and AuthorizedBy(d2) should still be x
+	assert _getAuthorizedBy(d1) == x && _getAuthorizedBy(d2) == x, "Authorizedby should both be x";
+}
+
+/**
+ * Either the account's authorized signer doesn't change, or it gets set from when it's 0.
  */
 rule authorizedBy_can_not_be_removed(method f, address signer) filtered { f -> !f.isView } {
 	address _account = _getAuthorizedBy(signer); 
@@ -124,12 +155,12 @@ rule authorizedBy_can_not_be_removed(method f, address signer) filtered { f -> !
  */
 rule initializableOnlyOnce {
 	env e;
-	address registryAddress;
-	initialize(e, registryAddress);
+	calldataarg arg;
+	initialize(e, arg);
 
 	env e2;
-	address registryAddress2;
-	initialize@withrevert(e2, registryAddress2);
+	calldataarg arg2;
+	initialize@withrevert(e2, arg2);
 	assert lastReverted;
 }
 
@@ -139,6 +170,7 @@ rule initializableOnlyOnce {
 rule createsAccount(method f, address a) filtered { f ->
 	!f.isView
 		&& f.selector != createAccount().selector
+		&& f.selector != setAccount(string,bytes,address,uint8,bytes32,bytes32).selector
 } {
 	bool _isAccount = isAccount(a);
 	callArbitrary(f);
@@ -154,30 +186,18 @@ invariant legacyRolesAreNotUsedInNewRoles(address account, bytes32 role)
 	isLegacyRole(role) => _getDefaultSigner(account, role) == 0
 
 /**
- * Once we set d as being authorized by an account x (some non-zero address),
- * This can never be overridden.
- * Note: this cannot be an invariant because in the initial state no authorizedBy is set.
- */
-rule onceSetAuthorizedByIsNeverOverridden(address d, address x, method f) {
-       require x != 0 => _getAuthorizedBy(d) == x;
-
-       callArbitrary(f);
-
-       assert x != 0 => _getAuthorizedBy(d) == x, "for an account x, if was previously the authorizer of d, should still be authorizer of d";
-}
-
-/**
  * view functions in general should not revert.
  * Some exceptions and more refined revert-characteristics are provided.
  */
-rule viewFunctionsDoNotRevert(method f) filtered { f -> f.isView } {
+rule viewFunctionsDoNotRevert(method f) filtered { f -> 
+	f.isView 
+	// some functions we ignore, and the reasons:
+	&& f.selector != hasAuthorizedSigner(address,string).selector // Calldatasize may not match
+	&& f.selector != batchGetMetadataURL(address[]).selector // Calldatasize may not match
+} {
 	env e;
 	require e.msg.value == 0; // view functions are not payable
 	
-	// some functions we ignore, and why:
-	require f.selector != hasAuthorizedSigner(address,string).selector; // Calldatasize may not match
-	require f.selector != batchGetMetadataURL(address[]).selector; // Calldatasize may not match
-
 	// functions that require special handling:
 	if (f.selector == getLegacySigner(address,bytes32).selector) {
 		// getLegacySigner requires getting a legacy role
@@ -357,6 +377,17 @@ rule signerAuthorizationChangePrivileges(address a, bytes32 r, address s, method
 	assert _completed && !completed_ => e.msg.sender == a, "Only account can remove a signer authorization";
 	assert !_completed && completed_ => e.msg.sender == a || e.msg.sender == s, "Only signer or account can complete a signer authorization";
 } 
+
+/**
+ * There's no contents to the fallback function
+ */
+rule check_no_fallback {
+	env e;
+	calldataarg arg;
+	invoke_fallback(e, arg);
+
+	assert lastReverted;
+}
 
 /**
  * A utility for shortening calls to arbitrary functions in which we do not care about the environment.
