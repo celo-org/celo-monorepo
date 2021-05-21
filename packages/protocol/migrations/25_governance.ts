@@ -89,6 +89,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'GoldToken',
       'Governance',
       'GovernanceSlasher',
+      'GrandaMento',
       'LockedGold',
       'Random',
       'Registry',
