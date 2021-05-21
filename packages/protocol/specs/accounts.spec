@@ -7,13 +7,22 @@ methods {
 	_getDataEncryptionKeyLen(address) returns uint256 
 	_getNameLen(address) returns uint256 
 	getWalletAddress(address) returns address envfree
+	getAttestationSigner(address) returns address envfree
 	_getAttestationSigner(address) returns address envfree
+	getVoteSigner(address) returns address envfree
 	_getVoteSigner(address) returns address envfree
+	getValidatorSigner(address) returns address envfree
 	_getValidatorSigner(address) returns address envfree
+	getDefaultSigner(address,bytes32) returns address envfree
 	_getDefaultSigner(address,bytes32) returns address envfree
+	getLegacySigner(address,bytes32) returns address envfree
 	isLegacyRole(bytes32) returns bool envfree
 	isCompletedSignerAuthorization(address,bytes32,address) returns bool envfree
 	isStartedSignerAuthorization(address,bytes32,address) returns bool envfree
+	voteSignerToAccount(address) returns address envfree
+	validatorSignerToAccount(address) returns address envfree
+	attestationSignerToAccount(address) returns address envfree
+	signerToAccount(address) returns address envfree
 	_getValidatorRole() returns bytes32 envfree
 	_getAttestationRole() returns bytes32 envfree
 	_getVoteRole() returns bytes32 envfree
@@ -204,7 +213,7 @@ rule viewFunctionsDoNotRevert(method f) filtered { f ->
 		address a;
 		bytes32 r;
 		require isLegacyRole(r);
-		getLegacySigner@withrevert(e, a, r);
+		getLegacySigner@withrevert(a, r);
 	} else if (f.selector == hasLegacySigner(address,bytes32).selector) {
 		// hasLegacySigner requires getting a legacy role
 		address a;
@@ -215,25 +224,25 @@ rule viewFunctionsDoNotRevert(method f) filtered { f ->
 		// will fail if address is not authorized by anyone, and is not an account.
 		address a;
 		require _getAuthorizedBy(a) != 0 || isAccount(a);
-		signerToAccount@withrevert(e, a);
+		signerToAccount@withrevert(a);
 	} else if (f.selector == voteSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
 		requireInvariant authorizedByIsNeverReflexive(a);
 		require (authBy != 0 && isSigner(authBy, a, _getVoteRole())) || (authBy == 0 && isAccount(a));
-		voteSignerToAccount@withrevert(e, a);
+		voteSignerToAccount@withrevert(a);
 	} else if (f.selector == validatorSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
 		requireInvariant authorizedByIsNeverReflexive(a);
 		require (authBy != 0 && isSigner(authBy, a, _getValidatorRole())) || (authBy == 0 && isAccount(a));
-		validatorSignerToAccount@withrevert(e, a);
+		validatorSignerToAccount@withrevert(a);
 	} else if (f.selector == attestationSignerToAccount(address).selector) {
 		address a;
 		address authBy = _getAuthorizedBy(a);
 		requireInvariant authorizedByIsNeverReflexive(a);
 		require (authBy != 0 && isSigner(authBy, a, _getAttestationRole())) || (authBy == 0 && isAccount(a));
-		attestationSignerToAccount@withrevert(e, a);
+		attestationSignerToAccount@withrevert(a);
 	} else {
 		calldataarg arg;
 		f@withrevert(e, arg);
@@ -253,12 +262,6 @@ invariant authorizedByIsNeverReflexive(address a)
  * The other direction may not be correct because authorizedBy is persistent while signer authorizations can be removed. 
  */
 invariant mustHaveAuthorizedByIfCompletedSignerAuthorization(address account, bytes32 role, address signer) 
-	account != 0 => (isCompletedSignerAuthorization(account, role, signer) => _getAuthorizedBy(signer) == account)
-
-/**
- * Once signer authorization is completed, it must mean authorizedBy was also set.
- */
-invariant completedSignerAuthMeansAuthByIsSet(address account, bytes32 role, address signer)
 	account != 0 => (isCompletedSignerAuthorization(account, role, signer) => _getAuthorizedBy(signer) == account)
 
 /**
@@ -337,7 +340,7 @@ rule cannotStartSignerAuthorizationsForOtherAccounts(method f) filtered { f -> !
 }
 
 /**
- * The only way authorizedBy should be set is using a signature [TODO: or by the signer being the caller]
+ * The only way authorizedBy should be set is using a signature, or by the signer being the caller
  */
 rule cannotSetAuthorizedByWithoutSignatures(method f) filtered { f -> 
 	!f.isView 
@@ -359,7 +362,7 @@ rule cannotSetAuthorizedByWithoutSignatures(method f) filtered { f ->
 } 
 
 /**
- * Can only change signerAuthorization of your own account: nothing -> started, started&completed -> nothing
+ * Conditions for being able to change signerAuthorization
  */
 rule signerAuthorizationChangePrivileges(address a, bytes32 r, address s, method f) filtered { f ->
 	!f.isView 
@@ -388,6 +391,74 @@ rule check_no_fallback {
 
 	assert lastReverted;
 }
+
+/**
+ * The values of get*Signer getters should be consistent for all roles.
+ */
+rule gettersInAgreement() {
+	address account;
+	require account != 0;
+	bytes32 role;
+	address indexedSigner = getIndexedSigner(account, role);
+	address defaultSigner = getDefaultSigner(account, role);
+	address legacySigner = getLegacySigner(account, role);
+	address voteSigner = getVoteSigner(account);
+	address validatorSigner = getValidatorSigner(account);
+	address attestationSigner = getAttestationSigner(account);
+
+	if (role == _getVoteRole()) {
+		assert indexedSigner == legacySigner && indexedSigner == voteSigner, "indexed signer agrees with legacy signer for vote role";
+	} else if (role == _getValidatorRole()) {
+		assert indexedSigner == legacySigner && indexedSigner == validatorSigner, "indexed signer agrees with legacy signer for validator role";
+	} else if (role == _getAttestationRole()) {
+		assert indexedSigner == legacySigner && indexedSigner == attestationSigner, "indexed signer agrees with legacy signer for attestation role";
+	} else {
+		assert indexedSigner == defaultSigner, "for any non legacy role indexed signer is default signer";
+	}
+
+	assert indexedSigner != 0 && defaultSigner != 0 && legacySigner != 0 
+		&& voteSigner != 0 && validatorSigner != 0 && attestationSigner != 0, "signer is never address 0";
+
+	// original assertion is wrong
+	//assert indexedSigner != account => defaultSigner != account, "If indexed signer is a distinct address then default signer for this role is also a distinct address";
+	assert !isLegacyRole(role) && indexedSigner != account => defaultSigner != account, "If indexed signer is a distinct address then default signer for this role is also a distinct address";
+}
+
+/**
+ * account to signer and signer to account getters should agree
+ */
+invariant accountToSignerAndInverseVote(address a, address s, bytes32 r)
+	r == _getVoteRole() => (s == getVoteSigner(a) => voteSignerToAccount(s) == a)
+{
+		preserved {
+			require a != s;
+		}
+}
+
+invariant accountToSignerAndInverseValidator(address a, address s, bytes32 r)	
+	r == _getValidatorRole() => (s == getValidatorSigner(a) => validatorSignerToAccount(s) == a)
+{
+		preserved {
+			require a != s;
+		}
+}
+
+invariant accountToSignerAndInverseAttestation(address a, address s, bytes32 r)
+	r == _getAttestationRole() => (s == getAttestationSigner(a) => attestationSignerToAccount(s) == a)
+{
+		preserved {
+			require a != s;
+		}
+}
+
+invariant accountToSignerAndInverseNewRoles(address a, address s, bytes32 r)	
+	getIndexedSigner(a, r) == s => signerToAccount(s) == a 
+{
+		preserved {
+			require a != s;
+		}
+}
+
 
 /**
  * A utility for shortening calls to arbitrary functions in which we do not care about the environment.
