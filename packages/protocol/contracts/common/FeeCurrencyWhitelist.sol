@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IFeeCurrencyWhitelist.sol";
+import "./interfaces/ICeloVersionedContract.sol";
 
 import "./InitializableV2.sol";
 
@@ -11,7 +12,13 @@ import "../stability/interfaces/ISortedOracles.sol";
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
  */
-contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, InitializableV2, UsingRegistryV2 {
+contract FeeCurrencyWhitelist is
+  IFeeCurrencyWhitelist,
+  Ownable,
+  InitializableV2,
+  UsingRegistryV2,
+  ICeloVersionedContract
+{
   address[] public whitelist;
 
   constructor(bool test) public InitializableV2(test) {}
@@ -34,5 +41,9 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, InitializableV2
 
   function getWhitelist() external view returns (address[] memory) {
     return whitelist;
+  }
+
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 }
