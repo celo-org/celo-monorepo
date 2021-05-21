@@ -7,7 +7,7 @@ const GrandaMento: GrandaMentoContract = artifacts.require('GrandaMento')
 // @ts-ignore
 GrandaMento.numberFormat = 'BigNumber'
 
-contract('GrandaMento', (_accounts: string[]) => {
+contract('GrandaMento', (accounts: string[]) => {
   let grandaMento: GrandaMentoInstance
 
   beforeEach(async () => {
@@ -16,6 +16,11 @@ contract('GrandaMento', (_accounts: string[]) => {
   })
 
   describe('#initialize()', () => {
+    it('should have set the owner', async () => {
+      const expectedOwner: string = await grandaMento.owner()
+      assert.equal(expectedOwner, accounts[0])
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(grandaMento.initialize())
     })
