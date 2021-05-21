@@ -4,7 +4,6 @@ import { stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
 import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
 import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
 import { LocalWallet } from '@celo/wallet-local'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import chalk from 'chalk'
@@ -138,6 +137,8 @@ export abstract class BaseCommand extends Command {
     if (res.flags.useLedger) {
       let transport: Transport
       try {
+        // Importing for ledger uses only fixes running jest tests
+        const TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default
         transport = await TransportNodeHid.open('')
         const derivationPathIndexes = res.raw.some(
           (value) => (value as any).flag === 'ledgerCustomAddresses'
