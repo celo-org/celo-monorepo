@@ -1,11 +1,12 @@
 import {
   authenticateUser,
   ErrorMessage,
+  GetContactMatchesRequest,
   hasValidAccountParam,
-  hasValidContractPhoneNumbersParam,
-  hasValidPhoneNumberHash,
+  hasValidContactPhoneNumbersParam,
   hasValidUserPhoneNumberParam,
   isVerified,
+  phoneNumberHashIsValidIfExists,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -16,19 +17,10 @@ import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/accou
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { getContractKit } from '../web3/contracts'
 
-interface GetContactMatchesRequest {
-  account: string
-  userPhoneNumber: string
-  contactPhoneNumbers: string[]
-  hashedPhoneNumber: string
-  sessionID?: string
-}
-
 interface ContactMatch {
   phoneNumber: string
 }
 
-// TODO (amyslawson) consider pagination or streaming of contacts?
 export async function handleGetContactMatches(
   request: Request<{}, {}, GetContactMatchesRequest>,
   response: Response
@@ -78,9 +70,8 @@ function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): b
   return (
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
-    hasValidContractPhoneNumbersParam(requestBody) &&
-    hasValidPhoneNumberHash(requestBody)
-    // TODO find way to check content body size without RE-JSONifying it
-    // isBodyReasonablySized(requestBody)
+    hasValidContactPhoneNumbersParam(requestBody) &&
+    !!requestBody.hashedPhoneNumber &&
+    phoneNumberHashIsValidIfExists(requestBody)
   )
 }

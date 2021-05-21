@@ -21,7 +21,7 @@ npm install -g @celo/celocli
 ```
 
 {% hint style="info" %}
-We are currently deploying the CLI with only Node v10.x LTS support. If you are running a different version of Node, consider using [NVM](https://github.com/nvm-sh/nvm#installation-and-update) to manage your node versions. e.g. with: `nvm install 10 && nvm use 10`
+We are currently deploying the CLI with only Node.js v12.x. If you are running a different version of Node.js, consider using [NVM](https://github.com/nvm-sh/nvm#installation-and-update) to manage your node versions. e.g. with: `nvm install 12 && nvm use 12`
 {% endhint %}
 
 {% hint style="info" %}
@@ -50,7 +50,11 @@ The Celo CLI supports using a [Ledger hardware wallet](../celo-holder-guide/ledg
 
 ### Plugins
 
-Additional plugins can be installed which make the CLI experience smoother.
+Additional plugins can be installed which make the CLI experience smoother. Currently, `celocli` only supports installing plugins published on NPM within the `@celo/*` and `@clabs/*` scopes.
+
+{% hint style="danger" %}
+Installing a 3rd party plugin can be _dangerous_! Please always be sure that you trust the plugin provider.
+{% endhint %}
 
 The autocomplete plugin adds an interactive autocomplete for `bash` and `zsh` shells. To enable the autocomplete plugin, follow the instructions provided at:
 

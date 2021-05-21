@@ -1,0 +1,19 @@
+oracle:
+  currencyPair: CELOEUR
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      askMaxPercentageDeviation: 0.05
+      bidMaxPercentageDeviation: 0.05
+      maxPercentageBidAskSpread: 0.025
+      # minReportPriceChangeThreshold
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  exchanges: COINBASE,BITTREX
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%

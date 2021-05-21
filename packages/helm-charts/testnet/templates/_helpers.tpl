@@ -36,9 +36,9 @@ spec:
     statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ .node_name }}-{{ .index }}
   type: {{ .service_type }}
   publishNotReadyAddresses: true
-  {{ if (eq .service_type "LoadBalancer") }}
+  {{- if (eq .service_type "LoadBalancer") }}
   loadBalancerIP: {{ .load_balancer_ip }}
-  {{ end }}
+  {{- end -}}
 {{- end -}}
 
 {{- define "celo.full-node-statefulset" -}}
@@ -47,8 +47,8 @@ kind: Service
 metadata:
   name: {{ .name }}
   labels:
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
     component: {{ .component_label }}
@@ -60,8 +60,33 @@ spec:
   - port: 8546
     name: ws
   selector:
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
+    component: {{ .component_label }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}-headless
+  labels:
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
+    component: {{ .component_label }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 8545
+    name: rpc
+  - port: 8546
+    name: ws
+  selector:
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
     component: {{ .component_label }}
@@ -73,12 +98,15 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: {{ .component_label }}
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
 spec:
-  {{ if .Values.geth.ssd_disks }}
+{{- $updateStrategy := index $.Values.updateStrategy $.component_label }}
+  updateStrategy:
+{{ toYaml $updateStrategy | indent 4 }}
+  {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -87,8 +115,9 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ .Values.geth.diskSizeGB }}Gi
-  {{ end }}
+          {{- $disk_size := ((eq .name "tx-nodes-private" ) | ternary .Values.geth.privateTxNodediskSizeGB .Values.geth.diskSizeGB ) }}
+          storage: {{ $disk_size }}Gi
+  {{- end }}
   podManagementPolicy: Parallel
   replicas: {{ .replicas }}
   serviceName: {{ .name }}
@@ -96,8 +125,8 @@ spec:
     matchLabels:
 {{ include "common.standard.labels" .  | indent 6 }}
       component: {{ .component_label }}
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+{{- if .proxy | default false }}
+{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
       validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
   template:
@@ -115,7 +144,7 @@ spec:
 {{- end }}
     spec:
       initContainers:
-{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
 {{ include "common.celotool-validator-container" (dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix "ip_addresses" .ip_addresses "validator_index" .validator_index) | indent 6 }}
 {{ if .unlock | default false }}
 {{ include "common.import-geth-account-container" .  | indent 6 }}

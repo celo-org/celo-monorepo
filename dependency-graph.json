@@ -14,14 +14,6 @@
     "location": "packages/azure",
     "dependencies": []
   },
-  "@celo/blockchain-api": {
-    "location": "packages/blockchain-api",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/flake-tracker",
-      "@celo/utils"
-    ]
-  },
   "@celo/celotool": {
     "location": "packages/celotool",
     "dependencies": [
@@ -75,6 +67,7 @@
   "@celo/faucet-app": {
     "location": "packages/faucet",
     "dependencies": [
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
@@ -83,48 +76,11 @@
     "location": "packages/flake-tracker",
     "dependencies": []
   },
-  "@celo/komencikit": {
-    "location": "packages/komencikit",
-    "dependencies": [
-      "@celo/base",
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/identity",
-      "@celo/utils"
-    ]
-  },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",
-      "@celo/utils"
-    ]
-  },
-  "@celo/mobile": {
-    "location": "packages/mobile",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/flake-tracker",
-      "@celo/identity",
-      "@celo/komencikit",
-      "@celo/network-utils",
-      "@celo/react-components",
-      "@celo/typescript",
-      "@celo/utils",
-      "@celo/wallet-rpc"
-    ]
-  },
-  "@celo/moonpay-auth": {
-    "location": "packages/moonpay-auth",
-    "dependencies": []
-  },
-  "@celo/notification-service": {
-    "location": "packages/notification-service",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/flake-tracker",
       "@celo/utils"
     ]
   },
@@ -137,18 +93,6 @@
       "@celo/typescript",
       "@celo/utils"
     ]
-  },
-  "@celo/react-components": {
-    "location": "packages/react-components",
-    "dependencies": [
-      "@celo/flake-tracker",
-      "@celo/typescript",
-      "@celo/utils"
-    ]
-  },
-  "@celo/reserve-web": {
-    "location": "packages/reserve-site",
-    "dependencies": []
   },
   "@celo/typescript": {
     "location": "packages/typescript",
@@ -167,6 +111,7 @@
   "@celo/phone-number-privacy-common": {
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/identity",
       "@celo/utils"
@@ -185,6 +130,7 @@
   "@celo/phone-number-privacy-signer": {
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/flake-tracker",
       "@celo/identity",
@@ -342,6 +288,17 @@
   },
   "@celo/wallet-rpc": {
     "location": "packages/sdk/wallets/wallet-rpc",
+    "dependencies": [
+      "@celo/connect",
+      "@celo/contractkit",
+      "@celo/dev-utils",
+      "@celo/utils",
+      "@celo/wallet-base",
+      "@celo/wallet-remote"
+    ]
+  },
+  "@celo/wallet-walletconnect": {
+    "location": "packages/sdk/wallets/wallet-walletconnect",
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",

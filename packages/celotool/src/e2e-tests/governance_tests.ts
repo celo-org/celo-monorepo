@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
+import { connectBipartiteClique, connectPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import {
@@ -235,13 +235,13 @@ describe('governance tests', () => {
   let accounts: any
   let kit: ContractKit
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -336,14 +336,7 @@ describe('governance tests', () => {
     } else {
       const difference = currentTarget.minus(previousTarget)
       // Assert equal to 9 decimal places due to rounding errors.
-      assert.equal(
-        fromFixed(difference)
-          .dp(9)
-          .toFixed(),
-        fromFixed(expected)
-          .dp(9)
-          .toFixed()
-      )
+      assert.equal(fromFixed(difference).dp(9).toFixed(), fromFixed(expected).dp(9).toFixed())
     }
   }
 
@@ -372,7 +365,7 @@ describe('governance tests', () => {
     let epoch: number
     let validatorAccounts: string[]
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
 
       await restart()
@@ -486,7 +479,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function(this: any) {
+    it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function (this: any) {
       this.timeout(0)
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
@@ -522,7 +515,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should update the validator scores at the end of each epoch', async function(this: any) {
+    it('should update the validator scores at the end of each epoch', async function (this: any) {
       this.timeout(0)
       const scoreParams = await validators.methods.getValidatorScoreParameters().call()
       const exponent = new BigNumber(scoreParams[0])
@@ -592,7 +585,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should distribute epoch payments at the end of each epoch', async function(this: any) {
+    it('should distribute epoch payments at the end of each epoch', async function (this: any) {
       this.timeout(0)
       const commission = 0.1
       const targetValidatorEpochPayment = new BigNumber(
@@ -652,7 +645,7 @@ describe('governance tests', () => {
       }
     })
 
-    it('should distribute epoch rewards at the end of each epoch', async function(this: any) {
+    it('should distribute epoch rewards at the end of each epoch', async function (this: any) {
       this.timeout(0)
       const lockedGold = await kit._web3Contracts.getLockedGold()
       const governance = await kit._web3Contracts.getGovernance()
@@ -897,7 +890,7 @@ describe('governance tests', () => {
     let epoch: number
     let validatorAccounts: string[]
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
 
       await restart()
@@ -921,8 +914,6 @@ describe('governance tests', () => {
       console.log('wait for validatorGroup to finish syncing')
       await waitToFinishInstanceSyncing(validatorGroup)
 
-      // Connect the validating nodes to the non-validating nodes, to test that announce messages
-      // are properly gossiped.
       const additionalValidatingNodes: GethInstanceConfig[] = [
         {
           name: 'validator2KeyRotation0',
@@ -954,7 +945,8 @@ describe('governance tests', () => {
         )
       )
 
-      await connectValidatorPeers([...gethConfig.instances, ...additionalValidatingNodes])
+      // Connect the validating nodes to the non-validating nodes, to test that announce messages are properly gossiped.
+      await connectBipartiteClique(gethConfig.instances, additionalValidatingNodes, verbose)
 
       console.log('wait for new validators to sync')
       await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
@@ -1034,13 +1026,19 @@ describe('governance tests', () => {
       assert.equal(errorWhileChangingValidatorSet, '')
     })
 
-    it('key rotation should have worked', async () => {
+    it('validator 0 should have signed at least one block', async () => {
       const rotation0MinedBlock = miners.some((a) => eqAddress(a, rotation0Address))
-      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
-      if (!rotation0MinedBlock || !rotation1MinedBlock) {
+      if (!rotation0MinedBlock) {
         console.log(rotation0Address, rotation1Address, miners)
       }
       assert.isTrue(rotation0MinedBlock)
+    })
+
+    it('validator 1 should have signed at least one block', async () => {
+      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
+      if (!rotation1MinedBlock) {
+        console.log(rotation0Address, rotation1Address, miners)
+      }
       assert.isTrue(rotation1MinedBlock)
     })
   })
@@ -1050,7 +1048,7 @@ describe('governance tests', () => {
     let blockFrozen: number
     let latestBlock: number
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0)
       await restart()
       const validator = (await kit.connection.getAccounts())[0]
@@ -1078,7 +1076,7 @@ describe('governance tests', () => {
 
   describe('after the gold token smart contract is registered', () => {
     let goldGenesisSupply = new BigNumber(0)
-    beforeEach(async function(this: any) {
+    beforeEach(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
       const genesis = await importGenesis(path.join(gethConfig.runPath, 'genesis.json'))
@@ -1087,7 +1085,7 @@ describe('governance tests', () => {
       })
     })
 
-    it('should initialize the Celo Gold total supply correctly', async function(this: any) {
+    it('should initialize the Celo Gold total supply correctly', async function (this: any) {
       const events = await registry.getPastEvents('RegistryUpdated', { fromBlock: 0 })
       let blockNumber = 0
       for (const e of events) {

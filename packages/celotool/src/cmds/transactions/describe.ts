@@ -21,7 +21,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: DescribeArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false)
 
   const web3 = new Web3(getFornoUrl(argv.celoEnv))
   const kit = await newKitFromWeb3(web3)

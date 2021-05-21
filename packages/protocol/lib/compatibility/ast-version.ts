@@ -2,6 +2,7 @@
 import { Artifact } from '@celo/protocol/lib/compatibility/internal'
 import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { isLibrary } from './report'
 const VM = require('ethereumjs-vm').default
 const abi = require('ethereumjs-abi')
 
@@ -12,7 +13,7 @@ export class ASTContractVersions {
   static fromArtifacts = async (artifacts: BuildArtifacts): Promise<ASTContractVersions>=> {
     const contracts = {}
 
-    await Promise.all(artifacts.listArtifacts().map(async (artifact) => {
+    await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(c.contractName, artifacts)).map(async (artifact) => {
       contracts[artifact.contractName] = await getContractVersion(artifact)
     }))
     return new ASTContractVersions(contracts)

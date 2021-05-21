@@ -58,7 +58,7 @@ library Proposals {
   /**
    * @notice Constructs a proposal.
    * @param proposal The proposal struct to be constructed.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -102,7 +102,7 @@ library Proposals {
 
   /**
    * @notice Constructs a proposal for use in memory.
-   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param values The values of CELO to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -355,7 +355,7 @@ library Proposals {
   // of the Solidity's code generator to produce a loop that copies tx.data into memory.
   /**
    * @notice Executes a function call.
-   * @param value The value of Celo Gold to be sent with the function call.
+   * @param value The value of CELO to be sent with the function call.
    * @param destination The destination address of the function call.
    * @param dataLength The length of the data to be included in the function call.
    * @param data The data to be included in the function call.

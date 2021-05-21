@@ -32,12 +32,13 @@ git clone https://github.com/critesjosh/helloCelo.git
 We will be using the Celo ContractKit SDK to interact with the Celo test network (Alfajores). Let's install it. It is already defined in the package.json, so we can get it with
 
 ```
+cd helloCelo
 npm install
 ```
 
 ## Importing ContractKit
 
-We will be writing our Node.js app in the `helloCello.js` file.
+We will be writing our Node.js app in the `helloCelo.js` file.
 
 Import the contract kit into our script with
 
@@ -99,7 +100,7 @@ node helloCelo.js
 ```
 
 {% hint style="info" %}
-You may notice that we convert the balance to a string before we print it. This is because the `balanceOf()` function returns a [BigNumber](https://github.com/MikeMcl/bignumber.js/). Javascript does not have floating point numbers, so it is common to convert integers to large numbers before doing arithmetic. So 1 CELO = 10\*\*18 base units of CELO. The `balanceOf()` function returns the account balance in these base units. Converting the BigNumber to a string converts the BigNumber object into a more legible string.
+Note that the `balanceOf()` function returns objects with type [BigNumber](https://github.com/MikeMcl/bignumber.js/) because balances are represented in Celo as a 256 bit unsigned integer, and JavaScript's number type cannot safely handle numbers of that size. Note also that the balance values are reported in units of CELO Wei, where one CELO = 10\*\*18 CELO Wei.
 {% endhint %}
 
 Reading all account balances is a powerful feature of blockchains. Next, let's see how we can send value to each other on the testnet.
@@ -120,7 +121,7 @@ Don't worry about what this means right now, just understand that it is easier t
 
 Because we are accessing the network remotely, we need to generate an account to sign transactions and fund that account with test CELO.
 
-There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`web3.js` to create a new private key/account pair. [Web3.js](https://web3js.readthedocs.io/en/v1.2.6/) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library works well for generating Celo accounts.
+There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`web3.js` to create a new private key/account pair. [Web3.js](https://web3js.readthedocs.io/) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library works well for generating Celo accounts.
 
 {% hint style="danger" %}
 This is not the standard way of managing Celo accounts. In a production environment, the [Celo Wallet](../../celo-codebase/wallet/) will manage accounts for you. Accessing accounts from the Celo Wallet will be discussed in future guides.
@@ -228,7 +229,12 @@ Run `$ node helloCelo.js` again to send the transactions and see the printed out
 
 The above instructions apply to building NodeJS applications. If you want to build an integration with a web application, you can still use the ContractKit by following slightly modified instructions.
 
-You will need to have the following `npm` libraries installed: `web3`, `@celo/contractkit`, `@celo/wallet-ledger`, `@ledgerhq/hw-app-eth`, `@ledgerhq/hw-transport-u2f` and `@ledgerhq/hw-transport-webusb`.
+The following code examples are typescript so should be stored in a `.tsc` file, you will also need to install typescript and then compile your typescript to javascript with `npx tsc` before you can run the code with node.
+
+```
+npm install --save-dev typescript
+npm install web3 @celo/contractkit @celo/wallet-ledger @ledgerhq/hw-app-eth @ledgerhq/hw-transport-u2f @ledgerhq/hw-transport-webusb
+```
 
 Then, you can create a new instance of the ContractKit with the following code:
 

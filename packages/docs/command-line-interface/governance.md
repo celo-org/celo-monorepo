@@ -14,6 +14,7 @@ USAGE
   $ celocli governance:build-proposal
 
 OPTIONS
+  --globalHelp     View all available global flags
   --output=output  (required) Path to output
 
 EXAMPLE
@@ -34,6 +35,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) From address
+  --globalHelp                                       View all available global flags
 
 EXAMPLE
   dequeue --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -53,6 +55,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
+  --globalHelp                                       View all available global flags
 
   --proposalID=proposalID                            (required) UUID of proposal to
                                                      execute
@@ -75,6 +78,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
+  --globalHelp                                       View all available global flags
 
   --jsonTransactions=jsonTransactions                (required) Path to json
                                                      transactions
@@ -101,6 +105,8 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
+  --globalHelp                         View all available global flags
+
   --jsonTransactions=jsonTransactions  (required) Path to json transactions of the
                                        hotfix
 
@@ -128,6 +134,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -151,6 +158,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Preparer's address
+  --globalHelp                                       View all available global flags
 
   --hash=hash                                        (required) Hash of hotfix
                                                      transactions
@@ -183,6 +191,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
 
+  --globalHelp                                       View all available global flags
+
   --jsonTransactions=jsonTransactions                (required) Path to json
                                                      transactions
 
@@ -206,6 +216,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
+  --globalHelp                                       View all available global flags
 
 EXAMPLE
   revokeupvote --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -225,6 +236,7 @@ USAGE
 
 OPTIONS
   --account=account                    Address of account or voter
+  --globalHelp                         View all available global flags
   --hotfix=hotfix                      Hash of hotfix proposal
   --jsonTransactions=jsonTransactions  Output proposal JSON to provided file
 
@@ -240,6 +252,14 @@ OPTIONS
 
   --whitelisters                       If set, displays validators that have whitelisted
                                        the hotfix.
+
+ALIASES
+  $ celocli governance:show
+  $ celocli governance:showhotfix
+  $ celocli governance:showaccount
+  $ celocli governance:view
+  $ celocli governance:viewhotfix
+  $ celocli governance:viewaccount
 
 EXAMPLES
   show --proposalID 99
@@ -271,6 +291,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
+  --globalHelp                                       View all available global flags
 
   --proposalID=proposalID                            (required) UUID of proposal to
                                                      upvote
@@ -280,55 +301,6 @@ EXAMPLE
 ```
 
 _See code: [src/commands/governance/upvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/upvote.ts)_
-
-## `celocli governance:view`
-
-View governance proposal information from ID
-
-```
-View governance proposal information from ID
-
-USAGE
-  $ celocli governance:view
-
-OPTIONS
-  --proposalID=proposalID  (required) UUID of proposal to view
-  --raw                    Display proposal in raw bytes format
-
-EXAMPLES
-  view --proposalID 99
-
-  view --proposalID 99 --raw
-```
-
-_See code: [src/commands/governance/view.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/view.ts)_
-
-## `celocli governance:viewhotfix`
-
-View information associated with hotfix
-
-```
-View information associated with hotfix
-
-USAGE
-  $ celocli governance:viewhotfix
-
-OPTIONS
-  --hash=hash        (required) Hash of hotfix transactions
-  --nonwhitelisters  If set, displays validators that have not whitelisted the hotfix.
-  --whitelisters     If set, displays validators that have whitelisted the hotfix.
-
-EXAMPLES
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  --whitelisters
-
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  --nonwhitelisters
-```
-
-_See code: [src/commands/governance/viewhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/viewhotfix.ts)_
 
 ## `celocli governance:vote`
 
@@ -342,6 +314,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --globalHelp                                       View all available global flags
 
   --proposalID=proposalID                            (required) UUID of proposal to vote
                                                      on
@@ -366,6 +339,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Whitelister's address
+  --globalHelp                                       View all available global flags
 
   --hash=hash                                        (required) Hash of hotfix
                                                      transactions
@@ -390,6 +364,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
+  --globalHelp                                       View all available global flags
 
 EXAMPLE
   withdraw --from 0x5409ed021d9299bf6814279a6a1411a7e866a631

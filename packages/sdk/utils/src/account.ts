@@ -68,10 +68,7 @@ export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrap
 
 export function formatNonAccentedCharacters(mnemonic: string) {
   const languages = getAllLanguages()
-  const normMnemonicArr = normalizeAccents(mnemonic)
-    .toLowerCase()
-    .trim()
-    .split(' ')
+  const normMnemonicArr = normalizeAccents(mnemonic).toLowerCase().trim().split(' ')
 
   for (const language of languages) {
     if (isLatinBasedLanguage(language)) {
@@ -214,6 +211,8 @@ function getWordList(language?: MnemonicLanguages) {
       return bip39.wordlists.korean
     case MnemonicLanguages.spanish:
       return bip39.wordlists.spanish
+    case MnemonicLanguages.portuguese:
+      return bip39.wordlists.portuguese
     default:
       return bip39.wordlists.english
   }
@@ -229,6 +228,7 @@ function getAllLanguages() {
     MnemonicLanguages.japanese,
     MnemonicLanguages.korean,
     MnemonicLanguages.spanish,
+    MnemonicLanguages.portuguese,
   ]
 }
 

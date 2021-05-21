@@ -149,8 +149,6 @@ spec:
           value: production
         - name: CELO_PROVIDER
           value: ws://localhost:8546
-        - name: SMS_PROVIDERS
-          value: twilio,nexmo
         - name: LOG_FORMAT
           value: stackdriver
         - name: NEXMO_KEY
@@ -163,6 +161,17 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}
               key: NEXMO_SECRET
+        - name: SMS_PROVIDERS
+          value: '{{ .Values.attestation_service.sms_providers }}'
+        - name: SMS_PROVIDERS_RANDOMIZED
+          value: '{{ .Values.attestation_service.sms_providers_randomized }}'
+        - name: TELEKOM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: TELEKOM_API_KEY
+        - name: TELEKOM_FROM
+          value: '{{ .Values.attestation_service.telekom.from }}'
         - name: TWILIO_ACCOUNT_SID
           valueFrom:
             secretKeyRef:

@@ -1,11 +1,10 @@
-import { ensureLeading0x } from '@celo/base'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
+import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
-import { Branded } from 'io-ts'
-import { CeloContract, CeloToken } from '../base'
+import { CeloContract, StableTokenContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
@@ -49,45 +48,7 @@ export interface MedianRate {
   rate: BigNumber
 }
 
-export type CurrencyPairIdentifier = Branded<Address, 'PairIdentifier'>
-
-/**
- * Used to construct the pair identifier from a pair label (e.g. CELO/BTC)
- * The pair identifier needs to be a valid ethereum address, thus we
- * truncate a keccak of the pair label.
- * This function returns a branded type which can be fed into the wrapper.
- * @param pair a string
- */
-export const pairIdentifier = (pair: string): CurrencyPairIdentifier => {
-  return ensureLeading0x(
-    keccak256(pair)
-      .slice(0, 20)
-      .toString('hex')
-  ) as CurrencyPairIdentifier
-}
-
-/**
- * This will act as an enum of common pairs.
- * We can't use a straight enum because we want the value
- * to be a ReportTarget
- *
- * E.g. usage: sortedOracles.getRates(OracleCurrencyPair.CELOBTC)
- */
-type defaultPairs = 'CELOBTC' | 'CELOUSD'
-export const OracleCurrencyPair: Record<defaultPairs, ReportTarget> = {
-  CELOBTC: pairIdentifier('CELO/BTC'),
-  CELOUSD: CeloContract.StableToken,
-}
-
-export type ReportTarget = CeloToken | CurrencyPairIdentifier
-
-/**
- * Disambiguate a ReportTarget to a CeloToken
- * @param target ReportTarget
- */
-const isCeloToken = (target: ReportTarget): target is CeloToken => {
-  return target === CeloContract.StableToken || target === CeloContract.GoldToken
-}
+export type ReportTarget = StableTokenContract | Address
 
 /**
  * Currency price oracle contract.
@@ -220,12 +181,15 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Updates an oracle value and the median.
    * @param value The amount of US Dollars equal to one CELO.
+   * @param oracleAddress The address to report as
+   * @param token The token to report for
    */
   async reportStableToken(
     value: BigNumber.Value,
-    oracleAddress: Address
+    oracleAddress: Address,
+    token: StableToken = StableToken.cUSD
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableToken, value, oracleAddress)
+    return this.report(this.kit.celoTokens.getContract(token), value, oracleAddress)
   }
 
   /**
@@ -332,10 +296,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    if (isCeloToken(target)) {
-      return this.kit.registry.addressFor(target)
-    } else {
+    if (this.kit.celoTokens.isStableTokenContract(target as CeloContract)) {
+      return this.kit.registry.addressFor(target as StableTokenContract)
+    } else if (isValidAddress(target)) {
       return target
+    } else {
+      throw new Error(`${target} is not StableTokenContract deployed or a valid Address`)
     }
   }
 }

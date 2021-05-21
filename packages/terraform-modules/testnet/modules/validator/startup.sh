@@ -202,7 +202,7 @@ if [[ ${proxied} == "true" ]]; then
 
     PROXY_INDEX=$(($PROXY_INDEX + 1))
   done
-  if docker run --rm --entrypoint=geth $GETH_NODE_DOCKER_IMAGE --help | grep -q 'proxy.proxyenodeurlpairs'; then
+  if docker run --rm --entrypoint=geth $GETH_NODE_DOCKER_IMAGE --help | grep 'proxy.proxyenodeurlpairs' >/dev/null; then
     PROXY_FLAG_NAME="--proxy.proxyenodeurlpairs"
   else
     PROXY_FLAG_NAME="--proxy.proxyenodeurlpair"
@@ -290,8 +290,6 @@ docker run \
     --consoleoutput=stdout \
     --verbosity=${geth_verbosity} \
     --ethstats=${validator_name}@${ethstats_host} \
-    --istanbul.blockperiod=${block_time} \
-    --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
     --allow-insecure-unlock \
     $METRICS_FLAGS \

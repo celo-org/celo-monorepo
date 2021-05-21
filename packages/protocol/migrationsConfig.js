@@ -219,6 +219,12 @@ const NetworkConfigs = {
       minElectableValidators: '10',
       frozen: false,
     },
+    stableToken: {
+      initialBalances: {
+        addresses: ['0x5409ED021D9299bf6814279A6A1411A7e866A631'],
+        values: ['10000000000000000000'],
+      },
+    },
     epochRewards: {
       frozen: false,
     },
@@ -260,6 +266,11 @@ const NetworkConfigs = {
     governance: {
       skipSetConstitution: true,
       skipTransferOwnership: true,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
     },
     stableToken: {
       frozen: false,
@@ -577,6 +588,7 @@ const NetworkConfigs = {
   },
 }
 
+NetworkConfigs.local = NetworkConfigs.testing
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 NetworkConfigs.mainnet = NetworkConfigs.rc1
