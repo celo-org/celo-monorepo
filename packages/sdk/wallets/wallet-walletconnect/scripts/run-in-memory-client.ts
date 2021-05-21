@@ -1,7 +1,7 @@
 import { newKit } from '@celo/contractkit'
+// import { serializeSignature, verifyEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import { WalletConnectWallet } from '../src'
 import { stagingEndpoint } from '../src/constants'
-// import { serializeSignature, verifyEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 
 async function main() {
   const name = `CLI DApp ${Math.random().toString().substring(12)}`
@@ -104,16 +104,11 @@ ${uri.toString()}
   //     },
   //   }
   //   try {
-  //     const testAddr = '0x12f0600c945826fe9be0ea08d7c6fd35df160749'
   //     console.log('sending typed data request')
-  //     const signedData = await kit.signTypedData(testAddr, TYPED_DATA)
+  //     const signedData = await kit.signTypedData(from, TYPED_DATA)
   //     console.log('signTypedData received: ', signedData)
   //     // Sanity check
-  //     const valid = verifyEIP712TypedDataSigner(
-  //       TYPED_DATA,
-  //       serializeSignature(signedData),
-  //       testAddr
-  //     )
+  //     const valid = verifyEIP712TypedDataSigner(TYPED_DATA, serializeSignature(signedData), from)
   //     console.log('signature is valid?: ', valid)
   //   } catch (e) {
   //     console.log('Failed', e.message)
