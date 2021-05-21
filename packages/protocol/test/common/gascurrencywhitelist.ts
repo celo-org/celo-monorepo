@@ -34,7 +34,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
-    await feeCurrencyWhitelist.initialize(registry.address)
+    await feeCurrencyWhitelist.initialize()
   })
 
   describe('#initialize()', () => {
@@ -44,7 +44,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(feeCurrencyWhitelist.initialize(registry.address))
+      await assertRevert(feeCurrencyWhitelist.initialize())
     })
   })
   describe('#addToken()', () => {
