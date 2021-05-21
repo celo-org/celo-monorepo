@@ -48,17 +48,13 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     })
   })
   describe('#addToken()', () => {
-    describe('when token has an invalid oracle price', () => {
-      it('should not allow to add a token without a valid oracle price', async () => {
-        await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
-      })
+    it('should revert when token has no oracle price', async () => {
+      await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
     })
 
-    describe('when token has a valid oracle price', () => {
+    describe('when token has an oracle price', () => {
       beforeEach(async () => {
-        await mockSortedOracles.setMedianRate(mockStableToken.address, stableAmountForRate)
-        await mockSortedOracles.setMedianTimestampToNow(mockStableToken.address)
-        await mockSortedOracles.setNumRates(mockStableToken.address, 2)
+        await mockSortedOracles.setNumRates(mockStableToken.address, 1)
       })
 
       it('should allow the owner to add a token', async () => {
