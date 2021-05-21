@@ -17,5 +17,8 @@ module.exports = deploymentForCoreContract<AccountsInstance>(
   web3,
   artifacts,
   CeloContractName.Accounts,
-  initializeArgs
+  initializeArgs,
+  async (accounts: AccountsInstance) => {
+    await accounts.setEip712DomainSeparator()
+  }
 )
