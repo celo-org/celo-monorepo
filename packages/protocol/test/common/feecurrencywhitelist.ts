@@ -1,6 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert } from '@celo/protocol/lib/test-utils'
-import BigNumber from 'bignumber.js'
 import {
   FeeCurrencyWhitelistContract,
   FeeCurrencyWhitelistInstance,
@@ -25,8 +24,6 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
   const nonOwner = accounts[1]
 
-  const goldAmountForRate = new BigNumber('0x10000000000000000')
-  const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
   beforeEach(async () => {
     mockStableToken = await MockStableToken.new()
     registry = await Registry.new()
