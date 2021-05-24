@@ -32,6 +32,7 @@ git clone https://github.com/critesjosh/helloCelo.git
 We will be using the Celo ContractKit SDK to interact with the Celo test network (Alfajores). Let's install it. It is already defined in the package.json, so we can get it with
 
 ```
+cd helloCelo
 npm install
 ```
 
@@ -120,7 +121,7 @@ Don't worry about what this means right now, just understand that it is easier t
 
 Because we are accessing the network remotely, we need to generate an account to sign transactions and fund that account with test CELO.
 
-There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`web3.js` to create a new private key/account pair. [Web3.js](https://web3js.readthedocs.io/en/v1.2.6/) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library works well for generating Celo accounts.
+There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`web3.js` to create a new private key/account pair. [Web3.js](https://web3js.readthedocs.io/) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library works well for generating Celo accounts.
 
 {% hint style="danger" %}
 This is not the standard way of managing Celo accounts. In a production environment, the [Celo Wallet](../../celo-codebase/wallet/) will manage accounts for you. Accessing accounts from the Celo Wallet will be discussed in future guides.

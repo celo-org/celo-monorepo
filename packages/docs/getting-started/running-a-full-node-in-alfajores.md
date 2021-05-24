@@ -2,7 +2,7 @@
 
 This section explains how to get a full node running on the [Alfajores Network](alfajores-testnet.md), using a Docker image that was built for this purpose.
 
-If you'd prefer a one click, hosted setup for running a node on one of the major cloud providers (AWS and GCP), checkout our [hosted nodes](hosted-nodes.md) documentation.
+If you'd prefer a simple, one click hosted setup for running a node on one of the major cloud providers (AWS and GCP), checkout our [hosted nodes](hosted-nodes.md) documentation.
 
 {% hint style="info" %}
 If you would like to keep up-to-date with all the news happening in the Celo community, including validation, node operation and governance, please sign up to our [Celo Signal mailing list](https://celo.activehosted.com/f/15).
@@ -84,7 +84,7 @@ This environment variable will only persist while you have this terminal window 
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --nousb --alfajores --datadir /root/.celo
+docker run --name celo-fullnode -d --restart unless-stopped --stop-timeout 300 -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --nousb --alfajores --datadir /root/.celo
 ```
 
 You'll start seeing some output. After a few minutes, you should see lines that look like this. This means your node has started syncing with the network and is receiving blocks.

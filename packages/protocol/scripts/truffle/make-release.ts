@@ -1,9 +1,10 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
+import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { linkedLibraries } from '@celo/protocol/migrationsConfig'
+import { checkImports } from '@celo/protocol/lib/web3-utils'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
@@ -25,7 +26,11 @@ import { RegistryInstance } from 'types'
  */
 
 class ContractAddresses {
-  static async create(contracts: string[], registry: RegistryInstance) {
+  static async create(
+    contracts: string[],
+    registry: RegistryInstance,
+    libraryAddresses: LibraryAddresses['addresses']
+  ) {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
@@ -34,6 +39,9 @@ class ContractAddresses {
           addresses.set(contract, registeredAddress)
         }
       })
+    )
+    Object.entries(libraryAddresses).forEach(([library, address]) =>
+      addresses.set(library, address)
     )
     return new ContractAddresses(addresses)
   }
@@ -75,12 +83,17 @@ const deployImplementation = async (
   dryRun: boolean,
   from: string
 ) => {
+  const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  const contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new())
+  const contract = await (dryRun
+    ? Contract.at(celoRegistryAddress)
+    : checkImports('InitializableV2', Contract, artifacts)
+    ? Contract.new(testingDeployment)
+    : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -214,10 +227,13 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'from', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
+      string: ['report', 'from', 'proposal', 'librariesFile', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(
+      argv.librariesFile ?? 'libraries.json'
+    )
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
@@ -225,15 +241,16 @@ module.exports = async (callback: (error?: any) => number) => {
       basename(x, '.json')
     )
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
-    const addresses = await ContractAddresses.create(contracts, registry)
+    const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
 
     const release = async (contractName: string) => {
+      // 0. Skip already released dependencies
       if (released.has(contractName)) {
         return
       }
-      // 1. Release all dependencies.
+      // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
       const contractDependencies = dependencies.get(contractName)
       for (const dependency of contractDependencies) {
         await release(dependency)
@@ -242,12 +259,10 @@ module.exports = async (callback: (error?: any) => number) => {
       const contractArtifact = await artifacts.require(contractName)
       await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
 
-      // 3. Deploy new versions of the contract, if needed.
-      const shouldDeployCoreContractImplementation = Object.keys(report.contracts).includes(
-        contractName
-      )
-      const isLibrary = linkedLibraries[contractName]
-      if (shouldDeployCoreContractImplementation) {
+      // 3. Deploy new versions of the contract or library, if indicated by the report.
+      const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
+      const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
+      if (shouldDeployContract) {
         await deployCoreContract(
           contractName,
           contractArtifact,
@@ -258,10 +273,11 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.dry_run,
           argv.from
         )
-      } else if (isLibrary) {
+      } else if (shouldDeployLibrary) {
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
       }
-      // Mark the contract as released
+
+      // 4. Mark the contract as released
       released.add(contractName)
     }
     for (const contractName of contracts) {

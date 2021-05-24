@@ -387,9 +387,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   getApproverMultisig = () =>
     this.getApprover().then((address) => this.kit.contracts.getMultiSig(address))
 
-  async getProposalStage(proposalID: BigNumber.Value): Promise<ProposalStage> {
-    // NOTE: `methods.getProposalStage` is broken for case where proposal is queued and expired
-    // can be reverted once https://github.com/celo-org/celo-monorepo/pull/6502 is released
+  getProposalStage = async (proposalID: BigNumber.Value): Promise<ProposalStage> => {
     const queue = await this.getQueue()
     const existsInQueue = queue.find((u) => u.proposalID === proposalID) !== undefined
     if (existsInQueue) {
@@ -450,8 +448,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getApprovalStatus(proposalID: BigNumber.Value): Promise<ApprovalStatus> {
     const multisig = await this.getApproverMultisig()
     const approveTx = await this.approve(proposalID)
-    const confirmations = (await multisig.getTransactionDataByContent(this.address, approveTx.txo))!
-      .confirmations
+    const multisigTxs = await multisig.getTransactionDataByContent(this.address, approveTx.txo)
+    const confirmations = multisigTxs ? multisigTxs.confirmations : []
     const approvers = await multisig.getOwners()
     return {
       completion: `${confirmations.length} / ${approvers.length}`,

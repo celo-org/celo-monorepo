@@ -42,33 +42,29 @@ export class MockWalletConnectClient extends EventEmitter {
     })
   }
 
-  async request(event: SessionTypes.PayloadEvent) {
+  async request(event: SessionTypes.RequestEvent) {
     const {
-      // @ts-ignore
-      request: { method },
+      request: { method, params },
     } = event
 
     // the request gets transformed between the client
     // and wallet, here we reassign to use our decoding
     //  methods in ./common.ts.
-    // @ts-ignore
-    const request = { payload: { params: event.request.params } }
-
     let result = null
     if (method === SupportedMethods.personalSign) {
-      const { payload, from } = parsePersonalSign(request)
+      const { payload, from } = parsePersonalSign(params)
       result = await testWallet.signPersonalMessage(from, payload)
     } else if (method === SupportedMethods.signTypedData) {
-      const { from, payload } = parseSignTypedData(request)
+      const { from, payload } = parseSignTypedData(params)
       result = await testWallet.signTypedData(from, payload)
     } else if (method === SupportedMethods.signTransaction) {
-      const tx = parseSignTransaction(request)
+      const tx = parseSignTransaction(params)
       result = await testWallet.signTransaction(tx)
     } else if (method === SupportedMethods.computeSharedSecret) {
-      const { from, publicKey } = parseComputeSharedSecret(request)
+      const { from, publicKey } = parseComputeSharedSecret(params)
       result = (await testWallet.computeSharedSecret(from, publicKey)).toString('hex')
     } else if (method === SupportedMethods.decrypt) {
-      const { from, payload } = parseDecrypt(request)
+      const { from, payload } = parseDecrypt(params)
       result = (await testWallet.decrypt(from, payload)).toString('hex')
     } else {
       return

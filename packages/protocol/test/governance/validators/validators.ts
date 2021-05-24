@@ -115,7 +115,7 @@ contract('Validators', (accounts: string[]) => {
     '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     // Do not register an account for the last address so it can be used as an authorized validator signer.
     await Promise.all(
       accounts.slice(0, -1).map((account) => accountsInstance.createAccount({ from: account }))
@@ -2192,13 +2192,7 @@ contract('Validators', (accounts: string[]) => {
             const removalTimestamp = removalTimestamps[i]
             const requirementExpiry = groupLockedGoldRequirements.duration.plus(removalTimestamp)
             const currentTimestamp = (await web3.eth.getBlock('latest')).timestamp
-            await timeTravel(
-              requirementExpiry
-                .minus(currentTimestamp)
-                .plus(1)
-                .toNumber(),
-              web3
-            )
+            await timeTravel(requirementExpiry.minus(currentTimestamp).plus(1).toNumber(), web3)
           }
         })
       })

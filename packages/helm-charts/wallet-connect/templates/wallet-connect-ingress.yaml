@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+{{ include "walletconnect.labels" .  | indent 4 }}
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - hosts:
+    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Name }}-tls
+  rules:
+  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Release.Name }}
+          servicePort: 5000

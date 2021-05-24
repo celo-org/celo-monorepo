@@ -227,7 +227,11 @@ export const verifyBytecodes = async (
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
 
-  const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
+  const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
+
+  const queue = contracts.filter(
+    (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
+  )
   const visited: Set<string> = new Set(queue)
 
   // truffle web3 version does not have getProof
@@ -248,4 +252,6 @@ export const verifyBytecodes = async (
   while (queue.length > 0) {
     await dfsStep(queue, visited, context)
   }
+
+  return context.libraryAddresses
 }

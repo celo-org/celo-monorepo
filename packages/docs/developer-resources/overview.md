@@ -19,9 +19,9 @@ View the [Developer Code Examples page](start.md) to get started using the Celo 
 - [Celo Ethers.js Wrapper](https://github.com/celo-tools/celo-ethers-wrapper) (_experimental_)
   - A minimal wrapper to make [ethers.js](https://docs.ethers.io/v5/) compatible with the Celo network
 - [use-contractkit](https://github.com/celo-tools/use-contractkit)
-  - A [Web3Modal](https://web3modal.com/)-like experience that injects ContractKit into your application. Supports a variety of different wallets, including but not limited to Valora, Ledger, Metamask (Celo compatible fork) and any WalletConnect compatible wallets
+  - A [Web3Modal](https://web3modal.com/)-like experience that injects ContractKit into your web-based application. Supports a variety of different wallets, including but not limited to Valora, Ledger, Metamask (Celo compatible fork) and any WalletConnect compatible wallets
 - [DappKit](dappkit/)
-  - Easily connect to the [Valora](http://valoraapp.com/) wallet
+  - Easily connect to the [Valora](http://valoraapp.com/) wallet with your React Native mobile application
   - Valora manages user account, private keys and transaction signing, so you can focus on building your dapp
   - Learn more and see the code with the [Dappkit truffle box](https://github.com/critesjosh/celo-dappkit)
 - [Python SDK](https://github.com/blaize-tech/celo-sdk-py)

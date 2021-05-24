@@ -41,7 +41,7 @@ release: {{ .Release.Name }}
 
 {{- define "common.conditional-init-genesis-container" -}}
 {{- $production_envs := list "rc1" "baklava" "alfajores" -}}
-{{- if not (has .Release.Name $production_envs) -}}
+{{- if not (has .Values.genesis.network $production_envs) -}}
 {{ include "common.init-genesis-container" . }}
 {{- end -}}
 {{- end -}}
@@ -95,8 +95,8 @@ release: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "common.bootnode-flag-script" -}}
-if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
-  BOOTNODE_FLAG="--{{ .Release.Name }}"
+if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
+  BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
 else
   BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi
@@ -182,12 +182,12 @@ fi
 
     exec geth \
       --port $PORT  \
-{{- if not (contains "rc1" .Release.Name) }}
-      "$BOOTNODE_FLAG" \
+{{- if not (contains "rc1" .Values.genesis.network) }}
+      $BOOTNODE_FLAG \
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1100 }} \
+      --maxpeers {{ .maxpeers | default 1200 }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \

@@ -7,7 +7,7 @@ This tutorial includes a walk through of a truffle box to get you started with d
  - View transactions with a block explorer
  - Mobile development using React Native and Expo
 
-**Mandatory:** Make sure that you have the [Yarn package manager](https://yarnpkg.com/), [Truffle](https://www.trufflesuite.com/truffle) installed and **are using Node.js version 10.x**, then `$ truffle unbox critesjosh/celo-dappkit` in your new project directory. This will download the code from [this GitHub repo](https://github.com/critesjosh/celo-dappkit) to get you started.
+**Mandatory:** Make sure that you have the [Yarn package manager](https://yarnpkg.com/), [Truffle](https://www.trufflesuite.com/truffle) installed and **are using Node.js v12.x**, then `$ truffle unbox critesjosh/celo-dappkit` in your new project directory. This will download the code from [this GitHub repo](https://github.com/critesjosh/celo-dappkit) to get you started.
 
 Use this [Truffle Box](https://www.trufflesuite.com/boxes) to get started building a mobile dapp using Celo and React Native in Javascript. We will build a simple React Native application that we can use to read and update a contract on the Alfajores test network.
 
@@ -158,5 +158,5 @@ You should now have the necessary skills to get started with developing mobile a
  - View transactions with a block explorer
  - Mobile development using React Native and Expo
 
-This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://discord.gg/745Qntv) if you need any help (or just want to chat)!
+This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://chat.celo.org) if you need any help (or just want to chat)!
 

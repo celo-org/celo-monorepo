@@ -12,9 +12,12 @@ async function start() {
   const server = createServer()
   logger.info('Starting server')
   const port = config.server.port
-  server.listen(port, () => {
-    logger.info(`Server is listening on port ${port}`)
-  })
+  const backupTimeout = config.timeout * 1.2
+  server
+    .listen(port, () => {
+      logger.info(`Server is listening on port ${port}`)
+    })
+    .setTimeout(backupTimeout)
 }
 
 start().catch((err) => {

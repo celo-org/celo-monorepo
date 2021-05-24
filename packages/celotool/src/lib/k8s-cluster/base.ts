@@ -26,7 +26,7 @@ export abstract class BaseClusterManager {
     this._celoEnv = celoEnv
   }
 
-  async switchToClusterContext(skipSetup: boolean = false) {
+  async switchToClusterContext(skipSetup: boolean, context?: string) {
     const exists = await this.switchToClusterContextIfExists()
     if (!exists) {
       await this.getAndSwitchToClusterContext()
@@ -35,7 +35,7 @@ export abstract class BaseClusterManager {
     await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
     if (!skipSetup) {
       if (!isCelotoolHelmDryRun()) {
-        await this.setupCluster()
+        await this.setupCluster(context)
       } else {
         console.info(`Skipping cluster setup due to --helmdryrun`)
       }
@@ -76,13 +76,13 @@ export abstract class BaseClusterManager {
     return true
   }
 
-  async setupCluster() {
+  async setupCluster(context?: string) {
     await createNamespaceIfNotExists(this.celoEnv)
     if (!isCelotoolHelmDryRun()) {
       console.info('Performing any cluster setup that needs to be done...')
 
       await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
-      await installAndEnableMetricsDeps(true, this.clusterConfig)
+      await installAndEnableMetricsDeps(true, context, this.clusterConfig)
     }
   }
 

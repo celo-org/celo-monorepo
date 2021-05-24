@@ -104,12 +104,8 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random()
-    .toString(36)
-    .slice(-8)
-  const blockscoutDBPassword = Math.random()
-    .toString(36)
-    .slice(-8)
+  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
+  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -312,6 +308,7 @@ export async function installCertManager() {
 
 export async function installAndEnableMetricsDeps(
   installPrometheus: boolean,
+  context?: string,
   clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
@@ -325,7 +322,7 @@ export async function installAndEnableMetricsDeps(
     )
   }
   if (installPrometheus) {
-    await installPrometheusIfNotExists(clusterConfig)
+    await installPrometheusIfNotExists(context, clusterConfig)
   }
 }
 
@@ -762,6 +759,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
+    `--set genesis.network=${celoEnv}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
@@ -880,7 +878,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
         ' '
       )}`,
       true
