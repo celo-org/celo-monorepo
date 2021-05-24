@@ -1,5 +1,6 @@
-import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { assertRevert, assumeOwnership } from '@celo/protocol/lib/test-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import {
   FeeCurrencyWhitelistContract,
   FeeCurrencyWhitelistInstance,
@@ -7,12 +8,10 @@ import {
   MockSortedOraclesInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  RegistryContract,
   RegistryInstance,
 } from 'types'
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
-const Registry: RegistryContract = artifacts.require('Registry')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 
@@ -26,9 +25,13 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
   beforeEach(async () => {
     mockStableToken = await MockStableToken.new()
-    registry = await Registry.at(celoRegistryAddress)
     mockSortedOracles = await MockSortedOracles.new()
+
+    registry = await getDeployedProxiedContract('Registry', artifacts)
+    // Take ownership of the registry contract to point it to the mocks
+    await assumeOwnership(['Registry'], accounts[0])
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+
     feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
     await feeCurrencyWhitelist.initialize()
   })
