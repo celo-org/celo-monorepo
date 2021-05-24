@@ -1,4 +1,4 @@
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 import {
   FeeCurrencyWhitelistContract,
@@ -26,8 +26,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
   beforeEach(async () => {
     mockStableToken = await MockStableToken.new()
-    registry = await Registry.new()
-
+    registry = await Registry.at(celoRegistryAddress)
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
