@@ -26,4 +26,4 @@ if ! nc -z 127.0.0.1 8545 && [ -z $FORNO ] ; then
   exit 1
 fi
 
-yarn run truffle console --network $NETWORK --build_directory $PWD/build/$NETWORK $FORNO
+yarn run truffle console --network $NETWORK --contracts_build_directory $PWD/build/contracts $FORNO

@@ -7,6 +7,11 @@
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
 - [Wallets](getting-started/wallets.md)
+  - [Using MetaMask with Celo](getting-started/using-metamask-with-celo/README.md)
+    - [Manual Setup](getting-started/using-metamask-with-celo/manual-setup.md)
+    - [Programmatic Setup](getting-started/using-metamask-with-celo/programmatic-setup.md)
+    - [Choosing the Right Gas Price](getting-started/using-metamask-with-celo/choosing-the-right-gas-price.md)
+    - [Using a Ledger with MetaMask](getting-started/using-metamask-with-celo/using-a-ledger-with-metamask.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
