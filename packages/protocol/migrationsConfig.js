@@ -235,6 +235,9 @@ const NetworkConfigs = {
     goldToken: {
       frozen: false,
     },
+    governance: {
+      skipTransferOwnership: true,
+    },
     reserve: {
       initialBalance: 100000000,
       // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
