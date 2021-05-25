@@ -6,7 +6,7 @@ import "../common/InitializableV2.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
- * @title Facilitates large exchanges between CELO and a stable token.
+ * @title Facilitates large exchanges between CELO and stable tokens.
  */
 contract GrandaMento is ICeloVersionedContract, Ownable, InitializableV2 {
   /**
