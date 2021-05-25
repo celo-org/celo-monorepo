@@ -116,9 +116,6 @@ const DefaultConfig = {
     numInternalRequiredConfirmations: 1,
     useMultiSig: true,
   },
-  grandaMento: {
-    frozen: false,
-  },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
