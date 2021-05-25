@@ -33,7 +33,7 @@ const kubeServiceAccountName = releaseName
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
 const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.25.0'
+const prometheusImageTag = 'v2.27.1'
 
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
@@ -160,6 +160,9 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       `--set remote_write[0].basic_auth.password=${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
       )}`,
+      `--set remote_write[0].write_relabel_configs[0].source_labels=[__name__]`,
+      `--set remote_write[0].write_relabel_configs[0].regex='(apiserver_(.+)|etcd_(.+)|nginx_(.+))'`,
+      `--set remote_write[0].write_relabel_configs[0].action='drop'`,
       `--set enable_alerts="${isProduction()}"`
     )
   }
