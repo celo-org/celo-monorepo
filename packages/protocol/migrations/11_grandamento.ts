@@ -5,10 +5,11 @@ import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
+import { config } from '@celo/protocol/migrationsConfig'
 import { GrandaMentoInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return []
+  return [config.registry.predeployedProxyAddress]
 }
 
 module.exports = deploymentForCoreContract<GrandaMentoInstance>(

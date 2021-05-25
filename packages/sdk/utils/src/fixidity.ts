@@ -20,3 +20,7 @@ export const fixedToInt = (f: BigNumber) => {
 export const multiply = (a: BigNumber, b: BigNumber) => {
   return a.times(b).idiv(fixed1)
 }
+
+export const divide = (a: BigNumber, b: BigNumber) => {
+  return a.times(fixed1).div(b)
+}
