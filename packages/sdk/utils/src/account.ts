@@ -66,59 +66,152 @@ export function validateMnemonic(mnemonic: string, bip39ToUse: Bip39 = bip39Wrap
   return false
 }
 
-export function formatNonAccentedCharacters(mnemonic: string) {
-  const languages = getAllLanguages()
-  const normMnemonicArr = normalizeAccents(mnemonic).toLowerCase().trim().split(' ')
+/**
+ * Normalize the mnemonic phrase to eliminate a number of inconsistencies with standard BIP-39
+ * phrases that are likely to arise when a user manually enters a phrase.
+ *
+ * @remarks Note that this does not guarantee that the output is a valid mnemonic phrase, or even
+ * that all the words in the phrase are contained in a valid wordlist.
+ */
+export function normalizeMnemonic(mnemonic: string, language?: MnemonicLanguages): string {
+  const words = splitMnemonic(mnemonic)
+  const lowered = words.map((word) => word.toLowerCase())
+  const detectedLanguage = language ?? detectLanguage(lowered)
 
-  for (const language of languages) {
-    if (isLatinBasedLanguage(language)) {
-      const wordList = getWordList(language)
-      const normWordListMap = createNormalizedWordListMap(wordList)
-      const languageMatches = arrayContainedInMap(normMnemonicArr, normWordListMap)
-
-      if (languageMatches) {
-        return replaceIncorrectlyAccentedWords(mnemonic, normMnemonicArr, normWordListMap)
-      }
-    }
+  // If the language is unknown, do not run further normalizations.
+  if (detectedLanguage === undefined) {
+    return joinMnemonic(lowered, detectedLanguage)
   }
 
-  return mnemonic
+  return joinMnemonic(formatNonAccentedCharacters(lowered, detectedLanguage), detectedLanguage)
 }
 
-const createNormalizedWordListMap = (wordList: string[]) => {
-  const normWordListMap = new Map()
-  for (const word of wordList) {
-    const noramlizedWord = normalizeAccents(word)
-    normWordListMap.set(noramlizedWord, word)
+/**
+ * Scans the provided phrase and adds accents to words where the are not provided, or provided
+ * inconsistently with the BIP-39 standard. Ensures that phrases differing only by accents will
+ * validate after being cast into the normalized form.
+ *
+ * @remarks Words should be converted to lower case before being given to this function.
+ */
+function formatNonAccentedCharacters(words: string[], language: MnemonicLanguages): string[] {
+  if (isLatinBasedLanguage(language)) {
+    const wordList = getWordList(language)
+    const normalizedWordMap = new Map(wordList.map((word) => [normalizeAccents(word), word]))
+    return words.map((word) => normalizedWordMap.get(normalizeAccents(word)) ?? word)
   }
-  return normWordListMap
+
+  return words
 }
 
-const arrayContainedInMap = (array: string[], map: Map<string, string>) => {
-  for (const item of array) {
-    if (!map.has(item)) {
+function isLatinBasedLanguage(language: MnemonicLanguages): boolean {
+  // Use exhaustive switch to ensure that every language is accounted for.
+  switch (language) {
+    case MnemonicLanguages.english:
+    case MnemonicLanguages.french:
+    case MnemonicLanguages.italian:
+    case MnemonicLanguages.spanish:
+    case MnemonicLanguages.portuguese:
+      return true
+    case MnemonicLanguages.chinese_simplified:
+    case MnemonicLanguages.chinese_traditional:
+    case MnemonicLanguages.japanese:
+    case MnemonicLanguages.korean:
       return false
-    }
   }
-  return true
 }
 
-const replaceIncorrectlyAccentedWords = (
-  mnemonic: string,
-  normMnemonicArr: string[],
-  normWordListMap: Map<string, string>
-) => {
-  const mnemonicArr = [...mnemonic.trim().split(' ')]
-  for (let i = 0; i < normMnemonicArr.length; i += 1) {
-    const noramlizedWord = normMnemonicArr[i]
-    const nonNormalizedWord = normWordListMap.get(noramlizedWord)
-
-    if (nonNormalizedWord) {
-      mnemonicArr[i] = nonNormalizedWord
-    }
+// Unify the bip39.wordlists (otherwise depends on the instance of the bip39)
+function getWordList(language?: MnemonicLanguages): string[] {
+  // Use exhaustive switch to ensure that every language is accounted for.
+  switch (language ?? MnemonicLanguages.english) {
+    case MnemonicLanguages.chinese_simplified:
+      return bip39.wordlists.chinese_simplified
+    case MnemonicLanguages.chinese_traditional:
+      return bip39.wordlists.chinese_traditional
+    case MnemonicLanguages.english:
+      return bip39.wordlists.english
+    case MnemonicLanguages.french:
+      return bip39.wordlists.french
+    case MnemonicLanguages.italian:
+      return bip39.wordlists.italian
+    case MnemonicLanguages.japanese:
+      return bip39.wordlists.japanese
+    case MnemonicLanguages.korean:
+      return bip39.wordlists.korean
+    case MnemonicLanguages.spanish:
+      return bip39.wordlists.spanish
+    case MnemonicLanguages.portuguese:
+      return bip39.wordlists.portuguese
   }
+}
 
-  return mnemonicArr.join(' ')
+export function getAllLanguages(): MnemonicLanguages[] {
+  return [
+    MnemonicLanguages.chinese_simplified,
+    MnemonicLanguages.chinese_traditional,
+    MnemonicLanguages.english,
+    MnemonicLanguages.french,
+    MnemonicLanguages.italian,
+    MnemonicLanguages.japanese,
+    MnemonicLanguages.korean,
+    MnemonicLanguages.spanish,
+    MnemonicLanguages.portuguese,
+  ]
+}
+
+/**
+ * Splits a mnemonic phrase into words, handling extra whitespace anywhere in the phrase.
+ */
+function splitMnemonic(mnemonic: string): string[] {
+  return [...mnemonic.trim().split(/\s+/)]
+}
+
+/**
+ * Joins a list of words into a mnemonic phrase. Inverse of splitMnemonic.
+ */
+function joinMnemonic(words: string[], language: MnemonicLanguages | undefined): string {
+  return words.join(language === MnemonicLanguages.japanese ? '\u3000' : ' ')
+}
+
+/**
+ * Detects the language of tokenized mnemonic phrase by applying a heuristic.
+ *
+ * @remarks Uses a heuristic of returning the language with the most matching words. In practice, we
+ * expect all words to come from a single language, also some may be misspelled or otherwise
+ * malformed. It may occasionally occur that a typo results in word from another language (e.g. bag
+ * -> bagr) but this should occur at most once or twice per phrase.
+ */
+export function detectLanguage(
+  words: string[],
+  candidates?: MnemonicLanguages[]
+): MnemonicLanguages | undefined {
+  // Assign a match score to each language by how many words of the phrase are in each language.
+  const scores: [MnemonicLanguages, number][] = (candidates ?? getAllLanguages()).map(
+    (candidate) => {
+      const wordSet = new Set(getWordList(candidate))
+      const score = words.reduce((count, word) => (wordSet.has(word) ? count + 1 : count), 0)
+      return [candidate, score]
+    }
+  )
+
+  // Reduce to the highest scoring candidate(s). Note that it is possible for multiple candidates to
+  // have the same score, but it likely to occur only for specially constructed phrases.
+  const [winners, highscore] = scores.reduce(
+    ([leaders, leadingScore], [candidate, score]) => {
+      if (score > leadingScore) {
+        return [[candidate], score]
+      } else if (score === leadingScore) {
+        return [[...leaders, candidate], leadingScore]
+      }
+      return [leaders, leadingScore]
+    },
+    [[], 0] as [MnemonicLanguages[], number]
+  )
+
+  if (winners.length !== 1 || highscore < 1) {
+    return undefined
+  }
+  return winners[0]
 }
 
 export async function generateKeys(
@@ -180,61 +273,10 @@ export function generateKeysFromSeed(
   }
 }
 
-function isLatinBasedLanguage(language: MnemonicLanguages) {
-  if (
-    language === MnemonicLanguages.chinese_simplified ||
-    language === MnemonicLanguages.chinese_traditional ||
-    language === MnemonicLanguages.japanese ||
-    language === MnemonicLanguages.korean
-  ) {
-    return false
-  }
-  return true
-}
-
-// Unify the bip39.wordlists (otherwise depends on the instance of the bip39)
-function getWordList(language?: MnemonicLanguages) {
-  switch (language) {
-    case MnemonicLanguages.chinese_simplified:
-      return bip39.wordlists.chinese_simplified
-    case MnemonicLanguages.chinese_traditional:
-      return bip39.wordlists.chinese_traditional
-    case MnemonicLanguages.english:
-      return bip39.wordlists.english
-    case MnemonicLanguages.french:
-      return bip39.wordlists.french
-    case MnemonicLanguages.italian:
-      return bip39.wordlists.italian
-    case MnemonicLanguages.japanese:
-      return bip39.wordlists.japanese
-    case MnemonicLanguages.korean:
-      return bip39.wordlists.korean
-    case MnemonicLanguages.spanish:
-      return bip39.wordlists.spanish
-    case MnemonicLanguages.portuguese:
-      return bip39.wordlists.portuguese
-    default:
-      return bip39.wordlists.english
-  }
-}
-
-function getAllLanguages() {
-  return [
-    MnemonicLanguages.chinese_simplified,
-    MnemonicLanguages.chinese_traditional,
-    MnemonicLanguages.english,
-    MnemonicLanguages.french,
-    MnemonicLanguages.italian,
-    MnemonicLanguages.japanese,
-    MnemonicLanguages.korean,
-    MnemonicLanguages.spanish,
-    MnemonicLanguages.portuguese,
-  ]
-}
-
 export const AccountUtils = {
   generateMnemonic,
   validateMnemonic,
+  normalizeMnemonic,
   generateKeys,
   generateSeed,
   generateKeysFromSeed,
