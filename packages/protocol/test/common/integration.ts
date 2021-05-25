@@ -2,8 +2,8 @@ import { ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
 import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
-  assertRevert,
   assertEqualBN,
+  assertRevert,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -13,12 +13,13 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
   ExchangeContract,
   ExchangeInstance,
+  FeeCurrencyWhitelistInstance,
   FreezerInstance,
   GoldTokenInstance,
   GovernanceApproverMultiSigInstance,
@@ -32,6 +33,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
   None = 0,
@@ -599,7 +601,13 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     const dequeuedIndex = 0
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
-    const contractsToOwn = ['Freezer', 'Registry', 'Reserve', 'SortedOracles']
+    const contractsToOwn = [
+      'Freezer',
+      'Registry',
+      'Reserve',
+      'SortedOracles',
+      'FeeCurrencyWhitelist',
+    ]
     const proposalTransactions = await Promise.all(
       contractsToOwn.map(async (x: string) => {
         return {
@@ -627,7 +635,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
     )
 
-    await governance.upvote(proposalId, 0, 0)
+    // await governance.upvote(proposalId, 0, 0)
     await timeTravel(config.governance.dequeueFrequency, web3)
     // @ts-ignore
     const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
@@ -654,37 +662,39 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       await registry.setAddressFor('ExchangeABC', exchangeAbc.address)
       await registry.setAddressFor('StableTokenABC', stableTokenAbc.address)
 
-      // TODO: This is not very readable, what are these parameters and why were these values chosen?
       await stableTokenAbc.initialize(
-        'Celo Abc',
-        'cABC',
-        '18',
-        '0x000000000000000000000000000000000000ce10',
-        '1000000000000000000000000',
-        '47304000',
-        [accounts[0]],
-        ['1000000000000000000'],
-        'ExchangeABC'
+        'Celo Abc', // Name
+        'cABC', // symbol
+        '18', // decimals
+        registry.address, // registry address
+        fixed1, // inflationRate
+        SECONDS_IN_A_WEEK, // inflationRatePeriod
+        [accounts[0]], // pre-mint account
+        ['1000000000000000000'], // pre-mint amount
+        'ExchangeABC' // exchange contract key on the registry
       )
       await exchangeAbc.initialize(
-        '0x000000000000000000000000000000000000ce10',
-        stableTokenAbc.address,
-        '5000000000000000000000',
-        '1300000000000000000000',
-        '300',
-        '1'
+        registry.address, // registry address
+        stableTokenAbc.address, // stableToken
+        '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
+        '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
+        '300', // updateFrequency, matches mainnet for cUSD and cEUR
+        '1' // minimumReports, minimum possible to avoid having to mock multiple reports
       )
     })
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      // TODO: It appears this succeeds if minBuyAmount is zero, seems fine but should think through more thoroughly.
       await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
+      exchangeAbc.sell(sellAmount, 0, true)
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
       await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+      // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
+      exchangeAbc.sell(sellAmount, 0, false)
     })
   })
 
@@ -722,8 +732,15 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   describe.only('When the contracts have been unfrozen and the mento has been activated', () => {
     before(async () => {
       const reserve: ReserveInstance = await getDeployedProxiedContract('Reserve', artifacts)
+      const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
+        'FeeCurrencyWhitelist',
+        artifacts
+      )
       await reserve.addToken(stableTokenAbc.address)
       await reserve.addExchangeSpender(exchangeAbc.address)
+      // fee currency can't be test here, but keep this line for reference
+      await feeCurrencyWhitelist.addToken(stableTokenAbc.address)
+
       await freezer.unfreeze(stableTokenAbc.address)
       await freezer.unfreeze(exchangeAbc.address)
     })
