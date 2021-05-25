@@ -1,8 +1,7 @@
-FROM node:10
+FROM node:12
 
 RUN apt-get update -y
 RUN apt-get install lsb-release libudev-dev libusb-dev -y --no-install-recommends apt-utils
-RUN npm install -g yarn
 
 # Install Kubernetes, as per https://kubernetes.io/docs/tasks/tools/install-kubectl/
 RUN apt-get install -y apt-transport-https && \
