@@ -110,6 +110,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     '__name__!~"phoenix_.+"',
     '__name__!~"workqueue_.+"',
     '__name__!~"nginx_.+"',
+    '__name__!~"etcd_.+"',
   ]
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP

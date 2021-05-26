@@ -24,6 +24,8 @@ export interface BaseFullNodeDeploymentConfig {
   diskSizeGb: number
   replicas: number
   rollingUpdatePartition: number
+  rpcApis: string
+  gcMode: string
   // If undefined, node keys will not be predetermined and will be random
   nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
@@ -94,13 +96,18 @@ export abstract class BaseFullNodeDeployer {
       )
     }
 
-    const rpcApis = 'eth,net,rpc,web3'
+    // const rpcApis = 'eth,net,rpc,web3'
+    const rpcApis = this._deploymentConfig.rpcApis
+      ? this._deploymentConfig.rpcApis
+      : 'eth,net,rpc,web3'
+    const gcMode = this._deploymentConfig.gcMode ? this._deploymentConfig.gcMode : 'full'
     return [
       `--set namespace=${this.kubeNamespace}`,
       `--set replicaCount=${this._deploymentConfig.replicas}`,
       `--set geth.updateStrategy.rollingUpdate.partition=${this._deploymentConfig.rollingUpdatePartition}`,
       `--set storage.size=${this._deploymentConfig.diskSizeGb}Gi`,
       `--set geth.expose_rpc_externally=false`,
+      `--set geth.gcmode=${gcMode}`,
       `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
       `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\,')}'`,
