@@ -752,7 +752,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
   const useMyCelo = stringToBoolean(fetchEnvOrFallback(envVar.GETH_USE_MYCELO, 'false'))
-  await getGenesis(celoEnv, !useExistingGenesis, useMyCelo)
+  await createAndPushGenesis(celoEnv, !useExistingGenesis, useMyCelo)
 
   const bootnodeOverwritePkey =
     fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== ''
@@ -1092,7 +1092,7 @@ function rollingUpdateHelmVariables() {
 
 const celoBlockchainDir: string = path.join(os.tmpdir(), 'celo-blockchain-celotool')
 
-export async function getGenesis(celoEnv: string, reset: boolean, useMyCelo: boolean) {
+export async function createAndPushGenesis(celoEnv: string, reset: boolean, useMyCelo: boolean) {
   let genesis: string = ''
   try {
     genesis = await getGenesisBlockFromGoogleStorage(celoEnv)

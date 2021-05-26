@@ -71,7 +71,7 @@ release: {{ .Release.Name }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo
-  {{- if .Values.genesis.useGenesisFileBase64 }}
+  {{- if eq (default .Values.genesis.useGenesisFileBase64 "false") "true" }}
   - name: config
     mountPath: /var/geth
   {{ end -}}
@@ -275,7 +275,7 @@ metadata:
 {{ include "common.standard.labels" .  | indent 4 }}
 data:
   networkid: {{ $.Values.genesis.networkId | quote }}
-{{- if eq (default $.Values.genesis.useGenesisFileBase64 "true") "false" }}
+{{- if eq (default $.Values.genesis.useGenesisFileBase64 "false") "true" }}
   genesis.json: {{ $.Values.genesis.genesisFileBase64 | b64dec | quote }}
 {{- end -}}
 {{- end -}}
