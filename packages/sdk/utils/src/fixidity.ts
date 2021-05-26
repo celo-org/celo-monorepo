@@ -22,5 +22,9 @@ export const multiply = (a: BigNumber, b: BigNumber) => {
 }
 
 export const divide = (a: BigNumber, b: BigNumber) => {
-  return a.times(fixed1).div(b)
+  return a.times(fixed1).idiv(b)
+}
+
+export const reciprocal = (f: BigNumber) => {
+  return divide(fixed1, f)
 }

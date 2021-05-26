@@ -8,6 +8,7 @@ import "../common/InitializableV2.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "./interfaces/IStableToken.sol";
 
 /**
  * @title Facilitates large exchanges between CELO and a stable token.
@@ -49,6 +50,7 @@ contract GrandaMento is
     address stableToken;
     uint256 sellAmount;
     uint256 buyAmount;
+    // uint256 approvalTimestamp;
     ExchangeState state;
     bool sellCelo;
   }
@@ -134,7 +136,8 @@ contract GrandaMento is
     exchangeProposals[proposalId] = ExchangeProposal({
       exchanger: msg.sender,
       stableToken: stableToken,
-      sellAmount: sellAmount,
+      sellAmount: // sellAmount is saved in units for stable tokens to account for inflation.
+      sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
       buyAmount: buyAmount,
       state: ExchangeState.Proposed,
       sellCelo: sellCelo
@@ -146,8 +149,8 @@ contract GrandaMento is
   }
 
   /**
-   * @notice Taking the spread and oracle price into account, calculates the
-   * amount of the asset being bought.
+   * @notice Using the oracle price, charges the spread, and calculates amount of
+   * the asset being bought.
    * @dev Stable token value amounts are used, not unit amounts.
    * @param stableToken The stableToken involved in the exchange.
    * @param sellAmount The amount of the sell token being sold.
@@ -171,9 +174,16 @@ contract GrandaMento is
     FixidityLib.Fraction memory adjustedSellAmount = FixidityLib.fixed1().subtract(spread).multiply(
       FixidityLib.newFixed(sellAmount)
     );
+    // Calculate the buy amount:
+    // exchangeRate * adjustedSellAmount
     return exchangeRate.multiply(adjustedSellAmount).fromFixed();
   }
 
+  /**
+   * @notice Gets the oracle CELO price quoted in the stable token.
+   * @param stableToken The stable token to get the oracle price for.
+   * @return The oracle CELO price quoted in the stable token.
+   */
   function getOracleExchangeRate(address stableToken)
     private
     view
