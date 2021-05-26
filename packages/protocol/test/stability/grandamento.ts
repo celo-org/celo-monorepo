@@ -10,18 +10,19 @@ GrandaMento.numberFormat = 'BigNumber'
 contract('GrandaMento', (accounts: string[]) => {
   let grandaMento: GrandaMentoInstance
 
+  const owner = accounts[0]
+
   beforeEach(async () => {
     grandaMento = await GrandaMento.new(true)
     await grandaMento.initialize()
   })
 
   describe('#initialize()', () => {
-    it('should have set the owner', async () => {
-      const expectedOwner: string = await grandaMento.owner()
-      assert.equal(expectedOwner, accounts[0])
+    it('sets the owner', async () => {
+      assert.equal(await grandaMento.owner(), owner)
     })
 
-    it('should not be callable again', async () => {
+    it('reverts when called again', async () => {
       await assertRevert(grandaMento.initialize())
     })
   })
