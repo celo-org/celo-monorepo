@@ -573,7 +573,6 @@ Array.from([
   })
 )
 
-// TODO: DO NOT FORGET TO REMOVE THE ONLYS HERE
 contract('Integration: Adding StableToken', (accounts: string[]) => {
   const Exchange: ExchangeContract = artifacts.require('Exchange')
   const StableToken: StableTokenContract = artifacts.require('StableToken')
@@ -635,7 +634,6 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
     )
 
-    // await governance.upvote(proposalId, 0, 0)
     await timeTravel(config.governance.dequeueFrequency, web3)
     // @ts-ignore
     const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
@@ -653,7 +651,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   b) Register the contracts
   //   c) Initialize the contracts
   //   d) Confirm mento is effectively frozen
-  describe.only('When the contracts have been deployed and initialized', () => {
+  describe('When the contracts have been deployed and initialized', () => {
     before(async () => {
       exchangeAbc = await Exchange.new()
       stableTokenAbc = await StableToken.new()
@@ -702,7 +700,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   a) Activate the oracles and freeze the mento
   //   b) Make an oracle report
   //   c) Confirm mento is effectively frozen
-  describe.only('When the contracts have been frozen and an oracle report has been made', () => {
+  describe('When the contracts have been frozen and an oracle report has been made', () => {
     before(async () => {
       const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract(
         'SortedOracles',
@@ -729,7 +727,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   a) Add the stable token to the reserve
   //   b) Unfreeze the mento
   //   c) Confirm mento is functional
-  describe.only('When the contracts have been unfrozen and the mento has been activated', () => {
+  describe('When the contracts have been unfrozen and the mento has been activated', () => {
     before(async () => {
       const reserve: ReserveInstance = await getDeployedProxiedContract('Reserve', artifacts)
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
