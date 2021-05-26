@@ -1,6 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
-import { divide, toFixed } from '@celo/utils/lib/fixidity'
+import { divide, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import {
@@ -56,14 +56,13 @@ contract('GrandaMento', (accounts: string[]) => {
   let registry: RegistryInstance
 
   const owner = accounts[0]
-  // const spread = toFixed(3 / 1000)
 
   const decimals = 18
   const unit = new BigNumber(10).pow(decimals)
   // CELO quoted in StableToken (cUSD), ie $5
   const defaultCeloStableTokenRate = toFixed(5)
 
-  // const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
+  const spread = toFixed(0.01) // 1%
 
   beforeEach(async () => {
     registry = await Registry.new()
@@ -78,7 +77,7 @@ contract('GrandaMento', (accounts: string[]) => {
     await sortedOracles.setNumRates(stableToken.address, 2)
 
     grandaMento = await GrandaMento.new(true)
-    await grandaMento.initialize(registry.address)
+    await grandaMento.initialize(registry.address, spread)
     await grandaMento.setStableTokenExchangeLimits(
       stableToken.address,
       unit.times(100),
@@ -92,13 +91,20 @@ contract('GrandaMento', (accounts: string[]) => {
   })
 
   describe('#initialize()', () => {
-    it('should have set the owner', async () => {
-      const expectedOwner: string = await grandaMento.owner()
-      assert.equal(expectedOwner, owner)
+    it('sets the owner', async () => {
+      assert.equal(await grandaMento.owner(), owner)
     })
 
-    it('should not be callable again', async () => {
-      await assertRevert(grandaMento.initialize(registry.address))
+    it('sets the registry', async () => {
+      assert.equal(await grandaMento.registry(), registry.address)
+    })
+
+    it('sets the spread', async () => {
+      assert.equal(await grandaMento.spread(), spread)
+    })
+
+    it('reverts when called again', async () => {
+      await assertRevert(grandaMento.initialize(registry.address, spread))
     })
   })
 
@@ -145,7 +151,7 @@ contract('GrandaMento', (accounts: string[]) => {
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
-      assertEqualBN(receipt1.logs[1].args.proposalId, 1)
+      assertEqualBN(receipt1.logs[0].args.proposalId, 1)
     })
 
     it('stores the exchange proposal', async () => {
@@ -183,7 +189,7 @@ contract('GrandaMento', (accounts: string[]) => {
             proposalId: 0,
             stableToken: stableToken.address,
             sellAmount: stableTokenSellAmount,
-            buyAmount: divide(stableTokenSellAmount, defaultCeloStableTokenRate),
+            buyAmount: stableTokenSellAmount.div(fromFixed(defaultCeloStableTokenRate)),
             sellCelo: false,
           },
         })
@@ -193,6 +199,8 @@ contract('GrandaMento', (accounts: string[]) => {
     describe('#getBuyAmount', () => {
       describe('when selling stable token', () => {
         it('returns the amount being bought when the spread is 0', async () => {
+          // Set spread as 0%
+          await grandaMento.setSpread(0)
           const stableTokenSellAmount = unit.times(500)
           assertEqualBN(
             await grandaMento.getBuyAmount(
@@ -200,10 +208,33 @@ contract('GrandaMento', (accounts: string[]) => {
               stableTokenSellAmount,
               false // sellCelo = false as we are selling stableToken
             ),
-            divide(toFixed(stableTokenSellAmount), defaultCeloStableTokenRate)
+            stableTokenSellAmount.div(fromFixed(defaultCeloStableTokenRate))
+          )
+        })
+
+        it('returns the amount being bought when the spread is > 0', async () => {
+          // Set spread as 1%
+          const spread = 0.01
+          await grandaMento.setSpread(toFixed(spread))
+
+          const stableTokenSellAmount = unit.times(500)
+          assertEqualBN(
+            await grandaMento.getBuyAmount(
+              stableToken.address,
+              stableTokenSellAmount,
+              false // sellCelo = false as we are selling stableToken
+            ),
+            stableTokenSellAmount.times(0.99).div(fromFixed(defaultCeloStableTokenRate))
           )
         })
       })
+    })
+  })
+
+  describe('#setSpread', () => {
+    it('sets the spread', async () => {
+      // Ensure initial value is 0
+      assertEqualBN(await grandaMento.spread(), 0)
     })
   })
 })

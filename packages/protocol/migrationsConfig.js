@@ -117,7 +117,7 @@ const DefaultConfig = {
     useMultiSig: true,
   },
   grandaMento: {
-    frozen: false,
+    spread: 0.01, // 1%
   },
   lockedGold: {
     unlockingPeriod: 3 * DAY,

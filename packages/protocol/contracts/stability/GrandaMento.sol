@@ -25,10 +25,16 @@ contract GrandaMento is
   event ProposedExchange(
     uint256 indexed proposalId,
     address indexed exchanger,
-    address stableToken,
+    address indexed stableToken,
     uint256 sellAmount,
     uint256 buyAmount,
     bool sellCelo
+  );
+  event SpreadSet(uint256 spread);
+  event StableTokenExchangeLimitsSet(
+    address indexed stableToken,
+    uint256 minExchangeAmount,
+    uint256 maxExchangeAmount
   );
 
   enum ExchangeState { Empty, Proposed, Approved, Executed, Cancelled }
@@ -46,18 +52,6 @@ contract GrandaMento is
     ExchangeState state;
     bool sellCelo;
   }
-
-  /**
-   * @notice Has the authority to approve a proposed exchange.
-   */
-  address public approver;
-
-  /**
-   * @notice The minimum amount of time in seconds that must elapse between a
-   * proposed exchange being approved and when the exchange can be executed.
-   * Should give sufficient time for Governance to veto an approved exchange.
-   */
-  uint256 public exchangeWaitPeriodSeconds;
 
   /**
    * @notice The percent fee imposed upon an exchange execution.
@@ -83,14 +77,6 @@ contract GrandaMento is
   uint256 public exchangeProposalCount;
 
   /**
-   * @notice Requires msg.sender to be the approver.
-   */
-  modifier onlyApprover() {
-    require(msg.sender == approver, "Sender must be the approver");
-    _;
-  }
-
-  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -106,10 +92,13 @@ contract GrandaMento is
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _registry The address of the registry.
+   * @param _spread The spread charged on exchanges.
    */
-  function initialize(address _registry) external initializer {
+  function initialize(address _registry, uint256 _spread) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registry);
+    setSpread(_spread);
   }
 
   function proposeExchange(address stableToken, uint256 sellAmount, bool sellCelo)
@@ -156,6 +145,15 @@ contract GrandaMento is
     return proposalId;
   }
 
+  /**
+   * @notice Taking the spread and oracle price into account, calculates the
+   * amount of the asset being bought.
+   * @dev Stable token value amounts are used, not unit amounts.
+   * @param stableToken The stableToken involved in the exchange.
+   * @param sellAmount The amount of the sell token being sold.
+   * @param sellCelo Whether CELO is being sold.
+   * @return The amount of the asset being bought.
+   */
   function getBuyAmount(address stableToken, uint256 sellAmount, bool sellCelo)
     public
     view
@@ -163,7 +161,7 @@ contract GrandaMento is
   {
     // Gets the price of CELO quoted in stableToken.
     FixidityLib.Fraction memory exchangeRate = getOracleExchangeRate(stableToken);
-    // If stableToken is being sold, we instead want the price of stableToken
+    // If stableToken is being sold, instead use the price of stableToken
     // quoted in CELO.
     if (!sellCelo) {
       exchangeRate = exchangeRate.reciprocal();
@@ -188,6 +186,23 @@ contract GrandaMento is
     return FixidityLib.wrap(rateNumerator).divide(FixidityLib.wrap(rateDenominator));
   }
 
+  /**
+   * @notice Sets the spread.
+   * @dev Sender must be owner.
+   * @param newSpread The new value for the spread.
+   */
+  function setSpread(uint256 newSpread) public onlyOwner {
+    spread = FixidityLib.wrap(newSpread);
+    emit SpreadSet(newSpread);
+  }
+
+  /**
+   * @notice Sets the minimum and maximum amount of the stable token an exchange can involve.
+   * @dev Sender must be owner.
+   * @param stableToken The stable token to set the limits for.
+   * @param minExchangeAmount The new minimum exchange amount for the stable token.
+   * @param maxExchangeAmount The new maximum exchange amount for the stable token.
+   */
   function setStableTokenExchangeLimits(
     address stableToken,
     uint256 minExchangeAmount,
@@ -197,5 +212,6 @@ contract GrandaMento is
       minExchangeAmount: minExchangeAmount,
       maxExchangeAmount: maxExchangeAmount
     });
+    emit StableTokenExchangeLimitsSet(stableToken, minExchangeAmount, maxExchangeAmount);
   }
 }
