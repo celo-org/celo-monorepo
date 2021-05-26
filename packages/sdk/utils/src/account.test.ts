@@ -5,8 +5,9 @@ import {
   generateMnemonic,
   getAllLanguages,
   MnemonicStrength,
-  validateMnemonic,
   normalizeMnemonic,
+  suggestCorrections,
+  validateMnemonic,
 } from './account'
 
 describe('AccountUtils', () => {
@@ -340,5 +341,88 @@ describe('AccountUtils', () => {
         expect(normalizeMnemonic(mnemonic)).toEqual(mnemonic)
       })
     }
+  })
+
+  describe('.suggestCorrections()', () => {
+    it('should correct a single simple typo on the first suggestion', () => {
+      const cases = [
+        {
+          mnemonic: 'crush hollow differ mean easy ostrihc almost cherry route hurt inner bless',
+          corrected: 'crush hollow differ mean easy ostrich almost cherry route hurt inner bless',
+        },
+        {
+          mnemonic: 'monster note endless discover tilt glide girl wing spstial imitate mad ridge',
+          corrected: 'monster note endless discover tilt glide girl wing spatial imitate mad ridge',
+        },
+        {
+          mnemonic: 'mimo musgo efecto danza tariot gente gavilán visor sala imán madre potencia',
+          corrected: 'mimo musgo efecto danza tarot gente gavilán visor sala imán madre potencia',
+        },
+        {
+          mnemonic:
+            'linéaire marron dosage déborder spiral farine faibvlir virtuose risible géomètre ivresse pinceau',
+          corrected:
+            'linéaire marron dosage déborder spiral farine faiblir virtuose risible géomètre ivresse pinceau',
+        },
+        {
+          mnemonic:
+            'leme malandro depurar coperoi sovado extrato explanar vilarejo resolver garrafa inverno pergunta',
+          corrected:
+            'leme malandro depurar copeiro sovado extrato explanar vilarejo resolver garrafa inverno pergunta',
+        },
+      ]
+
+      for (const { mnemonic, corrected } of cases) {
+        expect(suggestCorrections(mnemonic).next().value).toEqual(corrected)
+      }
+    })
+
+    it('should quickly offer the corect suggestion for a phrase with a few typos', () => {
+      //
+      const cases = [
+        {
+          mnemonic:
+            'whear poitdoor cup shoulder diret broccoli fragile donate legend slogan crew between secrety recall asset',
+          corrected:
+            'wheat outdoor cup shoulder dirt broccoli fragile donate legend slogan crew between secret recall asset',
+        },
+        {
+          mnemonic:
+            'inner lottery artist cintage climb corn theroty cronze tot segement squirrel south ordinatu assume congress',
+          corrected:
+            'inner lottery artist vintage climb corn theory bronze toy segment squirrel south ordinary assume congress',
+        },
+        {
+          mnemonic:
+            'note evidence bubble dog style master region prosper input amazing moviuew adain awrite drisagree glasre',
+          corrected:
+            'note evidence bubble dog style master region prosper input amazing movie again write disagree glare',
+        },
+        /*{
+        mnemonic: 'cruise arom apology bracket seminar another vorrow canin finish walnut rural rent pledge fasgion alarm',
+        corrected: 'cruise atom apology bracket seminar another borrow cabin finish walnut rural tent pledge fashion alarm'
+      },*/ {
+          mnemonic:
+            'wisgh animal bracket stand enroll purchase wave quantuim film polar rare fury time great time',
+          corrected:
+            'wish animal bracket stand enroll purchase wave quantum film polar rare fury time great time',
+        },
+      ]
+
+      for (const { mnemonic, corrected } of cases) {
+        let attempts = 0
+        for (const suggestion of suggestCorrections(mnemonic)) {
+          attempts++
+          if (suggestion === corrected) {
+            console.log(`Phrase '${mnemonic}' corrected in ${attempts} attempt(s)`)
+            break
+          }
+          //console.log(suggestion)
+          if (attempts >= 1000) {
+            throw new Error(`Phrase '${mnemonic}' was not corrected within 100 attempts`)
+          }
+        }
+      }
+    })
   })
 })

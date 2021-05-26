@@ -2,7 +2,8 @@
   "extends": "@celo/typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "downlevelIteration": true
   },
   "include": ["src"]
 }

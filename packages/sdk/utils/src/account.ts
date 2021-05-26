@@ -11,6 +11,7 @@ import * as bip39 from 'bip39'
 import { keccak256 } from 'ethereumjs-util'
 import randomBytes from 'randombytes'
 import { privateKeyToAddress } from './address'
+import { levenshteinDistance } from './levenshtein'
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
 export {
@@ -212,6 +213,103 @@ export function detectLanguage(
     return undefined
   }
   return winners[0]
+}
+
+/**
+ * Generates a list of suggested corrections to the mnemonic phrase based on a set of heuristics.
+ *
+ * @remarks It is recommended to normalize the mnemonic phrase before inputting to this function.
+ * DO NOT MERGE: Find a better name for this function... and break it up.
+ */
+export function* suggestCorrections(
+  mnemonic: string,
+  language?: MnemonicLanguages
+): Generator<string> {
+  const words = splitMnemonic(mnemonic)
+  const detectedLanguage = language ?? detectLanguage(words)
+
+  // If the language cannot be detected, no suggestions can be given.
+  if (detectedLanguage === undefined) {
+    return
+  }
+
+  // Identify locations with invalid words. We will attempt to correct each of these.
+  const validWords = new Set(getWordList(detectedLanguage))
+  const invalidWords: { word: string; index: number }[] = words
+    .map((word, index) => ({ word, index }))
+    .filter(({ word }) => !validWords.has(word))
+
+  // If no words are invalid, no suggestions can be given.
+  // TODO(victor): Implement a heuristic to check for swapped words.
+  if (invalidWords.length === 0) {
+    return
+  }
+
+  const spotSuggestions: SpotSuggestion[] = invalidWords.map(({ word, index }) => ({
+    suggestions: wordSuggestions(word, detectedLanguage),
+    index,
+  }))
+
+  // DO NOT MERGE: Description
+  function* replacementMaps(suggestions: SpotSuggestion[], weight: number): Generator<number[]> {
+    if (length < 1 || weight < 0) {
+      throw Error('programming error: depth array length and weight must be greater than zero')
+    }
+
+    // Base case: When length is one, "consume" the rest of the weight.
+    if (length === 1) {
+      yield [weight]
+      return
+    }
+
+    // Recursion case: When length is greater than one, consume iteratively 0 to weight units and
+    // combine it will all arrays of the remaining wight and one less length.
+    for (let w = 0; w <= weight; w++) {
+      for (const array of depthArrays(length - 1, weight - w)) {
+        yield [w, ...array]
+      }
+    }
+  }
+
+  // DO NOT MERGE: Description
+  const maxWeight = spotSuggestions.reduce(
+    (sum, { suggestions }) => sum + suggestions.length - 1,
+    0
+  )
+  for (let weight = 0; weight <= maxWeight; weight++) {
+    for (const depths of depthArrays(spotSuggestions.length, weight)) {
+      // Filter out depths lists that exceed the length of the spot suggestions list at any index.
+      if (spotSuggestions.some(({ suggestions }, i) => depths[i] >= suggestions.length)) {
+        // DO NOT MERGE: Is it acceptable to filter here?
+        continue
+      }
+
+      // Extract from the spot suggestions lists a suggested replacements keyed by index.
+      const replacements = new Map(
+        spotSuggestions.map(({ suggestions, index }, i) => [index, suggestions[depths[i]]])
+      )
+      const suggestedWords = words.map((word, i) => replacements.get(i) ?? word)
+      yield joinMnemonic(suggestedWords, detectedLanguage)
+    }
+  }
+}
+
+interface SpotSuggestion {
+  suggestions: Suggestion[]
+  index: number
+}
+
+interface Suggestion {
+  word: string
+  distance: number
+}
+
+// Create a function to return the sorted list of suggested word corrections.
+// DO NOT MERGE: Refactor this signature.
+function wordSuggestions(typo: string, language: MnemonicLanguages): Suggestion[] {
+  return getWordList(language)
+    .map((word) => ({ word, distance: levenshteinDistance(typo, word) }))
+    .sort((a, b) => a.distance - b.distance)
 }
 
 export async function generateKeys(
