@@ -250,8 +250,8 @@ export function* suggestCorrections(
     index,
   }))
 
-  // DO NOT MERGE: Description
-  function* replacementMaps(suggestions: SpotSuggestion[], weight: number): Generator<number[]> {
+  // DO NOT MERGE: Description and signature
+  function* depthArrays(length: number, weight: number): Generator<number[]> {
     if (length < 1 || weight < 0) {
       throw Error('programming error: depth array length and weight must be greater than zero')
     }
@@ -271,45 +271,66 @@ export function* suggestCorrections(
     }
   }
 
-  // DO NOT MERGE: Description
-  const maxWeight = spotSuggestions.reduce(
-    (sum, { suggestions }) => sum + suggestions.length - 1,
-    0
-  )
-  for (let weight = 0; weight <= maxWeight; weight++) {
-    for (const depths of depthArrays(spotSuggestions.length, weight)) {
-      // Filter out depths lists that exceed the length of the spot suggestions list at any index.
-      if (spotSuggestions.some(({ suggestions }, i) => depths[i] >= suggestions.length)) {
-        // DO NOT MERGE: Is it acceptable to filter here?
-        continue
-      }
+  function* combinations(lists: string[][]): Generator<string[]> {
+    if (lists.length < 1) {
+      throw Error('programming error: must be at least one input list')
+    }
 
-      // Extract from the spot suggestions lists a suggested replacements keyed by index.
-      const replacements = new Map(
-        spotSuggestions.map(({ suggestions, index }, i) => [index, suggestions[depths[i]]])
+    // Base case: No additional lists
+    if (lists.length === 1) {
+      for (const word of lists[0]) {
+        yield [word]
+      }
+      return
+    }
+
+    // Recursion case
+    for (const word of lists[0]) {
+      for (const tail of combinations(lists.slice(1))) {
+        yield [word, ...tail]
+      }
+    }
+  }
+
+  // DO NOT MERGE: Description and stopping condition
+  for (let weight = 0; ; weight++) {
+    for (const depths of depthArrays(spotSuggestions.length, weight)) {
+      const replacementLists = spotSuggestions.map(
+        ({ suggestions }, i) => suggestions[depths[i]] ?? []
       )
-      const suggestedWords = words.map((word, i) => replacements.get(i) ?? word)
-      yield joinMnemonic(suggestedWords, detectedLanguage)
+      for (const combination of combinations(replacementLists)) {
+        // Extract from the spot suggestions lists a suggested replacements keyed by index.
+        const replacements = new Map(spotSuggestions.map(({ index }, i) => [index, combination[i]]))
+        const suggestedWords = words.map((word, i) => replacements.get(i) ?? word)
+        yield joinMnemonic(suggestedWords, detectedLanguage)
+      }
     }
   }
 }
 
 interface SpotSuggestion {
-  suggestions: Suggestion[]
+  suggestions: SuggestionsByDistance
   index: number
 }
 
-interface Suggestion {
-  word: string
-  distance: number
+interface SuggestionsByDistance {
+  [distance: number]: string[]
 }
 
-// Create a function to return the sorted list of suggested word corrections.
 // DO NOT MERGE: Refactor this signature.
-function wordSuggestions(typo: string, language: MnemonicLanguages): Suggestion[] {
+function wordSuggestions(typo: string, language: MnemonicLanguages): SuggestionsByDistance {
   return getWordList(language)
-    .map((word) => ({ word, distance: levenshteinDistance(typo, word) }))
-    .sort((a, b) => a.distance - b.distance)
+    .map((word) => ({ distance: levenshteinDistance(typo, word), word }))
+    .reduce((map, { distance, word }) => {
+      // Reduction uses mutation, instead of spread, as an optimization.
+      const list = map[distance]
+      if (list !== undefined) {
+        list.push(word)
+      } else {
+        map[distance] = [word]
+      }
+      return map
+    }, {} as SuggestionsByDistance)
 }
 
 export async function generateKeys(
