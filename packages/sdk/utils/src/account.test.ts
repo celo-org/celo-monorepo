@@ -398,10 +398,13 @@ describe('AccountUtils', () => {
           corrected:
             'note evidence bubble dog style master region prosper input amazing movie again write disagree glare',
         },
-        /*{
-        mnemonic: 'cruise arom apology bracket seminar another vorrow canin finish walnut rural rent pledge fasgion alarm',
-        corrected: 'cruise atom apology bracket seminar another borrow cabin finish walnut rural tent pledge fashion alarm'
-      },*/ {
+        {
+          mnemonic:
+            'cruise arom apology bracket seminar another vorrow canin finish walnut rural rent pledge fasgion alarm',
+          corrected:
+            'cruise atom apology bracket seminar another borrow cabin finish walnut rural tent pledge fashion alarm',
+        },
+        {
           mnemonic:
             'wisgh animal bracket stand enroll purchase wave quantuim film polar rare fury time great time',
           corrected:

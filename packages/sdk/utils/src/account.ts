@@ -234,10 +234,12 @@ export function* suggestCorrections(
   }
 
   // Identify locations with invalid words. We will attempt to correct each of these.
-  const validWords = new Set(getWordList(detectedLanguage))
-  const invalidWords: { word: string; index: number }[] = words
-    .map((word, index) => ({ word, index }))
-    .filter(({ word }) => !validWords.has(word))
+  // const validWords = new Set(getWordList(detectedLanguage))
+  const invalidWords: { word: string; index: number }[] = words.map((word, index) => ({
+    word,
+    index,
+  }))
+  // .filter(({ word }) => !validWords.has(word))
 
   // If no words are invalid, no suggestions can be given.
   // TODO(victor): Implement a heuristic to check for swapped words.
