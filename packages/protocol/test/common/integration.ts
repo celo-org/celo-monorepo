@@ -573,6 +573,7 @@ Array.from([
   })
 )
 
+// TODO: DO NOT FORGET TO REMOVE THE ONLYS HERE
 contract('Integration: Adding StableToken', (accounts: string[]) => {
   const Exchange: ExchangeContract = artifacts.require('Exchange')
   const StableToken: StableTokenContract = artifacts.require('StableToken')
@@ -634,6 +635,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
     )
 
+    await governance.upvote(proposalId, 0, 0)
     await timeTravel(config.governance.dequeueFrequency, web3)
     // @ts-ignore
     const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
@@ -664,7 +666,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
         'Celo Abc', // Name
         'cABC', // symbol
         '18', // decimals
-        registry.address, // registry address
+        registry.address,
         fixed1, // inflationRate
         SECONDS_IN_A_WEEK, // inflationRatePeriod
         [accounts[0]], // pre-mint account
@@ -672,8 +674,8 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
         'ExchangeABC' // exchange contract key on the registry
       )
       await exchangeAbc.initialize(
-        registry.address, // registry address
-        stableTokenAbc.address, // stableToken
+        registry.address,
+        stableTokenAbc.address,
         '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
         '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
         '300', // updateFrequency, matches mainnet for cUSD and cEUR
@@ -685,14 +687,16 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
       await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
       // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
-      exchangeAbc.sell(sellAmount, 0, true)
+      await goldToken.approve(exchangeAbc.address, sellAmount)
+      await exchangeAbc.sell(sellAmount, 0, true)
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
       await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
       // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
-      exchangeAbc.sell(sellAmount, 0, false)
+      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
+      await exchangeAbc.sell(sellAmount, 0, false)
     })
   })
 
@@ -736,11 +740,10 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       )
       await reserve.addToken(stableTokenAbc.address)
       await reserve.addExchangeSpender(exchangeAbc.address)
-      // fee currency can't be test here, but keep this line for reference
-      await feeCurrencyWhitelist.addToken(stableTokenAbc.address)
-
       await freezer.unfreeze(stableTokenAbc.address)
       await freezer.unfreeze(exchangeAbc.address)
+      // Fee currency can't be tested here, but keep this line for reference
+      await feeCurrencyWhitelist.addToken(stableTokenAbc.address)
     })
 
     it(`should be possible to sell CELO`, async () => {
