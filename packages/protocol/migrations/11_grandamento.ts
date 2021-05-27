@@ -10,7 +10,11 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { GrandaMentoInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return [config.registry.predeployedProxyAddress, toFixed(config.grandaMento.spread).toString()]
+  return [
+    config.registry.predeployedProxyAddress,
+    config.grandaMento.approver,
+    toFixed(config.grandaMento.spread).toString(),
+  ]
 }
 
 module.exports = deploymentForCoreContract<GrandaMentoInstance>(

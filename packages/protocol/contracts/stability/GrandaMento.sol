@@ -33,6 +33,12 @@ contract GrandaMento is
     bool sellCelo
   );
 
+  // Emitted when an exchange proposal is approved by the approver.
+  event ExchangeProposalApproved(uint256 indexed proposalId);
+
+  // Emitted when the approver is set.
+  event ApproverSet(address approver);
+
   // Emitted when the spread is set.
   event SpreadSet(uint256 spread);
 
@@ -78,6 +84,9 @@ contract GrandaMento is
     bool sellCelo;
   }
 
+  // The address with the authority to approve exchange proposals.
+  address public approver;
+
   // The percent fee imposed upon an exchange execution.
   FixidityLib.Fraction public spread;
 
@@ -91,6 +100,14 @@ contract GrandaMento is
   // Number of exchange proposals that exist. Used for assigning an exchange
   // proposal ID to a new proposal.
   uint256 public exchangeProposalCount;
+
+  /**
+   * @notice Reverts if the sender is not the approver.
+   */
+  modifier onlyApprover() {
+    require(msg.sender == approver, "Sender must be approver");
+    _;
+  }
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -111,9 +128,10 @@ contract GrandaMento is
    * @param _registry The address of the registry.
    * @param _spread The spread charged on exchanges.
    */
-  function initialize(address _registry, uint256 _spread) external initializer {
+  function initialize(address _registry, address _approver, uint256 _spread) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registry);
+    setApprover(_approver);
     setSpread(_spread);
   }
 
@@ -174,6 +192,21 @@ contract GrandaMento is
   }
 
   /**
+   * @notice Approves an existing exchange proposal.
+   * @dev Sender must be the approver. Exchange proposal must be in the Proposed state.
+   * @param proposalId The identifier of the proposal to approve.
+   */
+  function approveExchangeProposal(uint256 proposalId) onlyApprover {
+    ExchangeProposal storage proposal = exchangeProposals[id];
+    // Ensure the proposal is in the Proposed state.
+    require(proposal.state == ExchangeState.Proposed, "Proposal must be in Proposed state");
+    // Set the time the approval occurred and change the state.
+    proposal.approvalTimestamp = block.timestamp;
+    proposal.state = ExchangeState.Approved;
+    emit ExchangeProposalApproved(proposalId);
+  }
+
+  /**
    * @notice Using the oracle price, charges the spread and calculates the amount of
    * the asset being bought.
    * @dev Stable token value amounts are used for the sellAmount, not unit amounts.
@@ -203,6 +236,16 @@ contract GrandaMento is
     // Calculate the buy amount:
     // exchangeRate * adjustedSellAmount
     return exchangeRate.multiply(adjustedSellAmount).fromFixed();
+  }
+
+  /**
+   * @notice Sets the approver.
+   * @dev Sender must be owner.
+   * @param newSpread The new value for the spread.
+   */
+  function setApprover(uint256 newApprover) public onlyOwner {
+    approver = newApprover;
+    emit ApproverSet(newApprover);
   }
 
   /**

@@ -117,6 +117,7 @@ const DefaultConfig = {
     useMultiSig: true,
   },
   grandaMento: {
+    approver: '0x0000000000000000000000000000000000000000',
     spread: 0.01, // 1%
   },
   lockedGold: {

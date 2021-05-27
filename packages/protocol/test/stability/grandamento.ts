@@ -70,6 +70,7 @@ contract('GrandaMento', (accounts: string[]) => {
   let registry: RegistryInstance
 
   const owner = accounts[0]
+  const approver = accounts[1]
 
   const decimals = 18
   const unit = new BigNumber(10).pow(decimals)
@@ -105,7 +106,7 @@ contract('GrandaMento', (accounts: string[]) => {
     await sortedOracles.setNumRates(stableToken.address, 2)
 
     grandaMento = await GrandaMento.new(true)
-    await grandaMento.initialize(registry.address, spreadFixed)
+    await grandaMento.initialize(registry.address, approver, spreadFixed)
     await grandaMento.setStableTokenExchangeLimits(
       stableToken.address,
       minExchangeAmount,
@@ -120,6 +121,10 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('sets the registry', async () => {
       assert.equal(await grandaMento.registry(), registry.address)
+    })
+
+    it('sets the approver', async () => {
+      assert.equal(await grandaMento.approver(), approver)
     })
 
     it('sets the spread', async () => {
@@ -409,6 +414,39 @@ contract('GrandaMento', (accounts: string[]) => {
           proposeExchange(newStableToken.address, celoSellAmount),
           'Max stable token exchange amount must be > 0'
         )
+      })
+    })
+  })
+
+  describe('#approveExchangeProposal', () => {
+    const proposalId = 0
+    beforeEach(async () => {
+      // Create an exchange proposal in the Proposed state with proposal ID 0
+      await grandaMento.proposeExchange(
+        stableToken.address,
+        unit.times(500),
+        false // sellCelo = false as we are selling stableToken
+      )
+    })
+    describe('when called by the approver', () => {
+      it('emits the ExchangeProposalApproved event', async () => {
+        const receipt = await grandaMento.approveExchangeProposal(proposalId, { from: approver })
+        assertLogMatches2(receipt.logs[0], {
+          event: 'ExchangeProposalApproved',
+          args: {
+            proposalId: 0,
+          },
+        })
+      })
+
+      it('approves an exchange proposal in the Proposed state', async () => {
+        const proposalBefore = parseExchangeProposal(
+          await grandaMento.exchangeProposals(proposalId)
+        )
+        // As a sanity check, make sure the exchange is in the Proposed state
+        assert.equal(proposalBefore.state, ExchangeState.Proposed)
+        await grandaMento.approveExchangeProposal(proposalId, { from: approver })
+        const proposalAfter = parseExchangeProposal(await grandaMento.exchangeProposals(proposalId))
       })
     })
   })
