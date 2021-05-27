@@ -1,12 +1,9 @@
 using Accounts as accounts
 
 methods {
-	
 	vote(uint256,uint256,uint8) returns bool
-	//initialize(address,uint256)
-	
+		
 	getProposalSlim(uint256) returns address, uint256, uint256, uint256 envfree	
-	getAccountFromVoteSigner(address) returns address envfree
 	stageDurations() returns uint256,uint256,uint256 envfree
 	getUpvotes(uint256) returns uint256 envfree
 	getUpvotedProposal(address) returns uint256 envfree
@@ -254,9 +251,9 @@ rule no_referendum_votes_unless_approved(method f, uint256 p) filtered { f -> !f
 // TODO: Can a voting user provide weight to multiple proposals?
 rule cant_unvote(uint256 deqIndex, uint8 voteValue) {	
     env eF;
-	uint256 NONE = getNoneVoteEnum();
+	uint256 NONE_ENUM = getNoneVoteEnum();
 	// get the voting delegate
-	address voterDelegate = getVoteSigner(eF.msg.sender);
+	address voterDelegate = accounts.getVoteSigner(eF.msg.sender);
 	
 	// check if voted
 	uint256 p;
@@ -271,7 +268,7 @@ rule cant_unvote(uint256 deqIndex, uint8 voteValue) {
     uint256 weight_;
 	p_, recordValue_, weight_ = getVoteRecord(voterDelegate,deqIndex);
 	
-	assert voteValue == NONE => (!result && recordValue_ == recordValue && weight_ == weight)/*|| voteReverted*/, "Cannot vote for none: function either returns false and did not update the vote, or it reverted"; // not voting none. reverting is fine and is encoded by the sinvoke
+	assert voteValue == NONE_ENUM => (!result && recordValue_ == recordValue && weight_ == weight)/*|| voteReverted*/, "Cannot vote for none: function either returns false and did not update the vote, or it reverted"; // not voting none. reverting is fine and is encoded by the sinvoke
 }
 
 rule cant_vote_twice_with_delegate(uint256 deqIndex, uint8 voteValue) {	
@@ -279,9 +276,9 @@ rule cant_vote_twice_with_delegate(uint256 deqIndex, uint8 voteValue) {
 	env eF;
 	require eF.msg.sender != 0;
 
-	uint256 NONE = getNoneVoteEnum();
+	uint256 NONE_ENUM = getNoneVoteEnum();
 	// get the voting delegate
-	address voterDelegate = getVoteSigner(eF.msg.sender);
+	address voterDelegate = accounts.getVoteSigner(eF.msg.sender);
 	
 	require eF.msg.sender != voterDelegate; // account delegates to someone else
 	
@@ -291,7 +288,7 @@ rule cant_vote_twice_with_delegate(uint256 deqIndex, uint8 voteValue) {
 	p, recordValue, _ = getVoteRecord(voterDelegate,deqIndex);
 	bool res = vote@withrevert(eF,p,deqIndex,voteValue);
 	
-	assert recordValue != NONE => lastReverted || res == false, "Could not succeed if delegate already voted";
+	assert recordValue != NONE_ENUM => lastReverted || res == false, "Could not succeed if delegate already voted";
 }
 /*
 TODO:
@@ -390,7 +387,7 @@ rule no_double_vote_referendum_all_but_vote(method f, address account, uint256 d
 	env eFTime; // same time as eF;
 	env e_;
 	
-	uint256 NONE = getNoneVoteEnum();
+	uint256 NONE_ENUM = getNoneVoteEnum();
 	uint256 ABSTAIN = getAbstainVoteEnum();
 	uint256 YES = getYesVoteEnum();
 	uint256 NO = getNoVoteEnum();
@@ -405,8 +402,8 @@ rule no_double_vote_referendum_all_but_vote(method f, address account, uint256 d
 	uint256 _yes; uint256 _no; uint256 _abstain;
 	_yes,_no,_abstain = getVoteTotals(p);
 	
-	// if can't vote for NONE, then necessarily if record vote is NONE, all votes are zero currently
-	require recordValue == NONE => (_yes == 0 && _no == 0 && _abstain == 0);
+	// if can't vote for NONE_ENUM, then necessarily if record vote is NONE_ENUM, all votes are zero currently
+	require recordValue == NONE_ENUM => (_yes == 0 && _no == 0 && _abstain == 0);
 	
 	//require eF.block.timestamp == eFTime.block.timestamp;
 	//bool isExpired = sinvoke _isDequeuedProposalExpired(eFTime,p);
@@ -425,11 +422,11 @@ rule no_double_vote_referendum_all_but_vote(method f, address account, uint256 d
 	bool doesProposalExist_ = proposalExists(e_,p);
 	
 	// if p expires, then sum of votes is no longer relevant - happens in approve, vote, execute
-	assert (recordValue != NONE && doesProposalExist_) => (yes_ + no_ + abstain_) == (_yes + _no + _abstain), "Total votes could not have changed if already voted";
+	assert (recordValue != NONE_ENUM && doesProposalExist_) => (yes_ + no_ + abstain_) == (_yes + _no + _abstain), "Total votes could not have changed if already voted";
 	assert recordValue == YES => yes_ <= _yes, "Yes votes could not have increased if voted yes already";
 	assert recordValue == NO => no_ <= _no, "No votes could not have increased if voted no already";
 	assert recordValue == ABSTAIN => abstain_ <= _abstain, "Abstain votes could not have increased if voted abstain already";
-	assert recordValue == NONE => (!doesProposalExist_ && yes_ == 0 && no_ == 0 && abstain_ == 0)// proposal no longer exists so everything is 0
+	assert recordValue == NONE_ENUM => (!doesProposalExist_ && yes_ == 0 && no_ == 0 && abstain_ == 0)// proposal no longer exists so everything is 0
 									// or just one out of (yes,no,abstain) changed
 									|| (yes_ == _yes && no_ == _no)
 									|| (yes_ == _yes && abstain_ == _abstain)
@@ -443,7 +440,7 @@ rule no_double_vote_referendum_vote(address account, uint256 deqIndex) {
 	env eFTime; // same time as eF;
 	env e_;
 	
-	uint256 NONE = getNoneVoteEnum();
+	uint256 NONE_ENUM = getNoneVoteEnum();
 	uint256 ABSTAIN = getAbstainVoteEnum();
 	uint256 YES = getYesVoteEnum();
 	uint256 NO = getNoVoteEnum();
@@ -458,10 +455,10 @@ rule no_double_vote_referendum_vote(address account, uint256 deqIndex) {
 	uint256 _yes; uint256 _no; uint256 _abstain;
 	_yes,_no,_abstain = getVoteTotals(p);
 	
-	// if can't vote for NONE, then necessarily if record vote is NONE, all votes are zero currently
-	require recordValue == NONE => (_yes == 0 && _no == 0 && _abstain == 0);
+	// if can't vote for NONE_ENUM, then necessarily if record vote is NONE_ENUM, all votes are zero currently
+	require recordValue == NONE_ENUM => (_yes == 0 && _no == 0 && _abstain == 0);
 	
-	require getAccountFromVoteSigner(eF.msg.sender) == account;
+	require accounts.voteSignerToAccount(eF.msg.sender) == account;
 	uint256 someP; uint256 someIndex; uint8 someValue;
 	
 	uint256 pOfSomeIndex;
@@ -478,11 +475,11 @@ rule no_double_vote_referendum_vote(address account, uint256 deqIndex) {
 	bool doesProposalExist_ = proposalExists(e_,p);
 	
 	// if p expires, then sum of votes is no longer relevant - happens in approve, vote, execute
-	assert (recordValue != NONE && doesProposalExist_) => (yes_ + no_ + abstain_) == (_yes + _no + _abstain), "Total votes could not have changed if already voted";
+	assert (recordValue != NONE_ENUM && doesProposalExist_) => (yes_ + no_ + abstain_) == (_yes + _no + _abstain), "Total votes could not have changed if already voted";
 	assert recordValue == YES => yes_ <= _yes, "Yes votes could not have increased if voted yes already";
 	assert recordValue == NO => no_ <= _no, "No votes could not have increased if voted no already";
 	assert recordValue == ABSTAIN => abstain_ <= _abstain, "Abstain votes could not have increased if voted abstain already";
-	assert recordValue == NONE => (!doesProposalExist_ && yes_ == 0 && no_ == 0 && abstain_ == 0)// proposal no longer exists so everything is 0
+	assert recordValue == NONE_ENUM => (!doesProposalExist_ && yes_ == 0 && no_ == 0 && abstain_ == 0)// proposal no longer exists so everything is 0
 									// or just one out of (yes,no,abstain) changed
 									|| (yes_ == _yes && no_ == _no)
 									|| (yes_ == _yes && abstain_ == _abstain)

@@ -41,41 +41,12 @@ contract GovernanceHarness is Governance {
   function getTotalLockedGold() public view returns (uint256) {
     return lockedGold.getTotalLockedGold();
   }
-  /*
-	// requires linkage of registry
-	// TODO: Note in the harness we assume already that getAddressFor always returns just the registry address
-	
-	*/
-  /*function _getVoterFromAccount(address account) public view returns (address) {
-		ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
-		return lockedGold.getDelegateFromAccountAndRole(account, ILockedGold.DelegateRole.Voting); 
-	}*/
-  /*
-	function getAccountFromVoter(address voter) public view returns (address) {
-		ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
-		return lockedGold.getAccountFromVoter(voter);
-	}
-	*/
-
-  // overriding get account weight
-  /*function getAccountWeight(address account) public view returns (uint256) {
-		ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
-		return lockedGold.getAccountWeight(account);
-	}*/
 
   function getUpvotedProposal(address account) public view returns (uint256) {
     uint256 proposalId;
     uint256 weight;
     (proposalId, weight) = this.getUpvoteRecord(account);
     return proposalId;
-  }
-
-  function getVoteSigner(address account) public view returns (address) {
-    return getAccounts().getVoteSigner(account);
-  }
-
-  function getAccountFromVoteSigner(address voter) public view returns (address) {
-    return getAccounts().voteSignerToAccount(voter);
   }
 
   function getProposalSlim(uint256 proposalId)
