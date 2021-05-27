@@ -19,8 +19,10 @@ function _isProposalPassing\(Proposals.Proposal storage proposal\)    internal  
 
 function _isProposalPassingOld\(Proposals.Proposal storage proposal\) private view returns \(bool\)/g' contracts/governance/Governance.sol
 
-
-
+# Simplify Proposal's externaCall invocation to 'true' (ok because wrapped in a require, and choosing not to care about side effect - should be ECF)
+perl -0777 -i -pe 's/function externalCall\(/function external_call2\(address destination, uint256 value, uint256 dataLength, bytes memory data\) private returns \(bool\) { return true; }
+function  external_Call\(/g' contracts/governance/Proposals.sol
+perl -0777 -i -pe 's/externalCall/external_call2/g' contracts/governance/Proposals.sol
 
 
 # Simplify ExtractFunctionSignature
