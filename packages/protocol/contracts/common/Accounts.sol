@@ -913,7 +913,7 @@ contract Accounts is
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the address is already authorized or is an account.
+   * @dev Fails if the address is already authorized to another account or is an account itself.
    * @dev Note that once an address is authorized, it may never be authorized again.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
@@ -925,15 +925,14 @@ contract Accounts is
   }
 
   /**
+   * @notice Returns the address that signed the provided role authorization
+   * @param account The `account` property signed over in the EIP712 signature
+   * @param signer The `signer` property signed over in the EIP712 signature
+   * @param role The `role` property signed over in the EIP712 signature
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
    */
-  function getRoleAuthorizationStructHash(address account, address signer, bytes32 role)
-    internal
-    pure
-    returns (bytes32)
-  {
-    return keccak256(abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role));
-  }
-
   function getRoleAuthorizationSigner(
     address account,
     address signer,
@@ -942,10 +941,22 @@ contract Accounts is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    bytes32 structHash = getRoleAuthorizationStructHash(account, signer, role);
+    bytes32 structHash = keccak256(
+      abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role)
+    );
     return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
   }
 
+  /**
+   * @notice Authorizes a role of `msg.sender`'s account to another address (`authorized`).
+   * @param authorized The address to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Fails if the address is already authorized to another account or is an account itself.
+   * @dev Note that this signature is EIP712 compliant over the authorizing `account` (`msg.sender`), 
+   * `signer` (`authorized`) and `role`.
+   */
   function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
     private
   {
@@ -955,6 +966,11 @@ contract Accounts is
     authorize(authorized);
   }
 
+  /**
+   * @notice Authorizes an address to `msg.sender`'s account
+   * @param authorized The address to authorize.
+   * @dev Fails if the address is already authorized for another account or is an account itself.
+   */
   function authorize(address authorized) private {
     require(isAccount(msg.sender), "Unknown account");
     require(
