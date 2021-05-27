@@ -954,8 +954,8 @@ contract Accounts is
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev Fails if the address is already authorized to another account or is an account itself.
-   * @dev Note that this signature is EIP712 compliant over the authorizing `account` (`msg.sender`), 
-   * `signer` (`authorized`) and `role`.
+   * @dev Note that this signature is EIP712 compliant over the authorizing `account` 
+   * (`msg.sender`), `signer` (`authorized`) and `role`.
    */
   function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
     private
