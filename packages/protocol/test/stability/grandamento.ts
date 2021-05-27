@@ -51,7 +51,7 @@ function parseExchangeProposal(
     buyAmount: proposalRaw[3],
     approvalTimestamp: proposalRaw[4],
     state: proposalRaw[5].toNumber() as ExchangeState,
-    sellCelo: typeof proposalRaw[6] == 'boolean' ? proposalRaw[6] : proposalRaw[6] == 'true',
+    sellCelo: typeof proposalRaw[6] === 'boolean' ? proposalRaw[6] : proposalRaw[6] === 'true',
   }
 }
 
@@ -95,7 +95,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
     stableToken = await MockStableToken.new()
     await stableToken.mint(owner, ownerStableTokenBalance)
-    stableToken.setInflationFactor(toFixed(stableTokenInflationFactor))
+    await stableToken.setInflationFactor(toFixed(stableTokenInflationFactor))
     await registry.setAddressFor(CeloContractName.StableToken, stableToken.address)
 
     sortedOracles = await MockSortedOracles.new()
@@ -325,10 +325,10 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     describe('when proposing an exchange that sells CELO', () => {
-      const proposeExchange = async (stableToken: string, sellAmount: BigNumber) => {
+      const proposeExchange = async (_stableToken: string, sellAmount: BigNumber) => {
         await goldToken.approve(grandaMento.address, sellAmount)
         // sellCelo = true as we are selling CELO
-        return grandaMento.proposeExchange(stableToken, sellAmount, true)
+        return grandaMento.proposeExchange(_stableToken, sellAmount, true)
       }
       const celoSellAmount = unit.times(100)
       it('emits the ProposedExchange event', async () => {

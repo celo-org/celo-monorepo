@@ -159,7 +159,7 @@ contract GrandaMento is
     uint256 proposalId = exchangeProposalCount;
     exchangeProposals[proposalId] = ExchangeProposal({
       exchanger: msg.sender,
-      stableToken: stableToken, // sellAmount is saved in units for stable tokens to account for inflation.
+      stableToken: stableToken, // for stable tokens, is saved in units to deal with demurrage.
       sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
       buyAmount: buyAmount,
       approvalTimestamp: 0, // initial value when not approved yet
