@@ -10,8 +10,8 @@ import "../common/interfaces/ICeloVersionedContract.sol";
  */
 contract GrandaMento is ICeloVersionedContract, Ownable, InitializableV2 {
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+   * @notice Sets initialized == true on implementation contracts.
+   * @param test Set to true to skip implementation initialization.
    */
   constructor(bool test) public InitializableV2(test) {}
 
