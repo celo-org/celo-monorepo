@@ -84,8 +84,12 @@ contract Accounts is
   event AttestationSignerRemoved(address indexed account, address oldSigner);
   event VoteSignerRemoved(address indexed account, address oldSigner);
   event ValidatorSignerRemoved(address indexed account, address oldSigner);
+  event IndexedSignerSet(address indexed account, address signer, bytes32 role);
+  event IndexedSignerRemoved(address indexed account, address oldSigner, bytes32 role);
   event DefaultSignerSet(address indexed account, address signer, bytes32 role);
   event DefaultSignerRemoved(address indexed account, address oldSigner, bytes32 role);
+  event LegacySignerSet(address indexed account, address signer, bytes32 role);
+  event LegacySignerRemoved(address indexed account, address oldSigner, bytes32 role);
   event SignerRemoved(address indexed account, address oldSigner, bytes32 indexed role);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountNameSet(address indexed account, string name);
@@ -248,17 +252,21 @@ contract Accounts is
     require(isSigner(msg.sender, signer, role), "Must authorize signer before setting as default");
 
     Account storage account = accounts[msg.sender];
-    if (role == VoteSigner) {
-      account.signers.vote = signer;
-    } else if (role == AttestationSigner) {
-      account.signers.attestation = signer;
-    } else if (role == ValidatorSigner) {
-      account.signers.validator = signer;
+    if (isLegacyRole(role)) {
+      if (role == VoteSigner) {
+        account.signers.vote = signer;
+      } else if (role == AttestationSigner) {
+        account.signers.attestation = signer;
+      } else if (role == ValidatorSigner) {
+        account.signers.validator = signer;
+      }
+      emit LegacySignerSet(msg.sender, signer, role);
     } else {
       defaultSigners[msg.sender][role] = signer;
+      emit DefaultSignerSet(msg.sender, signer, role);
     }
 
-    emit DefaultSignerSet(msg.sender, signer, role);
+    emit IndexedSignerSet(msg.sender, signer, role);
   }
 
   /**
@@ -528,17 +536,23 @@ contract Accounts is
    * @notice Remove one of the Validator, Attestation or 
    * Vote signers from an account. Should only be called from
    * methods that check the role is a legacy signer.
+   * @param role The role that has been authorized.
    */
   function removeLegacySigner(bytes32 role) private {
     Account storage account = accounts[msg.sender];
 
+    address signer;
     if (role == ValidatorSigner) {
+      signer = account.signers.validator;
       account.signers.validator = address(0);
     } else if (role == AttestationSigner) {
+      signer = account.signers.attestation;
       account.signers.attestation = address(0);
     } else if (role == VoteSigner) {
+      signer = account.signers.vote;
       account.signers.vote = address(0);
     }
+    emit LegacySignerRemoved(msg.sender, signer, role);
   }
 
   /**
@@ -547,7 +561,10 @@ contract Accounts is
    * @param role The role of the signer.
    */
   function removeIndexedSigner(bytes32 role) public {
+    address oldSigner = getIndexedSigner(msg.sender, role);
     isLegacyRole(role) ? removeLegacySigner(role) : removeDefaultSigner(role);
+
+    emit IndexedSignerRemoved(msg.sender, oldSigner, role);
   }
 
   /**
