@@ -11,7 +11,7 @@ import "../common/libraries/ReentrancyGuard.sol";
 import "./interfaces/IStableToken.sol";
 
 /**
- * @title Facilitates large exchanges between CELO and a stable token.
+ * @title Facilitates large exchanges between CELO stable tokens.
  */
 contract GrandaMento is
   ICeloVersionedContract,
@@ -23,6 +23,7 @@ contract GrandaMento is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
+  // Emitted when a new exchange proposal is created.
   event ProposedExchange(
     uint256 indexed proposalId,
     address indexed exchanger,
@@ -31,7 +32,11 @@ contract GrandaMento is
     uint256 buyAmount,
     bool sellCelo
   );
+
+  // Emitted when the spread is set.
   event SpreadSet(uint256 spread);
+
+  // Emitted when the exchange limits for a stable token are set.
   event StableTokenExchangeLimitsSet(
     address indexed stableToken,
     uint256 minExchangeAmount,
@@ -41,40 +46,50 @@ contract GrandaMento is
   enum ExchangeState { Empty, Proposed, Approved, Executed, Cancelled }
 
   struct ExchangeLimits {
+    // The minimum amount of an asset that can be exchanged in a single proposal.
     uint256 minExchangeAmount;
+    // The maximum amount of an asset that can be exchanged in a single proposal.
     uint256 maxExchangeAmount;
   }
 
   struct ExchangeProposal {
+    // The exchanger/proposer of the exchange proposal.
     address exchanger;
+    // The stable token involved in this proposal.
     address stableToken;
+    // The amount of the sell token being sold. If a stable token is being sold,
+    // the amount of stable token in "units" is stored rather than the "value."
+    // This is because stable tokens may experience demurrage/inflation, where
+    // the amount of stable token "units" doesn't change with time, but the "value"
+    // does. This is important to ensure the correct inflation-adjusted amount
+    // of the stable token is transferred out of this contract when a deposit is
+    // refunded or an exchange selling the stable token is executed.
+    // See StableToken.sol for more details on what "units" vs "values" are.
     uint256 sellAmount;
+    // The amount of the buy token being bought. For stable tokens, this is
+    // kept track of as the value, not units.
     uint256 buyAmount;
-    // uint256 approvalTimestamp;
+    // The timestamp (`block.timestamp`) at which the exchange proposal was approved.
+    // If the exchange proposal has not ever been approved, is 0.
+    uint256 approvalTimestamp;
+    // The state of the exchange proposal.
     ExchangeState state;
+    // Whether CELO is being sold and stableToken is being bought.
     bool sellCelo;
   }
 
-  /**
-   * @notice The percent fee imposed upon an exchange execution.
-   */
+  // The percent fee imposed upon an exchange execution.
   FixidityLib.Fraction public spread;
 
-  /**
-   * @notice Indexed by stable token address. The minimum and maximum amount of
-   * the stable token that can be minted or burned in a single exchange.
-   */
+  // The minimum and maximum amount of the stable token that can be minted or
+  // burned in a single exchange. Indexed by stable token address.
   mapping(address => ExchangeLimits) public stableTokenExchangeLimits;
 
-  /**
-   * @notice Indexed by the exchange proposal ID. State for all exchange proposals.
-   */
+  // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
 
-  /**
-   * @notice Number of exchange proposals that exist.
-   * @dev Used for assigning an exchange proposal ID to a new proposal.
-   */
+  // Number of exchange proposals that exist. Used for assigning an exchange
+  // proposal ID to a new proposal.
   uint256 public exchangeProposalCount;
 
   /**
@@ -102,16 +117,26 @@ contract GrandaMento is
     setSpread(_spread);
   }
 
+  /**
+   * @notice Creates a new exchange proposal and deposits the tokens being sold.
+   * @dev Stable token value amounts are used for the sellAmount, not unit amounts.
+   * @param stableToken The stableToken involved in the exchange.
+   * @param sellAmount The amount of the sell token being sold.
+   * @param sellCelo Whether CELO is being sold.
+   * @return The proposal identifier for the newly created exchange proposal.
+   */
   function proposeExchange(address stableToken, uint256 sellAmount, bool sellCelo)
     external
     nonReentrant
     returns (uint256)
   {
     // Require the configurable stableToken max exchange amount to be > 0.
+    // This covers the case where a stableToken has never been explicitly permitted.
     ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableToken];
     require(exchangeLimits.maxExchangeAmount > 0, "Max stable token exchange amount must be > 0");
 
     // Using the current oracle exchange rate, calculate what the buy amount is.
+    // This takes the spread into consideration.
     uint256 buyAmount = getBuyAmount(stableToken, sellAmount, sellCelo);
 
     // Ensure that the amount of stableToken being bought or sold is within
@@ -137,19 +162,22 @@ contract GrandaMento is
       stableToken: stableToken, // sellAmount is saved in units for stable tokens to account for inflation.
       sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
       buyAmount: buyAmount,
+      approvalTimestamp: 0, // initial value when not approved yet
       state: ExchangeState.Proposed,
       sellCelo: sellCelo
     });
-    emit ProposedExchange(proposalId, msg.sender, stableToken, sellAmount, buyAmount, sellCelo);
     exchangeProposalCount = exchangeProposalCount.add(1);
+    // Even if stable tokens are being sold, the sellAmount emitted is the "value."
+    emit ProposedExchange(proposalId, msg.sender, stableToken, sellAmount, buyAmount, sellCelo);
 
     return proposalId;
   }
 
   /**
-   * @notice Using the oracle price, charges the spread, and calculates amount of
+   * @notice Using the oracle price, charges the spread and calculates the amount of
    * the asset being bought.
-   * @dev Stable token value amounts are used, not unit amounts.
+   * @dev Stable token value amounts are used for the sellAmount, not unit amounts.
+   * Assumes both CELO and the stable token have 18 decimals.
    * @param stableToken The stableToken involved in the exchange.
    * @param sellAmount The amount of the sell token being sold.
    * @param sellCelo Whether CELO is being sold.
@@ -208,6 +236,7 @@ contract GrandaMento is
 
   /**
    * @notice Gets the oracle CELO price quoted in the stable token.
+   * @dev Reverts if there is not a rate for the provided stable token.
    * @param stableToken The stable token to get the oracle price for.
    * @return The oracle CELO price quoted in the stable token.
    */

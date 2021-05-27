@@ -42,15 +42,16 @@ enum ExchangeState {
 }
 
 function parseExchangeProposal(
-  proposalRaw: [string, string, BigNumber, BigNumber, BigNumber, any]
+  proposalRaw: [string, string, BigNumber, BigNumber, BigNumber, BigNumber, any]
 ) {
   return {
     exchanger: proposalRaw[0],
     stableToken: proposalRaw[1],
     sellAmount: proposalRaw[2],
     buyAmount: proposalRaw[3],
-    state: proposalRaw[4].toNumber() as ExchangeState,
-    sellCelo: typeof proposalRaw[5] == 'boolean' ? proposalRaw[5] : proposalRaw[5] == 'true',
+    approvalTimestamp: proposalRaw[4],
+    state: proposalRaw[5].toNumber() as ExchangeState,
+    sellCelo: typeof proposalRaw[6] == 'boolean' ? proposalRaw[6] : proposalRaw[6] == 'true',
   }
 }
 
@@ -236,6 +237,7 @@ contract('GrandaMento', (accounts: string[]) => {
           exchangeProposal.buyAmount,
           getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread)
         )
+        assertEqualBN(exchangeProposal.approvalTimestamp, 0)
         assert.equal(exchangeProposal.state, ExchangeState.Proposed)
         assert.equal(exchangeProposal.sellCelo, false)
       })
@@ -262,6 +264,7 @@ contract('GrandaMento', (accounts: string[]) => {
           exchangeProposal.buyAmount,
           getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread)
         )
+        assertEqualBN(exchangeProposal.approvalTimestamp, 0)
         assert.equal(exchangeProposal.state, ExchangeState.Proposed)
         assert.equal(exchangeProposal.sellCelo, false)
       })
@@ -354,6 +357,7 @@ contract('GrandaMento', (accounts: string[]) => {
           exchangeProposal.buyAmount,
           getBuyAmount(celoSellAmount, fromFixed(defaultCeloStableTokenRate), spread)
         )
+        assertEqualBN(exchangeProposal.approvalTimestamp, 0)
         assert.equal(exchangeProposal.state, ExchangeState.Proposed)
         assert.equal(exchangeProposal.sellCelo, true)
       })
