@@ -2205,7 +2205,7 @@ __metadata:
 
 "@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#piersy/test":
   version: 6.6.1
-  resolution: "@celo/ganache-cli@https://github.com/celo-org/ganache-cli.git#commit=6191ae4558a602324ad2a420f956af81b9346e74"
+  resolution: "@celo/ganache-cli@https://github.com/celo-org/ganache-cli.git#commit=e89bf88b771a637e10e8137e8ef08b0dc7ed4280"
   dependencies:
     ethereumjs-util: 6.1.0
     source-map-support: 0.5.12
