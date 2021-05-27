@@ -696,8 +696,8 @@ contract('Accounts', (accounts: string[]) => {
           it(`should emit the right event`, async () => {
             const resp = await testInstance.fn(authorized, sig.v, sig.r, sig.s)
 
-            assert.equal(resp.logs.length, genericWrite ? 2 : 3)
-            const log = resp.logs[genericWrite ? 0 : 2]
+            assert.equal(resp.logs.length, genericWrite ? 3 : 4)
+            const log = resp.logs[genericWrite ? 0 : 3]
             assertLogMatches(
               log,
               testInstance.eventName,
