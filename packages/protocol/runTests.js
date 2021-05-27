@@ -87,8 +87,6 @@ async function test() {
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {
-    console.log('sleeping... (remove me at some point!)')
-    await sleep(100000)
     // tslint:disable-next-line: no-console
     console.error(e.stdout ? e.stdout : e)
     process.nextTick(() => process.exit(1))

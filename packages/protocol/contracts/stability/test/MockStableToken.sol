@@ -45,17 +45,21 @@ contract MockStableToken {
   }
 
   function transfer(address to, uint256 value) external returns (bool) {
-    uint256 balanceValue = balanceOf(msg.sender);
+    return _transfer(msg.sender, to, value);
+  }
+
+  function transferFrom(address from, address to, uint256 value) external returns (bool) {
+    return _transfer(from, to, value);
+  }
+
+  function _transfer(address from, address to, uint256 value) internal returns (bool) {
+    uint256 balanceValue = balanceOf(from);
     if (balanceValue < value) {
       return false;
     }
     uint256 units = valueToUnits(value);
-    balances[msg.sender] = balances[msg.sender].sub(units);
+    balances[from] = balances[from].sub(units);
     balances[to] = balances[to].add(units);
-    return true;
-  }
-
-  function transferFrom(address, address, uint256) external pure returns (bool) {
     return true;
   }
 

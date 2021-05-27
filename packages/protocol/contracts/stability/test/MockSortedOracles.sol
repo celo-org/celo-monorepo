@@ -29,7 +29,10 @@ contract MockSortedOracles {
   }
 
   function medianRate(address token) external view returns (uint256, uint256) {
-    return (numerators[token], DENOMINATOR);
+    if (numerators[token] > 0) {
+      return (numerators[token], DENOMINATOR);
+    }
+    return (0, 0);
   }
 
   function isOldestReportExpired(address token) public view returns (bool, address) {

@@ -68,7 +68,6 @@ contract GrandaMento is
 
   /**
    * @notice Indexed by the exchange proposal ID. State for all exchange proposals.
-   * @dev A mapping is used instead of an array for slightly less gas consumption.
    */
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
 
@@ -79,8 +78,8 @@ contract GrandaMento is
   uint256 public exchangeProposalCount;
 
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+   * @notice Sets initialized == true on implementation contracts.
+   * @param test Set to true to skip implementation initialization.
    */
   constructor(bool test) public InitializableV2(test) {}
 
@@ -135,9 +134,8 @@ contract GrandaMento is
     uint256 proposalId = exchangeProposalCount;
     exchangeProposals[proposalId] = ExchangeProposal({
       exchanger: msg.sender,
-      stableToken: stableToken,
-      sellAmount: // sellAmount is saved in units for stable tokens to account for inflation.
-      sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
+      stableToken: stableToken, // sellAmount is saved in units for stable tokens to account for inflation.
+      sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
       buyAmount: buyAmount,
       state: ExchangeState.Proposed,
       sellCelo: sellCelo
@@ -180,23 +178,6 @@ contract GrandaMento is
   }
 
   /**
-   * @notice Gets the oracle CELO price quoted in the stable token.
-   * @param stableToken The stable token to get the oracle price for.
-   * @return The oracle CELO price quoted in the stable token.
-   */
-  function getOracleExchangeRate(address stableToken)
-    private
-    view
-    returns (FixidityLib.Fraction memory)
-  {
-    uint256 rateNumerator;
-    uint256 rateDenominator;
-    (rateNumerator, rateDenominator) = getSortedOracles().medianRate(stableToken);
-    require(rateDenominator > 0, "Exchange rate denominator must be greater than 0");
-    return FixidityLib.wrap(rateNumerator).divide(FixidityLib.wrap(rateDenominator));
-  }
-
-  /**
    * @notice Sets the spread.
    * @dev Sender must be owner.
    * @param newSpread The new value for the spread.
@@ -223,5 +204,22 @@ contract GrandaMento is
       maxExchangeAmount: maxExchangeAmount
     });
     emit StableTokenExchangeLimitsSet(stableToken, minExchangeAmount, maxExchangeAmount);
+  }
+
+  /**
+   * @notice Gets the oracle CELO price quoted in the stable token.
+   * @param stableToken The stable token to get the oracle price for.
+   * @return The oracle CELO price quoted in the stable token.
+   */
+  function getOracleExchangeRate(address stableToken)
+    private
+    view
+    returns (FixidityLib.Fraction memory)
+  {
+    uint256 rateNumerator;
+    uint256 rateDenominator;
+    (rateNumerator, rateDenominator) = getSortedOracles().medianRate(stableToken);
+    require(rateDenominator > 0, "Exchange rate denominator must be greater than 0");
+    return FixidityLib.wrap(rateNumerator).divide(FixidityLib.wrap(rateDenominator));
   }
 }
