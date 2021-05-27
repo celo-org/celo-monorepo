@@ -694,9 +694,6 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
       await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
-      // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
-      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await exchangeAbc.sell(sellAmount, 0, false)
     })
   })
 
