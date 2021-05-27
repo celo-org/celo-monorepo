@@ -26,6 +26,7 @@ export interface BaseFullNodeDeploymentConfig {
   rollingUpdatePartition: number
   rpcApis: string
   gcMode: string
+  useGstoreData: string
   // If undefined, node keys will not be predetermined and will be random
   nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
@@ -115,7 +116,7 @@ export abstract class BaseFullNodeDeployer {
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
       `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
-      `--set geth.use_gstorage_data=${fetchEnvOrFallback('USE_GSTORAGE_DATA', 'false')}`,
+      `--set geth.use_gstorage_data=${this._deploymentConfig.useGstoreData}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
       // Disable by default block age check in fullnode readinessProbe except for production envs
       `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(

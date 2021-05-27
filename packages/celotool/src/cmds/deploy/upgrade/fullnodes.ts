@@ -40,7 +40,7 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: FullNodeUpgradeArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
   if (!isCelotoolHelmDryRun()) {
-    await linkSAForWorkloadIdentity(argv.celoEnv)
+    await linkSAForWorkloadIdentity(argv.celoEnv, argv.context)
   }
   await upgradeFullNodeChart(
     argv.celoEnv,

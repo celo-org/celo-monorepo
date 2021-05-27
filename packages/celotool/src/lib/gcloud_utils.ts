@@ -1,5 +1,5 @@
 import { execCmd } from './cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from './env-utils'
 
 export async function getCurrentGcloudAccount() {
   const [output] = await execCmd('gcloud config get-value account')
@@ -43,8 +43,14 @@ export async function ensureAuthenticatedGcloudAccount() {
   }
 }
 
-export async function linkSAForWorkloadIdentity(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
+export async function linkSAForWorkloadIdentity(celoEnv: string, context: string) {
+  if (
+    getDynamicEnvVarValue(
+      DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
+      { context },
+      'false'
+    ).toLowerCase() === 'true'
+  ) {
     await execCmd(
       `gcloud iam service-accounts add-iam-policy-binding --project ${fetchEnv(
         envVar.TESTNET_PROJECT_NAME
@@ -60,7 +66,13 @@ export async function linkSAForWorkloadIdentity(celoEnv: string) {
 }
 
 export async function delinkSAForWorkloadIdentity(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
+  if (
+    getDynamicEnvVarValue(
+      DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
+      { context },
+      'false'
+    ).toLowerCase() === 'true'
+  ) {
     await execCmd(
       `gcloud iam service-accounts remove-iam-policy-binding --project ${fetchEnv(
         envVar.TESTNET_PROJECT_NAME
@@ -76,7 +88,13 @@ export async function delinkSAForWorkloadIdentity(celoEnv: string) {
 }
 
 export async function kubectlAnnotateKSA(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
+  if (
+    getDynamicEnvVarValue(
+      DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
+      { context },
+      'false'
+    ).toLowerCase() === 'true'
+  ) {
     await execCmd(
       `kubectl annotate serviceaccount \
         --namespace ${celoEnv} \
@@ -90,7 +108,13 @@ export async function kubectlAnnotateKSA(celoEnv: string) {
 }
 
 export async function removeKubectlAnnotateKSA(celoEnv: string) {
-  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, 'false').toLowerCase() === 'true') {
+  if (
+    getDynamicEnvVarValue(
+      DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
+      { context },
+      'false'
+    ).toLowerCase() === 'true'
+  ) {
     await execCmd(
       `kubectl annotate serviceaccount \
         --namespace ${celoEnv} \

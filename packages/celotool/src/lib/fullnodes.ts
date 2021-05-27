@@ -26,6 +26,7 @@ const contextFullNodeDeploymentEnvVars: {
   rollingUpdatePartition: DynamicEnvVar.FULL_NODES_ROLLING_UPDATE_PARTITION,
   rpcApis: DynamicEnvVar.FULL_NODES_RPC_API_METHODS,
   gcMode: DynamicEnvVar.FULL_NODES_GETH_GC_MODE,
+  useGstoreData: DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
 }
 
 /**
@@ -143,7 +144,6 @@ function getStaticNodesFileSuffix(context: string) {
  * provider for a context.
  */
 function getFullNodeDeploymentConfig(context: string): BaseFullNodeDeploymentConfig {
-  console.log(`jcortejoso1`)
   const fullNodeDeploymentEnvVarValues = getContextDynamicEnvVarValues(
     contextFullNodeDeploymentEnvVars,
     context
@@ -155,6 +155,7 @@ function getFullNodeDeploymentConfig(context: string): BaseFullNodeDeploymentCon
     rollingUpdatePartition: parseInt(fullNodeDeploymentEnvVarValues.rollingUpdatePartition, 10),
     rpcApis: fullNodeDeploymentEnvVarValues.rpcApis,
     gcMode: fullNodeDeploymentEnvVarValues.gcMode,
+    useGstoreData: fullNodeDeploymentEnvVarValues.useGstoreData,
   }
   return fullNodeDeploymentConfig
 }

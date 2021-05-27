@@ -98,7 +98,7 @@ release: {{ .Release.Name }}
 if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
 else
-  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+  [ -f /root/.celo/bootnodeEnode ] && BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi
 {{- end -}}
 
