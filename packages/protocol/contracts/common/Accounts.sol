@@ -262,13 +262,14 @@ contract Accounts is
   }
 
   /**
-   * @notice Authorizes an address to as a signer on behalf of the account.
+   * @notice Authorizes an address to as a signer, for `role`, on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param role The role to authorize signing for.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `signer`'s EIP712 signature over `role`, `msg.sender`  
+   *      and `signer`.
    */
   function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
     public
@@ -885,7 +886,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Check if an address has been an authorized signer for an account.
+   * @notice Check if an address has not been an authorized signer for an account.
    * @param signer The possibly authorized address.
    * @return Returns `false` if authorized. Returns `true` otherwise.
    */
@@ -894,7 +895,8 @@ contract Accounts is
   }
 
   /**
-   * @notice Check if an address has been an authorized signer for an account.
+   * @notice Check if `signer` has not been authorized, and if it has been previously
+   *         authorized that it was authorized by `account`.
    * @param account The authorizing account address.
    * @param signer The possibly authorized address.
    * @return Returns `false` if authorized. Returns `true` otherwise.
