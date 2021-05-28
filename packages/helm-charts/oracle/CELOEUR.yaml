@@ -3,8 +3,7 @@ oracle:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      askMaxPercentageDeviation: 0.05
-      bidMaxPercentageDeviation: 0.05
+      maxPercentageDeviation: 0.05
       maxPercentageBidAskSpread: 0.025
       # minReportPriceChangeThreshold
   metrics:
@@ -12,7 +11,7 @@ oracle:
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  exchanges: COINBASE,BITTREX
+  priceSources: "[[{exchange: 'BITTREX', symbol: 'CELOEUR', toInvert: false}],[{exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}]]"
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
