@@ -91,9 +91,7 @@ const deployImplementation = async (
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
-    : checkImports('InitializableV2', Contract, artifacts)
-    ? Contract.new(testingDeployment)
-    : Contract.new())
+    : Contract.new(testingDeployment))
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
