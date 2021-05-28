@@ -4,4 +4,4 @@ certoraRun specs/harnesses/GovernanceHarness.sol contracts/common/Accounts.sol \
 	--cache governance \
 	--optimistic_loop \
 	--solc_args "['--evm-version', 'istanbul']" \
-	--staging --msg "governance" 
+	--staging --msg "governance" --settings -ciMode=true 

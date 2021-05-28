@@ -4,4 +4,4 @@ certoraRun specs/harnesses/AccountsHarness.sol \
 	--loop_iter 2 \
 	--cache celo_accounts \
 	--solc_args "['--evm-version', 'istanbul']" \
-	--msg "Accounts"
+	--msg "Accounts" --settings -ciMode=true

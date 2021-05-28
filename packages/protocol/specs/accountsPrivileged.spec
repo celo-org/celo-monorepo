@@ -1,12 +1,27 @@
 definition knownAsNonPrivileged(method f) returns bool  = false
-/*	( 	f.selector == isWhitelistedOtoken(address).selector  ||
-		f.selector == isWhitelistedProduct(address,address,address,bool).selector ||
-		f.selector == owner().selector ||
-    	f.selector == isWhitelistedCallee(address).selector ||
-		f.selector == whitelistOtoken(address).selector ||
-		f.selector == addressBook().selector || 
-		f.selector == isWhitelistedCollateral(address).selector )*/; 
-
+  || f.selector == removeIndexedSigner(bytes32).selector
+  || f.selector == authorizeValidatorSignerWithPublicKey(address,uint8,bytes32,bytes32,bytes).selector
+  || f.selector == setAccountDataEncryptionKey(bytes).selector
+  || f.selector == removeVoteSigner().selector
+  || f.selector == authorizeValidatorSignerWithKeys(address,uint8,bytes32,bytes32,bytes,bytes,bytes).selector
+  || f.selector == authorizeVoteSigner(address,uint8,bytes32,bytes32).selector
+  || f.selector == authorizeSigner(address,bytes32).selector
+  || f.selector == setIndexedSigner(address,bytes32).selector
+  || f.selector == setMetadataURL(string).selector
+  || f.selector == removeAttestationSigner().selector
+  || f.selector == authorizeAttestationSigner(address,uint8,bytes32,bytes32).selector
+  || f.selector == setAccount(string,bytes,address,uint8,bytes32,bytes32).selector
+  || f.selector == authorizeSignerWithSignature(address,bytes32,uint8,bytes32,bytes32).selector
+  || f.selector == setWalletAddress(address,uint8,bytes32,bytes32).selector
+  || f.selector == createAccount().selector
+  || f.selector == completeSignerAuthorization(address,bytes32).selector
+  || f.selector == removeValidatorSigner().selector
+  || f.selector == authorizeValidatorSigner(address,uint8,bytes32,bytes32).selector
+  || f.selector == setName(string).selector
+  || f.selector == initialize(address).selector
+  || f.selector == removeDefaultSigner(bytes32).selector
+  || f.selector == removeSigner(address,bytes32).selector
+; 
 
 
 rule privilegedOperation(method f, address privileged)
