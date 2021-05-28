@@ -58,6 +58,10 @@ contract GovernanceHarness is Governance {
     return (proposal.proposer, proposal.deposit, proposal.timestamp, proposal.transactions.length);
   }
 
+  function getVotedId(address account, uint256 index) external view returns (uint256) {
+    return voters[account].referendumVotes[index].proposalId;
+  }
+
   // override for performance - do nothing
   function dequeueProposalsIfReady() public {}
 }
