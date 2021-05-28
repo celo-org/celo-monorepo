@@ -826,6 +826,21 @@ jobs:
           name: Build and run - Accounts
           command: |
             cd packages/protocol
+            chmod +x specs/scripts/accounts.sh
+            ./specs/scripts/accounts.sh
+      - run:
+          name: Build and run - Accounts privileged check
+          command: |
+            cd packages/protocol
+            chmod +x specs/scripts/accountsPrivileged.sh
+            ./specs/scripts/accountsPrivileged.sh
+      - run:
+          name: Build and run - Governance
+          command: |
+            cd packages/protocol
+            chmod +x specs/scripts/*.sh
+            ./specs/scripts/applyHarness.sh
+            ./specs/scripts/governance.sh
             certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond --solc_args "['--evm-version', 'istanbul']"
 
   flakey-test-summary:
