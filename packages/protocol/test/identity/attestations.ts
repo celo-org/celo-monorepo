@@ -27,8 +27,8 @@ import {
   MockLockedGoldInstance,
   MockRandomContract,
   MockRandomInstance,
-  MockStableTokenContract,
-  MockStableTokenInstance,
+  MockTokenContract,
+  MockTokenInstance,
   MockValidatorsContract,
   RegistryContract,
   RegistryInstance,
@@ -43,7 +43,7 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
  * for Truffle unit tests.
  */
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
-const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+const MockToken: MockTokenContract = artifacts.require('MockToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -53,8 +53,8 @@ const Registry: RegistryContract = artifacts.require('Registry')
 contract('Attestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let attestations: AttestationsTestInstance
-  let mockStableToken: MockStableTokenInstance
-  let otherMockStableToken: MockStableTokenInstance
+  let mockToken: MockTokenInstance
+  let otherMockToken: MockTokenInstance
   let random: MockRandomInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -86,8 +86,8 @@ contract('Attestations', (accounts: string[]) => {
 
   beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
     accountsInstance = await Accounts.new(true)
-    mockStableToken = await MockStableToken.new()
-    otherMockStableToken = await MockStableToken.new()
+    mockToken = await MockToken.new()
+    otherMockToken = await MockToken.new()
     const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
@@ -131,7 +131,7 @@ contract('Attestations', (accounts: string[]) => {
       attestationExpiryBlocks,
       selectIssuersWaitBlocks,
       maxAttestations,
-      [mockStableToken.address, otherMockStableToken.address],
+      [mockToken.address, otherMockToken.address],
       [attestationFee, attestationFee]
     )
 
@@ -149,7 +149,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should have set the fee', async () => {
-      const fee = await attestations.getAttestationRequestFee(mockStableToken.address)
+      const fee = await attestations.getAttestationRequestFee(mockToken.address)
       assert.equal(fee.toString(), attestationFee.toString())
     })
 
@@ -160,7 +160,7 @@ contract('Attestations', (accounts: string[]) => {
           attestationExpiryBlocks,
           selectIssuersWaitBlocks,
           maxAttestations,
-          [mockStableToken.address],
+          [mockToken.address],
           [attestationFee]
         )
       )
@@ -199,18 +199,18 @@ contract('Attestations', (accounts: string[]) => {
     const newAttestationFee: BigNumber = attestationFee.plus(1)
 
     it('should set the fee', async () => {
-      await attestations.setAttestationRequestFee(mockStableToken.address, newAttestationFee)
-      const fee = await attestations.getAttestationRequestFee(mockStableToken.address)
+      await attestations.setAttestationRequestFee(mockToken.address, newAttestationFee)
+      const fee = await attestations.getAttestationRequestFee(mockToken.address)
       assert.equal(fee.toString(), newAttestationFee.toString())
     })
 
     it('should revert when the fee is being set to 0', async () => {
-      await assertRevert(attestations.setAttestationRequestFee(mockStableToken.address, 0))
+      await assertRevert(attestations.setAttestationRequestFee(mockToken.address, 0))
     })
 
     it('should not be settable by a non-owner', async () => {
       await assertRevert(
-        attestations.setAttestationRequestFee(mockStableToken.address, newAttestationFee, {
+        attestations.setAttestationRequestFee(mockToken.address, newAttestationFee, {
           from: accounts[1],
         })
       )
@@ -218,7 +218,7 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should emit the AttestationRequestFeeSet event', async () => {
       const response = await attestations.setAttestationRequestFee(
-        mockStableToken.address,
+        mockToken.address,
         newAttestationFee
       )
       assert.lengthOf(response.logs, 1)
@@ -226,7 +226,7 @@ contract('Attestations', (accounts: string[]) => {
       assertLogMatches2(event, {
         event: 'AttestationRequestFeeSet',
         args: {
-          token: mockStableToken.address,
+          token: mockToken.address,
           value: newAttestationFee,
         },
       })
@@ -290,7 +290,7 @@ contract('Attestations', (accounts: string[]) => {
 
   describe('#request()', () => {
     it('should indicate an unselected attestation request', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(phoneHash, attestationsRequested, mockToken.address)
       const requestBlock = await web3.eth.getBlock('latest')
 
       const [
@@ -301,11 +301,11 @@ contract('Attestations', (accounts: string[]) => {
 
       assertEqualBN(blockNumber, requestBlock.number)
       assertEqualBN(attestationsRequested, actualAttestationsRequested)
-      assertSameAddress(actualAttestationRequestFeeToken, mockStableToken.address)
+      assertSameAddress(actualAttestationRequestFeeToken, mockToken.address)
     })
 
     it('should increment the number of attestations requested', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(phoneHash, attestationsRequested, mockToken.address)
 
       const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
       assertEqualBN(completed, 0)
@@ -313,14 +313,14 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert if 0 attestations are requested', async () => {
-      await assertRevert(attestations.request(phoneHash, 0, mockStableToken.address))
+      await assertRevert(attestations.request(phoneHash, 0, mockToken.address))
     })
 
     it('should emit the AttestationsRequested event', async () => {
       const response = await attestations.request(
         phoneHash,
         attestationsRequested,
-        mockStableToken.address
+        mockToken.address
       )
 
       assert.lengthOf(response.logs, 1)
@@ -331,25 +331,25 @@ contract('Attestations', (accounts: string[]) => {
           identifier: phoneHash,
           account: caller,
           attestationsRequested: new BigNumber(attestationsRequested),
-          attestationRequestFeeToken: mockStableToken.address,
+          attestationRequestFeeToken: mockToken.address,
         },
       })
     })
 
     describe('when attestations have already been requested', () => {
       beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+        await attestations.request(phoneHash, attestationsRequested, mockToken.address)
       })
 
       describe('when the issuers have not yet been selected', () => {
         it('should revert requesting more attestations', async () => {
-          await assertRevert(attestations.request(phoneHash, 1, mockStableToken.address))
+          await assertRevert(attestations.request(phoneHash, 1, mockToken.address))
         })
 
         describe('when the original request has expired', () => {
           it('should allow to request more attestations', async () => {
             await mineBlocks(attestationExpiryBlocks, web3)
-            await attestations.request(phoneHash, 1, mockStableToken.address)
+            await attestations.request(phoneHash, 1, mockToken.address)
           })
         })
 
@@ -357,7 +357,7 @@ contract('Attestations', (accounts: string[]) => {
           it('should allow to request more attestations', async () => {
             const randomnessBlockRetentionWindow = await random.randomnessBlockRetentionWindow()
             await mineBlocks(randomnessBlockRetentionWindow.toNumber(), web3)
-            await attestations.request(phoneHash, 1, mockStableToken.address)
+            await attestations.request(phoneHash, 1, mockToken.address)
           })
         })
       })
@@ -370,7 +370,7 @@ contract('Attestations', (accounts: string[]) => {
         })
 
         it('should allow to request more attestations', async () => {
-          await attestations.request(phoneHash, 1, mockStableToken.address)
+          await attestations.request(phoneHash, 1, mockToken.address)
           const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
           assert.equal(completed.toNumber(), 0)
           assert.equal(total.toNumber(), attestationsRequested + 1)
@@ -394,7 +394,7 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       it('does not select among those when requesting 5', async () => {
-        await attestations.request(phoneHash, 5, mockStableToken.address)
+        await attestations.request(phoneHash, 5, mockToken.address)
         const requestBlockNumber = await web3.eth.getBlockNumber()
         await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
         await attestations.selectIssuers(phoneHash)
@@ -406,7 +406,7 @@ contract('Attestations', (accounts: string[]) => {
 
     describe('when attestations were requested', () => {
       beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+        await attestations.request(phoneHash, attestationsRequested, mockToken.address)
         expectedRequestBlockNumber = await web3.eth.getBlockNumber()
       })
 
@@ -502,7 +502,7 @@ contract('Attestations', (accounts: string[]) => {
                 identifier: phoneHash,
                 account: caller,
                 issuer,
-                attestationRequestFeeToken: mockStableToken.address,
+                attestationRequestFeeToken: mockToken.address,
               },
             })
           })
@@ -511,7 +511,7 @@ contract('Attestations', (accounts: string[]) => {
         describe('when more attestations were requested', () => {
           beforeEach(async () => {
             await attestations.selectIssuers(phoneHash)
-            await attestations.request(phoneHash, 8, mockStableToken.address)
+            await attestations.request(phoneHash, 8, mockToken.address)
             expectedRequestBlockNumber = await web3.eth.getBlockNumber()
             const requestBlockNumber = await web3.eth.getBlockNumber()
             await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
@@ -639,10 +639,7 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should increment pendingWithdrawals for the rewards recipient', async () => {
       await attestations.complete(phoneHash, v, r, s)
-      const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockStableToken.address,
-        issuer
-      )
+      const pendingWithdrawals = await attestations.pendingWithdrawals(mockToken.address, issuer)
       assert.equal(pendingWithdrawals.toString(), attestationFee.toString())
     })
 
@@ -699,29 +696,23 @@ contract('Attestations', (accounts: string[]) => {
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
       await attestations.complete(phoneHash, v, r, s)
-      await mockStableToken.mint(attestations.address, attestationFee)
+      await mockToken.mint(attestations.address, attestationFee)
     })
 
     it('should remove the balance of available rewards for the issuer from issuer', async () => {
-      await attestations.withdraw(mockStableToken.address, {
+      await attestations.withdraw(mockToken.address, {
         from: issuer,
       })
-      const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockStableToken.address,
-        issuer
-      )
+      const pendingWithdrawals = await attestations.pendingWithdrawals(mockToken.address, issuer)
       assertEqualBN(pendingWithdrawals, 0)
     })
 
     it('should remove the balance of available rewards for the issuer from attestation signer', async () => {
       const signer = await accountsInstance.getAttestationSigner(issuer)
-      await attestations.withdraw(mockStableToken.address, {
+      await attestations.withdraw(mockToken.address, {
         from: signer,
       })
-      const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockStableToken.address,
-        issuer
-      )
+      const pendingWithdrawals = await attestations.pendingWithdrawals(mockToken.address, issuer)
       assertEqualBN(pendingWithdrawals, 0)
     })
 
@@ -733,11 +724,11 @@ contract('Attestations', (accounts: string[]) => {
         accounts
       )
       const signer = await accountsInstance.getVoteSigner(issuer)
-      await assertRevert(attestations.withdraw(mockStableToken.address, { from: signer }))
+      await assertRevert(attestations.withdraw(mockToken.address, { from: signer }))
     })
 
     it('should emit the Withdrawal event', async () => {
-      const response = await attestations.withdraw(mockStableToken.address, {
+      const response = await attestations.withdraw(mockToken.address, {
         from: issuer,
       })
       assert.lengthOf(response.logs, 1)
@@ -746,21 +737,19 @@ contract('Attestations', (accounts: string[]) => {
         event: 'Withdrawal',
         args: {
           account: issuer,
-          token: mockStableToken.address,
+          token: mockToken.address,
           amount: attestationFee,
         },
       })
     })
 
     it('should not allow someone with no pending withdrawals to withdraw', async () => {
-      await assertRevert(
-        attestations.withdraw(mockStableToken.address, { from: await getNonIssuer() })
-      )
+      await assertRevert(attestations.withdraw(mockToken.address, { from: await getNonIssuer() }))
     })
   })
 
   const requestAttestations = async () => {
-    await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+    await attestations.request(phoneHash, attestationsRequested, mockToken.address)
     const requestBlockNumber = await web3.eth.getBlockNumber()
     await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
     await attestations.selectIssuers(phoneHash)
@@ -866,7 +855,7 @@ contract('Attestations', (accounts: string[]) => {
           let other
           beforeEach(async () => {
             other = accounts[1]
-            await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
+            await attestations.request(phoneHash, attestationsRequested, mockToken.address, {
               from: other,
             })
             const requestBlockNumber = await web3.eth.getBlockNumber()
@@ -1092,7 +1081,7 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       it('should revert when the `to` address has attestations existing', async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
+        await attestations.request(phoneHash, attestationsRequested, mockToken.address, {
           from: replacementAddress,
         })
         const requestBlockNumber = await web3.eth.getBlockNumber()
