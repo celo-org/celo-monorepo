@@ -1162,24 +1162,3 @@ async function generateMyCeloGenesis(): Promise<string> {
   // Clean up the tmp dir as it's no longer needed
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
 }
-
-export async function createGethConfigConfigMap(celoEnv: string, genesisJson: string) {
-  const gethConfigMapPath = `/tmp/${celoEnv}-geth-config.yaml`
-  console.info(`Creating configmap ${gethConfigMapPath}`)
-  const configMapSkeleton = `
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  labels:
-    app: testnet
-    release: ${celoEnv}
-  name: ${celoEnv}-geth-config
-  namespace: ${celoEnv}
-data:
-  networkid: "${fetchEnv(envVar.NETWORK_ID)}"
-  genesis.json: |-
-    ${genesisJson.replace(/\n/g, '\n    ')}
-  `
-  fs.writeFileSync(gethConfigMapPath, configMapSkeleton)
-  await execCmdWithExitOnFailure(`kubectl create --namespace=${celoEnv} -f ${gethConfigMapPath}`)
-}
