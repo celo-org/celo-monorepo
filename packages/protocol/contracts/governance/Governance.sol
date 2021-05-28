@@ -680,12 +680,13 @@ contract Governance is
       VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
       (Proposals.Proposal storage proposal, Proposals.Stage stage) =
         requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
-      require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
-      Proposals.VoteValue value = voteRecord.value;
-      proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
-      proposal.networkWeight = getLockedGold().getTotalLockedGold();
-      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
-      delete voter.referendumVotes[dequeueIndex];
+      if (stage == Proposals.Stage.Referendum) {
+        Proposals.VoteValue value = voteRecord.value;
+        proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
+        proposal.networkWeight = getLockedGold().getTotalLockedGold();
+        emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
+        delete voter.referendumVotes[dequeueIndex];
+      }
     }
     voter.mostRecentReferendumProposal = 0;
     return true;
