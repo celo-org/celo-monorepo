@@ -34,7 +34,7 @@ MockStableToken.numberFormat = 'BigNumber'
 Registry.numberFormat = 'BigNumber'
 
 enum ExchangeState {
-  Empty,
+  None,
   Proposed,
   Approved,
   Executed,

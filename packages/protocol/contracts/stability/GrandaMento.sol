@@ -43,7 +43,7 @@ contract GrandaMento is
     uint256 maxExchangeAmount
   );
 
-  enum ExchangeState { Empty, Proposed, Approved, Executed, Cancelled }
+  enum ExchangeState { None, Proposed, Approved, Executed, Cancelled }
 
   struct ExchangeLimits {
     // The minimum amount of an asset that can be exchanged in a single proposal.
