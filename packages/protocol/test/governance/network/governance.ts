@@ -1555,22 +1555,10 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should not revert when some proposals are not within the Referendum stage', async () => {
+    it('should not revert when proposals are not in the Referendum stage', async () => {
       await governance.vote(proposalId, index, VoteValue.Yes)
       await timeTravel(referendumStageDuration, web3)
-
-      const resp = await governance.revokeVotes()
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'ProposalVoteRevoked',
-        args: {
-          proposalId,
-          account,
-          value,
-          weight,
-        },
-      })
+      await governance.revokeVotes()
     })
 
     describe('when voting on two proposals', () => {
