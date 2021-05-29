@@ -273,8 +273,8 @@ invariant noMultipleAccountsPerSignerInARole(address account, address account2, 
 			=> account == account2) {
 	
 	preserved {
-		requireInvariant completedSignerAuthMeansAuthByIsSet(account, role, signer);
-		requireInvariant completedSignerAuthMeansAuthByIsSet(account2, role2, signer);
+		requireInvariant mustHaveAuthorizedByIfCompletedSignerAuthorization(account, role, signer);
+		requireInvariant mustHaveAuthorizedByIfCompletedSignerAuthorization(account2, role2, signer);
 	}
 }
 
