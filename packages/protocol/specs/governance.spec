@@ -75,9 +75,6 @@ definition upvoteInv(uint p, uint w) returns bool
     = (p != 0 && w > 0) || (p == 0 && w == 0)
     ;
 
-/**
- * A user should never be able to upvote more than one proposal in the queue
- */
 rule no_double_upvote(uint256 p, address u) {
 	uint256 _upvotes = getUpvotes(p);
 	uint256 _usersUpvotedProposal = getUpvotedProposal(u);
@@ -148,16 +145,14 @@ rule cant_unvote(uint256 deqIndex, uint8 voteValue) {
 	address voterDelegate = accounts.getVoteSigner(eF.msg.sender);
 	
 	// check if voted
-	uint256 p;
 	uint256 recordValue;
     uint256 weight;
-	p, recordValue, weight = getVoteRecord(voterDelegate,deqIndex);
+	_, recordValue, weight = getVoteRecord(voterDelegate,deqIndex);
 	bool result = vote(eF,p,deqIndex,voteValue);
 	
-	uint256 p_;
 	uint256 recordValue_;
     uint256 weight_;
-	p_, recordValue_, weight_ = getVoteRecord(voterDelegate,deqIndex);
+	_, recordValue_, weight_ = getVoteRecord(voterDelegate,deqIndex);
 	
 	assert voteValue == NONE_ENUM => (!result && recordValue_ == recordValue && weight_ == weight), "Cannot vote for none: function either returns false and did not update the vote, or it reverted"; // not voting none. reverting is fine and is encoded by the safe invoke
 }
