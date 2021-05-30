@@ -21,8 +21,7 @@ definition knownAsNonPrivileged(method f) returns bool  = false
   || f.selector == initialize(address).selector
   || f.selector == removeDefaultSigner(bytes32).selector
   || f.selector == removeSigner(address,bytes32).selector
-; 
-
+  ; 
 
 rule privilegedOperation(method f, address privileged)
 description "$f can be called by more than one user without reverting"

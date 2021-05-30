@@ -23,19 +23,3 @@ function _isProposalPassingOld\(Proposals.Proposal storage proposal\) private vi
 perl -0777 -i -pe 's/function externalCall\(/function external_call2\(address destination, uint256 value, uint256 dataLength, bytes memory data\) private returns \(bool\) { return true; }
 function  external_Call\(/g' contracts/governance/Proposals.sol
 perl -0777 -i -pe 's/externalCall/external_call2/g' contracts/governance/Proposals.sol
-
-
-# Simplify ExtractFunctionSignature
-#perl -0777 -i -pe 's/function extractFunctionSignature\(bytes memory input\) internal pure returns \(bytes4\)/
-#function extractFunctionSignature2\(bytes calldata input\) external view returns \(bytes4 res\) \{ 
-#    bytes memory input_ = input;
-#    bytes32 x;
-#    assembly \{
-#      let d := add\(input_, 32\)
-#      x := mload\(d\)
-#    }
-#    res = bytes4\(x\);
-#  \}
-#function extractFunctionSignature\(bytes memory input\)     internal     pure returns \(bytes4\)/g' contracts/common/ExtractFunctionSignature.sol
-
-#perl -0777 -i -pe 's/extractFunctionSignature\(/extractFunctionSignature2\(/g' contracts/governance/Governance.sol

@@ -30,8 +30,6 @@ contract GovernanceHarness is Governance {
     return uint256(VoteValue.No);
   }
 
-  function init_state() public {}
-
   /* Override */
   LockedGoldHarness lockedGold;
   function getLockedGold() internal view returns (ILockedGold) {
