@@ -822,7 +822,7 @@ jobs:
           command: |
             cd packages/protocol
             chmod +x specs/scripts/lockedgold.sh
-            ./spec/scripts/lockedgold.sh
+            ./specs/scripts/lockedgold.sh
       - run:
           name: Build and run - Accounts
           command: |
