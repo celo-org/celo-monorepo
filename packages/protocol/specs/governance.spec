@@ -145,9 +145,10 @@ rule cant_unvote(uint256 deqIndex, uint8 voteValue) {
 	address voterDelegate = accounts.getVoteSigner(eF.msg.sender);
 	
 	// check if voted
+    uint256 p;
 	uint256 recordValue;
     uint256 weight;
-	_, recordValue, weight = getVoteRecord(voterDelegate,deqIndex);
+	p, recordValue, weight = getVoteRecord(voterDelegate,deqIndex);
 	bool result = vote(eF,p,deqIndex,voteValue);
 	
 	uint256 recordValue_;
