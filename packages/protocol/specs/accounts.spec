@@ -68,6 +68,7 @@ invariant address_signer_if_authroizedby_new(address x, address d, bytes32 role)
  * Given account x, address d a current signer, then d can not be a current signer of account y
  * (Expensive rule)
  */
+ /*
 rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, bytes32 r1, bytes32 r2, method f) filtered { f -> !f.isView } { 
 	// x and y are accounts d is authorizedby
 	require x != 0 && y != 0 && d != 0 && x != d && y != x && y != d;  
@@ -87,6 +88,7 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
 	assert getIndexedSigner(y, r2) != d,
     	"d must still not be a signer of any capacity for y";
 }
+*/
 
 /**
  * Account x can have two authorized addresses - legacy
