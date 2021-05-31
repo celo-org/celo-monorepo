@@ -100,3 +100,12 @@ packages/mobile/*
 packages/moonpay-auth/*
 packages/notification-service/*
 packages/react-components/*
+
+# yarn v2
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

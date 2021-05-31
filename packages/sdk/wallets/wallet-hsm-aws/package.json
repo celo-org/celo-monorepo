@@ -22,15 +22,15 @@
   "dependencies": {
     "@celo/utils": "1.2.2-dev",
     "@celo/wallet-base": "1.2.2-dev",
-    "@celo/wallet-remote": "1.2.2-dev",
     "@celo/wallet-hsm": "1.2.2-dev",
+    "@celo/wallet-remote": "1.2.2-dev",
     "@types/debug": "^4.1.5",
     "@types/secp256k1": "^4.0.0",
     "aws-sdk": "^2.705.0",
-    "eth-lib": "^0.2.8",
-    "ethereumjs-util": "^5.2.0",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
     "secp256k1": "^4.0.0"
   },
   "devDependencies": {

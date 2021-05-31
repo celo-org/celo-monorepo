@@ -9,9 +9,7 @@
   "bugs": "https://github.com/celo-org/celo-monorepo/issues?utf8=%E2%9C%93&q=label%3Acli+",
   "types": "lib/index.d.ts",
   "main": "lib/index.js",
-  "bin": {
-    "celocli": "./bin/run"
-  },
+  "bin": "./bin/run",
   "keywords": [
     "celo",
     "celocli",
@@ -48,9 +46,9 @@
     "@oclif/plugin-commands": "^1.3.0",
     "@oclif/plugin-help": "^1.2.4",
     "@oclif/plugin-not-found": "^1.2.4",
+    "@oclif/plugin-plugins": "^1.9.4",
     "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "@types/command-exists": "^1.2.0",
-    "@oclif/plugin-plugins": "^1.9.4",
     "bip32": "2.0.5",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",

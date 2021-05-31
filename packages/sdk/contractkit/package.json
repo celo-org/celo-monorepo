@@ -26,11 +26,11 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@types/debug": "^4.1.5",
     "@celo/base": "1.2.2-dev",
     "@celo/connect": "1.2.2-dev",
     "@celo/utils": "1.2.2-dev",
     "@celo/wallet-local": "1.2.2-dev",
+    "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
@@ -51,13 +51,10 @@
     "typedoc": "^0.19.2",
     "typedoc-plugin-markdown": "^2.2.16"
   },
-  "resolutions": {
-    "**/elliptic": "^6.5.4"
-  },
   "engines": {
     "node": ">=8.13.0"
   },
-  "browser":{
+  "browser": {
     "child_process": false
-  }  
+  }
 }

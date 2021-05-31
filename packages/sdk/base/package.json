@@ -18,8 +18,6 @@
   "files": [
     "lib/**/*"
   ],
-  "dependencies": {
-  },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1",

@@ -11,7 +11,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "test": "jest --testPathIgnorePatterns test\/end-to-end",
+    "test": "jest --testPathIgnorePatterns test/end-to-end",
     "test:e2e": "jest --runInBand test/end-to-end",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "bls:keygen": "ts-node scripts/create-bls-keys.ts",
@@ -20,8 +20,8 @@
   "dependencies": {
     "@celo/base": "1.1.1",
     "@celo/contractkit": "1.0.2",
-    "@celo/phone-number-privacy-common": "1.0.33",
     "@celo/identity": "1.0.2",
+    "@celo/phone-number-privacy-common": "1.0.33",
     "@celo/utils": "1.0.2",
     "@celo/wallet-hsm-azure": "1.0.0-beta3",
     "@google-cloud/secret-manager": "3.0.0",

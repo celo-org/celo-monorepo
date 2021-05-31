@@ -23,9 +23,9 @@
   "dependencies": {
     "@celo/contractkit": "1.0.2",
     "@celo/identity": "1.0.2",
-    "@celo/wallet-local": "1.0.2",
     "@celo/phone-number-privacy-common": "1.0.33",
     "@celo/utils": "1.0.0-beta3",
+    "@celo/wallet-local": "1.0.2",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0"
   },
