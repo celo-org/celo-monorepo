@@ -34,7 +34,7 @@ jobs:
           yarn lerna bootstrap
 
       - name: Build packages
-        run: yarn lerna run build
+        run: yarn lerna run build --ignore docs
 
       - name: Verify previous release
         run: yarn --cwd packages/protocol run verify-deployed -b celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
