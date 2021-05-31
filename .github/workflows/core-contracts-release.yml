@@ -14,7 +14,7 @@ on: push
 
 env:
   NETWORK: baklava
-  VERSION: 4
+  VERSION: 5
 
 jobs:
   core_contracts_release:
@@ -40,10 +40,7 @@ jobs:
       - name: Verify previous release
         run: |
           OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
-          echo 1
-          echo $OLD_BRANCH
-          echo 2
-          yarn --cwd packages/protocol run verify-deployed -b $OLD_BRANCH.${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
+          yarn --cwd packages/protocol run verify-deployed -b $OLD_BRANCH -n ${{ env.NETWORK }} -f;
 
       - name: Verify version compatibility
         run: |
@@ -53,6 +50,5 @@ jobs:
 
       - name: Make release
         run: |
-          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
           NEW_BRANCH=alexbharley/github-actions-deployment
           yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";

@@ -4836,6 +4836,21 @@
     glob "^7.1.2"
     web3-utils "1.2.1"
 
+"@truffle/hdwallet-provider@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-1.4.0.tgz#8b937d0688eebc049db4ab0e9ed895598b9b4d48"
+  integrity sha512-zCc4IWEtfAuKWWktZOaYFoHCvameQIz5Bk+S2ahCPxYMlWECWrbCMjoqqLojB1Hyz+IsvU1cspmr3E6PoO4ZmQ==
+  dependencies:
+    "@trufflesuite/web3-provider-engine" "15.0.13-1"
+    any-promise "^1.3.0"
+    bindings "^1.5.0"
+    ethereum-cryptography "^0.1.3"
+    ethereum-protocol "^1.0.1"
+    ethereumjs-common "^1.5.0"
+    ethereumjs-tx "^2.1.2"
+    ethereumjs-util "^6.1.0"
+    ethereumjs-wallet "^1.0.1"
+
 "@truffle/interface-adapter@^0.4.6":
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/@truffle/interface-adapter/-/interface-adapter-0.4.6.tgz#d904e2ae6e03712f310eb4da858a1fe07fa27d11"
@@ -4873,6 +4888,84 @@
     get-installed-path "^4.0.8"
     glob "^7.1.6"
     supports-color "^7.1.0"
+
+"@trufflesuite/eth-json-rpc-filters@^4.1.2-1":
+  version "4.1.2-1"
+  resolved "https://registry.yarnpkg.com/@trufflesuite/eth-json-rpc-filters/-/eth-json-rpc-filters-4.1.2-1.tgz#61ab78c52e98a883e5cf086925b34a30297b1824"
+  integrity sha512-/MChvC5dw2ck9NU1cZmdovCz2VKbOeIyR4tcxDvA5sT+NaL0rA2/R5U0yI7zsbo1zD+pgqav77rQHTzpUdDNJQ==
+  dependencies:
+    "@trufflesuite/eth-json-rpc-middleware" "^4.4.2-0"
+    await-semaphore "^0.1.3"
+    eth-query "^2.1.2"
+    json-rpc-engine "^5.1.3"
+    lodash.flatmap "^4.5.0"
+    safe-event-emitter "^1.0.1"
+
+"@trufflesuite/eth-json-rpc-infura@^4.0.3-0":
+  version "4.0.3-0"
+  resolved "https://registry.yarnpkg.com/@trufflesuite/eth-json-rpc-infura/-/eth-json-rpc-infura-4.0.3-0.tgz#6d22122937cf60ec9d21a02351c101fdc608c4fe"
+  integrity sha512-xaUanOmo0YLqRsL0SfXpFienhdw5bpQ1WEXxMTRi57az4lwpZBv4tFUDvcerdwJrxX9wQqNmgUgd1BrR01dumw==
+  dependencies:
+    "@trufflesuite/eth-json-rpc-middleware" "^4.4.2-1"
+    cross-fetch "^2.1.1"
+    eth-json-rpc-errors "^1.0.1"
+    json-rpc-engine "^5.1.3"
+
+"@trufflesuite/eth-json-rpc-middleware@^4.4.2-0", "@trufflesuite/eth-json-rpc-middleware@^4.4.2-1":
+  version "4.4.2-1"
+  resolved "https://registry.yarnpkg.com/@trufflesuite/eth-json-rpc-middleware/-/eth-json-rpc-middleware-4.4.2-1.tgz#8c3638ed8a7ed89a1e5e71407de068a65bef0df2"
+  integrity sha512-iEy9H8ja7/8aYES5HfrepGBKU9n/Y4OabBJEklVd/zIBlhCCBAWBqkIZgXt11nBXO/rYAeKwYuE3puH3ByYnLA==
+  dependencies:
+    "@trufflesuite/eth-sig-util" "^1.4.2"
+    btoa "^1.2.1"
+    clone "^2.1.1"
+    eth-json-rpc-errors "^1.0.1"
+    eth-query "^2.1.2"
+    ethereumjs-block "^1.6.0"
+    ethereumjs-tx "^1.3.7"
+    ethereumjs-util "^5.1.2"
+    ethereumjs-vm "^2.6.0"
+    fetch-ponyfill "^4.0.0"
+    json-rpc-engine "^5.1.3"
+    json-stable-stringify "^1.0.1"
+    pify "^3.0.0"
+    safe-event-emitter "^1.0.1"
+
+"@trufflesuite/eth-sig-util@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@trufflesuite/eth-sig-util/-/eth-sig-util-1.4.2.tgz#b529e2f38ac08e652116f48981132a26242a4f08"
+  integrity sha512-+GyfN6b0LNW77hbQlH3ufZ/1eCON7mMrGym6tdYf7xiNw9Vv3jBO72bmmos1EId2NgBvPMhmYYm6DSLQFTmzrA==
+  dependencies:
+    ethereumjs-abi "^0.6.8"
+    ethereumjs-util "^5.1.1"
+
+"@trufflesuite/web3-provider-engine@15.0.13-1":
+  version "15.0.13-1"
+  resolved "https://registry.yarnpkg.com/@trufflesuite/web3-provider-engine/-/web3-provider-engine-15.0.13-1.tgz#f6a7f7131a2fdc4ab53976318ed13ce83e8e4bcb"
+  integrity sha512-6u3x/iIN5fyj8pib5QTUDmIOUiwAGhaqdSTXdqCu6v9zo2BEwdCqgEJd1uXDh3DBmPRDfiZ/ge8oUPy7LerpHg==
+  dependencies:
+    "@trufflesuite/eth-json-rpc-filters" "^4.1.2-1"
+    "@trufflesuite/eth-json-rpc-infura" "^4.0.3-0"
+    "@trufflesuite/eth-json-rpc-middleware" "^4.4.2-1"
+    "@trufflesuite/eth-sig-util" "^1.4.2"
+    async "^2.5.0"
+    backoff "^2.5.0"
+    clone "^2.0.0"
+    cross-fetch "^2.1.0"
+    eth-block-tracker "^4.4.2"
+    eth-json-rpc-errors "^2.0.2"
+    ethereumjs-block "^1.2.2"
+    ethereumjs-tx "^1.2.0"
+    ethereumjs-util "^5.1.5"
+    ethereumjs-vm "^2.3.4"
+    json-stable-stringify "^1.0.1"
+    promise-to-callback "^1.0.0"
+    readable-stream "^2.2.9"
+    request "^2.85.0"
+    semaphore "^1.0.3"
+    ws "^5.1.1"
+    xhr "^2.2.0"
+    xtend "^4.0.1"
 
 "@types/abstract-leveldown@*":
   version "5.0.1"
@@ -11152,6 +11245,13 @@ eth-json-rpc-errors@^1.0.1:
   dependencies:
     fast-safe-stringify "^2.0.6"
 
+eth-json-rpc-errors@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/eth-json-rpc-errors/-/eth-json-rpc-errors-2.0.2.tgz#c1965de0301fe941c058e928bebaba2e1285e3c4"
+  integrity sha512-uBCRM2w2ewusRHGxN8JhcuOb2RN3ueAOYH/0BhqdFmQkZx5lj5+fLKTz0mIVOzd4FG5/kUksCzCD7eTEim6gaA==
+  dependencies:
+    fast-safe-stringify "^2.0.6"
+
 eth-json-rpc-filters@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/eth-json-rpc-filters/-/eth-json-rpc-filters-4.1.0.tgz#e7357a38983cde29858818dc55d394b9cf47c0f0"
@@ -11358,6 +11458,11 @@ ethereum-ens@^0.8.0:
     underscore "^1.8.3"
     web3 "^1.0.0-beta.34"
 
+ethereum-protocol@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/ethereum-protocol/-/ethereum-protocol-1.0.1.tgz#b7d68142f4105e0ae7b5e178cf42f8d4dc4b93cf"
+  integrity sha512-3KLX1mHuEsBW0dKG+c6EOJS1NBNqdCICvZW9sInmZTt5aY0oxmHVggYRE0lJu1tcnMD1K+AKHdLi6U43Awm1Vg==
+
 ethereum-types@^2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/ethereum-types/-/ethereum-types-2.1.5.tgz#477e2741837af07286cb3c48f3443a8bac2afb4b"
@@ -11537,7 +11642,7 @@ ethereumjs-util@^5.0.0, ethereumjs-util@^5.0.1, ethereumjs-util@^5.1.1, ethereum
     safe-buffer "^5.1.1"
     secp256k1 "^3.0.1"
 
-ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.0:
+ethereumjs-util@^6.0.0, ethereumjs-util@^6.1.0, ethereumjs-util@^6.2.0:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/ethereumjs-util/-/ethereumjs-util-6.2.1.tgz#fcb4e4dd5ceacb9d2305426ab1a5cd93e3163b69"
   integrity sha512-W2Ktez4L01Vexijrm5EB6w7dg4n/TgpoYU4avuT5T3Vmnw/eCRtiBrJfQYS/DCSvDIOLn2k57GcHdeBcgVxAqw==
