@@ -27,5 +27,5 @@ yarn --cwd packages/protocol run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r
 echo "Check versions complete!";
 
 echo "Make release...";
-yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n $NETWORK -p proposal.json -r report.json -i ./releaseData/initializationData/release$VERSION.json -z -f 0x85F1f7b4106929B368e33421DAcdFa6aB30d54Fb;
+yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n $NETWORK -p proposal.json -r report.json -i ./releaseData/initializationData/release$VERSION.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";
 echo "Make release complete!";

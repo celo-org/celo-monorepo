@@ -5,9 +5,9 @@ const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocke
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
 const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
-var Web3 = require('web3')
-var net = require('net')
-const { newKit } = require('../sdk/contractkit/lib')
+const Web3 = require('web3')
+const net = require('net')
+const HDWalletProvider = require('@truffle/hdwallet-provider')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
@@ -210,15 +210,16 @@ if (process.argv.includes('--forno')) {
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
   networks[argv.network].provider = function () {
-    return new Web3.providers.HttpProvider(fornoUrls[argv.network])
-  }
-
-  if (process.argv.includes('--from')) {
-    networks[argv.network].provider = function () {
-      const k = newKit(fornoUrls[argv.network])
-      k.addAccount('9e66701943997efeb9c974ac5bfc409b80720f00af2ad94e880da677d28d5786')
-      return k.web3.currentProvider
+    if (process.argv.includes('--from')) {
+      return new HDWalletProvider({
+        mnemonic: argv.from,
+        numberOfAddresses: 1,
+        derivationPath: "m/44'/52752'/0'/0/",
+        providerOrUrl: fornoUrls[argv.network],
+      })
     }
+
+    return new Web3.providers.HttpProvider()
   }
 }
 
