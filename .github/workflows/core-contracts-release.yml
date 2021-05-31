@@ -20,15 +20,6 @@ jobs:
   core_contracts_release:
     runs-on: ubuntu-latest
     steps:
-      - name: test
-        run: |
-          echo ${{ env.VERSION }}
-          echo "1"
-          echo $((${{ env.VERSION }}-1))
-          echo "2"
-          echo $(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }})
-          echo "3"
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # all history
@@ -47,16 +38,21 @@ jobs:
         run: yarn lerna run build --ignore docs
 
       - name: Verify previous release
-        run: yarn --cwd packages/protocol run verify-deployed -b celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
+        run: |
+          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
+          echo 1
+          echo $OLD_BRANCH
+          echo 2
+          yarn --cwd packages/protocol run verify-deployed -b $OLD_BRANCH.${{ env.NETWORK }} -n ${{ env.NETWORK }} -f;
 
       - name: Verify version compatibility
         run: |
-          OLD_BRANCH=celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }}
+          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
           NEW_BRANCH=alexbharley/github-actions-deployment
           yarn --cwd packages/protocol run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json;
 
       - name: Make release
         run: |
-          OLD_BRANCH=celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }}
+          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
           NEW_BRANCH=alexbharley/github-actions-deployment
           yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";
