@@ -23,8 +23,11 @@ jobs:
       - name: test
         run: |
           echo ${{ env.VERSION }}
-          echo $(${{ env.VERSION }}-1)
+          echo "1"
+          echo $((${{ env.VERSION }}-1))
+          echo "2"
           echo $(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }})
+          echo "3"
 
       - uses: actions/checkout@v2
         with:
