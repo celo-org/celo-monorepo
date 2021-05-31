@@ -20,6 +20,12 @@ jobs:
   core_contracts_release:
     runs-on: ubuntu-latest
     steps:
+      - name: test
+        run: |
+          echo ${{ env.VERSION }}
+          echo $(${{ env.VERSION }}-1)
+          echo $(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }})
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # all history

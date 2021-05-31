@@ -9,7 +9,7 @@ import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -24,7 +24,7 @@ contract Governance is
   IGovernance,
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   ReentrancyGuard,
   UsingRegistry,
   UsingPrecompiles
@@ -148,13 +148,6 @@ contract Governance is
     uint256 weight
   );
 
-  event ProposalVoteRevoked(
-    uint256 indexed proposalId,
-    address indexed account,
-    uint256 value,
-    uint256 weight
-  );
-
   event ProposalExecuted(uint256 indexed proposalId);
 
   event ProposalExpired(uint256 indexed proposalId);
@@ -185,12 +178,6 @@ contract Governance is
     _;
   }
 
-  /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
-   */
-  constructor(bool test) public InitializableV2(test) {}
-
   function() external payable {
     require(msg.data.length == 0, "unknown method");
   }
@@ -200,7 +187,7 @@ contract Governance is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 1, 0);
+    return (1, 2, 0, 2);
   }
 
   /**
@@ -208,7 +195,7 @@ contract Governance is
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
    * @param _concurrentProposals The number of proposals to dequeue at once.
-   * @param _minDeposit The minimum CELO deposit needed to make a proposal.
+   * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
@@ -281,7 +268,7 @@ contract Governance is
 
   /**
    * @notice Updates the minimum deposit needed to make a proposal.
-   * @param _minDeposit The minimum CELO deposit needed to make a proposal.
+   * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) public onlyOwner {
     require(_minDeposit > 0, "minDeposit must be larger than 0");
@@ -446,7 +433,7 @@ contract Governance is
 
   /**
    * @notice Creates a new proposal and adds it to end of the queue with no upvotes.
-   * @param values The values of CELO to be sent in the proposed transactions.
+   * @param values The values of Celo Gold to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -553,14 +540,11 @@ contract Governance is
   function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
-    }
-    Proposals.Proposal storage proposal = proposals[proposalId];
-    if (isQueued(proposalId)) {
+    } else if (isQueued(proposalId)) {
       return
-        _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
+        isQueuedProposalExpired(proposalId) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
-      return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
+      return proposals[proposalId].getDequeuedStage(stageDurations);
     }
   }
 
@@ -662,34 +646,7 @@ contract Governance is
     emit ProposalVoted(proposalId, account, uint256(value), weight);
     return true;
   }
-
   /* solhint-enable code-complexity */
-
-  /**
-   * @notice Revoke votes on all proposal of sender in the referendum stage.
-   * @return Whether or not all votes of an account was successfully revoked.
-   */
-  function revokeVotes() external nonReentrant returns (bool) {
-    address account = getAccounts().voteSignerToAccount(msg.sender);
-    Voter storage voter = voters[account];
-    for (
-      uint256 dequeueIndex = 0;
-      dequeueIndex < dequeued.length;
-      dequeueIndex = dequeueIndex.add(1)
-    ) {
-      VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
-      (Proposals.Proposal storage proposal, Proposals.Stage stage) =
-        requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
-      require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
-      Proposals.VoteValue value = voteRecord.value;
-      proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
-      proposal.networkWeight = getLockedGold().getTotalLockedGold();
-      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
-      delete voter.referendumVotes[dequeueIndex];
-    }
-    voter.mostRecentReferendumProposal = 0;
-    return true;
-  }
 
   /**
    * @notice Executes a proposal in the execution stage, removing it from `dequeued`.
@@ -758,7 +715,7 @@ contract Governance is
 
   /**
    * @notice Executes a whitelisted proposal.
-   * @param values The values of CELO to be sent in the proposed transactions.
+   * @param values The values of Celo Gold to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
@@ -786,7 +743,7 @@ contract Governance is
   }
 
   /**
-   * @notice Withdraws refunded CELO deposits.
+   * @notice Withdraws refunded Celo Gold deposits.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {
@@ -1133,6 +1090,7 @@ contract Governance is
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
+
   }
 
   /**
