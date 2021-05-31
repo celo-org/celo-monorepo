@@ -39,7 +39,10 @@ jobs:
 
       - name: Verify previous release
         run: |
+          NEW_VERSION=$((${{ env.VERSION }}-1))
+          echo "NEW_VERSION=$NEW_VERSION";
           OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
+          echo "OLD_BRANCH=$OLD_BRANCH";
           yarn --cwd packages/protocol run verify-deployed -b $OLD_BRANCH -n ${{ env.NETWORK }} -f;
 
       - name: Verify version compatibility
