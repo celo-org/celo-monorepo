@@ -14,7 +14,7 @@ on: push
 
 env:
   NETWORK: baklava
-  VERSION: 5
+  VERSION: 4
 
 jobs:
   core_contracts_release:
