@@ -219,7 +219,7 @@ if (process.argv.includes('--forno')) {
       })
     }
 
-    return new Web3.providers.HttpProvider()
+    return new Web3.providers.HttpProvider(fornoUrls[argv.network])
   }
 }
 
