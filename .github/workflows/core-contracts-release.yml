@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
@@ -41,14 +39,12 @@ jobs:
 
       - name: Verify version compatibility
         run: |
-          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION}}-1)).${{ env.NETWORK }}
+          OLD_BRANCH=celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }}
           NEW_BRANCH=alexbharley/github-actions-deployment
           yarn --cwd packages/protocol run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json;
 
       - name: Make release
-        run: echo "Make release"
-
-      # Runs the CD core contracts release script
-      - name: Run the core contract release script
-        run: sh ./scripts/github_actions_test.sh celo-core-contracts.v3 alfajores # ${{ github.event.inputs.release_version }} ${{ github.event.inputs.network }}
-        shell: bash
+        run: |
+          OLD_BRANCH=celo-core-contracts-v$(./scripts/github_actions_utils/subtract_one.sh ${{ env.VERSION }}).${{ env.NETWORK }}
+          NEW_BRANCH=alexbharley/github-actions-deployment
+          yarn --cwd packages/protocol run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";
