@@ -29,7 +29,10 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
+echo "Sourcing";
 source scripts/bash/release-lib.sh
+echo "Building";
 build_tag $BRANCH $LOG_FILE
 
+echo "yarn run truffle exec ./scripts/truffle/verify-bytecode.js";
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --librariesFile "libraries.json" $FORNO
