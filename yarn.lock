@@ -11211,7 +11211,7 @@ __metadata:
     "@types/jest": ^26.0.21
     babel-jest: ^26.6.3
     codecov: ^3.6.5
-    husky: ^3.0.0
+    husky: ^6.0.0
     jest: ^26.6.3
     jest-circus: ^26.6.3
     jest-junit: ^10.0.0
@@ -12710,7 +12710,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cosmiconfig@npm:^5.0.5, cosmiconfig@npm:^5.0.7, cosmiconfig@npm:^5.1.0, cosmiconfig@npm:^5.2.1":
+"cosmiconfig@npm:^5.0.5, cosmiconfig@npm:^5.0.7, cosmiconfig@npm:^5.1.0":
   version: 5.2.1
   resolution: "cosmiconfig@npm:5.2.1"
   dependencies:
@@ -17491,13 +17491,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"get-stdin@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "get-stdin@npm:7.0.0"
-  checksum: fff64f163097fa3a2ba40b1e3105125f422554485b43694ab3176e37d775052489f0ad31b1d5f59d3fea6054c917779c2c0346f44f4a44f43d4679a638d52283
-  languageName: node
-  linkType: hard
-
 "get-stream@npm:^2.2.0":
   version: 2.3.1
   resolution: "get-stream@npm:2.3.1"
@@ -19148,25 +19141,12 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"husky@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "husky@npm:3.0.1"
-  dependencies:
-    chalk: ^2.4.2
-    cosmiconfig: ^5.2.1
-    execa: ^1.0.0
-    get-stdin: ^7.0.0
-    is-ci: ^2.0.0
-    opencollective-postinstall: ^2.0.2
-    pkg-dir: ^4.2.0
-    please-upgrade-node: ^3.1.1
-    read-pkg: ^5.1.1
-    run-node: ^1.0.0
-    slash: ^3.0.0
+"husky@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "husky@npm:6.0.0"
   bin:
-    husky-run: ./run.js
-    husky-upgrade: ./lib/upgrader/bin.js
-  checksum: 9a76db01409598fdf45703723dece68053e81a09bb2ac9cff2be46050aa558148bdf21892698231a6b2342c7338062f1c939c1437bc7352fa3a29d96cb5f7a58
+    husky: lib/bin.js
+  checksum: 61e1f7f53f3c969d361c2a1d4ed8018b9447406ea6cd644a2526d18b76877d135001d8cbd48a1d201fc1614d96995e691ecd2b82a8d8513a6b4a313da1188ccd
   languageName: node
   linkType: hard
 
@@ -24482,7 +24462,29 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"mocha@npm:5.2.0, mocha@npm:^6.2.2":
+"mocha@npm:5.2.0, mocha@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "mocha@npm:5.2.0"
+  dependencies:
+    browser-stdout: 1.3.1
+    commander: 2.15.1
+    debug: 3.1.0
+    diff: 3.5.0
+    escape-string-regexp: 1.0.5
+    glob: 7.1.2
+    growl: 1.10.5
+    he: 1.1.1
+    minimatch: 3.0.4
+    mkdirp: 0.5.1
+    supports-color: 5.4.0
+  bin:
+    _mocha: ./bin/_mocha
+    mocha: ./bin/mocha
+  checksum: d00416391e21cc6906781634a6128c544449eadc1b0a9dfbcde19c7e87e732da23dd9b09ed79dfc3b0ca830da3e865100437a1bd4eb63ae669c713902c266d5c
+  languageName: node
+  linkType: hard
+
+"mocha@npm:^6.2.2":
   version: 6.2.3
   resolution: "mocha@npm:6.2.3"
   dependencies:
@@ -24513,28 +24515,6 @@ fsevents@^1.2.7:
     _mocha: bin/_mocha
     mocha: bin/mocha
   checksum: 5cae051154b4693a0d416bae6a697efe414fa7d7517344eb447b0435b6bf8feca4774b56b80e596e3fd58833088289ca49c635d145cf48a9610f2e2217852605
-  languageName: node
-  linkType: hard
-
-"mocha@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "mocha@npm:5.2.0"
-  dependencies:
-    browser-stdout: 1.3.1
-    commander: 2.15.1
-    debug: 3.1.0
-    diff: 3.5.0
-    escape-string-regexp: 1.0.5
-    glob: 7.1.2
-    growl: 1.10.5
-    he: 1.1.1
-    minimatch: 3.0.4
-    mkdirp: 0.5.1
-    supports-color: 5.4.0
-  bin:
-    _mocha: ./bin/_mocha
-    mocha: ./bin/mocha
-  checksum: d00416391e21cc6906781634a6128c544449eadc1b0a9dfbcde19c7e87e732da23dd9b09ed79dfc3b0ca830da3e865100437a1bd4eb63ae669c713902c266d5c
   languageName: node
   linkType: hard
 
@@ -26252,15 +26232,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"opencollective-postinstall@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "opencollective-postinstall@npm:2.0.2"
-  bin:
-    opencollective-postinstall: index.js
-  checksum: f71a908d0958a321c260050b5e9e78cbde59598e21df2dfb121b3721514db288ccdeb1d39b3ff0f9e81d85e661e5a2b3e3cd47fa1ab04feefca31facd58a5ca5
-  languageName: node
-  linkType: hard
-
 "opener@npm:~1.4.3":
   version: 1.4.3
   resolution: "opener@npm:1.4.3"
@@ -27393,15 +27364,6 @@ fsevents@^1.2.7:
   dependencies:
     find-up: ^4.0.0
   checksum: 1956ebf3cf5cc36a5d20e93851fcadd5a786774eb08667078561e72e0ab8ace91fc36a028d5305f0bfe7c89f9bf51886e2a3c8cb2c2620accfa3feb8da3c256b
-  languageName: node
-  linkType: hard
-
-"please-upgrade-node@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "please-upgrade-node@npm:3.1.1"
-  dependencies:
-    semver-compare: ^1.0.0
-  checksum: a414d1427212959e594432a954a69c38870b7f466328c5c8d64583cdef3519c71b06169e6110bdca7a19d2884aaf3803ae5cb341b1ce2eb8dd9dd558cb55c1b5
   languageName: node
   linkType: hard
 
@@ -28597,7 +28559,7 @@ pvutils@latest:
   languageName: node
   linkType: hard
 
-"read-pkg@npm:^5.1.1, read-pkg@npm:^5.2.0":
+"read-pkg@npm:^5.2.0":
   version: 5.2.0
   resolution: "read-pkg@npm:5.2.0"
   dependencies:
@@ -29616,15 +29578,6 @@ resolve@~1.8.1:
   languageName: node
   linkType: hard
 
-"run-node@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "run-node@npm:1.0.0"
-  bin:
-    run-node: run-node
-  checksum: 8e154ab24e086443a440728407daff84b5682d80f0c457cd9887bc197f8c3947a67deae5b69d36aa90729c7b5ecfb82c91a9cfcb0dc57e1e5c4dcf7256dd185c
-  languageName: node
-  linkType: hard
-
 "run-parallel@npm:^1.1.9":
   version: 1.1.9
   resolution: "run-parallel@npm:1.1.9"
@@ -29930,13 +29883,6 @@ resolve@~1.8.1:
   version: 1.1.0
   resolution: "semaphore@npm:1.1.0"
   checksum: af3a1cd598ce34a62e63714361f221570943231bda20204cf877ad17934df373ae06185da0eabeef0878b135ac65bdf4b4668293479b9542e8473d9941a83d17
-  languageName: node
-  linkType: hard
-
-"semver-compare@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "semver-compare@npm:1.0.0"
-  checksum: 9f3a74ca5f829c6b643668281228e2af310d9cb918a9d722e0c9426c4244c32346d29e955bbe796c46341f644fc741d888ca02e573f7aa230542809b03b0d8ec
   languageName: node
   linkType: hard
 
