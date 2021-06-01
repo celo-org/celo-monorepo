@@ -21,7 +21,12 @@ contract IdentityProxy {
    * @dev This can only be called by the deployer of this contract, presumably
    * the IdentityProxyHub after it checks the identity heuristic.
    */
-  function makeCall(address destination, bytes calldata data) external payable onlyDeployer {
-    ExternalCall.execute(destination, msg.value, data);
+  function makeCall(address destination, bytes calldata data)
+    external
+    payable
+    onlyDeployer
+    returns (bytes memory)
+  {
+    return ExternalCall.execute(destination, msg.value, data);
   }
 }
