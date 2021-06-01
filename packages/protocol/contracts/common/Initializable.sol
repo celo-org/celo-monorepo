@@ -11,7 +11,11 @@ contract Initializable {
 
   modifier initializer() {
     require(!initialized, "contract already initialized");
-    initialized = true;
+    _initialize();
     _;
+  }
+
+  function _initialize() private {
+    initialized = true;
   }
 }
