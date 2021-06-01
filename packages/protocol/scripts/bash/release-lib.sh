@@ -26,8 +26,5 @@ function build_tag() {
   fi
 
   [ -d contracts ] && rm -r contracts
-  echo " - Deleted"
-  echo "git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE"
   git checkout -- contracts 2>>$LOG_FILE >> $LOG_FILE
-  echo " - Checked out"
 }
