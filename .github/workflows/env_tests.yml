@@ -1,0 +1,23 @@
+name: env-tests
+
+# Run this workflow manually
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: 'Network to run env-tests against'
+        required: true
+
+jobs:
+  core_contracts_release:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Runs the env tests
+      - name: Run the env tests
+        run: cd packages/env-tests/; yarn ${{ github.event.inputs.network }}-test
+        shell: bash
