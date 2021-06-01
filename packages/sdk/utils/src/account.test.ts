@@ -378,7 +378,7 @@ describe('AccountUtils', () => {
     })
 
     it('should quickly offer the corect suggestion for a phrase with a few typos', () => {
-      //
+      // First 5 phrases were quickly copied on a keyboard to produce typos.
       const cases = [
         {
           mnemonic:
@@ -399,8 +399,9 @@ describe('AccountUtils', () => {
             'note evidence bubble dog style master region prosper input amazing movie again write disagree glare',
         },
         {
+          // Note: "rent" (typo) and "tent" are both in the BIP-39 English word list.
           mnemonic:
-            'cruise arom apology bracket seminar another vorrow canin finish walnut rural rent pledge fasgion alarm',
+            'cruise arom apology bracket demimnar another vorrow csninn finish walnut rural rent pledge fasgion alarm',
           corrected:
             'cruise atom apology bracket seminar another borrow cabin finish walnut rural tent pledge fashion alarm',
         },
@@ -410,6 +411,24 @@ describe('AccountUtils', () => {
           corrected:
             'wish animal bracket stand enroll purchase wave quantum film polar rare fury time great time',
         },
+        {
+          mnemonic:
+            'debat connect bid lend opkay decreaser library balcony claw become squeeze usage reseccue jazzz segment dinosaur cushion sing markvle iundo depth bag object trash',
+          corrected:
+            'debate connect bid lend okay decrease library balcony claw become squeeze usage rescue jazz segment dinosaur cushion sing marble undo depth bag object trash',
+        },
+        {
+          mnemonic:
+            'salute roayl possible rare dufbuty wabnt ynfikd oik cabbage labor approbe winner claw conduct spider velvet buyer level second adult payment blish inject draw',
+          corrected:
+            'salute royal possible rare dignity want unfold oil cabbage labor approve winner claw conduct spider velvet buyer level second adult payment blush inject draw',
+        },
+        {
+          mnemonic:
+            'frame mmarkety oak dissmiss bried theme avocade wgaon rabbit latin angry kind pitch wild trune chornic lamp cault into prioisty gues review parent add',
+          corrected:
+            'frame market oak dismiss brief theme avocado wagon rabbit latin angry kind pitch wild tube chronic lamp vault into priority guess review parent add',
+        },
       ]
 
       for (const { mnemonic, corrected } of cases) {
@@ -417,11 +436,11 @@ describe('AccountUtils', () => {
         for (const suggestion of suggestCorrections(mnemonic)) {
           attempts++
           if (suggestion === corrected) {
-            console.log(`Phrase '${mnemonic}' corrected in ${attempts} attempt(s)`)
+            // Enable the following log statement to see how many attempts each phrase takes.
+            //console.log(`Phrase '${mnemonic}' corrected in ${attempts} attempt(s)`)
             break
           }
-          //console.log(suggestion)
-          if (attempts >= 1000) {
+          if (attempts >= 25) {
             throw new Error(`Phrase '${mnemonic}' was not corrected within 100 attempts`)
           }
         }
