@@ -2,7 +2,7 @@ import { newKit } from '@celo/contractkit'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { PairingTypes, SessionTypes } from '@walletconnect/types'
-import { ERROR, getError } from '@walletconnect/utils'
+import { ERROR } from '@walletconnect/utils'
 import debugConfig from 'debug'
 import { SupportedMethods } from '../types'
 import {
@@ -134,7 +134,7 @@ export function getTestWallet() {
       await client.pair({ uri })
     },
     async close() {
-      const reason = getError(ERROR.USER_DISCONNECTED)
+      const reason = ERROR.USER_DISCONNECTED.format()
       await client.disconnect({ topic: sessionTopic, reason })
       await client.pairing.delete({ topic: pairingTopic, reason })
     },
