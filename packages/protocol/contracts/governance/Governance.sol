@@ -678,11 +678,18 @@ contract Governance is
       dequeueIndex = dequeueIndex.add(1)
     ) {
       VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
-      (Proposals.Proposal storage proposal, Proposals.Stage stage) =
-        requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
-      if (stage == Proposals.Stage.Referendum) {
-        // ensure vote record proposal matches dequeued index proposal before revoking
-        if (voteRecord.proposalId == dequeued[dequeueIndex]) {
+
+      // Skip proposals where there was no vote cast by the user AND
+      // ensure vote record proposal matches identifier of dequeued index proposal.
+      if (
+        voteRecord.value != Proposals.VoteValue.None &&
+        voteRecord.proposalId == dequeued[dequeueIndex]
+      ) {
+        (Proposals.Proposal storage proposal, Proposals.Stage stage) =
+          requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
+        
+        // only revoke from proposals which are still in referendum
+        if (stage == Proposals.Stage.Referendum) {
           proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
           proposal.networkWeight = getLockedGold().getTotalLockedGold();
           emit ProposalVoteRevoked(
@@ -692,9 +699,13 @@ contract Governance is
             voteRecord.weight
           );
         }
+
+        // always delete dequeue vote records for gas refund as they must be expired or revoked
         delete voter.referendumVotes[dequeueIndex];
       }
     }
+
+    // reset most recent referendum proposal ID to guarantee isVotingReferendum == false
     voter.mostRecentReferendumProposal = 0;
     return true;
   }
