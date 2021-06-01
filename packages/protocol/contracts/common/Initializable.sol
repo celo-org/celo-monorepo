@@ -5,17 +5,13 @@ contract Initializable {
 
   constructor(bool testingDeployment) public {
     if (!testingDeployment) {
-      _initialize();
+      initialized = true;
     }
   }
 
   modifier initializer() {
     require(!initialized, "contract already initialized");
-    _initialize();
-    _;
-  }
-
-  function _initialize() private {
     initialized = true;
+    _;
   }
 }
