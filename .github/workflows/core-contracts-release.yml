@@ -13,8 +13,8 @@ name: core-contracts-release
 on: push
 
 env:
-  NETWORK: baklava
-  VERSION: 4
+  NETWORK: alfajores
+  VERSION: 5
 
 jobs:
   core_contracts_release:
