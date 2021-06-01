@@ -196,8 +196,8 @@ contract GrandaMento is
    * @dev Sender must be the approver. Exchange proposal must be in the Proposed state.
    * @param proposalId The identifier of the proposal to approve.
    */
-  function approveExchangeProposal(uint256 proposalId) onlyApprover {
-    ExchangeProposal storage proposal = exchangeProposals[id];
+  function approveExchangeProposal(uint256 proposalId) external onlyApprover {
+    ExchangeProposal storage proposal = exchangeProposals[proposalId];
     // Ensure the proposal is in the Proposed state.
     require(proposal.state == ExchangeState.Proposed, "Proposal must be in Proposed state");
     // Set the time the approval occurred and change the state.
@@ -241,9 +241,9 @@ contract GrandaMento is
   /**
    * @notice Sets the approver.
    * @dev Sender must be owner.
-   * @param newSpread The new value for the spread.
+   * @param newApprover The new value for the spread.
    */
-  function setApprover(uint256 newApprover) public onlyOwner {
+  function setApprover(address newApprover) public onlyOwner {
     approver = newApprover;
     emit ApproverSet(newApprover);
   }

@@ -133,7 +133,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when called again', async () => {
       await assertRevert(
-        grandaMento.initialize(registry.address, spreadFixed),
+        grandaMento.initialize(registry.address, approver, spreadFixed),
         'contract already initialized'
       )
     })
@@ -439,7 +439,7 @@ contract('GrandaMento', (accounts: string[]) => {
         })
       })
 
-      it('approves an exchange proposal in the Proposed state', async () => {
+      it('changes an exchange proposal from the Proposed state to the Approved state', async () => {
         const proposalBefore = parseExchangeProposal(
           await grandaMento.exchangeProposals(proposalId)
         )
@@ -447,7 +447,36 @@ contract('GrandaMento', (accounts: string[]) => {
         assert.equal(proposalBefore.state, ExchangeState.Proposed)
         await grandaMento.approveExchangeProposal(proposalId, { from: approver })
         const proposalAfter = parseExchangeProposal(await grandaMento.exchangeProposals(proposalId))
+        assert.equal(proposalAfter.state, ExchangeState.Approved)
       })
+
+      it('stores the timestamp of the approval', async () => {
+        await grandaMento.approveExchangeProposal(proposalId, { from: approver })
+        const latestBlock = await web3.eth.getBlock('latest')
+        const proposal = parseExchangeProposal(await grandaMento.exchangeProposals(proposalId))
+        assertEqualBN(proposal.approvalTimestamp, latestBlock.timestamp)
+      })
+
+      it('reverts if the exchange proposal does not exist', async () => {
+        const nonexistentProposalId = 1
+        const proposal = parseExchangeProposal(
+          await grandaMento.exchangeProposals(nonexistentProposalId)
+        )
+        // As a sanity check, make sure the exchange is in the None state,
+        // indicating it doesn't exist.
+        assert.equal(proposal.state, ExchangeState.None)
+        await assertRevert(
+          grandaMento.approveExchangeProposal(nonexistentProposalId, { from: approver }),
+          'Proposal must be in Proposed state'
+        )
+      })
+    })
+
+    it('reverts if called by anyone other than the approver', async () => {
+      await assertRevert(
+        grandaMento.approveExchangeProposal(proposalId, { from: accounts[2] }),
+        'Sender must be approver'
+      )
     })
   })
 
