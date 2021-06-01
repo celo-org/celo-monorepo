@@ -2212,7 +2212,7 @@ __metadata:
     yargs: 13.2.4
   bin:
     ganache-cli: cli.js
-  checksum: 655b02d35652efcef29a280c6652976279d35cb25a2d25c088e96b734b786db605ec4e0960a3d14ebfe595a72970cb0dca2741ed192b880e0342a5e7f961b7b1
+  checksum: 9b69ff2cb580eb02806e4a5f7c668e557c33377a75e2776bdce2fa71dc98cc361062eea44e3d934705cf7f0719a778d1517953eb4499c64890d1deab71f32ee4
   languageName: node
   linkType: hard
 
