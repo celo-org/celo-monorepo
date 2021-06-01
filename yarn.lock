@@ -2203,16 +2203,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#piersy/test":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#31b5bbbca5e7d098d2459bc7942eafb77141f442":
   version: 6.6.1
-  resolution: "@celo/ganache-cli@https://github.com/celo-org/ganache-cli.git#commit=e89bf88b771a637e10e8137e8ef08b0dc7ed4280"
+  resolution: "@celo/ganache-cli@https://github.com/celo-org/ganache-cli.git#commit=31b5bbbca5e7d098d2459bc7942eafb77141f442"
   dependencies:
     ethereumjs-util: 6.1.0
     source-map-support: 0.5.12
     yargs: 13.2.4
   bin:
     ganache-cli: cli.js
-  checksum: 9b69ff2cb580eb02806e4a5f7c668e557c33377a75e2776bdce2fa71dc98cc361062eea44e3d934705cf7f0719a778d1517953eb4499c64890d1deab71f32ee4
+  checksum: f8f6c392852206a9bb1a9cb6793d7480de14b55c3038f97282ee5ab7646ea8067b91dc6588c3a643bb7445ef40b2b66f1eab165bbc92dd64c6b33da9c87c0944
   languageName: node
   linkType: hard
 
