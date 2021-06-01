@@ -3,11 +3,12 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract SlasherUtil is Ownable, UsingRegistry, UsingPrecompiles {
+contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
   using SafeMath for uint256;
 
   struct SlashingIncentives {
@@ -20,6 +21,12 @@ contract SlasherUtil is Ownable, UsingRegistry, UsingPrecompiles {
   SlashingIncentives public slashingIncentives;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Sets slashing incentives.

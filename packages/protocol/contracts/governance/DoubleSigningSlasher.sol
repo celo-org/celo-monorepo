@@ -1,12 +1,11 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
 
-contract DoubleSigningSlasher is ICeloVersionedContract, Initializable, SlasherUtil {
+contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
@@ -27,7 +26,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, Initializable, SlasherU
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) public SlasherUtil(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

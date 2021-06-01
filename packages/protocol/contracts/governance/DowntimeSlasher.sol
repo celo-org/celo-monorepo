@@ -4,10 +4,9 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
-import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract DowntimeSlasher is ICeloVersionedContract, Initializable, SlasherUtil {
+contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // Maps validator address -> end block of the latest interval for which it has been slashed.
@@ -44,7 +43,7 @@ contract DowntimeSlasher is ICeloVersionedContract, Initializable, SlasherUtil {
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) public SlasherUtil(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
