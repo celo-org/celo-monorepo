@@ -6,7 +6,7 @@ import {
   getAllLanguages,
   MnemonicStrength,
   normalizeMnemonic,
-  suggestCorrections,
+  suggestMnemonicCorrections,
   validateMnemonic,
 } from './account'
 
@@ -343,7 +343,7 @@ describe('AccountUtils', () => {
     }
   })
 
-  describe('.suggestCorrections()', () => {
+  describe('.suggestMnemonicCorrections()', () => {
     it('should correct a single simple typo on the first suggestion', () => {
       const cases = [
         {
@@ -373,7 +373,7 @@ describe('AccountUtils', () => {
       ]
 
       for (const { mnemonic, corrected } of cases) {
-        expect(suggestCorrections(mnemonic).next().value).toEqual(corrected)
+        expect(suggestMnemonicCorrections(mnemonic).next().value).toEqual(corrected)
       }
     })
 
@@ -433,7 +433,7 @@ describe('AccountUtils', () => {
 
       for (const { mnemonic, corrected } of cases) {
         let attempts = 0
-        for (const suggestion of suggestCorrections(mnemonic)) {
+        for (const suggestion of suggestMnemonicCorrections(mnemonic)) {
           attempts++
           if (suggestion === corrected) {
             // Enable the following log statement to see how many attempts each phrase takes.
@@ -451,7 +451,7 @@ describe('AccountUtils', () => {
       const mnemonic =
         'frame mmarkety oak dissmiss bried theme avocade wgaon rabbit latin angry kind pitch wild trune'
       let trials = 0
-      for (const suggestion of suggestCorrections(mnemonic)) {
+      for (const suggestion of suggestMnemonicCorrections(mnemonic)) {
         trials++
         expect(validateMnemonic(suggestion)).toBe(true)
         if (trials >= 100) {
@@ -464,7 +464,7 @@ describe('AccountUtils', () => {
       const mnemonic =
         'frame mmarkety oak dissmiss bried theme avocade wgaon rabbit latin angry kind pitch wild trune'
       let seen = new Set<string>()
-      for (const suggestion of suggestCorrections(mnemonic)) {
+      for (const suggestion of suggestMnemonicCorrections(mnemonic)) {
         expect(seen.has(suggestion)).toBe(false)
         seen.add(suggestion)
         if (seen.size >= 100) {
