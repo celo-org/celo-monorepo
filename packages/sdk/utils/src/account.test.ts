@@ -437,7 +437,7 @@ describe('AccountUtils', () => {
           attempts++
           if (suggestion === corrected) {
             // Enable the following log statement to see how many attempts each phrase takes.
-            //console.log(`Phrase '${mnemonic}' corrected in ${attempts} attempt(s)`)
+            // console.log(`Phrase '${mnemonic}' corrected in ${attempts} attempt(s)`)
             break
           }
           if (attempts >= 25) {
@@ -463,7 +463,7 @@ describe('AccountUtils', () => {
     it('should never return the same suggestion twice', () => {
       const mnemonic =
         'frame mmarkety oak dissmiss bried theme avocade wgaon rabbit latin angry kind pitch wild trune'
-      let seen = new Set<string>()
+      const seen = new Set<string>()
       for (const suggestion of suggestMnemonicCorrections(mnemonic)) {
         expect(seen.has(suggestion)).toBe(false)
         seen.add(suggestion)

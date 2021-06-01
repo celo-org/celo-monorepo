@@ -66,8 +66,8 @@ export function validateMnemonic(
   }
 
   const languages = getAllLanguages()
-  for (const language of languages) {
-    if (bip39ToUse.validateMnemonic(mnemonic, getWordList(language))) {
+  for (const guessedLanguage of languages) {
+    if (bip39ToUse.validateMnemonic(mnemonic, getWordList(guessedLanguage))) {
       return true
     }
   }
@@ -195,7 +195,7 @@ export function detectLanguage(
   candidates?: MnemonicLanguages[]
 ): MnemonicLanguages | undefined {
   // Assign a match score to each language by how many words of the phrase are in each language.
-  const scores: [MnemonicLanguages, number][] = (candidates ?? getAllLanguages()).map(
+  const scores: Array<[MnemonicLanguages, number]> = (candidates ?? getAllLanguages()).map(
     (candidate) => {
       const wordSet = new Set(getWordList(candidate))
       const score = words.reduce((count, word) => (wordSet.has(word) ? count + 1 : count), 0)
