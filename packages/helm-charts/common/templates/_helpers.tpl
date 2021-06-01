@@ -71,7 +71,7 @@ release: {{ .Release.Name }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo
-  {{- if .Values.genesis.useGenesisFileBase64 }}
+  {{- if eq (default .Values.genesis.useGenesisFileBase64 "false") "true" }}
   - name: config
     mountPath: /var/geth
   {{ end -}}
@@ -274,8 +274,10 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
 data:
-  networkid: {{ .Values.genesis.networkId | quote }}
-  genesis.json: {{ .Values.genesis.genesisFileBase64 | b64dec | quote }}
+  networkid: {{ $.Values.genesis.networkId | quote }}
+{{- if eq (default $.Values.genesis.useGenesisFileBase64 "false") "true" }}
+  genesis.json: {{ $.Values.genesis.genesisFileBase64 | b64dec | quote }}
+{{- end -}}
 {{- end -}}
 
 {{- define "common.celotool-validator-container" -}}
