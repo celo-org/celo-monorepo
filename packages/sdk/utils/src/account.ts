@@ -263,7 +263,7 @@ function* suggestUnvalidatedCorrections(
       throw Error('programming error: suggestions map must have at least one entry')
     }
     const [index, suggestions]: [number, SuggestionsByDistance] = next.value
-    g
+
     // Encode a prior that if the observed word is a valid word, then it is most likely correct.
     // Prior is added to the weight of words that that are not an exact match of the observation.
     // Weight the prior as a multiple of of probability of a single edit error.
@@ -325,7 +325,7 @@ export function* suggestCorrections(
 ): Generator<string> {
   const words = splitMnemonic(mnemonic)
   const lang = language ?? detectLanguage(words)
-  g
+
   // If the language is not provided or detected, no suggestions can be given.
   if (lang === undefined) {
     return
