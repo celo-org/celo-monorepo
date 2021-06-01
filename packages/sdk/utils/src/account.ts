@@ -85,7 +85,7 @@ export function validateMnemonic(
 export function normalizeMnemonic(mnemonic: string, language?: MnemonicLanguages): string {
   const words = splitMnemonic(mnemonic)
   const lowered = words.map((word) => word.toLowerCase())
-  const detectedLanguage = language ?? detectLanguage(lowered)
+  const detectedLanguage = language ?? detectMnemonicLanguage(lowered)
 
   // If the language is unknown, do not run further normalizations.
   if (detectedLanguage === undefined) {
@@ -190,7 +190,7 @@ function joinMnemonic(words: string[], language: MnemonicLanguages | undefined):
  * malformed. It may occasionally occur that a typo results in word from another language (e.g. bag
  * -> bagr) but this should occur at most once or twice per phrase.
  */
-export function detectLanguage(
+export function detectMnemonicLanguage(
   words: string[],
   candidates?: MnemonicLanguages[]
 ): MnemonicLanguages | undefined {
@@ -252,7 +252,7 @@ export function* suggestMnemonicCorrections(
   const words = splitMnemonic(mnemonic)
 
   // If the language is not provided or detected, no suggestions can be given.
-  const lang = language ?? detectLanguage(words)
+  const lang = language ?? detectMnemonicLanguage(words)
   if (lang === undefined) {
     return
   }
@@ -413,6 +413,7 @@ export function generateKeysFromSeed(
 }
 
 export const AccountUtils = {
+  detectMnemonicLanguage,
   generateMnemonic,
   normalizeMnemonic,
   validateMnemonic,
