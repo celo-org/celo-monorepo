@@ -231,7 +231,8 @@ export function detectLanguage(
  */
 function* suggestUnvalidatedCorrections(
   words: string[],
-  language: MnemonicLanguages
+  language: MnemonicLanguages,
+  weights?: Iterable<number>
 ): Generator<string> {
   // Identify locations with invalid words. We will attempt to correct each of these.
   // const validWords = new Set(getWordList(language))
@@ -255,81 +256,65 @@ function* suggestUnvalidatedCorrections(
   // DO NOT MERGE: Description and signature
   function* combineSuggestions(
     spots: SpotSuggestions,
-    minWeight: number = 0,
-    maxWeight: number = Infinity
-  ): Generator<[number, string][], void, undefined> {
+    weight: number
+  ): Generator<[number, string][], undefined, undefined> {
     const next = spots.entries().next()
-    if (next.value === undefined || minWeight < 0 || maxWeight < 0) {
+    if (next.value === undefined || weight < 0) {
       throw Error('programming error: suggestions map must have at least one entry')
     }
     const [index, suggestions]: [number, SuggestionsByDistance] = next.value
+    g
+    // Encode a prior that if the observed word is a valid word, then it is most likely correct.
+    // Prior is added to the weight of words that that are not an exact match of the observation.
+    // Weight the prior as a multiple of of probability of a single edit error.
+    // DO NOT MERGE: Currently not in user. Remove of use before final version.
+    const prior = suggestions.get(0) === undefined ? 0 : 0
 
-    // Define a generator to iterate over the sorted list of suggestions, returning only the only
-    // the ones that are within the specified weight range.
-    function* suggestionsInRange(): Generator<Suggestion, undefined, undefined> {
-      // Skip over any suggestions that are below the weight range min.
-      let i = 0
-      for (; i < suggestions.length; i++) {
-        if (suggestions[i].distance >= minWeight) {
-          break
-        }
-      }
-
-      // Yield suggestions from the list until we've iterated past the set in the weight range.
-      for (; i < suggestions.length; i++) {
-        if (suggestions[i].distance >= maxWeight) {
-          break
-        }
-        yield suggestions[i]
-      }
-      return
-    }
-
-    // Base case: TODO
+    // Base case: When there is only one entry, "consume" the rest of the weight by yielding all
+    // words in the suggestions list at edit distance `weight` as singleton lists (i.e. 1 word
+    // phrases).
     if (spots.size === 1) {
-      for (const suggestion of suggestionsInRange()) {
-        yield [[index, suggestion.word]]
-      }
+      yield* suggestions
+        .get(weight)
+        ?.map((suggestion): [number, string][] => [[index, suggestion]]) ?? []
       return
     }
 
-    // Recursion case: TODO
+    // Recursion case: When more than one entry exists, consume iteratively 0 to weight units and
+    // combine it with all arrays of the remaining weight, generated from removing one entry.
     const remaining: SpotSuggestions = new Map([...spots].filter(([i]) => i !== index))
-    const suggestionsIterator = suggestionsInRange()
-    let nextSuggestion: Suggestion | undefined = suggestionsIterator.next().value
-    while (nextSuggestion !== undefined) {
-      const suggestion = nextSuggestion
-      nextSuggestion = suggestionsIterator.next().value
-
-      for (const list of combineSuggestions(
-        remaining,
-        undefined,
-        (nextSuggestion?.distance ?? maxWeight) - suggestion.distance
-      )) {
-        yield [[index, suggestion.word] as [number, string], ...list]
-      }
-    }
-
-    /*
     for (const distance of [...suggestions.keys()].sort()) {
-      if (distance > weight) {
+      const wordWeight = distance == 0 ? distance : distance + prior
+      if (wordWeight > weight) {
         break
       }
-      for (const list of combineSuggestions(remaining, weight - distance)) {
-        for (const suggestion of suggestions.get(distance) ?? []) {
+      for (const list of combineSuggestions(remaining, weight - wordWeight)) {
+        for (const suggestion of suggestions.get(wordWeight) ?? []) {
           yield [[index, suggestion] as [number, string], ...list]
         }
       }
     }
-    */
   }
 
   // DO NOT MERGE: Description and stopping condition
-  for (const replacementList of combineSuggestions(spotSuggestions)) {
-    // Extract from the spot suggestions lists a suggested replacements keyed by index.
-    const replacements = new Map(replacementList)
-    const suggestedWords = words.map((word, i) => replacements.get(i) ?? word)
-    yield joinMnemonic(suggestedWords, language)
+  // TODO: Remove this loop over incrementing weight by allowing the combination function to
+  // produce a total ordering. Do so by having each step give a range remaining weight from 0 to
+  // min(maxWeight, nextWeightAtPosition).
+  for (const weight of weights ?? counter(0)) {
+    for (const replacementList of combineSuggestions(spotSuggestions, weight)) {
+      // Extract from the spot suggestions lists a suggested replacements keyed by index.
+      const replacements = new Map(replacementList)
+      const suggestedWords = words.map((word, i) => replacements.get(i) ?? word)
+      yield joinMnemonic(suggestedWords, language)
+    }
+  }
+}
+
+// Generates a range of integers from start (inclusive) to end (exclusive).
+// If end is not provided, counter goes on infinitely.
+function* counter(start = 0, end?: number) {
+  for (let i = start; end === undefined || i < end; i++) {
+    yield i
   }
 }
 
@@ -340,7 +325,7 @@ export function* suggestCorrections(
 ): Generator<string> {
   const words = splitMnemonic(mnemonic)
   const lang = language ?? detectLanguage(words)
-
+  g
   // If the language is not provided or detected, no suggestions can be given.
   if (lang === undefined) {
     return
@@ -356,19 +341,26 @@ export function* suggestCorrections(
 // SpotSuggestions is a number of suggestions keyed by phrase index.
 type SpotSuggestions = Map<number, SuggestionsByDistance>
 
-// Suggestions by distance is a list of suggestion words sorted by distance ascending.
-type SuggestionsByDistance = Suggestion[]
-
-interface Suggestion {
-  distance: number
-  word: string
-}
+// Suggestions by distance is a number of unordered suggestions lists keyed by edit distance.
+type SuggestionsByDistance = Map<number, string[]>
 
 // DO NOT MERGE: Refactor this signature.
 function wordSuggestions(typo: string, language: MnemonicLanguages): SuggestionsByDistance {
-  return getWordList(language)
-    .map((word) => ({ distance: levenshteinDistance(typo, word), word }))
-    .sort((a, b) => a.distance - b.distance)
+  return (
+    getWordList(language)
+      .map((word) => ({ distance: levenshteinDistance(typo, word), word }))
+      //.sort((a, b) => a.distance - b.distance) DO NOT MERGE: Should we sort these keys?
+      .reduce((map, { distance, word }) => {
+        // Reduction uses mutation, instead of spread, as an optimization.
+        const list = map.get(distance)
+        if (list !== undefined) {
+          list.push(word)
+        } else {
+          map.set(distance, [word])
+        }
+        return map
+      }, new Map<number, string[]>())
+  )
 }
 
 export async function generateKeys(
