@@ -4,9 +4,10 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
+import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
+contract DowntimeSlasher is ICeloVersionedContract, Initializable, SlasherUtil {
   using SafeMath for uint256;
 
   // Maps validator address -> end block of the latest interval for which it has been slashed.

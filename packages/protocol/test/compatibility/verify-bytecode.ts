@@ -107,7 +107,7 @@ contract('', (accounts) => {
     let library3
     let testContract
     beforeEach(async () => {
-      registry = await Registry.new()
+      registry = await Registry.new(true)
 
       library1 = await LinkedLibrary1.new({ from: accounts[0] })
       library3 = await LinkedLibrary3.new({ from: accounts[0] })

@@ -1,11 +1,12 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
 
-contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
+contract DoubleSigningSlasher is ICeloVersionedContract, Initializable, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
