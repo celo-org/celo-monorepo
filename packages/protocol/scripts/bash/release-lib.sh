@@ -27,11 +27,7 @@ function build_tag() {
     echo " - Contract artifacts already built at $BUILD_DIR"
   fi
   [ -d "build/contracts_tmp" ] && mv build/contracts_tmp build/contracts
-  echo " - Moved"
 
   [ -d contracts ] && rm -r contracts
-  echo " - Deleted"
-  echo "git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE"
   git checkout -- contracts 2>>$LOG_FILE >> $LOG_FILE
-  echo " - Checked out"
 }
