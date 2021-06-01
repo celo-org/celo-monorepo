@@ -33,3 +33,8 @@ variable type {
   type        = string
   description = "Type of backends, only used for names"
 }
+
+variable banned_cidr {
+  type        = list(string)
+  description = "Banned CIDR to make request to forno."
+}

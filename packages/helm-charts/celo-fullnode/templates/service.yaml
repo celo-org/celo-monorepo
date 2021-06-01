@@ -62,3 +62,4 @@ spec:
   selector:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: celo-fullnode
+    

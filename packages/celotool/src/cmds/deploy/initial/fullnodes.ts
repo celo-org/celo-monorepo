@@ -40,6 +40,6 @@ export const handler = async (argv: FullNodeInitialArgv) => {
   }
   await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
   if (!isCelotoolHelmDryRun()) {
-    await kubectlAnnotateKSA(argv.celoEnv)
+    await kubectlAnnotateKSA(argv.celoEnv, argv.context)
   }
 }

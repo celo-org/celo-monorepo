@@ -50,6 +50,6 @@ export const handler = async (argv: FullNodeUpgradeArgv) => {
     argv.createNEG
   )
   if (!isCelotoolHelmDryRun()) {
-    await kubectlAnnotateKSA(argv.celoEnv)
+    await kubectlAnnotateKSA(argv.celoEnv, argv.context)
   }
 }

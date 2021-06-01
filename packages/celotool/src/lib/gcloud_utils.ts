@@ -65,7 +65,7 @@ export async function linkSAForWorkloadIdentity(celoEnv: string, context: string
   }
 }
 
-export async function delinkSAForWorkloadIdentity(celoEnv: string) {
+export async function delinkSAForWorkloadIdentity(celoEnv: string, context: string) {
   if (
     getDynamicEnvVarValue(
       DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
@@ -87,7 +87,7 @@ export async function delinkSAForWorkloadIdentity(celoEnv: string) {
   }
 }
 
-export async function kubectlAnnotateKSA(celoEnv: string) {
+export async function kubectlAnnotateKSA(celoEnv: string, context: string) {
   if (
     getDynamicEnvVarValue(
       DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
@@ -107,7 +107,7 @@ export async function kubectlAnnotateKSA(celoEnv: string) {
   }
 }
 
-export async function removeKubectlAnnotateKSA(celoEnv: string) {
+export async function removeKubectlAnnotateKSA(celoEnv: string, context: string) {
   if (
     getDynamicEnvVarValue(
       DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
