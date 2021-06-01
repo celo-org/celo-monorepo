@@ -446,5 +446,31 @@ describe('AccountUtils', () => {
         }
       }
     })
+
+    it('should never return an invalid mnemonic', () => {
+      const mnemonic =
+        'frame mmarkety oak dissmiss bried theme avocade wgaon rabbit latin angry kind pitch wild trune'
+      let trials = 0
+      for (const suggestion of suggestCorrections(mnemonic)) {
+        trials++
+        expect(validateMnemonic(suggestion)).toBe(true)
+        if (trials >= 100) {
+          break
+        }
+      }
+    })
+
+    it('should never return the same suggestion twice', () => {
+      const mnemonic =
+        'frame mmarkety oak dissmiss bried theme avocade wgaon rabbit latin angry kind pitch wild trune'
+      let seen = new Set<string>()
+      for (const suggestion of suggestCorrections(mnemonic)) {
+        expect(seen.has(suggestion)).toBe(false)
+        seen.add(suggestion)
+        if (seen.size >= 100) {
+          break
+        }
+      }
+    })
   })
 })
