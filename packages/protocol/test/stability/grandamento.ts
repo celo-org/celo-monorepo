@@ -555,6 +555,31 @@ contract('GrandaMento', (accounts: string[]) => {
     })
   })
 
+  describe('#setApprover', () => {
+    const newApprover = accounts[2]
+    it('sets the approver', async () => {
+      await grandaMento.setApprover(newApprover)
+      assert.equal(await grandaMento.approver(), newApprover)
+    })
+
+    it('emits the ApproverSet event', async () => {
+      const receipt = await grandaMento.setApprover(newApprover)
+      assertLogMatches2(receipt.logs[0], {
+        event: 'ApproverSet',
+        args: {
+          approver: newApprover,
+        },
+      })
+    })
+
+    it('reverts when the sender is not the owner', async () => {
+      await assertRevert(
+        grandaMento.setApprover(newApprover, { from: accounts[1] }),
+        'Ownable: caller is not the owner'
+      )
+    })
+  })
+
   describe('#setSpread', () => {
     // 0.5%
     const newSpreadFixed = toFixed(0.005)
