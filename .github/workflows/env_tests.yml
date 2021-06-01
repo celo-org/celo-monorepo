@@ -11,7 +11,6 @@ on:
 jobs:
   core_contracts_release:
     runs-on: ubuntu-latest
-    environment: test
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
