@@ -36,6 +36,9 @@ contract GrandaMento is
   // Emitted when an exchange proposal is approved by the approver.
   event ExchangeProposalApproved(uint256 indexed proposalId);
 
+  // Emitted when an exchange proposal is cancelled.
+  event ExchangeProposalCancelled(uint256 indexed proposalId, address sender);
+
   // Emitted when the approver is set.
   event ApproverSet(address approver);
 
@@ -170,7 +173,7 @@ contract GrandaMento is
     IERC20 sellToken = sellCelo ? getGoldToken() : IERC20(stableToken);
     require(
       sellToken.transferFrom(msg.sender, address(this), sellAmount),
-      "Transfer of sell token failed"
+      "Transfer in of sell token failed"
     );
 
     // Record the proposal.
@@ -204,6 +207,51 @@ contract GrandaMento is
     proposal.approvalTimestamp = block.timestamp;
     proposal.state = ExchangeState.Approved;
     emit ExchangeProposalApproved(proposalId);
+  }
+
+  /**
+   * @notice Cancels an exchange proposer.
+   * @dev Only callable by the exchanger if the proposal is in the Proposed state
+   * or the owner if the proposal is in the Approved state.
+   * @param proposalId The identifier of the proposal to cancel.
+   */
+  function cancelExchangeProposal(uint256 proposalId) external nonReentrant {
+    ExchangeProposal storage proposal = exchangeProposals[proposalId];
+    // Require the appropriate state and sender.
+    // This will also revert if a proposalId is given that does not correspond
+    // to a previously created exchange proposal.
+    require(
+      (proposal.state == ExchangeState.Proposed && proposal.exchanger == msg.sender) ||
+        (proposal.state == ExchangeState.Approved && isOwner()),
+      "Sender cannot cancel the exchange proposal"
+    );
+    // Get the token and amount that will be refunded to the proposer.
+    IERC20 refundToken;
+    uint256 refundAmount;
+    if (proposal.sellCelo) {
+      refundToken = getGoldToken();
+      refundAmount = proposal.sellAmount;
+    } else {
+      address stableToken = proposal.stableToken;
+      refundToken = IERC20(stableToken);
+      // When selling stableToken, the sell amount is stored in units.
+      // Units must be converted to value when refunding.
+      refundAmount = IStableToken(stableToken).unitsToValue(proposal.sellAmount);
+    }
+    // In the event of a precision issue that results in refundAmount
+    // being greater than this contract's balance, refund the entire balance.
+    uint256 totalBalance = refundToken.balanceOf(address(this));
+    if (totalBalance < refundAmount) {
+      refundAmount = totalBalance;
+    }
+    // Mark the proposal as cancelled.
+    proposal.state = ExchangeState.Cancelled;
+    // Finally, transfer out the deposited funds.
+    require(
+      refundToken.transfer(proposal.exchanger, refundAmount),
+      "Transfer out of refund token failed"
+    );
+    emit ExchangeProposalCancelled(proposalId, msg.sender);
   }
 
   /**
