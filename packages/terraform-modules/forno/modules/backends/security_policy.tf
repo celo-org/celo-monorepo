@@ -10,6 +10,6 @@ resource "google_compute_security_policy" "forno" {
         src_ip_ranges = var.banned_cidr
       }
     }
-    description = "Deny access to unfair forno access"
+    description = "Deny access to forno due to unfair usage"
   }
 }
