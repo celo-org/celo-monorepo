@@ -20,7 +20,7 @@ data "google_compute_network_endpoint_group" "rpc_service_network_endpoint_group
 # A backend that can route traffic to all of the context NEGs.
 resource "google_compute_backend_service" "backend_service" {
   provider = google-beta
-  name = "${var.celo_env}-forno-backend-service-${var.type}"
+  name     = "${var.celo_env}-forno-backend-service-${var.type}"
 
   health_checks = [google_compute_health_check.http_health_check.self_link]
   timeout_sec   = var.timeout_sec
@@ -37,10 +37,10 @@ resource "google_compute_backend_service" "backend_service" {
   dynamic "backend" {
     for_each = var.context_info
     content {
-      balancing_mode = "RATE"
-      max_utilization = 0
-      max_rate_per_endpoint       = var.backend_max_requests_per_second
-      group          = data.google_compute_network_endpoint_group.rpc_service_network_endpoint_group[backend.key].self_link
+      balancing_mode        = "RATE"
+      max_utilization       = 0
+      max_rate_per_endpoint = var.backend_max_requests_per_second
+      group                 = data.google_compute_network_endpoint_group.rpc_service_network_endpoint_group[backend.key].self_link
     }
   }
 }
