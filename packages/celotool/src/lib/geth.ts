@@ -908,7 +908,6 @@ export async function startGeth(
     '--metrics',
     '--port',
     port.toString(),
-    '--rpcvhosts=*',
     '--networkid',
     gethConfig.networkId.toString(),
     `--verbosity=${verbosity}`,
@@ -932,21 +931,22 @@ export async function startGeth(
 
   if (rpcport) {
     instance.args.push(
-      '--rpc',
-      '--rpcport',
+      '--http',
+      '--http.port',
       rpcport.toString(),
-      '--rpccorsdomain=*',
-      '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
+      '--http.corsdomain=*',
+      '--http.vhosts=*',
+      '--http.api=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
     instance.args.push(
-      '--wsorigins=*',
       '--ws',
-      '--wsport',
+      '--ws.origins=*',
+      '--ws.port',
       wsport.toString(),
-      '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
+      '--ws.api=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
@@ -1050,6 +1050,9 @@ export async function startGeth(
       console.info(`geth:${instance.name}: ws port open ${wsport}`)
     }
   }
+
+  // Geth startup isn't fully done even when the port is open, so give it another second
+  await sleep(1000)
 
   console.log(
     `${instance.name}: running.`,
