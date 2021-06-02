@@ -26,7 +26,7 @@ contract('SortedOracles', (accounts: string[]) => {
   const aReportExpiry: number = 3600
 
   beforeEach(async () => {
-    sortedOracles = await SortedOracles.new()
+    sortedOracles = await SortedOracles.new(true)
     await sortedOracles.initialize(aReportExpiry)
   })
 
