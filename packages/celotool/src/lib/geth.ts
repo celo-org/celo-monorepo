@@ -895,8 +895,6 @@ export async function startGeth(
   if (instance.validating && !minerValidator) {
     throw new Error('miner.validator address from the instance is required')
   }
-  // TODO(ponti): add flag after Donut fork
-  // const txFeeRecipient = instance.txFeeRecipient || minerValidator
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
 
   instance.args = [
@@ -920,13 +918,8 @@ export async function startGeth(
   ]
 
   if (minerValidator) {
-    instance.args.push(
-      '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
-      minerValidator
-    )
-    // TODO(ponti): add flag after Donut fork
-    // '--tx-fee-recipient',
-    // txFeeRecipient
+    const txFeeRecipient = instance.txFeeRecipient || minerValidator
+    instance.args.push('--miner.validator', minerValidator, '--tx-fee-recipient', txFeeRecipient)
   }
 
   if (rpcport) {
