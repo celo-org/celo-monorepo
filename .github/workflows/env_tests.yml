@@ -29,6 +29,16 @@ jobs:
       - name: Build packages
         run: yarn lerna run build --ignore docs
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Decrypt mnenomic
+        run: yarn keys:decrypt
+
       # Runs the env tests
       - name: Run the env tests
         run: cd packages/env-tests/; yarn ${{ github.event.inputs.network }}-test
