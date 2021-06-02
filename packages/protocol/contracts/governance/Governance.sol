@@ -681,11 +681,13 @@ contract Governance is
       (Proposals.Proposal storage proposal, Proposals.Stage stage) =
         requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
       if (stage == Proposals.Stage.Referendum) {
-        Proposals.VoteValue value = voteRecord.value;
-        proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
-        proposal.networkWeight = getLockedGold().getTotalLockedGold();
-        emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
-        delete voter.referendumVotes[dequeueIndex];
+        // ensure vote record proposal matches dequeued index proposal before revoking
+        if(voteRecord.proposalId == dequeued[dequeueIndex]) {
+          proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
+          proposal.networkWeight = getLockedGold().getTotalLockedGold();
+          emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(voteRecord.value), voteRecord.weight);
+        }
+        delete voteRecord;
       }
     }
     voter.mostRecentReferendumProposal = 0;
