@@ -9,7 +9,7 @@ import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -24,7 +24,7 @@ contract Governance is
   IGovernance,
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   ReentrancyGuard,
   UsingRegistry,
   UsingPrecompiles
@@ -189,7 +189,7 @@ contract Governance is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   function() external payable {
     require(msg.data.length == 0, "unknown method");
