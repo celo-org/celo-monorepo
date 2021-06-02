@@ -125,7 +125,7 @@ contract GrandaMento is
    * @param sellCelo Whether CELO is being sold.
    * @return The proposal identifier for the newly created exchange proposal.
    */
-  function proposeExchange(address stableToken, uint256 sellAmount, bool sellCelo)
+  function createExchangeProposal(address stableToken, uint256 sellAmount, bool sellCelo)
     external
     nonReentrant
     returns (uint256)
