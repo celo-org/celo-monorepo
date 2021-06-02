@@ -34,7 +34,7 @@ contract('Accounts', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new(true, { from: account })
     mockValidators = await MockValidators.new()
-    const registry = await Registry.new()
+    const registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await accountsInstance.initialize(registry.address)

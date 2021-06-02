@@ -64,8 +64,8 @@ contract('Escrow', (accounts: string[]) => {
   let registry: RegistryInstance
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    escrow = await Escrow.new({ from: owner })
+    registry = await Registry.new(true)
+    escrow = await Escrow.new(true, { from: owner })
     await escrow.initialize(registry.address)
     mockAttestations = await MockAttestations.new({ from: owner })
     await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)

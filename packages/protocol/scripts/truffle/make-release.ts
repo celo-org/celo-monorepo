@@ -4,7 +4,6 @@ import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { checkImports } from '@celo/protocol/lib/web3-utils'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
@@ -91,9 +90,7 @@ const deployImplementation = async (
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
-    : checkImports('InitializableV2', Contract, artifacts)
-    ? Contract.new(testingDeployment)
-    : Contract.new())
+    : Contract.new(testingDeployment))
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'

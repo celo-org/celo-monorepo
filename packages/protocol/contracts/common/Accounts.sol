@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
@@ -16,7 +16,7 @@ contract Accounts is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  InitializableV2,
+  Initializable,
   UsingRegistry
 {
   using SafeMath for uint256;
@@ -97,7 +97,7 @@ contract Accounts is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -114,12 +114,13 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setEip712DomainSeparator();
   }
 
   /**
    * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
    */
-  function setEip712DomainSeparator() public onlyOwner {
+  function setEip712DomainSeparator() public {
     uint256 chainId;
     assembly {
       chainId := chainid

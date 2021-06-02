@@ -122,7 +122,7 @@ contract('Validators', (accounts: string[]) => {
     )
     mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     validators = await Validators.new()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
