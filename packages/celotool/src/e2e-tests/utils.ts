@@ -73,7 +73,9 @@ export async function initAndSyncGethWithRetry(
 
 export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
   const { wsport, rpcport } = instance
+  console.info(`${instance.name}: syncing start`)
   await waitToFinishSyncing(new Web3(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`))
+  console.info(`${instance.name}: syncing finished`)
 }
 
 export async function waitToFinishSyncing(web3: any) {
@@ -351,15 +353,20 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
     }
 
+    // restore data dirs
     await Promise.all(
-      gethConfig.instances.map(async (instance, i) => {
-        await restoreDatadir(gethConfig.runPath, instance)
-        if (!instance.privateKey && instance.validating) {
-          instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
-        }
-        return startGeth(gethConfig, gethBinaryPath, instance, verbose)
-      })
+      gethConfig.instances.map((instance) => restoreDatadir(gethConfig.runPath, instance))
     )
+
+    // do in sequence, not concurrently to avoid flaky errors
+    for (let i = 0; i < gethConfig.instances.length; i++) {
+      const instance = gethConfig.instances[i]
+      if (!instance.privateKey && instance.validating) {
+        instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+      }
+      await startGeth(gethConfig, gethBinaryPath, instance, verbose)
+    }
+
     await connectValidatorPeers(gethConfig.instances)
   }
 
