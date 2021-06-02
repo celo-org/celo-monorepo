@@ -1051,6 +1051,9 @@ export async function startGeth(
     }
   }
 
+  // Geth startup isn't fully done even when the port is open, so give it another second
+  await sleep(1000)
+
   console.log(
     `${instance.name}: running.`,
     rpcport ? `RPC: ${rpcport}` : '',
