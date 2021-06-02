@@ -96,3 +96,7 @@ export async function retryCmd(
   }
   throw Error(`Retried ${numAttempts} without any successes`)
 }
+
+export const stringToBoolean = (myString: string) => {
+  return myString.toLowerCase() === 'true'
+}
