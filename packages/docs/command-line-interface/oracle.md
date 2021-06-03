@@ -31,10 +31,10 @@ _See code: [src/commands/oracle/list.ts](https://github.com/celo-org/celo-monore
 
 ## `celocli oracle:remove-expired-reports TOKEN`
 
-Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")
+Remove expired oracle reports for a specified token
 
 ```
-Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")
+Remove expired oracle reports for a specified token
 
 USAGE
   $ celocli oracle:remove-expired-reports TOKEN
@@ -61,10 +61,10 @@ _See code: [src/commands/oracle/remove-expired-reports.ts](https://github.com/ce
 
 ## `celocli oracle:report TOKEN`
 
-Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")
+Report the price of CELO in a specified token
 
 ```
-Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")
+Report the price of CELO in a specified token
 
 USAGE
   $ celocli oracle:report TOKEN
