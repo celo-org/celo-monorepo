@@ -22,6 +22,7 @@ import {
   getEnodeAddress,
   getLogFilename,
   initAndStartGeth,
+  initGeth,
   migrateContracts,
   resetDataDir,
   restoreDatadir,
@@ -301,6 +302,15 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
     }
 
+    if (gethConfig.useMycelo || !(gethConfig.migrate || gethConfig.migrateTo)) {
+      // Just need to initialize the nodes in this case.  No need to actually start the network
+      // since we don't need to run the migrations against it.
+      for (const instance of gethConfig.instances) {
+        await initGeth(gethConfig, gethBinaryPath, instance, verbose)
+      }
+      return
+    }
+
     // Start all the instances
     for (const instance of gethConfig.instances) {
       await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
@@ -309,20 +319,18 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     // Directly connect validator peers that are not using a bootnode or proxy.
     await connectValidatorPeers(gethConfig.instances)
 
-    if (!gethConfig.useMycelo && (gethConfig.migrate || gethConfig.migrateTo)) {
-      await Promise.all(
-        gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
-      )
+    await Promise.all(
+      gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
+    )
 
-      await migrateContracts(
-        MonorepoRoot,
-        validatorPrivateKeys,
-        attestationKeys,
-        validators.map((x) => x.address),
-        gethConfig.migrateTo,
-        gethConfig.migrationOverrides
-      )
-    }
+    await migrateContracts(
+      MonorepoRoot,
+      validatorPrivateKeys,
+      attestationKeys,
+      validators.map((x) => x.address),
+      gethConfig.migrateTo,
+      gethConfig.migrationOverrides
+    )
   }
 
   const before = async () => {
