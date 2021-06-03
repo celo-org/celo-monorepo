@@ -22,35 +22,36 @@ This is a living document! Please edit and update it as part of your onboarding 
 
 ## Reading
 
-Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) and [mobile](packages/mobile) packages are good starting points.
-
+Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) and [mobile] packages are good starting points.
 
 ## Getting everything installed
 
-Follow these steps to get everything that you need installed to build the celo-monorepo codebase on your computer.
+Follow these steps to get everything that you need installed to build the [celo-monorepo] codebase on your computer.
 
 ### Common stuff
 
 #### Install Go
 
-We need Go for [celo-blockchain], the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client).
+We need Go for [celo-blockchain], the Go Celo implementation, and [`gobind`](https://pkg.go.dev/golang.org/x/mobile/cmd/gobind) to build Java language bindings to Go code for the Android Geth client.
 
-Note: We currently use Go 1.13. [Install Go 1.13 manually](https://golang.org/dl/), then run
+Note: to verify which version of Go is currenlty in use, refer to the [celo-blockchain README](https://github.com/celo-org/celo-blockchain/blob/master/README.md). 
 
-```
+Install it manually from https://golang.org/dl/. Then run:
+
+```bash
 go get golang.org/x/mobile/cmd/gobind
 ```
 
 Execute the following (and make sure the lines are in your `~/.bash_profile`):
 
-```
+```bash
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
 
 #### Install Node
 
-Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
+Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: https://github.com/nvm-sh/nvm.
 
 Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo] will need:
 
@@ -80,7 +81,7 @@ Install [Homebrew], the best way of managing packages on OSX:
 
 #### Install Yarn
 
-We use Yarn to build all of the [celo-monorepo] repo. Install it using [Homebrew](#homebrew):
+We use [Yarn] to build all of the [celo-monorepo] repo. Install it using [Homebrew](#homebrew):
 
 ```bash
 brew install yarn
@@ -90,7 +91,7 @@ brew install yarn
 
 #### Install Yarn
 
-We use Yarn to build all of the [celo-monorepo] repo. Install it by running the following:
+We use [Yarn] to build all of the [celo-monorepo] repo. Install it by running the following:
 
 ```bash
 # for documentation on yarn visit https://yarnpkg.com/en/docs/install#debian-stable
@@ -103,8 +104,8 @@ sudo apt-get update && sudo apt-get install yarn
 
 #### Install Rust
 
-We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust) This is not 
-required if you only want use the blockchain, monorepo, and mobile wallet.
+We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust).
+This is not required if you only want use the [celo-blockchain], [celo-monorepo], and [mobile] wallet.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -112,7 +113,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 Now lets add Rust to the PATH:
 
-```
+```bash
 echo "export PATH=$PATH:~/.cargo/bin/" >> ~/.bashrc
 source ~/.bashrc
 ```
@@ -124,7 +125,7 @@ rustup install 1.42.0
 rustup default 1.42.0
 ```
 
-If you're building Geth for Android, you need a NDK that has a cross-compilation toolchain. We need version 19.
+If you're building [Geth](https://geth.ethereum.org/) for Android, you need a NDK that has a cross-compilation toolchain. We need version 19.
 
 On Mac (darwin):
 ```bash
@@ -139,8 +140,11 @@ In `celo-blockchain`, define the relevant environment variables, e.g.:
 export NDK_VERSION=android-ndk-r19c
 ```
 
-and run `make ndk_bundle`. This will download the NDK for your platform.
+Then run the following to download the NDK for your platform:
 
+```bash
+make ndk_bundle
+``` 
 
 ## Building celo-monorepo
 
@@ -177,11 +181,13 @@ yarn build --ignore docs
 
 ## Running the mobile wallet
 
-To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](https://github.com/celo-org/wallet/tree/main/packages/mobile) directory.
+To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile] directory.
 
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
 [celo-bls]: https://github.com/celo-org/celo-bls-go
+[mobile]: https://github.com/celo-org/wallet/tree/main/packages/mobile 
 [Homebrew]: https://brew.sh
 [https://github.com/nvm-sh/nvm]: https://github.com/nvm-sh/nvm
+[Yarn]: https://yarnpkg.com/
