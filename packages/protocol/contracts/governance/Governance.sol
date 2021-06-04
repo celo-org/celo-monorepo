@@ -687,7 +687,7 @@ contract Governance is
       ) {
         (Proposals.Proposal storage proposal, Proposals.Stage stage) =
           requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
-        
+
         // only revoke from proposals which are still in referendum
         if (stage == Proposals.Stage.Referendum) {
           proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
