@@ -12,11 +12,6 @@ jobs:
   core_contracts_release:
     runs-on: ubuntu-latest
     environment: env-tests-environment
-
-    sevices:
-      lightestNode:
-        image: us.gcr.io/celo-org/geth:${{ github.event.inputs.network }}
-
     steps:
       - name: Setup lightest node
         run: |
