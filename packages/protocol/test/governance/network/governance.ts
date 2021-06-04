@@ -1557,6 +1557,12 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
+    it('should not revert when proposals are not in the Referendum stage', async () => {
+      await governance.vote(proposalId, index, VoteValue.Yes)
+      await timeTravel(referendumStageDuration, web3)
+      await governance.revokeVotes()
+    })
+
     describe('when voting on two proposals', () => {
       const proposalId1 = 2
       const proposalId2 = 3
