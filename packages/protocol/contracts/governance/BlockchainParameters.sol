@@ -37,6 +37,12 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param major Minimum client version that can be used in the chain, major version.
    * @param minor Minimum client version that can be used in the chain, minor version.

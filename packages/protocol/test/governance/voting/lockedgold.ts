@@ -63,11 +63,11 @@ contract('LockedGold', (accounts: string[]) => {
   beforeEach(async () => {
     mockGoldToken = await MockGoldToken.new()
     accountsInstance = await Accounts.new(true)
-    lockedGold = await LockedGold.new()
+    lockedGold = await LockedGold.new(true)
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)

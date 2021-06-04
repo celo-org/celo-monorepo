@@ -9,7 +9,7 @@ import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -24,7 +24,7 @@ contract Governance is
   IGovernance,
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   ReentrancyGuard,
   UsingRegistry,
   UsingPrecompiles
@@ -189,7 +189,7 @@ contract Governance is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   function() external payable {
     require(msg.data.length == 0, "unknown method");
@@ -680,12 +680,20 @@ contract Governance is
       VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
       (Proposals.Proposal storage proposal, Proposals.Stage stage) =
         requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
-      require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
-      Proposals.VoteValue value = voteRecord.value;
-      proposal.updateVote(voteRecord.weight, 0, value, Proposals.VoteValue.None);
-      proposal.networkWeight = getLockedGold().getTotalLockedGold();
-      emit ProposalVoteRevoked(voteRecord.proposalId, account, uint256(value), voteRecord.weight);
-      delete voter.referendumVotes[dequeueIndex];
+      if (stage == Proposals.Stage.Referendum) {
+        // ensure vote record proposal matches dequeued index proposal before revoking
+        if (voteRecord.proposalId == dequeued[dequeueIndex]) {
+          proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
+          proposal.networkWeight = getLockedGold().getTotalLockedGold();
+          emit ProposalVoteRevoked(
+            voteRecord.proposalId,
+            account,
+            uint256(voteRecord.value),
+            voteRecord.weight
+          );
+        }
+        delete voter.referendumVotes[dequeueIndex];
+      }
     }
     voter.mostRecentReferendumProposal = 0;
     return true;

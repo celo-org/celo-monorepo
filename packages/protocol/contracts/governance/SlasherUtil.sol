@@ -23,6 +23,12 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Sets slashing incentives.
    * @param penalty Penalty for the slashed signer.
    * @param reward Reward that the observer gets.

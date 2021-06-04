@@ -125,7 +125,7 @@ contract('Governance', (accounts: string[]) => {
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     testTransactions = await TestTransactions.new()
     await governance.initialize(
       registry.address,
@@ -1555,6 +1555,12 @@ contract('Governance', (accounts: string[]) => {
           weight,
         },
       })
+    })
+
+    it('should not revert when proposals are not in the Referendum stage', async () => {
+      await governance.vote(proposalId, index, VoteValue.Yes)
+      await timeTravel(referendumStageDuration, web3)
+      await governance.revokeVotes()
     })
 
     describe('when voting on two proposals', () => {
