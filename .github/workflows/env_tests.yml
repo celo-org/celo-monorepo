@@ -20,6 +20,7 @@ jobs:
           mkdir celo-data-dir
           cd celo-data-dir
           docker run --name celo-fullnode -d --restart unless-stopped --stop-timeout 300 -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode lightest --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --nousb --baklava --datadir /root/.celo
+          cd ..  
 
       - name: Checking if node is synced
         run: |
