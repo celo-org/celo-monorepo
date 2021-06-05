@@ -32,6 +32,9 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
+	  
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -44,9 +47,6 @@ jobs:
           yarn
           yarn lerna bootstrap
     
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Build packages
         run: yarn lerna run build --ignore docs
 
