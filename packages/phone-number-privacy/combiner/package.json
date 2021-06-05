@@ -28,7 +28,7 @@
     "@celo/phone-number-privacy-common": "1.0.33",
     "@celo/identity": "1.0.2",
     "@celo/utils": "1.0.2",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
     "elliptic": "^6.5.4",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",

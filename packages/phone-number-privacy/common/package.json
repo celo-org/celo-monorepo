@@ -21,7 +21,7 @@
     "@celo/identity": "1.0.2",
     "@celo/utils": "1.0.2",
     "bignumber.js": "^9.0.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
     "btoa": "1.2.1",
     "bunyan": "1.8.12",
     "bunyan-debug-stream": "2.0.0",

@@ -30,7 +30,7 @@
     "@celo/contractkit": "1.2.2-dev",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "elliptic": "^6.5.4",
