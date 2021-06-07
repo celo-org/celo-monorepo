@@ -1,5 +1,4 @@
 import { CeloContract } from '@celo/contractkit'
-import { stableTokenContractArray } from '@celo/contractkit/lib/base'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
@@ -7,8 +6,7 @@ import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ReportPrice extends BaseCommand {
-  static description =
-    'Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")'
+  static description = 'Report the price of CELO in a specified token'
 
   static args = [
     {
@@ -16,7 +14,6 @@ export default class ReportPrice extends BaseCommand {
       required: true,
       default: CeloContract.StableToken,
       description: 'Token to report on',
-      options: stableTokenContractArray,
     },
   ]
   static flags = {
@@ -39,15 +36,9 @@ export default class ReportPrice extends BaseCommand {
     const sortedOracles = await this.kit.contracts.getSortedOracles()
     const value = new BigNumber(res.flags.value)
 
-    try {
-      await this.kit.registry.addressFor(res.args.token)
-    } catch {
-      failWith(`The ${res.args.token} contract was not deployed yet`)
-    }
-
     await displaySendTx(
       'sortedOracles.report',
-      await sortedOracles.report(res.args.token, value, res.flags.from)
+      await sortedOracles.report(res.args.token, value, res.flags.from).catch((e) => failWith(e))
     )
     this.log(`Reported oracle value: ${value.toString()} ${res.args.token} == 1 CELO`)
   }
