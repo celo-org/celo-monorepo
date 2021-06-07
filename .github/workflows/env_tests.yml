@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  core_contracts_release:
+  env-tests:
     runs-on: ubuntu-latest
     environment: env-tests-environment
     steps:
