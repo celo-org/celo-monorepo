@@ -24,7 +24,7 @@ contract GrandaMento is
   using SafeMath for uint256;
 
   // Emitted when a new exchange proposal is created.
-  event ProposedExchange(
+  event ExchangeProposalCreated(
     uint256 indexed proposalId,
     address indexed exchanger,
     address indexed stableToken,
@@ -39,11 +39,17 @@ contract GrandaMento is
   // Emitted when an exchange proposal is cancelled.
   event ExchangeProposalCancelled(uint256 indexed proposalId, address sender);
 
+  // Emitted when an exchange proposal is executed.
+  event ExchangeProposalExecuted(uint256 indexed proposalId);
+
   // Emitted when the approver is set.
   event ApproverSet(address approver);
 
   // Emitted when the spread is set.
   event SpreadSet(uint256 spread);
+
+  // Emitted when the veto period in seconds is set.
+  event VetoPeriodSecondsSet(uint256 vetoPeriodSeconds);
 
   // Emitted when the exchange limits for a stable token are set.
   event StableTokenExchangeLimitsSet(
@@ -52,7 +58,7 @@ contract GrandaMento is
     uint256 maxExchangeAmount
   );
 
-  enum ExchangeState { None, Proposed, Approved, Executed, Cancelled }
+  enum ExchangeProposalState { None, Proposed, Approved, Executed, Cancelled }
 
   struct ExchangeLimits {
     // The minimum amount of an asset that can be exchanged in a single proposal.
@@ -63,7 +69,7 @@ contract GrandaMento is
 
   struct ExchangeProposal {
     // The exchanger/proposer of the exchange proposal.
-    address exchanger;
+    address payable exchanger;
     // The stable token involved in this proposal.
     address stableToken;
     // The amount of the sell token being sold. If a stable token is being sold,
@@ -78,11 +84,11 @@ contract GrandaMento is
     // The amount of the buy token being bought. For stable tokens, this is
     // kept track of as the value, not units.
     uint256 buyAmount;
-    // The timestamp (`block.timestamp`) at which the exchange proposal was approved.
-    // If the exchange proposal has not ever been approved, is 0.
+    // The timestamp (`block.timestamp`) at which the exchange proposal was approved
+    // in seconds. If the exchange proposal has not ever been approved, is 0.
     uint256 approvalTimestamp;
     // The state of the exchange proposal.
-    ExchangeState state;
+    ExchangeProposalState state;
     // Whether CELO is being sold and stableToken is being bought.
     bool sellCelo;
   }
@@ -92,6 +98,9 @@ contract GrandaMento is
 
   // The percent fee imposed upon an exchange execution.
   FixidityLib.Fraction public spread;
+
+  // The period in seconds after an approval during which an exchange proposal can be vetoed.
+  uint256 public vetoPeriodSeconds;
 
   // The minimum and maximum amount of the stable token that can be minted or
   // burned in a single exchange. Indexed by stable token address.
@@ -131,11 +140,17 @@ contract GrandaMento is
    * @param _registry The address of the registry.
    * @param _spread The spread charged on exchanges.
    */
-  function initialize(address _registry, address _approver, uint256 _spread) external initializer {
+  function initialize(
+    address _registry,
+    address _approver,
+    uint256 _spread,
+    uint256 _vetoPeriodSeconds
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registry);
     setApprover(_approver);
     setSpread(_spread);
+    setVetoPeriodSeconds(_vetoPeriodSeconds);
   }
 
   /**
@@ -184,12 +199,19 @@ contract GrandaMento is
       sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
       buyAmount: buyAmount,
       approvalTimestamp: 0, // initial value when not approved yet
-      state: ExchangeState.Proposed,
+      state: ExchangeProposalState.Proposed,
       sellCelo: sellCelo
     });
     exchangeProposalCount = exchangeProposalCount.add(1);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
-    emit ProposedExchange(proposalId, msg.sender, stableToken, sellAmount, buyAmount, sellCelo);
+    emit ExchangeProposalCreated(
+      proposalId,
+      msg.sender,
+      stableToken,
+      sellAmount,
+      buyAmount,
+      sellCelo
+    );
 
     return proposalId;
   }
@@ -202,15 +224,15 @@ contract GrandaMento is
   function approveExchangeProposal(uint256 proposalId) external onlyApprover {
     ExchangeProposal storage proposal = exchangeProposals[proposalId];
     // Ensure the proposal is in the Proposed state.
-    require(proposal.state == ExchangeState.Proposed, "Proposal must be in Proposed state");
+    require(proposal.state == ExchangeProposalState.Proposed, "Proposal must be in Proposed state");
     // Set the time the approval occurred and change the state.
     proposal.approvalTimestamp = block.timestamp;
-    proposal.state = ExchangeState.Approved;
+    proposal.state = ExchangeProposalState.Approved;
     emit ExchangeProposalApproved(proposalId);
   }
 
   /**
-   * @notice Cancels an exchange proposer.
+   * @notice Cancels an exchange proposal.
    * @dev Only callable by the exchanger if the proposal is in the Proposed state
    * or the owner if the proposal is in the Approved state.
    * @param proposalId The identifier of the proposal to cancel.
@@ -221,37 +243,86 @@ contract GrandaMento is
     // This will also revert if a proposalId is given that does not correspond
     // to a previously created exchange proposal.
     require(
-      (proposal.state == ExchangeState.Proposed && proposal.exchanger == msg.sender) ||
-        (proposal.state == ExchangeState.Approved && isOwner()),
+      (proposal.state == ExchangeProposalState.Proposed && proposal.exchanger == msg.sender) ||
+        (proposal.state == ExchangeProposalState.Approved && isOwner()),
       "Sender cannot cancel the exchange proposal"
     );
-    // Get the token and amount that will be refunded to the proposer.
-    IERC20 refundToken;
-    uint256 refundAmount;
-    if (proposal.sellCelo) {
-      refundToken = getGoldToken();
-      refundAmount = proposal.sellAmount;
-    } else {
-      address stableToken = proposal.stableToken;
-      refundToken = IERC20(stableToken);
-      // When selling stableToken, the sell amount is stored in units.
-      // Units must be converted to value when refunding.
-      refundAmount = IStableToken(stableToken).unitsToValue(proposal.sellAmount);
-    }
-    // In the event of a precision issue that results in refundAmount
-    // being greater than this contract's balance, refund the entire balance.
-    uint256 totalBalance = refundToken.balanceOf(address(this));
-    if (totalBalance < refundAmount) {
-      refundAmount = totalBalance;
-    }
     // Mark the proposal as cancelled.
-    proposal.state = ExchangeState.Cancelled;
+    proposal.state = ExchangeProposalState.Cancelled;
+    // Get the token and amount that will be refunded to the proposer.
+    (IERC20 refundToken, uint256 refundAmount) = getSellTokenAndSellAmount(proposal);
     // Finally, transfer out the deposited funds.
     require(
       refundToken.transfer(proposal.exchanger, refundAmount),
       "Transfer out of refund token failed"
     );
     emit ExchangeProposalCancelled(proposalId, msg.sender);
+  }
+
+  function executeExchangeProposal(uint256 proposalId) external nonReentrant {
+    ExchangeProposal storage proposal = exchangeProposals[proposalId];
+    // Require that the proposal is in the Approved state.
+    require(proposal.state == ExchangeProposalState.Approved, "Proposal must be in Approved state");
+    // Require that the veto period has elapsed since the approval time.
+    require(
+      proposal.approvalTimestamp.add(vetoPeriodSeconds) <= block.timestamp,
+      "Veto period not elapsed"
+    );
+    // Mark the proposal as executed.
+    proposal.state = ExchangeProposalState.Executed;
+
+    // Perform the exchange.
+    (IERC20 sellToken, uint256 sellAmount) = getSellTokenAndSellAmount(proposal);
+    // If the exchange sells CELO, the CELO is sent to the Reserve and
+    // stable token is minted.
+    if (proposal.sellCelo) {
+      // Send the CELO from this contract to the reserve.
+      require(
+        sellToken.transfer(address(getReserve()), sellAmount),
+        "Transfer out of CELO to Reserve failed"
+      );
+      // Mint stable token directly to the exchanger.
+      require(
+        IStableToken(proposal.stableToken).mint(proposal.exchanger, proposal.buyAmount),
+        "Stable token mint failed"
+      );
+    } else {
+      // If the exchange is selling stable token, the stable token is burned
+      // and CELO is transferred from the Reserve.
+      // Burn the stable token from this contract.
+      require(IStableToken(proposal.stableToken).burn(sellAmount), "Stable token burn failed");
+      // Transfer the CELO from the Reserve to the exchanger.
+      require(
+        getReserve().transferExchangeGold(proposal.exchanger, proposal.buyAmount),
+        "Transfer out of CELO from Reserve failed"
+      );
+    }
+    emit ExchangeProposalExecuted(proposalId);
+  }
+
+  function getSellTokenAndSellAmount(ExchangeProposal memory proposal)
+    private
+    returns (IERC20, uint256)
+  {
+    IERC20 sellToken;
+    uint256 sellAmount;
+    if (proposal.sellCelo) {
+      sellToken = getGoldToken();
+      sellAmount = proposal.sellAmount;
+    } else {
+      address stableToken = proposal.stableToken;
+      sellToken = IERC20(stableToken);
+      // When selling stableToken, the sell amount is stored in units.
+      // Units must be converted to value when refunding.
+      sellAmount = IStableToken(stableToken).unitsToValue(proposal.sellAmount);
+    }
+    // In the event of a precision issue that results in sellAmount
+    // being greater than this contract's balance, refund the entire balance.
+    uint256 totalBalance = sellToken.balanceOf(address(this));
+    if (totalBalance < sellAmount) {
+      sellAmount = totalBalance;
+    }
+    return (sellToken, sellAmount);
   }
 
   /**
@@ -304,6 +375,16 @@ contract GrandaMento is
   function setSpread(uint256 newSpread) public onlyOwner {
     spread = FixidityLib.wrap(newSpread);
     emit SpreadSet(newSpread);
+  }
+
+  /**
+   * @notice Sets the veto period in seconds.
+   * @dev Sender must be owner.
+   * @param newVetoPeriodSeconds The new value for the veto period in seconds.
+   */
+  function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
+    vetoPeriodSeconds = newVetoPeriodSeconds;
+    emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
   }
 
   /**

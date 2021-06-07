@@ -14,6 +14,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.registry.predeployedProxyAddress,
     config.grandaMento.approver,
     toFixed(config.grandaMento.spread).toString(),
+    config.grandaMento.vetoPeriodSeconds,
   ]
 }
 
