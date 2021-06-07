@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "name" (dict "Values" $.Values)}}
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  resourceNames: ["{{ template "funder-pod-name" (dict "Values" $.Values)}}"]
+  verbs: ["get", "patch"]
