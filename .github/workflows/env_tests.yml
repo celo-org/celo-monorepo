@@ -54,5 +54,5 @@ jobs:
         run: yarn keys:decrypt
 
       - name: Run the env tests
-        run: cd packages/env-tests/; CELO_ENV=baklava CELO_PROVIDER=http://127.0.0.1 jest --runInBand
+        run: cd packages/env-tests/; CELO_ENV=baklava CELO_PROVIDER=http://127.0.0.1 ./node_modules/.bin/jest --runInBand
         shell: bash
