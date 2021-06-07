@@ -54,5 +54,5 @@ jobs:
         run: yarn keys:decrypt
 
       - name: Run the env tests
-        run: cd packages/env-tests/; yarn ${{ github.event.inputs.network }}-test
+        run: cd packages/env-tests/; env CELO_PROVIDER=http://127.0.0.1 yarn ${{ github.event.inputs.network }}-test
         shell: bash
