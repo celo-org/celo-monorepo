@@ -271,7 +271,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Authorizes an address to as a signer, for `role`, on behalf of the account.
+   * @notice Authorizes an address to act as a signer, for `role`, on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param role The role to authorize signing for.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -672,8 +672,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Checks whether the role is one of Vote, Validator or 
-   * Attestation
+   * @notice Checks whether the role is one of Vote, Validator or Attestation
    * @param role The role to check
    */
   function isLegacyRole(bytes32 role) public pure returns (bool) {
@@ -935,7 +934,7 @@ contract Accounts is
    * @param s Output value s of the ECDSA signature.
    * @dev Fails if the address is already authorized to another account or is an account itself.
    * @dev Note that once an address is authorized, it may never be authorized again.
-   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `authorized`'s signature on `msg.sender`.
    */
   function authorizeAddress(address authorized, uint8 v, bytes32 r, bytes32 s) private {
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
