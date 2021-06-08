@@ -16,7 +16,7 @@ contract IdentityProxy {
 
   /**
    * @notice Performs an arbitrary call.
-   * @param destination The address the call.
+   * @param destination The address to call.
    * @param data The calldata to send with the call.
    * @dev This can only be called by the deployer of this contract, presumably
    * the IdentityProxyHub after it checks the identity heuristic.

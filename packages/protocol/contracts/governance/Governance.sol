@@ -666,8 +666,8 @@ contract Governance is
   /* solhint-enable code-complexity */
 
   /**
-   * @notice Revoke votes on all proposal of sender in the referendum stage.
-   * @return Whether or not all votes of an account was successfully revoked.
+   * @notice Revoke votes on all proposals of sender in the referendum stage.
+   * @return Whether or not all votes of an account were successfully revoked.
    */
   function revokeVotes() external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
