@@ -979,7 +979,7 @@ contract('GrandaMento', (accounts: string[]) => {
       const newStableToken = await MockStableToken.new()
       await assertRevert(
         grandaMento.getBuyAmount(newStableToken.address, sellAmount, true),
-        'Exchange rate denominator must be greater than 0'
+        'No oracle rates present for token'
       )
     })
   })
@@ -1057,6 +1057,15 @@ contract('GrandaMento', (accounts: string[]) => {
           maxExchangeAmount: max,
         },
       })
+    })
+
+    it('reverts when the minExchangeAmount is greater than the maxExchangeAmount', async () => {
+      await assertRevert(
+        grandaMento.setStableTokenExchangeLimits(stableToken.address, max, min, {
+          from: accounts[1],
+        }),
+        'Min exchange amount must not be greater than max'
+      )
     })
 
     it('reverts when the sender is not the owner', async () => {
