@@ -2,13 +2,28 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import compareVersions from 'compare-versions'
 import fs from 'fs'
 import { entries, range } from 'lodash'
+import os from 'os'
+import path from 'path'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
-import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import {
+  execCmd,
+  execCmdWithExitOnFailure,
+  outputIncludes,
+  spawnCmd,
+  spawnCmdWithExitOnFailure,
+} from './cmd-utils'
+import {
+  EnvTypes,
+  envVar,
+  fetchEnv,
+  fetchEnvOrFallback,
+  isProduction,
+  monorepoRoot,
+} from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { retrieveBootnodeIPAddress } from './geth'
+import { buildGethAll, checkoutGethRepo, retrieveBootnodeIPAddress } from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -16,7 +31,9 @@ import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
   getProxyName,
+  uploadGenesisBlockToGoogleStorage,
 } from './testnet-utils'
+import { stringToBoolean } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -734,9 +751,8 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
         ]
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
+  const useMyCelo = stringToBoolean(fetchEnvOrFallback(envVar.GETH_USE_MYCELO, 'false'))
+  await createAndPushGenesis(celoEnv, !useExistingGenesis, useMyCelo)
 
   const bootnodeOverwritePkey =
     fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== ''
@@ -758,7 +774,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
+    `--set genesis.useGenesisFileBase64="false"`,
     `--set genesis.network=${celoEnv}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
@@ -1072,4 +1088,77 @@ function rollingUpdateHelmVariables() {
       '0'
     )}`,
   ]
+}
+
+const celoBlockchainDir: string = path.join(os.tmpdir(), 'celo-blockchain-celotool')
+
+export async function createAndPushGenesis(celoEnv: string, reset: boolean, useMyCelo: boolean) {
+  let genesis: string = ''
+  try {
+    genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
+  } catch {
+    console.debug(`Genesis file not found in GCP. Creating a new one`)
+  }
+  if (genesis === '' || reset === true) {
+    genesis = useMyCelo ? await generateMyCeloGenesis() : generateGenesisFromEnv()
+  }
+  // Upload the new genesis file to gcp
+  if (!isCelotoolHelmDryRun()) {
+    await uploadGenesisBlockToGoogleStorage(celoEnv, genesis)
+  }
+}
+
+async function generateMyCeloGenesis(): Promise<string> {
+  // Clean up the tmp dir
+  await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
+  fs.mkdirSync(celoBlockchainDir)
+  const gethTag = fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
+  const celoBlockchainVersion = gethTag.includes('.') ? `v${gethTag}` : gethTag
+  await checkoutGethRepo(celoBlockchainVersion, celoBlockchainDir)
+  await buildGethAll(celoBlockchainDir)
+
+  // Generate genesis-config from template
+  const myceloBinary = path.join(celoBlockchainDir, 'build/bin/mycelo')
+  const myceloGenesisConfigArgs = [
+    'genesis-config',
+    '--template',
+    'monorepo',
+    '--mnemonic',
+    fetchEnv(envVar.MNEMONIC),
+    '--validators',
+    fetchEnv(envVar.VALIDATORS),
+    '--dev.accounts',
+    fetchEnv(envVar.LOAD_TEST_CLIENTS),
+    '--blockperiod',
+    fetchEnv(envVar.BLOCK_TIME),
+    '--epoch',
+    fetchEnv(envVar.EPOCH),
+    '--blockgaslimit',
+    '20000000',
+  ]
+  await spawnCmdWithExitOnFailure(myceloBinary, myceloGenesisConfigArgs, {
+    silent: false,
+    cwd: celoBlockchainDir,
+  })
+
+  // TODO: Load config to customize migrations...
+
+  // Generate genesis from config
+
+  const myceloGenesisFromConfigArgs = [
+    'genesis-from-config',
+    celoBlockchainDir,
+    '--buildpath',
+    path.join(monorepoRoot, 'packages/protocol/build/contracts'),
+  ]
+  await spawnCmdWithExitOnFailure(myceloBinary, myceloGenesisFromConfigArgs, {
+    silent: false,
+    cwd: celoBlockchainDir,
+  })
+  const genesisPath = path.join(celoBlockchainDir, 'genesis.json')
+  const genesisContent = fs.readFileSync(genesisPath).toString()
+  return genesisContent
+
+  // Clean up the tmp dir as it's no longer needed
+  await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
 }
