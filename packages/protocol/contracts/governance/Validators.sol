@@ -1167,7 +1167,7 @@ contract Validators is
       history.lastRemovedFromGroupTimestamp = now;
     }
 
-    if (history.entries[head].epochNumber == epochNumber) {
+    if (history.numEntries > 0 && history.entries[head].epochNumber == epochNumber) {
       // There have been no elections since the validator last changed membership, overwrite the
       // previous entry.
       history.entries[head] = MembershipHistoryEntry(epochNumber, group);
