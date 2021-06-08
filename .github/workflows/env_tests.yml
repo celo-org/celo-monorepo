@@ -5,18 +5,41 @@ on:
   workflow_dispatch:
     inputs:
       network:
-        description: 'Network to run env-tests against'
+        description: 'Network to run env-tests against.  Possible values are (staging|baklava|alfajores|mainnet)'
         required: true
 
 jobs:
-  core_contracts_release:
+  env-tests:
     runs-on: ubuntu-latest
+    environment: env-tests-environment
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Runs the env tests
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+  
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: Setup yarn
+        run: |
+          npm install --global yarn
+          yarn
+          yarn lerna bootstrap
+    
+      - name: Build packages
+        run: yarn lerna run build --ignore docs
+
+      - name: Decrypt mnenomic
+        run: yarn keys:decrypt
+
       - name: Run the env tests
         run: cd packages/env-tests/; yarn ${{ github.event.inputs.network }}-test
         shell: bash
