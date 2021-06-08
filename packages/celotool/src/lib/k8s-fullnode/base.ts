@@ -97,7 +97,6 @@ export abstract class BaseFullNodeDeployer {
       )
     }
 
-    // const rpcApis = 'eth,net,rpc,web3'
     const rpcApis = this._deploymentConfig.rpcApis
       ? this._deploymentConfig.rpcApis
       : 'eth,net,rpc,web3'
