@@ -74,7 +74,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "resolutions": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#31b5bbbca5e7d098d2459bc7942eafb77141f442",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#27cd3be8128115d92ff1ce47a0bd16e12620c474",
     "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0",
     "@grpc/grpc-js": "^1.1.8",
     "@types/prettier": "^2.2.1",
