@@ -12,7 +12,7 @@ The protocol has a target for the proportion of circulating CELO that is locked 
 
 The reward rate is adjusted as follows: 
 
-![]()
+![](https://storage.googleapis.com/celo-website/docs/voting_reward_rate_adjustment_equation.pdf)
 
 ## Adjusting the Reward Rate for Target Schedule and Deductions
 
