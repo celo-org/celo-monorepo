@@ -24,7 +24,7 @@ contract GrandaMento is
   using SafeMath for uint256;
 
   // Emitted when a new exchange proposal is created.
-  event ProposedExchange(
+  event ExchangeProposalCreated(
     uint256 indexed proposalId,
     address indexed exchanger,
     address indexed stableToken,
@@ -168,7 +168,14 @@ contract GrandaMento is
     });
     exchangeProposalCount = exchangeProposalCount.add(1);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
-    emit ProposedExchange(proposalId, msg.sender, stableToken, sellAmount, buyAmount, sellCelo);
+    emit ExchangeProposalCreated(
+      proposalId,
+      msg.sender,
+      stableToken,
+      sellAmount,
+      buyAmount,
+      sellCelo
+    );
 
     return proposalId;
   }
@@ -217,7 +224,8 @@ contract GrandaMento is
 
   /**
    * @notice Sets the minimum and maximum amount of the stable token an exchange can involve.
-   * @dev Sender must be owner.
+   * @dev Sender must be owner. Setting the maxExchangeAmount to 0 effectively disables new
+   * exchange proposals for the token.
    * @param stableToken The stable token to set the limits for.
    * @param minExchangeAmount The new minimum exchange amount for the stable token.
    * @param maxExchangeAmount The new maximum exchange amount for the stable token.
@@ -227,6 +235,10 @@ contract GrandaMento is
     uint256 minExchangeAmount,
     uint256 maxExchangeAmount
   ) external onlyOwner {
+    require(
+      minExchangeAmount <= maxExchangeAmount,
+      "Min exchange amount must not be greater than max"
+    );
     stableTokenExchangeLimits[stableToken] = ExchangeLimits({
       minExchangeAmount: minExchangeAmount,
       maxExchangeAmount: maxExchangeAmount
@@ -248,7 +260,8 @@ contract GrandaMento is
     uint256 rateNumerator;
     uint256 rateDenominator;
     (rateNumerator, rateDenominator) = getSortedOracles().medianRate(stableToken);
-    require(rateDenominator > 0, "Exchange rate denominator must be greater than 0");
+    // When rateDenominator is 0, it means there are no rates known to SortedOracles.
+    require(rateDenominator > 0, "No oracle rates present for token");
     return FixidityLib.wrap(rateNumerator).divide(FixidityLib.wrap(rateDenominator));
   }
 }

@@ -177,14 +177,14 @@ contract('GrandaMento', (accounts: string[]) => {
       // Celo token price quoted in CELO
       const stableTokenCeloRate = reciprocal(defaultCeloStableTokenRate)
       const stableTokenSellAmount = unit.times(500)
-      it('emits the ProposedExchange event with the sell amount as the stable token value when its inflation factor is 1', async () => {
+      it('emits the ExchangeProposalCreated event with the sell amount as the stable token value when its inflation factor is 1', async () => {
         const receipt = await grandaMento.createExchangeProposal(
           stableToken.address,
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
         assertLogMatches2(receipt.logs[0], {
-          event: 'ProposedExchange',
+          event: 'ExchangeProposalCreated',
           args: {
             exchanger: owner,
             proposalId: 0,
@@ -196,7 +196,7 @@ contract('GrandaMento', (accounts: string[]) => {
         })
       })
 
-      it('emits the ProposedExchange event with the sell amount as the stable token value when its inflation factor not 1', async () => {
+      it('emits the ExchangeProposalCreated event with the sell amount as the stable token value when its inflation factor not 1', async () => {
         // Set the inflationFactor to something that isn't 1
         const inflationFactor = 1.05
         await stableToken.setInflationFactor(toFixed(inflationFactor))
@@ -207,7 +207,7 @@ contract('GrandaMento', (accounts: string[]) => {
           false // sellCelo = false as we are selling stableToken
         )
         assertLogMatches2(receipt.logs[0], {
-          event: 'ProposedExchange',
+          event: 'ExchangeProposalCreated',
           args: {
             exchanger: owner,
             proposalId: 0,
@@ -331,10 +331,10 @@ contract('GrandaMento', (accounts: string[]) => {
         return grandaMento.createExchangeProposal(_stableToken, sellAmount, true)
       }
       const celoSellAmount = unit.times(100)
-      it('emits the ProposedExchange event', async () => {
+      it('emits the ExchangeProposalCreated event', async () => {
         const receipt = await createExchangeProposal(stableToken.address, celoSellAmount)
         assertLogMatches2(receipt.logs[0], {
-          event: 'ProposedExchange',
+          event: 'ExchangeProposalCreated',
           args: {
             exchanger: owner,
             proposalId: 0,
@@ -483,7 +483,7 @@ contract('GrandaMento', (accounts: string[]) => {
       const newStableToken = await MockStableToken.new()
       await assertRevert(
         grandaMento.getBuyAmount(newStableToken.address, sellAmount, true),
-        'Exchange rate denominator must be greater than 0'
+        'No oracle rates present for token'
       )
     })
   })
@@ -536,6 +536,15 @@ contract('GrandaMento', (accounts: string[]) => {
           maxExchangeAmount: max,
         },
       })
+    })
+
+    it('reverts when the minExchangeAmount is greater than the maxExchangeAmount', async () => {
+      await assertRevert(
+        grandaMento.setStableTokenExchangeLimits(stableToken.address, max, min, {
+          from: accounts[1],
+        }),
+        'Min exchange amount must not be greater than max'
+      )
     })
 
     it('reverts when the sender is not the owner', async () => {
