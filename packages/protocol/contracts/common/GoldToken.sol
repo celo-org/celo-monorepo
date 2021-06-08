@@ -13,7 +13,6 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 contract GoldToken is
   Initializable,
   CalledByVm,
-  Ownable,
   UsingRegistry,
   IERC20,
   ICeloToken,
