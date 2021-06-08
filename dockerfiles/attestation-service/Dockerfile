@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:12-alpine
 WORKDIR /celo-monorepo
 
 RUN apk update && apk add python git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev bash
