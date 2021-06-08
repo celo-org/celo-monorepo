@@ -57,6 +57,7 @@ metadata:
 {{ end }}
 spec:
   type: ClusterIP
+  sessionAffinity: ClientIP
   ports:
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
   selector:
