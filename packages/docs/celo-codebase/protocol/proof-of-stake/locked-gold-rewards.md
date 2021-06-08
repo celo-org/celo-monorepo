@@ -14,7 +14,7 @@ The reward rate is adjusted as follows:
 
 ![]()
 
-## Adjusting on-target Reward Rate for Target Schedule and Deductions
+## Adjusting the on-target Reward Rate for Target Schedule and Deductions
 
 Adjusting the on-target reward rate to account for under- or over-spending against the target schedule gives a baseline reward, essentially the percentage increase for a unit of Locked CELO voting for a group eligible for rewards.
 
