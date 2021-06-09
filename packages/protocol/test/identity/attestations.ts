@@ -98,8 +98,11 @@ contract('Attestations', (accounts: string[]) => {
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
+    const tokenBalance = web3.utils.toWei('10', 'ether').toString()
     await Promise.all(
       accounts.map(async (account) => {
+        await mockERC20Token.mint(account, tokenBalance)
+        await otherMockERC20Token.mint(account, tokenBalance)
         await accountsInstance.createAccount({ from: account })
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,

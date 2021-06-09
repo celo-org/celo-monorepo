@@ -127,7 +127,7 @@ contract('GrandaMento', (accounts: string[]) => {
     await sortedOracles.setNumRates(stableToken.address, 2)
 
     reserve = await MockReserve.new()
-    reserve.setGoldToken(goldToken.address)
+    await reserve.setGoldToken(goldToken.address)
     await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
     // Give the reserve some CELO
     await goldToken.transfer(reserve.address, unit.times(50000), { from: owner })
@@ -349,7 +349,7 @@ contract('GrandaMento', (accounts: string[]) => {
       it('reverts if the stable token has not had exchange limits set', async () => {
         await assertRevert(
           grandaMento.createExchangeProposal(
-            CeloContractName.StableTokenEUR, // not set yet in the Registry
+            CeloContractName.StableTokenEUR, // not set in the Registry
             stableTokenSellAmount,
             false // sellCelo = false as we are selling stableToken
           ),
@@ -1064,8 +1064,8 @@ contract('GrandaMento', (accounts: string[]) => {
       assertLogMatches2(receipt.logs[0], {
         event: 'StableTokenExchangeLimitsSet',
         args: {
-          stableTokenRegistryId: stableTokenRegistryId,
-          stableTokenRegistryIdHash: stableTokenRegistryIdHash,
+          stableTokenRegistryId,
+          stableTokenRegistryIdHash,
           minExchangeAmount: min,
           maxExchangeAmount: max,
         },

@@ -157,7 +157,8 @@ contract GrandaMento is
   /**
    * @notice Creates a new exchange proposal and deposits the tokens being sold.
    * @dev Stable token value amounts are used for the sellAmount, not unit amounts.
-   * @param stableTokenRegistryId The string registry ID for the stable token involved in the exchange.
+   * @param stableTokenRegistryId The string registry ID for the stable token
+   * involved in the exchange.
    * @param sellAmount The amount of the sell token being sold.
    * @param sellCelo Whether CELO is being sold.
    * @return The proposal identifier for the newly created exchange proposal.
