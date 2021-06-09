@@ -116,6 +116,9 @@ const DefaultConfig = {
     numInternalRequiredConfirmations: 1,
     useMultiSig: true,
   },
+  grandaMento: {
+    spread: 0.01, // 1%
+  },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
