@@ -8,7 +8,7 @@ Rewards to Locked Gold are totally independent from validator and validator grou
 
 ## Adjusting the Reward Rate for Voting Participation
 
-The protocol has a target for the proportion of circulating CELO that is locked and used for voting an on-target reward rate. The reward rate is adjusted for every epoch to increase or reduce the attractiveness of locking up additional supply. This aims to balance having sufficient liquidity for CELO, while making it more challenging to buy enough CELO to meaningfully influence the outcome of a validator election.
+The protocol has a target for the proportion of circulating CELO that is locked and used for voting. An on-target reward rate is determined and adjusted at every epoch to increase or reduce the attractiveness of locking up additional supply. This aims to balance having sufficient liquidity for CELO, while making it more challenging to buy enough CELO to meaningfully influence the outcome of a validator election.
 
 The reward rate is adjusted as follows: 
 
