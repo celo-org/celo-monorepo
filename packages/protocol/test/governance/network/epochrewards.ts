@@ -81,7 +81,7 @@ contract('EpochRewards', (accounts: string[]) => {
   const carbonOffsettingPartner = '0x0000000000000000000000000000000000000000'
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
-  const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
+  const sortedOraclesDenominator = new BigNumber('1000000000000000000000000')
   const timeTravelToDelta = async (timeDelta: BigNumber) => {
     // mine beforehand, just in case
     await jsonRpc(web3, 'evm_mine', [])
