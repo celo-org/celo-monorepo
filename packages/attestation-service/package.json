@@ -45,7 +45,7 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.1.1",
     "express-request-id": "1.4.1",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.21",
     "messagebird": "^3.5.0",
     "mysql2": "^2.1.0",
     "node-fetch": "^2.6.1",

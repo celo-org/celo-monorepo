@@ -71,7 +71,7 @@
     "glob-fs": "^0.1.7",
     "graphql": "^14.1.1",
     "j6": "^1.0.2",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.21",
     "mathjs": "^5.0.4",
     "node-fetch": "^2.6.1",
     "openzeppelin-solidity": "^2.5.0",
