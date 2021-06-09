@@ -27,6 +27,7 @@ export class NexmoSmsProvider extends SmsProvider {
     code: string
     phoneNumber: string
   }> = []
+  defaultNumberIndex: number = 0
   balanceMetric: boolean
   deliveryStatusURL: string | undefined
   applicationId: string | null = null
@@ -70,6 +71,15 @@ export class NexmoSmsProvider extends SmsProvider {
       phoneNumber: number.msisdn,
       code: phoneUtil.getRegionCodeForNumber(phoneUtil.parse('+' + number.msisdn)),
     }))
+
+    // The US number is likely a toll-free number and cannot be used outside of US and Canada
+    // We therefore want to set the default number to be non-US for global reach
+    for (let i = 0; i < this.nexmoNumbers.length; i++) {
+      if (this.nexmoNumbers[i].code !== 'US') {
+        this.defaultNumberIndex = i
+        break
+      }
+    }
   }
 
   async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
@@ -156,6 +166,6 @@ export class NexmoSmsProvider extends SmsProvider {
     if (matchingNumber !== undefined) {
       return matchingNumber.phoneNumber
     }
-    return this.nexmoNumbers[0].phoneNumber
+    return this.nexmoNumbers[this.defaultNumberIndex].phoneNumber
   }
 }
