@@ -6,6 +6,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
+import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import {
@@ -104,6 +105,9 @@ contract('GrandaMento', (accounts: string[]) => {
   const minExchangeAmount = unit.times(100)
   const maxExchangeAmount = unit.times(1000)
 
+  const stableTokenRegistryId = CeloContractName.StableToken
+  const stableTokenRegistryIdHash = soliditySha3(stableTokenRegistryId)
+
   beforeEach(async () => {
     registry = await Registry.new()
 
@@ -114,7 +118,7 @@ contract('GrandaMento', (accounts: string[]) => {
     await stableToken.mint(owner, ownerStableTokenBalance)
     await stableToken.mint(alice, ownerStableTokenBalance)
     await stableToken.setInflationFactor(toFixed(stableTokenInflationFactor))
-    await registry.setAddressFor(CeloContractName.StableToken, stableToken.address)
+    await registry.setAddressFor(stableTokenRegistryId, stableToken.address)
 
     sortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, sortedOracles.address)
@@ -131,7 +135,7 @@ contract('GrandaMento', (accounts: string[]) => {
     grandaMento = await GrandaMento.new(true)
     await grandaMento.initialize(registry.address, approver, spreadFixed, vetoPeriodSeconds)
     await grandaMento.setStableTokenExchangeLimits(
-      stableToken.address,
+      stableTokenRegistryId,
       minExchangeAmount,
       maxExchangeAmount
     )
@@ -170,7 +174,7 @@ contract('GrandaMento', (accounts: string[]) => {
     it('returns the proposal ID', async () => {
       const stableTokenSellAmount = unit.times(500)
       const id = await grandaMento.createExchangeProposal.call(
-        stableToken.address,
+        stableTokenRegistryId,
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
@@ -181,7 +185,7 @@ contract('GrandaMento', (accounts: string[]) => {
       assertEqualBN(await grandaMento.exchangeProposalCount(), 0)
       const stableTokenSellAmount = unit.times(500)
       await grandaMento.createExchangeProposal(
-        stableToken.address,
+        stableTokenRegistryId,
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
@@ -191,14 +195,14 @@ contract('GrandaMento', (accounts: string[]) => {
     it('assigns proposal IDs based off the exchange proposal count', async () => {
       const stableTokenSellAmount = unit.times(200)
       const receipt0 = await grandaMento.createExchangeProposal(
-        stableToken.address,
+        stableTokenRegistryId,
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
       assertEqualBN(receipt0.logs[0].args.proposalId, 0)
 
       const receipt1 = await grandaMento.createExchangeProposal(
-        stableToken.address,
+        stableTokenRegistryId,
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
@@ -211,7 +215,7 @@ contract('GrandaMento', (accounts: string[]) => {
       const stableTokenSellAmount = unit.times(500)
       it('emits the ExchangeProposalCreated event with the sell amount as the stable token value when its inflation factor is 1', async () => {
         const receipt = await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
@@ -234,7 +238,7 @@ contract('GrandaMento', (accounts: string[]) => {
         await stableToken.setInflationFactor(toFixed(inflationFactor))
 
         const receipt = await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
@@ -253,7 +257,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
       it('stores the exchange proposal with the sell amount in units when the stable token inflation factor is 1', async () => {
         await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
@@ -280,7 +284,7 @@ contract('GrandaMento', (accounts: string[]) => {
         await stableToken.setInflationFactor(toFixed(inflationFactor))
 
         await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
@@ -305,7 +309,7 @@ contract('GrandaMento', (accounts: string[]) => {
         const senderBalanceBefore = await stableToken.balanceOf(owner)
         const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
         await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
@@ -323,7 +327,7 @@ contract('GrandaMento', (accounts: string[]) => {
       it('reverts if the amount being sold is less than the stable token min exchange amount', async () => {
         await assertRevert(
           grandaMento.createExchangeProposal(
-            stableToken.address,
+            stableTokenRegistryId,
             minExchangeAmount.minus(1),
             false // sellCelo = false as we are selling stableToken
           ),
@@ -334,7 +338,7 @@ contract('GrandaMento', (accounts: string[]) => {
       it('reverts if the amount being sold is greater than the stable token max exchange amount', async () => {
         await assertRevert(
           grandaMento.createExchangeProposal(
-            stableToken.address,
+            stableTokenRegistryId,
             maxExchangeAmount.plus(1),
             false // sellCelo = false as we are selling stableToken
           ),
@@ -343,11 +347,9 @@ contract('GrandaMento', (accounts: string[]) => {
       })
 
       it('reverts if the stable token has not had exchange limits set', async () => {
-        const newStableToken = await MockStableToken.new()
-        await newStableToken.mint(owner, ownerStableTokenBalance)
         await assertRevert(
           grandaMento.createExchangeProposal(
-            newStableToken.address,
+            CeloContractName.StableTokenEUR, // not set yet in the Registry
             stableTokenSellAmount,
             false // sellCelo = false as we are selling stableToken
           ),
@@ -357,14 +359,17 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     describe('when proposing an exchange that sells CELO', () => {
-      const createExchangeProposal = async (_stableToken: string, sellAmount: BigNumber) => {
+      const createExchangeProposal = async (
+        _stableTokenRegistryId: string,
+        sellAmount: BigNumber
+      ) => {
         await goldToken.approve(grandaMento.address, sellAmount)
         // sellCelo = true as we are selling CELO
-        return grandaMento.createExchangeProposal(_stableToken, sellAmount, true)
+        return grandaMento.createExchangeProposal(_stableTokenRegistryId, sellAmount, true)
       }
       const celoSellAmount = unit.times(100)
       it('emits the ExchangeProposalCreated event', async () => {
-        const receipt = await createExchangeProposal(stableToken.address, celoSellAmount)
+        const receipt = await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
         assertLogMatches2(receipt.logs[0], {
           event: 'ExchangeProposalCreated',
           args: {
@@ -379,7 +384,7 @@ contract('GrandaMento', (accounts: string[]) => {
       })
 
       it('stores the exchange proposal', async () => {
-        await createExchangeProposal(stableToken.address, celoSellAmount)
+        await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
         // 0 is the proposal ID
         const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(0))
         assert.equal(exchangeProposal.exchanger, owner)
@@ -397,7 +402,7 @@ contract('GrandaMento', (accounts: string[]) => {
       it('deposits the stable tokens to be sold', async () => {
         const senderBalanceBefore = await goldToken.balanceOf(owner)
         const grandaMentoBalanceBefore = await goldToken.balanceOf(grandaMento.address)
-        await createExchangeProposal(stableToken.address, celoSellAmount)
+        await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
         const senderBalanceAfter = await goldToken.balanceOf(owner)
         const grandaMentoBalanceAfter = await goldToken.balanceOf(grandaMento.address)
         // Sender paid
@@ -414,7 +419,7 @@ contract('GrandaMento', (accounts: string[]) => {
         ).minus(1)
         await assertRevert(
           grandaMento.createExchangeProposal(
-            stableToken.address,
+            stableTokenRegistryId,
             sellAmount,
             true // sellCelo = true as we are selling CELO
           ),
@@ -429,16 +434,14 @@ contract('GrandaMento', (accounts: string[]) => {
           spread
         ).plus(1)
         await assertRevert(
-          createExchangeProposal(stableToken.address, sellAmount),
+          createExchangeProposal(stableTokenRegistryId, sellAmount),
           'Stable token exchange amount not within limits'
         )
       })
 
       it('reverts if the stable token has not had exchange limits set', async () => {
-        const newStableToken = await MockStableToken.new()
-        await newStableToken.mint(owner, ownerStableTokenBalance)
         await assertRevert(
-          createExchangeProposal(newStableToken.address, celoSellAmount),
+          createExchangeProposal(CeloContractName.StableTokenEUR, celoSellAmount),
           'Max stable token exchange amount must be > 0'
         )
       })
@@ -450,7 +453,7 @@ contract('GrandaMento', (accounts: string[]) => {
     beforeEach(async () => {
       // Create an exchange proposal in the Proposed state with proposal ID 0
       await grandaMento.createExchangeProposal(
-        stableToken.address,
+        stableTokenRegistryId,
         unit.times(500),
         false // sellCelo = false as we are selling stableToken
       )
@@ -512,7 +515,7 @@ contract('GrandaMento', (accounts: string[]) => {
     describe('when called by the exchanger', () => {
       beforeEach(async () => {
         await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false,
           {
@@ -541,7 +544,7 @@ contract('GrandaMento', (accounts: string[]) => {
     describe('when called by the owner', () => {
       beforeEach(async () => {
         await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false,
           {
@@ -571,7 +574,7 @@ contract('GrandaMento', (accounts: string[]) => {
     describe('when called by the appropriate sender for the proposal state', () => {
       it('emits the ExchangeProposalCancelled event', async () => {
         await grandaMento.createExchangeProposal(
-          stableToken.address,
+          stableTokenRegistryId,
           stableTokenSellAmount,
           false,
           {
@@ -591,7 +594,7 @@ contract('GrandaMento', (accounts: string[]) => {
       describe('when selling the stable token', () => {
         beforeEach(async () => {
           await grandaMento.createExchangeProposal(
-            stableToken.address,
+            stableTokenRegistryId,
             stableTokenSellAmount,
             false,
             {
@@ -654,7 +657,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
         it('refunds the same CELO amount as the original deposit', async () => {
           await goldToken.approve(grandaMento.address, celoSellAmount, { from: alice })
-          await grandaMento.createExchangeProposal(stableToken.address, celoSellAmount, true, {
+          await grandaMento.createExchangeProposal(stableTokenRegistryId, celoSellAmount, true, {
             from: alice,
           })
 
@@ -673,7 +676,7 @@ contract('GrandaMento', (accounts: string[]) => {
           await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
           await mockGoldToken.setBalanceOf(alice, celoSellAmount)
 
-          await grandaMento.createExchangeProposal(stableToken.address, celoSellAmount, true, {
+          await grandaMento.createExchangeProposal(stableTokenRegistryId, celoSellAmount, true, {
             from: alice,
           })
           const newGrandaMentoBalance = unit.times(40)
@@ -692,9 +695,14 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when called by a sender that is not permitted', async () => {
-      await grandaMento.createExchangeProposal(stableToken.address, stableTokenSellAmount, false, {
-        from: alice,
-      })
+      await grandaMento.createExchangeProposal(
+        stableTokenRegistryId,
+        stableTokenSellAmount,
+        false,
+        {
+          from: alice,
+        }
+      )
       await assertRevert(
         grandaMento.cancelExchangeProposal(0, { from: approver }),
         'Sender cannot cancel the exchange proposal'
@@ -718,7 +726,7 @@ contract('GrandaMento', (accounts: string[]) => {
         await goldToken.approve(grandaMento.address, celoSellAmount, { from: alice })
       }
       await grandaMento.createExchangeProposal(
-        stableToken.address,
+        stableTokenRegistryId,
         sellCelo ? celoSellAmount : stableTokenSellAmount,
         sellCelo,
         {
@@ -1039,20 +1047,25 @@ contract('GrandaMento', (accounts: string[]) => {
     const min = unit.times(123)
     const max = unit.times(321)
     it('sets the exchange limits for the provided stable token', async () => {
-      await grandaMento.setStableTokenExchangeLimits(stableToken.address, min, max)
+      await grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, min, max)
       const exchangeLimits = parseExchangeLimits(
-        await grandaMento.stableTokenExchangeLimits(stableToken.address)
+        await grandaMento.stableTokenExchangeLimits(stableTokenRegistryIdHash)
       )
       assertEqualBN(exchangeLimits.minExchangeAmount, min)
       assertEqualBN(exchangeLimits.maxExchangeAmount, max)
     })
 
     it('emits the StableTokenExchangeLimitsSet event', async () => {
-      const receipt = await grandaMento.setStableTokenExchangeLimits(stableToken.address, min, max)
+      const receipt = await grandaMento.setStableTokenExchangeLimits(
+        stableTokenRegistryId,
+        min,
+        max
+      )
       assertLogMatches2(receipt.logs[0], {
         event: 'StableTokenExchangeLimitsSet',
         args: {
-          stableToken: stableToken.address,
+          stableTokenRegistryId: stableTokenRegistryId,
+          stableTokenRegistryIdHash: stableTokenRegistryIdHash,
           minExchangeAmount: min,
           maxExchangeAmount: max,
         },
@@ -1061,7 +1074,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when the minExchangeAmount is greater than the maxExchangeAmount', async () => {
       await assertRevert(
-        grandaMento.setStableTokenExchangeLimits(stableToken.address, max, min, {
+        grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, max, min, {
           from: accounts[1],
         }),
         'Min exchange amount must not be greater than max'
@@ -1070,7 +1083,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when the sender is not the owner', async () => {
       await assertRevert(
-        grandaMento.setStableTokenExchangeLimits(stableToken.address, min, max, {
+        grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, min, max, {
           from: accounts[1],
         }),
         'Ownable: caller is not the owner'

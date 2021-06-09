@@ -53,7 +53,8 @@ contract GrandaMento is
 
   // Emitted when the exchange limits for a stable token are set.
   event StableTokenExchangeLimitsSet(
-    address indexed stableToken,
+    string stableTokenRegistryId,
+    bytes32 indexed stableTokenRegistryIdHash,
     uint256 minExchangeAmount,
     uint256 maxExchangeAmount
   );
@@ -103,8 +104,8 @@ contract GrandaMento is
   uint256 public vetoPeriodSeconds;
 
   // The minimum and maximum amount of the stable token that can be minted or
-  // burned in a single exchange. Indexed by stable token address.
-  mapping(address => ExchangeLimits) public stableTokenExchangeLimits;
+  // burned in a single exchange. Indexed by the keccak'd stable token registry identifier.
+  mapping(bytes32 => ExchangeLimits) public stableTokenExchangeLimits;
 
   // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
@@ -156,19 +157,21 @@ contract GrandaMento is
   /**
    * @notice Creates a new exchange proposal and deposits the tokens being sold.
    * @dev Stable token value amounts are used for the sellAmount, not unit amounts.
-   * @param stableToken The stableToken involved in the exchange.
+   * @param stableTokenRegistryId The string registry ID for the stable token involved in the exchange.
    * @param sellAmount The amount of the sell token being sold.
    * @param sellCelo Whether CELO is being sold.
    * @return The proposal identifier for the newly created exchange proposal.
    */
-  function createExchangeProposal(address stableToken, uint256 sellAmount, bool sellCelo)
-    external
-    nonReentrant
-    returns (uint256)
-  {
+  function createExchangeProposal(
+    string calldata stableTokenRegistryId,
+    uint256 sellAmount,
+    bool sellCelo
+  ) external nonReentrant returns (uint256) {
+    bytes32 stableTokenRegistryIdHash = keccak256(abi.encodePacked(stableTokenRegistryId));
+    address stableToken = registry.getAddressForOrDie(stableTokenRegistryIdHash);
     // Require the configurable stableToken max exchange amount to be > 0.
     // This covers the case where a stableToken has never been explicitly permitted.
-    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableToken];
+    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryIdHash];
     require(exchangeLimits.maxExchangeAmount > 0, "Max stable token exchange amount must be > 0");
 
     // Using the current oracle exchange rate, calculate what the buy amount is.
@@ -259,6 +262,12 @@ contract GrandaMento is
     emit ExchangeProposalCancelled(proposalId, msg.sender);
   }
 
+  /**
+   * @notice Executes an exchange proposal that's been approved and not vetoed.
+   * @dev Callable by anyone. Reverts if the proposal is not in the Approved state
+   * or vetoPeriodSeconds has not elapsed since approval.
+   * @param proposalId The identifier of the proposal to execute.
+   */
   function executeExchangeProposal(uint256 proposalId) external nonReentrant {
     ExchangeProposal storage proposal = exchangeProposals[proposalId];
     // Require that the proposal is in the Approved state.
@@ -273,22 +282,23 @@ contract GrandaMento is
 
     // Perform the exchange.
     (IERC20 sellToken, uint256 sellAmount) = getSellTokenAndSellAmount(proposal);
-    // If the exchange sells CELO, the CELO is sent to the Reserve and
-    // stable token is minted.
+    // If the exchange sells CELO, the CELO is sent to the Reserve from this contract
+    // and stable token is minted to the exchanger.
     if (proposal.sellCelo) {
       // Send the CELO from this contract to the reserve.
       require(
         sellToken.transfer(address(getReserve()), sellAmount),
         "Transfer out of CELO to Reserve failed"
       );
-      // Mint stable token directly to the exchanger.
+      // Mint stable token to the exchanger.
       require(
         IStableToken(proposal.stableToken).mint(proposal.exchanger, proposal.buyAmount),
         "Stable token mint failed"
       );
     } else {
-      // If the exchange is selling stable token, the stable token is burned
-      // and CELO is transferred from the Reserve.
+      // If the exchange is selling stable token, the stable token is burned from
+      // this contract and CELO is transferred from the Reserve to the exchanger.
+
       // Burn the stable token from this contract.
       require(IStableToken(proposal.stableToken).burn(sellAmount), "Stable token burn failed");
       // Transfer the CELO from the Reserve to the exchanger.
@@ -300,8 +310,15 @@ contract GrandaMento is
     emit ExchangeProposalExecuted(proposalId);
   }
 
+  /**
+   * @notice Gets the sell token and the sell amount for a proposal.
+   * @dev For stable token sell amounts that are stored as units, the value
+   * is returned. Ensures sell amount is not greater than this contract's balance.
+   * @param proposal The proposal to get the sell token and sell amount for.
+   */
   function getSellTokenAndSellAmount(ExchangeProposal memory proposal)
     private
+    view
     returns (IERC20, uint256)
   {
     IERC20 sellToken;
@@ -316,8 +333,13 @@ contract GrandaMento is
       // Units must be converted to value when refunding.
       sellAmount = IStableToken(stableToken).unitsToValue(proposal.sellAmount);
     }
-    // In the event of a precision issue that results in sellAmount
-    // being greater than this contract's balance, refund the entire balance.
+    // In the event a precision issue from the unit <-> value calculations results
+    // in sellAmount being greater than this contract's balance, set the sellAmount
+    // to the entire balance.
+    // This check should not be necessary for CELO, but is done so regardless
+    // for extra certainty that cancelling an exchange proposal can never fail
+    // if for some reason the CELO balance of this contract is less than the
+    // recorded sell amount.
     uint256 totalBalance = sellToken.balanceOf(address(this));
     if (totalBalance < sellAmount) {
       sellAmount = totalBalance;
@@ -358,6 +380,25 @@ contract GrandaMento is
   }
 
   /**
+   * @notice Gets the oracle CELO price quoted in the stable token.
+   * @dev Reverts if there is not a rate for the provided stable token.
+   * @param stableToken The stable token to get the oracle price for.
+   * @return The oracle CELO price quoted in the stable token.
+   */
+  function getOracleExchangeRate(address stableToken)
+    private
+    view
+    returns (FixidityLib.Fraction memory)
+  {
+    uint256 rateNumerator;
+    uint256 rateDenominator;
+    (rateNumerator, rateDenominator) = getSortedOracles().medianRate(stableToken);
+    // When rateDenominator is 0, it means there are no rates known to SortedOracles.
+    require(rateDenominator > 0, "No oracle rates present for token");
+    return FixidityLib.wrap(rateNumerator).divide(FixidityLib.wrap(rateDenominator));
+  }
+
+  /**
    * @notice Sets the approver.
    * @dev Sender must be owner.
    * @param newApprover The new value for the spread.
@@ -391,12 +432,12 @@ contract GrandaMento is
    * @notice Sets the minimum and maximum amount of the stable token an exchange can involve.
    * @dev Sender must be owner. Setting the maxExchangeAmount to 0 effectively disables new
    * exchange proposals for the token.
-   * @param stableToken The stable token to set the limits for.
+   * @param stableTokenRegistryId The string registry ID for the stable token to set limits for.
    * @param minExchangeAmount The new minimum exchange amount for the stable token.
    * @param maxExchangeAmount The new maximum exchange amount for the stable token.
    */
   function setStableTokenExchangeLimits(
-    address stableToken,
+    string calldata stableTokenRegistryId,
     uint256 minExchangeAmount,
     uint256 maxExchangeAmount
   ) external onlyOwner {
@@ -404,29 +445,16 @@ contract GrandaMento is
       minExchangeAmount <= maxExchangeAmount,
       "Min exchange amount must not be greater than max"
     );
-    stableTokenExchangeLimits[stableToken] = ExchangeLimits({
+    bytes32 stableTokenRegistryIdHash = keccak256(abi.encodePacked(stableTokenRegistryId));
+    stableTokenExchangeLimits[stableTokenRegistryIdHash] = ExchangeLimits({
       minExchangeAmount: minExchangeAmount,
       maxExchangeAmount: maxExchangeAmount
     });
-    emit StableTokenExchangeLimitsSet(stableToken, minExchangeAmount, maxExchangeAmount);
-  }
-
-  /**
-   * @notice Gets the oracle CELO price quoted in the stable token.
-   * @dev Reverts if there is not a rate for the provided stable token.
-   * @param stableToken The stable token to get the oracle price for.
-   * @return The oracle CELO price quoted in the stable token.
-   */
-  function getOracleExchangeRate(address stableToken)
-    private
-    view
-    returns (FixidityLib.Fraction memory)
-  {
-    uint256 rateNumerator;
-    uint256 rateDenominator;
-    (rateNumerator, rateDenominator) = getSortedOracles().medianRate(stableToken);
-    // When rateDenominator is 0, it means there are no rates known to SortedOracles.
-    require(rateDenominator > 0, "No oracle rates present for token");
-    return FixidityLib.wrap(rateNumerator).divide(FixidityLib.wrap(rateDenominator));
+    emit StableTokenExchangeLimitsSet(
+      stableTokenRegistryId,
+      stableTokenRegistryIdHash,
+      minExchangeAmount,
+      maxExchangeAmount
+    );
   }
 }
