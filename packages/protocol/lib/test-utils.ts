@@ -156,7 +156,6 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
   } catch (error) {
     const revertFound =
       error.message.search('VM Exception while processing transaction: revert') >= 0
-    console.log('Revert msg', error.message, 'revertFound', revertFound, 'errorMessageExpected', errorMessage)
     const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
