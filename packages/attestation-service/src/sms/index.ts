@@ -243,6 +243,7 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
+        phoneNumberType: phoneNumberTypeToString(numberType || PhoneNumberType.UNKNOWN),
       },
       transaction
     )

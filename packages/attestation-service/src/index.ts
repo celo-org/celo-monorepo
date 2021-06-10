@@ -2,6 +2,7 @@ import {
   AttestationRequestType,
   AttestationServiceTestRequestType,
   GetAttestationRequestType,
+  VerifiableCredentialRequestType,
 } from '@celo/utils/lib/io'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
@@ -22,6 +23,7 @@ import { handleGetAttestationRequest } from './requestHandlers/get_attestation'
 import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
+import { handleVerifiableCredentialRequest } from './requestHandlers/verifiable_credential'
 import { initializeSmsProviders, smsProvidersWithDeliveryStatus } from './sms'
 
 async function init() {
@@ -79,6 +81,11 @@ async function init() {
     '/test_attestations',
     express.json(),
     createValidatedHandler(AttestationServiceTestRequestType, handleTestAttestationRequest)
+  )
+  app.post(
+    '/vc',
+    express.json(),
+    createValidatedHandler(VerifiableCredentialRequestType, handleVerifiableCredentialRequest)
   )
 
   for (const p of smsProvidersWithDeliveryStatus()) {

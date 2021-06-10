@@ -7,7 +7,9 @@ export interface AttestationModel extends Model {
   identifier: string
   issuer: string
   countryCode: string
+  credentials: Array<string>
   phoneNumber: E164Number
+  phoneNumberType: string
   message: string
   securityCode: string | null
   securityCodeAttempt: number

@@ -1,10 +1,11 @@
-import { AttestationResponseType } from '@celo/utils/lib/io'
+import { AttestationResponseType, VerifiableCredentialResponseType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { rootLogger } from './logger'
 import { AttestationModel, AttestationStatus } from './models/attestation'
+import { VerifiableCredentialModel } from './models/verifiable_credential'
 
 export enum ErrorMessages {
   INVALID_SIGNATURE = 'Invalid signature provided',
@@ -102,6 +103,25 @@ export function respondWithAttestation(
         ? attestation.completedAt!.getTime() - attestation.createdAt.getTime()
         : undefined,
       attestationCode: attestationCode ?? undefined,
+      phoneNumberType: attestation.phoneNumberType,
+      credentials: attestation.credentials,
+    })
+  )
+}
+
+export function respondWithVerifiableCredential(
+  res: express.Response,
+  verifiableCredential: VerifiableCredentialModel,
+  alwaysSuccess?: boolean | undefined
+) {
+  res.status(alwaysSuccess ? 200 : verifiableCredential.failure() ? 422 : 200).json(
+    VerifiableCredentialResponseType.encode({
+      success: alwaysSuccess ? true : !verifiableCredential.failure(),
+      errors: verifiableCredential.errors(),
+      account: verifiableCredential.credentialSubject.id,
+      issuer: verifiableCredential.issuer,
+      phoneNumberType: verifiableCredential.credentialSubject.phoneNumberType,
+      credentials: [JSON.stringify(verifiableCredential)],
     })
   )
 }
