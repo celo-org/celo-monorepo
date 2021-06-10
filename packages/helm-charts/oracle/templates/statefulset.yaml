@@ -120,13 +120,12 @@ spec:
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
-{{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
+{{ include "common.env-var" (dict "name" "PRICE_SOURCES" "dict" .Values.oracle "value_name" "priceSources") | indent 8 }}
 {{ include "common.env-var" (dict "name" "GAS_PRICE_MULTIPLIER" "dict" .Values.oracle "value_name" "gasPriceMultiplier") | indent 8 }}
 {{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
 {{ include "common.env-var" (dict "name" "MAX_BLOCK_TIMESTAMP_AGE_MS" "dict" .Values.oracle "value_name" "maxBlockTimestampAgeMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.oracle.metrics "value_name" "enabled") | indent 8 }}
-{{ include "common.env-var" (dict "name" "MID_AGGREGATION_ASK_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "askMaxPercentageDeviation" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "MID_AGGREGATION_BID_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "bidMaxPercentageDeviation" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "maxPercentageDeviation" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_EXCHANGE_VOLUME_SHARE" "dict" .Values.oracle.aggregation.mid "value_name" "maxExchangeVolumeShare" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_PERCENTAGE_BID_ASK_SPREAD" "dict" .Values.oracle.aggregation.mid "value_name" "maxPercentageBidAskSpread" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MIN_REPORT_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle.reporter.blockBased "value_name" "minReportPriceChangeThreshold" "optional" true) | indent 8 }}
