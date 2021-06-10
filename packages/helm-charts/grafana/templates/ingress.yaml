@@ -38,18 +38,24 @@ spec:
 {{ toYaml $extraPaths | indent 10 }}
 {{- end }}
           - path: {{ $ingressPath }}
+            pathType: Prefix
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $servicePort }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $servicePort }}
   {{- end }}
   {{- else }}
     - http:
         paths:
           - backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $servicePort }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $servicePort }}
           {{- if $ingressPath }}
             path: {{ $ingressPath }}
+            pathType: Prefix
             {{- end }}
   {{- end -}}
 {{- end }}

@@ -49,7 +49,6 @@ oracle:
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  exchanges: BITTREX,OKCOIN,COINBASE
   gasPriceMultiplier: 6
   reportStrategy: BLOCK_BASED
   reporter:
