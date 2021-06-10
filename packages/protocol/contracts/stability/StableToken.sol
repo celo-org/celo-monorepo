@@ -8,7 +8,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
