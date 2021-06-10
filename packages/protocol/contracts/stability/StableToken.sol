@@ -21,7 +21,7 @@ import "../common/UsingPrecompiles.sol";
 contract StableToken is
   ICeloVersionedContract,
   Ownable,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   UsingPrecompiles,
   Freezable,
@@ -90,6 +90,12 @@ contract StableToken is
     }
     _;
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts.
+   * @param test Set to true to skip implementation initialization.
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.

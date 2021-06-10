@@ -108,7 +108,7 @@ contract('Exchange', (accounts: string[]) => {
     freezer = await Freezer.new()
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
-    stableToken = await StableToken.new()
+    stableToken = await StableToken.new(true)
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)

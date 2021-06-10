@@ -276,8 +276,6 @@ contract GrandaMento is
       proposal.approvalTimestamp.add(vetoPeriodSeconds) <= block.timestamp,
       "Veto period not elapsed"
     );
-    // Mark the proposal as executed.
-    proposal.state = ExchangeProposalState.Executed;
 
     // Perform the exchange.
     (IERC20 sellToken, uint256 sellAmount) = getSellTokenAndSellAmount(proposal);
@@ -306,6 +304,8 @@ contract GrandaMento is
         "Transfer out of CELO from Reserve failed"
       );
     }
+    // Mark the proposal as executed.
+    proposal.state = ExchangeProposalState.Executed;
     emit ExchangeProposalExecuted(proposalId);
   }
 
