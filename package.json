@@ -119,7 +119,7 @@
     "ua-parser-js": "^0.7.24",
     "underscore": "^1.12.1",
     "url-parse": "^1.5.0",
-    "web3-eth-contract": "1.3.5",
+    "web3-eth-contract": "1.3.6",
     "websocket-extensions": "^0.1.4",
     "y18n": "^5.0.5"
   }
