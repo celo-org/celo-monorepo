@@ -23,7 +23,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     transferWhitelist = await TransferWhitelist.new(registry.address)
   })
 

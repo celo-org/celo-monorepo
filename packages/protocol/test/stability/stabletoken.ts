@@ -37,10 +37,10 @@ contract('StableToken', (accounts: string[]) => {
   const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    freezer = await Freezer.new()
+    registry = await Registry.new(true)
+    freezer = await Freezer.new(true)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-    stableToken = await StableToken.new()
+    stableToken = await StableToken.new(true)
     const response = await stableToken.initialize(
       'Celo Dollar',
       'cUSD',
@@ -396,7 +396,7 @@ contract('StableToken', (accounts: string[]) => {
 
   describe('#getExchangeRegistryId()', () => {
     it('should match initialized value', async () => {
-      const stableToken2 = await StableToken.new()
+      const stableToken2 = await StableToken.new(true)
       await stableToken2.initialize(
         'Celo Dollar',
         'cUSD',
@@ -413,7 +413,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should fallback to default when uninitialized', async () => {
-      const stableToken2 = await StableToken.new()
+      const stableToken2 = await StableToken.new(true)
       const fetchedId = await stableToken2.getExchangeRegistryId()
       assert.equal(fetchedId, soliditySha3(CeloContractName.Exchange))
     })
