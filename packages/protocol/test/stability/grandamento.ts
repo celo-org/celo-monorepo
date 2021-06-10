@@ -6,7 +6,6 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
-import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import {
@@ -106,7 +105,6 @@ contract('GrandaMento', (accounts: string[]) => {
   const maxExchangeAmount = unit.times(1000)
 
   const stableTokenRegistryId = CeloContractName.StableToken
-  const stableTokenRegistryIdHash = soliditySha3(stableTokenRegistryId)
 
   beforeEach(async () => {
     registry = await Registry.new()
@@ -884,7 +882,9 @@ contract('GrandaMento', (accounts: string[]) => {
       })
 
       it('reverts when the vetoPeriodSeconds has not elapsed since the approval time', async () => {
-        await timeTravel(vetoPeriodSeconds - 1, web3)
+        // Traveling vetoPeriodSeconds - 1 can be flaky due to block times,
+        // so instead just subtract by 10 to be safe.
+        await timeTravel(vetoPeriodSeconds - 10, web3)
         await assertRevert(grandaMento.executeExchangeProposal(0), 'Veto period not elapsed')
       })
     })
@@ -1049,7 +1049,7 @@ contract('GrandaMento', (accounts: string[]) => {
     it('sets the exchange limits for the provided stable token', async () => {
       await grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, min, max)
       const exchangeLimits = parseExchangeLimits(
-        await grandaMento.stableTokenExchangeLimits(stableTokenRegistryIdHash)
+        await grandaMento.stableTokenExchangeLimits(stableTokenRegistryId)
       )
       assertEqualBN(exchangeLimits.minExchangeAmount, min)
       assertEqualBN(exchangeLimits.maxExchangeAmount, max)
@@ -1065,7 +1065,6 @@ contract('GrandaMento', (accounts: string[]) => {
         event: 'StableTokenExchangeLimitsSet',
         args: {
           stableTokenRegistryId,
-          stableTokenRegistryIdHash,
           minExchangeAmount: min,
           maxExchangeAmount: max,
         },

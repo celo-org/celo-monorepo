@@ -54,7 +54,6 @@ contract GrandaMento is
   // Emitted when the exchange limits for a stable token are set.
   event StableTokenExchangeLimitsSet(
     string stableTokenRegistryId,
-    bytes32 indexed stableTokenRegistryIdHash,
     uint256 minExchangeAmount,
     uint256 maxExchangeAmount
   );
@@ -104,8 +103,8 @@ contract GrandaMento is
   uint256 public vetoPeriodSeconds;
 
   // The minimum and maximum amount of the stable token that can be minted or
-  // burned in a single exchange. Indexed by the keccak'd stable token registry identifier.
-  mapping(bytes32 => ExchangeLimits) public stableTokenExchangeLimits;
+  // burned in a single exchange. Indexed by the stable token registry identifier string.
+  mapping(string => ExchangeLimits) public stableTokenExchangeLimits;
 
   // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
@@ -168,11 +167,10 @@ contract GrandaMento is
     uint256 sellAmount,
     bool sellCelo
   ) external nonReentrant returns (uint256) {
-    bytes32 stableTokenRegistryIdHash = keccak256(abi.encodePacked(stableTokenRegistryId));
-    address stableToken = registry.getAddressForOrDie(stableTokenRegistryIdHash);
+    address stableToken = registry.getAddressForStringOrDie(stableTokenRegistryId);
     // Require the configurable stableToken max exchange amount to be > 0.
     // This covers the case where a stableToken has never been explicitly permitted.
-    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryIdHash];
+    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryId];
     require(exchangeLimits.maxExchangeAmount > 0, "Max stable token exchange amount must be > 0");
 
     // Using the current oracle exchange rate, calculate what the buy amount is.
@@ -433,7 +431,7 @@ contract GrandaMento is
    * @notice Sets the minimum and maximum amount of the stable token an exchange can involve.
    * @dev Sender must be owner. Setting the maxExchangeAmount to 0 effectively disables new
    * exchange proposals for the token.
-   * @param stableTokenRegistryId The string registry ID for the stable token to set limits for.
+   * @param stableTokenRegistryId The registry ID string for the stable token to set limits for.
    * @param minExchangeAmount The new minimum exchange amount for the stable token.
    * @param maxExchangeAmount The new maximum exchange amount for the stable token.
    */
@@ -446,16 +444,10 @@ contract GrandaMento is
       minExchangeAmount <= maxExchangeAmount,
       "Min exchange amount must not be greater than max"
     );
-    bytes32 stableTokenRegistryIdHash = keccak256(abi.encodePacked(stableTokenRegistryId));
-    stableTokenExchangeLimits[stableTokenRegistryIdHash] = ExchangeLimits({
+    stableTokenExchangeLimits[stableTokenRegistryId] = ExchangeLimits({
       minExchangeAmount: minExchangeAmount,
       maxExchangeAmount: maxExchangeAmount
     });
-    emit StableTokenExchangeLimitsSet(
-      stableTokenRegistryId,
-      stableTokenRegistryIdHash,
-      minExchangeAmount,
-      maxExchangeAmount
-    );
+    emit StableTokenExchangeLimitsSet(stableTokenRegistryId, minExchangeAmount, maxExchangeAmount);
   }
 }
