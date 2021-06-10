@@ -1,0 +1,37 @@
+{
+  "name": "@celo/wallet-keystore",
+  "version": "1.2.2-dev",
+  "description": "keystore implementation",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "keywords": [
+    "celo",
+    "blockchain",
+    "sdk"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "docs": "typedoc && ts-node ../../utils/scripts/linkdocs.ts wallet-keystore",
+    "test": "jest --runInBand",
+    "lint": "tslint -c tslint.json --project .",
+    "prepublishOnly": "yarn build"
+  },
+  "dependencies": {
+    "@celo/utils": "1.2.2-dev",
+    "@celo/connect": "1.2.2-dev",
+    "@celo/wallet-base": "1.2.2-dev",
+    "@types/ethereumjs-util": "^5.2.0",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "ethereumjs-wallet": "^1.0.1"
+  },
+  "devDependencies": {
+    "web3": "1.3.5"
+  },
+  "engines": {
+    "node": ">=8.13.0"
+  }
+}
