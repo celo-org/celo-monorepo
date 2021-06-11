@@ -1,6 +1,10 @@
 // import * as ethUtil from 'ethereumjs-util'
 // import { scrypt } from 'crypto'
-import { ensureLeading0x } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  normalizeAddressWith0x,
+  privateKeyToAddress,
+} from '@celo/utils/lib/address'
 import { LocalWallet } from '@celo/wallet-local'
 import Wallet from 'ethereumjs-wallet'
 import { mkdirSync, promises as fsPromises, readFileSync, writeFileSync } from 'fs'
@@ -9,6 +13,12 @@ import path from 'path'
 /**
  * Stores and provides access to private keys.
  */
+
+// TODO maybe this is overkill...get rid of it if need be
+export enum ErrorMessages {
+  ACCOUNT_FILE_EXISTS = 'Existing encrypted keystore file for account',
+  UNKNOWN_FILE_STRUCTURE = 'Unexpected keystore file structure',
+}
 
 // TODO creating an interface for this as well (then have filesystem keystore, browser keystore, etc.)
 export class LocalKeystore {
@@ -43,11 +53,16 @@ export class LocalKeystore {
 
   // TODO restructure/reorganize this
   async importPrivateKey(privateKey: string, password: string) {
+    // Only allow for new private keys to be imported into the keystore
+    const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
+    if ((await this.listKeystoreAccounts()).includes(address)) {
+      throw new Error(ErrorMessages.ACCOUNT_FILE_EXISTS)
+    }
+
     const key = Buffer.from(privateKey, 'hex')
     const wallet = Wallet.fromPrivateKey(key)
     const keystore = await wallet.toV3String(password)
     const fileName = wallet.getV3Filename(Date.now())
-    // TODO handle if we add the same account twice -- don't overwrite and only allow one?
     writeFileSync(path.join(this._keystoreDir, fileName), keystore)
     // TODO take in an interface for writing to file storage?
     // That could then be switched out for browser/file system/mock test writer/etc.
@@ -68,7 +83,7 @@ export class LocalKeystore {
       return ensureLeading0x(address)
     } catch (e) {
       console.log(e)
-      throw new Error('Unexpected keystore file structure')
+      throw new Error(ErrorMessages.UNKNOWN_FILE_STRUCTURE)
     }
   }
 }
