@@ -25,6 +25,7 @@ export const ProxyContracts = [
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
+  'GrandaMentoProxy',
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
@@ -69,6 +70,7 @@ export const CoreContracts = [
   // stability
   'Exchange',
   'ExchangeEUR',
+  'GrandaMento',
   'Reserve',
   'ReserveSpenderMultiSig',
   'StableToken',
