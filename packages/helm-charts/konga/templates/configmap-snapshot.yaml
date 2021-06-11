@@ -1,0 +1,252 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name:  {{ include "konga.fullname" . }}-snapshot
+  labels:
+    app.kubernetes.io/name: {{ include "konga.name" . }}
+    helm.sh/chart: {{ include "konga.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  kong_node.data: |
+    module.exports = [
+        {
+            "name": "Kong",
+            "type": "default",
+            "kong_admin_url": "http://{{ .Values.kong.service }}:{{ .Values.kong.admin_port }}",
+            "health_checks": false,
+            "active" : true,
+        }
+    ]
+  snapshot.json: |
+    {
+      "createdUser": null,
+      "updatedUser": null,
+      "id": 2,
+      "name": "restored_snapshot",
+      "kong_node_name": "kong",
+      "kong_node_url": "http://kong:8001",
+      "kong_version": "2.4.1",
+      "data": {
+        "services": [
+          {
+            "port": 8545,
+            "path": null,
+            "client_certificate": null,
+            "connect_timeout": 60000,
+            "id": "d98c9e59-dc44-4bad-81ca-d399724462b0",
+            "read_timeout": 60000,
+            "write_timeout": 60000,
+            "name": "Forno",
+            "protocol": "http",
+            "host": "baklava-fullnodes-rpc.baklava",
+            "tls_verify_depth": null,
+            "tls_verify": null,
+            "created_at": 1623232145,
+            "updated_at": 1623318621,
+            "retries": 5,
+            "tags": [],
+            "ca_certificates": null,
+            "extras": {
+              "id": 1,
+              "service_id": "d98c9e59-dc44-4bad-81ca-d399724462b0",
+              "kong_node_id": "2",
+              "description": null,
+              "tags": null,
+              "createdAt": "2021-06-09T09:49:05.000Z",
+              "updatedAt": "2021-06-09T09:49:05.000Z",
+              "createdUser": null,
+              "updatedUser": null
+            }
+          }
+        ],
+        "routes": [
+          {
+            "request_buffering": true,
+            "response_buffering": true,
+            "https_redirect_status_code": 426,
+            "preserve_host": false,
+            "path_handling": "v1",
+            "id": "eaa4fa2b-cd10-4c61-a2ac-6831adcd0752",
+            "name": "forno",
+            "hosts": null,
+            "regex_priority": 0,
+            "service": {
+              "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
+            },
+            "created_at": 1623232306,
+            "paths": [
+              "/",
+              "/*"
+            ],
+            "methods": [
+              "GET",
+              "POST",
+              "PUT"
+            ],
+            "headers": null,
+            "destinations": null,
+            "protocols": [
+              "http"
+            ],
+            "snis": null,
+            "updated_at": 1623318621,
+            "strip_path": true,
+            "tags": null,
+            "sources": null
+          }
+        ],
+        "consumers": [
+          {
+            "id": "1532538d-cb47-48fa-8a8e-b21952644a6e",
+            "username": "anonymous",
+            "created_at": 1623404756,
+            "custom_id": null,
+            "tags": [],
+            "credentials": {
+              "key-auths": []
+            }
+          },
+          {
+            "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949",
+            "username": "jcortejoso",
+            "created_at": 1623404316,
+            "custom_id": null,
+            "tags": [],
+            "credentials": {
+              "key-auths": [
+                {
+                  "key": "secret",
+                  "id": "13d3c5c0-d3bf-4205-a9b4-2072b81ac8b0",
+                  "consumer": {
+                    "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
+                  },
+                  "created_at": 1623404508,
+                  "ttl": null,
+                  "tags": null
+                }
+              ]
+            }
+          }
+        ],
+        "plugins": [
+          {
+            "consumer": null,
+            "created_at": 1623406677,
+            "protocols": [
+              "grpc",
+              "grpcs",
+              "http",
+              "https"
+            ],
+            "enabled": true,
+            "name": "key-auth",
+            "id": "5d4f343a-1a40-4901-87bd-e839788e075b",
+            "service": null,
+            "route": null,
+            "tags": null,
+            "config": {
+              "key_in_header": true,
+              "key_in_query": true,
+              "key_in_body": false,
+              "anonymous": "1532538d-cb47-48fa-8a8e-b21952644a6e",
+              "key_names": [
+                "apikey"
+              ],
+              "run_on_preflight": true,
+              "hide_credentials": false
+            }
+          },
+          {
+            "consumer": {
+              "id": "1532538d-cb47-48fa-8a8e-b21952644a6e"
+            },
+            "created_at": 1623235507,
+            "protocols": [
+              "grpc",
+              "grpcs",
+              "http",
+              "https"
+            ],
+            "enabled": true,
+            "name": "rate-limiting",
+            "id": "6893a5ba-460f-4eb3-86fb-243b7f16025c",
+            "service": null,
+            "route": null,
+            "tags": null,
+            "config": {
+              "redis_database": 0,
+              "redis_host": null,
+              "redis_port": 6379,
+              "path": null,
+              "redis_password": null,
+              "hour": null,
+              "day": null,
+              "header_name": null,
+              "year": null,
+              "policy": "cluster",
+              "fault_tolerant": true,
+              "hide_client_headers": false,
+              "month": null,
+              "second": null,
+              "minute": 10,
+              "limit_by": "ip",
+              "redis_timeout": 2000
+            }
+          },
+          {
+            "consumer": {
+              "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
+            },
+            "created_at": 1623406844,
+            "protocols": [
+              "grpc",
+              "grpcs",
+              "http",
+              "https"
+            ],
+            "enabled": true,
+            "name": "rate-limiting",
+            "id": "852846f2-eefe-4157-ba10-43a2e870bce1",
+            "service": null,
+            "route": null,
+            "tags": null,
+            "config": {
+              "redis_database": 0,
+              "redis_host": null,
+              "redis_port": 6379,
+              "path": null,
+              "redis_password": null,
+              "hour": null,
+              "day": null,
+              "header_name": null,
+              "year": null,
+              "policy": "cluster",
+              "fault_tolerant": true,
+              "hide_client_headers": false,
+              "month": null,
+              "second": null,
+              "minute": 100,
+              "limit_by": "ip",
+              "redis_timeout": 2000
+            }
+          }
+        ],
+        "acls": [
+          {
+            "group": "noratelimit",
+            "consumer": {
+              "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
+            },
+            "created_at": 1623404350,
+            "tags": null,
+            "id": "57187a97-d48b-4128-b007-281c0ed33659"
+          }
+        ],
+        "upstreams": [],
+        "certificates": [],
+        "snis": []
+      },
+      "createdAt": "2021-06-11T10:27:23.000Z",
+      "updatedAt": "2021-06-11T10:27:23.000Z"
+    }
