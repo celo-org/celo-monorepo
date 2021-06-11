@@ -106,14 +106,14 @@ export class LocalKeystore {
     return pkTest
   }
 
-  async changeKeystorePassphrase(address: string, oldpassphrase: string, newpassphrase: string) {
+  async changeKeystorePassphrase(address: string, oldPassphrase: string, newPassphrase: string) {
     // get proper filename for address
     const addressToFileMap = await this.getAddressToFileMap()
     const filePath = path.join(this._keystoreDir, addressToFileMap[address])
     // TODO modularize this more -- i.e. extract `Wallet` impl details from importPrivateKey + getPrivateKeyFromFile??
     const newKeystore = await (
-      await Wallet.fromV3(readFileSync(filePath).toString(), oldpassphrase)
-    ).toV3String(newpassphrase)
+      await Wallet.fromV3(readFileSync(filePath).toString(), oldPassphrase)
+    ).toV3String(newPassphrase)
     writeFileSync(filePath, newKeystore)
   }
 
