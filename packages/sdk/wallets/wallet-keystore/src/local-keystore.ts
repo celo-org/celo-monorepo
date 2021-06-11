@@ -16,7 +16,7 @@ import path from 'path'
 
 // TODO maybe this is overkill...get rid of it if need be
 export enum ErrorMessages {
-  ACCOUNT_FILE_EXISTS = 'Existing encrypted keystore file for account',
+  ADDRESS_FILE_EXISTS = 'Existing encrypted keystore file for address',
   UNKNOWN_FILE_STRUCTURE = 'Unexpected keystore file structure',
 }
 
@@ -44,40 +44,23 @@ export class LocalKeystore {
     return this._keystoreDir
   }
 
-  async listKeystoreAccounts(): Promise<string[]> {
-    // TODO fix error handling
-    return (await fsPromises.readdir(this._keystoreDir)).map((file) =>
-      LocalKeystore.getAddressFromFile(path.join(this._keystoreDir, file))
+  async getAddressToFileMap(): Promise<Record<string, string>> {
+    // Don't store this to minimize race conditions (file is deleted/added manually)
+    const addressToFile: Record<string, string> = {}
+    ;(await fsPromises.readdir(this._keystoreDir)).map(
+      (file) =>
+        (addressToFile[LocalKeystore.getAddressFromFile(path.join(this._keystoreDir, file))] = file)
     )
+    return addressToFile
   }
 
-  // TODO restructure/reorganize this
-  async importPrivateKey(privateKey: string, password: string) {
-    // Only allow for new private keys to be imported into the keystore
-    const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
-    if ((await this.listKeystoreAccounts()).includes(address)) {
-      throw new Error(ErrorMessages.ACCOUNT_FILE_EXISTS)
-    }
-
-    const key = Buffer.from(privateKey, 'hex')
-    const wallet = Wallet.fromPrivateKey(key)
-    const keystore = await wallet.toV3String(password)
-    const fileName = wallet.getV3Filename(Date.now())
-    writeFileSync(path.join(this._keystoreDir, fileName), keystore)
-    // TODO take in an interface for writing to file storage?
-    // That could then be switched out for browser/file system/mock test writer/etc.
+  async listKeystoreAddresses(): Promise<string[]> {
+    return Object.keys(await this.getAddressToFileMap())
   }
 
-  static async getPrivateKeyFromFile(keystoreFile: string, password: string): Promise<string> {
-    const keystore = readFileSync(keystoreFile).toString()
-    const pkTest = (await Wallet.fromV3(keystore, password)).getPrivateKeyString()
-    return pkTest
-  }
-
-  // TODO modify this as needed to not require the user to pass in the entire
-  static getAddressFromFile(keystoreFile: string): string {
-    // TODO is this possible without actually decrypting the file?
-    const rawKeystore = readFileSync(keystoreFile).toString()
+  // TODO modify this as needed to not require the user to pass in the entire path --> or make this just a pure helper function
+  static getAddressFromFile(keystoreFilePath: string): string {
+    const rawKeystore = readFileSync(keystoreFilePath).toString()
     try {
       const address = JSON.parse(rawKeystore).address
       return ensureLeading0x(address)
@@ -86,9 +69,64 @@ export class LocalKeystore {
       throw new Error(ErrorMessages.UNKNOWN_FILE_STRUCTURE)
     }
   }
+
+  // TODO restructure/reorganize this
+  async importPrivateKey(privateKey: string, passphrase: string) {
+    // Only allow for new private keys to be imported into the keystore
+    const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
+    if ((await this.listKeystoreAddresses()).includes(address)) {
+      throw new Error(ErrorMessages.ADDRESS_FILE_EXISTS)
+    }
+
+    const key = Buffer.from(privateKey, 'hex')
+    const wallet = Wallet.fromPrivateKey(key)
+    const keystore = await wallet.toV3String(passphrase)
+    const fileName = wallet.getV3Filename(Date.now())
+    writeFileSync(path.join(this._keystoreDir, fileName), keystore)
+    // TODO take in an interface for writing to file storage?
+    // That could then be switched out for browser/file system/mock test writer/etc.
+  }
+
+  async getPrivateKeyFromAddress(address: string, passphrase: string): Promise<string> {
+    const addressToFileMap = await this.getAddressToFileMap()
+    return LocalKeystore.getPrivateKeyFromFile(
+      path.join(this._keystoreDir, addressToFileMap[address]),
+      passphrase
+    )
+  }
+
+  // TODO maybe this is not needed at all, or a helper that is not part of this class
+  // TODO !! or change to `getPrivateKeyFromString` and then have the upper file do the file reading and passing in
+  static async getPrivateKeyFromFile(
+    keystoreFilePath: string,
+    passphrase: string
+  ): Promise<string> {
+    const keystore = readFileSync(keystoreFilePath).toString()
+    const pkTest = (await Wallet.fromV3(keystore, passphrase)).getPrivateKeyString()
+    return pkTest
+  }
+
+  async changeKeystorePassphrase(address: string, oldpassphrase: string, newpassphrase: string) {
+    // get proper filename for address
+    const addressToFileMap = await this.getAddressToFileMap()
+    const filePath = path.join(this._keystoreDir, addressToFileMap[address])
+    // TODO modularize this more -- i.e. extract `Wallet` impl details from importPrivateKey + getPrivateKeyFromFile??
+    const newKeystore = await (
+      await Wallet.fromV3(readFileSync(filePath).toString(), oldpassphrase)
+    ).toV3String(newpassphrase)
+    writeFileSync(filePath, newKeystore)
+  }
+
+  // // TODO do we want to require passphrase to delete? at least confirms that user really wants to delete this? they can ofc always manually delete this...
+  // removeKeystoreFile(keystoreFilePath: string, passphrase: string) {
+  //   console.log(keystoreFilePath)
+  //   console.log(passphrase)
+  // }
 }
 
 // TODO maybe even separate this out into its own file + tests
+// TODO can make this its own wallet as well that uses the LocalWallet...?
+// TODO this could then implement the UnlockableWallet interface???
 export class KeystoreWalletWrapper {
   // TODO make this more permissive?
   private _localKeystore: LocalKeystore
@@ -99,8 +137,8 @@ export class KeystoreWalletWrapper {
     this._localWallet = new LocalWallet()
   }
 
-  async importPrivateKey(privateKey: string, password: string) {
-    await this._localKeystore.importPrivateKey(privateKey, password)
+  async importPrivateKey(privateKey: string, passphrase: string) {
+    await this._localKeystore.importPrivateKey(privateKey, passphrase)
     // // TODO do we also want to add the pk signer right here?
     this._localWallet.addAccount(privateKey)
   }
@@ -108,18 +146,18 @@ export class KeystoreWalletWrapper {
   getLocalWallet(): LocalWallet {
     return this._localWallet
   }
-  // DO NOT DELETE YET
-  // TODO password default just for initial dev/testing
-  // async addAccountFromKeystore(account: string, password: string = 'c#gc6s&UTBO6@nXzx1!U') {
-  //   // TODO get the available accounts in the keystore
-  //   // if keystore account does not match (what about duplicated??) --> how does geth manage this?
-  //   const testKeystoreFile = 'eth-keystore-test'
 
-  //   // FOR now just for compiler issues
-  //   console.log(account)
-  //   // TODO unlock the actual
-  //   // TODO modify -- Wrapper should not interact with the actual File names !!!!
-  //   const privateKey = await this._localKeystore.getPrivateKeyFromFile(testKeystoreFile, password)
-  //   this._localWallet.addAccount(privateKey)
-  // }
+  async unlockAccount(address: string, passphrase: string) {
+    // Unlock and add account to internal LocalWallet
+
+    // TODO duration...seems non-trivial; as a default make this manual?
+    // OR if this is a wallet itself, have a setting for permanent unlock or require passphrase for each tx
+    this._localWallet.addAccount(
+      await this._localKeystore.getPrivateKeyFromAddress(address, passphrase)
+    )
+  }
+
+  async lockAccount(address: string) {
+    this._localWallet.removeAccount(address)
+  }
 }
