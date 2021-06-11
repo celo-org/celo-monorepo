@@ -1,0 +1,49 @@
+# This file is intended to show the expected value structure with placeholder values.
+# Many values are optional, and the defaults are left up to the client.
+# These values are commented out in this file, but show the correct structure
+# if they were to be specified.
+
+kube:
+  serviceAccountSecretName: "secret"
+
+environment:
+  name: test
+  network: alfajores
+  cluster:
+    name: test-cluster
+    location: location
+
+image:
+  repository: celotestnet.azurecr.io/komenci/komenci
+  tag: 5f2ef23e6c51eda8e5288490eab8ec2cbd058b11
+
+kubectl:
+  image:
+    repository: bitnami/kubectl
+    tag: 1.17.4
+
+funder:
+  node_env: production
+  identity:
+    address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
+    azure:
+      id: defaultId
+      clientId: defaultClientId
+      keyVaultName: staging-komenci-eus
+  configurations:
+    - token: 0x0
+      addressesToWatch: 0x0,0x1,0x2
+      balanceThreshold: 10
+      topupAmount: 10
+      cron: "*/5 * * * *"
+    - token: 0x1
+      addressesToWatch: 0x0,0x1,0x2
+      balanceThreshold: 10
+      topupAmount: 10
+      cron: "*/5 * * * *"
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+
+loggingAgent:
+  credentials: eydleGFtcGxlJzogJ2NyZWRlbnRpYWxzJ30K # base64 credentials.json of a gcloud service account

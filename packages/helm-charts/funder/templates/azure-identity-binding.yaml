@@ -1,0 +1,10 @@
+{{- $identity := .Values.funder.identity -}}
+{{ if (hasKey $identity "azure") }}
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: {{ template "azure-identity-binding-name" (dict "dot" $) }}
+spec:
+  azureIdentity: {{ template "azure-identity-name" (dict "dot" $) }}
+  selector: {{ template "azure-identity-binding-name" (dict "dot" $) }}
+{{ end }}

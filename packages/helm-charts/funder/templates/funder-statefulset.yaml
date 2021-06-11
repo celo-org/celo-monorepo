@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{- include "funder-component-label" . | nindent 4 }}
+spec:
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: 1
+  serviceName: funder
+  selector:
+    matchLabels:
+{{ include "labels" . | indent 6 }}
+{{ include "funder-component-label" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "labels" . | indent 8 }}
+{{ include "funder-component-label" . | indent 8 }}
+      annotations:
+{{ if .Values.funder.metrics.enabled }}
+{{ include "metric-annotations" . | indent 8 }}
+{{ end }}
+    spec:
+      initContainers:
+      - name: set-label
+        image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - |
+          RID=${POD_NAME##*-}
+          TOKEN_ENV_VAR_NAME="TOKEN_$RID"
+          kubectl \
+          --namespace "$POD_NAMESPACE" \
+          --server="https://kubernetes.default.svc" \
+          --token="${!TOKEN_ENV_VAR_NAME}" \
+          --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
+          label pod "$POD_NAME" \
+          --overwrite \
+          "aadpodidbinding=$POD_NAME-identity-binding"
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: TOKEN_0
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ .Values.kube.serviceAccountSecretName }}
+      containers:
+      - name: funder-service
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: Always
+        ports:
+          - name: prometheus
+            containerPort: {{ .Values.funder.metrics.prometheusPort }}
+        command:
+          - bash
+          - "-c"
+          - |
+            export AZURE_VAULT_NAME={{ .Values.funder.identity.azure.keyVaultName }}
+            export WALLET_ADDRESSES={{ .Values.funder.identity.address }}
+            
+            node packages/apps/funder/dist/main.js
+        resources:
+          {{- toYaml .Values.funder.resources | nindent 12 }}
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+{{- range $index, $config := .Values.funder.configurations -}}
+{{ include "common.env-var" (dict "name" (print "TOKEN__" $index) "dict" $config "value_name" "token") | indent 8 }}
+{{ include "common.env-var" (dict "name" (print "ADDRESSES_TO_WATCH__" $index) "dict" $config "value_name" "addressesToWatch") | indent 8 }}
+{{ include "common.env-var" (dict "name" (print "BALANCE_THRESHOLD__" $index) "dict" $config "value_name" "balanceThreshold") | indent 8 }}
+{{ include "common.env-var" (dict "name" (print "TOPUP_AMOUNT__" $index) "dict" $config "value_name" "topupAmount") | indent 8 }}
+{{ include "common.env-var" (dict "name" (print "CRON__" $index) "dict" $config "value_name" "cron") | indent 8 }}
+{{ end }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 8 }}
+{{ include "common.env-var" (dict "name" "NODE_ENV" "dict" .Values.funder "value_name" "node_env") | indent 8 }}
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
