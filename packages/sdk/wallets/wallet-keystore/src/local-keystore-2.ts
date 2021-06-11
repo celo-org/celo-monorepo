@@ -7,7 +7,7 @@ import {
 } from '@celo/utils/lib/address'
 import { LocalWallet } from '@celo/wallet-local'
 import Wallet from 'ethereumjs-wallet'
-import { mkdirSync, promises as fsPromises, readFileSync, writeFileSync } from 'fs'
+import { mkdirSync, promises as fsPromises, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import path from 'path'
 
 export enum ErrorMessages {
@@ -15,56 +15,21 @@ export enum ErrorMessages {
   UNKNOWN_FILE_STRUCTURE = 'Unexpected keystore file structure',
 }
 
-export interface KeystoreIO {
-  getAddressMap: () => Promise<Record<string, any>>
-  // TODO could make all of these either keystoreName OR address
-  persistKeystore: (keystoreName: string, keystore: string) => void
-  getRawKeystore: (keystoreName: string) => string
-  removeKeystore: (keystoreName: string) => void
-}
-
-// // TODO
-export class KeystoreFileIO implements KeystoreIO {
-  private _keystoreDir: string
-
-  constructor(keystoreDir?: string) {
-    // TODO Figure out how this is done for celocli files, etc.?
-    this._keystoreDir = keystoreDir
-      ? keystoreDir
-      : path.join(
-          '/Users/eelanagaraj/celo/celo-monorepo/packages/sdk/wallets/wallet-keystore/test-keystore-dir',
-          'keystore'
-        )
-    // TODO revisit if it makes sense to only make the directory if default...
-    mkdirSync(this._keystoreDir, { recursive: true })
-  }
-
-  // getRawKeystoreDir(): string {
-  //   return this._keystoreDir
-  // }
-
+export abstract class Keystore {
   /**
-   * Map addresses to their respective keystore files
+   * Takes in a string private key and produces V3Keystore strings
+   * This class should contain all knowledge/logic of the V3Keystore strings
    */
-  async getAddressMap(): Promise<Record<string, string>> {
-    // Don't store this to minimize race conditions (file is deleted/added manually)
-    const addressToFile: Record<string, string> = {}
-    ;(await fsPromises.readdir(this._keystoreDir)).map(
-      (file) =>
-        (addressToFile[
-          KeystoreFileIO.getAddressFromFile(path.join(this._keystoreDir, file))
-        ] = file)
-    )
-    return addressToFile
-  }
 
-  // TODO --> maybe something like getRawKeystoreNamesContents or getRawKeystoresIterable
-  // i.e. something to allow you to iterate through the names, keystores of the IO type?
+  // Must be implemented by subclass
+  // TODO could make all of these either keystoreName OR address
+  abstract persistKeystore(keystoreName: string, keystore: string): void
+  abstract getRawKeystore(keystoreName: string): string
+  abstract getAllKeystoreNames(): Promise<string[]>
+  abstract removeKeystore(keystoreName: string): void
 
-  // TODO revisit this -- is there a way for the `rawKeystore.address` knowledge to stay within the Keystore?
-  // TODO could even extract this piece out --> raw keystore --> address
-  static getAddressFromFile(keystoreFilePath: string): string {
-    const rawKeystore = readFileSync(keystoreFilePath).toString()
+  getAddress(keystoreName: string): string {
+    const rawKeystore = this.getRawKeystore(keystoreName)
     try {
       const address = JSON.parse(rawKeystore).address
       return ensureLeading0x(address)
@@ -74,38 +39,20 @@ export class KeystoreFileIO implements KeystoreIO {
     }
   }
 
-  persistKeystore(keystoreName: string, keystore: string) {
-    writeFileSync(path.join(this._keystoreDir, keystoreName), keystore)
-  }
-
-  getRawKeystore(keystoreName: string): string {
-    return readFileSync(path.join(this._keystoreDir, keystoreName)).toString()
-  }
-
-  removeKeystore(keystoreName: string) {
-    // TODO
-    console.log(keystoreName)
-  }
-}
-
-export class Keystore {
-  /**
-   * Takes in a string private key and produces V3Keystore strings
-   * This class should contain all knowledge/logic of the V3Keystore strings
-   */
-  private _keystoreIO: KeystoreIO
-
-  // TODO for now -- later, create an IO interface that this could take in?
-  constructor(keystoreIO: KeystoreIO) {
-    // TODO Figure out how this is done for celocli files, etc.?
-    this._keystoreIO = keystoreIO
-  }
-
   async listKeystoreAddresses(): Promise<string[]> {
-    return Object.keys(await this._keystoreIO.getAddressMap())
+    return Object.keys(await this.getAddressMap())
   }
 
-  // TODO restructure/reorganize this
+  /**
+   * Map addresses to their respective keystore files
+   */
+  async getAddressMap(): Promise<Record<string, string>> {
+    // Don't store this to minimize race conditions (file is deleted/added manually)
+    const addressToFile: Record<string, string> = {}
+    ;(await this.getAllKeystoreNames()).map((file) => (addressToFile[this.getAddress(file)] = file))
+    return addressToFile
+  }
+
   async importPrivateKey(privateKey: string, passphrase: string) {
     // Only allow for new private keys to be imported into the keystore
     const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
@@ -118,45 +65,88 @@ export class Keystore {
     const keystore = await wallet.toV3String(passphrase)
     const keystoreName = wallet.getV3Filename(Date.now())
 
-    this._keystoreIO.persistKeystore(keystoreName, keystore)
+    this.persistKeystore(keystoreName, keystore)
   }
 
-  // async getPrivateKeyFromV3String(rawString: string, passphrase: string): Promise<string> {
-  //   return (await Wallet.fromV3(rawString, passphrase)).getPrivateKeyString()
-  // }
-  // // alt-version
-  // async getPrivateKeyFromKeystore(keystoreName: string, passphrase: string): Promise<string> {
-  //   const rawKeystore = this._keystoreIO.getRawKeystore(keystoreName)
-  //   return (await Wallet.fromV3(rawKeystore, passphrase)).getPrivateKeyString()
-  // }
-
   async getKeystoreName(address: string): Promise<string> {
-    return (await this._keystoreIO.getAddressMap())[address]
+    return (await this.getAddressMap())[address]
   }
 
   // TODO: if need be, can make it address OR name passed in
   async getPrivateKey(address: string, passphrase: string): Promise<string> {
-    const rawKeystore = this._keystoreIO.getRawKeystore(await this.getKeystoreName(address))
+    const rawKeystore = this.getRawKeystore(await this.getKeystoreName(address))
     return (await Wallet.fromV3(rawKeystore, passphrase)).getPrivateKeyString()
   }
 
   async changeKeystorePassphrase(address: string, oldPassphrase: string, newPassphrase: string) {
     const keystoreName = await this.getKeystoreName(address)
-    const rawKeystore = this._keystoreIO.getRawKeystore(keystoreName)
+    const rawKeystore = this.getRawKeystore(keystoreName)
     const newKeystore = await (await Wallet.fromV3(rawKeystore, oldPassphrase)).toV3String(
       newPassphrase
     )
-    this._keystoreIO.persistKeystore(keystoreName, newKeystore)
-  }
-
-  async removeKeystore(address: string) {
-    this._keystoreIO.removeKeystore(await this.getKeystoreName(address))
+    this.persistKeystore(keystoreName, newKeystore)
   }
 }
 
-// something like???:
-// FileKeystore<FileIO> implements Keystore ???
-// TODO --> look at how this is done within Signer
+export class FileKeystore extends Keystore {
+  private _keystoreDir: string
+
+  constructor(keystoreDir?: string) {
+    super()
+    // TODO Figure out how this is done for celocli files, etc.?
+    this._keystoreDir = keystoreDir
+      ? keystoreDir
+      : path.join(
+          '/Users/eelanagaraj/celo/celo-monorepo/packages/sdk/wallets/wallet-keystore/test-keystore-dir',
+          'keystore'
+        )
+    // TODO revisit if it makes sense to only make the directory if default...
+    mkdirSync(this._keystoreDir, { recursive: true })
+  }
+
+  async getAllKeystoreNames(): Promise<string[]> {
+    return fsPromises.readdir(this._keystoreDir)
+  }
+
+  persistKeystore(keystoreName: string, keystore: string) {
+    writeFileSync(path.join(this._keystoreDir, keystoreName), keystore)
+  }
+
+  getRawKeystore(keystoreName: string): string {
+    return readFileSync(path.join(this._keystoreDir, keystoreName)).toString()
+  }
+
+  removeKeystore(keystoreName: string) {
+    // TODO test
+    return unlinkSync(path.join(this._keystoreDir, keystoreName))
+  }
+}
+
+// TODO for testing
+export class InMemoryKeystore extends Keystore {
+  private _storage: Record<string, string>
+
+  constructor() {
+    super()
+    this._storage = {}
+  }
+
+  persistKeystore(keystoreName: string, keystore: string) {
+    this._storage[keystoreName] = keystore
+  }
+
+  getRawKeystore(keystoreName: string): string {
+    return this._storage[keystoreName]
+  }
+
+  getAllKeystoreNames(): Promise<string[]> {
+    return new Promise((resolve) => resolve(Object.keys(this._storage)))
+  }
+
+  removeKeystore(keystoreName: string) {
+    delete this._storage[keystoreName]
+  }
+}
 
 export class KeystoreWalletWrapper {
   // TODO make this more permissive?
@@ -190,3 +180,5 @@ export class KeystoreWalletWrapper {
     this._localWallet.removeAccount(address)
   }
 }
+
+// const testKeystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore())
