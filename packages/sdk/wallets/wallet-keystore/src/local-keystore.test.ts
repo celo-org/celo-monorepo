@@ -8,10 +8,10 @@ import { ErrorMessages, KeystoreWalletWrapper, LocalKeystore } from './local-key
 jest.setTimeout(30000)
 
 const TEST_PASSPHRASE = 'test-password1!'
-const TEST_PK = '477651e4d34628765680270958b2e4f4724c505ce2443939ac5363b8a2b129ba'
+const TEST_PK = 'd72f6c0b0d7348a72eaa7d3c997bd49293bdc7d4bf79eba03e9f7ca9c5ac6b7f'
 const TEST_ADDR = normalizeAddressWith0x(privateKeyToAddress(TEST_PK))
 const TEST_PASSPHRASE2 = 'test-password2!!'
-const TEST_PK2 = '1fcef0e877cc7fcf3ef687f9ed74dc7ab983b602f3e08e088479a49b1e2e4113'
+const TEST_PK2 = 'bb6f3fa4a83b7b06e72e580a3b09df5dd6fb4fa745ee2b0d865413ad6299e64e'
 const TEST_ADDR2 = normalizeAddressWith0x(privateKeyToAddress(TEST_PK2))
 // TODO change this
 const TEST_DIRECTORY =

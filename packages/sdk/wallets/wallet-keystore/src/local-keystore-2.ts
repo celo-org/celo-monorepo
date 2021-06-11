@@ -15,7 +15,7 @@ export enum ErrorMessages {
   UNKNOWN_FILE_STRUCTURE = 'Unexpected keystore file structure',
 }
 
-export abstract class Keystore {
+export abstract class KeystoreBase {
   /**
    * Takes in a string private key and produces V3Keystore strings
    * This class should contain all knowledge/logic of the V3Keystore strings
@@ -88,7 +88,7 @@ export abstract class Keystore {
   }
 }
 
-export class FileKeystore extends Keystore {
+export class FileKeystore extends KeystoreBase {
   private _keystoreDir: string
 
   constructor(keystoreDir?: string) {
@@ -123,7 +123,7 @@ export class FileKeystore extends Keystore {
 }
 
 // TODO for testing
-export class InMemoryKeystore extends Keystore {
+export class InMemoryKeystore extends KeystoreBase {
   private _storage: Record<string, string>
 
   constructor() {
@@ -150,10 +150,10 @@ export class InMemoryKeystore extends Keystore {
 
 export class KeystoreWalletWrapper {
   // TODO make this more permissive?
-  private _keystore: Keystore
+  private _keystore: KeystoreBase
   private _localWallet: LocalWallet
 
-  constructor(keystore: Keystore) {
+  constructor(keystore: KeystoreBase) {
     this._keystore = keystore
     this._localWallet = new LocalWallet()
   }
