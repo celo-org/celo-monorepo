@@ -80,6 +80,11 @@ describe('KeystoreBase functionality via InMemoryKeystore (mock)', () => {
       expect(await keystore.listKeystoreAddresses()).toEqual([ADDRESS1])
     })
 
+    it('deletes keystore', async () => {
+      await keystore.deleteKeystore(ADDRESS1)
+      expect(await keystore.listKeystoreAddresses()).toEqual([])
+    })
+
     it('maps address to keystore name', async () => {
       keystore.persistKeystore(KEYSTORE_NAME2, GETH_GEN_KEYSTORE2)
       const expectedMap: Record<string, string> = {}

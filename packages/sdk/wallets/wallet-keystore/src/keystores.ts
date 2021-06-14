@@ -87,10 +87,14 @@ export abstract class KeystoreBase {
     )
     this.persistKeystore(keystoreName, newKeystore)
   }
+
+  async deleteKeystore(address: string) {
+    this.removeKeystore(await this.getKeystoreName(address))
+  }
 }
 
 /**
- * Used for mocking keystore operations
+ * Used for mocking keystore operations in unit tests
  */
 export class InMemoryKeystore extends KeystoreBase {
   private _storage: Record<string, string> = {}
