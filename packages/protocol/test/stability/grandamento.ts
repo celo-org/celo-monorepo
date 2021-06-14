@@ -1,6 +1,7 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
+  assertEqualBNArray,
   assertLogMatches2,
   assertRevertWithReason,
   timeTravel,
@@ -205,6 +206,27 @@ contract('GrandaMento', (accounts: string[]) => {
         false // sellCelo = false as we are selling stableToken
       )
       assertEqualBN(receipt1.logs[0].args.proposalId, 1)
+    })
+
+    it('adds the exchange proposal to the activeProposalIds linked list', async () => {
+      const stableTokenSellAmount = unit.times(200)
+      await grandaMento.createExchangeProposal(
+        stableTokenRegistryId,
+        stableTokenSellAmount,
+        false // sellCelo = false as we are selling stableToken
+      )
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(0)])
+
+      // Add another
+      await grandaMento.createExchangeProposal(
+        stableTokenRegistryId,
+        stableTokenSellAmount,
+        false // sellCelo = false as we are selling stableToken
+      )
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(0),
+        new BigNumber(1),
+      ])
     })
 
     describe('when proposing an exchange that sells stable tokens', () => {
@@ -491,6 +513,11 @@ contract('GrandaMento', (accounts: string[]) => {
         assertEqualBN(proposal.approvalTimestamp, latestBlock.timestamp)
       })
 
+      it('does not remove the exchange proposal from the activeProposalIds linked list', async () => {
+        await grandaMento.approveExchangeProposal(proposalId, { from: approver })
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(0)])
+      })
+
       it('reverts if the exchange proposal does not exist', async () => {
         const nonexistentProposalId = 1
         const proposal = parseExchangeProposal(
@@ -593,6 +620,53 @@ contract('GrandaMento', (accounts: string[]) => {
             sender: alice,
           },
         })
+      })
+
+      it('removes the exchange proposal from the activeProposalIds linked list', async () => {
+        // proposalId 0
+        await grandaMento.createExchangeProposal(
+          stableTokenRegistryId,
+          stableTokenSellAmount,
+          false,
+          {
+            from: alice,
+          }
+        )
+        // proposalId 1
+        await grandaMento.createExchangeProposal(
+          stableTokenRegistryId,
+          stableTokenSellAmount,
+          false,
+          {
+            from: alice,
+          }
+        )
+        // proposalId 2
+        await grandaMento.createExchangeProposal(
+          stableTokenRegistryId,
+          stableTokenSellAmount,
+          false,
+          {
+            from: alice,
+          }
+        )
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+          new BigNumber(0),
+          new BigNumber(1),
+          new BigNumber(2),
+        ])
+        // Remove 1
+        await grandaMento.cancelExchangeProposal(1, { from: alice })
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+          new BigNumber(0),
+          new BigNumber(2),
+        ])
+        // Remove 0
+        await grandaMento.cancelExchangeProposal(0, { from: alice })
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(2)])
+        // Remove 2
+        await grandaMento.cancelExchangeProposal(2, { from: alice })
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
       })
 
       describe('when selling the stable token', () => {
@@ -764,6 +838,12 @@ contract('GrandaMento', (accounts: string[]) => {
             await grandaMento.exchangeProposals(0)
           )
           assert.equal(exchangeProposalAfter.state, ExchangeProposalState.Executed)
+        })
+
+        it('removes the exchange proposal from the activeProposalIds linked list', async () => {
+          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(0)])
+          await grandaMento.executeExchangeProposal(0)
+          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
         })
 
         describe('when selling stable token', () => {
