@@ -19,6 +19,8 @@ export abstract class KeystoreBase {
    * Handles encrytion and transformation between private keys <-> V3Keystore strings
    */
 
+  // TODO docstrings
+
   // Must be implemented by subclass
   // TODO could make all of these either keystoreName OR address
   abstract persistKeystore(keystoreName: string, keystore: string): void
@@ -41,9 +43,7 @@ export abstract class KeystoreBase {
     return Object.keys(await this.getAddressMap())
   }
 
-  /**
-   * Map addresses to their respective keystore files
-   */
+  // Map addresses to their respective keystore entries (names)
   async getAddressMap(): Promise<Record<string, string>> {
     // Don't store this to minimize race conditions (file is deleted/added manually)
     const addressToFile: Record<string, string> = {}
@@ -74,7 +74,6 @@ export abstract class KeystoreBase {
     return keystoreName
   }
 
-  // TODO: if need be, can make it address OR name passed in
   async getPrivateKey(address: string, passphrase: string): Promise<string> {
     const rawKeystore = this.getRawKeystore(await this.getKeystoreName(address))
     // TODO do we want to trim leading 0x here? what is the best practice here?
@@ -125,7 +124,9 @@ export class FileKeystore extends KeystoreBase {
   }
 }
 
-// TODO for testing
+/**
+ * Used for mocking keystore operations
+ */
 export class InMemoryKeystore extends KeystoreBase {
   private _storage: Record<string, string> = {}
 
@@ -146,8 +147,10 @@ export class InMemoryKeystore extends KeystoreBase {
   }
 }
 
+/**
+ * Convenience wrapper of the LocalWallet to connect to a keystore
+ */
 export class KeystoreWalletWrapper {
-  // TODO make this more permissive?
   private _keystore: KeystoreBase
   private _localWallet: LocalWallet
 
