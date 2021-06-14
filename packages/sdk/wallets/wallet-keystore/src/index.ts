@@ -1,1 +1,2 @@
-export * from './local-keystore'
+export * from './keystore-wallet-wrapper'
+export * from './keystores'

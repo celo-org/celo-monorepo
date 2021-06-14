@@ -1,5 +1,5 @@
 import { normalizeAddressWith0x, privateKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
-import { ErrorMessages, InMemoryKeystore, KeystoreWalletWrapper } from './local-keystore'
+import { ErrorMessages, InMemoryKeystore } from './keystores'
 
 jest.setTimeout(20000)
 
@@ -86,36 +86,6 @@ describe('KeystoreBase functionality via InMemoryKeystore (mock)', () => {
       expectedMap[ADDRESS1] = KEYSTORE_NAME1
       expectedMap[ADDRESS2] = KEYSTORE_NAME2
       expect(await keystore.getAddressMap()).toEqual(expectedMap)
-    })
-  })
-})
-
-describe('KeystoreWalletWrapper using InMemoryKeystore', () => {
-  let keystoreWallet: KeystoreWalletWrapper
-
-  beforeEach(() => {
-    keystoreWallet = new KeystoreWalletWrapper(new InMemoryKeystore())
-  })
-
-  describe('checks with an empty keystore', () => {
-    it('imports private key into keystore wallet', async () => {
-      await keystoreWallet.importPrivateKey(PK1, PASSPHRASE1)
-      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
-    })
-  })
-
-  describe('checks with a populated keystore', () => {
-    beforeEach(() => {
-      keystoreWallet.getKeystore().persistKeystore(KEYSTORE_NAME1, GETH_GEN_KEYSTORE1)
-    })
-
-    it('lists no accounts pre-unlock', async () => {
-      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([])
-    })
-
-    it('lists account post-unlock', async () => {
-      await keystoreWallet.unlockAccount(ADDRESS1, PASSPHRASE1)
-      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
     })
   })
 })

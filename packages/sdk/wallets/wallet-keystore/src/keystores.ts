@@ -3,7 +3,6 @@ import {
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import { LocalWallet } from '@celo/wallet-local'
 import Wallet from 'ethereumjs-wallet'
 import { mkdirSync, promises as fsPromises, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import path from 'path'
@@ -11,7 +10,7 @@ import path from 'path'
 export enum ErrorMessages {
   KEYSTORE_ENTRY_EXISTS = 'Existing encrypted keystore for address',
   NO_MATCHING_ENTRY = 'Keystore entry not found for address',
-  UNKNOWN_FILE_STRUCTURE = 'Unexpected keystore file structure',
+  UNKNOWN_STRUCTURE = 'Unexpected keystore entry structure',
 }
 
 export abstract class KeystoreBase {
@@ -35,7 +34,7 @@ export abstract class KeystoreBase {
       return ensureLeading0x(address)
     } catch (e) {
       console.log(e)
-      throw new Error(ErrorMessages.UNKNOWN_FILE_STRUCTURE)
+      throw new Error(ErrorMessages.UNKNOWN_STRUCTURE)
     }
   }
 
@@ -90,6 +89,29 @@ export abstract class KeystoreBase {
   }
 }
 
+/**
+ * Used for mocking keystore operations
+ */
+export class InMemoryKeystore extends KeystoreBase {
+  private _storage: Record<string, string> = {}
+
+  persistKeystore(keystoreName: string, keystore: string) {
+    this._storage[keystoreName] = keystore
+  }
+
+  getRawKeystore(keystoreName: string): string {
+    return this._storage[keystoreName]
+  }
+
+  getAllKeystoreNames(): Promise<string[]> {
+    return new Promise((resolve) => resolve(Object.keys(this._storage)))
+  }
+
+  removeKeystore(keystoreName: string) {
+    delete this._storage[keystoreName]
+  }
+}
+
 export class FileKeystore extends KeystoreBase {
   private _keystoreDir: string
 
@@ -120,66 +142,3 @@ export class FileKeystore extends KeystoreBase {
     return unlinkSync(path.join(this._keystoreDir, keystoreName))
   }
 }
-
-/**
- * Used for mocking keystore operations
- */
-export class InMemoryKeystore extends KeystoreBase {
-  private _storage: Record<string, string> = {}
-
-  persistKeystore(keystoreName: string, keystore: string) {
-    this._storage[keystoreName] = keystore
-  }
-
-  getRawKeystore(keystoreName: string): string {
-    return this._storage[keystoreName]
-  }
-
-  getAllKeystoreNames(): Promise<string[]> {
-    return new Promise((resolve) => resolve(Object.keys(this._storage)))
-  }
-
-  removeKeystore(keystoreName: string) {
-    delete this._storage[keystoreName]
-  }
-}
-
-/**
- * Convenience wrapper of the LocalWallet to connect to a keystore
- */
-export class KeystoreWalletWrapper {
-  private _keystore: KeystoreBase
-  private _localWallet: LocalWallet
-
-  constructor(keystore: KeystoreBase) {
-    this._keystore = keystore
-    this._localWallet = new LocalWallet()
-  }
-
-  async importPrivateKey(privateKey: string, passphrase: string) {
-    await this._keystore.importPrivateKey(privateKey, passphrase)
-    this._localWallet.addAccount(privateKey)
-  }
-
-  getLocalWallet(): LocalWallet {
-    return this._localWallet
-  }
-
-  getKeystore(): KeystoreBase {
-    return this._keystore
-  }
-
-  async unlockAccount(address: string, passphrase: string) {
-    // Unlock and add account to internal LocalWallet
-
-    // TODO duration...seems non-trivial; as a default make this manual?
-    // OR if this is a wallet itself, have a setting for permanent unlock or require passphrase for each tx
-    this._localWallet.addAccount(await this._keystore.getPrivateKey(address, passphrase))
-  }
-
-  async lockAccount(address: string) {
-    this._localWallet.removeAccount(address)
-  }
-}
-
-// const testKeystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore())
