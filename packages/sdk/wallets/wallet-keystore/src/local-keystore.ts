@@ -67,7 +67,7 @@ export abstract class KeystoreBase {
   }
 
   async getKeystoreName(address: string): Promise<string> {
-    const keystoreName = (await this.getAddressMap())[address]
+    const keystoreName = (await this.getAddressMap())[normalizeAddressWith0x(address)]
     if (keystoreName === undefined) {
       throw new Error(ErrorMessages.NO_MATCHING_ENTRY)
     }
@@ -93,17 +93,14 @@ export abstract class KeystoreBase {
 export class FileKeystore extends KeystoreBase {
   private _keystoreDir: string
 
-  constructor(keystoreDir?: string) {
+  constructor(keystoreDir: string) {
     super()
-    // TODO Figure out how this is done for celocli files, etc.?
-    this._keystoreDir = keystoreDir
-      ? keystoreDir
-      : path.join(
-          '/Users/eelanagaraj/celo/celo-monorepo/packages/sdk/wallets/wallet-keystore/test-keystore-dir',
-          'keystore'
-        )
-    // TODO revisit if it makes sense to only make the directory if default...
-    mkdirSync(this._keystoreDir, { recursive: true })
+    this._keystoreDir = path.join(keystoreDir, 'keystore')
+    // Does not overwrite existing directories
+    const createdDir = mkdirSync(this._keystoreDir, { recursive: true })
+    if (createdDir) {
+      console.log(`Keystore directory created at ${createdDir}`)
+    }
   }
 
   async getAllKeystoreNames(): Promise<string[]> {
