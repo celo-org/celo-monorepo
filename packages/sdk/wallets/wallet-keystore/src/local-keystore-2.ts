@@ -12,6 +12,7 @@ import path from 'path'
 
 export enum ErrorMessages {
   KEYSTORE_ENTRY_EXISTS = 'Existing encrypted keystore for address',
+  NO_MATCHING_ENTRY = 'Keystore entry not found for address',
   UNKNOWN_FILE_STRUCTURE = 'Unexpected keystore file structure',
 }
 
@@ -69,12 +70,17 @@ export abstract class KeystoreBase {
   }
 
   async getKeystoreName(address: string): Promise<string> {
-    return (await this.getAddressMap())[address]
+    const keystoreName = (await this.getAddressMap())[address]
+    if (keystoreName === undefined) {
+      throw new Error(ErrorMessages.NO_MATCHING_ENTRY)
+    }
+    return keystoreName
   }
 
   // TODO: if need be, can make it address OR name passed in
   async getPrivateKey(address: string, passphrase: string): Promise<string> {
     const rawKeystore = this.getRawKeystore(await this.getKeystoreName(address))
+    // TODO do we want to trim leading 0x here? what is the best practice here?
     return (await Wallet.fromV3(rawKeystore, passphrase)).getPrivateKeyString()
   }
 
@@ -124,12 +130,7 @@ export class FileKeystore extends KeystoreBase {
 
 // TODO for testing
 export class InMemoryKeystore extends KeystoreBase {
-  private _storage: Record<string, string>
-
-  constructor() {
-    super()
-    this._storage = {}
-  }
+  private _storage: Record<string, string> = {}
 
   persistKeystore(keystoreName: string, keystore: string) {
     this._storage[keystoreName] = keystore
