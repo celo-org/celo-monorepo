@@ -201,5 +201,5 @@ function buildAndExecTerraformCmd(
 
 function buildTerraformCmd(command: string, cmdPath: string, ...options: string[]) {
   const optionsStr = options ? options.join(' ') : ''
-  return `terraform ${command} -input=false ${optionsStr} ${cmdPath}`
+  return `terraform0.13 ${command} -input=false ${optionsStr} ${cmdPath}`
 }

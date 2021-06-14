@@ -32,7 +32,7 @@ resource "google_compute_backend_service" "backend_service" {
     "Access-Control-Expose-Headers:Content-Length,Content-Range"
   ]
 
-  security_policy = google_compute_security_policy.forno.self_link
+  security_policy = var.security_policy_id
 
   dynamic "backend" {
     for_each = var.context_info
