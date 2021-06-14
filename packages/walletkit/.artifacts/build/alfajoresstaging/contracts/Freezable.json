@@ -1,0 +1,767 @@
+{
+  "contractName": "Freezable",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setRegistry",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "RegistrySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"registry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"registryAddress\",\"type\":\"address\"}],\"name\":\"setRegistry\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"registryAddress\",\"type\":\"address\"}],\"name\":\"RegistrySet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{\"isOwner()\":{\"details\":\"Returns true if the caller is the current owner.\"},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"setRegistry(address)\":{\"params\":{\"registryAddress\":\"The address of a registry contract for routing to other contracts.\"}},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}}},\"userdoc\":{\"methods\":{\"setRegistry(address)\":{\"notice\":\"Updates the address pointing to a Registry contract.\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/Freezable.sol\":\"Freezable\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/Freezable.sol\":{\"keccak256\":\"0xcbb6a65c87795d53b59fa3f34d06600eb9191d91f61885ee2c352c12bea7bdd5\",\"urls\":[\"bzzr://f305ee224c1e37c22044fd6df9558bb3cb2402cba26cbb9e4c1492ff00cb1e4a\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol\":{\"keccak256\":\"0x07ba9d147a58b1f7fcaf20a6f8153cf2b12ade0a4b18b82277f0b68ce3020da2\",\"urls\":[\"bzzr://efd669c36d2a235a054b1a33cba3ed1b75ffcad75f6eafc7ec9e7d3ccd9213b6\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IAccounts.sol\":{\"keccak256\":\"0xa9c13f6416fd92c03b79d68c89bfc63be92c50decac66152f965be82134af39f\",\"urls\":[\"bzzr://666f71e58942bdb585545355336623add312b83c9496643cb3d845dbf69b7af8\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IFeeCurrencyWhitelist.sol\":{\"keccak256\":\"0x56a6bf3f869c16d9948ecdb09b3d6db1ff1b70f107c01de0317364e55cd2b910\",\"urls\":[\"bzzr://254fac7fef703edbe318656f1520016234d843c7e36087e0cb578b3689b368d9\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IFreezer.sol\":{\"keccak256\":\"0x3328bdfb02ac3fcec51261c76515e5490642de377a2c5a8a6edb876dbf8aa17a\",\"urls\":[\"bzzr://f95bcc8e1888a59705ff94f6db6b0cf4d46c758c364ec695acd3241d2fc59012\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IRegistry.sol\":{\"keccak256\":\"0x471687ca7891fba15e73b768243ca77defac8dee96b27f48108f0f7125eaa444\",\"urls\":[\"bzzr://3e9f82667a71a9494cb0652babef8bef1aa58925af6c1ae9d92eebecf000e44f\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IElection.sol\":{\"keccak256\":\"0x72a681a70ac9a7988f2ab56a24557104f29bd714cf6e93f38609c4d34985a0d9\",\"urls\":[\"bzzr://90aa128a237944e9181ced77c7587ad2ee908a6143e5d3902ad6d83c4c6b616b\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IGovernance.sol\":{\"keccak256\":\"0x585e6c90b0275e4115e4f34f80765119e0ab547dae6a87f905c9f87d2e6730d5\",\"urls\":[\"bzzr://d30bfcc72d46bcc87fd2cb9061a73fcc342bea9957630572d5e909fa7e1fb6b9\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/ILockedGold.sol\":{\"keccak256\":\"0x7ffcfbcbede6c0eb081f281c2d388963015e8cb94e8ba2c4b00726939fd46c5e\",\"urls\":[\"bzzr://2e0c411c8967767e164b2bf88254b3abc07ed944377d23844e35649983e387d1\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IValidators.sol\":{\"keccak256\":\"0x105c12dd72fcc8f6f822ce39e3bd307dec11c039b0a405f14723c58d71a7cb8b\",\"urls\":[\"bzzr://1d7e91e2c4bd35f49edd110492f1751d5d9b3d390459e6d22f4ff349039de822\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/identity/interfaces/IAttestations.sol\":{\"keccak256\":\"0xcb9b5b4d2ba77cb1fb9e968566f55bbf8d44785318206ffe5485ec5a790e7b24\",\"urls\":[\"bzzr://1b4b441574c1f5779b570a8871afc6dfad4aeac1c3ca824620ebf11e54134b55\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/identity/interfaces/IRandom.sol\":{\"keccak256\":\"0xf8470783201987bcae377bb928d7c632cac43f9eb971693d0c5db9b533853a6a\",\"urls\":[\"bzzr://f1452cc34aa553ae029634ff7c1a4a1a8765b249b321fab547093d794a6fc805\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/stability/interfaces/IExchange.sol\":{\"keccak256\":\"0xe7a8b23970f1fe170d2597f6e581443a7e36146dae802b94960cc2070b0d60ac\",\"urls\":[\"bzzr://30cf790165d4c8bcdafa9555340efa41bae18636d7401edcfe044546ec787eb3\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/stability/interfaces/IReserve.sol\":{\"keccak256\":\"0xee63e1b537e9e5e06347c5a2914e26321cb901bec27180c12d2c486dca0fb5b6\",\"urls\":[\"bzzr://51ac088f32cb1f8ea81e395bfddb5e91931872c21f17eb84d92776caf32733f9\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/stability/interfaces/ISortedOracles.sol\":{\"keccak256\":\"0xc0b81e3356ba4e66cb1b091834be3ec2d30f717ce90f6622dd39172d6abad617\",\"urls\":[\"bzzr://297709c9ce942f184d51368c47cbeb03ccb5fa18e780ed073db3bb86578661e9\"]},\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/stability/interfaces/IStableToken.sol\":{\"keccak256\":\"0x5b8951a2e7d87a3e560de60f0909e606c926e784b4cb09c34ea4a33ceb0d11a9\",\"urls\":[\"bzzr://50ec1a011e6bbb2348b15a4c21fc805fd67dd13ff3a48ba522874ca5767c2ce0\"]},\"openzeppelin-solidity/contracts/GSN/Context.sol\":{\"keccak256\":\"0x90a3995645af7562d84b9d69363ffa5ae7217714ab61e951bf7bc450f40e4061\",\"urls\":[\"bzzr://51482c01bddf23793bddee43b60ab9578a62948a4f2082def24ea792a553b055\"]},\"openzeppelin-solidity/contracts/ownership/Ownable.sol\":{\"keccak256\":\"0x6fb9d7889769d7cc161225f9ef7a90e468ba9788b253816f8d8b6894d3472c24\",\"urls\":[\"bzzr://ab46c9368bc3abdded5eb85858304518c8a0291060ab42087075d759dbf3925f\"]},\"openzeppelin-solidity/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0xe5bb0f57cff3e299f360052ba50f1ea0fff046df2be070b6943e0e3c3fdad8a9\",\"urls\":[\"bzzr://cf2d583b8dce38d0617fdcd65f2fd9f126fe17b7f683b5a515ea9d2762d8b062\"]}},\"version\":1}",
+  "bytecode": "0x608060405260006100146100b760201b60201c565b9050806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff16600073ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3506100bf565b600033905090565b61075d806100ce6000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c8063715018a6146100675780637b103999146100715780638da5cb5b146100bb5780638f32d59b14610105578063a91ee0dc14610127578063f2fde38b1461016b575b600080fd5b61006f6101af565b005b6100796102e8565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c361030e565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61010d610337565b604051808215151515815260200191505060405180910390f35b6101696004803603602081101561013d57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610395565b005b6101ad6004803603602081101561018157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610539565b005b6101b7610337565b610229576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166103796105bf565b73ffffffffffffffffffffffffffffffffffffffff1614905090565b61039d610337565b61040f576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156104b2576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f43616e6e6f7420726567697374657220746865206e756c6c206164647265737381525060200191505060405180910390fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff167f27fe5f0c1c3b1ed427cc63d0f05759ffdecf9aec9e18d31ef366fc8a6cb5dc3b60405160405180910390a250565b610541610337565b6105b3576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b6105bc816105c7565b50565b600033905090565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141561064d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602681526020018061070c6026913960400191505060405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a165627a7a7230582001fd0b38ac37ba3742629c2338f776fd030ac60ffe817f68e63150f9f8a3e99e0029",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100625760003560e01c8063715018a6146100675780637b103999146100715780638da5cb5b146100bb5780638f32d59b14610105578063a91ee0dc14610127578063f2fde38b1461016b575b600080fd5b61006f6101af565b005b6100796102e8565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c361030e565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61010d610337565b604051808215151515815260200191505060405180910390f35b6101696004803603602081101561013d57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610395565b005b6101ad6004803603602081101561018157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610539565b005b6101b7610337565b610229576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166103796105bf565b73ffffffffffffffffffffffffffffffffffffffff1614905090565b61039d610337565b61040f576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156104b2576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f43616e6e6f7420726567697374657220746865206e756c6c206164647265737381525060200191505060405180910390fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff167f27fe5f0c1c3b1ed427cc63d0f05759ffdecf9aec9e18d31ef366fc8a6cb5dc3b60405160405180910390a250565b610541610337565b6105b3576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b6105bc816105c7565b50565b600033905090565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141561064d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602681526020018061070c6026913960400191505060405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a165627a7a7230582001fd0b38ac37ba3742629c2338f776fd030ac60ffe817f68e63150f9f8a3e99e0029",
+  "sourceMap": "56:282:6:-;;;698:17:129;718:12;:10;;;:12;;:::i;:::-;698:32;;749:9;740:6;;:18;;;;;;;;;;;;;;;;;;806:9;773:43;;802:1;773:43;;;;;;;;;;;;664:159;56:282:6;;788:96:125;833:15;867:10;860:17;;788:96;:::o;56:282:6:-;;;;;;;",
+  "deployedSourceMap": "56:282:6:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;56:282:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1684:137:129;;;:::i;:::-;;2818:25:17;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;899:77:129;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;1250:92;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;3367:230:17;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;3367:230:17;;;;;;;;;;;;;;;;;;;:::i;:::-;;1970:107:129;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1970:107:129;;;;;;;;;;;;;;;;;;;:::i;:::-;;1684:137;1103:9;:7;:9::i;:::-;1095:54;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1782:1;1745:40;;1766:6;;;;;;;;;;;1745:40;;;;;;;;;;;;1812:1;1795:6;;:19;;;;;;;;;;;;;;;;;;1684:137::o;2818:25:17:-;;;;;;;;;;;;;:::o;899:77:129:-;937:7;963:6;;;;;;;;;;;956:13;;899:77;:::o;1250:92::-;1290:4;1329:6;;;;;;;;;;;1313:22;;:12;:10;:12::i;:::-;:22;;;1306:29;;1250:92;:::o;3367:230:17:-;1103:9:129;:7;:9::i;:::-;1095:54;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3471:1:17;3444:29;;:15;:29;;;;3436:74;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3537:15;3516:8;;:37;;;;;;;;;;;;;;;;;;3576:15;3564:28;;;;;;;;;;;;3367:230;:::o;1970:107:129:-;1103:9;:7;:9::i;:::-;1095:54;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2042:28;2061:8;2042:18;:28::i;:::-;1970:107;:::o;788:96:125:-;833:15;867:10;860:17;;788:96;:::o;2178:225:129:-;2271:1;2251:22;;:8;:22;;;;2243:73;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2360:8;2331:38;;2352:6;;;;;;;;;;;2331:38;;;;;;;;;;;;2388:8;2379:6;;:17;;;;;;;;;;;;;;;;;;2178:225;:::o",
+  "source": "pragma solidity ^0.5.3;\n\nimport \"./UsingRegistry.sol\";\n\ncontract Freezable is UsingRegistry {\n  // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they will\n  // revert.\n  modifier onlyWhenNotFrozen() {\n    require(!getFreezer().isFrozen(address(this)), \"can't call when contract is frozen\");\n    _;\n  }\n}\n",
+  "sourcePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/Freezable.sol",
+  "ast": {
+    "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/Freezable.sol",
+    "exportedSymbols": {
+      "Freezable": [
+        2170
+      ]
+    },
+    "id": 2171,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2150,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:6"
+      },
+      {
+        "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+        "file": "./UsingRegistry.sol",
+        "id": 2151,
+        "nodeType": "ImportDirective",
+        "scope": 2171,
+        "sourceUnit": 6231,
+        "src": "25:29:6",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2152,
+              "name": "UsingRegistry",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 6230,
+              "src": "78:13:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_UsingRegistry_$6230",
+                "typeString": "contract UsingRegistry"
+              }
+            },
+            "id": 2153,
+            "nodeType": "InheritanceSpecifier",
+            "src": "78:13:6"
+          }
+        ],
+        "contractDependencies": [
+          6230,
+          35967,
+          36422
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2170,
+        "linearizedBaseContracts": [
+          2170,
+          6230,
+          36422,
+          35967
+        ],
+        "name": "Freezable",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2168,
+              "nodeType": "Block",
+              "src": "234:102:6",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2163,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "UnaryOperation",
+                        "operator": "!",
+                        "prefix": true,
+                        "src": "248:37:6",
+                        "subExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "arguments": [
+                                {
+                                  "argumentTypes": null,
+                                  "id": 2160,
+                                  "name": "this",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 37412,
+                                  "src": "279:4:6",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_contract$_Freezable_$2170",
+                                    "typeString": "contract Freezable"
+                                  }
+                                }
+                              ],
+                              "expression": {
+                                "argumentTypes": [
+                                  {
+                                    "typeIdentifier": "t_contract$_Freezable_$2170",
+                                    "typeString": "contract Freezable"
+                                  }
+                                ],
+                                "id": 2159,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "lValueRequested": false,
+                                "nodeType": "ElementaryTypeNameExpression",
+                                "src": "271:7:6",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_type$_t_address_$",
+                                  "typeString": "type(address)"
+                                },
+                                "typeName": "address"
+                              },
+                              "id": 2161,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "typeConversion",
+                              "lValueRequested": false,
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "271:13:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": null,
+                              "arguments": [],
+                              "expression": {
+                                "argumentTypes": [],
+                                "id": 2156,
+                                "name": "getFreezer",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 6125,
+                                "src": "249:10:6",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_function_internal_view$__$returns$_t_contract$_IFreezer_$6511_$",
+                                  "typeString": "function () view returns (contract IFreezer)"
+                                }
+                              },
+                              "id": 2157,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "functionCall",
+                              "lValueRequested": false,
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "249:12:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_IFreezer_$6511",
+                                "typeString": "contract IFreezer"
+                              }
+                            },
+                            "id": 2158,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "isFrozen",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 6510,
+                            "src": "249:21:6",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_bool_$",
+                              "typeString": "function (address) view external returns (bool)"
+                            }
+                          },
+                          "id": 2162,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "249:36:6",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "63616e27742063616c6c207768656e20636f6e74726163742069732066726f7a656e",
+                        "id": 2164,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "287:36:6",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_5887998fd0cc8fe29f593f0d6a6ef4ffd3ae8a4c67fbef99f5d4587c096a9a6b",
+                          "typeString": "literal_string \"can't call when contract is frozen\""
+                        },
+                        "value": "can't call when contract is frozen"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_5887998fd0cc8fe29f593f0d6a6ef4ffd3ae8a4c67fbef99f5d4587c096a9a6b",
+                          "typeString": "literal_string \"can't call when contract is frozen\""
+                        }
+                      ],
+                      "id": 2155,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        37343,
+                        37344
+                      ],
+                      "referencedDeclaration": 37344,
+                      "src": "240:7:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 2165,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "240:84:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2166,
+                  "nodeType": "ExpressionStatement",
+                  "src": "240:84:6"
+                },
+                {
+                  "id": 2167,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "330:1:6"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2169,
+            "name": "onlyWhenNotFrozen",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 2154,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "231:2:6"
+            },
+            "src": "205:131:6",
+            "visibility": "internal"
+          }
+        ],
+        "scope": 2171,
+        "src": "56:282:6"
+      }
+    ],
+    "src": "0:339:6"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/Freezable.sol",
+    "exportedSymbols": {
+      "Freezable": [
+        2170
+      ]
+    },
+    "id": 2171,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2150,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:6"
+      },
+      {
+        "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+        "file": "./UsingRegistry.sol",
+        "id": 2151,
+        "nodeType": "ImportDirective",
+        "scope": 2171,
+        "sourceUnit": 6231,
+        "src": "25:29:6",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2152,
+              "name": "UsingRegistry",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 6230,
+              "src": "78:13:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_UsingRegistry_$6230",
+                "typeString": "contract UsingRegistry"
+              }
+            },
+            "id": 2153,
+            "nodeType": "InheritanceSpecifier",
+            "src": "78:13:6"
+          }
+        ],
+        "contractDependencies": [
+          6230,
+          35967,
+          36422
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2170,
+        "linearizedBaseContracts": [
+          2170,
+          6230,
+          36422,
+          35967
+        ],
+        "name": "Freezable",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2168,
+              "nodeType": "Block",
+              "src": "234:102:6",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2163,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "UnaryOperation",
+                        "operator": "!",
+                        "prefix": true,
+                        "src": "248:37:6",
+                        "subExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "arguments": [
+                                {
+                                  "argumentTypes": null,
+                                  "id": 2160,
+                                  "name": "this",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 37412,
+                                  "src": "279:4:6",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_contract$_Freezable_$2170",
+                                    "typeString": "contract Freezable"
+                                  }
+                                }
+                              ],
+                              "expression": {
+                                "argumentTypes": [
+                                  {
+                                    "typeIdentifier": "t_contract$_Freezable_$2170",
+                                    "typeString": "contract Freezable"
+                                  }
+                                ],
+                                "id": 2159,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "lValueRequested": false,
+                                "nodeType": "ElementaryTypeNameExpression",
+                                "src": "271:7:6",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_type$_t_address_$",
+                                  "typeString": "type(address)"
+                                },
+                                "typeName": "address"
+                              },
+                              "id": 2161,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "typeConversion",
+                              "lValueRequested": false,
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "271:13:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": null,
+                              "arguments": [],
+                              "expression": {
+                                "argumentTypes": [],
+                                "id": 2156,
+                                "name": "getFreezer",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 6125,
+                                "src": "249:10:6",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_function_internal_view$__$returns$_t_contract$_IFreezer_$6511_$",
+                                  "typeString": "function () view returns (contract IFreezer)"
+                                }
+                              },
+                              "id": 2157,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "functionCall",
+                              "lValueRequested": false,
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "249:12:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_IFreezer_$6511",
+                                "typeString": "contract IFreezer"
+                              }
+                            },
+                            "id": 2158,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "isFrozen",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 6510,
+                            "src": "249:21:6",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_bool_$",
+                              "typeString": "function (address) view external returns (bool)"
+                            }
+                          },
+                          "id": 2162,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "249:36:6",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "63616e27742063616c6c207768656e20636f6e74726163742069732066726f7a656e",
+                        "id": 2164,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "287:36:6",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_5887998fd0cc8fe29f593f0d6a6ef4ffd3ae8a4c67fbef99f5d4587c096a9a6b",
+                          "typeString": "literal_string \"can't call when contract is frozen\""
+                        },
+                        "value": "can't call when contract is frozen"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_5887998fd0cc8fe29f593f0d6a6ef4ffd3ae8a4c67fbef99f5d4587c096a9a6b",
+                          "typeString": "literal_string \"can't call when contract is frozen\""
+                        }
+                      ],
+                      "id": 2155,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        37343,
+                        37344
+                      ],
+                      "referencedDeclaration": 37344,
+                      "src": "240:7:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 2165,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "240:84:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2166,
+                  "nodeType": "ExpressionStatement",
+                  "src": "240:84:6"
+                },
+                {
+                  "id": 2167,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "330:1:6"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2169,
+            "name": "onlyWhenNotFrozen",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 2154,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "231:2:6"
+            },
+            "src": "205:131:6",
+            "visibility": "internal"
+          }
+        ],
+        "scope": 2171,
+        "src": "56:282:6"
+      }
+    ],
+    "src": "0:339:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.10",
+  "updatedAt": "2020-04-09T23:11:36.841Z",
+  "devdoc": {
+    "methods": {
+      "isOwner()": {
+        "details": "Returns true if the caller is the current owner."
+      },
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "setRegistry(address)": {
+        "params": {
+          "registryAddress": "The address of a registry contract for routing to other contracts."
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {
+      "setRegistry(address)": {
+        "notice": "Updates the address pointing to a Registry contract."
+      }
+    }
+  }
+}

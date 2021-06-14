@@ -1,0 +1,19 @@
+apiVersion: pingcap.com/v1alpha1
+kind: TimeChaos
+metadata:
+  name: time-shift
+  namespace: scenario1
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - scenario1
+    labelSelectors:
+      "component": "validators"
+  timeOffset:
+    sec: 2000
+    nsec: 2000
+  duration: "60s"
+  scheduler:
+    cron: "@every 10000m"
+

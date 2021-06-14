@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "253914576835",
+    "firebase_url": "https://celo-testnet.firebaseio.com",
+    "project_id": "celo-testnet",
+    "storage_bucket": "celo-testnet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253914576835:android:6d9c4247d90a3a91",
+        "android_client_info": {
+          "package_name": "org.celo.verifier.integration"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253914576835-u207i10sk5griej7mjsk0lpnauc0h2qn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6hpprgfsGqMstqxa5UeFfczwaXiLsrPg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

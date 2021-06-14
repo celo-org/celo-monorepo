@@ -1,0 +1,19 @@
+apiVersion: pingcap.com/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-failure-example22
+  namespace: scenario1
+spec:
+  action: pod-failure
+  mode: fixed
+  value: "1"
+  duration: "99m"
+  selector:
+    namespaces:
+      - scenario1
+    labelSelectors:
+      "component": "validators"
+      "statefulset.kubernetes.io/pod-name": "scenario1-validators-15"
+  scheduler:
+    cron: "@every 100m"
+

@@ -1,0 +1,497 @@
+{
+  "contractName": "MsgSenderCheck",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "checkMsgSender",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"checkMsgSender\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/test/MsgSenderCheck.sol\":\"MsgSenderCheck\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/test/MsgSenderCheck.sol\":{\"keccak256\":\"0x90889442a726a36e1501b713d72099cc5a1e7e40c32b188fdc530c273ed5b7cc\",\"urls\":[\"bzzr://488e0e15df150e31cbbcfcd7f14574a286db45d83639f99a3163d041804aa370\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610144806100206000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c8063979aaf9914610030575b600080fd5b6100726004803603602081101561004657600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610074565b005b3373ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614610115576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601a8152602001807f6164647265737320776173206e6f74206d73672e73656e64657200000000000081525060200191505060405180910390fd5b5056fea165627a7a72305820710b7f9a488b82555b67027a037838e51c1b15ce56d5f2674a27b820a36044050029",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c8063979aaf9914610030575b600080fd5b6100726004803603602081101561004657600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610074565b005b3373ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614610115576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601a8152602001807f6164647265737320776173206e6f74206d73672e73656e64657200000000000081525060200191505060405180910390fd5b5056fea165627a7a72305820710b7f9a488b82555b67027a037838e51c1b15ce56d5f2674a27b820a36044050029",
+  "sourceMap": "25:150:49:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:150:49;;;;;;;",
+  "deployedSourceMap": "25:150:49:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:150:49;;;;;;;;;;;;;;;;;;;53:120;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;53:120:49;;;;;;;;;;;;;;;;;;;:::i;:::-;;;127:10;119:18;;:4;:18;;;111:57;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;53:120;:::o",
+  "source": "pragma solidity ^0.5.3;\n\ncontract MsgSenderCheck {\n  function checkMsgSender(address addr) external view {\n    require(addr == msg.sender, \"address was not msg.sender\");\n  }\n}\n",
+  "sourcePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/test/MsgSenderCheck.sol",
+  "ast": {
+    "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/test/MsgSenderCheck.sol",
+    "exportedSymbols": {
+      "MsgSenderCheck": [
+        10757
+      ]
+    },
+    "id": 10758,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 10742,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:49"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 10757,
+        "linearizedBaseContracts": [
+          10757
+        ],
+        "name": "MsgSenderCheck",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 10755,
+              "nodeType": "Block",
+              "src": "105:68:49",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 10751,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 10748,
+                          "name": "addr",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 10744,
+                          "src": "119:4:49",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 10749,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 37340,
+                            "src": "127:3:49",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 10750,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "127:10:49",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "119:18:49",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "6164647265737320776173206e6f74206d73672e73656e646572",
+                        "id": 10752,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "139:28:49",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_f25a69686b68127ffdbe209d571572c4f0af250b4fa9ef4fe3e81b7b6343d2b5",
+                          "typeString": "literal_string \"address was not msg.sender\""
+                        },
+                        "value": "address was not msg.sender"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_f25a69686b68127ffdbe209d571572c4f0af250b4fa9ef4fe3e81b7b6343d2b5",
+                          "typeString": "literal_string \"address was not msg.sender\""
+                        }
+                      ],
+                      "id": 10747,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        37343,
+                        37344
+                      ],
+                      "referencedDeclaration": 37344,
+                      "src": "111:7:49",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 10753,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "111:57:49",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 10754,
+                  "nodeType": "ExpressionStatement",
+                  "src": "111:57:49"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 10756,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "checkMsgSender",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10745,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10744,
+                  "name": "addr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10756,
+                  "src": "77:12:49",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10743,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "77:7:49",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "76:14:49"
+            },
+            "returnParameters": {
+              "id": 10746,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "105:0:49"
+            },
+            "scope": 10757,
+            "src": "53:120:49",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 10758,
+        "src": "25:150:49"
+      }
+    ],
+    "src": "0:176:49"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/test/MsgSenderCheck.sol",
+    "exportedSymbols": {
+      "MsgSenderCheck": [
+        10757
+      ]
+    },
+    "id": 10758,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 10742,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:49"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 10757,
+        "linearizedBaseContracts": [
+          10757
+        ],
+        "name": "MsgSenderCheck",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 10755,
+              "nodeType": "Block",
+              "src": "105:68:49",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 10751,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 10748,
+                          "name": "addr",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 10744,
+                          "src": "119:4:49",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 10749,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 37340,
+                            "src": "127:3:49",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 10750,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "127:10:49",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "119:18:49",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "6164647265737320776173206e6f74206d73672e73656e646572",
+                        "id": 10752,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "139:28:49",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_f25a69686b68127ffdbe209d571572c4f0af250b4fa9ef4fe3e81b7b6343d2b5",
+                          "typeString": "literal_string \"address was not msg.sender\""
+                        },
+                        "value": "address was not msg.sender"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_f25a69686b68127ffdbe209d571572c4f0af250b4fa9ef4fe3e81b7b6343d2b5",
+                          "typeString": "literal_string \"address was not msg.sender\""
+                        }
+                      ],
+                      "id": 10747,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        37343,
+                        37344
+                      ],
+                      "referencedDeclaration": 37344,
+                      "src": "111:7:49",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 10753,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "111:57:49",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 10754,
+                  "nodeType": "ExpressionStatement",
+                  "src": "111:57:49"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 10756,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "checkMsgSender",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10745,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10744,
+                  "name": "addr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10756,
+                  "src": "77:12:49",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10743,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "77:7:49",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "76:14:49"
+            },
+            "returnParameters": {
+              "id": 10746,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "105:0:49"
+            },
+            "scope": 10757,
+            "src": "53:120:49",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 10758,
+        "src": "25:150:49"
+      }
+    ],
+    "src": "0:176:49"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.10",
+  "updatedAt": "2020-04-09T23:11:37.042Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

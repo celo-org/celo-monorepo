@@ -1,0 +1,21 @@
+apiVersion: pingcap.com/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: pod-failure-pod0
+  namespace: scenario1
+spec:
+  action: loss
+  mode: fixed
+  value: "1"
+  duration: "9999m"
+  loss:
+    loss: "100"
+    correlation: "25"
+  selector:
+    namespaces:
+      - scenario1
+    labelSelectors:
+      # "component": "validators"
+      "statefulset.kubernetes.io/pod-name": "scenario1-validators-0"
+  scheduler:
+    cron: "@every 10000m"

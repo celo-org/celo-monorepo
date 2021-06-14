@@ -1,0 +1,133 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ABI = [
+    {
+        constant: true,
+        inputs: [],
+        name: 'initialized',
+        outputs: [{ name: '', type: 'bool' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [],
+        name: 'renounceOwnership',
+        outputs: [],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'registry',
+        outputs: [{ name: '', type: 'address' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'owner',
+        outputs: [{ name: '', type: 'address' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'isOwner',
+        outputs: [{ name: '', type: 'bool' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [{ name: 'registryAddress', type: 'address' }],
+        name: 'setRegistry',
+        outputs: [],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [{ name: '', type: 'address' }],
+        name: 'vestings',
+        outputs: [{ name: '', type: 'address' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [{ name: 'newOwner', type: 'address' }],
+        name: 'transferOwnership',
+        outputs: [],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, name: 'beneficiary', type: 'address' },
+            { indexed: false, name: 'atAddress', type: 'address' },
+        ],
+        name: 'NewVestingInstanceCreated',
+        type: 'event',
+    },
+    {
+        anonymous: false,
+        inputs: [{ indexed: true, name: 'registryAddress', type: 'address' }],
+        name: 'RegistrySet',
+        type: 'event',
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, name: 'previousOwner', type: 'address' },
+            { indexed: true, name: 'newOwner', type: 'address' },
+        ],
+        name: 'OwnershipTransferred',
+        type: 'event',
+    },
+    {
+        constant: false,
+        inputs: [{ name: 'registryAddress', type: 'address' }],
+        name: 'initialize',
+        outputs: [],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [
+            { name: 'vestingBeneficiary', type: 'address' },
+            { name: 'vestingNumPeriods', type: 'uint256' },
+            { name: 'vestingCliff', type: 'uint256' },
+            { name: 'vestingStartTime', type: 'uint256' },
+            { name: 'vestingPeriodSec', type: 'uint256' },
+            { name: 'vestAmountPerPeriod', type: 'uint256' },
+            { name: 'vestingRevocable', type: 'bool' },
+            { name: 'vestingRevoker', type: 'address' },
+            { name: 'vestingMaxPausePeriod', type: 'uint256' },
+        ],
+        name: 'createVestingInstance',
+        outputs: [{ name: '', type: 'address' }],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+];
+function newVestingFactory(web3, address) {
+    return new web3.eth.Contract(exports.ABI, address);
+}
+exports.newVestingFactory = newVestingFactory;
+//# sourceMappingURL=VestingFactory.js.map

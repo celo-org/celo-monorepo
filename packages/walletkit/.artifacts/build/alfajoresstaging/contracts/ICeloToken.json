@@ -1,0 +1,769 @@
+{
+  "contractName": "ICeloToken",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        },
+        {
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "transferWithComment",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "symbol",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "decimals",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"string\"}],\"name\":\"transferWithComment\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{},\"title\":\"This interface describes the non- ERC20 shared interface for all Celo Tokens, and in the absence of interface inheritance is intended as a companion to IERC20.sol.\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/ICeloToken.sol\":\"ICeloToken\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/ICeloToken.sol\":{\"keccak256\":\"0x97dded698c491f05d56b180280e918848dd51170bcd52052287d1285362fae32\",\"urls\":[\"bzzr://f3b78113e54fbef8c7deeaa4cd297b90696d27f86ab42b08d090d9f1ecfa4244\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.5.3;\n\n/**\n * @title This interface describes the non- ERC20 shared interface for all Celo Tokens, and\n * in the absence of interface inheritance is intended as a companion to IERC20.sol.\n */\ninterface ICeloToken {\n  function transferWithComment(address, uint256, string calldata) external returns (bool);\n  function name() external view returns (string memory);\n  function symbol() external view returns (string memory);\n  function decimals() external view returns (uint8);\n}\n",
+  "sourcePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/ICeloToken.sol",
+  "ast": {
+    "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/ICeloToken.sol",
+    "exportedSymbols": {
+      "ICeloToken": [
+        6487
+      ]
+    },
+    "id": 6488,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6460,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:19"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": "@title This interface describes the non- ERC20 shared interface for all Celo Tokens, and\nin the absence of interface inheritance is intended as a companion to IERC20.sol.",
+        "fullyImplemented": false,
+        "id": 6487,
+        "linearizedBaseContracts": [
+          6487
+        ],
+        "name": "ICeloToken",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6471,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "transferWithComment",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6467,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6462,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "264:7:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6461,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "264:7:19",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6464,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "273:7:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6463,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "273:7:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6466,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "282:15:19",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_calldata_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 6465,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "282:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "263:35:19"
+            },
+            "returnParameters": {
+              "id": 6470,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6469,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "317:4:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 6468,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "317:4:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "316:6:19"
+            },
+            "scope": 6487,
+            "src": "235:88:19",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6476,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "name",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6472,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "339:2:19"
+            },
+            "returnParameters": {
+              "id": 6475,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6474,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6476,
+                  "src": "365:13:19",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 6473,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "365:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "364:15:19"
+            },
+            "scope": 6487,
+            "src": "326:54:19",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6481,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "symbol",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6477,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "398:2:19"
+            },
+            "returnParameters": {
+              "id": 6480,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6479,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6481,
+                  "src": "424:13:19",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 6478,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "424:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "423:15:19"
+            },
+            "scope": 6487,
+            "src": "383:56:19",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6486,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "decimals",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6482,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "459:2:19"
+            },
+            "returnParameters": {
+              "id": 6485,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6484,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6486,
+                  "src": "485:5:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 6483,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "485:5:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "484:7:19"
+            },
+            "scope": 6487,
+            "src": "442:50:19",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6488,
+        "src": "210:284:19"
+      }
+    ],
+    "src": "0:495:19"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/cmcewen/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/ICeloToken.sol",
+    "exportedSymbols": {
+      "ICeloToken": [
+        6487
+      ]
+    },
+    "id": 6488,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6460,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:19"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": "@title This interface describes the non- ERC20 shared interface for all Celo Tokens, and\nin the absence of interface inheritance is intended as a companion to IERC20.sol.",
+        "fullyImplemented": false,
+        "id": 6487,
+        "linearizedBaseContracts": [
+          6487
+        ],
+        "name": "ICeloToken",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6471,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "transferWithComment",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6467,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6462,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "264:7:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6461,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "264:7:19",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6464,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "273:7:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6463,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "273:7:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6466,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "282:15:19",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_calldata_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 6465,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "282:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "263:35:19"
+            },
+            "returnParameters": {
+              "id": 6470,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6469,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6471,
+                  "src": "317:4:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 6468,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "317:4:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "316:6:19"
+            },
+            "scope": 6487,
+            "src": "235:88:19",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6476,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "name",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6472,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "339:2:19"
+            },
+            "returnParameters": {
+              "id": 6475,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6474,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6476,
+                  "src": "365:13:19",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 6473,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "365:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "364:15:19"
+            },
+            "scope": 6487,
+            "src": "326:54:19",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6481,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "symbol",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6477,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "398:2:19"
+            },
+            "returnParameters": {
+              "id": 6480,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6479,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6481,
+                  "src": "424:13:19",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 6478,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "424:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "423:15:19"
+            },
+            "scope": 6487,
+            "src": "383:56:19",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 6486,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "decimals",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6482,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "459:2:19"
+            },
+            "returnParameters": {
+              "id": 6485,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6484,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6486,
+                  "src": "485:5:19",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 6483,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "485:5:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "484:7:19"
+            },
+            "scope": 6487,
+            "src": "442:50:19",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6488,
+        "src": "210:284:19"
+      }
+    ],
+    "src": "0:495:19"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.10",
+  "updatedAt": "2020-04-09T23:11:36.935Z",
+  "devdoc": {
+    "methods": {},
+    "title": "This interface describes the non- ERC20 shared interface for all Celo Tokens, and in the absence of interface inheritance is intended as a companion to IERC20.sol."
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
