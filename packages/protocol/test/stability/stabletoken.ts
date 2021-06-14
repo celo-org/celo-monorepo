@@ -390,6 +390,7 @@ contract('StableToken', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.Exchange, exchange)
       await registry.setAddressFor(CeloContractName.GrandaMento, grandaMento)
       await stableToken.mint(exchange, amountToMint)
+      await stableToken.mint(grandaMento, amountToMint)
     })
 
     it('should allow the registered exchange contract to burn', async () => {
