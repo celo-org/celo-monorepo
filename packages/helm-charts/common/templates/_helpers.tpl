@@ -216,6 +216,7 @@ fi
       fieldRef:
         fieldPath: status.hostIP
 {{- end }}
+{{ include  "common.geth-prestop-hook" . | indent 2 -}}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:
@@ -264,6 +265,13 @@ fi
     mountPath: /root/.celo/account
     readOnly: true
 {{- end }}
+{{- end -}}
+
+{{- define "common.geth-prestop-hook" -}}
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh","-c","killall -HUP geth; while killall -0 geth; do sleep 1; done"]
 {{- end -}}
 
 {{- define "common.geth-configmap" -}}
