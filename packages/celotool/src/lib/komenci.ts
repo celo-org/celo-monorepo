@@ -240,6 +240,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     vars.appSecretsKeyVault,
     'LOGGER-SERVICE-ACCOUNT'
   )
+  const segmentApiKey = await getPasswordFromKeyVaultSecret(
+    vars.appSecretsKeyVault,
+    'SEGMENT-API-KEY'
+  )
   const rewardServiceConfig = getContextDynamicEnvVarValues(
     contextKomenciRewardsServiceConfigDynamicEnvVars,
     context
@@ -289,6 +293,8 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set rewards.db.port=${rewardDatabaseConfig.port}`,
     `--set rewards.db.username=${rewardDatabaseConfig.username}`,
     `--set rewards.db.password=${rewardDatabasePassword}`,
+    `--set rewards.segmentApiKey=${segmentApiKey}`,
+    `--set rewards.shouldSendRewards=${fetchEnv(envVar.KOMENCI_SHOULD_SEND_REWARDS)}`,
     `--set rewards.metrics.enabled=true`,
     `--set rewards.metrics.prometheusPort=9090`,
     `--set rewards.relayer.replicas=${rewardsRelayerCount}`,
