@@ -8,10 +8,10 @@ resource "google_compute_health_check" "http_health_check" {
   }
 }
 
-# This is a reference to the ClusterIP RPC service inside this region's k8s cluster.
+# This is a reference to the ClusterIP service inside this region's k8s cluster.
 # We get the NEG for each context.
-data "google_compute_network_endpoint_group" "rpc_service_network_endpoint_group" {
-  name = each.value.rpc_service_network_endpoint_group_name
+data "google_compute_network_endpoint_group" "service_network_endpoint_group" {
+  name = each.value.service_network_endpoint_group_name
   zone = each.value.zone
 
   for_each = var.context_info
@@ -36,7 +36,7 @@ resource "google_compute_backend_service" "backend_service" {
     content {
       balancing_mode = "RATE"
       max_rate       = var.backend_max_requests_per_second
-      group          = data.google_compute_network_endpoint_group.rpc_service_network_endpoint_group[backend.key].self_link
+      group          = data.google_compute_network_endpoint_group.service_network_endpoint_group[backend.key].self_link
     }
   }
 }

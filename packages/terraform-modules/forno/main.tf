@@ -52,6 +52,17 @@ module "ws_backends" {
   timeout_sec                     = 1200 # 20 minutes
 }
 
+module "kong" {
+  source = "./modules/backends"
+  # variables
+  backend_max_requests_per_second = var.backend_max_requests_per_second_kong
+  celo_env                        = var.celo_env
+  context_info                    = var.context_info_kong
+  health_check_destination_port   = 8000
+  type                            = "kong"
+  timeout_sec                     = 1200 # 20 minutes
+}
+
 resource "google_compute_global_address" "global_address" {
   name = "${var.celo_env}-forno-global-address"
 
