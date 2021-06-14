@@ -201,10 +201,9 @@ contract GrandaMento is
     );
 
     // Record the proposal.
-    // Increment the running count of exchange proposals and use the new count
-    // as the proposal ID. This is intentionally never 0 because LinkedList,
-    // which is used for keeping track of active proposal IDs, requires keys
-    // to be non-zero.
+    // Add 1 to the running proposal count and use as the proposalId. This is
+    // intentionally never 0 because LinkedList, which is used for keeping track
+    // of active proposal IDs, requires keys to be non-zero.
     exchangeProposalCount = exchangeProposalCount.add(1);
     exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
@@ -226,8 +225,7 @@ contract GrandaMento is
       buyAmount,
       sellCelo
     );
-
-    return proposalId;
+    return exchangeProposalCount;
   }
 
   /**

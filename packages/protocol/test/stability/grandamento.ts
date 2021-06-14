@@ -177,7 +177,7 @@ contract('GrandaMento', (accounts: string[]) => {
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
-      assertEqualBN(id, 0)
+      assertEqualBN(id, 1)
     })
 
     it('increments the exchange proposal count', async () => {
@@ -193,19 +193,19 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('assigns proposal IDs based off the exchange proposal count', async () => {
       const stableTokenSellAmount = unit.times(200)
-      const receipt0 = await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false // sellCelo = false as we are selling stableToken
-      )
-      assertEqualBN(receipt0.logs[0].args.proposalId, 0)
-
       const receipt1 = await grandaMento.createExchangeProposal(
         stableTokenRegistryId,
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
       assertEqualBN(receipt1.logs[0].args.proposalId, 1)
+
+      const receipt2 = await grandaMento.createExchangeProposal(
+        stableTokenRegistryId,
+        stableTokenSellAmount,
+        false // sellCelo = false as we are selling stableToken
+      )
+      assertEqualBN(receipt2.logs[0].args.proposalId, 2)
     })
 
     it('adds the exchange proposal to the activeProposalIds linked list', async () => {
@@ -215,7 +215,7 @@ contract('GrandaMento', (accounts: string[]) => {
         stableTokenSellAmount,
         false // sellCelo = false as we are selling stableToken
       )
-      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(0)])
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
 
       // Add another
       await grandaMento.createExchangeProposal(
@@ -224,8 +224,8 @@ contract('GrandaMento', (accounts: string[]) => {
         false // sellCelo = false as we are selling stableToken
       )
       assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-        new BigNumber(0),
         new BigNumber(1),
+        new BigNumber(2),
       ])
     })
 
@@ -243,7 +243,7 @@ contract('GrandaMento', (accounts: string[]) => {
           event: 'ExchangeProposalCreated',
           args: {
             exchanger: owner,
-            proposalId: 0,
+            proposalId: 1,
             stableToken: stableToken.address,
             sellAmount: stableTokenSellAmount,
             buyAmount: getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread),
@@ -266,7 +266,7 @@ contract('GrandaMento', (accounts: string[]) => {
           event: 'ExchangeProposalCreated',
           args: {
             exchanger: owner,
-            proposalId: 0,
+            proposalId: 1,
             stableToken: stableToken.address,
             sellAmount: stableTokenSellAmount,
             buyAmount: getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread),
@@ -281,8 +281,8 @@ contract('GrandaMento', (accounts: string[]) => {
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
-        // 0 is the proposal ID
-        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+        // 1 is the proposal ID
+        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
         assert.equal(exchangeProposal.exchanger, owner)
         assert.equal(exchangeProposal.stableToken, stableToken.address)
         assertEqualBN(
@@ -308,8 +308,8 @@ contract('GrandaMento', (accounts: string[]) => {
           stableTokenSellAmount,
           false // sellCelo = false as we are selling stableToken
         )
-        // 0 is the proposal ID
-        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+        // 1 is the proposal ID
+        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
         assert.equal(exchangeProposal.exchanger, owner)
         assert.equal(exchangeProposal.stableToken, stableToken.address)
         assertEqualBN(
@@ -397,7 +397,7 @@ contract('GrandaMento', (accounts: string[]) => {
           event: 'ExchangeProposalCreated',
           args: {
             exchanger: owner,
-            proposalId: 0,
+            proposalId: 1,
             stableToken: stableToken.address,
             sellAmount: celoSellAmount,
             buyAmount: getBuyAmount(celoSellAmount, fromFixed(defaultCeloStableTokenRate), spread),
@@ -408,8 +408,8 @@ contract('GrandaMento', (accounts: string[]) => {
 
       it('stores the exchange proposal', async () => {
         await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
-        // 0 is the proposal ID
-        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+        // 1 is the proposal ID
+        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
         assert.equal(exchangeProposal.exchanger, owner)
         assert.equal(exchangeProposal.stableToken, stableToken.address)
         assertEqualBN(exchangeProposal.sellAmount, celoSellAmount)
@@ -475,9 +475,9 @@ contract('GrandaMento', (accounts: string[]) => {
   })
 
   describe('#approveExchangeProposal', () => {
-    const proposalId = 0
+    const proposalId = 1
     beforeEach(async () => {
-      // Create an exchange proposal in the Proposed state with proposal ID 0
+      // Create an exchange proposal in the Proposed state with proposal ID 1
       await grandaMento.createExchangeProposal(
         stableTokenRegistryId,
         unit.times(500),
@@ -490,7 +490,7 @@ contract('GrandaMento', (accounts: string[]) => {
         assertLogMatches2(receipt.logs[0], {
           event: 'ExchangeProposalApproved',
           args: {
-            proposalId: 0,
+            proposalId: 1,
           },
         })
       })
@@ -515,11 +515,11 @@ contract('GrandaMento', (accounts: string[]) => {
 
       it('does not remove the exchange proposal from the activeProposalIds linked list', async () => {
         await grandaMento.approveExchangeProposal(proposalId, { from: approver })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(0)])
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
       })
 
       it('reverts if the exchange proposal does not exist', async () => {
-        const nonexistentProposalId = 1
+        const nonexistentProposalId = 2
         const proposal = parseExchangeProposal(
           await grandaMento.exchangeProposals(nonexistentProposalId)
         )
@@ -556,17 +556,17 @@ contract('GrandaMento', (accounts: string[]) => {
       })
 
       it('changes an exchange proposal from the Proposed state to the Cancelled state', async () => {
-        await grandaMento.cancelExchangeProposal(0, { from: alice })
-        const exchangeProposalAfter = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+        await grandaMento.cancelExchangeProposal(1, { from: alice })
+        const exchangeProposalAfter = parseExchangeProposal(await grandaMento.exchangeProposals(1))
         assert.equal(exchangeProposalAfter.state, ExchangeProposalState.Cancelled)
       })
 
       it('reverts when the exchange proposal is not in the Proposed state', async () => {
         // Get the exchange into the Approved state.
-        await grandaMento.approveExchangeProposal(0, { from: approver })
+        await grandaMento.approveExchangeProposal(1, { from: approver })
         // Try to have Alice cancel it when the exchange proposal is in the Approved state.
         await assertRevertWithReason(
-          grandaMento.cancelExchangeProposal(0, { from: alice }),
+          grandaMento.cancelExchangeProposal(1, { from: alice }),
           'Sender cannot cancel the exchange proposal'
         )
       })
@@ -586,17 +586,17 @@ contract('GrandaMento', (accounts: string[]) => {
 
       it('changes an exchange proposal from the Approved state to the Cancelled state', async () => {
         // Put it in the Approved state
-        await grandaMento.approveExchangeProposal(0, { from: approver })
+        await grandaMento.approveExchangeProposal(1, { from: approver })
         // Now cancel it
-        await grandaMento.cancelExchangeProposal(0, { from: owner })
-        const exchangeProposalAfter = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+        await grandaMento.cancelExchangeProposal(1, { from: owner })
+        const exchangeProposalAfter = parseExchangeProposal(await grandaMento.exchangeProposals(1))
         assert.equal(exchangeProposalAfter.state, ExchangeProposalState.Cancelled)
       })
 
       it('reverts when the exchange proposal is not in the Approved state', async () => {
         // Try to cancel it when the exchange proposal is in the Proposed state.
         await assertRevertWithReason(
-          grandaMento.cancelExchangeProposal(0, { from: owner }),
+          grandaMento.cancelExchangeProposal(1, { from: owner }),
           'Sender cannot cancel the exchange proposal'
         )
       })
@@ -612,18 +612,18 @@ contract('GrandaMento', (accounts: string[]) => {
             from: alice,
           }
         )
-        const receipt = await grandaMento.cancelExchangeProposal(0, { from: alice })
+        const receipt = await grandaMento.cancelExchangeProposal(1, { from: alice })
         assertLogMatches2(receipt.logs[0], {
           event: 'ExchangeProposalCancelled',
           args: {
-            proposalId: 0,
+            proposalId: 1,
             sender: alice,
           },
         })
       })
 
       it('removes the exchange proposal from the activeProposalIds linked list', async () => {
-        // proposalId 0
+        // proposalId 1
         await grandaMento.createExchangeProposal(
           stableTokenRegistryId,
           stableTokenSellAmount,
@@ -651,21 +651,21 @@ contract('GrandaMento', (accounts: string[]) => {
           }
         )
         assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-          new BigNumber(0),
           new BigNumber(1),
           new BigNumber(2),
+          new BigNumber(3),
+        ])
+        // Remove 2
+        await grandaMento.cancelExchangeProposal(2, { from: alice })
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+          new BigNumber(1),
+          new BigNumber(3),
         ])
         // Remove 1
         await grandaMento.cancelExchangeProposal(1, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-          new BigNumber(0),
-          new BigNumber(2),
-        ])
-        // Remove 0
-        await grandaMento.cancelExchangeProposal(0, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(2)])
-        // Remove 2
-        await grandaMento.cancelExchangeProposal(2, { from: alice })
+        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(3)])
+        // Remove 3
+        await grandaMento.cancelExchangeProposal(3, { from: alice })
         assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
       })
 
@@ -684,7 +684,7 @@ contract('GrandaMento', (accounts: string[]) => {
         it('refunds the same stable token amount as the original deposit when the inflation factor is 1', async () => {
           const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
           const aliceBalanceBefore = await stableToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(0, { from: alice })
+          await grandaMento.cancelExchangeProposal(1, { from: alice })
           const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
           const aliceBalanceAfter = await stableToken.balanceOf(alice)
 
@@ -701,7 +701,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
           const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
           const aliceBalanceBefore = await stableToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(0, { from: alice })
+          await grandaMento.cancelExchangeProposal(1, { from: alice })
           const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
           const aliceBalanceAfter = await stableToken.balanceOf(alice)
 
@@ -721,7 +721,7 @@ contract('GrandaMento', (accounts: string[]) => {
           )
 
           const aliceBalanceBefore = await stableToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(0, { from: alice })
+          await grandaMento.cancelExchangeProposal(1, { from: alice })
           const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
           const aliceBalanceAfter = await stableToken.balanceOf(alice)
 
@@ -741,7 +741,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
           const grandaMentoBalanceBefore = await goldToken.balanceOf(grandaMento.address)
           const aliceBalanceBefore = await goldToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(0, { from: alice })
+          await grandaMento.cancelExchangeProposal(1, { from: alice })
           const grandaMentoBalanceAfter = await goldToken.balanceOf(grandaMento.address)
           const aliceBalanceAfter = await goldToken.balanceOf(alice)
 
@@ -762,7 +762,7 @@ contract('GrandaMento', (accounts: string[]) => {
           await mockGoldToken.setBalanceOf(grandaMento.address, newGrandaMentoBalance)
 
           const aliceBalanceBefore = await mockGoldToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(0, { from: alice })
+          await grandaMento.cancelExchangeProposal(1, { from: alice })
           const grandaMentoBalanceAfter = await mockGoldToken.balanceOf(grandaMento.address)
           const aliceBalanceAfter = await mockGoldToken.balanceOf(alice)
 
@@ -782,14 +782,14 @@ contract('GrandaMento', (accounts: string[]) => {
         }
       )
       await assertRevertWithReason(
-        grandaMento.cancelExchangeProposal(0, { from: approver }),
+        grandaMento.cancelExchangeProposal(1, { from: approver }),
         'Sender cannot cancel the exchange proposal'
       )
     })
 
     it('reverts when the proposalId does not exist', async () => {
       await assertRevertWithReason(
-        grandaMento.cancelExchangeProposal(0, { from: approver }),
+        grandaMento.cancelExchangeProposal(1, { from: approver }),
         'Sender cannot cancel the exchange proposal'
       )
     })
@@ -814,7 +814,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
     describe('when the proposal is in the Approved state', () => {
       beforeEach(async () => {
-        await grandaMento.approveExchangeProposal(0, { from: approver })
+        await grandaMento.approveExchangeProposal(1, { from: approver })
       })
 
       describe('when vetoPeriodSeconds has elapsed since the approval time', () => {
@@ -823,26 +823,26 @@ contract('GrandaMento', (accounts: string[]) => {
         })
 
         it('emits the ExchangeProposalExecuted event', async () => {
-          const receipt = await grandaMento.executeExchangeProposal(0)
+          const receipt = await grandaMento.executeExchangeProposal(1)
           assertLogMatches2(receipt.logs[0], {
             event: 'ExchangeProposalExecuted',
             args: {
-              proposalId: 0,
+              proposalId: 1,
             },
           })
         })
 
         it('changes an exchange proposal from the Approved state to the Executed state', async () => {
-          await grandaMento.executeExchangeProposal(0)
+          await grandaMento.executeExchangeProposal(1)
           const exchangeProposalAfter = parseExchangeProposal(
-            await grandaMento.exchangeProposals(0)
+            await grandaMento.exchangeProposals(1)
           )
           assert.equal(exchangeProposalAfter.state, ExchangeProposalState.Executed)
         })
 
         it('removes the exchange proposal from the activeProposalIds linked list', async () => {
-          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(0)])
-          await grandaMento.executeExchangeProposal(0)
+          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
+          await grandaMento.executeExchangeProposal(1)
           assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
         })
 
@@ -854,7 +854,7 @@ contract('GrandaMento', (accounts: string[]) => {
           it('burns the correct stable token value when the inflation factor is 1', async () => {
             const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
             const totalSupplyBefore = await stableToken.totalSupply()
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
             const totalSupplyAfter = await stableToken.totalSupply()
 
@@ -871,7 +871,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
             const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
             const totalSupplyBefore = await stableToken.totalSupply()
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
             const totalSupplyAfter = await stableToken.totalSupply()
 
@@ -891,7 +891,7 @@ contract('GrandaMento', (accounts: string[]) => {
             )
 
             const totalSupplyBefore = await stableToken.totalSupply()
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const totalSupplyAfter = await stableToken.totalSupply()
 
             assertEqualBN(await stableToken.balanceOf(grandaMento.address), 0)
@@ -899,10 +899,10 @@ contract('GrandaMento', (accounts: string[]) => {
           })
 
           it('transfers the buyAmount of CELO out of the Reserve to the exchanger', async () => {
-            const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+            const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
             const reserveBalanceBefore = await goldToken.balanceOf(reserve.address)
             const exchangerBalanceBefore = await goldToken.balanceOf(alice)
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const reserveBalanceAfter = await goldToken.balanceOf(reserve.address)
             const exchangerBalanceAfter = await goldToken.balanceOf(alice)
 
@@ -925,7 +925,7 @@ contract('GrandaMento', (accounts: string[]) => {
           it('transfers the CELO to the Reserve', async () => {
             const grandaMentoBalanceBefore = await goldToken.balanceOf(grandaMento.address)
             const reserveBalanceBefore = await goldToken.balanceOf(reserve.address)
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const grandaMentoBalanceAfter = await goldToken.balanceOf(grandaMento.address)
             const reserveBalanceAfter = await goldToken.balanceOf(reserve.address)
 
@@ -943,7 +943,7 @@ contract('GrandaMento', (accounts: string[]) => {
             await mockGoldToken.setBalanceOf(reserve.address, unit.times(50000))
 
             const reserveBalanceBefore = await mockGoldToken.balanceOf(reserve.address)
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const reserveBalanceAfter = await mockGoldToken.balanceOf(reserve.address)
 
             assertEqualBN(await mockGoldToken.balanceOf(grandaMento.address), 0)
@@ -951,10 +951,10 @@ contract('GrandaMento', (accounts: string[]) => {
           })
 
           it('mints the buyAmount of stable token to the exchanger', async () => {
-            const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(0))
+            const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
             const totalSupplyBefore = await stableToken.totalSupply()
             const exchangerBalanceBefore = await stableToken.balanceOf(alice)
-            await grandaMento.executeExchangeProposal(0)
+            await grandaMento.executeExchangeProposal(1)
             const totalSupplyAfter = await stableToken.totalSupply()
             const exchangerBalanceAfter = await stableToken.balanceOf(alice)
 
@@ -972,7 +972,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // so instead just subtract by 10 to be safe.
         await timeTravel(vetoPeriodSeconds - 10, web3)
         await assertRevertWithReason(
-          grandaMento.executeExchangeProposal(0),
+          grandaMento.executeExchangeProposal(1),
           'Veto period not elapsed'
         )
       })
@@ -980,19 +980,19 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when the proposal is not in the Approved state', async () => {
       await assertRevertWithReason(
-        grandaMento.executeExchangeProposal(0),
+        grandaMento.executeExchangeProposal(1),
         'Proposal must be in Approved state'
       )
     })
 
     it('reverts if the proposal has been previously executed', async () => {
-      await grandaMento.approveExchangeProposal(0, { from: approver })
+      await grandaMento.approveExchangeProposal(1, { from: approver })
       await timeTravel(vetoPeriodSeconds, web3)
       // Execute it
-      await grandaMento.executeExchangeProposal(0)
+      await grandaMento.executeExchangeProposal(1)
       // Try executing it again
       await assertRevertWithReason(
-        grandaMento.executeExchangeProposal(0),
+        grandaMento.executeExchangeProposal(1),
         'Proposal must be in Approved state'
       )
     })
