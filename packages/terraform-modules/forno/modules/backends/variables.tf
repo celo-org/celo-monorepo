@@ -12,7 +12,7 @@ variable context_info {
   type = map(
     object({
       zone                                    = string
-      rpc_service_network_endpoint_group_name = string
+      service_network_endpoint_group_name     = string
     })
   )
   description = "Provides basic information on each context. Keys are contexts and values are the corresponding info"

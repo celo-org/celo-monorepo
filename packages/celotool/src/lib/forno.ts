@@ -98,6 +98,7 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
 
   return {
     backend_max_requests_per_second: '100',
+    backend_max_requests_per_second_kong: '10000',
     celo_env: celoEnv,
     context_info_http: JSON.stringify(contextInfosHttp),
     context_info_ws: JSON.stringify(contextInfosWs),
