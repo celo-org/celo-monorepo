@@ -1,5 +1,5 @@
 import { normalizeAddressWith0x, privateKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
-import { ErrorMessages, InMemoryKeystore } from './local-keystore-2'
+import { ErrorMessages, InMemoryKeystore, KeystoreWalletWrapper } from './local-keystore-2'
 
 jest.setTimeout(10000)
 
@@ -24,7 +24,7 @@ describe('test keystore functionality via in-memory (mock) keystore', () => {
     it('lists no addresses', async () => {
       expect(await keystore.listKeystoreAddresses()).toEqual([])
     })
-    it('imports keystore properly (can decrypt, can list addresses)', async () => {
+    it('imports keystore (can decrypt, can list addresses)', async () => {
       await keystore.importPrivateKey(PK1, PASSPHRASE1)
       expect(await keystore.listKeystoreAddresses()).toEqual([ADDRESS1])
       expect(trimLeading0x(await keystore.getPrivateKey(ADDRESS1, PASSPHRASE1))).toEqual(PK1)
@@ -39,7 +39,7 @@ describe('test keystore functionality via in-memory (mock) keystore', () => {
     })
   })
 
-  describe('checks with an existing keystore entry', () => {
+  describe('checks with a populated keystore', () => {
     beforeEach(() => {
       keystore.persistKeystore(KEYSTORE_NAME1, GETH_GEN_KEYSTORE1)
     })
@@ -84,23 +84,32 @@ describe('test keystore functionality via in-memory (mock) keystore', () => {
   })
 })
 
-// describe('keystore wallet wrapper tests', () => {
-//   let keystoreWallet: KeystoreWalletWrapper
-//   let keystoreTestDir: string
+describe('keystore wallet wrapper tests', () => {
+  let keystoreWallet: KeystoreWalletWrapper
 
-//   beforeAll(() => {
-//     keystoreTestDir = path.join(DIRECTORY, `test-wallet-keystore-${Date.now()}`)
-//   })
+  beforeEach(() => {
+    keystoreWallet = new KeystoreWalletWrapper(new InMemoryKeystore())
+  })
 
-//   beforeEach(() => {
-//     const randString = (Math.random() + 1).toString().substring(2, 10)
-//     keystoreWallet = new KeystoreWalletWrapper(
-//       path.join(keystoreTestDir, `test-keystore-${randString}`)
-//     )
-//   })
+  describe('checks with an empty keystore', () => {
+    it('imports private key into keystore wallet', async () => {
+      await keystoreWallet.importPrivateKey(PK1, PASSPHRASE1)
+      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
+    })
+  })
 
-//   it('imports private key into keystore wallet properly', async () => {
-//     await keystoreWallet.importPrivateKey(PK, PASSPHRASE)
-//     expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDR])
-//   })
-// })
+  describe('checks with a populated keystore', () => {
+    beforeEach(() => {
+      keystoreWallet.getKeystore().persistKeystore(KEYSTORE_NAME1, GETH_GEN_KEYSTORE1)
+    })
+
+    it('lists no accounts pre-unlock', async () => {
+      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([])
+    })
+
+    it('lists account post-unlock', async () => {
+      await keystoreWallet.unlockAccount(ADDRESS1, PASSPHRASE1)
+      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
+    })
+  })
+})

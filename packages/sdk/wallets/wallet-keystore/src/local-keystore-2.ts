@@ -161,12 +161,15 @@ export class KeystoreWalletWrapper {
 
   async importPrivateKey(privateKey: string, passphrase: string) {
     await this._keystore.importPrivateKey(privateKey, passphrase)
-    // // TODO do we also want to add the pk signer right here?
     this._localWallet.addAccount(privateKey)
   }
 
   getLocalWallet(): LocalWallet {
     return this._localWallet
+  }
+
+  getKeystore(): KeystoreBase {
+    return this._keystore
   }
 
   async unlockAccount(address: string, passphrase: string) {
