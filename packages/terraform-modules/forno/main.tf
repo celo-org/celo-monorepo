@@ -73,6 +73,7 @@ module "kong" {
   health_check_destination_port   = 8000
   type                            = "kong"
   timeout_sec                     = 1200 # 20 minutes
+  banned_cidr                     = var.banned_cidr
 }
 
 resource "google_compute_global_address" "global_address" {
@@ -117,6 +118,11 @@ resource "google_compute_url_map" "url_map" {
       paths   = ["/ws"]
       service = module.ws_backends.backend_service_id
     }
+
+    path_rule {
+      paths   = ["/kong"]
+      service = module.kong.backend_service_id
+    }
   }
 }
 
@@ -147,6 +153,6 @@ resource "google_compute_firewall" "allow-health-check" {
 
   allow {
     protocol = "tcp"
-    ports    = ["6000", "6001", "8545", "8546"]
+    ports    = ["6000", "6001", "8000", "8545", "8546"]
   }
 }
