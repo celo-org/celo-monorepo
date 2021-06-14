@@ -27,16 +27,6 @@ spec:
 {{- if .Values.extraVolumes }}
 {{ toYaml .Values.extraVolumes | indent 8 }}
 {{- end }}
-      # initContainers:
-      #   - name: psql
-      #     image: docker pull governmentpaas/psql:latest
-      #     imagePullPolicy: IfNotPresent
-      #     command:
-      #     - /bin/sh
-      #     - -c
-      #     args:
-      #     - |
-      #        psql 
       containers:
         - name: konga
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -67,6 +57,8 @@ spec:
         - name: restore-snapshot
           image: jcortejoso/httpie-jq:latest
           imagePullPolicy: IfNotPresent
+          stdin: true
+          tty: true
           command:
           - /bin/sh
           - -c
