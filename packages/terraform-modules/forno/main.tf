@@ -49,7 +49,7 @@ module "http_backends" {
   context_info                    = var.context_info_http
   health_check_destination_port   = 6000
   type                            = "http"
-  banned_cidr                     = var.banned_cidr
+  security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
 module "ws_backends" {
@@ -61,7 +61,7 @@ module "ws_backends" {
   health_check_destination_port   = 6001
   type                            = "ws"
   timeout_sec                     = 1200 # 20 minutes
-  banned_cidr                     = var.banned_cidr
+  security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
 module "kong" {
@@ -132,7 +132,8 @@ resource "google_compute_url_map" "url_map" {
 resource "google_compute_target_https_proxy" "target_https_proxy" {
   name             = "${var.celo_env}-forno-target-https-proxy"
   url_map          = google_compute_url_map.url_map.id
-  ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id, "https://www.googleapis.com/compute/v1/projects/celo-testnet-production/global/sslCertificates/rc1-tx-node-lb-forno-cert-drmawdkoofenvgce"]
+  // ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id, "https://www.googleapis.com/compute/v1/projects/celo-testnet-production/global/sslCertificates/rc1-tx-node-lb-forno-cert-drmawdkoofenvgce"]
+  ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id]
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {
