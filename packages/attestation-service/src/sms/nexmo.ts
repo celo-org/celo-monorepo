@@ -26,11 +26,12 @@ export class NexmoSmsProvider extends SmsProvider {
   nexmoNumbers: Array<{
     code: string
     phoneNumber: string
+    type: string
   }> = []
-  defaultNumberIndex: number = 0
   balanceMetric: boolean
   deliveryStatusURL: string | undefined
   applicationId: string | null = null
+  tollFreeType: string = 'landline-toll-free'
 
   constructor(
     apiKey: string,
@@ -70,16 +71,8 @@ export class NexmoSmsProvider extends SmsProvider {
     this.nexmoNumbers = availableNumbers.map((number: any) => ({
       phoneNumber: number.msisdn,
       code: phoneUtil.getRegionCodeForNumber(phoneUtil.parse('+' + number.msisdn)),
+      type: number.type,
     }))
-
-    // The US number is likely a toll-free number and cannot be used outside of US and Canada
-    // We therefore want to set the default number to be non-US for global reach
-    for (let i = 0; i < this.nexmoNumbers.length; i++) {
-      if (this.nexmoNumbers[i].code !== 'US') {
-        this.defaultNumberIndex = i
-        break
-      }
-    }
   }
 
   async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
@@ -166,6 +159,11 @@ export class NexmoSmsProvider extends SmsProvider {
     if (matchingNumber !== undefined) {
       return matchingNumber.phoneNumber
     }
-    return this.nexmoNumbers[this.defaultNumberIndex].phoneNumber
+    // Toll free numbers cannot send internationally
+    let defaultNumber = this.nexmoNumbers.find((number) => number.type !== this.tollFreeType)
+    if (!defaultNumber) {
+      defaultNumber = this.nexmoNumbers[0]
+    }
+    return defaultNumber.phoneNumber
   }
 }
