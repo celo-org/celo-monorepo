@@ -46,12 +46,14 @@ export abstract class KeystoreBase {
   async getAddressMap(): Promise<Record<string, string>> {
     // Don't store this to minimize race conditions (file is deleted/added manually)
     const addressToFile: Record<string, string> = {}
-    ;(await this.getAllKeystoreNames()).map((file) => (addressToFile[this.getAddress(file)] = file))
+    ;(await this.getAllKeystoreNames()).forEach(
+      (file) => (addressToFile[this.getAddress(file)] = file)
+    )
     return addressToFile
   }
 
   async importPrivateKey(privateKey: string, passphrase: string) {
-    // Only allow for new private keys to be imported into the keystore
+    // Duplicate entries for the same private key are not permitted
     const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
     if ((await this.listKeystoreAddresses()).includes(address)) {
       throw new Error(ErrorMessages.KEYSTORE_ENTRY_EXISTS)
@@ -107,8 +109,8 @@ export class InMemoryKeystore extends KeystoreBase {
     return this._storage[keystoreName]
   }
 
-  getAllKeystoreNames(): Promise<string[]> {
-    return new Promise((resolve) => resolve(Object.keys(this._storage)))
+  async getAllKeystoreNames(): Promise<string[]> {
+    return Object.keys(this._storage)
   }
 
   removeKeystore(keystoreName: string) {
