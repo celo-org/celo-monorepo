@@ -11,8 +11,8 @@ variable "celo_env" {
 variable "context_info" {
   type = map(
     object({
-      zone                                    = string
-      service_network_endpoint_group_name     = string
+      zone                                = string
+      service_network_endpoint_group_name = string
     })
   )
   description = "Provides basic information on each context. Keys are contexts and values are the corresponding info"
