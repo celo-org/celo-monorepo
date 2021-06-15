@@ -99,6 +99,10 @@ resource "google_compute_managed_ssl_certificate" "ssl_cert" {
 
 resource "random_id" "ssl_random_suffix" {
   byte_length = 4
+
+  keepers = {
+    domains = join(",", var.ssl_cert_domains)
+  }
 }
 
 resource "google_compute_url_map" "url_map" {
@@ -130,10 +134,11 @@ resource "google_compute_url_map" "url_map" {
 # whose utilization is not full.
 # See https://cloud.google.com/load-balancing/docs/https#network-service-tiers_1
 resource "google_compute_target_https_proxy" "target_https_proxy" {
-  name             = "${var.celo_env}-forno-target-https-proxy"
-  url_map          = google_compute_url_map.url_map.id
-  // ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id, "https://www.googleapis.com/compute/v1/projects/celo-testnet-production/global/sslCertificates/rc1-tx-node-lb-forno-cert-drmawdkoofenvgce"]
-  ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id]
+  name    = "${var.celo_env}-forno-target-https-proxy"
+  url_map = google_compute_url_map.url_map.id
+  ssl_certificates = [
+    google_compute_managed_ssl_certificate.ssl_cert.id,
+  ]
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {
