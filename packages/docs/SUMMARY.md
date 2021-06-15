@@ -64,21 +64,22 @@
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
-  <!-- - [Building a dApp with Contracts on Celo]() -->
-  <!-- - [The Celo Protocol]()
-    - [Architecture]()
-    - [Similarities with Ethereum]()
-    - [Difference between Ethereum and Celo]()
-      - [Mobile First]()
-      - [Architectural Differences]()
-        - [Validators, full node, light node]()
-      - [Protocol Differences]()
-        - [TX object - link to transactions]()
-        - [fees in dollars- link to Paying for Gas in Tokens]()
-      - [Development Differences]()
-    - [dApps on Celo]()
-      - [What is a dApp?]() -->
-    <!-- - [Architecture]() -->
+  - [WalletConnect](developer-resources/walkthroughs/wallet-connect.md)
+    <!-- - [Building a dApp with Contracts on Celo]() -->
+    <!-- - [The Celo Protocol]()
+      - [Architecture]()
+      - [Similarities with Ethereum]()
+      - [Difference between Ethereum and Celo]()
+        - [Mobile First]()
+        - [Architectural Differences]()
+          - [Validators, full node, light node]()
+        - [Protocol Differences]()
+          - [TX object - link to transactions]()
+          - [fees in dollars- link to Paying for Gas in Tokens]()
+        - [Development Differences]()
+      - [dApps on Celo]()
+        - [What is a dApp?]() -->
+      <!-- - [Architecture]() -->
 - [ContractKit](developer-resources/contractkit/README.md)
   - [Setup](developer-resources/contractkit/setup.md)
   - [Using the kit](developer-resources/contractkit/usage.md)
