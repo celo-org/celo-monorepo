@@ -12,50 +12,98 @@ function flattenSigsArray(sigs: Uint8Array[]) {
   return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))
 }
 export class BLSCryptographyClient {
-  private verifiedSignatures: Uint8Array[] = []
+  private unverifiedSignatures: ServicePartialSignature[] = []
+  private verifiedSignatures: ServicePartialSignature[] = []
+  private get totalSignatures(): number {
+    return this.unverifiedSignatures.length + this.verifiedSignatures.length
+  }
+  private get allSignatures(): Uint8Array {
+    const allSigs = this.verifiedSignatures.concat(this.unverifiedSignatures)
+    const sigBuffers = allSigs.map((response) => Buffer.from(response.signature, 'base64'))
+    return flattenSigsArray(sigBuffers)
+  }
 
-  public async addSignature(
-    serviceResponse: ServicePartialSignature,
-    blindedMessage: string,
-    logger?: Logger
-  ): Promise<void> {
-    logger = logger ?? rootLogger
-    const polynomial = config.thresholdSignature.polynomial
-    const sigBuffer = Buffer.from(serviceResponse.signature, 'base64')
-
-    try {
-      await threshold_bls.partialVerifyBlindSignature(
-        Buffer.from(polynomial, 'hex'),
-        Buffer.from(blindedMessage, 'base64'),
-        sigBuffer
-      )
-      this.verifiedSignatures.push(sigBuffer)
-    } catch (err) {
-      logger.error({ url: serviceResponse.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
-      logger.error(err)
-    }
+  public addSignature(serviceResponse: ServicePartialSignature) {
+    this.unverifiedSignatures.push(serviceResponse)
   }
 
   /**
    * Returns true if the number of valid signatures is enough to perform a combination
    */
-  public hasSufficientVerifiedSignatures(): boolean {
+  public hasSufficientSignatures(): boolean {
     const threshold = config.thresholdSignature.threshold
-    return this.verifiedSignatures.length >= threshold
+    return this.totalSignatures >= threshold
   }
 
   /*
    * Computes the BLS signature for the blinded phone number.
+   * Throws an exception if one of the signature is invalid
+   * and drops the invalid signature for future requests using this instance
    */
-  public async combinePartialBlindedSignatures(): Promise<string> {
+  public async combinePartialBlindedSignatures(
+    blindedMessage: string,
+    logger?: Logger
+  ): Promise<string> {
+    logger = logger ?? rootLogger
     const threshold = config.thresholdSignature.threshold
-    if (!this.hasSufficientVerifiedSignatures()) {
-      const err = new Error(
-        `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.verifiedSignatures.length}/${threshold}`
+    if (!this.hasSufficientSignatures()) {
+      throw new Error(
+        `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.totalSignatures}/${threshold}`
       )
-      throw err
     }
-    const result = threshold_bls.combine(threshold, flattenSigsArray(this.verifiedSignatures))
-    return Buffer.from(result).toString('base64')
+    // Optimistically attempt to combine unverified signatures
+    // If combination fails, iterate through each signature and remove invalid ones
+    // We do this since signature verification incurs higher latencies
+    try {
+      // TODO verify that this throws if invalid
+      const result = threshold_bls.combine(threshold, this.allSignatures)
+      return Buffer.from(result).toString('base64')
+    } catch (error) {
+      logger.error(error, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+      // Verify each signature and remove invalid ones
+      const verifySigReqs = this.unverifiedSignatures.map((unverifiedSignature) => {
+        return this.verifySignature(blindedMessage, unverifiedSignature, logger!)
+      })
+      await Promise.all(verifySigReqs)
+      this.clearUnverifiedSignatures()
+    }
+    // Invalid sigs have been removed
+    if (this.hasSufficientSignatures()) {
+      const result = threshold_bls.combine(threshold, this.allSignatures)
+      return Buffer.from(result).toString('base64')
+    }
+    throw new Error(ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+  }
+
+  private async verifySignature(
+    blindedMessage: string,
+    unverifiedSignature: ServicePartialSignature,
+    logger: Logger
+  ) {
+    const sigBuffer = Buffer.from(unverifiedSignature.signature, 'base64')
+    if (await this.isValidSignature(sigBuffer, blindedMessage)) {
+      // We move it to the verified set so that we don't need to re-verify in the future
+      this.verifiedSignatures.push(unverifiedSignature)
+    } else {
+      logger.error({ url: unverifiedSignature.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+    }
+  }
+
+  private clearUnverifiedSignatures() {
+    this.unverifiedSignatures = []
+  }
+
+  private async isValidSignature(signature: Buffer, blindedMessage: string) {
+    const polynomial = config.thresholdSignature.polynomial
+    try {
+      await threshold_bls.partialVerifyBlindSignature(
+        Buffer.from(polynomial, 'hex'),
+        Buffer.from(blindedMessage, 'base64'),
+        signature
+      )
+      return true
+    } catch {
+      return false
+    }
   }
 }
