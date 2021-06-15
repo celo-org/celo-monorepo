@@ -112,8 +112,8 @@ contract GrandaMento is
   // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
 
-  // An linkedlist of all exchange proposals that are currently in the Proposed or
-  // Approved state. Used for easily viewing all the exchange proposals off-chain.
+  // A list of all exchange proposals that are currently in the Proposed or
+  // Approved state. Used for easily viewing all the active exchange proposals.
   LinkedList.List private activeProposalIds;
 
   // Number of exchange proposals that exist. Used for assigning an exchange
@@ -259,7 +259,7 @@ contract GrandaMento is
         (proposal.state == ExchangeProposalState.Approved && isOwner()),
       "Sender cannot cancel the exchange proposal"
     );
-    // Mark the proposal as cancelled. Do so prior to refunding to protect from reentrancy.
+    // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
     // Remove the proposal from the active list.
     activeProposalIds.remove(proposalId);
@@ -288,7 +288,7 @@ contract GrandaMento is
       proposal.approvalTimestamp.add(vetoPeriodSeconds) <= block.timestamp,
       "Veto period not elapsed"
     );
-    // Mark the proposal as executed. Do so prior to exchanging to protect from reentrancy.
+    // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Executed;
     // Remove the proposal from the active list.
     activeProposalIds.remove(proposalId);
@@ -392,6 +392,11 @@ contract GrandaMento is
     return exchangeRate.multiply(adjustedSellAmount).fromFixed();
   }
 
+  /**
+   * @notice Gets the proposal identifiers of all exchange proposals in the
+   * Proposed or Approved state.
+   * @return An array of active exchange proposals IDs.
+   */
   function getActiveProposalIds() external view returns (uint256[] memory) {
     return activeProposalIds.getKeys();
   }
