@@ -76,6 +76,27 @@ export function validateMnemonic(
 }
 
 /**
+ * Return a list of the words in the mnemonic that are not in the list of valid BIP-39 words for the
+ * specified or detected language.
+ *
+ * @remarks Will return undefined if the language cannot be detected (e.g.  all the words are
+ * invalid, or half of the valid words are from one language and the other half from another.)
+ */
+export function invalidMnemonicWords(
+  mnemonic: string,
+  language?: MnemonicLanguages
+): string[] | undefined {
+  const words = splitMnemonic(mnemonic)
+  const detectedLanguage = language ?? detectMnemonicLanguage(words)
+  if (detectedLanguage === undefined) {
+    return undefined
+  }
+
+  const wordSet = new Set(getWordList(detectedLanguage))
+  return words.filter((word) => !wordSet.has(word))
+}
+
+/**
  * Normalize the mnemonic phrase to eliminate a number of inconsistencies with standard BIP-39
  * phrases that are likely to arise when a user manually enters a phrase.
  *
@@ -417,6 +438,7 @@ export const AccountUtils = {
   generateMnemonic,
   normalizeMnemonic,
   validateMnemonic,
+  invalidMnemonicWords,
   suggestMnemonicCorrections,
   generateKeys,
   generateSeed,

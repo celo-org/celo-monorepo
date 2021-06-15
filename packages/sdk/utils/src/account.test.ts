@@ -4,6 +4,7 @@ import {
   generateKeys,
   generateMnemonic,
   getAllLanguages,
+  invalidMnemonicWords,
   MnemonicStrength,
   normalizeMnemonic,
   suggestMnemonicCorrections,
@@ -341,6 +342,28 @@ describe('AccountUtils', () => {
         expect(normalizeMnemonic(mnemonic)).toEqual(mnemonic)
       })
     }
+  })
+
+  describe('.invalidMnemonicWords()', () => {
+    it('should return list of invalid words in a phrase with errors', () => {
+      const mnemonic =
+        'salute roayl possible rare dufbuty wabnt ynfikd oik cabbage labor approbe winner claw conduct spider velvet buyer level second adult payment blish inject draw'
+      const invalidWords = ['roayl', 'dufbuty', 'wabnt', 'ynfikd', 'oik', 'approbe', 'blish']
+      expect(invalidMnemonicWords(mnemonic)).toEqual(invalidWords)
+    })
+
+    it('should return an empty list when given a correct phrase', () => {
+      const mnemonic =
+        'salute royal possible rare dignity want unfold oil cabbage labor approve winner claw conduct spider velvet buyer level second adult payment blush inject draw'
+      expect(invalidMnemonicWords(mnemonic)).toEqual([])
+    })
+
+    it('should return undefined when the language is undetermined', () => {
+      // A specially crafted phrase with equal numbers of english and spanish words, one of each being invalid.
+      const mnemonic =
+        'oil sponsor unlock diet aprove trim usual ethics tip prepare twist hunt neto sanidad tregua cuneta cazar tirón trueno enredo tauro pan torpedo húmedo'
+      expect(invalidMnemonicWords(mnemonic)).not.toBeDefined()
+    })
   })
 
   describe('.suggestMnemonicCorrections()', () => {
