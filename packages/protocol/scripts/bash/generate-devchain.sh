@@ -28,11 +28,14 @@ CURR_BRANCH=`git symbolic-ref -q HEAD --short`
 
 checkout_tag $BRANCH $LOG_FILE contracts
 checkout_tag $BRANCH $LOG_FILE migrations
-# build migrations
-yarn build:ts
+checkout_tag $BRANCH $LOG_FILE test
+
+# build contracts and migrations (and tests which are ideally unnecessary)
+yarn build
 
 echo "- Create local network"
 yarn devchain generate-tar "build/$BRANCH/devchain.tar.gz" $GRANTS_FLAG >> $LOG_FILE
 
 checkout_tag $CURR_BRANCH $LOG_FILE contracts
 checkout_tag $CURR_BRANCH $LOG_FILE migrations
+checkout_tag $CURR_BRANCH $LOG_FILE test

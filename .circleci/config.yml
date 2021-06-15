@@ -242,11 +242,11 @@ jobs:
       - run:
           name: Check if the test should run
           command: ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-      # - run:
-      #     name: Generate devchain of previous release
-      #     command: yarn --cwd packages/protocol test:generate-devchain -b $RELEASE_TAG -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
       - run:
-          name: Test against current release
+          name: Generate devchain of current network release
+          command: yarn --cwd packages/protocol test:generate-devchain -b $RELEASE_TAG -l /dev/stdoutˆ
+      - run:
+          name: Test release against current network release
           command: yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -l /dev/stdout
 
   protocol-test-release-snapshots:
