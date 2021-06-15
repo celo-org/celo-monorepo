@@ -17,6 +17,7 @@ import {
   getHooks,
   mnemonic,
   sleep,
+  waitForAnnounceToStabilize,
   waitForBlock,
   waitForEpochTransition,
   waitToFinishInstanceSyncing,
@@ -268,6 +269,7 @@ describe('governance tests', () => {
     accounts = await kit._web3Contracts.getAccounts()
 
     await waitForBlock(web3, 1)
+    await waitForAnnounceToStabilize(web3)
 
     const er = await kit._web3Contracts.getEpochRewards()
     const fraction = await er.methods.getCarbonOffsettingFraction().call()

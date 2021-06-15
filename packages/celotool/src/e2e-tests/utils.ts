@@ -103,6 +103,16 @@ export async function waitForEpochTransition(web3: Web3, epoch: number) {
   } while (blockNumber % epoch !== 1)
 }
 
+export async function waitForAnnounceToStabilize(web3: Web3) {
+  // Due to a problem in the announce protocol's settings, it can take a minute for all the validators
+  // to be aware of each other even though they are connected.  This can lead to the first validator missing
+  // block signatures initially.  So we wait for that to pass.
+  // Before we used mycelo, this wasn't noticeable because the migrations  meant that the network would have
+  // been running for close to 10 minutes already, which was more than enough time.
+  // TODO: This function and its uses can be removed after the announce startup behavior has been resolved.
+  await waitForBlock(web3, 70)
+}
+
 export function assertAlmostEqual(
   actual: BigNumber,
   expected: BigNumber,
