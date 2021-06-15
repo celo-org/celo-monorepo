@@ -125,7 +125,7 @@ Past Foundation votes recipients:
 * **Cohort 4:** [22 validator groups](https://docs.google.com/spreadsheets/d/1bp2nJUxqhWner-uOffBohKQc3N93e--eMpP7XOBrbGI/edit?usp=sharing) -- votes expired on May 1, 2021
 
 Currently receiving Foundation votes: 
-* **Cohort 5:** [24 validator groups](https://docs.google.com/spreadsheets/d/1n2lwFsAsFaohng4Bo_FEWcoXzZl5CrLFxA6EK0nuFSA/edit#gid=0) -- votes will expire on Aug 1, 2021
+* **Cohort 5:** [24 validator groups](https://docs.google.com/spreadsheets/d/1n2lwFsAsFaohng4Bo_FEWcoXzZl5CrLFxA6EK0nuFSA/edit#gid=0) -- votes expired on Aug 1, 2021
 * **Cohort 6:** [7 validator groups](https://docs.google.com/spreadsheets/d/1HT_fN-mSAL2etF0Po_h122jeU1zpEtdpb_khogOfBCg/edit?usp=sharing) -- votes will expire on Nov 1, 2021
 * **Cohort 7:** [23 validator groups](https://docs.google.com/spreadsheets/d/1eYBzQMObTAy-WKs5CHHFnGGl_k1rQo0MBHinV3OgSik/edit#gid=1466530578) -- votes will expire on Feb 1, 2022
 
