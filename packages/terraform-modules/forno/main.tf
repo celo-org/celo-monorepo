@@ -73,7 +73,7 @@ module "kong" {
   health_check_destination_port   = 8000
   type                            = "kong"
   timeout_sec                     = 1200 # 20 minutes
-  banned_cidr                     = var.banned_cidr
+  security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
 resource "google_compute_global_address" "global_address" {
