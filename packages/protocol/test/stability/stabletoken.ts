@@ -399,7 +399,8 @@ contract('StableToken', (accounts: string[]) => {
       const expectedBalance = amountToMint - amountToBurn
       assert.equal(balance, expectedBalance)
       const supply = (await stableToken.totalSupply()).toNumber()
-      assert.equal(supply, expectedBalance)
+      const expectedSupply = amountToMint * 2 - amountToBurn
+      assert.equal(supply, expectedSupply)
     })
 
     it('should allow the registered granda mento contract to burn', async () => {
@@ -408,7 +409,8 @@ contract('StableToken', (accounts: string[]) => {
       const expectedBalance = amountToMint - amountToBurn
       assert.equal(balance, expectedBalance)
       const supply = (await stableToken.totalSupply()).toNumber()
-      assert.equal(supply, expectedBalance)
+      const expectedSupply = amountToMint * 2 - amountToBurn
+      assert.equal(supply, expectedSupply)
     })
 
     it('should not allow anyone else to burn', async () => {
