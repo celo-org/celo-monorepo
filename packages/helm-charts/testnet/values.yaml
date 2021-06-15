@@ -32,9 +32,10 @@ geth:
     requests:
       memory: "256Mi"
       cpu: "500m"
-    limits:
-      memory: "4Gi"
-      cpu: "4"
+    limits: {}
+    # limits:
+    #   memory: "4Gi"
+    #   cpu: "4"
   fullnodeCheckBlockAge: true
 
 # UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
