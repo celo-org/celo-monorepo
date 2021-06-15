@@ -1,0 +1,54 @@
+name: core-contracts-release
+
+# Run this workflow manually
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       release_version:
+#         description: 'Version number of the release to be deployed'
+#         required: true
+#       network:
+#         description: 'Network to deploy core contracts release on'
+#         required: true
+on: push
+
+env:
+  NETWORK: alfajores
+  VERSION: 5
+
+jobs:
+  core_contracts_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # all history
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: yarn
+        run: |
+          npm install --global yarn
+          yarn
+          yarn lerna bootstrap
+
+      - name: Build packages
+        run: yarn lerna run build --ignore docs
+
+      - name: Verify previous release
+        run: |
+          export OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
+          cd packages/protocol && yarn run verify-deployed -b $OLD_BRANCH -n ${{ env.NETWORK }} -f;
+
+      - name: Verify version compatibility
+        run: |
+          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
+          NEW_BRANCH=alexbharley/github-actions-deployment-2
+          cd packages/protocol && yarn run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json;
+
+      - name: Make release
+        run: |
+          NEW_BRANCH=alexbharley/github-actions-deployment-2
+          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";

@@ -20,6 +20,7 @@ function build_tag() {
   if [ ! -d $BUILD_DIR ]; then
     echo " - Build contract artifacts at $BUILD_DIR"
     yarn build:sol >> $LOG_FILE
+    echo " - Built contract artifacts at $BUILD_DIR !"
     rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
     mv build/contracts $BUILD_DIR
   else
@@ -28,5 +29,5 @@ function build_tag() {
   [ -d "build/contracts_tmp" ] && mv build/contracts_tmp build/contracts
 
   [ -d contracts ] && rm -r contracts
-  git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE
+  git checkout -- contracts 2>>$LOG_FILE >> $LOG_FILE
 }
