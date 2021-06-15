@@ -50,15 +50,15 @@ describe(`BLS service computes signature`, () => {
 
     const blsCryptoClient = new BLSCryptographyClient()
     for (let i = 0; i < signatures.length; i++) {
-      await blsCryptoClient.addSignature(signatures[i], blindedMsg)
+      await blsCryptoClient.addSignature(signatures[i])
       if (i >= 2) {
-        expect(blsCryptoClient.hasSufficientVerifiedSignatures()).toBeTruthy()
+        expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
       } else {
-        expect(blsCryptoClient.hasSufficientVerifiedSignatures()).toBeFalsy()
+        expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
       }
     }
 
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures()
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -102,9 +102,9 @@ describe(`BLS service computes signature`, () => {
 
     const blsCryptoClient = new BLSCryptographyClient()
     await signatures.forEach(async (signature) => {
-      await blsCryptoClient.addSignature(signature, blindedMsg)
+      await blsCryptoClient.addSignature(signature)
     })
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures()
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -147,12 +147,73 @@ describe(`BLS service computes signature`, () => {
 
     const blsCryptoClient = new BLSCryptographyClient()
     await signatures.forEach(async (signature) => {
-      await blsCryptoClient.addSignature(signature, blindedMsg)
+      await blsCryptoClient.addSignature(signature)
     })
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures()
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     } catch (e) {
       expect(e.message.includes('Not enough not enough partial signatures'))
     }
+  })
+  it('throws error if signature is invalid, but can recover from failure with sufficient signatures', async () => {
+    const signatures: ServicePartialSignature[] = [
+      {
+        url: 'url1',
+        signature:
+          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
+      },
+      {
+        url: 'url2',
+        signature: 'X',
+      },
+      {
+        url: 'url3',
+        signature:
+          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
+      },
+      {
+        url: 'url4',
+        signature:
+          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
+      },
+    ]
+
+    const message = Buffer.from('hello world')
+    const userSeed = new Uint8Array(32)
+    for (let i = 0; i < userSeed.length - 1; i++) {
+      userSeed[i] = i
+    }
+
+    const blindedMsgResult = threshold_bls.blind(message, userSeed)
+    const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
+
+    const blsCryptoClient = new BLSCryptographyClient()
+    // Add sigs one-by-one and verify intermediary states
+    await blsCryptoClient.addSignature(signatures[0])
+    expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
+    await blsCryptoClient.addSignature(signatures[1])
+    expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
+    await blsCryptoClient.addSignature(signatures[2])
+    expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
+    // Should fail since 1/3 sigs are invalid
+    try {
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    } catch (e) {
+      expect(e.message.includes('Not enough not enough partial signatures'))
+    }
+    // Should be false, now that the invalid signature has been removed
+    expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
+
+    await blsCryptoClient.addSignature(signatures[3])
+    expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
+
+    const unblindedSignedMessage = threshold_bls.unblind(
+      Buffer.from(actual, 'base64'),
+      blindedMsgResult.blindingFactor
+    )
+    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
+    expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 })

@@ -37,7 +37,7 @@ export class BLSCryptographyClient {
 
   /*
    * Computes the BLS signature for the blinded phone number.
-   * Throws an exception if one of the signature is invalid
+   * Throws an exception if not enough valid signatures
    * and drops the invalid signature for future requests using this instance
    */
   public async combinePartialBlindedSignatures(
@@ -55,22 +55,17 @@ export class BLSCryptographyClient {
     // If combination fails, iterate through each signature and remove invalid ones
     // We do this since signature verification incurs higher latencies
     try {
-      // TODO verify that this throws if invalid
       const result = threshold_bls.combine(threshold, this.allSignatures)
       return Buffer.from(result).toString('base64')
     } catch (error) {
       logger.error(error, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
       // Verify each signature and remove invalid ones
+      // This logging will help us troubleshoot which signers are having issues
       const verifySigReqs = this.unverifiedSignatures.map((unverifiedSignature) => {
         return this.verifySignature(blindedMessage, unverifiedSignature, logger!)
       })
       await Promise.all(verifySigReqs)
       this.clearUnverifiedSignatures()
-    }
-    // Invalid sigs have been removed
-    if (this.hasSufficientSignatures()) {
-      const result = threshold_bls.combine(threshold, this.allSignatures)
-      return Buffer.from(result).toString('base64')
     }
     throw new Error(ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
   }
