@@ -944,13 +944,14 @@ contract Accounts is
   }
 
   /**
-   * @notice Returns the address that signed the provided role authorization
+   * @notice Returns the address that signed the provided role authorization.
    * @param account The `account` property signed over in the EIP712 signature
    * @param signer The `signer` property signed over in the EIP712 signature
    * @param role The `role` property signed over in the EIP712 signature
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @return The address that signed the provided role authorization.
    */
   function getRoleAuthorizationSigner(
     address account,
@@ -969,6 +970,7 @@ contract Accounts is
   /**
    * @notice Authorizes a role of `msg.sender`'s account to another address (`authorized`).
    * @param authorized The address to authorize.
+   * @param role The role to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
