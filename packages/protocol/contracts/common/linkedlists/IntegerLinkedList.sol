@@ -13,14 +13,6 @@ library IntegerLinkedList {
   using SafeMath for uint256;
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
-  /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
@@ -28,7 +20,7 @@ library IntegerLinkedList {
    * @param nextKey The key of the element that comes after the element to insert.
    */
   function insert(LinkedList.List storage list, uint256 key, uint256 previousKey, uint256 nextKey)
-    public
+    internal
   {
     list.insert(bytes32(key), bytes32(previousKey), bytes32(nextKey));
   }
@@ -38,7 +30,7 @@ library IntegerLinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
-  function push(LinkedList.List storage list, uint256 key) public {
+  function push(LinkedList.List storage list, uint256 key) internal {
     list.insert(bytes32(key), bytes32(0), list.tail);
   }
 
@@ -47,7 +39,7 @@ library IntegerLinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(LinkedList.List storage list, uint256 key) public {
+  function remove(LinkedList.List storage list, uint256 key) internal {
     list.remove(bytes32(key));
   }
 
@@ -59,7 +51,7 @@ library IntegerLinkedList {
    * @param nextKey The key of the element that comes after the updated element.
    */
   function update(LinkedList.List storage list, uint256 key, uint256 previousKey, uint256 nextKey)
-    public
+    internal
   {
     list.update(bytes32(key), bytes32(previousKey), bytes32(nextKey));
   }
@@ -70,7 +62,7 @@ library IntegerLinkedList {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(LinkedList.List storage list, uint256 key) public view returns (bool) {
+  function contains(LinkedList.List storage list, uint256 key) internal view returns (bool) {
     return list.elements[bytes32(key)].exists;
   }
 
@@ -81,7 +73,7 @@ library IntegerLinkedList {
    * @return The keys of the greatest elements.
    * @dev Reverts if n is greater than the number of elements in the list.
    */
-  function headN(LinkedList.List storage list, uint256 n) public view returns (uint256[] memory) {
+  function headN(LinkedList.List storage list, uint256 n) internal view returns (uint256[] memory) {
     bytes32[] memory byteKeys = list.headN(n);
     uint256[] memory keys = new uint256[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -95,7 +87,7 @@ library IntegerLinkedList {
    * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(LinkedList.List storage list) public view returns (uint256[] memory) {
+  function getKeys(LinkedList.List storage list) internal view returns (uint256[] memory) {
     return headN(list, list.numElements);
   }
 }
