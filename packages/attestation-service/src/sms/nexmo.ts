@@ -155,10 +155,15 @@ export class NexmoSmsProvider extends SmsProvider {
   }
 
   private getMatchingNumber = (countryCode: string) => {
-    const matchingNumber = this.nexmoNumbers.find((number) => number.code === countryCode)
+    // Use toll-free number for +1 numbers to satisfy 10DLC requirements
+    const matchingNumber = this.nexmoNumbers.find(
+      (number) =>
+        number.code === countryCode && (countryCode !== 'US' || number.type === this.tollFreeType)
+    )
     if (matchingNumber !== undefined) {
       return matchingNumber.phoneNumber
     }
+
     // Toll free numbers cannot send internationally
     let defaultNumber = this.nexmoNumbers.find((number) => number.type !== this.tollFreeType)
     if (!defaultNumber) {
