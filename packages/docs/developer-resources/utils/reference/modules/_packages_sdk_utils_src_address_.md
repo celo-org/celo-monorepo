@@ -131,7 +131,7 @@ ___
 
 ▸ **isValidAddress**(`input`: string): *boolean*
 
-*Defined in [packages/sdk/utils/src/address.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L46)*
+*Defined in [packages/sdk/utils/src/address.ts:46](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L46)*
 
 **Parameters:**
 
@@ -147,7 +147,7 @@ ___
 
 ▸ **isValidPrivateKey**(`privateKey`: string): *boolean*
 
-*Defined in [packages/sdk/utils/src/address.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L43)*
+*Defined in [packages/sdk/utils/src/address.ts:43](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L43)*
 
 **Parameters:**
 
@@ -163,7 +163,7 @@ ___
 
 ▸ **privateKeyToAddress**(`privateKey`: string): *string*
 
-*Defined in [packages/sdk/utils/src/address.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L32)*
+*Defined in [packages/sdk/utils/src/address.ts:32](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L32)*
 
 **Parameters:**
 
@@ -179,7 +179,7 @@ ___
 
 ▸ **privateKeyToPublicKey**(`privateKey`: string): *string*
 
-*Defined in [packages/sdk/utils/src/address.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L35)*
+*Defined in [packages/sdk/utils/src/address.ts:35](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L35)*
 
 **Parameters:**
 
@@ -195,7 +195,7 @@ ___
 
 ▸ **publicKeyToAddress**(`publicKey`: string): *string*
 
-*Defined in [packages/sdk/utils/src/address.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L38)*
+*Defined in [packages/sdk/utils/src/address.ts:38](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/address.ts#L38)*
 
 **Parameters:**
 

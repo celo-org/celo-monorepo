@@ -16,6 +16,8 @@
 * [E164Number](_packages_sdk_utils_src_io_.md#e164number)
 * [GetAttestationRequest](_packages_sdk_utils_src_io_.md#getattestationrequest)
 * [Signature](_packages_sdk_utils_src_io_.md#signature)
+* [VerifiableCredentialRequest](_packages_sdk_utils_src_io_.md#verifiablecredentialrequest)
+* [VerifiableCredentialResponse](_packages_sdk_utils_src_io_.md#verifiablecredentialresponse)
 
 ### Variables
 
@@ -31,6 +33,8 @@
 * [SaltType](_packages_sdk_utils_src_io_.md#const-salttype)
 * [SignatureType](_packages_sdk_utils_src_io_.md#const-signaturetype)
 * [UrlType](_packages_sdk_utils_src_io_.md#const-urltype)
+* [VerifiableCredentialRequestType](_packages_sdk_utils_src_io_.md#const-verifiablecredentialrequesttype)
+* [VerifiableCredentialResponseType](_packages_sdk_utils_src_io_.md#const-verifiablecredentialresponsetype)
 
 ## References
 
@@ -50,7 +54,7 @@ ___
 
 Ƭ **Address**: *t.TypeOf‹typeof AddressType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L101)*
+*Defined in [packages/sdk/utils/src/io.ts:107](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L107)*
 
 ___
 
@@ -58,7 +62,7 @@ ___
 
 Ƭ **AttestationRequest**: *t.TypeOf‹typeof AttestationRequestType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L116)*
+*Defined in [packages/sdk/utils/src/io.ts:122](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L122)*
 
 ___
 
@@ -66,7 +70,7 @@ ___
 
 Ƭ **AttestationResponse**: *t.TypeOf‹typeof AttestationResponseType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:162](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L162)*
+*Defined in [packages/sdk/utils/src/io.ts:170](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L170)*
 
 ___
 
@@ -74,7 +78,7 @@ ___
 
 Ƭ **AttestationServiceTestRequest**: *t.TypeOf‹typeof AttestationServiceTestRequestType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L98)*
+*Defined in [packages/sdk/utils/src/io.ts:98](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L98)*
 
 ___
 
@@ -82,7 +86,7 @@ ___
 
 Ƭ **E164Number**: *t.TypeOf‹typeof E164PhoneNumberType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L102)*
+*Defined in [packages/sdk/utils/src/io.ts:108](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L108)*
 
 ___
 
@@ -90,7 +94,7 @@ ___
 
 Ƭ **GetAttestationRequest**: *t.TypeOf‹typeof GetAttestationRequestType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L128)*
+*Defined in [packages/sdk/utils/src/io.ts:134](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L134)*
 
 ___
 
@@ -98,7 +102,23 @@ ___
 
 Ƭ **Signature**: *t.TypeOf‹typeof SignatureType›*
 
-*Defined in [packages/sdk/utils/src/io.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L100)*
+*Defined in [packages/sdk/utils/src/io.ts:106](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L106)*
+
+___
+
+###  VerifiableCredentialRequest
+
+Ƭ **VerifiableCredentialRequest**: *t.TypeOf‹typeof VerifiableCredentialRequestType›*
+
+*Defined in [packages/sdk/utils/src/io.ts:104](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L104)*
+
+___
+
+###  VerifiableCredentialResponse
+
+Ƭ **VerifiableCredentialResponse**: *t.TypeOf‹typeof VerifiableCredentialResponseType›*
+
+*Defined in [packages/sdk/utils/src/io.ts:183](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L183)*
 
 ## Variables
 
@@ -116,7 +136,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L51)*
+*Defined in [packages/sdk/utils/src/io.ts:51](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L51)*
 
 ___
 
@@ -134,7 +154,7 @@ ___
   language: t.union([t.undefined, t.string]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L104)*
+*Defined in [packages/sdk/utils/src/io.ts:110](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L110)*
 
 ___
 
@@ -160,6 +180,8 @@ ___
   status: t.union([t.undefined, t.string]),
   attempt: t.union([t.undefined, t.number]),
   countryCode: t.union([t.undefined, t.string]),
+  phoneNumberType: t.union([t.undefined, t.string]),
+  credentials: t.union([t.undefined, t.Array]),
 
   // Time to receive eventual delivery/failure (inc retries)
   duration: t.union([t.undefined, t.number]),
@@ -172,7 +194,7 @@ ___
   attestationCode: t.union([t.undefined, t.string]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L130)*
+*Defined in [packages/sdk/utils/src/io.ts:136](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L136)*
 
 ___
 
@@ -191,7 +213,7 @@ ___
   appSignature: t.string,
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L79)*
+*Defined in [packages/sdk/utils/src/io.ts:79](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L79)*
 
 ___
 
@@ -204,7 +226,7 @@ ___
   provider: t.union([t.string, t.undefined]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L92)*
+*Defined in [packages/sdk/utils/src/io.ts:92](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L92)*
 
 ___
 
@@ -222,7 +244,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L39)*
+*Defined in [packages/sdk/utils/src/io.ts:39](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L39)*
 
 ___
 
@@ -238,7 +260,7 @@ ___
   securityCode: t.union([t.undefined, t.string]),
 })
 
-*Defined in [packages/sdk/utils/src/io.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L118)*
+*Defined in [packages/sdk/utils/src/io.ts:124](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L124)*
 
 ___
 
@@ -259,7 +281,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L24)*
+*Defined in [packages/sdk/utils/src/io.ts:24](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L24)*
 
 ___
 
@@ -277,7 +299,7 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L63)*
+*Defined in [packages/sdk/utils/src/io.ts:63](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L63)*
 
 ___
 
@@ -285,7 +307,7 @@ ___
 
 • **SaltType**: *StringC‹›* = t.string
 
-*Defined in [packages/sdk/utils/src/io.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L77)*
+*Defined in [packages/sdk/utils/src/io.ts:77](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L77)*
 
 ___
 
@@ -293,7 +315,7 @@ ___
 
 • **SignatureType**: *StringC‹›* = t.string
 
-*Defined in [packages/sdk/utils/src/io.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L75)*
+*Defined in [packages/sdk/utils/src/io.ts:75](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L75)*
 
 ___
 
@@ -311,4 +333,32 @@ ___
   String
 )
 
-*Defined in [packages/sdk/utils/src/io.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L12)*
+*Defined in [packages/sdk/utils/src/io.ts:12](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L12)*
+
+___
+
+### `Const` VerifiableCredentialRequestType
+
+• **VerifiableCredentialRequestType**: *TypeC‹object›* = t.type({
+  accountAddress: AddressType,
+  phoneNumberType: t.string,
+})
+
+*Defined in [packages/sdk/utils/src/io.ts:100](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L100)*
+
+___
+
+### `Const` VerifiableCredentialResponseType
+
+• **VerifiableCredentialResponseType**: *TypeC‹object›* = t.type({
+  // Always returned in 1.0.x
+  success: t.boolean,
+
+  // New fields
+  account: t.union([t.undefined, AddressType]),
+  issuer: t.union([t.undefined, AddressType]),
+  phoneNumberType: t.union([t.undefined, t.string]),
+  credentials: t.union([t.undefined, t.array(t.string)]),
+})
+
+*Defined in [packages/sdk/utils/src/io.ts:172](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L172)*

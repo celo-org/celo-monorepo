@@ -13,7 +13,7 @@
 
 • **SUCCESS**: = "200"
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L11)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:11](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L11)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **UNAUTHORIZED**: = "401"
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L12)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:12](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L12)*

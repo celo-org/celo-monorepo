@@ -102,7 +102,7 @@ export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTe
 
 export const VerifiableCredentialRequestType = t.type({
   accountAddress: AddressType,
-  phoneType: t.string,
+  phoneNumberType: t.string,
 })
 export type VerifiableCredentialRequest = t.TypeOf<typeof VerifiableCredentialRequestType>
 
@@ -175,9 +175,6 @@ export type AttestationResponse = t.TypeOf<typeof AttestationResponseType>
 export const VerifiableCredentialResponseType = t.type({
   // Always returned in 1.0.x
   success: t.boolean,
-
-  // Stringifyed JSON dict of dicts, mapping attempt to error info.
-  errors: t.union([t.undefined, t.array(t.string)]),
 
   // New fields
   account: t.union([t.undefined, AddressType]),

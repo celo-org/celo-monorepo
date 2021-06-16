@@ -18,7 +18,7 @@
 
 • **callback**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L23)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:23](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L23)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **dappName**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L25)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:25](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L25)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **requestId**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L24)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:24](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L24)*

@@ -5,7 +5,6 @@ import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { rootLogger } from './logger'
 import { AttestationModel, AttestationStatus } from './models/attestation'
-import { VerifiableCredentialModel } from './models/verifiable_credential'
 
 export enum ErrorMessages {
   INVALID_SIGNATURE = 'Invalid signature provided',
@@ -109,19 +108,14 @@ export function respondWithAttestation(
   )
 }
 
-export function respondWithVerifiableCredential(
-  res: express.Response,
-  verifiableCredential: VerifiableCredentialModel,
-  alwaysSuccess?: boolean | undefined
-) {
-  res.status(alwaysSuccess ? 200 : verifiableCredential.failure() ? 422 : 200).json(
+export function respondWithVerifiableCredential(res: express.Response, verifiableCredential: any) {
+  res.status(200).json(
     VerifiableCredentialResponseType.encode({
-      success: alwaysSuccess ? true : !verifiableCredential.failure(),
-      errors: verifiableCredential.errors(),
+      success: true,
       account: verifiableCredential.credentialSubject.id,
       issuer: verifiableCredential.issuer,
       phoneNumberType: verifiableCredential.credentialSubject.phoneNumberType,
-      credentials: [JSON.stringify(verifiableCredential)],
+      credentials: [verifiableCredential],
     })
   )
 }

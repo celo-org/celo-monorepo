@@ -22,7 +22,7 @@
 
 • **estimatedGas**: *number*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L104)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:107](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L107)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **feeCurrencyAddress**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L108)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:111](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L111)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **from**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L105)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:108](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L108)*
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **nonce**: *number*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L107)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:110](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L110)*
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **to**? : *undefined | string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L106)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:109](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L109)*
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 • **txData**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L103)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:106](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L106)*
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L109)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:112](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L112)*

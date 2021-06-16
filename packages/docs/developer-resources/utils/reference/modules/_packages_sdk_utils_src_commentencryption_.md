@@ -23,7 +23,7 @@
 
 ▸ **decryptComment**(`comment`: string, `key`: Buffer, `sender`: boolean): *[EncryptionStatus](../interfaces/_packages_sdk_utils_src_commentencryption_.encryptionstatus.md)*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L104)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:104](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L104)*
 
 Decrypts a comments encrypted by encryptComment. If it cannot decrypt the comment (i.e. comment was
 never encrypted in the first place), it returns the comments without any changes.
@@ -46,7 +46,7 @@ ___
 
 ▸ **decryptData**(`data`: Buffer, `key`: Buffer, `sender`: boolean): *Buffer*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L45)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:45](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L45)*
 
 Decrypts raw data that was encrypted by encryptData. Throws on error.
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **encryptComment**(`comment`: string, `pubKeyRecipient`: Buffer, `pubKeySelf`: Buffer): *[EncryptionStatus](../interfaces/_packages_sdk_utils_src_commentencryption_.encryptionstatus.md)*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L69)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:69](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L69)*
 
 Encrypts a comment. If it can encrypt, it returns a base64 string with the following:
    ECIES(session key to other) + ECIES(session key to self) + AES(comment)
@@ -92,7 +92,7 @@ ___
 
 ▸ **encryptData**(`data`: Buffer, `pubKeyRecipient`: Buffer, `pubKeySelf`: Buffer): *Buffer*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L27)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:27](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L27)*
 
 Encrypts a buffer to two recipients. Throws on error.
 
@@ -114,16 +114,16 @@ Encrypted data to sender and recipient.
 
 ### ▪ **CommentEncryptionUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L115)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:115](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L115)*
 
 ###  decryptComment
 
 • **decryptComment**: *[decryptComment](_packages_sdk_utils_src_commentencryption_.md#decryptcomment)*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L117)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:117](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L117)*
 
 ###  encryptComment
 
 • **encryptComment**: *[encryptComment](_packages_sdk_utils_src_commentencryption_.md#encryptcomment)*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L116)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:116](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L116)*

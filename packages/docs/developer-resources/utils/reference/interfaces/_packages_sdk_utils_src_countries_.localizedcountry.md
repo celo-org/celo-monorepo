@@ -22,7 +22,7 @@
 
 • **countryCallingCode**: *string*
 
-*Defined in [packages/sdk/utils/src/countries.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L17)*
+*Defined in [packages/sdk/utils/src/countries.ts:19](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L19)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **countryPhonePlaceholder**: *object*
 
-*Defined in [packages/sdk/utils/src/countries.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L13)*
+*Defined in [packages/sdk/utils/src/countries.ts:15](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L15)*
 
 #### Type declaration:
 
@@ -44,7 +44,7 @@ ___
 
 • **displayName**: *string*
 
-*Defined in [packages/sdk/utils/src/countries.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L10)*
+*Defined in [packages/sdk/utils/src/countries.ts:12](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L12)*
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • **displayNameNoDiacritics**: *string*
 
-*Defined in [packages/sdk/utils/src/countries.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L11)*
+*Defined in [packages/sdk/utils/src/countries.ts:13](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L13)*
 
 ___
 
@@ -60,4 +60,4 @@ ___
 
 • **names**: *CountryNames*
 
-*Defined in [packages/sdk/utils/src/countries.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L12)*
+*Defined in [packages/sdk/utils/src/countries.ts:14](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L14)*

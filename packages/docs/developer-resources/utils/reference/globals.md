@@ -42,3 +42,4 @@
 * ["packages/sdk/utils/src/string"](modules/_packages_sdk_utils_src_string_.md)
 * ["packages/sdk/utils/src/task"](modules/_packages_sdk_utils_src_task_.md)
 * ["packages/sdk/utils/src/typed-data-constructors"](modules/_packages_sdk_utils_src_typed_data_constructors_.md)
+* ["packages/sdk/utils/src/verifiableCredential"](modules/_packages_sdk_utils_src_verifiablecredential_.md)

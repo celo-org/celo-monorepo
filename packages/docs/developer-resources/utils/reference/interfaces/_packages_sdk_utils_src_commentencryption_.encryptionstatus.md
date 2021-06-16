@@ -17,7 +17,7 @@
 
 • **comment**: *string*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L16)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:16](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L16)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **success**: *boolean*
 
-*Defined in [packages/sdk/utils/src/commentEncryption.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L15)*
+*Defined in [packages/sdk/utils/src/commentEncryption.ts:15](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/commentEncryption.ts#L15)*

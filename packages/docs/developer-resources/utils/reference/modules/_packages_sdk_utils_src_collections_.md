@@ -55,7 +55,7 @@ ___
 
 Ƭ **AddressListItem**: *AddressListItem‹BigNumber›*
 
-*Defined in [packages/sdk/utils/src/collections.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/collections.ts#L7)*
+*Defined in [packages/sdk/utils/src/collections.ts:7](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/collections.ts#L7)*
 
 ## Functions
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **linkedListChange**(`sortedList`: AddressListItem[], `change`: AddressListItem): *object*
 
-*Defined in [packages/sdk/utils/src/collections.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/collections.ts#L12)*
+*Defined in [packages/sdk/utils/src/collections.ts:12](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/collections.ts#L12)*
 
 **Parameters:**
 
@@ -86,7 +86,7 @@ ___
 
 ▸ **linkedListChanges**(`sortedList`: AddressListItem[], `changeList`: AddressListItem[]): *object*
 
-*Defined in [packages/sdk/utils/src/collections.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/collections.ts#L19)*
+*Defined in [packages/sdk/utils/src/collections.ts:19](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/collections.ts#L19)*
 
 **Parameters:**
 

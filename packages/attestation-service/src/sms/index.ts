@@ -1,3 +1,4 @@
+import { VerifiableCredentialUtils } from '@celo/utils'
 import { sleep } from '@celo/utils/lib/async'
 import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
@@ -12,8 +13,9 @@ import {
   makeSequelizeLogger,
   sequelize,
   SequelizeLogger,
+  useKit,
 } from '../db'
-import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
+import { fetchEnv, fetchEnvOrDefault, getAccountAddress, isYes } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
@@ -263,6 +265,28 @@ export async function startSendSms(
 
       // Parsed number and found providers. Attempt delivery.
       shouldRetry = await doSendSms(attestation, providers, logger)
+    }
+
+    // Issues verifiable credential for phone number type
+    try {
+      const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
+        attestation.phoneNumberType,
+        attestation.account,
+        getAccountAddress()
+      )
+
+      const proofOptions = VerifiableCredentialUtils.getProofOptions(getAccountAddress())
+      const verifiableCredential = await VerifiableCredentialUtils.issueCredential(
+        credential,
+        proofOptions,
+        async (signInput) =>
+          await useKit((kit) =>
+            kit.connection.sign(signInput.ethereumPersonalMessage, getAccountAddress())
+          )
+      )
+      attestation.credentials.push(verifiableCredential)
+    } catch (e) {
+      logger.error({ e })
     }
 
     await attestation.save({ transaction, logging: sequelizeLogger })
