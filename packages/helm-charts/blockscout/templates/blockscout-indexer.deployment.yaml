@@ -21,6 +21,12 @@ spec:
       component: blockscout-indexer
   template:
     metadata:
+      {{- if .Values.blockscout.indexer.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/indexer
+        prometheus.io/port: "4001"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
