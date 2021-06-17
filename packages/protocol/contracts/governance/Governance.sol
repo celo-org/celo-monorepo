@@ -502,6 +502,7 @@ contract Governance is
     Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     if (_isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
+      return (proposal, Proposals.Stage.Expiration);
     }
     return (proposal, stage);
   }
