@@ -906,6 +906,7 @@
     - [Encrypted Payment Comments](celo-codebase/protocol/transactions/tx-comment-encyption.md)
     - [Full Node Incentives](celo-codebase/protocol/transactions/full-node-incentives.md)
   - [Identity](celo-codebase/protocol/identity/README.md)
+    - [Valora Accounts](celo-codebase/protocol/identity/valora-accounts.md)
     - [Phone Number Privacy](celo-codebase/protocol/identity/phone-number-privacy.md)
     - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
