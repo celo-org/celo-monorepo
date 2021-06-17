@@ -23,10 +23,6 @@ As mentioned above, MetaMask does not natively support Celo compatibility. Becau
   * Similarly, if you want to import the Celo account you made on MetaMask to a different Celo wallet \(e.g. [Valora](https://valoraapp.com/)\) you'd have to import it using the private key itself, NOT the seed phrase that MetaMask gives you.
   * See these guides if you accidentally sent [ETH to CELO addresses](https://docs.celo.org/celo-owner-guide/celo-recovery) or [CELO to ETH addresses.](https://docs.celo.org/celo-owner-guide/eth-recovery)\*\*\*\*
 
-### **Gas Prices**
-
-* Metamask's gas estimate may not produce accurate prices. We recommend checking gas prices against a block explorer or following the instructions at the end of this guide for asking the Celo node for a suggested gas price.
-
 ### Gas Fee Currency
 
 * While gas on Celo can usually be paid in [many different currencies](https://docs.celo.org/celo-codebase/protocol/transactions/erc20-transaction-fees), when using Metamask, gas fees will automatically be paid in CELO. This is because MetaMask will be using the [Ethereum-compatible Celo transaction format](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0035.md), which doesn't include the `feecurrency` field.
