@@ -113,7 +113,7 @@ export function normalizeMnemonic(mnemonic: string, language?: MnemonicLanguages
     return joinMnemonic(lowered, detectedLanguage)
   }
 
-  return joinMnemonic(formatNonAccentedCharacters(lowered, detectedLanguage), detectedLanguage)
+  return joinMnemonic(formatNonAccentedWords(lowered, detectedLanguage), detectedLanguage)
 }
 
 /**
@@ -123,7 +123,7 @@ export function normalizeMnemonic(mnemonic: string, language?: MnemonicLanguages
  *
  * @remarks Words should be converted to lower case before being given to this function.
  */
-function formatNonAccentedCharacters(words: string[], language: MnemonicLanguages): string[] {
+function formatNonAccentedWords(words: string[], language: MnemonicLanguages): string[] {
   if (isLatinBasedLanguage(language)) {
     const wordList = getWordList(language)
     const normalizedWordMap = new Map(wordList.map((word) => [normalizeAccents(word), word]))
@@ -148,6 +148,13 @@ function isLatinBasedLanguage(language: MnemonicLanguages): boolean {
     case MnemonicLanguages.korean:
       return false
   }
+}
+
+/**
+ * @deprecated now an alias for normalizeMnemonic.
+ */
+export function formatNonAccentedCharacters(mnemonic: string) {
+  return normalizeMnemonic(mnemonic)
 }
 
 // Unify the bip39.wordlists (otherwise depends on the instance of the bip39)
