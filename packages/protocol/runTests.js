@@ -83,6 +83,9 @@ async function test() {
       process.exit(1)
     }
     testArgs = testArgs.concat(testFiles)
+    if (argv.coverage) {
+      testArgs = testArgs.concat(['test/teardown.ts'])
+    }
 
     await exec('yarn', testArgs)
     await closeGanache()

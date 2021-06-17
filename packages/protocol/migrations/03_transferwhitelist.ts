@@ -6,7 +6,11 @@ import { RegistryInstance, TransferWhitelistInstance } from 'types'
 const name = CeloContractName.TransferWhitelist
 const Contract = artifacts.require(name)
 
-module.exports = (deployer: any) => {
+module.exports = (deployer: any, networkName: string) => {
+  if (networkName === 'coverage') {
+    console.info('Skipping transfer whitelist')
+    return
+  }
   deployer.deploy(Contract, config.registry.predeployedProxyAddress)
   deployer.then(async () => {
     const contract: TransferWhitelistInstance = await Contract.deployed()

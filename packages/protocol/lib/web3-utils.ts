@@ -251,11 +251,15 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   registerAddress: boolean,
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
-  const Contract = artifacts.require(name)
-  const ContractProxy = artifacts.require(name + 'Proxy')
-  const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log('Deploying', name)
+    if (networkName === 'coverage') {
+      console.log('Skipping', name)
+      return
+    }
+    const Contract = artifacts.require(name)
+    const ContractProxy = artifacts.require(name + 'Proxy')
+    const testingDeployment = false
+    console.log('Deploying', name, networkName)
     deployer.deploy(ContractProxy)
     if (checkImports('InitializableV2', Contract, artifacts)) {
       deployer.deploy(Contract, testingDeployment)

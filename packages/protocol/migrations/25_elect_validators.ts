@@ -222,6 +222,11 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
+  if (networkName === 'coverage') {
+    console.log('Skipping elect validators')
+    return
+  }
+
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',
     artifacts

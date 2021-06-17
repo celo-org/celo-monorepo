@@ -423,7 +423,7 @@ jobs:
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: test
-          command: yarn --cwd packages/protocol test:coverage
+          command: yarn --cwd packages/protocol test --coverage identity/random
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
@@ -883,6 +883,9 @@ workflows:
       - pre-protocol-test-release:
           requires:
             - lint-checks
+      - protocol-test-with-code-coverage:
+          requires:
+            - install_dependencies
       - protocol-test-release:
           requires:
             - lint-checks
