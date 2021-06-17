@@ -98,7 +98,7 @@ release: {{ .Release.Name }}
 if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
 else
-  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+  [ -f /root/.celo/bootnodeEnode ] && BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi
 {{- end -}}
 
@@ -216,6 +216,7 @@ fi
       fieldRef:
         fieldPath: status.hostIP
 {{- end }}
+{{ include  "common.geth-prestop-hook" . | indent 2 -}}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:
@@ -264,6 +265,13 @@ fi
     mountPath: /root/.celo/account
     readOnly: true
 {{- end }}
+{{- end -}}
+
+{{- define "common.geth-prestop-hook" -}}
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh","-c","killall -HUP geth; while killall -0 geth; do sleep 1; done"]
 {{- end -}}
 
 {{- define "common.geth-configmap" -}}
