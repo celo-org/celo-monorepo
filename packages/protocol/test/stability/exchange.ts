@@ -24,6 +24,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
 const Exchange: ExchangeContract = artifacts.require('Exchange')
 const Freezer: FreezerContract = artifacts.require('Freezer')
@@ -60,7 +61,6 @@ contract('Exchange', (accounts: string[]) => {
 
   const updateFrequency = 60 * 60
   const minimumReports = 2
-  const SECONDS_IN_A_WEEK = 604800
 
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000)

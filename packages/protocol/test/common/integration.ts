@@ -1,7 +1,10 @@
+import { ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
 import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
   assertEqualBN,
+  assertRevert,
+  assumeOwnership,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -11,11 +14,14 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
+  ExchangeContract,
   ExchangeInstance,
+  FeeCurrencyWhitelistInstance,
+  FreezerInstance,
   GoldTokenInstance,
   GovernanceApproverMultiSigInstance,
   GovernanceInstance,
@@ -24,8 +30,11 @@ import {
   RegistryInstance,
   ReserveInstance,
   ReserveSpenderMultiSigInstance,
+  SortedOraclesInstance,
+  StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
   None = 0,
@@ -507,7 +516,7 @@ Array.from([
       })
 
       // Note that this test relies on having purchased cUSD in a previous test
-      describe('When buying gold', () => {
+      describe('When buying celo', () => {
         before(async () => {
           originalStable = await stableToken.balanceOf(accounts[0])
           originalGold = await goldToken.balanceOf(accounts[0])
@@ -564,3 +573,135 @@ Array.from([
     })
   })
 )
+
+contract('Integration: Adding StableToken', (accounts: string[]) => {
+  const Exchange: ExchangeContract = artifacts.require('Exchange')
+  const StableToken: StableTokenContract = artifacts.require('StableToken')
+  let exchangeAbc: ExchangeInstance
+  let freezer: FreezerInstance
+  let goldToken: GoldTokenInstance
+  let stableTokenAbc: StableTokenInstance
+  const sellAmount = web3.utils.toWei('0.1', 'ether')
+  const minBuyAmount = 1
+
+  // 0. Make ourselves the owner of the various contracts we will need to interact with, as
+  // passing a governance proposal for each one will be a pain in the butt.
+  before(async () => {
+    goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
+    freezer = await getDeployedProxiedContract('Freezer', artifacts)
+    const contractsToOwn = [
+      'Freezer',
+      'Registry',
+      'Reserve',
+      'SortedOracles',
+      'FeeCurrencyWhitelist',
+    ]
+    await assumeOwnership(contractsToOwn, accounts[0])
+  })
+
+  // 1. Mimic the state of the world post-contracts-release
+  //   a) Deploy the contracts. For simplicity, omit proxies for now.
+  //   b) Register the contracts
+  //   c) Initialize the contracts
+  //   d) Confirm mento is effectively frozen
+  describe('When the contracts have been deployed and initialized', () => {
+    before(async () => {
+      exchangeAbc = await Exchange.new()
+      stableTokenAbc = await StableToken.new()
+
+      const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+      await registry.setAddressFor('ExchangeABC', exchangeAbc.address)
+      await registry.setAddressFor('StableTokenABC', stableTokenAbc.address)
+
+      await stableTokenAbc.initialize(
+        'Celo Abc', // Name
+        'cABC', // symbol
+        '18', // decimals
+        registry.address,
+        fixed1, // inflationRate
+        SECONDS_IN_A_WEEK, // inflationRatePeriod
+        [accounts[0]], // pre-mint account
+        ['1000000000000000000'], // pre-mint amount
+        'ExchangeABC' // exchange contract key on the registry
+      )
+      await exchangeAbc.initialize(
+        registry.address,
+        stableTokenAbc.address,
+        '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
+        '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
+        '300', // updateFrequency, matches mainnet for cUSD and cEUR
+        '1' // minimumReports, minimum possible to avoid having to mock multiple reports
+      )
+    })
+
+    it(`should be impossible to sell CELO`, async () => {
+      await goldToken.approve(exchangeAbc.address, sellAmount)
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
+      await goldToken.approve(exchangeAbc.address, sellAmount)
+      await exchangeAbc.sell(sellAmount, 0, true)
+    })
+
+    it(`should be impossible to sell stable token`, async () => {
+      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+    })
+  })
+
+  // 2. Mimic the state of the world post-oracle-activation-proposal
+  //   a) Activate the oracles and freeze the mento
+  //   b) Make an oracle report
+  //   c) Confirm mento is effectively frozen
+  describe('When the contracts have been frozen and an oracle report has been made', () => {
+    before(async () => {
+      const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract(
+        'SortedOracles',
+        artifacts
+      )
+      await sortedOracles.addOracle(stableTokenAbc.address, ensureLeading0x(accounts[0]))
+      await freezer.freeze(stableTokenAbc.address)
+      await freezer.freeze(exchangeAbc.address)
+      await sortedOracles.report(stableTokenAbc.address, toFixed(1), NULL_ADDRESS, NULL_ADDRESS)
+    })
+
+    it(`should be impossible to sell CELO`, async () => {
+      await goldToken.approve(exchangeAbc.address, sellAmount)
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+    })
+
+    it(`should be impossible to sell stable token`, async () => {
+      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
+      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+    })
+  })
+
+  // 3. Mimic the state of the world post-mento-activation-proposal
+  //   a) Add the stable token to the reserve
+  //   b) Unfreeze the mento
+  //   c) Confirm mento is functional
+  describe('When the contracts have been unfrozen and the mento has been activated', () => {
+    before(async () => {
+      const reserve: ReserveInstance = await getDeployedProxiedContract('Reserve', artifacts)
+      const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
+        'FeeCurrencyWhitelist',
+        artifacts
+      )
+      await reserve.addToken(stableTokenAbc.address)
+      await reserve.addExchangeSpender(exchangeAbc.address)
+      await freezer.unfreeze(stableTokenAbc.address)
+      await freezer.unfreeze(exchangeAbc.address)
+      // Fee currency can't be tested here, but keep this line for reference
+      await feeCurrencyWhitelist.addToken(stableTokenAbc.address)
+    })
+
+    it(`should be possible to sell CELO`, async () => {
+      await goldToken.approve(exchangeAbc.address, sellAmount)
+      await exchangeAbc.sell(sellAmount, minBuyAmount, true)
+    })
+
+    it(`should be possible to sell stable token`, async () => {
+      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
+      await exchangeAbc.sell(sellAmount, minBuyAmount, false)
+    })
+  })
+})
