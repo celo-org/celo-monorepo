@@ -8,7 +8,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./interfaces/IValidators.sol";
 
 import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
+import "../common/InitializableV2.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -24,7 +24,7 @@ contract Validators is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  Initializable,
+  InitializableV2,
   UsingRegistry,
   UsingPrecompiles,
   CalledByVm
@@ -163,7 +163,7 @@ contract Validators is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 0, 1);
   }
 
   /**
@@ -206,6 +206,12 @@ contract Validators is
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
     setDowntimeGracePeriod(_downtimeGracePeriod);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Updates the block delay for a ValidatorGroup's commission udpdate
@@ -1167,7 +1173,7 @@ contract Validators is
       history.lastRemovedFromGroupTimestamp = now;
     }
 
-    if (history.entries[head].epochNumber == epochNumber) {
+    if (history.numEntries > 0 && history.entries[head].epochNumber == epochNumber) {
       // There have been no elections since the validator last changed membership, overwrite the
       // previous entry.
       history.entries[head] = MembershipHistoryEntry(epochNumber, group);
