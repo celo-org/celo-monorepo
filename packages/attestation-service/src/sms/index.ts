@@ -15,7 +15,7 @@ import {
   SequelizeLogger,
   useKit,
 } from '../db'
-import { fetchEnv, fetchEnvOrDefault, getAccountAddress, isYes } from '../env'
+import { fetchEnv, fetchEnvOrDefault, getAttestationSignerAddress, isYes } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
@@ -272,16 +272,16 @@ export async function startSendSms(
       const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
         attestation.phoneNumberType,
         attestation.account,
-        getAccountAddress()
+        getAttestationSignerAddress()
       )
 
-      const proofOptions = VerifiableCredentialUtils.getProofOptions(getAccountAddress())
+      const proofOptions = VerifiableCredentialUtils.getProofOptions(getAttestationSignerAddress())
       const verifiableCredential = await VerifiableCredentialUtils.issueCredential(
         credential,
         proofOptions,
         async (signInput) =>
           await useKit((kit) =>
-            kit.connection.sign(signInput.ethereumPersonalMessage, getAccountAddress())
+            kit.connection.sign(signInput.ethereumPersonalMessage, getAttestationSignerAddress())
           )
       )
       attestation.credentials.push(verifiableCredential)

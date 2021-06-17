@@ -101,6 +101,7 @@ export const AttestationServiceTestRequestType = t.type({
 export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>
 
 export const VerifiableCredentialRequestType = t.type({
+  issuer: AddressType,
   accountAddress: AddressType,
   phoneNumberType: t.string,
 })

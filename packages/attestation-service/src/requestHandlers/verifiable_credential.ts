@@ -1,25 +1,40 @@
+import { eqAddress } from '@celo/base'
 import { VerifiableCredentialUtils } from '@celo/utils'
 import { VerifiableCredentialRequest } from '@celo/utils/lib/io'
 import express from 'express'
 import { useKit } from '../db'
-import { getAccountAddress } from '../env'
-import { respondWithError, respondWithVerifiableCredential, Response } from '../request'
+import { getAccountAddress, getAttestationSignerAddress } from '../env'
+import {
+  ErrorWithResponse,
+  respondWithError,
+  respondWithVerifiableCredential,
+  Response,
+} from '../request'
 
 export class VerifiableCredentialHandler {
   constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {}
 
   async signVerifiableCredential(signingInput: string) {
-    return await useKit((kit) => kit.connection.sign(signingInput, getAccountAddress()))
+    return await useKit((kit) => kit.connection.sign(signingInput, getAttestationSignerAddress()))
   }
 
-  async doCredential(phoneNumberType: string, subject: string) {
+  async validateRequest(issuer: string) {
+    const address = getAccountAddress()
+    if (!eqAddress(address, issuer)) {
+      throw new ErrorWithResponse(`Mismatching issuer, I am ${address}`, 422)
+    }
+  }
+
+  async doCredential(phoneNumberType: string, subject: string, issuer: string) {
+    await this.validateRequest(issuer)
+
     const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
       phoneNumberType,
       subject,
-      getAccountAddress()
+      getAttestationSignerAddress()
     )
 
-    const proofOptions = VerifiableCredentialUtils.getProofOptions(getAccountAddress())
+    const proofOptions = VerifiableCredentialUtils.getProofOptions(getAttestationSignerAddress())
 
     const verifiableCredential = await VerifiableCredentialUtils.issueCredential(
       credential,
@@ -38,8 +53,8 @@ export async function handleVerifiableCredentialRequest(
 ) {
   const handler = new VerifiableCredentialHandler(vcRequest)
   try {
-    const { phoneNumberType, accountAddress } = vcRequest
-    const verifiableCredential = await handler.doCredential(phoneNumberType, accountAddress)
+    const { phoneNumberType, accountAddress, issuer } = vcRequest
+    const verifiableCredential = await handler.doCredential(phoneNumberType, accountAddress, issuer)
     respondWithVerifiableCredential(res, verifiableCredential)
   } catch (error) {
     respondWithError(res, error.responseCode ?? 500, `${error.message ?? error}`)
