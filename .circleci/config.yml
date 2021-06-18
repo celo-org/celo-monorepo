@@ -241,7 +241,7 @@ jobs:
       - image: celohq/node10-gcloud:v3
     resource_class: large
     environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
+      RELEASE_TAG: celo-core-contracts-v4.rc0
     steps:
       - attach_workspace:
           at: ~/app
@@ -268,7 +268,7 @@ jobs:
     <<: *defaults
     resource_class: large
     environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
+      RELEASE_TAG: celo-core-contracts-v4.rc0
     steps:
       - attach_workspace:
           at: ~/app
