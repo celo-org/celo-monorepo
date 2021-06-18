@@ -800,6 +800,10 @@ contract('GrandaMento', (accounts: string[]) => {
     const celoSellAmount = unit.times(100)
     let sellCelo = false
     beforeEach(async () => {
+      // When a test sets sellCelo to true, the sender in the test must approve
+      // the CELO to grandaMento.
+      // The MockStableToken does not enforce allowances so there is no need
+      // to approve the stable token to grandaMento when sellCelo is false.
       if (sellCelo) {
         await goldToken.approve(grandaMento.address, celoSellAmount, { from: alice })
       }
