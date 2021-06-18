@@ -7,6 +7,7 @@ import {
   fetchEnv,
   fetchEnvOrFallback,
   getDynamicEnvVarValue,
+  isProduction,
 } from './env-utils'
 import {
   installGenericHelmChart,
@@ -109,6 +110,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     '__name__!~"phoenix_.+"',
     '__name__!~"workqueue_.+"',
     '__name__!~"nginx_.+"',
+    '__name__!~"etcd_.+"',
   ]
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
@@ -149,6 +151,19 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     `--set cluster=${clusterName}`,
     `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
   ]
+
+  if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
+    params.push(
+      `--set remote_write[0].url=${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}`,
+      `--set remote_write[0].basic_auth.username=${fetchEnv(
+        envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
+      )}`,
+      `--set remote_write[0].basic_auth.password=${fetchEnv(
+        envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
+      )}`,
+      `--set enable_alerts="${isProduction()}"`
+    )
+  }
 
   if (!usingGCP) {
     const cloudProvider = getCloudProviderPrefix(clusterConfig!)

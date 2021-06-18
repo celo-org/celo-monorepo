@@ -4,7 +4,7 @@ Tool for interacting with the Celo Protocol.
 
 ## Installation
 
-We are currently deploying the CLI with only Node v10.x LTS support.
+We are currently deploying the CLI with only Node.js v12.x support.
 
 To install globally, run:
 

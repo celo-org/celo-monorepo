@@ -47,18 +47,14 @@ Leveraging our previously added [@celo-tools/use-contractkit](https://github.com
 import React from 'react'
 import { useContractKit } from '@celo-tools/use-contractkit'
 
-function App () {
-  const { address, openModal } = useContractKit()
+function App() {
+  const { address, connect } = useContractKit()
 
   return (
     <main>
       <h1>Celo Voting DApp</h1>
 
-      {address ? (
-        // once connected, show past proposals
-      ) : (
-        <button onClick={openModal}>Click here to connect your wallet</button>
-      )}
+      <button onClick={connect}>Click here to connect your wallet</button>
     </main>
   )
 }
@@ -85,7 +81,7 @@ import React, { useCallback, useEffect } from 'react'
 import { useContractKit } from '@celo-tools/use-contractkit'
 
 function App() {
-  const { address, openModal } = useContractKit()
+  const { address, connect, kit, getConnectedKit } = useContractKit()
   const [proposals, setProposals] = useState([])
 
   const fetchProposals = useCallback(async () => {
@@ -218,7 +214,7 @@ To actually vote on a proposal we need to again interact with the [Governance.so
 ```typescript
 const vote = useCallback(
   async (id: string, value: VoteValue) => {
-    // requireInitialised
+    const kit = await getConnectedKit()
     const governance = await kit.contracts.getGovernance()
     await (await governance.vote(id, value)).sendAndWaitForReceipt()
     fetchProposals()
@@ -281,11 +277,11 @@ With modern static site generators we have amazing leverage over what gets compu
 
 Next.js [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) comes to mind here as a great way to offload heavy computation to the server.
 
-### Showing numbers in wei vs. Celo
+### Showing numbers in wei vs. Celo vs. local currency
 
-Take this advice with a grain of salt as it really depends on how familiar with cryptocurrencies and blockchain your users are. At some point in most DApp users are going to need to deal with large numbers. It's up to you whether you display these in wei (1e18) or not.
+Take this advice with a grain of salt as it really depends on how familiar with cryptocurrencies and blockchain your users are. At some point in most DApp users are going to need to deal with large numbers. It's up to you whether you display these in wei (1e18) CELO or converted to a currency the user prefers (BTC, USD or EUR for example).
 
-The sweeping generalisation would be to allow entering values as decimals, but when confirming actions, show the value in wei to the user so they can verify if that's the value they'd expect.
+The sweeping generalisation would be to allow entering values in CELO or their preferred currency and never expose the raw wei amounts to end users.
 
 ## Wrapping up
 

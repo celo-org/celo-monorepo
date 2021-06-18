@@ -10,7 +10,7 @@ npm install @celo/contractkit
 yarn add @celo/contractkit
 ```
 
-You will need node version `10.0.0` or higher.
+You will need Node.js v12.x.
 
 ## Initializing the Kit
 

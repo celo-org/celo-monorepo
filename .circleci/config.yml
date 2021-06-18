@@ -2,6 +2,11 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+parameters:
+  # When you need to force a rebuild of the node modules cache then bump this version
+  node-modules-cache-version:
+    type: integer
+    default: 7
 reference:
   workspace: &workspace ~/app
   ## Configurations
@@ -21,7 +26,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud:v3
+    - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -52,7 +57,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v5-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-<< pipeline.parameters.node-modules-cache-version >>-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: |
@@ -106,7 +111,7 @@ commands:
             fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v5-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-<< pipeline.parameters.node-modules-cache-version >>-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
@@ -229,6 +234,11 @@ jobs:
   # other script
   pre-protocol-test-release:
     <<: *defaults
+    docker:
+      # We override the default docker image here because this job builds the
+      # previous release and requires node 10 rather than node 12 to build
+      # properly.
+      - image: celohq/node10-gcloud:v3
     resource_class: large
     environment:
       RELEASE_TAG: celo-core-contracts-v3.rc0
@@ -724,7 +734,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -737,7 +747,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -750,7 +760,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -766,7 +776,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node10-gcloud
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
     steps:
       - run:
           name: Check if the test should run

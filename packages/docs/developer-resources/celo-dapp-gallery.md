@@ -6,6 +6,10 @@ Additionally, head over to [Celo Hub](https://celohub.org) and [Electric Capital
 
 ## [Celo Camp](https://www.celocamp.com/) Projects
 
+### GoodGhosting
+[GoodGosting](https://www.goodghosting.com) is a no-loss DeFi saving game. Users can compete with others to get higher interest rates than when they would save by themselves. We created a shared saving pool smart contract, which plugs into existing Celo DeFi projects (e.g. Moola) to generate interest for all winning players.
+[Github](https://github.com/Good-Ghosting/goodghosting-smart-contracts/tree/feature/celo)
+
 ### Infibridge
 
 [Infibridge](https://www.infibridge.com) is a "Metamask like" browser extension wallet for Celo. It will support payment of gas fees in Celo or stable currencies like cUSD and cEUR. It has deep integration with Celo to allow staking, voting and token swaps. [Github](https://github.com/infibridge/browser-extension-wallet)
