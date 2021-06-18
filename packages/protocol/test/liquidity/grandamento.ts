@@ -1093,8 +1093,9 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('can set the approver to the zero address', async () => {
-      await grandaMento.setApprover('0x0000000000000000000000000000000000000000')
-      assert.equal(await grandaMento.approver(), newApprover)
+      const zeroAddress = '0x0000000000000000000000000000000000000000'
+      await grandaMento.setApprover(zeroAddress)
+      assert.equal(await grandaMento.approver(), zeroAddress)
     })
 
     it('emits the ApproverSet event', async () => {

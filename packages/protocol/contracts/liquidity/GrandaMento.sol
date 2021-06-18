@@ -10,7 +10,7 @@ import "../common/linkedlists/LinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "./interfaces/IStableToken.sol";
+import "../stability/interfaces/IStableToken.sol";
 
 /**
  * @title Facilitates large exchanges between CELO stable tokens.
