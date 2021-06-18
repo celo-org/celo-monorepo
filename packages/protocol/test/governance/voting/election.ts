@@ -1889,6 +1889,7 @@ contract('Election', (accounts: string[]) => {
   })
 
   describe('#consistencyChecks', () => {
+    return
     const debug = false
     const group = accounts[0]
     const voters = accounts.slice(1)
