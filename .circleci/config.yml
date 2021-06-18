@@ -411,26 +411,83 @@ jobs:
           name: Unit tests
           command: yarn --cwd packages/protocol test stability/
 
-  # Slow and flaky compared to protocol-test which runs without coverage
-  protocol-test-with-code-coverage:
+  protocol-test-stability-with-code-coverage:
     <<: *defaults
     resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
       - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-      - run:
           name: test
           command: yarn --cwd packages/protocol test --coverage stability/
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+
+  protocol-test-governance-voting-with-code-coverage:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
       - run:
-          name: Upload to CodeCov
-          command: yarn codecov -F protocol
+          name: test
+          command: yarn --cwd packages/protocol test --coverage governance/voting/
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+
+  protocol-test-governance-network-with-code-coverage:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: test
+          command: yarn --cwd packages/protocol test --coverage governance/network/
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+  
+  protocol-test-governance-validators-with-code-coverage:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: test
+          command: yarn --cwd packages/protocol test --coverage governance/validators/
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+
+  protocol-test-common-with-code-coverage:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: test
+          command: yarn --cwd packages/protocol test --coverage common/
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+
+  protocol-test-identity-with-code-coverage:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: test
+          command: yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestation|identity/escrow)'
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
 
   contractkit-test:
     <<: *defaults
@@ -854,10 +911,25 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - lint-checks:
+      - protocol-test-common-with-code-coverage:
           requires:
             - install_dependencies
-      - protocol-test-with-code-coverage:
+      - protocol-test-stability-with-code-coverage:
+          requires:
+            - install_dependencies
+      - protocol-test-common-with-code-coverage:
+          requires:
+            - install_dependencies
+      - protocol-test-identity-with-code-coverage:
+          requires:
+            - install_dependencies
+      - protocol-test-governance-network-with-code-coverage:
+          requires:
+            - install_dependencies
+      - protocol-test-governance-voting-with-code-coverage:
+          requires:
+            - install_dependencies
+      - protocol-test-governance-validators-with-code-coverage:
           requires:
             - install_dependencies
   npm-install-testing-cron-workflow:

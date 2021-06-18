@@ -252,7 +252,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    if (networkName === 'coverage') {
+    if (networkName === 'coverage1') {
       console.log('Skipping', name)
       return
     }

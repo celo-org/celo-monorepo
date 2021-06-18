@@ -9,7 +9,7 @@ const Contract = artifacts.require(name)
 const ContractProxy = artifacts.require(name + 'Proxy')
 
 module.exports = (deployer: any, networkName: string, _accounts: string[]) => {
-  if (networkName === 'coverage') {
+  if (networkName === 'coverage1') {
     return
   }
 

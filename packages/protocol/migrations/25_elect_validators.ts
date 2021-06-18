@@ -222,7 +222,7 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
-  if (networkName === 'coverage') {
+  if (networkName === 'coverage1') {
     console.log('Skipping elect validators')
     return
   }
