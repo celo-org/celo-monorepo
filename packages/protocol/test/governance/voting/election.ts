@@ -1083,6 +1083,7 @@ contract('Election', (accounts: string[]) => {
 
     describe('when there is a large number of groups', () => {
       const numbers: any = {}
+      return
       beforeEach(async () => {
         await mockLockedGold.setTotalLockedGold(new BigNumber(1e25))
         await mockValidators.setNumRegisteredValidators(400)

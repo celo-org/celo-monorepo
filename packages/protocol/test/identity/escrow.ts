@@ -73,6 +73,7 @@ contract('Escrow', (accounts: string[]) => {
 
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
+      console.log(process.env.NETWORK)
       const actualOwner: string = await escrow.owner()
       assert.equal(actualOwner, owner)
     })

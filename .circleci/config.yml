@@ -484,7 +484,7 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestation|identity/escrow)'
+          command: yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestation|identity/escrow|identity/identityproxy)'
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
