@@ -51,10 +51,12 @@ export type AttestationStatic = typeof Model &
 export default (sequelize: Sequelize) => {
   const model = sequelize.define('Attestations', {
     account: DataTypes.STRING,
+    credentials: DataTypes.ARRAY(DataTypes.STRING),
     identifier: DataTypes.STRING,
     issuer: DataTypes.STRING,
     countryCode: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
+    phoneNumberType: DataTypes.STRING,
     message: DataTypes.STRING,
     securityCode: DataTypes.STRING,
     securityCodeAttempt: DataTypes.INTEGER,

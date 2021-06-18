@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction()
 
     try {
@@ -22,7 +22,7 @@ module.exports = {
     }
   },
 
-  down: (queryInterface, Sequelize) => {
+  down: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction()
     try {
       await queryInterface.removeColumn('Attestations', 'phoneNumberType')

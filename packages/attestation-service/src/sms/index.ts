@@ -284,7 +284,7 @@ export async function startSendSms(
             kit.connection.sign(signInput.ethereumPersonalMessage, getAttestationSignerAddress())
           )
       )
-      attestation.credentials.push(verifiableCredential)
+      attestation.credentials = [verifiableCredential]
     } catch (e) {
       logger.error({ e })
     }
