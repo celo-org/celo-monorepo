@@ -121,7 +121,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     '__name__!~"container_spec_.+"',
     '__name__!~"container_start_.+"',
     '__name__!~"container_last_.+"',
-    '__name__!~"kube_pod_[^c].+"',
+    '__name__!~"kube_pod_[^cs].+"',
     '__name__!~"kube_pod_container_[^r].+"',
     '__name__!~"kube_pod_container_status_waiting_reason"',
     '__name__!~"kube_pod_container_status_terminated_reason"',
@@ -206,7 +206,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       'kube_node_status_condition',
       'kube_pod_container_status_last_terminated_reason',
       'kube_pod_container_[^r].+',
-      'kube_pod_[^c].+',
+      'kube_pod_[^cs].+',
       'workqueue_.+',
       'kube_secret_.+',
     ]
