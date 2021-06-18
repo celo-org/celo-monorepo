@@ -588,6 +588,7 @@ const NetworkConfigs = {
   },
 }
 
+NetworkConfigs.coverage = NetworkConfigs.development
 NetworkConfigs.local = NetworkConfigs.testing
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores

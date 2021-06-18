@@ -247,7 +247,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     artifacts
   )
 
-  if (networkName === 'development') {
+  if (networkName === 'development' || networkName === 'coverage') {
     isGanache = true
     const addr0 = privateKeyToAddress('0x' + ganachePrivateKey(0))
     for (let i = 10; i < 36; i++) {

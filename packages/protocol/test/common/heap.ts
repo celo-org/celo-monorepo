@@ -20,7 +20,7 @@ contract('HeapTest', () => {
 
   describe('#sort()', () => {
     it('test with random lists', async () => {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 10; i++) {
         const testLst = makeRandomList(1000000000)
         const res: any = await heapTest.sort(testLst)
         assert.deepEqual(
@@ -30,7 +30,7 @@ contract('HeapTest', () => {
       }
     })
     it('test with random lists including repeated items', async () => {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 10; i++) {
         const testLst = makeRandomList(10)
         const res: any = await heapTest.sort(testLst)
         assert.deepEqual(

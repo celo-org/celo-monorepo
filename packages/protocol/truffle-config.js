@@ -92,6 +92,8 @@ const networks = {
     network_id: '*',
     gasPrice: 0,
     gas: gasLimit,
+    defaultBalance: 200000000,
+    mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
     from: DEVELOPMENT_FROM,
     provider: function () {
       if (coverageProvider == null) {
