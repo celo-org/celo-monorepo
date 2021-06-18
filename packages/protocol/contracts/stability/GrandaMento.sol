@@ -201,9 +201,10 @@ contract GrandaMento is
     );
 
     // Record the proposal.
-    // Add 1 to the running proposal count and use as the proposalId. This is
-    // intentionally never 0 because LinkedList, which is used for keeping track
-    // of active proposal IDs, requires keys to be non-zero.
+    // Add 1 to the running proposal count, and use the updated proposal count as
+    // the proposal ID. Proposal IDs intentionally start at 1 rather than 0 because
+    // LinkedList, which is used for keeping track of active proposal IDs, requires
+    // keys to be non-zero.
     exchangeProposalCount = exchangeProposalCount.add(1);
     exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
@@ -261,7 +262,7 @@ contract GrandaMento is
     );
     // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
-    // Remove the proposal from the active list.
+    // Remove the proposal from the active list. This operation is O(1).
     activeProposalIds.remove(proposalId);
     // Get the token and amount that will be refunded to the proposer.
     (IERC20 refundToken, uint256 refundAmount) = getSellTokenAndSellAmount(proposal);
@@ -290,7 +291,7 @@ contract GrandaMento is
     );
     // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Executed;
-    // Remove the proposal from the active list.
+    // Remove the proposal from the active list. This operation is O(1).
     activeProposalIds.remove(proposalId);
 
     // Perform the exchange.
@@ -422,7 +423,7 @@ contract GrandaMento is
 
   /**
    * @notice Sets the approver.
-   * @dev Sender must be owner.
+   * @dev Sender must be owner. New approver is allowed to be address(0).
    * @param newApprover The new value for the spread.
    */
   function setApprover(address newApprover) public onlyOwner {

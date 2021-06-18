@@ -695,7 +695,7 @@ contract('GrandaMento', (accounts: string[]) => {
           assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), stableTokenSellAmount)
         })
 
-        it('refunds the appropriate stable token amount value when the inflation factor is 1', async () => {
+        it('refunds the appropriate stable token amount value when the inflation factor is not 1', async () => {
           const inflationFactor = 1.1
           await stableToken.setInflationFactor(toFixed(inflationFactor))
 
@@ -1085,6 +1085,11 @@ contract('GrandaMento', (accounts: string[]) => {
     const newApprover = accounts[2]
     it('sets the approver', async () => {
       await grandaMento.setApprover(newApprover)
+      assert.equal(await grandaMento.approver(), newApprover)
+    })
+
+    it('can set the approver to the zero address', async () => {
+      await grandaMento.setApprover('0x0000000000000000000000000000000000000000')
       assert.equal(await grandaMento.approver(), newApprover)
     })
 
