@@ -632,7 +632,7 @@ contract('GrandaMento', (accounts: string[]) => {
             from: alice,
           }
         )
-        // proposalId 1
+        // proposalId 2
         await grandaMento.createExchangeProposal(
           stableTokenRegistryId,
           stableTokenSellAmount,
@@ -641,7 +641,7 @@ contract('GrandaMento', (accounts: string[]) => {
             from: alice,
           }
         )
-        // proposalId 2
+        // proposalId 3
         await grandaMento.createExchangeProposal(
           stableTokenRegistryId,
           stableTokenSellAmount,
