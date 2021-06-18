@@ -961,7 +961,25 @@ workflows:
       - install_dependencies
       - lint-checks:
           requires:
-            - install_dependencies
-      - protocol-test-with-code-coverage:
+            - lint-checks
+      - protocol-test-common-with-code-coverage:
+          requires:
+            - lint-checks
+      - protocol-test-stability-with-code-coverage:
+          requires:
+            - lint-checks
+      - protocol-test-common-with-code-coverage:
+          requires:
+            - lint-checks
+      - protocol-test-identity-with-code-coverage:
+          requires:
+            - lint-checks
+      - protocol-test-governance-network-with-code-coverage:
+          requires:
+            - lint-checks
+      - protocol-test-governance-voting-with-code-coverage:
+          requires:
+            - lint-checks
+      - protocol-test-governance-validators-with-code-coverage:
           requires:
             - lint-checks
