@@ -211,6 +211,7 @@ const deployLibrary = async (
   isDryRun: boolean,
   from: string
 ) => {
+  console.log('In deployLibrary', contractName)
   const contract = await deployImplementation(contractName, contractArtifact, isDryRun, from)
   addresses.set(contractName, contract.address)
   return
@@ -235,6 +236,7 @@ module.exports = async (callback: (error?: any) => number) => {
       argv.librariesFile ?? 'libraries.json'
     )
     const report: ASTDetailedVersionedReport = fullReport.report
+    console.log('fullReport:', JSON.stringify(fullReport))
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
@@ -246,12 +248,14 @@ module.exports = async (callback: (error?: any) => number) => {
     const proposal: ProposalTx[] = []
 
     const release = async (contractName: string) => {
+      console.log('In release', contractName)
       // 0. Skip already released dependencies
       if (released.has(contractName)) {
         return
       }
       // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
       const contractDependencies = dependencies.get(contractName)
+      console.log('contractDependencies for', contractName, contractDependencies)
       for (const dependency of contractDependencies) {
         await release(dependency)
       }

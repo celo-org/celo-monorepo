@@ -33,10 +33,13 @@ contract MockStableToken {
 
   function mint(address to, uint256 value) external returns (bool) {
     balances[to] = balances[to].add(valueToUnits(value));
+    _totalSupply = _totalSupply.add(value);
     return true;
   }
 
-  function burn(uint256) external pure returns (bool) {
+  function burn(uint256 value) external returns (bool) {
+    balances[msg.sender] = balances[msg.sender].sub(valueToUnits(value));
+    _totalSupply = _totalSupply.sub(value);
     return true;
   }
 
