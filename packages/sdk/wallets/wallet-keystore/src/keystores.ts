@@ -56,7 +56,6 @@ export abstract class KeystoreBase {
       const address = JSON.parse(rawKeystore).address
       return ensureLeading0x(address)
     } catch (e) {
-      console.log(e)
       throw new Error(ErrorMessages.UNKNOWN_STRUCTURE)
     }
   }
@@ -190,10 +189,7 @@ export class FileKeystore extends KeystoreBase {
     super()
     this._keystoreDir = path.join(keystoreDir, 'keystore')
     // Does not overwrite existing directories
-    const createdDir = mkdirSync(this._keystoreDir, { recursive: true })
-    if (createdDir) {
-      console.log(`Keystore directory created at ${createdDir}`)
-    }
+    mkdirSync(this._keystoreDir, { recursive: true })
   }
 
   /**
