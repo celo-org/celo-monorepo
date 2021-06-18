@@ -24,6 +24,9 @@ export interface BaseFullNodeDeploymentConfig {
   diskSizeGb: number
   replicas: number
   rollingUpdatePartition: number
+  rpcApis: string
+  gcMode: string
+  useGstoreData: string
   // If undefined, node keys will not be predetermined and will be random
   nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
@@ -94,13 +97,17 @@ export abstract class BaseFullNodeDeployer {
       )
     }
 
-    const rpcApis = 'eth,net,rpc,web3'
+    const rpcApis = this._deploymentConfig.rpcApis
+      ? this._deploymentConfig.rpcApis
+      : 'eth,net,rpc,web3'
+    const gcMode = this._deploymentConfig.gcMode ? this._deploymentConfig.gcMode : 'full'
     return [
       `--set namespace=${this.kubeNamespace}`,
       `--set replicaCount=${this._deploymentConfig.replicas}`,
       `--set geth.updateStrategy.rollingUpdate.partition=${this._deploymentConfig.rollingUpdatePartition}`,
       `--set storage.size=${this._deploymentConfig.diskSizeGb}Gi`,
       `--set geth.expose_rpc_externally=false`,
+      `--set geth.gcmode=${gcMode}`,
       `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
       `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\,')}'`,
@@ -108,7 +115,7 @@ export abstract class BaseFullNodeDeployer {
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
       `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
-      `--set geth.use_gstorage_data=${fetchEnvOrFallback('USE_GSTORAGE_DATA', 'false')}`,
+      `--set geth.use_gstorage_data=${this._deploymentConfig.useGstoreData}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
       // Disable by default block age check in fullnode readinessProbe except for production envs
       `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
