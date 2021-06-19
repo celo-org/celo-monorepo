@@ -151,8 +151,9 @@ describe(`BLS service computes signature`, () => {
     })
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+      throw new Error('Expected failure with missing signatures')
     } catch (e) {
-      expect(e.message.includes('Not enough not enough partial signatures'))
+      expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
   })
   it('throws error if signature is invalid, but can recover from failure with sufficient signatures', async () => {
@@ -199,7 +200,7 @@ describe(`BLS service computes signature`, () => {
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     } catch (e) {
-      expect(e.message.includes('Not enough not enough partial signatures'))
+      expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
     // Should be false, now that the invalid signature has been removed
     expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
