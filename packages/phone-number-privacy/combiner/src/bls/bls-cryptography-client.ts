@@ -47,9 +47,11 @@ export class BLSCryptographyClient {
     logger = logger ?? rootLogger
     const threshold = config.thresholdSignature.threshold
     if (!this.hasSufficientSignatures()) {
-      throw new Error(
+      const error = new Error(
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.totalSignatures}/${threshold}`
       )
+      logger.error(error)
+      throw error
     }
     // Optimistically attempt to combine unverified signatures
     // If combination fails, iterate through each signature and remove invalid ones
@@ -58,7 +60,7 @@ export class BLSCryptographyClient {
       const result = threshold_bls.combine(threshold, this.allSignatures)
       return Buffer.from(result).toString('base64')
     } catch (error) {
-      logger.error(error, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+      logger.error(error)
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
       const verifySigReqs = this.unverifiedSignatures.map((unverifiedSignature) => {
@@ -67,7 +69,7 @@ export class BLSCryptographyClient {
       await Promise.all(verifySigReqs)
       this.clearUnverifiedSignatures()
     }
-    throw new Error(ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+    throw new Error(ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
   }
 
   private async verifySignature(
