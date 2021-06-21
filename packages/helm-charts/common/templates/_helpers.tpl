@@ -155,14 +155,17 @@ fi
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    if grep -nri ${ACCOUNT_ADDRESS#0x} /root/.celo/keystore/ > /dev/null; then
+      :
     {{- if .proxy | default false }}
-    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+      [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- else }}
     {{- if not (.proxied | default false) }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- end }}
     {{- end }}
+    fi
     {{- end }}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -512,7 +515,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- define "common.gsutil-sync-data-init-container" -}}
 - name: gsutil-sync-data
   image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   command:
   - /bin/sh
   - -c
