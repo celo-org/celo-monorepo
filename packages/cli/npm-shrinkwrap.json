@@ -408,7 +408,7 @@
         "@types/elliptic": "^6.4.9",
         "@types/ethereumjs-util": "^5.2.0",
         "@types/google-libphonenumber": "^7.4.17",
-        "@types/lodash": "^4.14.136",
+        "@types/lodash": "^4.14.170",
         "@types/node": "^10.12.18",
         "@types/randombytes": "^2.0.0",
         "@umpirsky/country-list": "git+https://github.com/umpirsky/country-list.git#05fda51cd97b3294e8175ffed06104c44b3c71d7",
@@ -427,7 +427,7 @@
         "google-libphonenumber": "^3.2.15",
         "io-ts": "2.0.1",
         "keccak256": "^1.0.0",
-        "lodash": "^4.17.14",
+        "lodash": "^4.17.21",
         "numeral": "^2.0.6",
         "web3-eth-abi": "1.3.5",
         "web3-utils": "1.3.5"
@@ -1135,7 +1135,7 @@
         "@ledgerhq/hw-transport": "^5.11.0",
         "@ledgerhq/hw-transport-node-hid-noevents": "^5.11.0",
         "@ledgerhq/logs": "^5.11.0",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.21",
         "node-hid": "^1.2.0",
         "usb": "^1.6.0"
       }
@@ -1643,7 +1643,7 @@
             "hyperlinker": "^1.0.0",
             "indent-string": "^3.2.0",
             "is-wsl": "^1.1.0",
-            "lodash": "^4.17.11",
+            "lodash": "^4.17.21",
             "password-prompt": "^1.0.7",
             "semver": "^5.6.0",
             "strip-ansi": "^5.0.0",
@@ -1719,7 +1719,7 @@
         "@oclif/command": "^1.5.4",
         "@oclif/config": "^1.8.7",
         "cli-ux": "^5.4.5",
-        "lodash": "^4.17.11"
+        "lodash": "^4.17.21"
       }
     },
     "@oclif/plugin-help": {
@@ -1769,7 +1769,7 @@
         "@oclif/command": "^1.6.0",
         "cli-ux": "^4.9.0",
         "fast-levenshtein": "^2.0.6",
-        "lodash": "^4.17.13"
+        "lodash": "^4.17.21"
       },
       "dependencies": {
         "ansi-escapes": {
@@ -1805,7 +1805,7 @@
             "hyperlinker": "^1.0.0",
             "indent-string": "^3.2.0",
             "is-wsl": "^1.1.0",
-            "lodash": "^4.17.11",
+            "lodash": "^4.17.21",
             "password-prompt": "^1.0.7",
             "semver": "^5.6.0",
             "strip-ansi": "^5.0.0",
@@ -2177,9 +2177,9 @@
       }
     },
     "@types/lodash": {
-      "version": "4.14.168",
-      "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.168.tgz",
-      "integrity": "sha512-oVfRvqHV/V6D1yifJbVRU3TMp8OT6o6BG+U9MkwuJ3U8/CsDHvalRpsxBqivn71ztOFZBTfJMvETbqHiaNSj7Q=="
+      "version": "4.14.170",
+      "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.170.tgz",
+      "integrity": "sha512-bpcvu/MKHHeYX+qeEN8GE7DIravODWdACVA1ctevD8CN24RhPZIKMn9ntfAsrvLfSX3cR5RrBKAbYm9bGs0A+Q=="
     },
     "@types/long": {
       "version": "4.0.1",
@@ -2466,7 +2466,7 @@
       "resolved": "https://registry.npmjs.org/async/-/async-2.6.3.tgz",
       "integrity": "sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==",
       "requires": {
-        "lodash": "^4.17.14"
+        "lodash": "^4.17.21"
       }
     },
     "async-limiter": {
@@ -3117,7 +3117,7 @@
         "indent-string": "^4.0.0",
         "is-wsl": "^2.2.0",
         "js-yaml": "^3.13.1",
-        "lodash": "^4.17.11",
+        "lodash": "^4.17.21",
         "natural-orderby": "^2.0.1",
         "object-treeify": "^1.1.4",
         "password-prompt": "^1.1.2",
@@ -4753,7 +4753,7 @@
         "cli-width": "^3.0.0",
         "external-editor": "^3.0.3",
         "figures": "^3.0.0",
-        "lodash": "^4.17.19",
+        "lodash": "^4.17.21",
         "mute-stream": "0.0.8",
         "run-async": "^2.4.0",
         "rxjs": "^6.6.0",
@@ -5281,9 +5281,9 @@
       }
     },
     "lodash": {
-      "version": "4.17.20",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.20.tgz",
-      "integrity": "sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA=="
+      "version": "4.17.21",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
+      "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
     },
     "lodash._reinterpolate": {
       "version": "3.0.0",
@@ -7898,7 +7898,7 @@
       "integrity": "sha512-W9tKgmSn0DpSatfri0nx52Joq5hVXgeLiqR/5G0sZNDoLZFOr/xjBUDcShCOGNsBnEMNo1KAMBkTej1Hm62HTw==",
       "requires": {
         "flat": "^4.1.0",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.21",
         "yargs": "^13.3.0"
       }
     },

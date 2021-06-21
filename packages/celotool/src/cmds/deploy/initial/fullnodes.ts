@@ -34,12 +34,12 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: FullNodeInitialArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
   if (!isCelotoolHelmDryRun()) {
-    await linkSAForWorkloadIdentity(argv.celoEnv)
+    await linkSAForWorkloadIdentity(argv.celoEnv, argv.context)
   } else {
     console.info(`Skipping Workload Identity Service account setup due to --helmdryrun.`)
   }
   await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
   if (!isCelotoolHelmDryRun()) {
-    await kubectlAnnotateKSA(argv.celoEnv)
+    await kubectlAnnotateKSA(argv.celoEnv, argv.context)
   }
 }
