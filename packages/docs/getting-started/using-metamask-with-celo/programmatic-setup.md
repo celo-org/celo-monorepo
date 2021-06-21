@@ -8,12 +8,11 @@ description: >-
 
 ## **Summary**
 
-For dApp Developers interested in using MetaMask with Celo, we encourage doing the following 4 things, which are described in detail in the below sections.
+For dApp Developers interested in using MetaMask with Celo, we encourage doing the following 3 things, which are described in detail in the below sections.
 
 1. Add the Network
 2. Add Celo tokens \(e.g. cUSD, cEUR\)
-3. Explicitly choose the gas price
-4. Handle cases where MetaMask is connected to a different network
+3. Handle cases where MetaMask is connected to a different network
 
 ## **Adding a Celo Network to MetaMask**
 
@@ -39,7 +38,7 @@ const CELO_PARAMS = {
       nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 }, rpcUrls: ['https://forno.celo.org'],
       blockExplorerUrls: ['https://explorer.celo.org/'],
       iconUrls: ['future'],
- };  
+ };
 ```
 {% endtab %}
 
@@ -52,7 +51,7 @@ const ALFAJORES_PARAMS = {
       rpcUrls: ['https://alfajores-forno.celo-testnet.org'],
       blockExplorerUrls: ['https://alfajores-blockscout.celo-testnet.org/'],
       iconUrls: ['future'],
-    };  
+    };
 ```
 {% endtab %}
 
@@ -117,12 +116,6 @@ To double-check that the above values are up-to-date, please verify using the `c
 {% endhint %}
 
 * Where it says `INSERT_SYMBOL_HERE`, please replace with the correct symbol for the asset you'd like to watch. For Celo Dollars, it's `cUSD` and for Celo Euros, it's `cEUR`.
-
-## **Explicitly choosing the gas price**
-
-See the next page for this information:
-
-{% page-ref page="choosing-the-right-gas-price.md" %}
 
 ## **Handling cases where MetaMask is connected to a different network**
 

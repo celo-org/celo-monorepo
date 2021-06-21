@@ -5,10 +5,12 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/InitializableV2.sol";
+import "../common/linkedlists/IntegerLinkedList.sol";
+import "../common/linkedlists/LinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "./interfaces/IStableToken.sol";
+import "../stability/interfaces/IStableToken.sol";
 
 /**
  * @title Facilitates large exchanges between CELO stable tokens.
@@ -21,6 +23,7 @@ contract GrandaMento is
   ReentrancyGuard
 {
   using FixidityLib for FixidityLib.Fraction;
+  using IntegerLinkedList for LinkedList.List;
   using SafeMath for uint256;
 
   // Emitted when a new exchange proposal is created.
@@ -109,6 +112,10 @@ contract GrandaMento is
   // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
 
+  // A list of all exchange proposals that are currently in the Proposed or
+  // Approved state. Used for easily viewing all the active exchange proposals.
+  LinkedList.List private activeProposalIds;
+
   // Number of exchange proposals that exist. Used for assigning an exchange
   // proposal ID to a new proposal.
   uint256 public exchangeProposalCount;
@@ -194,8 +201,12 @@ contract GrandaMento is
     );
 
     // Record the proposal.
-    uint256 proposalId = exchangeProposalCount;
-    exchangeProposals[proposalId] = ExchangeProposal({
+    // Add 1 to the running proposal count, and use the updated proposal count as
+    // the proposal ID. Proposal IDs intentionally start at 1 rather than 0 because
+    // LinkedList, which is used for keeping track of active proposal IDs, requires
+    // keys to be non-zero.
+    exchangeProposalCount = exchangeProposalCount.add(1);
+    exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
       stableToken: stableToken, // for stable tokens, is saved in units to deal with demurrage.
       sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
@@ -204,18 +215,18 @@ contract GrandaMento is
       state: ExchangeProposalState.Proposed,
       sellCelo: sellCelo
     });
-    exchangeProposalCount = exchangeProposalCount.add(1);
+    // Push it into the array of active proposals.
+    activeProposalIds.push(exchangeProposalCount);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
     emit ExchangeProposalCreated(
-      proposalId,
+      exchangeProposalCount,
       msg.sender,
       stableToken,
       sellAmount,
       buyAmount,
       sellCelo
     );
-
-    return proposalId;
+    return exchangeProposalCount;
   }
 
   /**
@@ -249,8 +260,10 @@ contract GrandaMento is
         (proposal.state == ExchangeProposalState.Approved && isOwner()),
       "Sender cannot cancel the exchange proposal"
     );
-    // Mark the proposal as cancelled.
+    // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
+    // Remove the proposal from the active list. This operation is O(1).
+    activeProposalIds.remove(proposalId);
     // Get the token and amount that will be refunded to the proposer.
     (IERC20 refundToken, uint256 refundAmount) = getSellTokenAndSellAmount(proposal);
     // Finally, transfer out the deposited funds.
@@ -276,6 +289,10 @@ contract GrandaMento is
       proposal.approvalTimestamp.add(vetoPeriodSeconds) <= block.timestamp,
       "Veto period not elapsed"
     );
+    // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
+    proposal.state = ExchangeProposalState.Executed;
+    // Remove the proposal from the active list. This operation is O(1).
+    activeProposalIds.remove(proposalId);
 
     // Perform the exchange.
     (IERC20 sellToken, uint256 sellAmount) = getSellTokenAndSellAmount(proposal);
@@ -304,8 +321,6 @@ contract GrandaMento is
         "Transfer out of CELO from Reserve failed"
       );
     }
-    // Mark the proposal as executed.
-    proposal.state = ExchangeProposalState.Executed;
     emit ExchangeProposalExecuted(proposalId);
   }
 
@@ -379,6 +394,15 @@ contract GrandaMento is
   }
 
   /**
+   * @notice Gets the proposal identifiers of all exchange proposals in the
+   * Proposed or Approved state.
+   * @return An array of active exchange proposals IDs.
+   */
+  function getActiveProposalIds() external view returns (uint256[] memory) {
+    return activeProposalIds.getKeys();
+  }
+
+  /**
    * @notice Gets the oracle CELO price quoted in the stable token.
    * @dev Reverts if there is not a rate for the provided stable token.
    * @param stableToken The stable token to get the oracle price for.
@@ -399,7 +423,7 @@ contract GrandaMento is
 
   /**
    * @notice Sets the approver.
-   * @dev Sender must be owner.
+   * @dev Sender must be owner. New approver is allowed to be address(0).
    * @param newApprover The new value for the spread.
    */
   function setApprover(address newApprover) public onlyOwner {
