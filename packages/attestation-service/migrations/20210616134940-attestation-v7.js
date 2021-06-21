@@ -11,7 +11,7 @@ module.exports = {
       })
 
       await queryInterface.addColumn('Attestations', 'credentials', {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
+        type: Sequelize.STRING,
         allowNull: true,
       })
 

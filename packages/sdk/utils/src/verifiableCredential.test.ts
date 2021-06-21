@@ -1,4 +1,8 @@
-import { getPhoneNumberTypeJSONLD, getProofOptions, issueCredential } from './verifiableCredential'
+import {
+  getPhoneNumberTypeJSONLD,
+  getProofOptions,
+  validateVerifiableCredential,
+} from './verifiableCredential'
 
 const MOCK_VALORA_ADDRESS = '0xa0ae58da58dfa46fa55c3b86545e7065f90ff011'
 const MOCK_ATTESTATION_SIGNER_ADDRESS = '0xc0f4e7b1a61538447e08fad89f561a2d07f78a93'
@@ -26,10 +30,7 @@ const MOCK_PROOF_OPTIONS = JSON.stringify({
   proofPurpose: 'assertionMethod',
 })
 
-const MOCK_SIGNATURE =
-  '0xf96e9022adb7af41d8bf130330ff13b6e9701de3aaa7477e55122683b513717c5fa6ac3d1c286db264643eb487500aa3e457ff2224b8d1b219bc4c81950e3c011b'
-
-const MOCK_VERIFIABLE_CREDENTIAL = {
+const MOCK_VERIFIABLE_CREDENTIAL = JSON.stringify({
   '@context': [
     'https://www.w3.org/2018/credentials/v1',
     {
@@ -40,10 +41,10 @@ const MOCK_VERIFIABLE_CREDENTIAL = {
   type: ['VerifiableCredential', 'PhoneNumberType'],
   credentialSubject: {
     id: 'did:pkh:eth:0xa0ae58da58dfa46fa55c3b86545e7065f90ff011',
-    phoneNumberType: 'MOBILE',
+    phoneNumberType: 'mobile',
   },
   issuer: 'did:pkh:eth:0xc0f4e7b1a61538447e08fad89f561a2d07f78a93',
-  issuanceDate: '2021-06-16T12:04:33.563Z',
+  issuanceDate: '2021-06-18T13:43:57.534Z',
   proof: {
     '@context': [
       {
@@ -97,11 +98,11 @@ const MOCK_VERIFIABLE_CREDENTIAL = {
     type: 'EthereumPersonalSignature2021',
     proofPurpose: 'assertionMethod',
     proofValue:
-      '0xf96e9022adb7af41d8bf130330ff13b6e9701de3aaa7477e55122683b513717c5fa6ac3d1c286db264643eb487500aa3e457ff2224b8d1b219bc4c81950e3c011b',
+      '0x1f8cbfb1144e7f36e1656fa3086250f8f6189c5aae56f9c4c976ae43972880d471166d9fc747b1784792bb757f3753cd56d2dc8d15b59410d806c451c5846cae1b',
     verificationMethod: 'did:pkh:eth:0xc0f4e7b1a61538447e08fad89f561a2d07f78a93#Recovery2020',
-    created: '2021-06-16T12:04:33.564Z',
+    created: '2021-06-18T13:43:57.534Z',
   },
-}
+})
 
 describe('JSON-LD Objects', () => {
   it('Should return the correct PhoneNumberType JSON-LD object', () => {
@@ -128,18 +129,8 @@ describe('Proof Options', () => {
 })
 
 describe('Verifiable Credential', () => {
-  it('Should issue the correct PhoneNumberType credential', async () => {
-    let verifiableCredential = JSON.parse(
-      await issueCredential(
-        JSON.stringify(MOCK_PHONE_NUMBER_TYPE_JSONLD),
-        MOCK_PROOF_OPTIONS,
-        (_: any) => MOCK_SIGNATURE
-      )
-    )
-
-    // Required for testing since a new credential is being issued
-    verifiableCredential.proof.created = '2021-06-16T12:04:33.564Z'
-
-    expect(verifiableCredential).toEqual(MOCK_VERIFIABLE_CREDENTIAL)
+  it('Should not throw errors', async () => {
+    const result = await validateVerifiableCredential(MOCK_VERIFIABLE_CREDENTIAL)
+    expect(result.errors.length).toEqual(0)
   })
 })

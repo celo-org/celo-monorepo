@@ -202,6 +202,7 @@ function getProvidersFor(attestation: AttestationModel, logger: Logger) {
 export async function startSendSms(
   key: AttestationKey,
   phoneNumber: E164Number,
+  account: string,
   messageToSend: string,
   securityCode: string | null = null,
   attestationCode: string | null = null,
@@ -231,6 +232,33 @@ export async function startSendSms(
       providers = providers.filter((provider) => provider.type === onlyUseProvider!)
     }
 
+    // Issues verifiable credential for phone number type
+    let verifiableCredential
+    try {
+      const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
+        numberType === 1 ? 'mobile' : 'unknown',
+        account.toLowerCase(),
+        getAttestationSignerAddress().toLowerCase()
+      )
+
+      const proofOptions = VerifiableCredentialUtils.getProofOptions(
+        getAttestationSignerAddress().toLowerCase()
+      )
+      verifiableCredential = await VerifiableCredentialUtils.issueCredential(
+        credential,
+        proofOptions,
+        async (signInput) =>
+          await useKit((kit) =>
+            kit.connection.sign(
+              signInput.ethereumPersonalMessage,
+              getAttestationSignerAddress().toLowerCase()
+            )
+          )
+      )
+    } catch (e) {
+      logger.error({ e })
+    }
+
     attestation = await findOrCreateAttestation(
       key,
       {
@@ -245,7 +273,8 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
-        phoneNumberType: phoneNumberTypeToString(numberType || PhoneNumberType.UNKNOWN),
+        phoneNumberType: numberType === 1 ? 'mobile' : 'unknown',
+        credentials: `[${verifiableCredential}]`,
       },
       transaction
     )
@@ -265,28 +294,6 @@ export async function startSendSms(
 
       // Parsed number and found providers. Attempt delivery.
       shouldRetry = await doSendSms(attestation, providers, logger)
-    }
-
-    // Issues verifiable credential for phone number type
-    try {
-      const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
-        attestation.phoneNumberType,
-        attestation.account,
-        getAttestationSignerAddress()
-      )
-
-      const proofOptions = VerifiableCredentialUtils.getProofOptions(getAttestationSignerAddress())
-      const verifiableCredential = await VerifiableCredentialUtils.issueCredential(
-        credential,
-        proofOptions,
-        async (signInput) =>
-          await useKit((kit) =>
-            kit.connection.sign(signInput.ethereumPersonalMessage, getAttestationSignerAddress())
-          )
-      )
-      attestation.credentials = [verifiableCredential]
-    } catch (e) {
-      logger.error({ e })
     }
 
     await attestation.save({ transaction, logging: sequelizeLogger })

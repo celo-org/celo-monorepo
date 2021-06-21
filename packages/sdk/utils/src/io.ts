@@ -95,6 +95,7 @@ export const AttestationServiceStatusResponseType = t.type({
 export const AttestationServiceTestRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   message: t.string,
+  account: AddressType,
   signature: SignatureType,
   provider: t.union([t.string, t.undefined]),
 })
@@ -158,7 +159,7 @@ export const AttestationResponseType = t.type({
   attempt: t.union([t.undefined, t.number]),
   countryCode: t.union([t.undefined, t.string]),
   phoneNumberType: t.union([t.undefined, t.string]),
-  credentials: t.union([t.undefined, t.Array]),
+  credentials: t.union([t.undefined, t.string]),
 
   // Time to receive eventual delivery/failure (inc retries)
   duration: t.union([t.undefined, t.number]),

@@ -15,7 +15,9 @@ export class VerifiableCredentialHandler {
   constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {}
 
   async signVerifiableCredential(signingInput: string) {
-    return await useKit((kit) => kit.connection.sign(signingInput, getAttestationSignerAddress()))
+    return await useKit((kit) =>
+      kit.connection.sign(signingInput, getAttestationSignerAddress().toLowerCase())
+    )
   }
 
   async validateRequest(issuer: string) {
@@ -30,11 +32,13 @@ export class VerifiableCredentialHandler {
 
     const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
       phoneNumberType,
-      subject,
-      getAttestationSignerAddress()
+      subject.toLowerCase(),
+      getAttestationSignerAddress().toLowerCase()
     )
 
-    const proofOptions = VerifiableCredentialUtils.getProofOptions(getAttestationSignerAddress())
+    const proofOptions = VerifiableCredentialUtils.getProofOptions(
+      getAttestationSignerAddress().toLowerCase()
+    )
 
     const verifiableCredential = await VerifiableCredentialUtils.issueCredential(
       credential,

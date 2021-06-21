@@ -54,6 +54,7 @@ export async function handleTestAttestationRequest(
       key,
       testRequest.phoneNumber,
       testRequest.message,
+      testRequest.account,
       null,
       testRequest.message,
       logger,

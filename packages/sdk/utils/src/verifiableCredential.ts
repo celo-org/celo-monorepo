@@ -54,6 +54,8 @@ export const validateVerifiableCredential = async (verifiableCredential: string)
   if (result.errors.length > 0) {
     throw new Error(result.errors)
   }
+
+  return result
 }
 
 /**
@@ -83,7 +85,11 @@ export const issueCredential = async (
 
   let vc = await completeIssueCredential(credential, JSON.stringify(preparation), signature)
 
-  validateVerifiableCredential(vc)
+  try {
+    await validateVerifiableCredential(vc)
+  } catch (e) {
+    throw e
+  }
 
   return vc
 }

@@ -7,7 +7,7 @@ export interface AttestationModel extends Model {
   identifier: string
   issuer: string
   countryCode: string
-  credentials: Array<string>
+  credentials: string
   phoneNumber: E164Number
   phoneNumberType: string
   message: string
@@ -51,7 +51,7 @@ export type AttestationStatic = typeof Model &
 export default (sequelize: Sequelize) => {
   const model = sequelize.define('Attestations', {
     account: DataTypes.STRING,
-    credentials: DataTypes.ARRAY(DataTypes.STRING),
+    credentials: DataTypes.STRING,
     identifier: DataTypes.STRING,
     issuer: DataTypes.STRING,
     countryCode: DataTypes.STRING,
