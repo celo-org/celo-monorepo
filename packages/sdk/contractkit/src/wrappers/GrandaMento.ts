@@ -12,9 +12,17 @@ import {
   valueToString,
 } from './BaseWrapper'
 
+export interface GrandaMentoConfig {
+  approver: string
+  spread: BigNumber // seconds
+  vetoPeriodSeconds: BigNumber
+  // stableTokenExchangeLimits
+  // exchangeProposals
+}
+
 // TODO update comments to match the contracts
 
-export class GrandaMentWrapper extends BaseWrapper<GrandaMento> {
+export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   approver = proxyCall(this.contract.methods.approver)
 
   spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
@@ -24,6 +32,21 @@ export class GrandaMentWrapper extends BaseWrapper<GrandaMento> {
     undefined,
     valueToBigNumber
   )
+
+  // stableTokenExchangeLimits
+  // exchangeProposals
+
+  /**
+   * Returns current configuration parameters.
+   */
+  async getConfig(): Promise<GrandaMentoConfig> {
+    const res = await Promise.all([this.approver(), this.spread(), this.vetoPeriodSeconds()])
+    return {
+      approver: res[0],
+      spread: res[1],
+      vetoPeriodSeconds: res[2],
+    }
+  }
 
   createExchangeProposal: (
     stableTokenRegistryId: string,
