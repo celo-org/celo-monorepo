@@ -27,6 +27,7 @@ const contextFullNodeDeploymentEnvVars: {
   rpcApis: DynamicEnvVar.FULL_NODES_RPC_API_METHODS,
   gcMode: DynamicEnvVar.FULL_NODES_GETH_GC_MODE,
   useGstoreData: DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
+  deployNginxSidecar: DynamicEnvVar.FULL_NODES_DEPLOY_NGINX,
 }
 
 /**
@@ -156,6 +157,7 @@ function getFullNodeDeploymentConfig(context: string): BaseFullNodeDeploymentCon
     rpcApis: fullNodeDeploymentEnvVarValues.rpcApis,
     gcMode: fullNodeDeploymentEnvVarValues.gcMode,
     useGstoreData: fullNodeDeploymentEnvVarValues.useGstoreData,
+    deployNginxSidecar: fullNodeDeploymentEnvVarValues.deployNginxSidecar,
   }
   return fullNodeDeploymentConfig
 }

@@ -27,6 +27,7 @@ export interface BaseFullNodeDeploymentConfig {
   rpcApis: string
   gcMode: string
   useGstoreData: string
+  deployNginxSidecar: string
   // If undefined, node keys will not be predetermined and will be random
   nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
@@ -117,6 +118,7 @@ export abstract class BaseFullNodeDeployer {
       `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
       `--set geth.use_gstorage_data=${this._deploymentConfig.useGstoreData}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
+      `--set geth.enable_nginx=${this._deploymentConfig.deployNginxSidecar}`,
       // Disable by default block age check in fullnode readinessProbe except for production envs
       `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
         envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
