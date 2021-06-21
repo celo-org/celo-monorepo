@@ -607,7 +607,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   describe('When the contracts have been deployed and initialized', () => {
     before(async () => {
       exchangeAbc = await Exchange.new()
-      stableTokenAbc = await StableToken.new()
+      stableTokenAbc = await StableToken.new(true)
 
       const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
       await registry.setAddressFor('ExchangeABC', exchangeAbc.address)
