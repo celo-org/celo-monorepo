@@ -238,7 +238,8 @@ export async function startSendSms(
       const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
         numberType === 1 ? 'mobile' : 'unknown',
         account.toLowerCase(),
-        getAttestationSignerAddress().toLowerCase()
+        getAttestationSignerAddress().toLowerCase(),
+        key.identifier
       )
 
       const proofOptions = VerifiableCredentialUtils.getProofOptions(

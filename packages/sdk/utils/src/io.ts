@@ -105,6 +105,7 @@ export const VerifiableCredentialRequestType = t.type({
   issuer: AddressType,
   accountAddress: AddressType,
   phoneNumberType: t.string,
+  identifier: t.string,
 })
 export type VerifiableCredentialRequest = t.TypeOf<typeof VerifiableCredentialRequestType>
 

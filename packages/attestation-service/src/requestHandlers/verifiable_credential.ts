@@ -27,13 +27,14 @@ export class VerifiableCredentialHandler {
     }
   }
 
-  async doCredential(phoneNumberType: string, subject: string, issuer: string) {
+  async doCredential(phoneNumberType: string, subject: string, issuer: string, identifier: string) {
     await this.validateRequest(issuer)
 
     const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
       phoneNumberType,
       subject.toLowerCase(),
-      getAttestationSignerAddress().toLowerCase()
+      getAttestationSignerAddress().toLowerCase(),
+      identifier
     )
 
     const proofOptions = VerifiableCredentialUtils.getProofOptions(
@@ -57,8 +58,13 @@ export async function handleVerifiableCredentialRequest(
 ) {
   const handler = new VerifiableCredentialHandler(vcRequest)
   try {
-    const { phoneNumberType, accountAddress, issuer } = vcRequest
-    const verifiableCredential = await handler.doCredential(phoneNumberType, accountAddress, issuer)
+    const { phoneNumberType, accountAddress, issuer, identifier } = vcRequest
+    const verifiableCredential = await handler.doCredential(
+      phoneNumberType,
+      accountAddress,
+      issuer,
+      identifier
+    )
     respondWithVerifiableCredential(res, verifiableCredential)
   } catch (error) {
     respondWithError(res, error.responseCode ?? 500, `${error.message ?? error}`)

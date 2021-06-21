@@ -7,6 +7,7 @@ import {
 const MOCK_VALORA_ADDRESS = '0xa0ae58da58dfa46fa55c3b86545e7065f90ff011'
 const MOCK_ATTESTATION_SIGNER_ADDRESS = '0xc0f4e7b1a61538447e08fad89f561a2d07f78a93'
 const MOCK_PHONE_NUMBER_TYPE = 'MOBILE'
+const MOCK_IDENTIFIER = ''
 
 const MOCK_PHONE_NUMBER_TYPE_JSONLD = {
   '@context': [
@@ -110,7 +111,8 @@ describe('JSON-LD Objects', () => {
       getPhoneNumberTypeJSONLD(
         MOCK_PHONE_NUMBER_TYPE,
         MOCK_VALORA_ADDRESS,
-        MOCK_ATTESTATION_SIGNER_ADDRESS
+        MOCK_ATTESTATION_SIGNER_ADDRESS,
+        MOCK_IDENTIFIER
       )
     )
 
