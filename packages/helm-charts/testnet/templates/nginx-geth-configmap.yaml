@@ -1,0 +1,3 @@
+{{- if .Values.geth.enable_nginx | default false }}
+{{ include "common.nginx-geth-configmap" . }}
+{{- end }}

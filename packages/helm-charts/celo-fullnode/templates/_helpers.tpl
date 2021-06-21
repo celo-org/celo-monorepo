@@ -40,6 +40,12 @@ Create chart name and version as used by the chart label.
   targetPort: ws
   protocol: TCP
   name: ws
+{{- if .Values.geth.enable_nginx | default false }}
+- port: 3000
+  targetPort: nginx
+  protocol: TCP
+  name: nginx
+{{- end }}
 {{- end -}}
 
 {{/*

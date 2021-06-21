@@ -59,6 +59,10 @@ spec:
     name: rpc
   - port: 8546
     name: ws
+{{- if .enable_nginx_geth | default false }}
+  - port: 3000
+    name: nginx
+{{- end }}
   selector:
 {{- if .proxy | default false }}
 {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
@@ -151,6 +155,9 @@ spec:
 {{ end }}
       containers:
 {{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
+{{- if .enable_nginx_geth | default false }}
+{{ include "common.nginx-geth-sidecar" . | indent 6 }}
+{{- end }}
       terminationGracePeriodSeconds: 120 # 2 mins
       volumes:
       - name: data
@@ -161,6 +168,9 @@ spec:
       - name: account
         secret:
           secretName: {{ template "common.fullname" . }}-geth-account
+{{- if .enable_nginx_geth | default false }}
+{{ include "common.nginx-geth-sidecar-volume" . | indent 6 }}
+{{- end }}
 {{- end -}}
 
 {{- /* This template puts a semicolon-separated pair of proxy enodes into $PROXY_ENODE_URL_PAIR. */ -}}

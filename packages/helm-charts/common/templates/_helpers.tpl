@@ -530,3 +530,97 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - name: data
     mountPath: /root/.celo
 {{- end -}}
+
+{{- define "common.nginx-geth-sidecar" -}}
+- name: nginx
+  image: nginx:latest
+  imagePullPolicy: IfNotPresent
+  ports:
+  - containerPort: 3000
+    name: nginx
+    protocol: TCP
+  volumeMounts:
+  - name: nginx-geth-config
+    mountPath: /etc/nginx/nginx.conf
+    subPath: nginx.conf
+{{- end -}}
+
+{{- define "common.nginx-geth-sidecar-volume" -}}
+- name: nginx-geth-config
+  configMap:
+    name: {{ template "common.fullname" . }}-nginx-geth-config
+{{- end -}}
+
+{{- define "common.nginx-geth-configmap" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.fullname" . }}-nginx-geth-config
+  labels:
+{{ include "common.standard.labels" .  | indent 4 }}
+data:
+  nginx.conf: |-
+    # /etc/nginx/nginx.conf
+    user nginx;
+    # Set number of worker processes automatically based on number of CPU cores.
+    worker_processes auto;
+    # Enables the use of JIT for regular expressions to speed-up their processing.
+    pcre_jit on;
+    # Configures default error logger.
+    error_log /var/log/nginx/error.log warn;
+    # Includes files with directives to load dynamic modules.
+    include /etc/nginx/modules/*.conf;
+    events {
+        # The maximum number of simultaneous connections that can be opened by
+        # a worker process.
+        worker_connections 1024;
+    }
+    http {
+    server {
+        listen 3000;
+        server_name tx-nodes-private;
+
+        location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+
+        proxy_pass http://ws-backend;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        }
+
+        location /rpc {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+
+        proxy_pass http://rpc-backend;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        }
+
+        location /ws {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+
+        proxy_pass http://ws-backend;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        }
+    }
+    upstream rpc-backend {
+        server localhost:8545;
+    }
+
+    upstream ws-backend {
+        server localhost:8546;
+    }
+    }
+    # TIP: Uncomment if you use stream module.
+    #include /etc/nginx/stream.conf;
+{{- end -}}
