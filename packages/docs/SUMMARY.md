@@ -10,7 +10,6 @@
   - [Using MetaMask with Celo](getting-started/using-metamask-with-celo/README.md)
     - [Manual Setup](getting-started/using-metamask-with-celo/manual-setup.md)
     - [Programmatic Setup](getting-started/using-metamask-with-celo/programmatic-setup.md)
-    - [Choosing the Right Gas Price](getting-started/using-metamask-with-celo/choosing-the-right-gas-price.md)
     - [Using a Ledger with MetaMask](getting-started/using-metamask-with-celo/using-a-ledger-with-metamask.md)
 - [Mainnet](getting-started/mainnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
@@ -64,21 +63,22 @@
   - [DappKit Truffle Box](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
-  <!-- - [Building a dApp with Contracts on Celo]() -->
-  <!-- - [The Celo Protocol]()
-    - [Architecture]()
-    - [Similarities with Ethereum]()
-    - [Difference between Ethereum and Celo]()
-      - [Mobile First]()
-      - [Architectural Differences]()
-        - [Validators, full node, light node]()
-      - [Protocol Differences]()
-        - [TX object - link to transactions]()
-        - [fees in dollars- link to Paying for Gas in Tokens]()
-      - [Development Differences]()
-    - [dApps on Celo]()
-      - [What is a dApp?]() -->
-    <!-- - [Architecture]() -->
+  - [WalletConnect](developer-resources/walkthroughs/wallet-connect.md)
+    <!-- - [Building a dApp with Contracts on Celo]() -->
+    <!-- - [The Celo Protocol]()
+      - [Architecture]()
+      - [Similarities with Ethereum]()
+      - [Difference between Ethereum and Celo]()
+        - [Mobile First]()
+        - [Architectural Differences]()
+          - [Validators, full node, light node]()
+        - [Protocol Differences]()
+          - [TX object - link to transactions]()
+          - [fees in dollars- link to Paying for Gas in Tokens]()
+        - [Development Differences]()
+      - [dApps on Celo]()
+        - [What is a dApp?]() -->
+      <!-- - [Architecture]() -->
 - [ContractKit](developer-resources/contractkit/README.md)
   - [Setup](developer-resources/contractkit/setup.md)
   - [Using the kit](developer-resources/contractkit/usage.md)
@@ -504,7 +504,7 @@
       - [ParsedBlock](developer-resources/explorer/reference/interfaces/_block_explorer_.parsedblock.md)
       - [ParsedTx](developer-resources/explorer/reference/interfaces/_block_explorer_.parsedtx.md)
     <!-- explorer-reference-end -->
-  
+
   - [Governance](developer-resources/governance/reference/SUMMARY.md)
     <!-- governance-reference-start -->
     - [Globals](developer-resources/governance/reference/globals.md)
@@ -897,6 +897,7 @@
     - [Stability Algorithm \(Mento\)](celo-codebase/protocol/stability/doto.md)
     - [Oracles](celo-codebase/protocol/stability/oracles.md)
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
+    - [Adding Stable Tokens](celo-codebase/protocol/stability/adding_stable_assets.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
   - [Transactions](celo-codebase/protocol/transactions/README.md)
     - [Native Currency](celo-codebase/protocol/transactions/native-currency.md)
@@ -906,6 +907,7 @@
     - [Encrypted Payment Comments](celo-codebase/protocol/transactions/tx-comment-encyption.md)
     - [Full Node Incentives](celo-codebase/protocol/transactions/full-node-incentives.md)
   - [Identity](celo-codebase/protocol/identity/README.md)
+    - [Valora Accounts](celo-codebase/protocol/identity/valora-accounts.md)
     - [Phone Number Privacy](celo-codebase/protocol/identity/phone-number-privacy.md)
     - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
