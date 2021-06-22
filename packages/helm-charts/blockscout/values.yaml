@@ -2,7 +2,7 @@ imagePullPolicy: IfNotPresent
 blockscout:
   indexer:
     terminationGracePeriodSeconds: 60
-    port: 4000
+    port: 4001
     strategy:
       rollingUpdate:
         maxSurge: 1
