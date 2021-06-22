@@ -30,7 +30,7 @@ contract GrandaMento is
   event ExchangeProposalCreated(
     uint256 indexed proposalId,
     address indexed exchanger,
-    address indexed stableToken,
+    string stableTokenRegistryId,
     uint256 sellAmount,
     uint256 buyAmount,
     bool sellCelo
@@ -40,7 +40,7 @@ contract GrandaMento is
   event ExchangeProposalApproved(uint256 indexed proposalId);
 
   // Emitted when an exchange proposal is cancelled.
-  event ExchangeProposalCancelled(uint256 indexed proposalId, address sender);
+  event ExchangeProposalCancelled(uint256 indexed proposalId);
 
   // Emitted when an exchange proposal is executed.
   event ExchangeProposalExecuted(uint256 indexed proposalId);
@@ -73,8 +73,14 @@ contract GrandaMento is
   struct ExchangeProposal {
     // The exchanger/proposer of the exchange proposal.
     address payable exchanger;
-    // The stable token involved in this proposal.
+    // The stable token involved in this proposal. This is stored rather than
+    // the stable token's registry ID in case the contract address is changed
+    // while a stable token deposit
     address stableToken;
+    // The state of the exchange proposal.
+    ExchangeProposalState state;
+    // Whether CELO is being sold and stableToken is being bought.
+    bool sellCelo;
     // The amount of the sell token being sold. If a stable token is being sold,
     // the amount of stable token in "units" is stored rather than the "value."
     // This is because stable tokens may experience demurrage/inflation, where
@@ -90,10 +96,6 @@ contract GrandaMento is
     // The timestamp (`block.timestamp`) at which the exchange proposal was approved
     // in seconds. If the exchange proposal has not ever been approved, is 0.
     uint256 approvalTimestamp;
-    // The state of the exchange proposal.
-    ExchangeProposalState state;
-    // Whether CELO is being sold and stableToken is being bought.
-    bool sellCelo;
   }
 
   // The address with the authority to approve exchange proposals.
@@ -206,22 +208,26 @@ contract GrandaMento is
     // LinkedList, which is used for keeping track of active proposal IDs, requires
     // keys to be non-zero.
     exchangeProposalCount = exchangeProposalCount.add(1);
+    // For stable tokens, is saved in units to deal with demurrage.
+    uint256 storedSellAmount = sellCelo
+      ? sellAmount
+      : IStableToken(stableToken).valueToUnits(sellAmount);
     exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
-      stableToken: stableToken, // for stable tokens, is saved in units to deal with demurrage.
-      sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
+      stableToken: stableToken,
+      sellAmount: storedSellAmount,
       buyAmount: buyAmount,
       approvalTimestamp: 0, // initial value when not approved yet
       state: ExchangeProposalState.Proposed,
       sellCelo: sellCelo
     });
-    // Push it into the array of active proposals.
+    // Push it into the list of active proposals.
     activeProposalIds.push(exchangeProposalCount);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
     emit ExchangeProposalCreated(
       exchangeProposalCount,
       msg.sender,
-      stableToken,
+      stableTokenRegistryId,
       sellAmount,
       buyAmount,
       sellCelo
@@ -271,7 +277,7 @@ contract GrandaMento is
       refundToken.transfer(proposal.exchanger, refundAmount),
       "Transfer out of refund token failed"
     );
-    emit ExchangeProposalCancelled(proposalId, msg.sender);
+    emit ExchangeProposalCancelled(proposalId);
   }
 
   /**
@@ -434,9 +440,10 @@ contract GrandaMento is
   /**
    * @notice Sets the spread.
    * @dev Sender must be owner.
-   * @param newSpread The new value for the spread.
+   * @param newSpread The new value for the spread to be wrapped. Must be <= fixed 1.
    */
   function setSpread(uint256 newSpread) public onlyOwner {
+    require(spread <= FixidityLib.fixed1(), "Spread must be smaller than 1");
     spread = FixidityLib.wrap(newSpread);
     emit SpreadSet(newSpread);
   }
