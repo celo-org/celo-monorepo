@@ -62,11 +62,11 @@ function parseExchangeProposal(
   return {
     exchanger: proposalRaw[0],
     stableToken: proposalRaw[1],
-    sellAmount: proposalRaw[2],
-    buyAmount: proposalRaw[3],
-    approvalTimestamp: proposalRaw[4],
-    state: proposalRaw[5].toNumber() as ExchangeProposalState,
-    sellCelo: typeof proposalRaw[6] === 'boolean' ? proposalRaw[6] : proposalRaw[6] === 'true',
+    state: proposalRaw[2].toNumber() as ExchangeProposalState,
+    sellCelo: typeof proposalRaw[3] === 'boolean' ? proposalRaw[3] : proposalRaw[3] === 'true',
+    sellAmount: proposalRaw[4],
+    buyAmount: proposalRaw[5],
+    approvalTimestamp: proposalRaw[6],
   }
 }
 
@@ -244,7 +244,7 @@ contract('GrandaMento', (accounts: string[]) => {
           args: {
             exchanger: owner,
             proposalId: 1,
-            stableToken: stableToken.address,
+            stableTokenRegistryId: stableTokenRegistryId,
             sellAmount: stableTokenSellAmount,
             buyAmount: getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread),
             sellCelo: false,
@@ -267,7 +267,7 @@ contract('GrandaMento', (accounts: string[]) => {
           args: {
             exchanger: owner,
             proposalId: 1,
-            stableToken: stableToken.address,
+            stableTokenRegistryId: stableTokenRegistryId,
             sellAmount: stableTokenSellAmount,
             buyAmount: getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread),
             sellCelo: false,
@@ -398,7 +398,7 @@ contract('GrandaMento', (accounts: string[]) => {
           args: {
             exchanger: owner,
             proposalId: 1,
-            stableToken: stableToken.address,
+            stableTokenRegistryId: stableTokenRegistryId,
             sellAmount: celoSellAmount,
             buyAmount: getBuyAmount(celoSellAmount, fromFixed(defaultCeloStableTokenRate), spread),
             sellCelo: true,
@@ -617,7 +617,6 @@ contract('GrandaMento', (accounts: string[]) => {
           event: 'ExchangeProposalCancelled',
           args: {
             proposalId: 1,
-            sender: alice,
           },
         })
       })
@@ -1132,6 +1131,13 @@ contract('GrandaMento', (accounts: string[]) => {
           spread: newSpreadFixed,
         },
       })
+    })
+
+    it('reverts when the spread is greater than 1', async () => {
+      await assertRevertWithReason(
+        grandaMento.setSpread(newSpreadFixed),
+        'Spread must be smaller than 1'
+      )
     })
 
     it('reverts when the sender is not the owner', async () => {
