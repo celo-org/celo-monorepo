@@ -134,5 +134,5 @@ If you would like to keep up-to-date with all the news happening in the Celo com
 
 You can add the [Celo Signal public calendar](https://calendar.google.com/calendar/u/0/embed?src=c_9su6ich1uhmetr4ob3sij6kaqs@group.calendar.google.com) as well which has relevant dates.
 
-Additional details and explanation about cohorts can be found here [The-celo-foundation-voting-program](https://medium.com/celoorg/the-celo-foundation-voting-program-7ad9fd2e918d) in the Celo Blog article.
+Additional details and explanation about cohorts and the [The-celo-foundation-voting-program](https://medium.com/celoorg/the-celo-foundation-voting-program-7ad9fd2e918d) can be found on the Celo Blog.
 {% endhint %}
