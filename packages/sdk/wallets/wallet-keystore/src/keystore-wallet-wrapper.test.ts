@@ -9,31 +9,31 @@ const KEYSTORE_NAME1 = 'PK1 keystore name'
 const ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PK1))
 
 describe('KeystoreWalletWrapper using InMemoryKeystore', () => {
-  let keystoreWallet: KeystoreWalletWrapper
+  let keystoreWalletWrapper: KeystoreWalletWrapper
 
   beforeEach(() => {
-    keystoreWallet = new KeystoreWalletWrapper(new InMemoryKeystore())
+    keystoreWalletWrapper = new KeystoreWalletWrapper(new InMemoryKeystore())
   })
 
   describe('checks with an empty keystore', () => {
     it('imports private key into keystore wallet', async () => {
-      await keystoreWallet.importPrivateKey(PK1, PASSPHRASE1)
-      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
+      await keystoreWalletWrapper.importPrivateKey(PK1, PASSPHRASE1)
+      expect(keystoreWalletWrapper.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
     })
   })
 
   describe('checks with a populated keystore', () => {
     beforeEach(() => {
-      keystoreWallet.getKeystore().persistKeystore(KEYSTORE_NAME1, GETH_GEN_KEYSTORE1)
+      keystoreWalletWrapper.getKeystore().persistKeystore(KEYSTORE_NAME1, GETH_GEN_KEYSTORE1)
     })
 
     it('lists no accounts pre-unlock', async () => {
-      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([])
+      expect(keystoreWalletWrapper.getLocalWallet().getAccounts()).toEqual([])
     })
 
     it('lists account post-unlock', async () => {
-      await keystoreWallet.unlockAccount(ADDRESS1, PASSPHRASE1)
-      expect(keystoreWallet.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
+      await keystoreWalletWrapper.unlockAccount(ADDRESS1, PASSPHRASE1)
+      expect(keystoreWalletWrapper.getLocalWallet().getAccounts()).toEqual([ADDRESS1])
     })
   })
 })

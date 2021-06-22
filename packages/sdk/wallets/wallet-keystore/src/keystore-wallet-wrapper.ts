@@ -28,9 +28,6 @@ export class KeystoreWalletWrapper {
 
   async unlockAccount(address: string, passphrase: string) {
     // Unlock and add account to internal LocalWallet
-
-    // TODO duration...seems non-trivial; as a default make this manual?
-    // OR if this is a wallet itself, have a setting for permanent unlock or require passphrase for each tx
     this._localWallet.addAccount(await this._keystore.getPrivateKey(address, passphrase))
   }
 
