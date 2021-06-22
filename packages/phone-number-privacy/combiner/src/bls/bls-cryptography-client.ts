@@ -65,7 +65,7 @@ export class BLSCryptographyClient {
       logger.error(error)
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
-      this.unverifiedSignatures.map((unverifiedSignature) => {
+      this.unverifiedSignatures.forEach((unverifiedSignature) => {
         this.verifySignature(blindedMessage, unverifiedSignature, logger!)
       })
       this.clearUnverifiedSignatures()
