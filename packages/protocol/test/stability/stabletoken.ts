@@ -18,6 +18,7 @@ import {
   StableTokenInstance,
 } from 'types'
 import { soliditySha3 } from 'web3-utils'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -34,7 +35,6 @@ contract('StableToken', (accounts: string[]) => {
   let initializationTime
 
   const amountToMint = 10
-  const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7
 
   beforeEach(async () => {
     registry = await Registry.new()

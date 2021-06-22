@@ -5,8 +5,8 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 500Mi
-            cpu: 500m
+            memory: 250Mi
+            cpu: 200m
     pool_size: 30
     resources:
       requests:
@@ -23,7 +23,7 @@ blockscout:
         resources:
           requests:
             memory: 250Mi
-            cpu: 500m
+            cpu: 200m
     pool_size: 10
     resources:
       requests:
@@ -41,7 +41,7 @@ blockscout:
         resources:
           requests:
             memory: 250Mi
-            cpu: 500m
+            cpu: 200m
     pool_size: 10
     sourcify:
       enabled: true
