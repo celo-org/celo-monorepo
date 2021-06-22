@@ -1,7 +1,6 @@
 imagePullPolicy: IfNotPresent
 blockscout:
   indexer:
-    port: 4001
     db:
       proxy:
         resources:
