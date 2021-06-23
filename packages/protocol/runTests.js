@@ -62,7 +62,7 @@ async function test() {
       testArgs.push('--verbose-rpc')
     }
     if (argv.coverage) {
-      testArgs = testArgs.concat(['--network', 'coverage1'])
+      testArgs = testArgs.concat(['--network', 'coverage'])
     } else {
       testArgs = testArgs.concat(['--network', networkName])
     }
