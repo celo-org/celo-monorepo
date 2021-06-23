@@ -891,7 +891,7 @@
       - [KeystoreBase](developer-resources/wallet-keystore/reference/classes/_keystores_.keystorebase.md)
     - [Enums]()
       - [ErrorMessages](developer-resources/wallet-keystore/reference/enums/_keystores_.errormessages.md)
-      <!-- wallet-keystore-reference-end -->
+    <!-- wallet-keystore-reference-end -->
 
 ## Celo Codebase
 
