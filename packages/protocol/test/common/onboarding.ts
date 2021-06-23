@@ -71,7 +71,6 @@ const ProxyCloneFactory: ProxyCloneFactoryContract = artifacts.require('ProxyClo
 const Random: MockRandomContract = artifacts.require('MockRandom')
 const Validators: MockValidatorsContract = artifacts.require('MockValidators')
 contract('Komenci Onboarding', (_accounts: string[]) => {
-  return
   let accounts: AccountsInstance
   let stableToken: StableTokenInstance
   let mtw: MetaTransactionWalletInstance

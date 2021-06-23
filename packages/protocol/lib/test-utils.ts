@@ -130,7 +130,6 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
 // TODO: Use assertRevert directly from openzeppelin-solidity
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
-    console.log("assert revert", promise)
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {

@@ -440,7 +440,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         })
 
         describe('when the transactions are executed as a meta-transaction', () => {
-          return
           beforeEach(async () => {
             // @ts-ignore
             const data = wallet.contract.methods
@@ -521,7 +520,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     describe('when submitted by a non-signer', () => {
-      return
       beforeEach(() => {
         submitter = nonSigner
       })
