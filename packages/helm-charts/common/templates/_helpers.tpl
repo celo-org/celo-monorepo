@@ -274,7 +274,7 @@ fi
 lifecycle:
   preStop:
     exec:
-      command: ["/bin/sh","-c","killall -HUP geth; while killall -0 geth; do sleep 1; done"]
+      command: ["/bin/sh","-c","killall -SIGTERM geth; while killall -0 geth; do sleep 1; done"]
 {{- end -}}
 
 {{- define "common.geth-configmap" -}}
