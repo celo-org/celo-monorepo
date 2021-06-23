@@ -21,7 +21,7 @@ const web3 = kit.web3
 web3.eth.getBlock("latest")
 ```
 
-will work the same way
+will work the same way.
 
 ## Web3 limitations
 
@@ -31,8 +31,8 @@ To facilitate the life of every developer, we decided to wrap the `Provider` set
 
 This let you use the Web3 instance to interact with node's Json RPC API in a transparent way, just deciding which Provider do you need.
 
-This is also the reason that the `Kit` requires a valid provider from the beginning
+This is also the reason that the `Kit` requires a valid provider from the beginning.
 
-## Local Signing Problem
+## Local Signing
 
-`Web3` provides an alternative way to locally sign transactions which is the usage of `web3.eth.accounts.signTransaction` module to register local accounts, but since Celo transactions are different to the Ethereum ones, this does not work with Celo, hence **you must not use it**.
+As part of the [Donut hardfork](https://medium.com/celoorg/dissecting-the-donut-hardfork-23cad6015fa2) network upgrade that occurred on May 19th, 2021, the Celo network now accepts Ethereum-style transactions as well as Celo transactions. This means that you can use Ethereum transaction signing tools (like [Metamask](../../getting-started/using-metamask-with-celo), web3.js and ethers.js) to sign transactions for the Celo network. Remember that Celo is a separate layer 1 blockchain from Ethereum, so do not send Ethereum assets directly to your Celo account address on Ethereum.
