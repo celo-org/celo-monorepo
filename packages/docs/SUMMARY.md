@@ -872,8 +872,26 @@
       - [RpcWallet](developer-resources/wallet-rpc/reference/classes/_rpc_wallet_.rpcwallet.md)
     - [Enums]()
       - [RpcWalletErrors](developer-resources/wallet-rpc/reference/enums/_rpc_wallet_.rpcwalleterrors.md)
-    <!-- wallet-rpc-reference-end -->
-
+      <!-- wallet-rpc-reference-end -->
+  - [Wallet-Keystore](developer-resources/wallet-keystore/reference/SUMMARY.md)
+    <!-- wallet-keystore-reference-start -->
+    - [Globals](developer-resources/wallet-keystore/reference/globals.md)
+    - [Modules]()
+      - [keystore-wallet-wrapper](developer-resources/wallet-keystore/reference/modules/_keystore_wallet_wrapper_.md)
+      - [KeystoreWalletWrapper](developer-resources/wallet-keystore/reference/classes/_keystore_wallet_wrapper_.keystorewalletwrapper.md)
+      - [keystores](developer-resources/wallet-keystore/reference/modules/_keystores_.md)
+      - [ErrorMessages](developer-resources/wallet-keystore/reference/enums/_keystores_.errormessages.md)
+      - [FileKeystore](developer-resources/wallet-keystore/reference/classes/_keystores_.filekeystore.md)
+      - [InMemoryKeystore](developer-resources/wallet-keystore/reference/classes/_keystores_.inmemorykeystore.md)
+      - [KeystoreBase](developer-resources/wallet-keystore/reference/classes/_keystores_.keystorebase.md)
+    - [Classes]()
+      - [KeystoreWalletWrapper](developer-resources/wallet-keystore/reference/classes/_keystore_wallet_wrapper_.keystorewalletwrapper.md)
+      - [FileKeystore](developer-resources/wallet-keystore/reference/classes/_keystores_.filekeystore.md)
+      - [InMemoryKeystore](developer-resources/wallet-keystore/reference/classes/_keystores_.inmemorykeystore.md)
+      - [KeystoreBase](developer-resources/wallet-keystore/reference/classes/_keystores_.keystorebase.md)
+    - [Enums]()
+      - [ErrorMessages](developer-resources/wallet-keystore/reference/enums/_keystores_.errormessages.md)
+      <!-- wallet-keystore-reference-end -->
 
 ## Celo Codebase
 
