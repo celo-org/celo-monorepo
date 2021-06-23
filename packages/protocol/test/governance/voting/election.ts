@@ -1083,7 +1083,7 @@ contract('Election', (accounts: string[]) => {
 
     describe('when there is a large number of groups', () => {
       const numbers: any = {}
-      return
+      if (process.env.NETWORK === 'coverage') return
       beforeEach(async () => {
         await mockLockedGold.setTotalLockedGold(new BigNumber(1e25))
         await mockValidators.setNumRegisteredValidators(400)
@@ -1889,7 +1889,7 @@ contract('Election', (accounts: string[]) => {
   })
 
   describe('#consistencyChecks', () => {
-    return
+    if (process.env.NETWORK === 'coverage') return
     const debug = false
     const group = accounts[0]
     const voters = accounts.slice(1)

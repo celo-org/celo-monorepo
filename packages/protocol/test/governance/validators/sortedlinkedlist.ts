@@ -330,7 +330,7 @@ contract('IntegerSortedLinkedListTest', () => {
     }
 
     it('should maintain invariants when lesser and greater are correct', async () => {
-      const numActions = 5
+      const numActions = process.env.NETWORK === 'coverage' ? 10 : 100
       const numKeys = 20
       const getLesserAndGreater = async (element: SortedElement) => {
         const [keys, values] = await sortedListTest.getElements()
@@ -357,7 +357,7 @@ contract('IntegerSortedLinkedListTest', () => {
     })
 
     it('should maintain invariants when lesser and greater are incorrect', async () => {
-      const numReports = 5
+      const numReports = process.env.NETWORK === 'coverage' ? 10 : 200
       const numKeys = 10
       const getRandomKeys = async () => {
         const [keys] = await sortedListTest.getElements()

@@ -360,7 +360,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     }
 
     it('should maintain invariants when lesser, greater are correct', async () => {
-      const numActions = 10
+      const numActions = process.env.NETWORK === 'coverage' ? 10 : 100
       const numKeys = 20
       const getLesserAndGreater = async (element: SortedElement) => {
         const [keys, numerators] = await addressSortedLinkedListWithMedianTest.getElements()
@@ -390,7 +390,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should maintain invariants when lesser, greater are incorrect', async () => {
-      const numReports = 10
+      const numReports = process.env.NETWORK === 'coverage' ? 10 : 200
       const numKeys = 20
       const getRandomKeys = async () => {
         let lesser = NULL_ADDRESS

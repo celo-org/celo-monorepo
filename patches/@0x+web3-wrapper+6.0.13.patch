@@ -1,0 +1,12 @@
+patch-package
+--- a/node_modules/@0x/web3-wrapper/lib/src/web3_wrapper.js
++++ b/node_modules/@0x/web3-wrapper/lib/src/web3_wrapper.js
+@@ -276,7 +276,7 @@ var Web3Wrapper = /** @class */ (function () {
+                         // HACK Parity can return a pending transaction receipt. We check for a non null
+                         // block number before continuing with returning a fully realised receipt.
+                         // ref: https://github.com/paritytech/parity-ethereum/issues/1180
+-                        if (transactionReceiptRpc !== null && transactionReceiptRpc.blockNumber !== null) {
++                        if (transactionReceiptRpc !== null && typeof transactionReceiptRpc === 'object' && transactionReceiptRpc.blockNumber !== null) {
+                             transactionReceiptRpc.status = Web3Wrapper._normalizeTxReceiptStatus(transactionReceiptRpc.status);
+                             transactionReceipt = marshaller_1.marshaller.unmarshalTransactionReceipt(transactionReceiptRpc);
+                             return [2 /*return*/, transactionReceipt];
