@@ -210,7 +210,7 @@ contract('Exchange', (accounts: string[]) => {
     })
 
     it('should emit a MinimumReportsSet event', async () => {
-      const tx = await exchange.setMinimumReports(newMinimumReports)
+      const tx = await exchange.setMinimumReports(newMinimumReports, { from: accounts[0] })
       assert(tx.logs.length === 1, 'Did not receive event')
 
       const log = tx.logs[0]

@@ -1,7 +1,7 @@
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import {getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -130,6 +130,7 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
 // TODO: Use assertRevert directly from openzeppelin-solidity
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
+    console.log("assert revert", promise)
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
