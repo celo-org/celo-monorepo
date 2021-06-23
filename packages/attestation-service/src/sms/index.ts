@@ -21,9 +21,9 @@ import { AttestationKey, AttestationModel, AttestationStatus } from '../models/a
 import { ErrorWithResponse } from '../request'
 import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { MessageBirdSmsProvider } from './messagebird'
-import { NexmoSmsProvider } from './nexmo'
 import { TelekomSmsProvider } from './telekom'
 import { TwilioSmsProvider } from './twilio'
+import { VonageSmsProvider } from './vonage'
 
 // Maximum delivery attempts (including first) regardless of provider
 const maxDeliveryAttempts = parseInt(
@@ -100,11 +100,11 @@ export async function initializeSmsProviders(
         smsProviders.push(messageBirdProvider)
         smsProvidersByType[SmsProviderType.MESSAGEBIRD] = messageBirdProvider
         break
-      case SmsProviderType.NEXMO:
-        const nexmoProvider = NexmoSmsProvider.fromEnv()
-        await nexmoProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
-        smsProviders.push(nexmoProvider)
-        smsProvidersByType[SmsProviderType.NEXMO] = nexmoProvider
+      case SmsProviderType.VONAGE:
+        const vonageProvider = VonageSmsProvider.fromEnv()
+        await vonageProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
+        smsProviders.push(vonageProvider)
+        smsProvidersByType[SmsProviderType.VONAGE] = vonageProvider
         break
       case SmsProviderType.TWILIO:
         const twilioProvider = TwilioSmsProvider.fromEnv()

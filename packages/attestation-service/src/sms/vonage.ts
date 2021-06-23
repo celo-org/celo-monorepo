@@ -2,7 +2,7 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
-import Nexmo from 'nexmo'
+import Vonage from 'nexmo'
 import { receivedDeliveryReport } from '.'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Gauges } from '../metrics'
@@ -11,19 +11,29 @@ import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './b
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
-export class NexmoSmsProvider extends SmsProvider {
+export class VonageSmsProvider extends SmsProvider {
   static fromEnv() {
-    return new NexmoSmsProvider(
-      fetchEnv('NEXMO_KEY'),
-      fetchEnv('NEXMO_SECRET'),
-      fetchEnvOrDefault('NEXMO_APPLICATION', ''),
-      readUnsupportedRegionsFromEnv('NEXMO_UNSUPPORTED_REGIONS', 'NEXMO_BLACKLIST'),
-      isYes(fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', ''))
+    return new VonageSmsProvider(
+      fetchEnvOrDefault('VONAGE_KEY', fetchEnv('NEXMO_KEY')),
+      fetchEnvOrDefault('VONAGE_SECRET', fetchEnv('NEXMO_SECRET')),
+      fetchEnvOrDefault('VONAGE_APPLICATION', fetchEnvOrDefault('NEXMO_APPLICATION', '')),
+      readUnsupportedRegionsFromEnv(
+        'VONAGE_UNSUPPORTED_REGIONS',
+        'VONAGE_BLACKLIST',
+        'NEXMO_UNSUPPORTED_REGIONS',
+        'NEXMO_BLACKLIST'
+      ),
+      isYes(
+        fetchEnvOrDefault(
+          'VONAGE_ACCOUNT_BALANCE_METRIC',
+          fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', '')
+        )
+      )
     )
   }
-  type = SmsProviderType.NEXMO
+  type = SmsProviderType.VONAGE
   client: any
-  nexmoNumbers: Array<{
+  vonageNumbers: Array<{
     code: string
     phoneNumber: string
     type: string
@@ -43,13 +53,13 @@ export class NexmoSmsProvider extends SmsProvider {
     super()
     this.applicationId = applicationId
     if (applicationId) {
-      this.client = new Nexmo({
+      this.client = new Vonage({
         apiKey,
         apiSecret,
         applicationId,
       })
     } else {
-      this.client = new Nexmo({
+      this.client = new Vonage({
         apiKey,
         apiSecret,
       })
@@ -65,10 +75,10 @@ export class NexmoSmsProvider extends SmsProvider {
 
     if (!availableNumbers) {
       throw new Error(
-        'You have no phone numbers in your Nexmo account. Please buy at least one number at https://dashboard.nexmo.com/buy-numbers'
+        'You have no phone numbers in your Vonage account. Please buy at least one number at https://dashboard.nexmo.com/buy-numbers'
       )
     }
-    this.nexmoNumbers = availableNumbers.map((number: any) => ({
+    this.vonageNumbers = availableNumbers.map((number: any) => ({
       phoneNumber: number.msisdn,
       code: phoneUtil.getRegionCodeForNumber(phoneUtil.parse('+' + number.msisdn)),
       type: number.type,
@@ -107,10 +117,10 @@ export class NexmoSmsProvider extends SmsProvider {
   deliveryStatusHandlers = () => [bodyParser.json()]
 
   async sendSms(attestation: AttestationModel) {
-    const nexmoNumber = this.getMatchingNumber(attestation.countryCode)
+    const vonageNumber = this.getMatchingNumber(attestation.countryCode)
     return new Promise<string>((resolve, reject) => {
       this.client.message.sendSms(
-        nexmoNumber,
+        vonageNumber,
         attestation.phoneNumber,
         attestation.message,
         { callback: this.deliveryStatusURL },
@@ -156,7 +166,7 @@ export class NexmoSmsProvider extends SmsProvider {
 
   private getMatchingNumber = (countryCode: string) => {
     // Use toll-free number for +1 numbers to satisfy 10DLC requirements
-    const matchingNumber = this.nexmoNumbers.find(
+    const matchingNumber = this.vonageNumbers.find(
       (number) =>
         number.code === countryCode && (countryCode !== 'US' || number.type === this.tollFreeType)
     )
@@ -165,9 +175,9 @@ export class NexmoSmsProvider extends SmsProvider {
     }
 
     // Toll free numbers cannot send internationally
-    let defaultNumber = this.nexmoNumbers.find((number) => number.type !== this.tollFreeType)
+    let defaultNumber = this.vonageNumbers.find((number) => number.type !== this.tollFreeType)
     if (!defaultNumber) {
-      defaultNumber = this.nexmoNumbers[0]
+      defaultNumber = this.vonageNumbers[0]
     }
     return defaultNumber.phoneNumber
   }
