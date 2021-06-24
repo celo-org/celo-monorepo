@@ -1,7 +1,8 @@
-import { mkdirSync, readdirSync, readFileSync, rmdirSync } from 'fs'
+import { trimLeading0x } from '@celo/utils/lib/address'
+import { mkdirSync, readdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
 import path from 'path'
 import { FileKeystore } from './file-keystore'
-import { ADDRESS1, PASSPHRASE1, PK1 } from './test-constants'
+import { ADDRESS1, GETH_GEN_KEYSTORE1, KEYSTORE_NAME1, PASSPHRASE1, PK1 } from './test-constants'
 
 jest.setTimeout(20000)
 
@@ -35,5 +36,15 @@ describe('FileKeystore tests', () => {
     )
     keystore.removeKeystore(keystoreName)
     expect(readdirSync(keystorePath).length).toBe(0)
+  })
+
+  it('reads key from file in existing keystore', async () => {
+    const keystorePath = path.join(testWorkdir, 'keystore')
+    mkdirSync(keystorePath)
+    writeFileSync(path.join(keystorePath, KEYSTORE_NAME1), GETH_GEN_KEYSTORE1)
+    const keystore = new FileKeystore(testWorkdir)
+    expect(await keystore.getAllKeystoreNames()).toEqual([KEYSTORE_NAME1])
+    expect(await keystore.listKeystoreAddresses()).toEqual([ADDRESS1])
+    expect(trimLeading0x(await keystore.getPrivateKey(ADDRESS1, PASSPHRASE1))).toEqual(PK1)
   })
 })
