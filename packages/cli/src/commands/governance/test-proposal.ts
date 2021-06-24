@@ -36,11 +36,21 @@ export default class Propose extends BaseCommand {
     const proposal = await builder.build()
     printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
+    let gov = await this.kit.contracts.getGovernance()
+
     for (let tx of proposal) {
       console.log(tx)
       if (!tx.to) {
         continue
       }
+
+      console.log(
+        await this.web3.eth.call({ to: tx.to, from: gov.address, value: tx.value, data: tx.input })
+      )
+      console.log(
+        await this.web3.eth.call({ to: tx.to, from: account, value: tx.value, data: tx.input })
+      )
+
       let res = toTxResult(
         this.web3.eth.sendTransaction({ to: tx.to, from: account, value: tx.value, data: tx.input })
       )
