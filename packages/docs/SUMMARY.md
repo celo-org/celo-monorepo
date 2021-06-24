@@ -64,6 +64,7 @@
   - [Using Windows](developer-resources/develop-on-windows.md)
   - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
   - [WalletConnect](developer-resources/walkthroughs/wallet-connect.md)
+  - [Using Keystores](developer-resources/walkthroughs/using-js-keystores.md)
     <!-- - [Building a dApp with Contracts on Celo]() -->
     <!-- - [The Celo Protocol]()
       - [Architecture]()
