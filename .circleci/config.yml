@@ -419,10 +419,16 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage stability/
+          command: |
+            yarn --cwd packages/protocol test --coverage stability/
+            cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-stability.json
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/coverage/coverage-stability.json'
 
   protocol-test-governance-voting-with-code-coverage:
     <<: *defaults
@@ -432,10 +438,16 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage governance/voting/
+          command: |
+            yarn --cwd packages/protocol test --coverage governance/voting/
+            cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-voting.json
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/coverage/coverage-voting.json'
 
   protocol-test-governance-network-with-code-coverage:
     <<: *defaults
@@ -445,10 +457,16 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage governance/network/
+          command: |
+            yarn --cwd packages/protocol test --coverage governance/network/
+            cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-network.json
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/coverage/coverage-network.json'
   
   protocol-test-governance-validators-with-code-coverage:
     <<: *defaults
@@ -458,10 +476,16 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage governance/validators/
+          command: |
+            yarn --cwd packages/protocol test --coverage governance/validators/
+            cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-validators.json
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/coverage/coverage-validators.json'
 
   protocol-test-common-with-code-coverage:
     <<: *defaults
@@ -471,10 +495,16 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage common/
+          command: |
+            yarn --cwd packages/protocol test --coverage common/
+            cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-common.json
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/coverage/coverage-common.json'
 
   protocol-test-identity-with-code-coverage:
     <<: *defaults
