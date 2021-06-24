@@ -493,7 +493,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - 'packages/protocol/coverage-identity.json'
+            - 'packages/protocol/coverage/coverage-identity.json'
 
   contractkit-test:
     <<: *defaults
