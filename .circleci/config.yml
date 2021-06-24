@@ -484,10 +484,16 @@ jobs:
           at: ~/app
       - run:
           name: test
-          command: yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestation|identity/escrow|identity/identityproxy)'
+          command: |
+            yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestation|identity/escrow|identity/identityproxy)'
+            cp packages/protocol/coverage.json packages/protocol/coverage-identity.json
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'packages/protocol/coverage-identity.json'
 
   contractkit-test:
     <<: *defaults
