@@ -525,6 +525,19 @@ jobs:
           paths:
             - 'packages/protocol/coverage/coverage-identity.json'
 
+  protocol-test-code-coverage:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: test
+          command: |
+            yarn run nyc merge packages/protocol/coverage
+      - store_artifacts:
+          path: coverage.json
+          destination: coverage.json
+
   contractkit-test:
     <<: *defaults
     steps:
@@ -1019,3 +1032,11 @@ workflows:
       - protocol-test-governance-validators-with-code-coverage:
           requires:
             - lint-checks
+      - protocol-test-code-coverage:
+          requires:
+            - protocol-test-governance-validators-with-code-coverage
+            - protocol-test-governance-voting-with-code-coverage
+            - protocol-test-governance-network-with-code-coverage
+            - protocol-test-common-with-code-coverage 
+            - protocol-test-stability-with-code-coverage 
+            - protocol-test-identity-with-code-coverage 
