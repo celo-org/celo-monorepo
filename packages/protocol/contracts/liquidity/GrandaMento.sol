@@ -177,21 +177,23 @@ contract GrandaMento is
     bool sellCelo
   ) external nonReentrant returns (uint256) {
     address stableToken = registry.getAddressForStringOrDie(stableTokenRegistryId);
-    // Require the configurable stableToken max exchange amount to be > 0.
-    // This covers the case where a stableToken has never been explicitly permitted.
-    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryId];
-    require(exchangeLimits.maxExchangeAmount > 0, "Max stable token exchange amount must be > 0");
 
     // Using the current oracle exchange rate, calculate what the buy amount is.
     // This takes the spread into consideration.
     uint256 buyAmount = getBuyAmount(stableToken, sellAmount, sellCelo);
 
+    // Get the minimum and maximum amount of stable token than can be involved
+    // in the exchange. This reverts if exchange limits for the stable token have
+    // not been set.
+    (uint256 minStableTokenExchangeAmount, uint256 maxStableTokenExchangeAmount) = getStableTokenExchangeLimits(
+      stableTokenRegistryId
+    );
     // Ensure that the amount of stableToken being bought or sold is within
     // the configurable exchange limits.
     uint256 stableTokenExchangeAmount = sellCelo ? buyAmount : sellAmount;
     require(
-      stableTokenExchangeAmount <= exchangeLimits.maxExchangeAmount &&
-        stableTokenExchangeAmount >= exchangeLimits.minExchangeAmount,
+      stableTokenExchangeAmount <= maxStableTokenExchangeAmount &&
+        stableTokenExchangeAmount >= minStableTokenExchangeAmount,
       "Stable token exchange amount not within limits"
     );
 
@@ -209,17 +211,17 @@ contract GrandaMento is
     // keys to be non-zero.
     exchangeProposalCount = exchangeProposalCount.add(1);
     // For stable tokens, is saved in units to deal with demurrage.
-    uint256 storedSellAmount = sellCelo
-      ? sellAmount
-      : IStableToken(stableToken).valueToUnits(sellAmount);
+    // uint256 storedSellAmount = sellCelo
+    //   ? sellAmount
+    //   : IStableToken(stableToken).valueToUnits(sellAmount);
     exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
       stableToken: stableToken,
-      sellAmount: storedSellAmount,
-      buyAmount: buyAmount,
-      approvalTimestamp: 0, // initial value when not approved yet
       state: ExchangeProposalState.Proposed,
-      sellCelo: sellCelo
+      sellCelo: sellCelo,
+      sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
+      buyAmount: buyAmount,
+      approvalTimestamp: 0 // initial value when not approved yet
     });
     // Push it into the list of active proposals.
     activeProposalIds.push(exchangeProposalCount);
@@ -428,6 +430,25 @@ contract GrandaMento is
   }
 
   /**
+   * @notice Gets the minimum and maximum amount of a stable token that can be
+   * involved in a single exchange.
+   * @dev Reverts if there is no explicit exchange limit for the stable token.
+   * @param stableTokenRegistryId The string registry ID for the stable token.
+   * @return (minimum exchange amount, maximum exchange amount).
+   */
+  function getStableTokenExchangeLimits(string memory stableTokenRegistryId)
+    public
+    view
+    returns (uint256, uint256)
+  {
+    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryId];
+    // Require the configurable stableToken max exchange amount to be > 0.
+    // This covers the case where a stableToken has never been explicitly permitted.
+    require(exchangeLimits.maxExchangeAmount > 0, "Stable token exchange amount must be defined");
+    return (exchangeLimits.minExchangeAmount, exchangeLimits.maxExchangeAmount);
+  }
+
+  /**
    * @notice Sets the approver.
    * @dev Sender must be owner. New approver is allowed to be address(0).
    * @param newApprover The new value for the spread.
@@ -443,7 +464,7 @@ contract GrandaMento is
    * @param newSpread The new value for the spread to be wrapped. Must be <= fixed 1.
    */
   function setSpread(uint256 newSpread) public onlyOwner {
-    require(spread <= FixidityLib.fixed1(), "Spread must be smaller than 1");
+    require(newSpread <= FixidityLib.fixed1().unwrap(), "Spread must be smaller than 1");
     spread = FixidityLib.wrap(newSpread);
     emit SpreadSet(newSpread);
   }
