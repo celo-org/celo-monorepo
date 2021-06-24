@@ -125,7 +125,7 @@ blockscout components.
 - name: SUBNETWORK
   value: {{ .Values.blockscout.subnetwork }}
 - name: COIN
-  value: cGLD
+  value: CELO
 - name: SEGMENT_KEY
   value: {{ .Values.blockscout.segment_key }}
 - name: ECTO_USE_SSL
@@ -136,6 +136,8 @@ blockscout components.
   value: {{ .Values.blockscout.jsonrpc_http_url }}
 - name: ETHEREUM_JSONRPC_WS_URL
   value: {{ .Values.blockscout.jsonrpc_ws_url }}
+- name: PGUSER
+  value: $(DATABASE_USER)
 - name: DATABASE_URL
   value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
 - name: DATABASE_DB
