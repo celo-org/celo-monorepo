@@ -132,6 +132,7 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
+    // Only ever tested with ganache.
     // When it's a view call, error.message has a shape like:
     // `Returned error: VM Exception while processing transaction: revert ${revertMessage}`
     // When it's a transaction (eg a non-view send call), error.message has a shape like:
