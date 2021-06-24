@@ -3,6 +3,7 @@ import { completeIssueCredential, prepareIssueCredential, verifyCredential } fro
 /**
  * Returns a JSON-LD object to be used for Verifiable Credentials attesting PhoneNumberTypes
  * @param phoneNumberType The type of the phone number
+ * @param phoneNumberTypeProvider The lookup provider of the phone number type
  * @param subject Subject of the verifiable credential, usually a Valora user
  * @param issuer Address of whom is issuing this credential, usually getAttestationSignerAddress()
  * @param identifier Transaction identifier
@@ -11,13 +12,15 @@ export const getPhoneNumberTypeJSONLD = (
   phoneNumberType: string,
   subject: string,
   issuer: string,
-  identifier: string
+  identifier: string,
+  phoneNumberTypeProvider: string
 ) => {
   return JSON.stringify({
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       {
         phoneNumberType: 'https://docs.celo.org/phone_types',
+        phoneNumberTypeProvider: 'https://docs.celo.org/phone_type_providers',
         identifier: 'https://docs.celo.org/identifier',
         PhoneNumberType: 'https://docs.celo.org/PhoneNumberType',
       },
@@ -27,6 +30,7 @@ export const getPhoneNumberTypeJSONLD = (
       id: `did:pkh:eth:${subject.toLowerCase()}`,
       phoneNumberType,
       identifier,
+      phoneNumberTypeProvider,
     },
     issuanceDate: new Date().toISOString(),
     issuer: `did:pkh:eth:${issuer.toLowerCase()}`,
