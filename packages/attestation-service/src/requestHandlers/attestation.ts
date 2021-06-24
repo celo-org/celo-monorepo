@@ -197,7 +197,6 @@ class AttestationRequestHandler {
       attestation = await startSendSms(
         this.key,
         this.attestationRequest.phoneNumber,
-        this.attestationRequest.account,
         textMessage,
         securityCode,
         attestationCodeDeeplink,

@@ -16,6 +16,7 @@ import {
 } from './db'
 import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
 import { rootLogger } from './logger'
+import { initializeLookupProviders } from './lookup'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { handleAttestationRequest } from './requestHandlers/attestation'
 import { handleAttestationDeliveryStatus } from './requestHandlers/delivery'
@@ -44,6 +45,8 @@ async function init() {
   const deliveryStatusURLForProviderType = (t: string) => `${externalURL}/delivery_status_${t}`
 
   await initializeSmsProviders(deliveryStatusURLForProviderType)
+
+  await initializeLookupProviders()
 
   await startPeriodicHealthCheck()
 

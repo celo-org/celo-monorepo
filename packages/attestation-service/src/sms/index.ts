@@ -1,4 +1,3 @@
-import { VerifiableCredentialUtils } from '@celo/utils'
 import { sleep } from '@celo/utils/lib/async'
 import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
@@ -13,9 +12,9 @@ import {
   makeSequelizeLogger,
   sequelize,
   SequelizeLogger,
-  useKit,
 } from '../db'
-import { fetchEnv, fetchEnvOrDefault, getAttestationSignerAddress, isYes } from '../env'
+import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
+import { issueAttestationPhoneNumberTypeCredential } from '../lookup'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
@@ -202,7 +201,6 @@ function getProvidersFor(attestation: AttestationModel, logger: Logger) {
 export async function startSendSms(
   key: AttestationKey,
   phoneNumber: E164Number,
-  account: string,
   messageToSend: string,
   securityCode: string | null = null,
   attestationCode: string | null = null,
@@ -220,7 +218,6 @@ export async function startSendSms(
 
   try {
     const parsedNumber = phoneUtil.parse(phoneNumber)
-    const numberType = parsedNumber ? phoneUtil.getNumberType(parsedNumber) : null
     const countryCode = parsedNumber ? phoneUtil.getRegionCodeForNumber(parsedNumber) : null
 
     let providers: SmsProvider[] = countryCode
@@ -232,33 +229,7 @@ export async function startSendSms(
       providers = providers.filter((provider) => provider.type === onlyUseProvider!)
     }
 
-    // Issues verifiable credential for phone number type
-    let verifiableCredential
-    try {
-      const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
-        numberType === 1 ? 'mobile' : 'unknown',
-        account.toLowerCase(),
-        getAttestationSignerAddress().toLowerCase(),
-        key.identifier
-      )
-
-      const proofOptions = VerifiableCredentialUtils.getProofOptions(
-        getAttestationSignerAddress().toLowerCase()
-      )
-      verifiableCredential = await VerifiableCredentialUtils.issueCredential(
-        credential,
-        proofOptions,
-        async (signInput) =>
-          await useKit((kit) =>
-            kit.connection.sign(
-              signInput.ethereumPersonalMessage,
-              getAttestationSignerAddress().toLowerCase()
-            )
-          )
-      )
-    } catch (e) {
-      logger.error({ e })
-    }
+    const numberType = parsedNumber ? phoneUtil.getNumberType(parsedNumber) : null
 
     attestation = await findOrCreateAttestation(
       key,
@@ -274,11 +245,16 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
-        phoneNumberType: numberType === 1 ? 'mobile' : 'unknown',
-        credentials: `[${verifiableCredential}]`,
       },
       transaction
     )
+
+    // Issues verifiable credential for phone number type
+    let verifiableCredential = await issueAttestationPhoneNumberTypeCredential(attestation, logger)
+
+    if (verifiableCredential) {
+      attestation.credentials = `[${verifiableCredential}]`
+    }
 
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()

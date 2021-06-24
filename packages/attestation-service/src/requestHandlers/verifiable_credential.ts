@@ -1,9 +1,11 @@
 import { eqAddress } from '@celo/base'
-import { VerifiableCredentialUtils } from '@celo/utils'
+import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { VerifiableCredentialRequest } from '@celo/utils/lib/io'
+import Logger from 'bunyan'
 import express from 'express'
-import { useKit } from '../db'
+import { findAttestationByKey, useKit } from '../db'
 import { getAccountAddress, getAttestationSignerAddress } from '../env'
+import { issueAttestationPhoneNumberTypeCredential } from '../lookup'
 import {
   ErrorWithResponse,
   respondWithError,
@@ -20,34 +22,43 @@ export class VerifiableCredentialHandler {
     )
   }
 
-  async validateRequest(issuer: string) {
+  async validateRequest(issuer: string, issuers: string[]) {
     const address = getAccountAddress()
     if (!eqAddress(address, issuer)) {
       throw new ErrorWithResponse(`Mismatching issuer, I am ${address}`, 422)
     }
+
+    if (!issuers.includes(issuer)) {
+      throw new ErrorWithResponse(`I am not an authorized issuer for this account`, 422)
+    }
   }
 
-  async doCredential(phoneNumberType: string, subject: string, issuer: string, identifier: string) {
-    await this.validateRequest(issuer)
+  async doCredential(account: string, issuer: string, identifier: string, logger: Logger) {
+    const attestations = await useKit((kit) => kit.contracts.getAttestations())
 
-    const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
-      phoneNumberType,
-      subject.toLowerCase(),
-      getAttestationSignerAddress().toLowerCase(),
-      identifier
-    )
+    const issuers = await attestations.getAttestationIssuers(identifier, account)
 
-    const proofOptions = VerifiableCredentialUtils.getProofOptions(
-      getAttestationSignerAddress().toLowerCase()
-    )
+    // Checks if the attestation service is an authorized issuer
+    await this.validateRequest(issuer, issuers)
 
-    const verifiableCredential = await VerifiableCredentialUtils.issueCredential(
-      credential,
-      proofOptions,
-      async (signInput) => await this.signVerifiableCredential(signInput.ethereumPersonalMessage)
-    )
+    const state = await attestations.getAttestationState(identifier, account, issuer)
 
-    return JSON.parse(verifiableCredential)
+    // Checks if the attestation is marked as completed
+    if (state?.attestationState === AttestationState.Complete) {
+      throw new ErrorWithResponse(`Can't issue a credential for an incomplete attestation`, 422)
+    }
+
+    const attestation = await findAttestationByKey({
+      identifier,
+      issuer,
+      account,
+    })
+
+    if (attestation) {
+      return JSON.parse(await issueAttestationPhoneNumberTypeCredential(attestation, logger))
+    } else {
+      throw new Error('Unable to find attestation')
+    }
   }
 }
 
@@ -58,12 +69,12 @@ export async function handleVerifiableCredentialRequest(
 ) {
   const handler = new VerifiableCredentialHandler(vcRequest)
   try {
-    const { phoneNumberType, accountAddress, issuer, identifier } = vcRequest
+    const { account, issuer, identifier } = vcRequest
     const verifiableCredential = await handler.doCredential(
-      phoneNumberType,
-      accountAddress,
+      account,
       issuer,
-      identifier
+      identifier,
+      res.locals.logger
     )
     respondWithVerifiableCredential(res, verifiableCredential)
   } catch (error) {
