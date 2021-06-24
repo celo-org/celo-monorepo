@@ -621,6 +621,10 @@
       - [PublicAccessor](developer-resources/identity/reference/interfaces/_offchain_accessors_interfaces_.publicaccessor.md)
     <!-- identity-reference-end -->
 
+  - [Keystores](developer-resources/keystores/reference/../../../SUMMARY.md)
+    <!-- keystores-reference-start -->
+      <!-- keystores-reference-end -->
+
   - [Network-Utils](developer-resources/network-utils/reference/SUMMARY.md)
     <!-- network-utils-reference-start -->
     - [Globals](developer-resources/network-utils/reference/globals.md)
