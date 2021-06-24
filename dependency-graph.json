@@ -202,6 +202,13 @@
       "@celo/wallet-local"
     ]
   },
+  "@celo/keystores": {
+    "location": "packages/sdk/keystores",
+    "dependencies": [
+      "@celo/utils",
+      "@celo/wallet-local"
+    ]
+  },
   "@celo/network-utils": {
     "location": "packages/sdk/network-utils",
     "dependencies": [
@@ -259,13 +266,6 @@
     "location": "packages/sdk/wallets/wallet-hsm",
     "dependencies": [
       "@celo/base"
-    ]
-  },
-  "@celo/wallet-keystore": {
-    "location": "packages/sdk/wallets/wallet-keystore",
-    "dependencies": [
-      "@celo/utils",
-      "@celo/wallet-local"
     ]
   },
   "@celo/wallet-ledger": {
