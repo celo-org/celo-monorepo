@@ -1,5 +1,5 @@
 import { LocalWallet } from '@celo/wallet-local'
-import { KeystoreBase } from './keystores'
+import { KeystoreBase } from './keystore-base'
 
 /**
  * Convenience wrapper of the LocalWallet to connect to a keystore
