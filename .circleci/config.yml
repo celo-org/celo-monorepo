@@ -966,9 +966,6 @@ workflows:
       - protocol-test-stability-with-code-coverage:
           requires:
             - install_dependencies
-      - protocol-test-common-with-code-coverage:
-          requires:
-            - install_dependencies
       - protocol-test-identity-with-code-coverage:
           requires:
             - install_dependencies
