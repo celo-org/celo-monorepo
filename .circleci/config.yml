@@ -1017,9 +1017,6 @@ workflows:
       - protocol-test-stability-with-code-coverage:
           requires:
             - lint-checks
-      - protocol-test-common-with-code-coverage:
-          requires:
-            - lint-checks
       - protocol-test-identity-with-code-coverage:
           requires:
             - lint-checks
