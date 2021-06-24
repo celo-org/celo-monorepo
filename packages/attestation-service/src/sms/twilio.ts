@@ -2,7 +2,7 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
-import { fetchEnv } from '../env'
+import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
@@ -13,7 +13,8 @@ export class TwilioSmsProvider extends SmsProvider {
       fetchEnv('TWILIO_ACCOUNT_SID'),
       fetchEnv('TWILIO_MESSAGING_SERVICE_SID'),
       fetchEnv('TWILIO_AUTH_TOKEN'),
-      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST')
+      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST'),
+      isYes(fetchEnvOrDefault('USE_VERIFY_API', '0'))
     )
   }
 
@@ -26,12 +27,14 @@ export class TwilioSmsProvider extends SmsProvider {
     twilioSid: string,
     messagingServiceSid: string,
     twilioAuthToken: string,
-    unsupportedRegionCodes: string[]
+    unsupportedRegionCodes: string[],
+    useVerifyApi: boolean
   ) {
     super()
     this.client = twilio(twilioSid, twilioAuthToken)
     this.messagingServiceSid = messagingServiceSid
     this.unsupportedRegionCodes = unsupportedRegionCodes
+    this.useVerifyApi = useVerifyApi
   }
 
   async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
