@@ -981,6 +981,14 @@ workflows:
       - protocol-test-governance-validators-with-code-coverage:
           requires:
             - install_dependencies
+      - protocol-test-code-coverage:
+          requires:
+            - protocol-test-governance-validators-with-code-coverage
+            - protocol-test-governance-voting-with-code-coverage
+            - protocol-test-governance-network-with-code-coverage
+            - protocol-test-common-with-code-coverage 
+            - protocol-test-stability-with-code-coverage 
+            - protocol-test-identity-with-code-coverage 
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -1029,11 +1037,3 @@ workflows:
       - protocol-test-governance-validators-with-code-coverage:
           requires:
             - lint-checks
-      - protocol-test-code-coverage:
-          requires:
-            - protocol-test-governance-validators-with-code-coverage
-            - protocol-test-governance-voting-with-code-coverage
-            - protocol-test-governance-network-with-code-coverage
-            - protocol-test-common-with-code-coverage 
-            - protocol-test-stability-with-code-coverage 
-            - protocol-test-identity-with-code-coverage 
