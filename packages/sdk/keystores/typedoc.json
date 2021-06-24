@@ -8,6 +8,6 @@
   "ignoreCompilerErrors": true,
   "hideGenerator": "true",
   "theme": "gitbook",
-  "out": "../../../docs/developer-resources/wallet-keystore/reference",
+  "out": "../../../docs/developer-resources/keystores/reference",
   "gitRevision": "master"
 }

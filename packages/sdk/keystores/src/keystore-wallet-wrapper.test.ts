@@ -1,6 +1,6 @@
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { InMemoryKeystore } from './inmemory-keystore'
 import { KeystoreWalletWrapper } from './keystore-wallet-wrapper'
-import { InMemoryKeystore } from './keystores'
 
 const PASSPHRASE1 = 'test- passwøörd1!'
 const PK1 = 'd72f6c0b0d7348a72eaa7d3c997bd49293bdc7d4bf79eba03e9f7ca9c5ac6b7f'
