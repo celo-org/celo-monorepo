@@ -534,9 +534,16 @@ jobs:
           name: test
           command: |
             yarn run nyc merge packages/protocol/coverage
+            cp coverage.json packages/protocol/coverage
+      - store_artifacts:
+          path: packages/protocol/coverage/coverage.json
+          destination: protocol/coverage/coverage.json
       - store_artifacts:
           path: coverage.json
           destination: coverage.json
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F protocol
 
   contractkit-test:
     <<: *defaults
