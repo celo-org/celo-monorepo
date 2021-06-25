@@ -543,7 +543,9 @@ jobs:
           destination: coverage.json
       - run:
           name: Upload to CodeCov
-          command: yarn codecov -F protocol
+          command: |
+            bash <(curl -s https://codecov.io/bash)
+            yarn codecov -F protocol
 
   contractkit-test:
     <<: *defaults
