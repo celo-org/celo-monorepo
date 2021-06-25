@@ -7,7 +7,6 @@ import { AttestationModel } from '../models/attestation'
 export abstract class SmsProvider {
   abstract type: SmsProviderType
   unsupportedRegionCodes: string[] = []
-  useVerifyApi: boolean = false
 
   canServePhoneNumber(countryCode: string, _: E164Number) {
     return !this.unsupportedRegionCodes.includes(countryCode.toUpperCase())

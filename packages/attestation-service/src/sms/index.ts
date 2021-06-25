@@ -203,6 +203,8 @@ export async function startSendSms(
   messageToSend: string,
   securityCode: string | null = null,
   attestationCode: string | null = null,
+  appSignature: string | undefined,
+  language: string | undefined,
   logger: Logger,
   sequelizeLogger: SequelizeLogger,
   onlyUseProvider: string | null = null
@@ -243,9 +245,18 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
+        appSignature,
+        language,
       },
       transaction
     )
+    // For backwards compatibility
+    if (!attestation.appSignature) {
+      attestation.appSignature = appSignature
+    }
+    if (!attestation.language) {
+      attestation.language = language
+    }
 
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()

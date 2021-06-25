@@ -2,7 +2,7 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
-import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
+import { fetchEnv, fetchEnvOrDefault } from '../env'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
@@ -12,29 +12,69 @@ export class TwilioSmsProvider extends SmsProvider {
     return new TwilioSmsProvider(
       fetchEnv('TWILIO_ACCOUNT_SID'),
       fetchEnv('TWILIO_MESSAGING_SERVICE_SID'),
+      fetchEnvOrDefault('TWILIO_VERIFY_SERVICE_SID', ''),
       fetchEnv('TWILIO_AUTH_TOKEN'),
-      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST'),
-      isYes(fetchEnvOrDefault('USE_VERIFY_API', '0'))
+      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST')
     )
   }
 
   client: Twilio
   messagingServiceSid: string
+  verifyServiceSid: string
   type = SmsProviderType.TWILIO
   deliveryStatusURL: string | undefined
+  // https://www.twilio.com/docs/verify/api/verification#start-new-verification
+  twilioSupportedLocales = [
+    'af',
+    'ar',
+    'ca',
+    'cs',
+    'da',
+    'de',
+    'el',
+    'en',
+    'en-gb',
+    'es',
+    'fi',
+    'fr',
+    'he',
+    'hi',
+    'hr',
+    'hu',
+    'id',
+    'it',
+    'ja',
+    'ko',
+    'ms',
+    'nb',
+    'nl',
+    'pl',
+    'pt',
+    'pr-br',
+    'ro',
+    'ru',
+    'sv',
+    'th',
+    'tl',
+    'tr',
+    'vi',
+    'zh',
+    'zh-cn',
+    'zh-hk',
+  ]
 
   constructor(
     twilioSid: string,
     messagingServiceSid: string,
+    verifyServiceSid: string,
     twilioAuthToken: string,
-    unsupportedRegionCodes: string[],
-    useVerifyApi: boolean
+    unsupportedRegionCodes: string[]
   ) {
     super()
     this.client = twilio(twilioSid, twilioAuthToken)
     this.messagingServiceSid = messagingServiceSid
+    this.verifyServiceSid = verifyServiceSid
     this.unsupportedRegionCodes = unsupportedRegionCodes
-    this.useVerifyApi = useVerifyApi
   }
 
   async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
@@ -74,27 +114,67 @@ export class TwilioSmsProvider extends SmsProvider {
   async initialize(deliveryStatusURL: string) {
     // Ensure the messaging service exists
     try {
-      await this.client.messaging.services
-        .get(this.messagingServiceSid)
-        .fetch()
-        .then((service) => {
-          if (this.useVerifyApi && !service.customCodeEnabled) {
-            // Make sure that custom code is enabled
-          }
-        })
+      await this.client.messaging.services.get(this.messagingServiceSid).fetch()
       this.deliveryStatusURL = deliveryStatusURL
     } catch (error) {
       throw new Error(`Twilio Messaging Service could not be fetched: ${error}`)
     }
+    if (this.verifyServiceSid) {
+      try {
+        await this.client.verify.services
+          .get(this.verifyServiceSid)
+          .fetch()
+          .then((service) => {
+            if (!service.customCodeEnabled) {
+              // Make sure that custom code is enabled
+              throw new Error(
+                'TWILIO_VERIFY_SERVICE_SID is specified, but customCode is not enabled. Please contact Twilio support to enable it.'
+              )
+            }
+          })
+      } catch (error) {
+        throw new Error(`Twilio Verify Service could not be fetched: ${error}`)
+      }
+    }
   }
 
   async sendSms(attestation: AttestationModel) {
-    const m = await this.client.messages.create({
-      body: attestation.message,
-      to: attestation.phoneNumber,
-      from: this.messagingServiceSid,
-      statusCallback: this.deliveryStatusURL,
-    })
-    return m.sid
+    // Prefer Verify API if Verify Service is present and
+    // user is not requesting a deeplink
+    if (this.verifyServiceSid && attestation.securityCode) {
+      const requestParams: any = {
+        to: attestation.message,
+        channel: 'sms',
+        customCode: attestation.securityCode,
+      }
+
+      if (attestation.appSignature) {
+        requestParams.appHash = attestation.appSignature
+      }
+      // Normalize to locales that Twilio supports
+      // If locale is not supported, Twilio API will throw an error
+      if (attestation.language) {
+        const locale = attestation.language.toLocaleLowerCase()
+        if (['es-419', 'es-us', 'es-la'].includes(locale)) {
+          attestation.language = 'es'
+        }
+        if (this.twilioSupportedLocales.includes(locale)) {
+          requestParams.locale = locale
+        }
+      }
+      const m = await this.client.verify
+        .services(this.verifyServiceSid)
+        .verifications.create(requestParams)
+      return m.sid
+    } else {
+      // Send using the message service
+      const m = await this.client.messages.create({
+        body: attestation.message,
+        to: attestation.phoneNumber,
+        from: this.messagingServiceSid,
+        statusCallback: this.deliveryStatusURL,
+      })
+      return m.sid
+    }
   }
 }

@@ -24,6 +24,8 @@ export interface AttestationModel extends Model {
   recordError: (error: string) => void
   failure: () => boolean
   currentError: () => string | undefined
+  appSignature: string | undefined
+  language: string | undefined
 }
 
 export interface AttestationKey {

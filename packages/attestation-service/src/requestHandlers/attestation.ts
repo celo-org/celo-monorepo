@@ -174,9 +174,8 @@ class AttestationRequestHandler {
         securityCode = randomBytes(7)
           .map((x) => x % 10)
           .join('')
-        messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${
-          this.attestationRequest.securityCodePrefix
-        }${securityCode}`
+        securityCode = `${this.attestationRequest.securityCodePrefix}${securityCode}`
+        messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${securityCode}`
       } else {
         // Client is requesting direct SMS with the deeplink.
         messageBase = attestationCodeDeeplink
@@ -200,6 +199,8 @@ class AttestationRequestHandler {
         textMessage,
         securityCode,
         attestationCodeDeeplink,
+        this.attestationRequest.smsRetrieverAppSig,
+        this.attestationRequest.language,
         this.logger,
         this.sequelizeLogger
       )
