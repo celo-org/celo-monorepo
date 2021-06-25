@@ -74,7 +74,14 @@ export class TwilioSmsProvider extends SmsProvider {
   async initialize(deliveryStatusURL: string) {
     // Ensure the messaging service exists
     try {
-      await this.client.messaging.services.get(this.messagingServiceSid).fetch()
+      await this.client.messaging.services
+        .get(this.messagingServiceSid)
+        .fetch()
+        .then((service) => {
+          if (this.useVerifyApi && !service.customCodeEnabled) {
+            // Make sure that custom code is enabled
+          }
+        })
       this.deliveryStatusURL = deliveryStatusURL
     } catch (error) {
       throw new Error(`Twilio Messaging Service could not be fetched: ${error}`)
