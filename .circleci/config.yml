@@ -515,7 +515,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestation|identity/escrow|identity/identityproxy)'
+            yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestations|identity/escrow|identity/identityproxy)'
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-identity.json
       - store_artifacts:
           path: packages/protocol/coverage
