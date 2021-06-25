@@ -182,6 +182,11 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}
               key: TWILIO_MESSAGING_SERVICE_SID
+        - name: TWILIO_VERIFY_SERVICE_SID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: TWILIO_VERIFY_SERVICE_SID
         - name: TWILIO_AUTH_TOKEN
           valueFrom:
             secretKeyRef:

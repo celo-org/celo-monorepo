@@ -250,7 +250,7 @@ export async function startSendSms(
       },
       transaction
     )
-    // For backwards compatibility
+    // For backward compatibility
     if (!attestation.appSignature) {
       attestation.appSignature = appSignature
     }

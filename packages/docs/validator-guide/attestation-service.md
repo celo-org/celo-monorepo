@@ -63,6 +63,10 @@ To actually be able to send SMS, you need to create a messaging service under [P
 
 Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. It is strongly recommended that you purchase at least a US (`+1`) number which seem to provide high delivery success rates.  If you purchase numbers in other locales, Twilio will intelligently select the best number to send each SMS.
 
+#### Verify Service
+
+We're in the process of transitioning to [Twilio's Verify Service](https://www.twilio.com/verify) which will automatically manage a set of phone numbers for global reach. Create a Verify Service in the Twilio Portal by navigating to [Verify](https://www.twilio.com/console/verify/services) and click `+` to create a new service. It's important to provide `Celo` as the service friendly name, since this will show up in the text message content. Set the code length to `8 digits` and disable landline validation. Enter `sell-oh` in the `TTS SERVICE NAME`. Provide the resulting `SID` in the `TWILIO_VERIFY_SERVICE_SID` configuration variable. In the future, we'll likely switch entirely to the Verify Service and deprecate the Messaging Service, but for now it's important to specify both.
+
 ### Nexmo
 
 After signing up for [Nexmo](https://dashboard.nexmo.com/sign-up), click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you use a credit or debit card (as opposed to other forms of payment) as you will then be able to enable `Auto reload`. You should also enable `Low balance alerts`. Both of these will help avoid failing to deliver SMS when your funds are exhausted. It appears that these options may not be immediately available for all new accounts due to fraud checks: try sending a few SMS, checking back after a few days, or raising a support ticket.
@@ -186,6 +190,7 @@ Twilio configuration options:
 | ------------------------------ | --------------------------------------------------------------- |
 | `TWILIO_ACCOUNT_SID`           | The Twilio account ID                                           |
 | `TWILIO_MESSAGING_SERVICE_SID` | The Twilio Message Service ID. Starts with `MG`                 |
+| `TWILIO_VERIFY_SERVICE_SID` | The Twilio Verify Service ID. Starts with `VA` |
 | `TWILIO_AUTH_TOKEN`            | The API authentication token                                    |
 | `TWILIO_UNSUPPORTED_REGIONS`   | Optional. A comma-separated list of country codes to not serve, recommended value `CU,SY,KP,IR,SD`  |
 
