@@ -84,7 +84,7 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
-  beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
+  beforeEachWithRetries('Attestations setup', 3, 10000, async () => {
     accountsInstance = await Accounts.new(true)
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
