@@ -5,6 +5,7 @@ resource "google_compute_health_check" "http_health_check" {
     port = var.health_check_destination_port
     # For NetworkEndpointGroup, the port specified for each network endpoint is used for health checking
     port_specification = "USE_FIXED_PORT"
+    request_path       = var.health_check_request_path
   }
 }
 

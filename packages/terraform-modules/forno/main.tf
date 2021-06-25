@@ -71,6 +71,7 @@ module "kong" {
   celo_env                        = var.celo_env
   context_info                    = var.context_info_kong
   health_check_destination_port   = 8000
+  health_check_request_path       = "/kong/status"
   type                            = "kong"
   timeout_sec                     = 1200 # 20 minutes
   security_policy_id              = google_compute_security_policy.forno.self_link

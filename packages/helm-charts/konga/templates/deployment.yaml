@@ -81,6 +81,9 @@ spec:
               ## Connection id field can be non-unique. It should be 1
               connection_id=$(http GET localhost:1337/api/kongnode | jq -r '.[] | select (.name=="Kong") | .id' | head -n1)
               snapshot_id=$(http GET localhost:1337/api/snapshot | jq -e -r ".[] | select (.name==\"$snapshot_name\") | .id")
+              sleep 90
+              http POST localhost:1337/api/snapshots/$snapshot_id/restore Authorization:'Bearer noauthtoken' "Connection-Id:$connection_id" imports\\:='["services","routes","consumers","plugins","acls","upstreams","certificates","snis"]' token=noauthtoken
+              sleep 90
               http POST localhost:1337/api/snapshots/$snapshot_id/restore Authorization:'Bearer noauthtoken' "Connection-Id:$connection_id" imports\\:='["services","routes","consumers","plugins","acls","upstreams","certificates","snis"]' token=noauthtoken
             fi
             tail -f /dev/null
