@@ -44,7 +44,7 @@ export class VerifiableCredentialHandler {
     const state = await attestations.getAttestationState(identifier, account, issuer)
 
     // Checks if the attestation is marked as completed
-    if (state?.attestationState === AttestationState.Complete) {
+    if (state.attestationState === AttestationState.Complete) {
       throw new ErrorWithResponse(`Can't issue a credential for an incomplete attestation`, 422)
     }
 

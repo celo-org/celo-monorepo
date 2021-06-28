@@ -4,11 +4,19 @@ import { LookupProvider, LookupProviderType, LookupResult } from './base'
 
 export class VonageLookupProvider extends LookupProvider {
   static fromEnv() {
-    return new VonageLookupProvider(
-      fetchEnvOrDefault('VONAGE_KEY', fetchEnv('NEXMO_KEY')),
-      fetchEnvOrDefault('VONAGE_SECRET', fetchEnv('NEXMO_SECRET')),
-      fetchEnvOrDefault('VONAGE_APPLICATION', fetchEnvOrDefault('NEXMO_APPLICATION', ''))
-    )
+    try {
+      return new VonageLookupProvider(
+        fetchEnv('VONAGE_KEY'),
+        fetchEnv('VONAGE_SECRET'),
+        fetchEnvOrDefault('VONAGE_APPLICATION', '')
+      )
+    } catch (e) {
+      return new VonageLookupProvider(
+        fetchEnv('NEXMO_KEY'),
+        fetchEnv('NEXMO_SECRET'),
+        fetchEnvOrDefault('VONAGE_APPLICATION', '')
+      )
+    }
   }
   type = LookupProviderType.VONAGE
   client: any
