@@ -897,6 +897,7 @@
     - [Stability Algorithm \(Mento\)](celo-codebase/protocol/stability/doto.md)
     - [Oracles](celo-codebase/protocol/stability/oracles.md)
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
+    - [Adding Stable Tokens](celo-codebase/protocol/stability/adding_stable_assets.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
   - [Transactions](celo-codebase/protocol/transactions/README.md)
     - [Native Currency](celo-codebase/protocol/transactions/native-currency.md)
