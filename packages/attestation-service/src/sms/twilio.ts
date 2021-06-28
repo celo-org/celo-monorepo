@@ -162,10 +162,24 @@ export class TwilioSmsProvider extends SmsProvider {
           requestParams.locale = locale
         }
       }
-      const m = await this.client.verify
-        .services(this.verifyServiceSid)
-        .verifications.create(requestParams)
-      return m.sid
+      try {
+        const m = await this.client.verify
+          .services(this.verifyServiceSid)
+          .verifications.create(requestParams)
+        return m.sid
+      } catch (e) {
+        // Verify landlines using voice
+        if (e.message.includes('SMS is not supported by landline phone number')) {
+          requestParams.appHash = undefined
+          requestParams.channel = 'call'
+          const m = await this.client.verify
+            .services(this.verifyServiceSid)
+            .verifications.create(requestParams)
+          return m.sid
+        } else {
+          throw e
+        }
+      }
     } else {
       // Send using the message service
       const m = await this.client.messages.create({
