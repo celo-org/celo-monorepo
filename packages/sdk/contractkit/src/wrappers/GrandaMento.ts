@@ -12,13 +12,13 @@ import {
   valueToString,
 } from './BaseWrapper'
 
-export interface GrandaMentoExchangeProposal {}
+// export interface GrandaMentoExchangeProposal {}
 
 export interface GrandaMentoConfig {
   approver: string
   spread: BigNumber // seconds
   vetoPeriodSeconds: BigNumber
-  stableTokenExchangeLimits: any //{ id: string : IPerson; }
+  stableTokenExchangeLimits: any // { id: string : IPerson; }
   // stableTokenExchangeLimits
   // exchangeProposals
 }

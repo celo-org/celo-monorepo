@@ -15,7 +15,7 @@ export async function assumeOwnership(
   proposer: string,
   to: string,
   proposalId: number = 1
-  //dequeuedIndex: number = 0
+  // dequeuedIndex: number = 0
 ) {
   const lockedGold = await kit.contracts.getLockedGold()
   const grandaMento = await kit.contracts.getGrandaMento()
@@ -43,9 +43,9 @@ export async function assumeOwnership(
     to: (registry as any)._address,
     input: grandaMento.getContract().methods.transferOwnership(to).encodeABI(),
   }
-  let proposal: Proposal = [ownershiptx]
+  const proposal: Proposal = [ownershiptx]
 
-  governance.propose(proposal, 'URL').sendAndWaitForReceipt({
+  await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
     from: proposer,
     value: (await governance.getConfig()).minDeposit.toNumber(),
   })
@@ -146,5 +146,5 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     expect(config.vetoPeriodSeconds).toEqBigNumber(expConfig.vetoPeriodSeconds)
   })
 
-  it('#setStableTokenExchangeLimits', async () => {})
+  // it('#setStableTokenExchangeLimits', async () => {})
 })
