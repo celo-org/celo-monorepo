@@ -277,7 +277,7 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
-      terminationGracePeriodSeconds: 120 # 2 mins
+      terminationGracePeriodSeconds: {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
       volumes:
       - name: data
         emptyDir: {}
