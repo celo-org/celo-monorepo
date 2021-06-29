@@ -37,7 +37,8 @@ describe(getContactMatches, () => {
         mockAccount,
         mockAccount,
         authSigner,
-        serviceContext
+        serviceContext,
+        authSigner
       )
     ).resolves.toMatchObject([mockE164Number2])
   })

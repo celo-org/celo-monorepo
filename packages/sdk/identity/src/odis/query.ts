@@ -50,7 +50,7 @@ export interface MatchmakingRequest extends PhoneNumberPrivacyRequest {
   userPhoneNumber: string
   contactPhoneNumbers: string[]
   hashedPhoneNumber: string
-  signedUserPhoneNumber: string
+  signedUserPhoneNumber?: string
 }
 
 export interface SignMessageResponse {

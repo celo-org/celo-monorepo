@@ -1,7 +1,6 @@
 import { E164Number } from '@celo/utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
-import { ec as EC } from 'elliptic'
 import {
   AuthSigner,
   EncryptionKeySigner,
@@ -13,7 +12,6 @@ import {
 } from './query'
 
 const debug = debugFactory('kit:odis:matchmaking')
-const ec = new EC('secp256k1')
 
 const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups
@@ -28,26 +26,27 @@ export async function getContactMatches(
   phoneNumberIdentifier: string,
   signer: AuthSigner,
   context: ServiceContext,
-  dekSigner: EncryptionKeySigner,
+  dekSigner?: EncryptionKeySigner,
   clientVersion?: string,
   sessionID?: string
 ): Promise<E164Number[]> {
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
-  const signedUserPhoneNumber = await signWithDEK(selfPhoneNumObfuscated, dekSigner)
 
   const body: MatchmakingRequest = {
     account,
     userPhoneNumber: selfPhoneNumObfuscated,
     contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
     hashedPhoneNumber: phoneNumberIdentifier,
-    signedUserPhoneNumber,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
   }
 
   if (sessionID) {
     body.sessionID = sessionID
+  }
+  if (dekSigner) {
+    body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
   }
 
   const response = await queryOdis<MatchmakingResponse>(signer, body, context, MATCHMAKING_ENDPOINT)
