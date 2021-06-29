@@ -158,16 +158,20 @@ async function requestSignatures(request: Request, response: Response) {
 
   logResponseDiscrepancies(responses, logger)
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-  try {
-    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
-      request.body.blindedQueryPhoneNumber,
-      logger
-    )
-    response.json({ success: true, combinedSignature, version: VERSION })
-  } catch {
-    // May fail upon combining signatures if too many sigs are invalid
-    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
+        request.body.blindedQueryPhoneNumber,
+        logger
+      )
+      response.json({ success: true, combinedSignature, version: VERSION })
+      return
+    } catch {
+      // May fail upon combining signatures if too many sigs are invalid
+      // Fallback to handleMissingSignatures
+    }
   }
+  handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
 }
 
 async function handleSuccessResponse(
