@@ -252,7 +252,7 @@ contract('GrandaMento', (accounts: string[]) => {
       })
 
       describe(`when proposing an exchange that sells ${sellTokenString}`, () => {
-        for (const inflationFactor of sellCelo ? [1] : [1, 1.05]) {
+        for (const inflationFactor of sellCelo ? [1] : [1, 1.1]) {
           it(`emits the ExchangeProposalCreated event${
             sellCelo
               ? ''
@@ -268,8 +268,8 @@ contract('GrandaMento', (accounts: string[]) => {
               args: {
                 exchanger: owner,
                 proposalId: 1,
-                stableTokenRegistryId: stableTokenRegistryId,
-                sellAmount: sellAmount,
+                stableTokenRegistryId,
+                sellAmount,
                 buyAmount: getBuyAmount(sellAmount, fromFixed(oracleRate), spread),
                 sellCelo,
               },
@@ -317,22 +317,22 @@ contract('GrandaMento', (accounts: string[]) => {
         })
 
         it('reverts if the amount of stable token being exchanged is less than the stable token min exchange amount', async () => {
-          const sellAmount = sellCelo
+          const _sellAmount = sellCelo
             ? getSellAmount(minExchangeAmount, fromFixed(oracleRate), spread).minus(1)
             : minExchangeAmount.minus(1)
 
           await assertRevertWithReason(
-            grandaMento.createExchangeProposal(stableTokenRegistryId, sellAmount, sellCelo),
+            grandaMento.createExchangeProposal(stableTokenRegistryId, _sellAmount, sellCelo),
             'Stable token exchange amount not within limits'
           )
         })
 
         it('reverts if the amount of stable token being exchanged is greater than the stable token max exchange amount', async () => {
-          const sellAmount = sellCelo
+          const _sellAmount = sellCelo
             ? getSellAmount(maxExchangeAmount, fromFixed(oracleRate), spread).plus(1)
             : maxExchangeAmount.plus(1)
           await assertRevertWithReason(
-            grandaMento.createExchangeProposal(stableTokenRegistryId, sellAmount, sellCelo),
+            grandaMento.createExchangeProposal(stableTokenRegistryId, _sellAmount, sellCelo),
             'Stable token exchange amount not within limits'
           )
         })
@@ -517,11 +517,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
         describe(`when selling ${sellTokenString}`, () => {
           beforeEach(async () => {
-            if (sellCelo) {
-              sellToken = goldToken
-            } else {
-              sellToken = stableToken
-            }
+            sellToken = sellCelo ? goldToken : stableToken
           })
 
           for (const inflationFactor of sellCelo ? [1] : [1, 1.1]) {
@@ -794,7 +790,7 @@ contract('GrandaMento', (accounts: string[]) => {
         sellCelo ? defaultCeloStableTokenRate : defaultStableTokenCeloRate
       )
       describe('when selling stable token', () => {
-        for (const _spread of [0, 0.01])
+        for (const _spread of [0, 0.01]) {
           it(`returns the amount being bought when the spread is ${_spread}`, async () => {
             await grandaMento.setSpread(toFixed(_spread))
             assertEqualBN(
@@ -802,6 +798,7 @@ contract('GrandaMento', (accounts: string[]) => {
               getBuyAmount(sellAmount, oracleRate, _spread)
             )
           })
+        }
       })
     }
 
