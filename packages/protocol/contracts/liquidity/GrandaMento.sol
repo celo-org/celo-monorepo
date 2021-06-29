@@ -118,8 +118,8 @@ contract GrandaMento is
   // Approved state. Used for easily viewing all the active exchange proposals.
   LinkedList.List private activeProposalIds;
 
-  // Number of exchange proposals that exist. Used for assigning an exchange
-  // proposal ID to a new proposal.
+  // Number of exchange proposals that have ever been created. Used for assigning
+  // an exchange proposal ID to a new proposal.
   uint256 public exchangeProposalCount;
 
   /**
@@ -147,7 +147,9 @@ contract GrandaMento is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _registry The address of the registry.
+   * @param _approver The approver that has the ability to approve exchange proposals.
    * @param _spread The spread charged on exchanges.
+   * @param _vetoPeriodSeconds The length of the veto period in seconds.
    */
   function initialize(
     address _registry,
@@ -444,14 +446,17 @@ contract GrandaMento is
     ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryId];
     // Require the configurable stableToken max exchange amount to be > 0.
     // This covers the case where a stableToken has never been explicitly permitted.
-    require(exchangeLimits.maxExchangeAmount > 0, "Stable token exchange amount must be defined");
+    require(
+      exchangeLimits.maxExchangeAmount > 0,
+      "Max stable token exchange amount must be defined"
+    );
     return (exchangeLimits.minExchangeAmount, exchangeLimits.maxExchangeAmount);
   }
 
   /**
    * @notice Sets the approver.
    * @dev Sender must be owner. New approver is allowed to be address(0).
-   * @param newApprover The new value for the spread.
+   * @param newApprover The new value for the approver.
    */
   function setApprover(address newApprover) public onlyOwner {
     approver = newApprover;

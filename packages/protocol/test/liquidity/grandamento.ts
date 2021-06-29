@@ -347,7 +347,7 @@ contract('GrandaMento', (accounts: string[]) => {
               stableTokenSellAmount,
               sellCelo
             ),
-            'Stable token exchange amount must be defined'
+            'Max stable token exchange amount must be defined'
           )
         })
       })
@@ -939,7 +939,7 @@ contract('GrandaMento', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
       await assertRevertWithReason(
         grandaMento.getStableTokenExchangeLimits(CeloContractName.StableTokenEUR),
-        'Stable token exchange amount must be defined'
+        'Max stable token exchange amount must be defined'
       )
     })
   })
