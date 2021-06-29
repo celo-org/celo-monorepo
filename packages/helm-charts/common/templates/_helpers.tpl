@@ -71,7 +71,7 @@ release: {{ .Release.Name }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo
-  {{- if .Values.genesis.useGenesisFileBase64 }}
+  {{- if eq (default .Values.genesis.useGenesisFileBase64 "false") "true" }}
   - name: config
     mountPath: /var/geth
   {{ end -}}
@@ -98,7 +98,7 @@ release: {{ .Release.Name }}
 if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
 else
-  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+  [ -f /root/.celo/bootnodeEnode ] && BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi
 {{- end -}}
 
@@ -155,14 +155,17 @@ fi
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    if grep -nri ${ACCOUNT_ADDRESS#0x} /root/.celo/keystore/ > /dev/null; then
+      :
     {{- if .proxy | default false }}
-    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+      [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- else }}
     {{- if not (.proxied | default false) }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- end }}
     {{- end }}
+    fi
     {{- end }}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -216,6 +219,7 @@ fi
       fieldRef:
         fieldPath: status.hostIP
 {{- end }}
+{{ include  "common.geth-prestop-hook" . | indent 2 -}}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:
@@ -266,6 +270,13 @@ fi
 {{- end }}
 {{- end -}}
 
+{{- define "common.geth-prestop-hook" -}}
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh","-c","killall -SIGTERM geth; while killall -0 geth; do sleep 1; done"]
+{{- end -}}
+
 {{- define "common.geth-configmap" -}}
 apiVersion: v1
 kind: ConfigMap
@@ -274,8 +285,10 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
 data:
-  networkid: {{ .Values.genesis.networkId | quote }}
-  genesis.json: {{ .Values.genesis.genesisFileBase64 | b64dec | quote }}
+  networkid: {{ $.Values.genesis.networkId | quote }}
+{{- if eq (default $.Values.genesis.useGenesisFileBase64 "false") "true" }}
+  genesis.json: {{ $.Values.genesis.genesisFileBase64 | b64dec | quote }}
+{{- end -}}
 {{- end -}}
 
 {{- define "common.celotool-validator-container" -}}
@@ -480,7 +493,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - "-c"
   - |
     if [ -d /root/.celo/celo/chaindata ]; then
-      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      lastBlockTimestamp=$(timeout 60 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
       # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
@@ -502,7 +515,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- define "common.gsutil-sync-data-init-container" -}}
 - name: gsutil-sync-data
   image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   command:
   - /bin/sh
   - -c

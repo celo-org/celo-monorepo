@@ -79,7 +79,3 @@ The following are examples for cUSD and cEUR.
 {% hint style="info" %}
 To double-check that the above values are up-to-date, please verify using the `celocli network:contracts` command \([see documentation](https://docs.celo.org/command-line-interface/commands/network#celocli-network-contracts)\).
 {% endhint %}
-
-## **Notes**
-
-After the above steps, you should be able to see your Celo assets in your MetaMask wallet. To transact using MetaMask, you'll have to be mindful of gas prices. **Metamask gas estimation may not produce accurate prices for the Celo Network.** We recommend checking gas prices against a block explorer or following the instructions at the end of this guide.

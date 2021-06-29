@@ -1,3 +1,24 @@
+# For managing terraform state remotely
+terraform {
+  backend "gcs" {
+    bucket = "celo_tf_state"
+  }
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "3.69.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "3.69.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.1.0"
+    }
+  }
+}
+
 provider "google" {
   credentials = file(var.gcloud_credentials_path)
   project     = var.gcloud_project
@@ -10,17 +31,6 @@ provider "google-beta" {
   project     = var.gcloud_project
   region      = "us-west1"
   zone        = "us-west1-a"
-}
-
-# For managing terraform state remotely
-terraform {
-  backend "gcs" {
-    bucket = "celo_tf_state"
-  }
-  required_providers {
-    google      = "~> 3.38.0"
-    google-beta = "~> 3.38.0"
-  }
 }
 
 data "terraform_remote_state" "state" {
@@ -39,6 +49,7 @@ module "http_backends" {
   context_info                    = var.context_info_http
   health_check_destination_port   = 6000
   type                            = "http"
+  banned_cidr                     = var.banned_cidr
 }
 
 module "ws_backends" {
@@ -50,6 +61,7 @@ module "ws_backends" {
   health_check_destination_port   = 6001
   type                            = "ws"
   timeout_sec                     = 1200 # 20 minutes
+  banned_cidr                     = var.banned_cidr
 }
 
 resource "google_compute_global_address" "global_address" {
@@ -103,7 +115,7 @@ resource "google_compute_url_map" "url_map" {
 resource "google_compute_target_https_proxy" "target_https_proxy" {
   name             = "${var.celo_env}-forno-target-https-proxy"
   url_map          = google_compute_url_map.url_map.id
-  ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id]
+  ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id, "https://www.googleapis.com/compute/v1/projects/celo-testnet-production/global/sslCertificates/rc1-tx-node-lb-forno-cert-drmawdkoofenvgce"]
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {

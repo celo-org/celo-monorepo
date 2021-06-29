@@ -43,6 +43,11 @@ variable ssl_cert_domains {
   description = "Domains to use for the SSL certificate. Each must end with a period."
 }
 
+variable banned_cidr {
+  type        = list(string)
+  description = "Banned CIDR to make request to forno."
+}
+
 variable vpc_network_name {
   type        = string
   description = "The name of the VPC network"
