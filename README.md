@@ -6,7 +6,7 @@
 
 **Celo Monorepo - Official repository for core projects comprising the Celo platform**
 
-This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [wallet app](https://github.com/celo-org/celo-monorepo/tree/master/packages/mobile),
+This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [contractKit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit),
 and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
 
 <!-- row 1 - status -->
