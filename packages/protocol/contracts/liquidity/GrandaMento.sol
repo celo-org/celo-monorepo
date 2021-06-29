@@ -475,16 +475,6 @@ contract GrandaMento is
   }
 
   /**
-   * @notice Sets the veto period in seconds.
-   * @dev Sender must be owner.
-   * @param newVetoPeriodSeconds The new value for the veto period in seconds.
-   */
-  function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
-    vetoPeriodSeconds = newVetoPeriodSeconds;
-    emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
-  }
-
-  /**
    * @notice Sets the minimum and maximum amount of the stable token an exchange can involve.
    * @dev Sender must be owner. Setting the maxExchangeAmount to 0 effectively disables new
    * exchange proposals for the token.
@@ -506,5 +496,15 @@ contract GrandaMento is
       maxExchangeAmount: maxExchangeAmount
     });
     emit StableTokenExchangeLimitsSet(stableTokenRegistryId, minExchangeAmount, maxExchangeAmount);
+  }
+
+  /**
+   * @notice Sets the veto period in seconds.
+   * @dev Sender must be owner.
+   * @param newVetoPeriodSeconds The new value for the veto period in seconds.
+   */
+  function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
+    vetoPeriodSeconds = newVetoPeriodSeconds;
+    emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
   }
 }
