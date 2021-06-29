@@ -80,6 +80,8 @@ spec:
           value: "true"
         - name: DISABLE_INDEXER
           value: "true"
+        - name: DISABLE_EXCHANGE_RATES
+          value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.api.pool_size | quote }}
         - name: BLOCKSCOUT_HOST
