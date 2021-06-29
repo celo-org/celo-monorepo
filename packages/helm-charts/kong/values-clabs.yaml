@@ -1,9 +1,9 @@
 ingress:
   enabled: true
-  hostname: kongcelotool.local
+  hostname: kong.local
 
 ingressController:
-  ingressClass: kongcelotool
+  ingressClass: kong
 
 postgresql:
   postgresqlPassword: kong

@@ -8,10 +8,10 @@ const kongChartPath = '../helm-charts/kong'
 const kongaChartPath = '../helm-charts/konga'
 
 // One unique kong/a deployment per cluster
-const kongReleaseName = 'kongcelotool'
-const kongNamespace = 'kongcelotool'
-const kongaReleaseName = 'kongacelotool'
-const kongaNamespace = 'kongcelotool'
+const kongReleaseName = 'kong'
+const kongNamespace = 'kong'
+const kongaReleaseName = 'konga'
+const kongaNamespace = 'kong'
 
 export async function installKong(celoEnv: string) {
   await createNamespaceIfNotExists(kongNamespace)
@@ -33,19 +33,29 @@ export async function upgradeKong(celoEnv: string) {
     kongNamespace,
     kongReleaseName,
     kongChartPath,
-    [],
+    await kongHelmParamenters(celoEnv),
     `values-clabs.yaml`
   )
 }
 
-export async function installKonga() {
+export async function installKonga(celoEnv: string) {
   await createNamespaceIfNotExists(kongaNamespace)
   // Update values in values.yaml file
-  return installGenericHelmChart(kongaNamespace, kongaReleaseName, kongaChartPath, [])
+  return installGenericHelmChart(
+    kongaNamespace,
+    kongaReleaseName,
+    kongaChartPath,
+    kongaHelmParamenters(celoEnv)
+  )
 }
 
-export async function upgradeKonga() {
-  return upgradeGenericHelmChart(kongaNamespace, kongaReleaseName, kongaChartPath, [])
+export async function upgradeKonga(celoEnv: string) {
+  return upgradeGenericHelmChart(
+    kongaNamespace,
+    kongaReleaseName,
+    kongaChartPath,
+    kongaHelmParamenters(celoEnv)
+  )
 }
 
 export async function destroyKongAndKonga() {
@@ -61,6 +71,10 @@ async function kongHelmParamenters(celoEnv: string) {
     `--set kong.extraEnvVars[0].name=KONG_TRUSTED_IPS`,
     `--set kong.extraEnvVars[0].value='${trustedIPs.replace(/,/g, '\\,')}'`,
   ]
+}
+
+function kongaHelmParamenters(celoEnv: string) {
+  return [`--set geth_rpc_service=${celoEnv}-fullnodes-rpc.${celoEnv}`]
 }
 
 /**

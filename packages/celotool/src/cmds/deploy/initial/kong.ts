@@ -23,5 +23,5 @@ export const builder = (argv: KongInitialArgv) => {
 export const handler = async (argv: KongInitialArgv) => {
   await switchToClusterFromEnvOrContext(argv, true)
   await installKong(argv.celoEnv)
-  await installKonga()
+  await installKonga(argv.celoEnv)
 }

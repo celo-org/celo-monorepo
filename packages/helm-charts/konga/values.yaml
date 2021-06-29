@@ -25,7 +25,7 @@ config:
 #   konga_hook_timeout: 60000
   db_adapter: postgres
   # db_uri:
-  db_host: kongcelotool-postgresql
+  db_host: kong-postgresql
   db_port: 5432
   db_user: kong
   db_password: kong
@@ -89,5 +89,5 @@ tolerations: []
 affinity: {}
 
 kong:
-  service: kongcelotool
+  service: kong
   admin_port: 8001

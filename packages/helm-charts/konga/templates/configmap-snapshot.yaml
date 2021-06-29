@@ -30,161 +30,141 @@ data:
       "data": {
         "services": [
           {
-            "tls_verify_depth": null,
-            "tags": [],
+            "created_at": 1623859719,
+            "updated_at": 1624957267,
+            "write_timeout": 60000,
+            "connect_timeout": 60000,
+            "read_timeout": 60000,
             "ca_certificates": null,
+            "tls_verify_depth": null,
+            "host": "localhost",
+            "name": "status",
             "retries": 5,
+            "path": null,
+            "tags": [],
+            "client_certificate": null,
+            "tls_verify": null,
             "id": "90a37cb9-2c01-472b-8fff-715835e56156",
             "port": 8000,
-            "client_certificate": null,
-            "created_at": 1623859719,
-            "updated_at": 1623859719,
-            "name": "status",
             "protocol": "http",
-            "write_timeout": 60000,
-            "connect_timeout": 60000,
-            "host": "localhost",
-            "read_timeout": 60000,
-            "path": null,
-            "tls_verify": null,
-            "extras": {
-              "id": 3,
-              "service_id": "90a37cb9-2c01-472b-8fff-715835e56156",
-              "kong_node_id": "2",
-              "description": null,
-              "tags": null,
-              "createdAt": "2021-06-16T16:08:39.000Z",
-              "updatedAt": "2021-06-16T16:08:39.000Z",
-              "createdUser": null,
-              "updatedUser": null
-            }
+            "extras": {}
           },
           {
-            "tls_verify_depth": null,
-            "tags": [],
-            "ca_certificates": null,
-            "retries": 5,
-            "id": "d98c9e59-dc44-4bad-81ca-d399724462b0",
-            "port": 8545,
-            "client_certificate": null,
             "created_at": 1623232145,
-            "updated_at": 1623318621,
-            "name": "Forno",
-            "protocol": "http",
+            "updated_at": 1624957267,
             "write_timeout": 60000,
             "connect_timeout": 60000,
-            "host": "baklava-fullnodes-rpc.baklava",
             "read_timeout": 60000,
+            "ca_certificates": null,
+            "tls_verify_depth": null,
+            "host": "{{ .Values.geth_rpc_service }}",
+            "name": "Forno",
+            "retries": 5,
             "path": null,
+            "tags": [],
+            "client_certificate": null,
             "tls_verify": null,
-            "extras": {
-              "id": 1,
-              "service_id": "d98c9e59-dc44-4bad-81ca-d399724462b0",
-              "kong_node_id": "2",
-              "description": null,
-              "tags": null,
-              "createdAt": "2021-06-09T09:49:05.000Z",
-              "updatedAt": "2021-06-09T09:49:05.000Z",
-              "createdUser": null,
-              "updatedUser": null
-            }
+            "id": "d98c9e59-dc44-4bad-81ca-d399724462b0",
+            "port": 8545,
+            "protocol": "http",
+            "extras": {}
           }
         ],
         "routes": [
           {
+            "created_at": 1623859737,
+            "updated_at": 1624957267,
+            "hosts": null,
+            "preserve_host": false,
+            "https_redirect_status_code": 426,
+            "snis": null,
             "service": {
               "id": "90a37cb9-2c01-472b-8fff-715835e56156"
             },
-            "headers": null,
-            "path_handling": "v0",
-            "id": "37f4e0db-fbc9-4aa3-9f47-5c957c54efdc",
-            "hosts": null,
-            "preserve_host": false,
-            "methods": [
-              "GET"
+            "tags": null,
+            "protocols": [
+              "http",
+              "https"
             ],
+            "name": "health-check",
+            "path_handling": "v0",
             "paths": [
               "/status",
               "/status*",
               "/kong/status",
               "/kong/status*"
             ],
-            "name": "health-check",
+            "methods": [
+              "GET"
+            ],
             "sources": null,
             "destinations": null,
-            "protocols": [
-              "http",
-              "https"
-            ],
-            "created_at": 1623859737,
-            "request_buffering": true,
-            "response_buffering": true,
             "regex_priority": 100,
-            "snis": null,
-            "updated_at": 1624628809,
-            "https_redirect_status_code": 426,
-            "tags": null,
-            "strip_path": true
+            "strip_path": true,
+            "headers": null,
+            "id": "37f4e0db-fbc9-4aa3-9f47-5c957c54efdc",
+            "response_buffering": true,
+            "request_buffering": true
           },
           {
+            "created_at": 1623232306,
+            "updated_at": 1624957267,
+            "hosts": null,
+            "preserve_host": false,
+            "https_redirect_status_code": 426,
+            "snis": null,
             "service": {
               "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
             },
-            "headers": null,
+            "tags": null,
+            "protocols": [
+              "http"
+            ],
+            "name": "forno",
             "path_handling": "v0",
-            "id": "eaa4fa2b-cd10-4c61-a2ac-6831adcd0752",
-            "hosts": null,
-            "preserve_host": false,
+            "paths": [
+              "/",
+              "/*"
+            ],
             "methods": [
               "GET",
               "POST",
               "PUT"
             ],
-            "paths": [
-              "/",
-              "/*"
-            ],
-            "name": "forno",
             "sources": null,
             "destinations": null,
-            "protocols": [
-              "http"
-            ],
-            "created_at": 1623232306,
-            "request_buffering": true,
-            "response_buffering": true,
             "regex_priority": 10,
-            "snis": null,
-            "updated_at": 1624360203,
-            "https_redirect_status_code": 426,
-            "tags": null,
-            "strip_path": true
+            "strip_path": true,
+            "headers": null,
+            "id": "eaa4fa2b-cd10-4c61-a2ac-6831adcd0752",
+            "response_buffering": true,
+            "request_buffering": true
           }
         ],
         "consumers": [
           {
-            "username": "anonymous",
-            "id": "1532538d-cb47-48fa-8a8e-b21952644a6e",
             "created_at": 1623404756,
-            "custom_id": null,
             "tags": [],
+            "custom_id": null,
+            "id": "1532538d-cb47-48fa-8a8e-b21952644a6e",
+            "username": "anonymous",
             "credentials": {
               "key-auths": []
             }
           },
           {
-            "username": "jcortejoso",
-            "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949",
             "created_at": 1623404316,
-            "custom_id": null,
             "tags": [],
+            "custom_id": null,
+            "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949",
+            "username": "jcortejoso",
             "credentials": {
               "key-auths": [
                 {
                   "ttl": null,
-                  "id": "13d3c5c0-d3bf-4205-a9b4-2072b81ac8b0",
-                  "created_at": 1623404508,
+                  "created_at": 1624957734,
                   "key": "secret",
+                  "id": "b5794193-c1e5-4f2a-bdd5-8896cfcc90e1",
                   "consumer": {
                     "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
                   },
@@ -196,299 +176,152 @@ data:
         ],
         "plugins": [
           {
-            "name": "rate-limiting",
-            "service": {
-              "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
-            },
+            "created_at": 1624889602,
             "consumer": {
               "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
             },
             "config": {
-              "header_name": null,
-              "redis_password": null,
-              "policy": "cluster",
-              "second": null,
-              "minute": 100,
-              "hour": null,
-              "day": null,
-              "hide_client_headers": false,
-              "year": null,
               "path": null,
-              "month": null,
-              "limit_by": "ip",
-              "fault_tolerant": true,
               "redis_timeout": 2000,
               "redis_database": 0,
               "redis_host": null,
-              "redis_port": 6379
+              "redis_port": 6379,
+              "header_name": null,
+              "limit_by": "ip",
+              "second": null,
+              "minute": 100,
+              "policy": "cluster",
+              "day": null,
+              "month": null,
+              "fault_tolerant": true,
+              "hide_client_headers": false,
+              "redis_password": null,
+              "hour": null,
+              "year": null
             },
-            "id": "175852a3-9891-4b26-b0f3-f2832bceadbf",
-            "created_at": 1624889602,
-            "enabled": true,
-            "tags": null,
+            "name": "rate-limiting",
+            "service": {
+              "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
+            },
             "route": null,
+            "tags": null,
+            "id": "175852a3-9891-4b26-b0f3-f2832bceadbf",
             "protocols": [
               "grpc",
               "grpcs",
               "http",
               "https"
-            ]
+            ],
+            "enabled": true
           },
           {
+            "created_at": 1623859751,
+            "consumer": null,
+            "config": {
+              "message": "ok",
+              "body": null,
+              "content_type": null,
+              "status_code": 200
+            },
             "name": "request-termination",
             "service": {
               "id": "90a37cb9-2c01-472b-8fff-715835e56156"
             },
-            "consumer": null,
-            "config": {
-              "body": null,
-              "content_type": null,
-              "status_code": 200,
-              "message": "ok"
-            },
+            "route": null,
+            "tags": null,
             "id": "18ccb4e4-b09c-4251-af1d-d3367f7ca667",
-            "created_at": 1623859751,
-            "enabled": true,
-            "tags": null,
-            "route": null,
             "protocols": [
               "grpc",
               "grpcs",
               "http",
               "https"
-            ]
+            ],
+            "enabled": true
           },
           {
-            "name": "key-auth",
-            "service": null,
-            "consumer": null,
-            "config": {
-              "key_names": [
-                "apikey"
-              ],
-              "anonymous": "1532538d-cb47-48fa-8a8e-b21952644a6e",
-              "run_on_preflight": true,
-              "key_in_header": true,
-              "key_in_query": true,
-              "key_in_body": false,
-              "hide_credentials": false
-            },
-            "id": "5d4f343a-1a40-4901-87bd-e839788e075b",
-            "created_at": 1623406677,
-            "enabled": false,
-            "tags": null,
-            "route": null,
-            "protocols": [
-              "grpc",
-              "grpcs",
-              "http",
-              "https"
-            ]
-          },
-          {
-            "name": "rate-limiting",
-            "service": {
-              "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
-            },
-            "consumer": {
-              "id": "1532538d-cb47-48fa-8a8e-b21952644a6e"
-            },
-            "config": {
-              "header_name": null,
-              "redis_password": null,
-              "policy": "cluster",
-              "second": null,
-              "minute": 10,
-              "hour": null,
-              "day": null,
-              "hide_client_headers": false,
-              "year": null,
-              "path": null,
-              "month": null,
-              "limit_by": "ip",
-              "fault_tolerant": true,
-              "redis_timeout": 2000,
-              "redis_database": 0,
-              "redis_host": null,
-              "redis_port": 6379
-            },
-            "id": "6060fd61-cf04-4bb2-a426-0aea585ac159",
             "created_at": 1624889534,
-            "enabled": true,
-            "tags": null,
-            "route": null,
-            "protocols": [
-              "grpc",
-              "grpcs",
-              "http",
-              "https"
-            ]
-          },
-          {
-            "name": "rate-limiting",
-            "service": null,
             "consumer": {
               "id": "1532538d-cb47-48fa-8a8e-b21952644a6e"
             },
             "config": {
+              "path": null,
+              "redis_timeout": 2000,
+              "redis_database": 0,
+              "redis_host": null,
+              "redis_port": 6379,
               "header_name": null,
-              "redis_password": null,
-              "policy": "cluster",
+              "limit_by": "ip",
               "second": null,
               "minute": 10,
-              "hour": null,
-              "day": null,
-              "hide_client_headers": false,
-              "year": null,
-              "path": null,
-              "month": null,
-              "limit_by": "ip",
-              "fault_tolerant": true,
-              "redis_timeout": 2000,
-              "redis_database": 0,
-              "redis_host": null,
-              "redis_port": 6379
-            },
-            "id": "6893a5ba-460f-4eb3-86fb-243b7f16025c",
-            "created_at": 1623235507,
-            "enabled": false,
-            "tags": null,
-            "route": null,
-            "protocols": [
-              "grpc",
-              "grpcs",
-              "http",
-              "https"
-            ]
-          },
-          {
-            "name": "request-termination",
-            "service": null,
-            "consumer": null,
-            "config": {
-              "body": null,
-              "content_type": null,
-              "status_code": 200,
-              "message": "OK"
-            },
-            "id": "7c6cb1c1-e19e-46fa-9fc9-d854db08d965",
-            "created_at": 1623859319,
-            "enabled": false,
-            "tags": null,
-            "route": null,
-            "protocols": [
-              "grpc",
-              "grpcs",
-              "http",
-              "https"
-            ]
-          },
-          {
-            "name": "rate-limiting",
-            "service": null,
-            "consumer": {
-              "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
-            },
-            "config": {
-              "header_name": null,
-              "redis_password": null,
               "policy": "cluster",
-              "second": null,
-              "minute": 100,
-              "hour": null,
               "day": null,
-              "hide_client_headers": false,
-              "year": null,
-              "path": null,
               "month": null,
-              "limit_by": "ip",
               "fault_tolerant": true,
-              "redis_timeout": 2000,
-              "redis_database": 0,
-              "redis_host": null,
-              "redis_port": 6379
+              "hide_client_headers": false,
+              "redis_password": null,
+              "hour": null,
+              "year": null
             },
-            "id": "852846f2-eefe-4157-ba10-43a2e870bce1",
-            "created_at": 1623406844,
-            "enabled": false,
-            "tags": null,
-            "route": null,
-            "protocols": [
-              "grpc",
-              "grpcs",
-              "http",
-              "https"
-            ]
-          },
-          {
-            "name": "key-auth",
+            "name": "rate-limiting",
             "service": {
               "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
             },
+            "route": null,
+            "tags": null,
+            "id": "6060fd61-cf04-4bb2-a426-0aea585ac159",
+            "protocols": [
+              "grpc",
+              "grpcs",
+              "http",
+              "https"
+            ],
+            "enabled": true
+          },
+          {
+            "created_at": 1624889633,
             "consumer": null,
             "config": {
               "key_names": [
                 "apikey"
               ],
-              "anonymous": "1532538d-cb47-48fa-8a8e-b21952644a6e",
               "run_on_preflight": true,
+              "anonymous": "1532538d-cb47-48fa-8a8e-b21952644a6e",
               "key_in_header": true,
               "key_in_query": true,
               "key_in_body": false,
               "hide_credentials": false
             },
-            "id": "96259f8e-0484-4c98-9f4d-d4406c354407",
-            "created_at": 1624889633,
-            "enabled": true,
-            "tags": null,
+            "name": "key-auth",
+            "service": {
+              "id": "d98c9e59-dc44-4bad-81ca-d399724462b0"
+            },
             "route": null,
-            "protocols": [
-              "grpc",
-              "grpcs",
-              "http",
-              "https"
-            ]
-          },
-          {
-            "name": "request-termination",
-            "service": null,
-            "consumer": null,
-            "config": {
-              "body": null,
-              "content_type": null,
-              "status_code": 200,
-              "message": "ok"
-            },
-            "id": "f09b5ebc-68b3-40d5-b1f7-2af4dc689bd6",
-            "created_at": 1623859799,
-            "enabled": true,
             "tags": null,
-            "route": {
-              "id": "37f4e0db-fbc9-4aa3-9f47-5c957c54efdc"
-            },
+            "id": "96259f8e-0484-4c98-9f4d-d4406c354407",
             "protocols": [
               "grpc",
               "grpcs",
               "http",
               "https"
-            ]
+            ],
+            "enabled": true
           }
         ],
         "acls": [
           {
-            "tags": null,
+            "created_at": 1623404350,
+            "group": "noratelimit",
+            "id": "57187a97-d48b-4128-b007-281c0ed33659",
             "consumer": {
               "id": "bdfbe991-2e69-4d50-bf79-4681be7f5949"
             },
-            "id": "57187a97-d48b-4128-b007-281c0ed33659",
-            "group": "noratelimit",
-            "created_at": 1623404350
+            "tags": null
           }
         ],
         "upstreams": [],
         "certificates": [],
         "snis": []
       },
-      "createdAt": "2021-06-28T14:15:16.000Z",
-      "updatedAt": "2021-06-28T14:15:16.000Z"
+      "createdAt": "2021-06-29T09:09:28.000Z",
+      "updatedAt": "2021-06-29T09:09:28.000Z"
     }
