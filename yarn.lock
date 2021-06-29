@@ -1477,6 +1477,26 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
+"@celo/phone-number-privacy-common@1.0.33":
+  version "1.0.33"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.33.tgz#97e5479403c002a4fb88e62a567c9c7927d60710"
+  integrity sha512-eOGeG7r8tNxKB852AHsE5VW8y4FTWk6Lo3/LJcI6roUVrIp1QJXm92sOFpedlwP23OunR2/NKNpIKTLdOc0faA==
+  dependencies:
+    "@celo/base" "1.1.1"
+    "@celo/contractkit" "1.0.2"
+    "@celo/identity" "1.0.2"
+    "@celo/utils" "1.0.2"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "^6.5.4"
+    is-base64 "^1.1.0"
+    libphonenumber-js "^1.9.11"
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"

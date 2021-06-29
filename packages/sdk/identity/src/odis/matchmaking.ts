@@ -1,17 +1,19 @@
 import { E164Number } from '@celo/utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
-import { WasmBlsBlindingClient } from './bls-blinding-client'
-import { getBlindedPhoneNumber } from './phone-number-identifier'
+import { ec as EC } from 'elliptic'
 import {
   AuthSigner,
+  EncryptionKeySigner,
   MatchmakingRequest,
   MatchmakingResponse,
   queryOdis,
   ServiceContext,
+  signWithDEK,
 } from './query'
 
 const debug = debugFactory('kit:odis:matchmaking')
+const ec = new EC('secp256k1')
 
 const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups
@@ -26,20 +28,20 @@ export async function getContactMatches(
   phoneNumberIdentifier: string,
   signer: AuthSigner,
   context: ServiceContext,
-  blsBlindingClient: WasmBlsBlindingClient,
+  dekSigner: EncryptionKeySigner,
   clientVersion?: string,
   sessionID?: string
 ): Promise<E164Number[]> {
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
-  const blindedPhoneNumber = await getBlindedPhoneNumber(e164NumberCaller, blsBlindingClient)
+  const signedUserPhoneNumber = await signWithDEK(selfPhoneNumObfuscated, dekSigner)
 
   const body: MatchmakingRequest = {
     account,
     userPhoneNumber: selfPhoneNumObfuscated,
     contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
     hashedPhoneNumber: phoneNumberIdentifier,
-    blindedPhoneNumber,
+    signedUserPhoneNumber,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
   }

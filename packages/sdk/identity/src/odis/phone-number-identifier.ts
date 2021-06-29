@@ -38,15 +38,21 @@ export async function getPhoneNumberIdentifier(
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
-  blsBlindingClient: WasmBlsBlindingClient,
   selfPhoneHash?: string,
   clientVersion?: string,
+  blsBlindingClient?: BlsBlindingClient,
   sessionID?: string
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
+  }
+
+  // Fallback to using Wasm version if not specified
+  if (!blsBlindingClient) {
+    debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
+    blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
   }
 
   const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient)
@@ -70,7 +76,7 @@ export async function getPhoneNumberIdentifier(
  */
 export async function getBlindedPhoneNumber(
   e164Number: string,
-  blsBlindingClient: WasmBlsBlindingClient
+  blsBlindingClient: BlsBlindingClient
 ): Promise<string> {
   debug('Retrieving blinded message')
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')

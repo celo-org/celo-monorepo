@@ -30,9 +30,7 @@ export function isBodyReasonablySized(
   return JSON.stringify(requestBody).length <= REASONABLE_BODY_CHAR_LIMIT
 }
 
-export function hasValidBlindedPhoneNumberParam(
-  requestBody: GetBlindedMessageSigRequest | GetContactMatchesRequest
-): boolean {
+export function hasValidBlindedPhoneNumberParam(requestBody: GetBlindedMessageSigRequest): boolean {
   return (
     !!requestBody.blindedQueryPhoneNumber &&
     requestBody.blindedQueryPhoneNumber.length === 64 &&
