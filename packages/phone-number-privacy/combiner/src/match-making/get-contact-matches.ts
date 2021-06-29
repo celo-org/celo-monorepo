@@ -57,7 +57,8 @@ export async function handleGetContactMatches(
       return
     }
 
-    let signedUserPhoneNumberHash = ''
+    // Verify that signedUserPhoneNumber was signed by the account's DEK
+    let signedUserPhoneNumberHash: string | undefined
     let shouldStoreRequest = true
     if (signedUserPhoneNumber) {
       let isValidSig = false
@@ -83,9 +84,11 @@ export async function handleGetContactMatches(
         respondWithError(response, 403, WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE, logger)
         return
       }
+
+      // Hash signed number one more time for good measure
       signedUserPhoneNumberHash = crypto
         .createHash('sha256')
-        .update(signedUserPhoneNumber!)
+        .update(signedUserPhoneNumber)
         .digest('base64')
     }
 
@@ -101,20 +104,25 @@ export async function handleGetContactMatches(
         respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
         return
       } else {
+        // Account has performed matchmaking before and has provided a phone number dek signature
         const signedUserPhoneNumberRecord = await getAccountSignedUserPhoneNumberRecord(
           account,
           logger
         )
         if (!signedUserPhoneNumberRecord) {
+          // Account has performed matchmaking before and has provided a phone number dek signature
+          // but we do not have a record of their phone number signature in the db.
           logger.info(
             { account },
             'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
           )
-          if (shouldStoreRequest) {
+          if (shouldStoreRequest && signedUserPhoneNumberHash) {
             await setAccountSignedUserPhoneNumberRecord(account, signedUserPhoneNumberHash, logger)
           }
         } else {
-          if (signedUserPhoneNumberRecord !== signedUserPhoneNumberHash) {
+          if (signedUserPhoneNumberRecord !== signedUserPhoneNumberHash!) {
+            // Account has performed matchmaking before and has provided a phone number dek signature
+            // but the phone number signature we have stored in the db does not match what they provided.
             logger.info(
               { account },
               'Blocking account from querying matches for a different phone number than before.'
@@ -122,15 +130,13 @@ export async function handleGetContactMatches(
             respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
             return
           }
+          // Account has performed matchmaking before and has provided a phone number dek signature
+          // and the phone number signature we have stored in the db matches what they provided.
           logger.info(
             { account },
             'Allowing account to requery matches for the same phone number as before.'
           )
         }
-      }
-    } else if (signedUserPhoneNumber) {
-      if (shouldStoreRequest) {
-        await setAccountSignedUserPhoneNumberRecord(account, signedUserPhoneNumberHash, logger)
       }
     }
 
@@ -144,8 +150,9 @@ export async function handleGetContactMatches(
       },
       'measured percentage of contacts covered by matchmaking'
     )
-    if (shouldStoreRequest) {
-      await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
+
+    await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
+    if (shouldStoreRequest && signedUserPhoneNumberHash) {
       await setDidMatchmaking(account, signedUserPhoneNumberHash, logger)
     }
     response.json({ success: true, matchedContacts, version: VERSION })

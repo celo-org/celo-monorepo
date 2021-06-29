@@ -93,6 +93,7 @@ export async function setDidMatchmaking(
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+        .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
         .timeout(DB_TIMEOUT)
     } catch (err) {
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
