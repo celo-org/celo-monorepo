@@ -54,6 +54,8 @@ contract Exchange is
   uint256 public updateFrequency;
   uint256 public minimumReports;
 
+  bytes32 public stableTokenRegistryId;
+
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
     _;
@@ -70,7 +72,7 @@ contract Exchange is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param stableToken Address of the stable token
+   * @param stableTokenIdentifier The registry identification for the corresponding stable token contract
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
@@ -81,7 +83,7 @@ contract Exchange is
    */
   function initialize(
     address registryAddress,
-    address stableToken,
+    string calldata stableTokenIdentifier,
     uint256 _spread,
     uint256 _reserveFraction,
     uint256 _updateFrequency,
@@ -89,12 +91,11 @@ contract Exchange is
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setStableToken(stableToken);
+    setStableTokenIdentifier(stableTokenIdentifier);
     setSpread(_spread);
     setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
-    _updateBucketsIfNecessary();
   }
 
   /**
@@ -187,15 +188,18 @@ contract Exchange is
         getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
-      require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");
+      require(
+        IStableToken(getStableTokenContractAddress()).mint(msg.sender, buyAmount),
+        "Mint of stable token failed"
+      );
     } else {
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
       require(
-        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
+        IERC20(getStableTokenContractAddress()).transferFrom(msg.sender, address(this), sellAmount),
         "Transfer of sell token failed"
       );
-      IStableToken(stable).burn(sellAmount);
+      IStableToken(getStableTokenContractAddress()).burn(sellAmount);
 
       require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
     }
@@ -267,11 +271,26 @@ contract Exchange is
 
   /**
     * @notice Allows owner to set the Stable Token address
-    * @param newStableToken The new address for Stable Token
+    * @param stableTokenIdentifier The new address for Stable Token
     */
-  function setStableToken(address newStableToken) public onlyOwner {
-    stable = newStableToken;
-    emit StableTokenSet(newStableToken);
+  function setStableTokenIdentifier(string memory stableTokenIdentifier) public onlyOwner {
+    stableTokenRegistryId = keccak256(abi.encodePacked(stableTokenIdentifier));
+    stable = registry.getAddressForOrDie(stableTokenRegistryId);
+    emit StableTokenSet(stable);
+  }
+
+  /**
+    * @notice Takes Stable Token Identifier and returns stable token contract address
+    * and also ensures that the correct contract address is used in the event that the stable value is 0
+    * @return address of the stable token contract
+    */
+
+  function getStableTokenContractAddress() public view returns (address) {
+    if (stableTokenRegistryId == bytes32(0)) {
+      return stable;
+    } else {
+      return registry.getAddressForOrDie(stableTokenRegistryId);
+    }
   }
 
   /**
@@ -411,12 +430,13 @@ contract Exchange is
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
-    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stable);
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(getStableTokenContractAddress());
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
-    bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
+    bool enoughReports = sortedOracles.numRates(getStableTokenContractAddress()) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
-    bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
+    bool medianReportRecent = sortedOracles.medianTimestamp(getStableTokenContractAddress()) >
+      now.sub(updateFrequency);
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
@@ -426,7 +446,7 @@ contract Exchange is
     (rateNumerator, rateDenominator) = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
-      .medianRate(stable);
+      .medianRate(getStableTokenContractAddress());
     require(rateDenominator > 0, "exchange rate denominator must be greater than 0");
     return (rateNumerator, rateDenominator);
   }
