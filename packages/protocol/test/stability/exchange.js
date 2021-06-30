@@ -206,7 +206,7 @@ contract('Exchange', function (accounts) {
                     return [4 /*yield*/, Exchange.new()];
                 case 18:
                     exchange = _a.sent();
-                    return [4 /*yield*/, exchange.initialize(registry.address, stableToken.address, spread, reserveFraction, updateFrequency, minimumReports)];
+                    return [4 /*yield*/, exchange.initialize(registry.address, 'StableToken', spread, reserveFraction, updateFrequency, minimumReports)];
                 case 19:
                     _a.sent();
                     return [4 /*yield*/, registry.setAddressFor(registry_utils_1.CeloContractName.Exchange, exchange.address)];
@@ -232,7 +232,7 @@ contract('Exchange', function (accounts) {
         it('should not be callable again', function () { return __awaiter(void 0, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, test_utils_1.assertRevert(exchange.initialize(registry.address, stableToken.address, spread, reserveFraction, updateFrequency, minimumReports))];
+                    case 0: return [4 /*yield*/, test_utils_1.assertRevert(exchange.initialize(registry.address, 'StableToken', spread, reserveFraction, updateFrequency, minimumReports))];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
