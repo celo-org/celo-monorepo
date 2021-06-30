@@ -275,6 +275,15 @@ contract Exchange is
     emit MinimumReportsSet(newMininumReports);
   }
 
+  /** DEPRECATED
+    * @notice Allows owner to set the Stable Token address
+    * @param newStableToken The new address for Stable Token
+    */
+  function setStableToken(address newStableToken) public onlyOwner {
+    stable = newStableToken;
+    emit StableTokenSet(newStableToken);
+  }
+
   /**
     * @notice Allows owner to set the Stable Token address
     * @param stableTokenIdentifier The new address for Stable Token
@@ -290,7 +299,6 @@ contract Exchange is
     * and also ensures that the correct contract address is used in the event that the stable value is 0
     * @return address of the stable token contract
     */
-
   function getStableTokenContractAddress() public view returns (address) {
     if (stableTokenRegistryId == bytes32(0)) {
       return stable;
