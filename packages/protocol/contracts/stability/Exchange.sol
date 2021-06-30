@@ -78,7 +78,7 @@ contract Exchange is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param stableTokenIdentifier The registry identification for the corresponding stable token contract
+   * @param stableTokenIdentifier The registry identification for the corresponding stable token
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
@@ -296,7 +296,8 @@ contract Exchange is
 
   /**
     * @notice Takes Stable Token Identifier and returns stable token contract address
-    * and also ensures that the correct contract address is used in the event that the stable value is 0
+    * and also ensures that the correct contract address 
+    * is used in the event that the stable value is 0
     * @return address of the stable token contract
     */
   function getStableTokenContractAddress() public view returns (address) {
