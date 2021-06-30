@@ -21,7 +21,7 @@ const initializeArgs = async (): Promise<any[]> => {
   )
   return [
     config.registry.predeployedProxyAddress,
-    stableTokenEUR.address,
+    'StableTokenEUR',
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
