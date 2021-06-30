@@ -55,6 +55,23 @@ export default class Propose extends BaseCommand {
     printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
     const governance = await this.kit.contracts.getGovernance()
+
+    for (let tx of proposal) {
+      console.log(tx)
+      if (!tx.to) {
+        continue
+      }
+
+      console.log(
+        await this.web3.eth.call({
+          to: tx.to,
+          from: governance.address,
+          value: tx.value,
+          data: tx.input,
+        })
+      )
+    }
+
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),
