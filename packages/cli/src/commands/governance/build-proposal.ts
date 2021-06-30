@@ -27,5 +27,25 @@ export default class BuildProposal extends BaseCommand {
     const output = await promptBuilder.promptTransactions()
     console.info(`Outputting proposal to ${res.flags.output}`)
     writeFileSync(res.flags.output!, JSON.stringify(output))
+
+    let proposals = await builder.build()
+
+    const governance = await this.kit.contracts.getGovernance()
+
+    for (let tx of proposals) {
+      console.log(tx)
+      if (!tx.to) {
+        continue
+      }
+
+      console.log(
+        await this.web3.eth.call({
+          to: tx.to,
+          from: governance.address,
+          value: tx.value,
+          data: tx.input,
+        })
+      )
+    }
   }
 }
