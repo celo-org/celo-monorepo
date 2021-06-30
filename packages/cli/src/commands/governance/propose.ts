@@ -6,6 +6,7 @@ import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { checkProposal } from '../../utils/governance'
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
 
@@ -56,21 +57,7 @@ export default class Propose extends BaseCommand {
 
     const governance = await this.kit.contracts.getGovernance()
 
-    for (let tx of proposal) {
-      console.log(tx)
-      if (!tx.to) {
-        continue
-      }
-
-      console.log(
-        await this.web3.eth.call({
-          to: tx.to,
-          from: governance.address,
-          value: tx.value,
-          data: tx.input,
-        })
-      )
-    }
+    await checkProposal(proposal, this.kit)
 
     await displaySendTx(
       'proposeTx',
