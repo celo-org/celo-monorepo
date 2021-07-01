@@ -21,6 +21,16 @@ export interface StableTokenExchangeLimits {
   maxExchangeAmount: BigNumber
 }
 
+export interface ExchangeProposal {
+  exchanger: string
+  stableToken: string
+  sellAmount: BigNumber
+  buyAmount: BigNumber
+  approvalTimestamp: BigNumber
+  state: number // TODO replace with enum
+  sellCelo: boolean
+}
+
 // TODO update comments to match the contracts
 
 export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
@@ -36,8 +46,6 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
 
   owner = proxyCall(this.contract.methods.owner)
 
-  exchangeProposals = proxyCall(this.contract.methods.exchangeProposals)
-
   setStableTokenExchangeLimits = proxySend(
     this.kit,
     this.contract.methods.setStableTokenExchangeLimits
@@ -45,11 +53,29 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
 
   createExchangeProposal = proxySend(this.kit, this.contract.methods.createExchangeProposal)
 
-  getActiveProposalIds = proxySend(this.kit, this.contract.methods.getActiveProposalIds)
+  approveExchangeProposal = proxySend(this.kit, this.contract.methods.approveExchangeProposal)
+
+  executeExchangeProposal = proxySend(this.kit, this.contract.methods.executeExchangeProposal)
+  cancelExchangeProposal = proxySend(this.kit, this.contract.methods.cancelExchangeProposal)
 
   // getContract() {
   //   return this.contract
   // }
+
+  // exchangeProposals = proxyCall(this.contract.methods.exchangeProposals)
+
+  async getExchangeProposal(exchangeProposalID: string): Promise<ExchangeProposal> {
+    const result = await this.contract.methods.exchangeProposals(exchangeProposalID).call()
+    return {
+      exchanger: result['exchanger'],
+      stableToken: result['stableToken'],
+      sellAmount: new BigNumber(result['sellAmount']),
+      buyAmount: new BigNumber(result['buyAmount']),
+      approvalTimestamp: new BigNumber(result['approvalTimestamp']),
+      state: parseInt(result['state']), // TODO replace with enum
+      sellCelo: result['sellCelo'],
+    }
+  }
 
   async stableTokenExchangeLimits(
     stableTokenRegistryId: string
@@ -99,4 +125,11 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   //     baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
   //   }
   // }
+
+  async getActiveProposalIds() {
+    // TODO move this to proxy call
+    // const ids = await this.contract.methods.getActiveProposalIds().call()
+    return await this.contract.methods.getActiveProposalIds().call()
+    //return ids.map(valueToBigNumber)
+  }
 }

@@ -33,7 +33,7 @@
     "numRequiredConfirmations": 1
   },
   "grandaMento": {
-    "approver": "0x0000000000000000000000000000000000000000",
+    "approver": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
     "spread": 0.01,
     "vetoPeriodSeconds": 10800
   },
