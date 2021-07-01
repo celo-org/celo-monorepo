@@ -436,11 +436,6 @@ contract('GrandaMento', (accounts: string[]) => {
         } in the exchange rate since exchange proposal creation within the maximum`, async () => {
           // The absolute max change
           const newCeloStableTokenRate = defaultCeloStableTokenRate.times(1 + rateChange)
-          console.log(
-            'a newCeloStableTokenRate',
-            newCeloStableTokenRate,
-            newCeloStableTokenRate.toString()
-          )
           await sortedOracles.setMedianRate(stableToken.address, newCeloStableTokenRate)
           await grandaMento.approveExchangeProposal(proposalId, { from: approver })
         })
@@ -453,13 +448,8 @@ contract('GrandaMento', (accounts: string[]) => {
         it(`reverts when ${
           rateChange > 0 ? 'an increase' : 'a decrease'
         } in the exchange rate since exchange proposal creation not within the maximum`, async () => {
-          // The absolute max change
+          // Just in excess of the max change
           const newCeloStableTokenRate = defaultCeloStableTokenRate.times(1 + rateChange)
-          console.log(
-            'b newCeloStableTokenRate',
-            newCeloStableTokenRate,
-            newCeloStableTokenRate.toString()
-          )
           await sortedOracles.setMedianRate(stableToken.address, newCeloStableTokenRate)
           await assertRevertWithReason(
             grandaMento.approveExchangeProposal(proposalId, { from: approver }),
