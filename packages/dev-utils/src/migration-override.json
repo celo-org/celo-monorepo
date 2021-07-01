@@ -23,7 +23,8 @@
     "referendumStageDuration": 100,
     "executionStageDuration": 100,
     "minDeposit": 1,
-    "concurrentProposals": 5
+    "concurrentProposals": 5,
+    "skipTransferOwnership": true
   },
   "governanceApproverMultiSig": {
     "signatories": [

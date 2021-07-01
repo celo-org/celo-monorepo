@@ -1,7 +1,10 @@
 import { Address } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
+import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { ContractKit, newKitFromWeb3 } from '../kit'
+import { AccountsWrapper } from './Accounts'
 import { Proposal, ProposalTransaction } from './Governance'
 import { GrandaMentoWrapper } from './GrandaMento'
 
@@ -13,14 +16,24 @@ export async function assumeOwnership(
   kit: ContractKit,
   web3: Web3,
   // contractsToOwn: string[],
-  proposer: string,
+  // proposer: string,
   to: string,
   proposalId: number = 1
   // dequeuedIndex: number = 0
 ) {
+  const ONE_CGLD = web3.utils.toWei('1', 'ether')
+  const accounts = await web3.eth.getAccounts()
+  let accountWrapper: AccountsWrapper
+  accountWrapper = await kit.contracts.getAccounts()
   const lockedGold = await kit.contracts.getLockedGold()
-  const grandaMento = await kit.contracts.getGrandaMento()
-  const registry = await kit._web3Contracts.getRegistry()
+
+  await concurrentMap(4, accounts.slice(0, 4), async (account) => {
+    await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
+    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_CGLD })
+  })
+
+  // const registry = await kit._web3Contracts.getRegistry()
+  const grandaMento = await kit._web3Contracts.getGrandaMento()
   const governance = await kit.contracts.getGovernance()
   const multiSig = await kit.contracts.getMultiSig(await governance.getApprover())
 
@@ -41,13 +54,13 @@ export async function assumeOwnership(
 
   const ownershiptx: ProposalTransaction = {
     value: '0',
-    to: (registry as any)._address,
-    input: grandaMento.getContract().methods.transferOwnership(to).encodeABI(),
+    to: (grandaMento as any)._address,
+    input: grandaMento.methods.transferOwnership(to).encodeABI(),
   }
   const proposal: Proposal = [ownershiptx]
 
   await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
-    from: proposer,
+    from: accounts[0],
     value: (await governance.getConfig()).minDeposit.toNumber(),
   })
 
@@ -73,8 +86,8 @@ export async function assumeOwnership(
 
   // await governance.upvote(proposalId, 0, 0)
 
-  const tx = await governance.upvote(proposalId, proposer)
-  await tx.sendAndWaitForReceipt({ from: proposer })
+  const tx = await governance.upvote(proposalId, accounts[1])
+  await tx.sendAndWaitForReceipt()
   await timeTravel(expConfigGovernance.dequeueFrequency, web3)
   await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
 
@@ -83,19 +96,22 @@ export async function assumeOwnership(
   // const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
   const tx2 = await governance.approve(proposalId)
   const multisigTx = await multiSig.submitOrConfirmTransaction(governance.address, tx2.txo)
-  await multisigTx.sendAndWaitForReceipt({ from: proposer })
+  await multisigTx.sendAndWaitForReceipt({ from: accounts[0] })
   await timeTravel(expConfigGovernance.approvalStageDuration, web3)
   // await multiSig.submitTransaction(governance.address, 0, txData)
   // await timeTravel(config.governance.approvalStageDuration, web3)
   // await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
   const tx3 = await governance.vote(proposalId, 'Yes')
-  await governance.getVoter(proposer)
-  await tx3.sendAndWaitForReceipt({ from: proposer })
+  await tx3.sendAndWaitForReceipt({ from: accounts[2] })
   await timeTravel(expConfigGovernance.referendumStageDuration, web3)
   // await timeTravel(config.governance.referendumStageDuration, web3)
   // await governance.execute(proposalId, dequeuedIndex)
   const tx4 = await governance.execute(proposalId)
   await tx4.sendAndWaitForReceipt()
+  // console.log('proposal passed: ' + propo.toString())
+
+  const exists = await governance.proposalExists(proposalId)
+  expect(exists).toBeFalsy()
 }
 
 testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
@@ -119,23 +135,65 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     // const contractsToOwn = ['GrandaMento']
 
     // let's own Granda Mento
-    //  await assumeOwnership(kit, web3, accounts[0], accounts[0])
   })
+
+  const newLimitMin = new BigNumber('1000')
+  const newLimitMax = new BigNumber('1000000000000')
+  const increaseLimits = async () => {
+    await (
+      await grandaMento.setStableTokenExchangeLimits(
+        'StableToken',
+        newLimitMin.toString(),
+        newLimitMax.toString()
+      )
+    ).sendAndWaitForReceipt()
+  }
 
   describe('Active proposals', () => {
     it('gets the proposals', async () => {
       const activeProposals = await grandaMento.getActiveProposals()
-      // console.log(activeProposals)
-      // console.log(typeof activeProposals)
       expect(activeProposals).toEqual([])
     })
+    it('increases limits', async () => {
+      //  await assumeOwnership(kit, web3, accounts[0])
+      // not sure if this should be here as it is owed by governance
+      // console.log('owner is ' + (await grandaMento.owner()))
+      // console.log('account #0 is ' + accounts[0])
+      // console.log('governance contract is' + (await kit.contracts.getGovernance()).address)
+      let limits = await grandaMento.stableTokenExchangeLimits('StableToken') // TODO change this for an enum
+      expect(limits.minExchangeAmount).toEqBigNumber(new BigNumber(0))
+      expect(limits.maxExchangeAmount).toEqBigNumber(new BigNumber(0))
 
-    it('submits proposal', async () => {
-      // const stableTokenRegistryId = 'StableTokenUSD'
-      // const sellAmount = new BigNumber(100000) // check the 18 zeros
-      // const sellCelo = true
-      // inspire in the oracle set up and sent a tx to increase the limits
-      // createExchangeProposal()
+      await increaseLimits()
+
+      limits = await grandaMento.stableTokenExchangeLimits('StableToken')
+      expect(limits.minExchangeAmount).toEqBigNumber(newLimitMin)
+      expect(limits.maxExchangeAmount).toEqBigNumber(newLimitMax)
+    })
+
+    describe.only('Has more has a proposal', () => {
+      beforeAll(async () => {})
+
+      it('Can submit a proposal', async () => {
+        await increaseLimits() // this should be in the before all but for some reason not working
+        // console.log(await grandaMento.stableTokenExchangeLimits('StableToken'))
+
+        const celoToken = await kit.contracts.getGoldToken()
+        await (
+          await celoToken.increaseAllowance(grandaMento.address, '100000000')
+        ).sendAndWaitForReceipt()
+
+        await (
+          await grandaMento.createExchangeProposal('StableToken', '100000000', true)
+        ).sendAndWaitForReceipt()
+
+        const activeProposals = await grandaMento.getActiveProposals()
+        expect(activeProposals).not.toEqual([])
+        console.log('Active proposals')
+
+        const proposal = await grandaMento.exchangeProposals(activeProposals[0])
+        console.log(proposal)
+      })
     })
   })
 

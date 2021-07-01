@@ -126,6 +126,9 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
+  getGrandaMento() {
+    return this.getContract(CeloContract.GrandaMento)
+  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }

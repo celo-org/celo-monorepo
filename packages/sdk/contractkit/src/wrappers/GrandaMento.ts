@@ -1,15 +1,11 @@
-import { CeloTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { GrandaMento } from '../generated/GrandaMento'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,
-  identity,
   proxyCall,
   proxySend,
-  tupleParser,
   valueToBigNumber,
-  valueToString,
 } from './BaseWrapper'
 
 // export interface GrandaMentoExchangeProposal {}
@@ -18,9 +14,11 @@ export interface GrandaMentoConfig {
   approver: string
   spread: BigNumber // seconds
   vetoPeriodSeconds: BigNumber
-  stableTokenExchangeLimits: any // { id: string : IPerson; }
-  // stableTokenExchangeLimits
-  // exchangeProposals
+}
+
+export interface StableTokenExchangeLimits {
+  minExchangeAmount: BigNumber
+  maxExchangeAmount: BigNumber
 }
 
 // TODO update comments to match the contracts
@@ -36,13 +34,33 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     valueToBigNumber
   )
 
-  stableTokenExchangeLimits = proxyCall(this.contract.methods.stableTokenExchangeLimits)
+  owner = proxyCall(this.contract.methods.owner)
 
-  // stableTokenExchangeLimits
-  // exchangeProposals
+  exchangeProposals = proxyCall(this.contract.methods.exchangeProposals)
 
-  getContract() {
-    return this.contract
+  setStableTokenExchangeLimits = proxySend(
+    this.kit,
+    this.contract.methods.setStableTokenExchangeLimits
+  )
+
+  createExchangeProposal = proxySend(this.kit, this.contract.methods.createExchangeProposal)
+
+  getActiveProposalIds = proxySend(this.kit, this.contract.methods.getActiveProposalIds)
+
+  // getContract() {
+  //   return this.contract
+  // }
+
+  async stableTokenExchangeLimits(
+    stableTokenRegistryId: string
+  ): Promise<StableTokenExchangeLimits> {
+    const result = await this.contract.methods
+      .stableTokenExchangeLimits(stableTokenRegistryId)
+      .call()
+    return {
+      minExchangeAmount: new BigNumber(result.minExchangeAmount),
+      maxExchangeAmount: new BigNumber(result.maxExchangeAmount),
+    }
   }
 
   /**
@@ -50,29 +68,27 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
    */
 
   async getConfig(): Promise<GrandaMentoConfig> {
-    const res = await Promise.all([
-      this.approver(),
-      this.spread(),
-      this.vetoPeriodSeconds(),
-      this.stableTokenExchangeLimits(''), // not sure why it needs a string here
-    ])
+    const res = await Promise.all([this.approver(), this.spread(), this.vetoPeriodSeconds()])
     return {
       approver: res[0],
       spread: res[1],
       vetoPeriodSeconds: res[2],
-      stableTokenExchangeLimits: res[3], // TODO format and test this
     }
   }
 
-  createExchangeProposal: (
-    stableTokenRegistryId: string,
-    sellAmount: BigNumber.Value,
-    sellCelo: boolean
-  ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
-    this.contract.methods.createExchangeProposal,
-    tupleParser(identity, valueToString, identity)
-  )
+  // async stableTokenExchangeLimits() {
+  //   return await this.contract.methods.stableTokenExchangeLimits()
+  // }
+
+  // createExchangeProposal: (
+  //   stableTokenRegistryId: string,
+  //   sellAmount: BigNumber.Value,
+  //   sellCelo: boolean
+  // ) => CeloTransactionObject<string> = proxySend(
+  //   this.kit,
+  //   this.contract.methods.createExchangeProposal,
+  //   tupleParser(identity, valueToString, identity)
+  // )
 
   // async getParticipationParameters(): Promise<ParticipationParameters> {
   //   const res = await this.contract.methods.getParticipationParameters().call()
@@ -83,8 +99,4 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   //     baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
   //   }
   // }
-  async getActiveProposals() {
-    const ids = await this.contract.methods.getActiveProposalIds().call()
-    return ids.map(valueToBigNumber)
-  }
 }

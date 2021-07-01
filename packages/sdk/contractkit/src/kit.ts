@@ -130,6 +130,7 @@ export class ContractKit {
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
+      this.contracts.getGrandaMento(),
     ]
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
@@ -145,6 +146,7 @@ export class ContractKit {
       contracts[7].getConfig(),
       contracts[8].getConfig(),
       contracts[9].getConfig(),
+      // TODO add here
     ])
     return {
       exchanges: res[0],
@@ -175,6 +177,7 @@ export class ContractKit {
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
       this.contracts.getBlockchainParameters(),
+      this.contracts.getGrandaMento(),
     ]
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
@@ -190,6 +193,7 @@ export class ContractKit {
       contracts[7].getHumanReadableConfig(),
       contracts[8].getHumanReadableConfig(),
       contracts[9].getConfig(),
+      // TODO add here
     ])
     return {
       exchanges: res[0],
