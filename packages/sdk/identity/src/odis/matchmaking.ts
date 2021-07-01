@@ -47,6 +47,8 @@ export async function getContactMatches(
   }
   if (dekSigner) {
     body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
+  } else {
+    console.warn('Failure to provide DEK will prevent users from requerying their matches')
   }
 
   const response = await queryOdis<MatchmakingResponse>(signer, body, context, MATCHMAKING_ENDPOINT)
