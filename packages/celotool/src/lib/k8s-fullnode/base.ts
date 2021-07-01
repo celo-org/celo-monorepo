@@ -51,7 +51,7 @@ export abstract class BaseFullNodeDeployer {
       this.kubeNamespace,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters(helmChartPath, context)
+      await this.helmParameters(context)
     )
 
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
@@ -71,7 +71,7 @@ export abstract class BaseFullNodeDeployer {
       this.kubeNamespace,
       this.releaseName,
       helmChartPath,
-      await this.helmParameters(helmChartPath, context)
+      await this.helmParameters(context)
     )
 
     await scaleResource(
@@ -91,7 +91,7 @@ export abstract class BaseFullNodeDeployer {
     await this.deallocateAllIPs()
   }
 
-  async helmParameters(helmChartPath: string, context: string) {
+  async helmParameters(context: string) {
     let nodeKeys: string[] | undefined
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       nodeKeys = range(this._deploymentConfig.replicas).map((index: number) =>
