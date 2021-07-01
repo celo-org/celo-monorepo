@@ -131,7 +131,7 @@ describe(getRemainingQueryCount, () => {
     )
     contractKitVerifiedNoTx.contracts[ContractRetrieval.getStableToken] = jest.fn(
       (stableToken: StableToken) => {
-        return stableToken === undefined
+        return stableToken === StableToken.cUSD
           ? createMockToken(new BigNumber(200000000000000000))
           : createMockToken(new BigNumber(0))
       }

@@ -164,10 +164,10 @@ async function _getQueryQuota(logger: Logger, account: string, hashedPhoneNumber
 
   await Promise.all([
     new Promise((resolve) => {
-      resolve(getDollarBalance(logger, account, walletAddress))
+      resolve(getStableTokenBalance(StableToken.cUSD, logger, account, walletAddress))
     }),
     new Promise((resolve) => {
-      resolve(getEuroBalance(logger, account, walletAddress))
+      resolve(getStableTokenBalance(StableToken.cEUR, logger, account, walletAddress))
     }),
     new Promise((resolve) => {
       resolve(getCeloBalance(logger, account, walletAddress))
@@ -256,40 +256,18 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
   return res
 }
 
-export async function getDollarBalance(logger: Logger, ...addresses: string[]): Promise<BigNumber> {
-  return Promise.all(
-    addresses
-      .filter((address) => address !== NULL_ADDRESS)
-      .map((address) =>
-        retryAsyncWithBackOffAndTimeout(
-          async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
-          RETRY_COUNT,
-          [],
-          RETRY_DELAY_IN_MS,
-          undefined,
-          FULL_NODE_TIMEOUT_IN_MS
-        ).catch((err) => {
-          Counters.blockchainErrors.labels(Labels.read).inc()
-          throw err
-        })
-      )
-  ).then((values) => {
-    logger.trace(
-      { addresses, balances: values.map((bn) => bn.toString()) },
-      'Fetched cusd balances for addresses'
-    )
-    return values.reduce((a, b) => a.plus(b))
-  })
-}
-
-export async function getEuroBalance(logger: Logger, ...addresses: string[]): Promise<BigNumber> {
+export async function getStableTokenBalance(
+  stableToken: StableToken,
+  logger: Logger,
+  ...addresses: string[]
+): Promise<BigNumber> {
   return Promise.all(
     addresses
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOffAndTimeout(
           async () =>
-            (await getContractKit().contracts.getStableToken(StableToken.cEUR)).balanceOf(address),
+            (await getContractKit().contracts.getStableToken(stableToken)).balanceOf(address),
           RETRY_COUNT,
           [],
           RETRY_DELAY_IN_MS,
