@@ -12,8 +12,10 @@ export class Account {
   [ACCOUNTS_COLUMNS.createdAt]: Date = new Date();
   [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
 
-  constructor(address: string, signedUserPhoneNumber: string) {
+  constructor(address: string, signedUserPhoneNumber?: string) {
     this.address = address
-    this.signedUserPhoneNumber = signedUserPhoneNumber
+    if (signedUserPhoneNumber) {
+      this.signedUserPhoneNumber = signedUserPhoneNumber
+    }
   }
 }

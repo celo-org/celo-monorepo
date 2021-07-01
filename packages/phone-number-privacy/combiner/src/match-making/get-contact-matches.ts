@@ -57,11 +57,12 @@ export async function handleGetContactMatches(
       return
     }
 
-    // Verify that signedUserPhoneNumber was signed by the account's DEK
     let signedUserPhoneNumberHash: string | undefined
-    let shouldStoreRequest = true
+
+    // Verify that signedUserPhoneNumber was signed by the account's DEK
     if (signedUserPhoneNumber) {
       let isValidSig = false
+      let didRetrieveDEK = true
       try {
         isValidSig = await verifySignedUserPhoneNumberSignature(
           account,
@@ -75,7 +76,7 @@ export async function handleGetContactMatches(
             'Failed to retrieve DEK to verify signedUserPhoneNumber. Signature is assumed valid and request is not recorded.'
           )
           isValidSig = true
-          shouldStoreRequest = false
+          didRetrieveDEK = false
         } else {
           throw error
         }
@@ -84,12 +85,14 @@ export async function handleGetContactMatches(
         respondWithError(response, 403, WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE, logger)
         return
       }
-
-      // Hash signed number one more time for good measure
-      signedUserPhoneNumberHash = crypto
-        .createHash('sha256')
-        .update(signedUserPhoneNumber)
-        .digest('base64')
+      if (didRetrieveDEK) {
+        // Hash signed number for good measure
+        // If we did not retrieve the DEK, then signedUserPhoneNumberHash will remain null and not be stored in db.
+        signedUserPhoneNumberHash = crypto
+          .createHash('sha256')
+          .update(signedUserPhoneNumber)
+          .digest('base64')
+      }
     }
 
     if (await getDidMatchmaking(account, logger)) {
@@ -110,17 +113,31 @@ export async function handleGetContactMatches(
           logger
         )
         if (!signedUserPhoneNumberRecord) {
-          // Account has performed matchmaking before and has provided a phone number dek signature
-          // but we do not have a record of their phone number signature in the db.
-          logger.info(
-            { account },
-            'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
-          )
-          if (shouldStoreRequest && signedUserPhoneNumberHash) {
-            await setAccountSignedUserPhoneNumberRecord(account, signedUserPhoneNumberHash, logger)
+          if (signedUserPhoneNumberRecord === '') {
+            // Account has performed matchmaking before and has provided a phone number dek signature
+            // but we do not have a record of their phone number signature in the db.
+            logger.info(
+              { account },
+              'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
+            )
+            if (signedUserPhoneNumberHash) {
+              await setAccountSignedUserPhoneNumberRecord(
+                account,
+                signedUserPhoneNumberHash,
+                logger
+              )
+            }
+          } else if (signedUserPhoneNumber === undefined) {
+            // Account has performed matchmaking before and has provided a phone number dek signature
+            // but we were unable to find a record of their phone number signature due to a db error.
+            logger.info(
+              { account },
+              'Allowing account to perform matchmaking due to db error finding phone number record. We will not record the phone number this time.'
+            )
+            signedUserPhoneNumberHash = undefined // To prevent overwriting the old number
           }
-        } else {
-          if (signedUserPhoneNumberRecord !== signedUserPhoneNumberHash!) {
+        } else if (signedUserPhoneNumberHash) {
+          if (signedUserPhoneNumberRecord !== signedUserPhoneNumberHash) {
             // Account has performed matchmaking before and has provided a phone number dek signature
             // but the phone number signature we have stored in the db does not match what they provided.
             logger.info(
@@ -152,9 +169,7 @@ export async function handleGetContactMatches(
     )
 
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
-    if (shouldStoreRequest && signedUserPhoneNumberHash) {
-      await setDidMatchmaking(account, signedUserPhoneNumberHash, logger)
-    }
+    await setDidMatchmaking(account, logger, signedUserPhoneNumberHash)
     response.json({ success: true, matchedContacts, version: VERSION })
   } catch (err) {
     logger.error('Failed to getContactMatches')

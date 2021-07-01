@@ -138,7 +138,7 @@ export async function queryOdis<ResponseType>(
 
   let authHeader = ''
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    authHeader = signWithDEK(bodyString, signer)
+    authHeader = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     authHeader = await signer.contractKit.connection.sign(bodyString, body.account)
   } else {

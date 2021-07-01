@@ -45,7 +45,7 @@ export function identifierIsValidIfExists(
 }
 
 export function hasValidIdentifier(requestBody: GetContactMatchesRequest): boolean {
-  return !!requestBody.hashedPhoneNumber || isByte32(requestBody.hashedPhoneNumber)
+  return !!requestBody.hashedPhoneNumber && isByte32(requestBody.hashedPhoneNumber)
 }
 
 function isValidObfuscatedPhoneNumber(phoneNumber: string) {

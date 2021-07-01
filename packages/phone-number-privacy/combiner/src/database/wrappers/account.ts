@@ -84,16 +84,22 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
  */
 export async function setDidMatchmaking(
   account: string,
-  signedUserPhoneNumber: string,
-  logger: Logger
+  logger: Logger,
+  signedUserPhoneNumber?: string
 ) {
   logger.debug({ account }, 'Setting did matchmaking')
   if (await getAccountExists(account, logger)) {
     try {
+      if (signedUserPhoneNumber) {
+        return accounts()
+          .where(ACCOUNTS_COLUMNS.address, account)
+          .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+          .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
+          .timeout(DB_TIMEOUT)
+      }
       return accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
-        .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
         .timeout(DB_TIMEOUT)
     } catch (err) {
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
