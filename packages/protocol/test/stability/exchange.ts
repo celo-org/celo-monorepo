@@ -140,7 +140,7 @@ contract('Exchange', (accounts: string[]) => {
     exchange = await Exchange.new()
     await exchange.initialize(
       registry.address,
-      stableToken.address,
+      'StableToken',
       spread,
       reserveFraction,
       updateFrequency,
@@ -159,7 +159,7 @@ contract('Exchange', (accounts: string[]) => {
       await assertRevert(
         exchange.initialize(
           registry.address,
-          stableToken.address,
+          'StableToken',
           spread,
           reserveFraction,
           updateFrequency,
