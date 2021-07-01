@@ -1043,7 +1043,7 @@ contract Governance is
    */
   function dequeueProposalsIfReady() public {
     // solhint-disable-next-line not-rely-on-time
-    if (now >= lastDequeue.add(dequeueFrequency)) {
+    if (queue.list.numElements > 0 && now >= lastDequeue.add(dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
