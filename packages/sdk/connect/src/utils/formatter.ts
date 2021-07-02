@@ -133,6 +133,7 @@ export function inputBlockNumberFormatter(blockNumber: BlockNumber) {
 }
 
 export function outputBlockHeaderFormatter(blockHeader: any): BlockHeader {
+  // transform to number
   blockHeader.gasLimit = hexToNumber(blockHeader.gasLimit)
   blockHeader.gasUsed = hexToNumber(blockHeader.gasUsed)
   blockHeader.size = hexToNumber(blockHeader.size)
@@ -140,21 +141,11 @@ export function outputBlockHeaderFormatter(blockHeader: any): BlockHeader {
   if (blockHeader.number !== null) {
     blockHeader.number = hexToNumber(blockHeader.number)
   }
-  if (blockHeader.miner) {
-    blockHeader.miner = toChecksumAddress(blockHeader.miner)
-  }
   return blockHeader as BlockHeader
 }
 
 export function outputBlockFormatter(block: any): Block {
-  // transform to number
-  block.gasLimit = hexToNumber(block.gasLimit)
-  block.gasUsed = hexToNumber(block.gasUsed)
-  block.size = hexToNumber(block.size)
-  block.timestamp = hexToNumber(block.timestamp)
-  if (block.number !== null) {
-    block.number = hexToNumber(block.number)
-  }
+  block = outputBlockHeaderFormatter(block)
 
   if (block.difficulty) {
     block.difficulty = outputBigNumberFormatter(block.difficulty)
@@ -169,10 +160,6 @@ export function outputBlockFormatter(block: any): Block {
         return outputCeloTxFormatter(item)
       }
     })
-  }
-
-  if (block.miner) {
-    block.miner = toChecksumAddress(block.miner)
   }
 
   return block as Block
