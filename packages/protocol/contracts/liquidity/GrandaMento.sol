@@ -473,7 +473,7 @@ contract GrandaMento is
    * @notice Gets the proposal identifiers of exchange proposals in the
    * Proposed or Approved state. Returns a version of activeProposalIdsSuperset
    * with inactive proposal IDs set as 0.
-   * @dev Elements with a proposal ID of 0 should be filtered out.
+   * @dev Elements with a proposal ID of 0 should be filtered out by the consumer.
    * @return An array of active exchange proposals IDs.
    */
   function getActiveProposalIds() external view returns (uint256[] memory) {
