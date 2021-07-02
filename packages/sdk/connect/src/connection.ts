@@ -409,11 +409,18 @@ export class Connection {
     return hexToNumber(response.result)!
   }
 
+  private isBlockNumberHash = (blockNumber: BlockNumber) =>
+    blockNumber instanceof String && blockNumber.indexOf('0x') === 0
+
   getBlock = async (
     blockHashOrBlockNumber: BlockNumber,
     fullTxObjects: boolean = true
   ): Promise<Block> => {
-    const response = await this.rpcCaller.call('eth_getBlockByNumberOrHash', [
+    const endpoint = this.isBlockNumberHash(blockHashOrBlockNumber)
+      ? 'eth_getBlockByHash' // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
+      : 'eth_getBlockByNumber' // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
+
+    const response = await this.rpcCaller.call(endpoint, [
       inputBlockNumberFormatter(blockHashOrBlockNumber),
       fullTxObjects,
     ])
@@ -422,15 +429,19 @@ export class Connection {
   }
 
   getBlockHeader = async (blockHashOrBlockNumber: BlockNumber): Promise<BlockHeader> => {
-    const response = await this.rpcCaller.call('eth_getHeaderByNumberOrHash', [
+    const endpoint = this.isBlockNumberHash(blockHashOrBlockNumber)
+      ? 'eth_getHeaderByHash'
+      : 'eth_getHeaderByNumber'
+
+    const response = await this.rpcCaller.call(endpoint, [
       inputBlockNumberFormatter(blockHashOrBlockNumber),
     ])
 
     return outputBlockHeaderFormatter(response.result)
   }
 
-  getLatestTimestamp = async () => (await this.getBlockHeader('latest')).timestamp
-  now = this.getLatestTimestamp // alias
+  getLatestTimesatamp = async () => (await this.getBlockHeader('latest')).timestamp as number
+  now = this.getLatestTimesatamp // alias
 
   getBalance = async (address: Address, defaultBlock?: BlockNumber): Promise<string> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getBalance
