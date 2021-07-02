@@ -429,6 +429,9 @@ export class Connection {
     return outputBlockHeaderFormatter(response.result)
   }
 
+  getLatestTimestamp = async () => (await this.getBlockHeader('latest')).timestamp
+  now = this.getLatestTimestamp // alias
+
   getBalance = async (address: Address, defaultBlock?: BlockNumber): Promise<string> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getBalance
     const response = await this.rpcCaller.call('eth_getBalance', [
