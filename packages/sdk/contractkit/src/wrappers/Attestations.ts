@@ -705,6 +705,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       state: AttestationServiceStatusState.NoAttestationSigner,
       version: null,
       ageOfLatestBlock: null,
+      smsProvidersRandomized: null,
+      maxDeliveryAttempts: null,
+      maxRerequestMins: null,
     }
 
     if (!hasAttestationSigner) {
@@ -760,6 +763,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.state = ret.rightAccount
         ? AttestationServiceStatusState.Valid
         : AttestationServiceStatusState.WrongAccount
+      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
+      ret.smsProvidersRandomized = statusResponseBody.smsProvidersRandomized
+      ret.maxDeliveryAttempts = statusResponseBody.maxDeliveryAttempts
+      ret.maxRerequestMins = statusResponseBody.maxRerequestMins
 
       // Healthcheck was added in 1.0.1, same time version started being reported.
       if (statusResponseBody.version) {
@@ -843,4 +850,7 @@ export interface AttestationServiceStatusResponse {
   state: AttestationServiceStatusState
   version: string | null
   ageOfLatestBlock: number | null
+  smsProvidersRandomized: boolean | null
+  maxDeliveryAttempts: number | null
+  maxRerequestMins: number | null
 }

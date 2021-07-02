@@ -190,6 +190,9 @@ async function processAttestationServiceStatusForValidator(
     state,
     version,
     ageOfLatestBlock,
+    smsProvidersRandomized,
+    maxDeliveryAttempts,
+    maxRerequestMins,
   } = status
   const isElected = electedValidators.has(validator.address)
   dataLogger.info(
@@ -208,6 +211,9 @@ async function processAttestationServiceStatusForValidator(
       state,
       version,
       ageOfLatestBlock,
+      smsProvidersRandomized,
+      maxDeliveryAttempts,
+      maxRerequestMins,
     },
     'checked_attestation_service_status'
   )
