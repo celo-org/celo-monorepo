@@ -8,6 +8,7 @@ import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import {
   Address,
   Block,
+  BlockHeader,
   BlockNumber,
   CeloTx,
   CeloTxObject,
@@ -25,6 +26,7 @@ import {
   inputSignFormatter,
   outputBigNumberFormatter,
   outputBlockFormatter,
+  outputBlockHeaderFormatter,
   outputCeloTxFormatter,
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
@@ -411,19 +413,20 @@ export class Connection {
     blockHashOrBlockNumber: BlockNumber,
     fullTxObjects: boolean = true
   ): Promise<Block> => {
-    // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
-    let fnCall = 'eth_getBlockByNumber'
-    if (blockHashOrBlockNumber instanceof String && blockHashOrBlockNumber.indexOf('0x') === 0) {
-      // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
-      fnCall = 'eth_getBlockByHash'
-    }
-
-    const response = await this.rpcCaller.call(fnCall, [
+    const response = await this.rpcCaller.call('eth_getBlockByNumberOrHash', [
       inputBlockNumberFormatter(blockHashOrBlockNumber),
       fullTxObjects,
     ])
 
     return outputBlockFormatter(response.result)
+  }
+
+  getBlockHeader = async (blockHashOrBlockNumber: BlockNumber): Promise<BlockHeader> => {
+    const response = await this.rpcCaller.call('eth_getHeaderByNumberOrHash', [
+      inputBlockNumberFormatter(blockHashOrBlockNumber),
+    ])
+
+    return outputBlockHeaderFormatter(response.result)
   }
 
   getBalance = async (address: Address, defaultBlock?: BlockNumber): Promise<string> => {

@@ -3,7 +3,15 @@ import { isValidAddress, toChecksumAddress } from '@celo/utils/lib/address'
 import { sha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { encode } from 'utf8'
-import { Block, BlockNumber, CeloTx, CeloTxPending, CeloTxReceipt, Log } from '../types'
+import {
+  Block,
+  BlockHeader,
+  BlockNumber,
+  CeloTx,
+  CeloTxPending,
+  CeloTxReceipt,
+  Log,
+} from '../types'
 
 /**
  * Formats the input of a transaction and converts all values to HEX
@@ -122,6 +130,20 @@ export function inputBlockNumberFormatter(blockNumber: BlockNumber) {
   return isHexStrict(blockNumber.toString())
     ? blockNumber.toString().toLocaleLowerCase()
     : numberToHex(blockNumber.toString())!
+}
+
+export function outputBlockHeaderFormatter(blockHeader: any): BlockHeader {
+  blockHeader.gasLimit = hexToNumber(blockHeader.gasLimit)
+  blockHeader.gasUsed = hexToNumber(blockHeader.gasUsed)
+  blockHeader.size = hexToNumber(blockHeader.size)
+  blockHeader.timestamp = hexToNumber(blockHeader.timestamp)
+  if (blockHeader.number !== null) {
+    blockHeader.number = hexToNumber(blockHeader.number)
+  }
+  if (blockHeader.miner) {
+    blockHeader.miner = toChecksumAddress(blockHeader.miner)
+  }
+  return blockHeader as BlockHeader
 }
 
 export function outputBlockFormatter(block: any): Block {
