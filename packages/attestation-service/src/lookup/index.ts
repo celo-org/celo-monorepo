@@ -1,11 +1,12 @@
-import { VerifiableCredentialUtils } from '@celo/utils'
+import { SignatureUtils, VerifiableCredentialUtils } from '@celo/utils'
 import Logger from 'bunyan'
 import { shuffle } from 'lodash'
 import { useKit } from '../db'
 import { fetchEnv, fetchEnvOrDefault, getAttestationSignerAddress, isYes } from '../env'
 import { Counters } from '../metrics'
 import { AttestationModel } from '../models/attestation'
-import { LookupProvider, LookupProviderType, obfuscateNumber } from './base'
+import { obfuscateNumber } from '../utils/phone_number'
+import { LookupProvider, LookupProviderType } from './base'
 import { TwilioLookupProvider } from './twilio'
 import { VonageLookupProvider } from './vonage'
 
@@ -80,10 +81,12 @@ export const issueAttestationPhoneNumberTypeCredential = async (
       credential,
       proofOptions,
       async (signInput) =>
-        await useKit((kit) =>
-          kit.connection.sign(
-            signInput.ethereumPersonalMessage,
-            getAttestationSignerAddress().toLowerCase()
+        await useKit(async (kit) =>
+          SignatureUtils.serializeSignature(
+            await kit.connection.signTypedData(
+              getAttestationSignerAddress().toLowerCase(),
+              signInput
+            )
           )
         )
     )
@@ -100,7 +103,6 @@ async function lookupPhoneNumber(
 ): Promise<LookupProviderType> {
   const providers = getLookupProviders()
   const provider = providers[attestation.attempt % providers.length]
-  console.log(providers)
   try {
     logger.info(
       {
@@ -118,7 +120,6 @@ async function lookupPhoneNumber(
   } catch (error) {
     const errorMsg = `${error.message ?? error}`
     attestation.recordError(errorMsg)
-    console.log(errorMsg)
 
     logger.info(
       {

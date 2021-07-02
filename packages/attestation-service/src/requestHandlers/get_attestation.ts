@@ -15,7 +15,7 @@ import {
 } from '../db'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError } from '../request'
-import { obfuscateNumber } from '../sms/base'
+import { obfuscateNumber } from '../utils/phone_number'
 
 const MAX_SECURITY_CODE_ATTEMPTS = 5
 

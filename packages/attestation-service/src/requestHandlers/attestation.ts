@@ -12,7 +12,7 @@ import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
 import { rerequestAttestation, startSendSms } from '../sms'
-import { obfuscateNumber } from '../sms/base'
+import { obfuscateNumber } from '../utils/phone_number'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'

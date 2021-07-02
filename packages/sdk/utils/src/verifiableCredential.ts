@@ -45,6 +45,36 @@ export const getProofOptions = (issuer: string) => {
   return JSON.stringify({
     verificationMethod: `did:pkh:eth:${issuer.toLowerCase()}#Recovery2020`,
     proofPurpose: 'assertionMethod',
+    eip712Domain: {
+      primaryType: 'VerifiableCredential',
+      domain: {
+        name: 'Celo Phone Number Type Verifiable Credential',
+      },
+      messageSchema: {
+        EIP712Domain: [{ name: 'name', type: 'string' }],
+        VerifiableCredential: [
+          { name: '@context', type: 'string[]' },
+          { name: 'type', type: 'string[]' },
+          { name: 'issuer', type: 'string' },
+          { name: 'issuanceDate', type: 'string' },
+          { name: 'credentialSubject', type: 'CredentialSubject' },
+          { name: 'proof', type: 'Proof' },
+        ],
+        CredentialSubject: [
+          { name: 'id', type: 'string' },
+          { name: 'phoneNumberType', type: 'string' },
+          { name: 'identifier', type: 'string' },
+          { name: 'phoneNumberTypeProvider', type: 'string' },
+        ],
+        Proof: [
+          { name: '@context', type: 'string' },
+          { name: 'verificationMethod', type: 'string' },
+          { name: 'created', type: 'string' },
+          { name: 'proofPurpose', type: 'string' },
+          { name: 'type', type: 'string' },
+        ],
+      },
+    },
   })
 }
 
@@ -82,7 +112,7 @@ export const issueCredential = async (
     kty: 'EC',
     crv: 'secp256k1',
     alg: 'ES256K-R',
-    key_ops: ['signPersonalMessage'],
+    key_ops: ['signTypedData'],
   }
 ): Promise<string> => {
   const preparation = JSON.parse(

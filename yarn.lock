@@ -10276,8 +10276,10 @@ dicer@^0.3.0:
   dependencies:
     streamsearch "0.1.2"
 
-"didkit-wasm-node@file:../didkit/lib/web/pkg/node":
-  version "0.1.0"
+didkit-wasm-node@0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/didkit-wasm-node/-/didkit-wasm-node-0.1.4.tgz#806e1f672d8721e2e101560e1a7af794ac6078cf"
+  integrity sha512-Ev2pChUFxBi/aNg7HA66vWxGj+W4oO0RghFmoz0XlrSFHMPt+mWu0/UpnxUK1mfODOkM30J0LnYoXuHCf1qvkA==
 
 diff-sequences@^26.6.2:
   version "26.6.2"
