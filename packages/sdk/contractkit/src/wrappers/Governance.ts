@@ -388,9 +388,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     this.getApprover().then((address) => this.kit.contracts.getMultiSig(address))
 
   getProposalStage = async (proposalID: BigNumber.Value): Promise<ProposalStage> => {
-    const queue = await this.getQueue()
-    const existsInQueue = queue.find((u) => u.proposalID === proposalID) !== undefined
-    if (existsInQueue) {
+    if (await this.isQueued(proposalID)) {
       const expired = await this.isQueuedProposalExpired(proposalID)
       return expired ? ProposalStage.Expiration : ProposalStage.Queued
     }
@@ -555,6 +553,23 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    */
   isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(valueToString))
+
+  /**
+   * @returns UNIX timestamp (in seconds) when another dequeue becomes possible
+   */
+  nextDequeue = async () => {
+    const dequeueFrequency = await this.dequeueFrequency()
+    const lastDequeue = await this.lastDequeue()
+    return lastDequeue.plus(dequeueFrequency)
+  }
+
+  /**
+   * @returns time in seconds until another dequeue is possible
+   */
+  timeToNextDequeue = async () => {
+    const nextDequeue = await this.nextDequeue()
+    return Math.floor(Date.now() / 1000) - nextDequeue.toNumber()
+  }
 
   /**
    * Returns the value of proposal deposits that have been refunded.
