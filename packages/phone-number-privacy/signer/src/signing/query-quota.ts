@@ -281,7 +281,7 @@ export async function getStableTokenBalance(
   ).then((values) => {
     logger.trace(
       { addresses, balances: values.map((bn) => bn.toString()) },
-      'Fetched ceur balances for addresses'
+      `Fetched ${stableToken} balances for addresses`
     )
     return values.reduce((a, b) => a.plus(b))
   })
