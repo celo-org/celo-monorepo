@@ -141,6 +141,9 @@ export function outputBlockHeaderFormatter(blockHeader: any): BlockHeader {
   if (blockHeader.number !== null) {
     blockHeader.number = hexToNumber(blockHeader.number)
   }
+  if (blockHeader.miner) {
+    blockHeader.miner = toChecksumAddress(blockHeader.miner)
+  }
   return blockHeader as BlockHeader
 }
 
