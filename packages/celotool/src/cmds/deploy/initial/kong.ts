@@ -7,17 +7,10 @@ export const command = 'kong'
 
 export const describe = 'deploy Kong and Konga packages'
 
-export type KongInitialArgv = InitialArgv &
-  ContextArgv & {
-    skipClusterSetup: boolean
-  }
+export type KongInitialArgv = InitialArgv & ContextArgv
 
 export const builder = (argv: KongInitialArgv) => {
-  return addContextMiddleware(argv).option('skipClusterSetup', {
-    type: 'boolean',
-    description: 'If you know that you can skip the cluster setup',
-    default: false,
-  })
+  return addContextMiddleware(argv)
 }
 
 export const handler = async (argv: KongInitialArgv) => {
