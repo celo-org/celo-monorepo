@@ -125,7 +125,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
     it('#upvote', async () => {
       await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
+      // shouldTimeTravel is false so getUpvotes isn't on dequeued proposal
+      await upvoteFn(accounts[1], false)
 
       const voteWeight = await governance.getVoteWeight(accounts[1])
       const upvotes = await governance.getUpvotes(proposalID)
@@ -135,7 +136,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
     it('#revokeUpvote', async () => {
       await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
+      // shouldTimeTravel is false so revoke isn't on dequeued proposal
+      await upvoteFn(accounts[1], false)
 
       const before = await governance.getUpvotes(proposalID)
       const upvoteRecord = await governance.getUpvoteRecord(accounts[1])
