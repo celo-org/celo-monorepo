@@ -5,8 +5,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/InitializableV2.sol";
-import "../common/linkedlists/IntegerLinkedList.sol";
-import "../common/linkedlists/LinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -23,7 +21,6 @@ contract GrandaMento is
   ReentrancyGuard
 {
   using FixidityLib for FixidityLib.Fraction;
-  using IntegerLinkedList for LinkedList.List;
   using SafeMath for uint256;
 
   // Emitted when a new exchange proposal is created.
@@ -128,9 +125,18 @@ contract GrandaMento is
   // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
 
-  // A list of all exchange proposals that are currently in the Proposed or
-  // Approved state. Used for easily viewing all the active exchange proposals.
-  LinkedList.List private activeProposalIds;
+  // An array containing a superset of the IDs of exchange proposals that are currently
+  // in the Proposed or Approved state. Intended to allow easy viewing of all active
+  // exchange proposals. It's possible for a proposal ID in this array to no longer be
+  // active, so filtering is required to find the true set of active proposal IDs.
+  // A superset is kept because exchange proposal vetoes, intended to be done
+  // by Governance, effectively go through a multi-day timelock. If the veto
+  // call was required to provide the index in an array of activeProposalIds to
+  // remove corresponding to the vetoed exchange proposal, the timelock could result
+  // in the provided index being stale by the time the veto would be executed.
+  // Alternative approaches exist, like maintaining a linkedlist of active proposal
+  // IDs, but this approach was chosen for its low implementation complexity.
+  uint256[] public activeProposalIdsSuperset;
 
   // Number of exchange proposals that have ever been created. Used for assigning
   // an exchange proposal ID to a new proposal.
@@ -232,26 +238,24 @@ contract GrandaMento is
 
     // Record the proposal.
     // Add 1 to the running proposal count, and use the updated proposal count as
-    // the proposal ID. Proposal IDs intentionally start at 1 rather than 0 because
-    // LinkedList, which is used for keeping track of active proposal IDs, requires
-    // keys to be non-zero.
+    // the proposal ID. Proposal IDs intentionally start at 1.
     exchangeProposalCount = exchangeProposalCount.add(1);
-    // For stable tokens, is saved in units to deal with demurrage.
-    // uint256 storedSellAmount = sellCelo
-    //   ? sellAmount
-    //   : IStableToken(stableToken).valueToUnits(sellAmount);
+    // For stable tokens, the amount is stored in units to deal with demurrage.
+    uint256 storedSellAmount = sellCelo
+      ? sellAmount
+      : IStableToken(stableToken).valueToUnits(sellAmount);
     exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
       stableToken: stableToken,
       state: ExchangeProposalState.Proposed,
       sellCelo: sellCelo,
-      sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
+      sellAmount: storedSellAmount,
       buyAmount: buyAmount,
       celoStableTokenExchangeRate: celoStableTokenExchangeRate,
       approvalTimestamp: 0 // initial value when not approved yet
     });
-    // Push it into the list of active proposals.
-    activeProposalIds.push(exchangeProposalCount);
+    // Push it into the array of active proposals.
+    activeProposalIdsSuperset.push(exchangeProposalCount);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
     emit ExchangeProposalCreated(
       exchangeProposalCount,
@@ -313,8 +317,6 @@ contract GrandaMento is
     );
     // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
-    // Remove the proposal from the active list. This operation is O(1).
-    activeProposalIds.remove(proposalId);
     // Get the token and amount that will be refunded to the proposer.
     (IERC20 refundToken, uint256 refundAmount) = getSellTokenAndSellAmount(proposal);
     // Finally, transfer out the deposited funds.
@@ -342,9 +344,6 @@ contract GrandaMento is
     );
     // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Executed;
-    // Remove the proposal from the active list. This operation is O(1).
-    activeProposalIds.remove(proposalId);
-
     // Perform the exchange.
     (IERC20 sellToken, uint256 sellAmount) = getSellTokenAndSellAmount(proposal);
     // If the exchange sells CELO, the CELO is sent to the Reserve from this contract
@@ -446,12 +445,53 @@ contract GrandaMento is
   }
 
   /**
-   * @notice Gets the proposal identifiers of all exchange proposals in the
-   * Proposed or Approved state.
+   * @notice Removes the proposal ID found at the provided index of activeProposalIdsSuperset
+   * if the exchange proposal is not active.
+   * @dev Anyone can call. Reverts if the exchange proposal is active.
+   * @param index The index of the proposal ID to remove from activeProposalIdsSuperset.
+   */
+  function removeFromActiveProposalIdsSuperset(uint256 index) external {
+    require(index < activeProposalIdsSuperset.length, "Index out of bounds");
+    uint256 proposalId = activeProposalIdsSuperset[index];
+    // Require the exchange proposal to be inactive.
+    require(
+      exchangeProposals[proposalId].state != ExchangeProposalState.Proposed &&
+        exchangeProposals[proposalId].state != ExchangeProposalState.Approved,
+      "Exchange proposal not inactive"
+    );
+    // If not removing the last element, overwrite the index with the value of
+    // the last element.
+    uint256 lastIndex = activeProposalIdsSuperset.length.sub(1);
+    if (index < lastIndex) {
+      activeProposalIdsSuperset[index] = activeProposalIdsSuperset[lastIndex];
+    }
+    // Delete the last element.
+    activeProposalIdsSuperset.length--;
+  }
+
+  /**
+   * @notice Gets the proposal identifiers of exchange proposals in the
+   * Proposed or Approved state. Returns a version of activeProposalIdsSuperset
+   * with inactive proposal IDs set as 0.
+   * @dev Elements with a proposal ID of 0 should be filtered out.
    * @return An array of active exchange proposals IDs.
    */
   function getActiveProposalIds() external view returns (uint256[] memory) {
-    return activeProposalIds.getKeys();
+    // Solidity doesn't play well with dynamically sized memory arrays.
+    // Instead, this array is created with the same length as activeProposalIdsSuperset,
+    // and will replace elements that are inactive proposal IDs with the value 0.
+    uint256[] memory activeProposalIds = new uint256[](activeProposalIdsSuperset.length);
+
+    for (uint256 i = 0; i < activeProposalIdsSuperset.length; i = i.add(1)) {
+      uint256 proposalId = activeProposalIdsSuperset[i];
+      if (
+        exchangeProposals[proposalId].state == ExchangeProposalState.Proposed ||
+        exchangeProposals[proposalId].state == ExchangeProposalState.Approved
+      ) {
+        activeProposalIds[i] = proposalId;
+      }
+    }
+    return activeProposalIds;
   }
 
   /**

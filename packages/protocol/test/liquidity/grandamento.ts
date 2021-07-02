@@ -240,16 +240,14 @@ contract('GrandaMento', (accounts: string[]) => {
       assertEqualBN(receipt2.logs[0].args.proposalId, 2)
     })
 
-    it('adds the exchange proposal to the activeProposalIds linked list', async () => {
+    it('adds the exchange proposal to the activeProposalIdsSuperset', async () => {
       await createExchangeProposal(false)
-      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
+      assertEqualBN(await grandaMento.activeProposalIdsSuperset(0), new BigNumber(1))
 
       // Add another
       await createExchangeProposal(false)
-      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-        new BigNumber(1),
-        new BigNumber(2),
-      ])
+      assertEqualBN(await grandaMento.activeProposalIdsSuperset(0), new BigNumber(1))
+      assertEqualBN(await grandaMento.activeProposalIdsSuperset(1), new BigNumber(2))
     })
 
     for (const sellCelo of [true, false]) {
@@ -425,11 +423,6 @@ contract('GrandaMento', (accounts: string[]) => {
         assertEqualBN(proposal.approvalTimestamp, latestBlock.timestamp)
       })
 
-      it('does not remove the exchange proposal from the activeProposalIds linked list', async () => {
-        await grandaMento.approveExchangeProposal(proposalId, { from: approver })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
-      })
-
       for (const rateChange of [-maxApprovalExchangeRateChange, maxApprovalExchangeRateChange]) {
         it(`tolerates ${
           rateChange > 0 ? 'an increase' : 'a decrease'
@@ -537,33 +530,6 @@ contract('GrandaMento', (accounts: string[]) => {
             proposalId: 1,
           },
         })
-      })
-
-      it('removes the exchange proposal from the activeProposalIds linked list', async () => {
-        // proposalId 1
-        await createExchangeProposal(false, alice)
-        // proposalId 2
-        await createExchangeProposal(false, alice)
-        // proposalId 3
-        await createExchangeProposal(false, alice)
-
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-          new BigNumber(1),
-          new BigNumber(2),
-          new BigNumber(3),
-        ])
-        // Remove 2
-        await grandaMento.cancelExchangeProposal(2, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-          new BigNumber(1),
-          new BigNumber(3),
-        ])
-        // Remove 1
-        await grandaMento.cancelExchangeProposal(1, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(3)])
-        // Remove 3
-        await grandaMento.cancelExchangeProposal(3, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
       })
 
       for (const sellCelo of [true, false]) {
@@ -691,12 +657,6 @@ contract('GrandaMento', (accounts: string[]) => {
             await grandaMento.exchangeProposals(1)
           )
           assert.equal(exchangeProposalAfter.state, ExchangeProposalState.Executed)
-        })
-
-        it('removes the exchange proposal from the activeProposalIds linked list', async () => {
-          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
-          await grandaMento.executeExchangeProposal(1)
-          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
         })
 
         describe('when selling stable token', () => {
@@ -843,6 +803,101 @@ contract('GrandaMento', (accounts: string[]) => {
         grandaMento.executeExchangeProposal(1),
         'Proposal must be in Approved state'
       )
+    })
+  })
+
+  describe('#removeFromActiveProposalIdsSuperset', () => {
+    beforeEach(async () => {
+      // proposalId 1
+      await createExchangeProposal(false, alice)
+      // proposalId 2
+      await createExchangeProposal(false, alice)
+      // proposalId 3
+      await createExchangeProposal(false, alice)
+    })
+
+    it('removes the exchange proposal from the activeProposalIdsSuperset', async () => {
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(1),
+        new BigNumber(2),
+        new BigNumber(3),
+      ])
+      // Remove ID 3
+      await grandaMento.cancelExchangeProposal(3, { from: alice })
+      // Remove ID 3, which is at index 2
+      await grandaMento.removeFromActiveProposalIdsSuperset(2)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(1),
+        new BigNumber(2),
+      ])
+
+      // Remove ID 1
+      await grandaMento.cancelExchangeProposal(1, { from: alice })
+      // Remove ID 1, which is at index 0
+      await grandaMento.removeFromActiveProposalIdsSuperset(0)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(2)])
+
+      // Remove ID 2
+      // Test with the exchange proposal being executed rather than cancelled
+      await grandaMento.approveExchangeProposal(2, { from: approver })
+      await timeTravel(vetoPeriodSeconds, web3)
+      await grandaMento.executeExchangeProposal(2)
+      // Remove ID 2, which is at index 0
+      await grandaMento.removeFromActiveProposalIdsSuperset(0)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
+    })
+
+    it('reverts if the exchange proposal is active', async () => {
+      await assertRevertWithReason(
+        grandaMento.removeFromActiveProposalIdsSuperset(0),
+        'Exchange proposal not inactive'
+      )
+    })
+
+    it('reverts if the provided index is out of bounds', async () => {
+      await assertRevertWithReason(
+        grandaMento.removeFromActiveProposalIdsSuperset(3),
+        'Index out of bounds'
+      )
+    })
+  })
+
+  describe('#getActiveProposalIds', () => {
+    beforeEach(async () => {
+      // proposalId 1
+      await createExchangeProposal(false, alice)
+      // proposalId 2
+      await createExchangeProposal(false, alice)
+      // proposalId 3
+      await createExchangeProposal(false, alice)
+    })
+
+    it('returns the active exchange proposal IDs when the superset has no inactive proposal IDs', async () => {
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(1),
+        new BigNumber(2),
+        new BigNumber(3),
+      ])
+    })
+
+    it('returns the active exchange proposal IDs with 0s for any inactive proposal IDs in the superset', async () => {
+      // cancel proposal ID 1
+      await grandaMento.cancelExchangeProposal(1, { from: alice })
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(0),
+        new BigNumber(2),
+        new BigNumber(3),
+      ])
+
+      // execute proposal ID 3
+      await grandaMento.approveExchangeProposal(3, { from: approver })
+      await timeTravel(vetoPeriodSeconds, web3)
+      await grandaMento.executeExchangeProposal(3)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(0),
+        new BigNumber(2),
+        new BigNumber(0),
+      ])
     })
   })
 
