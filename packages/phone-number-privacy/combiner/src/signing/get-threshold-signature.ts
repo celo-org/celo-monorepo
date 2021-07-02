@@ -158,12 +158,20 @@ async function requestSignatures(request: Request, response: Response) {
 
   logResponseDiscrepancies(responses, logger)
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-  if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
-  } else {
-    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
-    response.json({ success: true, combinedSignature, version: VERSION })
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
+        request.body.blindedQueryPhoneNumber,
+        logger
+      )
+      response.json({ success: true, combinedSignature, version: VERSION })
+      return
+    } catch {
+      // May fail upon combining signatures if too many sigs are invalid
+      // Fallback to handleMissingSignatures
+    }
   }
+  handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
 }
 
 async function handleSuccessResponse(
@@ -195,19 +203,25 @@ async function handleSuccessResponse(
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
   const signatureAdditionStart = Date.now()
-  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
+  await blsCryptoClient.addSignature(partialSig)
   logger.info(
     {
       signer: serviceUrl,
-      hasSufficientSignatures: blsCryptoClient.hasSufficientVerifiedSignatures(),
+      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(),
       additionLatency: Date.now() - signatureAdditionStart,
     },
     'Added signature'
   )
   // Send response immediately once we cross threshold
-  if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    // Close outstanding requests
-    controller.abort()
+  // BLS threshold signatures can be combined without all partial signatures
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      // Close outstanding requests
+      controller.abort()
+    } catch {
+      // Already logged, continue to collect signatures
+    }
   }
 }
 
