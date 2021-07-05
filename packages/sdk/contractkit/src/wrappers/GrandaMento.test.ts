@@ -66,7 +66,6 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     })
 
     it('updated the config', async () => {
-      // await increaseLimits() // TODO this should be in the before all but for some reason not working
       const config = await grandaMento.getConfig()
       expect(config.exchangeLimits.get(StableTokenName.cUSD)?.minExchangeAmount).toEqBigNumber(
         new BigNumber(newLimitMin)
@@ -90,7 +89,6 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
     describe('Has  a proposal', () => {
       beforeEach(async () => {
-        // create the proposal here
         sellAmount = new BigNumber('100000000')
         await (
           await celoToken.increaseAllowance(grandaMento.address, sellAmount)
@@ -130,7 +128,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
         expect(proposal.state).toEqual(ExchangeProposalState.Executed)
       })
 
-      it('Cancel proposal', async () => {
+      it('cancels proposal', async () => {
         await (await grandaMento.cancelExchangeProposal(1)).sendAndWaitForReceipt()
 
         const proposal = await grandaMento.getExchangeProposal('1')
