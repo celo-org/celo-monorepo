@@ -32,6 +32,13 @@ export enum CeloContract {
 
 export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
 
+type TokenKeys = { cUSD: StableTokenContract; cEUR: StableTokenContract }
+
+export const StableToken: TokenKeys = {
+  cUSD: CeloContract.StableToken,
+  cEUR: CeloContract.StableTokenEUR,
+}
+
 export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
 
 export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
