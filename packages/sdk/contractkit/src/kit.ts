@@ -146,7 +146,7 @@ export class ContractKit {
       contracts[7].getConfig(),
       contracts[8].getConfig(),
       contracts[9].getConfig(),
-      // TODO add here
+      contracts[10].getConfig(),
     ])
     return {
       exchanges: res[0],
@@ -193,7 +193,7 @@ export class ContractKit {
       contracts[7].getHumanReadableConfig(),
       contracts[8].getHumanReadableConfig(),
       contracts[9].getConfig(),
-      // TODO add here
+      contracts[10].getConfig(),
     ])
     return {
       exchanges: res[0],
