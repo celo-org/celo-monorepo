@@ -60,12 +60,12 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
   })
 
   describe('When Granda Mento is enabled', () => {
-    // beforeAll(async () => {
-    //   await increaseLimits()
-    // })
+    beforeEach(async () => {
+      await increaseLimits()
+    })
 
     it('has new limits', async () => {
-      await increaseLimits() // this should be in the before all but for some reason not working
+      // await increaseLimits() // this should be in the before all but for some reason not working
 
       console.log(StableTokenName.cUSD)
       const limits = await grandaMento.stableTokenExchangeLimits(StableTokenName.cUSD)
@@ -75,7 +75,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
     describe('Has  a proposal', () => {
       it('can submit a proposal', async () => {
-        await increaseLimits() // this should be in the before all but for some reason not working
+        // await increaseLimits() // this should be in the before all but for some reason not working
         console.log(await grandaMento.getAllStableTokenLimits())
         const sellAmount = new BigNumber('100000000')
         await (
@@ -115,7 +115,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
       })
 
       it('Cancel proposal', async () => {
-        await increaseLimits() // TODO this should be in the before all but for some reason not working
+        // await increaseLimits() // TODO this should be in the before all but for some reason not working
         const celoToken = await kit.contracts.getGoldToken()
         const sellAmount = new BigNumber('100000000')
         await (
@@ -133,7 +133,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
       })
 
       it('updated the config', async () => {
-        await increaseLimits()
+        // await increaseLimits() // TODO this should be in the before all but for some reason not working
         const config = await grandaMento.getConfig()
         expect(config.exchangeLimits.get(StableTokenName.cUSD)?.minExchangeAmount).toEqBigNumber(
           new BigNumber(newLimitMin)
