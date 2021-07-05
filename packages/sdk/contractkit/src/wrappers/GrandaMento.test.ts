@@ -19,6 +19,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
   let stableToken: StableTokenWrapper
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
+  let sellAmount: BigNumber
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
@@ -64,20 +65,33 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
       await increaseLimits()
     })
 
-    it('has new limits', async () => {
-      // await increaseLimits() // this should be in the before all but for some reason not working
+    it('updated the config', async () => {
+      // await increaseLimits() // TODO this should be in the before all but for some reason not working
+      const config = await grandaMento.getConfig()
+      expect(config.exchangeLimits.get(StableTokenName.cUSD)?.minExchangeAmount).toEqBigNumber(
+        new BigNumber(newLimitMin)
+      )
+      expect(config.exchangeLimits.get(StableTokenName.cUSD)?.maxExchangeAmount).toEqBigNumber(
+        new BigNumber(newLimitMax)
+      )
+      expect(config.exchangeLimits.get(StableTokenName.cEUR)?.minExchangeAmount).toEqBigNumber(
+        new BigNumber(0)
+      )
+      expect(config.exchangeLimits.get(StableTokenName.cEUR)?.maxExchangeAmount).toEqBigNumber(
+        new BigNumber(0)
+      )
+    })
 
-      console.log(StableTokenName.cUSD)
+    it('has new limits', async () => {
       const limits = await grandaMento.stableTokenExchangeLimits(StableTokenName.cUSD)
       expect(limits.minExchangeAmount).toEqBigNumber(newLimitMin)
       expect(limits.maxExchangeAmount).toEqBigNumber(newLimitMax)
     })
 
     describe('Has  a proposal', () => {
-      it('can submit a proposal', async () => {
-        // await increaseLimits() // this should be in the before all but for some reason not working
-        console.log(await grandaMento.getAllStableTokenLimits())
-        const sellAmount = new BigNumber('100000000')
+      beforeEach(async () => {
+        // create the proposal here
+        sellAmount = new BigNumber('100000000')
         await (
           await celoToken.increaseAllowance(grandaMento.address, sellAmount)
         ).sendAndWaitForReceipt()
@@ -85,7 +99,9 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
         await (
           await grandaMento.createExchangeProposal(StableTokenName.cUSD, sellAmount, true)
         ).sendAndWaitForReceipt()
+      })
 
+      it('executes', async () => {
         const activeProposals = await grandaMento.getActiveProposalIds()
         expect(activeProposals).not.toEqual([])
 
@@ -115,38 +131,10 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
       })
 
       it('Cancel proposal', async () => {
-        // await increaseLimits() // TODO this should be in the before all but for some reason not working
-        const celoToken = await kit.contracts.getGoldToken()
-        const sellAmount = new BigNumber('100000000')
-        await (
-          await celoToken.increaseAllowance(grandaMento.address, sellAmount)
-        ).sendAndWaitForReceipt()
-
-        await (
-          await grandaMento.createExchangeProposal(StableTokenName.cUSD, sellAmount, true)
-        ).sendAndWaitForReceipt()
-
         await (await grandaMento.cancelExchangeProposal(1)).sendAndWaitForReceipt()
 
         const proposal = await grandaMento.getExchangeProposal('1')
-        expect(proposal.state).toEqual(4)
-      })
-
-      it('updated the config', async () => {
-        // await increaseLimits() // TODO this should be in the before all but for some reason not working
-        const config = await grandaMento.getConfig()
-        expect(config.exchangeLimits.get(StableTokenName.cUSD)?.minExchangeAmount).toEqBigNumber(
-          new BigNumber(newLimitMin)
-        )
-        expect(config.exchangeLimits.get(StableTokenName.cUSD)?.maxExchangeAmount).toEqBigNumber(
-          new BigNumber(newLimitMax)
-        )
-        expect(config.exchangeLimits.get(StableTokenName.cEUR)?.minExchangeAmount).toEqBigNumber(
-          new BigNumber(0)
-        )
-        expect(config.exchangeLimits.get(StableTokenName.cEUR)?.maxExchangeAmount).toEqBigNumber(
-          new BigNumber(0)
-        )
+        expect(proposal.state).toEqual(ExchangeProposalState.Cancelled)
       })
     })
   })
