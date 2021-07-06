@@ -47,7 +47,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     })
 
     it('fetches empty limits', async () => {
-      let limits = await grandaMento.stableTokenExchangeLimits(StableTokenName.cUSD)
+      const limits = await grandaMento.stableTokenExchangeLimits(StableTokenName.cUSD)
       expect(limits.minExchangeAmount).toEqBigNumber(new BigNumber(0))
       expect(limits.maxExchangeAmount).toEqBigNumber(new BigNumber(0))
     })
@@ -139,7 +139,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   it('#getConfig', async () => {
     const config = await grandaMento.getConfig()
-    // expect(config.approver).toBe(expConfig.approver) // TODO FIX this tests
+    expect(config.approver).toBe(expConfig.approver) // TODO FIX this tests, for some reason `expConfig.approver` is 0x0000...0 even it's writen on the migrations-override.json
     expect(config.spread).toEqBigNumber(expConfig.spread)
     expect(config.vetoPeriodSeconds).toEqBigNumber(expConfig.vetoPeriodSeconds)
     expect(config.exchangeLimits.get(StableTokenName.cUSD)?.minExchangeAmount).toEqBigNumber(

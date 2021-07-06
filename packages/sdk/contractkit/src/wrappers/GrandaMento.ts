@@ -71,29 +71,29 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     sellAmount: BigNumber,
     sellCelo: true
   ) {
-    const createExchangeProposal_ = proxySend(
+    const createExchangeProposalInner = proxySend(
       this.kit,
       this.contract.methods.createExchangeProposal
     )
-    return await createExchangeProposal_(stableTokenRegistryId, sellAmount.toNumber(), sellCelo)
+    return createExchangeProposalInner(stableTokenRegistryId, sellAmount.toNumber(), sellCelo)
   }
 
   async getExchangeProposal(exchangeProposalID: string | number): Promise<ExchangeProposal> {
     const result = await this.contract.methods.exchangeProposals(exchangeProposalID).call()
-    const state = parseInt(result['state'])
+    const state = parseInt(result.state, 10)
 
-    if (state == ExchangeProposalState.None) {
+    if (state === ExchangeProposalState.None) {
       throw new Error("Proposal doesn't exist")
     }
 
     return {
-      exchanger: result['exchanger'],
-      stableToken: result['stableToken'],
-      sellAmount: new BigNumber(result['sellAmount']),
-      buyAmount: new BigNumber(result['buyAmount']),
-      approvalTimestamp: new BigNumber(result['approvalTimestamp']),
-      state: state,
-      sellCelo: result['sellCelo'],
+      exchanger: result.exchanger,
+      stableToken: result.stableToken,
+      sellAmount: new BigNumber(result.sellAmount),
+      buyAmount: new BigNumber(result.buyAmount),
+      approvalTimestamp: new BigNumber(result.approvalTimestamp),
+      sellCelo: result.sellCelo,
+      state,
     }
   }
 
@@ -112,8 +112,8 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   async getAllStableTokenLimits(): Promise<AllStableConfig> {
     const out: AllStableConfig = new Map()
 
-    // TODO make this paralel
-    for (let token in StableToken) {
+    // TODO make this paralel and refactor to a map after having the right type for StableToken
+    for (const token in StableToken) {
       const tokenRegistry: StableTokenContract = StableToken[token]
       const value = await this.stableTokenExchangeLimits(tokenRegistry)
       out.set(tokenRegistry, value)
