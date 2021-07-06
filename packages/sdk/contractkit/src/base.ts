@@ -45,6 +45,7 @@ const AuxiliaryContracts = [
   CeloContract.MultiSig,
   CeloContract.MetaTransactionWalletDeployer,
   CeloContract.MetaTransactionWallet,
+  CeloContract.ERC20,
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
