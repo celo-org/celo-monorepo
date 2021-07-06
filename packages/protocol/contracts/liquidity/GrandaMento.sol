@@ -216,15 +216,15 @@ contract GrandaMento is
       // Get the minimum and maximum amount of stable token than can be involved
       // in the exchange. This reverts if exchange limits for the stable token have
       // not been set.
-      (uint256 minStableTokenExchangeAmount, uint256 maxStableTokenExchangeAmount) = getStableTokenExchangeLimits(
+      (uint256 minExchangeAmount, uint256 minExchangeAmount) = getStableTokenExchangeLimits(
         stableTokenRegistryId
       );
       // Ensure that the amount of stableToken being bought or sold is within
       // the configurable exchange limits.
       uint256 stableTokenExchangeAmount = sellCelo ? buyAmount : sellAmount;
       require(
-        stableTokenExchangeAmount <= maxStableTokenExchangeAmount &&
-          stableTokenExchangeAmount >= minStableTokenExchangeAmount,
+        stableTokenExchangeAmount <= maxExchangeAmount &&
+          stableTokenExchangeAmount >= minExchangeAmount,
         "Stable token exchange amount not within limits"
       );
     }
