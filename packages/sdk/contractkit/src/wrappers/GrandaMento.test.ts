@@ -107,7 +107,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
         expect(proposal.exchanger).toEqual(accounts[0])
         expect(proposal.stableToken).toEqual(stableToken.address)
         expect(proposal.sellAmount).toEqBigNumber(sellAmount)
-        expect(proposal.buyAmount).toEqBigNumber(new BigNumber('99000000')) // TODO double check this number
+        expect(proposal.buyAmount).toEqBigNumber(new BigNumber('99000000'))
         expect(proposal.approvalTimestamp).toEqual(new BigNumber(0))
         expect(proposal.state).toEqual(ExchangeProposalState.Proposed)
         expect(proposal.sellCelo).toEqual(true)
