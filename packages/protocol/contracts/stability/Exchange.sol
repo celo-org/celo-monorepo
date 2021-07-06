@@ -33,6 +33,7 @@ contract Exchange is
   event UpdateFrequencySet(uint256 updateFrequency);
   event MinimumReportsSet(uint256 minimumReports);
   event StableTokenSet(address indexed stable);
+  event StableTokenIdentifierSet(string stableTokenIdentifier);
   event SpreadSet(uint256 spread);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
@@ -290,8 +291,7 @@ contract Exchange is
     */
   function setStableTokenIdentifier(string memory stableTokenIdentifier) public onlyOwner {
     stableTokenRegistryId = keccak256(abi.encodePacked(stableTokenIdentifier));
-    stable = registry.getAddressForOrDie(stableTokenRegistryId);
-    emit StableTokenSet(stable);
+    emit StableTokenIdentifierSet(stableTokenIdentifier);
   }
 
   /**

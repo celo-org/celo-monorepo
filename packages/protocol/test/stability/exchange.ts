@@ -146,13 +146,19 @@ contract('Exchange', (accounts: string[]) => {
       updateFrequency,
       minimumReports
     )
+
+    await registry.setAddressFor(CeloContractName.StableToken, stableToken.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
-  describe('#initialize()', () => {
+  describe.only('#initialize()', () => {
     it('should have set the owner', async () => {
       const expectedOwner: string = await exchange.owner()
       assert.equal(expectedOwner, accounts[0])
+    })
+
+    it('should set stable token identfier', async () => {
+      // TODO:
     })
 
     it('should not be callable again', async () => {
