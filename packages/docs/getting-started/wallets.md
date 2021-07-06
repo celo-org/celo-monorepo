@@ -52,7 +52,7 @@ Steakwallet is a non-custodial, multi chain staking wallet. It aims to be the hu
 
 - [steakwallet.fi](https://steakwallet.fi)
 - Platforms: Android, iOS
-- Maintainers: [Steakwallet LLC](https://steakwallet.fi))
+- Maintainers: [Steakwallet LLC](https://steakwallet.fi)
 
 ## Celo Compatible Wallets
 
