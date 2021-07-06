@@ -1,4 +1,6 @@
-import { isVerified } from '@celo/phone-number-privacy-common'
+import { ACCOUNT_ADDRESSES, PRIVATE_KEYS } from '@celo/dev-utils'
+import { signWithDEK } from '@celo/identity/src/odis'
+import { getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
@@ -16,6 +18,8 @@ jest.mock('@celo/phone-number-privacy-common', () => ({
   isVerified: jest.fn(),
 }))
 const mockIsVerified = isVerified as jest.Mock
+const mockGetDataEncryptionKey = getDataEncryptionKey as jest.Mock
+mockGetDataEncryptionKey.mockReturnValue(ACCOUNT_ADDRESSES[0])
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = jest.fn()
@@ -168,80 +172,113 @@ describe(`POST /getContactMatches endpoint`, () => {
   }
 
   describe('with valid input', () => {
-    const req = {
-      body: validInput,
-      headers: mockHeaders,
-    } as Request
+    const expectSuccessfulMatchmaking = (req: Request) => {
+      it('provides matches', (done) => {
+        mockGetNumberPairContacts.mockReturnValue(validInput.contactPhoneNumbers)
+        mockIsVerified.mockReturnValue(true)
+        const res = {
+          json(body: any) {
+            try {
+              expect(body.success).toEqual(true)
+              expect(body.matchedContacts).toEqual([
+                { phoneNumber: validInput.contactPhoneNumbers[0] },
+              ])
+              done()
+            } catch (e) {
+              done(e)
+            }
+          },
+          status(status: any) {
+            try {
+              expect(status).toEqual(200)
+              done()
+            } catch (e) {
+              done(e)
+            }
+            return {
+              json() {
+                return {}
+              },
+            }
+          },
+        } as Response
 
-    it('provides matches', (done) => {
-      mockGetNumberPairContacts.mockReturnValue(validInput.contactPhoneNumbers)
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        json(body: any) {
-          try {
-            expect(body.success).toEqual(true)
-            expect(body.matchedContacts).toEqual([
-              { phoneNumber: validInput.contactPhoneNumbers[0] },
-            ])
-            done()
-          } catch (e) {
-            done(e)
-          }
-        },
-        status(status: any) {
-          try {
-            expect(status).toEqual(200)
-            done()
-          } catch (e) {
-            done(e)
-          }
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      } as Response
+        getContactMatches(req, res)
+      })
 
-      getContactMatches(req, res)
-    })
+      it('provides matches empty array', (done) => {
+        mockGetNumberPairContacts.mockReturnValue([])
+        mockIsVerified.mockReturnValue(true)
+        const res = {
+          json(body: any) {
+            try {
+              expect(body.success).toEqual(true)
+              expect(body.matchedContacts).toEqual([])
+              done()
+            } catch (e) {
+              done(e)
+            }
+          },
+          status(status: any) {
+            try {
+              expect(status).toEqual(200)
+              done()
+            } catch (e) {
+              done(e)
+            }
+            return {
+              json() {
+                return {}
+              },
+            }
+          },
+        } as Response
 
-    it('provides matches empty array', (done) => {
-      mockGetNumberPairContacts.mockReturnValue([])
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        json(body: any) {
-          try {
-            expect(body.success).toEqual(true)
-            expect(body.matchedContacts).toEqual([])
-            done()
-          } catch (e) {
-            done(e)
-          }
-        },
-        status(status: any) {
-          try {
-            expect(status).toEqual(200)
-            done()
-          } catch (e) {
-            done(e)
-          }
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      } as Response
+        getContactMatches(req, res)
+      })
+    }
 
-      getContactMatches(req, res)
-    })
+    const reqs = new Map([
+      [
+        'w/o signedUserPhoneNumber',
+        {
+          body: validInput,
+          headers: mockHeaders,
+        } as Request,
+      ],
+      [
+        'w/ signedUserPhoneNumber',
+        {
+          body: {
+            ...validInput,
+            signedUserPhoneNumber: signWithDEK(validInput.userPhoneNumber, PRIVATE_KEYS[0]),
+          },
+          headers: mockHeaders,
+        } as Request,
+      ],
+    ])
 
-    it('rejects more than one attempt to matchmake with 403', (done) => {
-      mockGetDidMatchmaking.mockReturnValue(true)
-      mockIsVerified.mockReturnValue(true)
-      getContactMatches(req, invalidResponseExpected(done, 403))
-    })
+    reqs.forEach((req, description) =>
+      describe(description, () => {
+        expectSuccessfulMatchmaking(req)
+        describe('With replayed requests', () => {
+          mockGetDidMatchmaking.mockReturnValue(true)
+          switch (description) {
+            case 'w/o signedUserPhoneNumber':
+              it('rejects more than one request to matchmake with 403', (done) => {
+                mockGetDidMatchmaking.mockReturnValue(true)
+                mockIsVerified.mockReturnValue(true)
+                getContactMatches(req, invalidResponseExpected(done, 403))
+              })
+              break
+            case 'w/ signedUserPhoneNumber':
+              expectSuccessfulMatchmaking(req)
+            default:
+              break
+          }
+        })
+      })
+    )
   })
 
   describe('with invalid input', () => {
