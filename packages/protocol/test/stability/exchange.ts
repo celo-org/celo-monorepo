@@ -151,7 +151,7 @@ contract('Exchange', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
-  describe.only('#initialize()', () => {
+  describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const expectedOwner: string = await exchange.owner()
       assert.equal(expectedOwner, accounts[0])
