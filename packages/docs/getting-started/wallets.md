@@ -48,7 +48,14 @@ Celo Extension Wallet is a fork of Metamask for the Celo Network. It's a browser
 
 ## Celo Compatible Wallets
 
-There are currently a few other compatible wallets. When the upcoming [Donut hard-fork](https://github.com/celo-org/celo-proposals/issues/94) is live, Celo transactions will become compatible with Ethereum transactions. This will allow some Ethereum wallets to work with Celo. More updates on this coming soon.
+There are currently a few other compatible wallets. With the [Donut hard-fork](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0027.md), Celo now accepts Ethereum-style transactions. This allows some Ethereum wallets to work with Celo.
+
+### Metamask
+
+You can find more information about using Metamask with Celo on [this page](using-metamask-with-celo).
+
+- [metamask.io](https://metamask.io/)
+- Platforms: Web, iOS, Android
 
 ### Dove Wallet
 
