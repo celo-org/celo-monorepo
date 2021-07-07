@@ -250,11 +250,15 @@ export async function startSendSms(
       transaction
     )
 
-    // Issues verifiable credential for phone number type
-    let verifiableCredential = await issueAttestationPhoneNumberTypeCredential(attestation, logger)
-
-    if (verifiableCredential) {
+    try {
+      // Issues verifiable credential for phone number type
+      let verifiableCredential = await issueAttestationPhoneNumberTypeCredential(
+        attestation,
+        logger
+      )
       attestation.credentials = `[${verifiableCredential}]`
+    } catch (e) {
+      logger.error({ e })
     }
 
     if (!countryCode) {

@@ -91,7 +91,7 @@ export const issueAttestationPhoneNumberTypeCredential = async (
         )
     )
   } catch (e) {
-    logger.error({ e })
+    throw new Error(e)
   }
 }
 
