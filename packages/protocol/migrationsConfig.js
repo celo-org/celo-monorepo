@@ -228,10 +228,11 @@ const NetworkConfigs = {
     epochRewards: {
       frozen: false,
     },
+    /*
     exchange: {
       frozen: false,
       minimumReports: 1,
-    },
+    },*/
     goldToken: {
       frozen: false,
     },
@@ -588,6 +589,7 @@ const NetworkConfigs = {
   },
 }
 
+NetworkConfigs.coverage = NetworkConfigs.development
 NetworkConfigs.local = NetworkConfigs.testing
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores

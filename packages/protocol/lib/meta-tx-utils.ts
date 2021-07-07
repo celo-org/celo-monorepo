@@ -62,6 +62,7 @@ export const getSignatureForMetaTransaction = async (
       {
         method: 'eth_signTypedData',
         params: [signer, typedData],
+        id: Math.floor(Math.random() * 1000000),
       },
       (error, resp) => {
         if (error) {

@@ -2,6 +2,7 @@
 require('ts-node/register')
 const ProviderEngine = require('web3-provider-engine')
 const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
+const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js')
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
 const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
@@ -92,6 +93,8 @@ const networks = {
     network_id: '*',
     gasPrice: 0,
     gas: gasLimit,
+    defaultBalance: 200000000,
+    mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
     from: DEVELOPMENT_FROM,
     provider: function () {
       if (coverageProvider == null) {
@@ -134,6 +137,14 @@ const networks = {
          * but it can be easily fixed by assigning `sendAsync` to `send`.
          */
         coverageProvider.send = coverageProvider.sendAsync.bind(coverageProvider)
+        /*
+        coverageProvider.send = (a, b) => {
+          console.log('monkey sending', JSON.stringify(a), b)
+          return coverageProvider.sendAsync(a, (err,res) => {
+            console.log('returned', err, res)
+            b(err,res)
+          })
+        }*/
       }
       return coverageProvider
     },
@@ -188,6 +199,7 @@ const networks = {
 }
 // Equivalent
 networks.mainnet = networks.rc1
+networks.coverage1 = networks.coverage
 
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.

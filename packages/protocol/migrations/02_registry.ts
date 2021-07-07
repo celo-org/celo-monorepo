@@ -8,7 +8,12 @@ const name = 'Registry'
 const Contract = artifacts.require(name)
 const ContractProxy = artifacts.require(name + 'Proxy')
 
-module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
+module.exports = (deployer: any, networkName: string, _accounts: string[]) => {
+  process.env.NETWORK = networkName
+  if (networkName === 'coverage1') {
+    return
+  }
+
   // tslint:disable-next-line: no-console
   console.info('Deploying Registry')
   deployer.deploy(ContractProxy)

@@ -390,6 +390,7 @@ contract('Accounts', (accounts: string[]) => {
     const signature = await new Promise<string>((resolve, reject) => {
       web3.currentProvider.send(
         {
+          id: Math.floor(Math.random() * 1000000),
           method: 'eth_signTypedData',
           params: [signer, typedData],
         },

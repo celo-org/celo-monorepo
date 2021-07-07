@@ -62,7 +62,7 @@ async function test() {
       testArgs.push('--verbose-rpc')
     }
     if (argv.coverage) {
-      testArgs = testArgs.concat(['--network', 'coverage'])
+      testArgs = testArgs.concat(['--network', 'coverage1'])
     } else {
       testArgs = testArgs.concat(['--network', networkName])
     }
@@ -83,6 +83,9 @@ async function test() {
       process.exit(1)
     }
     testArgs = testArgs.concat(testFiles)
+    if (argv.coverage) {
+      testArgs = testArgs.concat(['test/teardown.ts'])
+    }
 
     await exec('yarn', testArgs)
     await closeGanache()

@@ -222,6 +222,13 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
+  // if (networkName === 'coverage1' || networkName === 'coverage') {
+  //  if (networkName === 'coverage1') {
+  if (networkName === 'coverage1') {
+    console.log('Skipping elect validators')
+    return
+  }
+
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',
     artifacts
@@ -242,7 +249,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     artifacts
   )
 
-  if (networkName === 'development') {
+  if (networkName === 'development' || networkName === 'coverage') {
     isGanache = true
     const addr0 = privateKeyToAddress('0x' + ganachePrivateKey(0))
     for (let i = 10; i < 36; i++) {
