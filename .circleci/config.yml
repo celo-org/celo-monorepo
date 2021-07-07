@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    LATEST_RELEASE: git tag -l "core-contracts.v*" --format "%(refname)" | tail -n 1
+    RELEASE_TAG: core-contracts.v4
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -260,8 +260,8 @@ jobs:
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against $LATEST_RELEASE"
-            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $LATEST_RELEASE -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
+            echo "Comparing against $RELEASE_TAG"
+            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
       - persist_to_workspace:
           root: .
           paths:
@@ -280,19 +280,19 @@ jobs:
       - run:
           name: Copy DevChain and Build generated from released tag
           command: |
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $LATEST_RELEASE | sed -e 's/\//_/g'))
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
             (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
       - run:
           name: Test against current release
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against $LATEST_RELEASE"
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $LATEST_RELEASE | sed -e 's/\//_/g'))
-            yarn --cwd packages/protocol test:devchain-release -b $LATEST_RELEASE -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+            echo "Comparing against $RELEASE_TAG"
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-release-snapshots:
-    <<: *defaults
+    <<: *contract-defaults
     resource_class: large
     steps:
       - attach_workspace:
