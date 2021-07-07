@@ -31,6 +31,11 @@ defaults: &defaults
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
 
+contract-defaults: &contract-defaults
+  <<: *defaults
+  environment:
+    LATEST_RELEASE: git tag -l "core-contracts.v*" --format "%(refname)" | tail -n 1
+
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
@@ -233,15 +238,13 @@ jobs:
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
   pre-protocol-test-release:
-    <<: *defaults
+    <<: *contract-defaults
     docker:
       # We override the default docker image here because this job builds the
       # previous release and requires node 10 rather than node 12 to build
       # properly.
       - image: celohq/node10-gcloud:v3
     resource_class: large
-    environment:
-      RELEASE_TAG: core-contracts-v4
     steps:
       - attach_workspace:
           at: ~/app
@@ -257,18 +260,16 @@ jobs:
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against $RELEASE_TAG"
-            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
+            echo "Comparing against $LATEST_RELEASE"
+            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $LATEST_RELEASE -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
       - persist_to_workspace:
           root: .
           paths:
             - 'packages/protocol/.tmp/released_chain/*'
 
   protocol-test-release:
-    <<: *defaults
+    <<: *contract-defaults
     resource_class: large
-    environment:
-      RELEASE_TAG: core-contracts-v4
     steps:
       - attach_workspace:
           at: ~/app
@@ -279,16 +280,16 @@ jobs:
       - run:
           name: Copy DevChain and Build generated from released tag
           command: |
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $LATEST_RELEASE | sed -e 's/\//_/g'))
             (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
       - run:
           name: Test against current release
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against $RELEASE_TAG"
-            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+            echo "Comparing against $LATEST_RELEASE"
+            BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $LATEST_RELEASE | sed -e 's/\//_/g'))
+            yarn --cwd packages/protocol test:devchain-release -b $LATEST_RELEASE -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-release-snapshots:
     <<: *defaults
