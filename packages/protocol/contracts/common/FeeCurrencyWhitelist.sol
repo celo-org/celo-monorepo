@@ -4,19 +4,25 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 
-import "../common/Initializable.sol";
+import "./InitializableV2.sol";
 
+import "./UsingRegistry.sol";
+import "../stability/interfaces/ISortedOracles.sol";
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
  */
-contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
+contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, InitializableV2, UsingRegistry {
   address[] public whitelist;
+
+  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress Address of the Registry contract.
    */
-  function initialize() external initializer {
+  function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
   }
 
   /**
@@ -24,6 +30,11 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
    * @param tokenAddress The address of the token to add.
    */
   function addToken(address tokenAddress) external onlyOwner {
+    uint256 rateNumerator;
+    uint256 rateDenominator;
+    (rateNumerator, rateDenominator) = getSortedOracles().medianRate(tokenAddress);
+    require(rateDenominator > 0, "FeeCurrencyWhitelist: Invalid Oracle Price (Denominator)");
+    require(rateNumerator > 0, "FeeCurrencyWhitelist: Invalid Oracle Price (Numerator)");
     whitelist.push(tokenAddress);
   }
 
