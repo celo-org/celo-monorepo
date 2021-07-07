@@ -1,14 +1,12 @@
+import { toTxResult } from '@celo/connect'
 import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/governance'
 import { flags } from '@oclif/command'
-import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
-import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
+import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { checkProposal } from '../../utils/governance'
 export default class Propose extends BaseCommand {
-  static description = 'Submit a governance proposal'
+  static description = 'Test a governance proposal'
 
   static flags = {
     ...BaseCommand.flags,
@@ -16,12 +14,7 @@ export default class Propose extends BaseCommand {
       required: true,
       description: 'Path to json transactions',
     }),
-    deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
-    descriptionURL: flags.string({
-      required: true,
-      description: 'A URL where further information about the proposal can be viewed',
-    }),
   }
 
   static examples = [
@@ -31,13 +24,7 @@ export default class Propose extends BaseCommand {
   async run() {
     const res = this.parse(Propose)
     const account = res.flags.from
-    const deposit = new BigNumber(res.flags.deposit)
     this.kit.defaultAccount = account
-
-    await newCheckBuilder(this, account)
-      .hasEnoughCelo(account, deposit)
-      .exceedsProposalMinDeposit(deposit)
-      .runChecks()
 
     const builder = new ProposalBuilder(this.kit)
 
@@ -46,24 +33,20 @@ export default class Propose extends BaseCommand {
     const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
 
-    // BUILD FROM CONTRACTKIT FUNCTIONS
-    // const params = await this.kit.contracts.getBlockchainParameters()
-    // builder.addTx(params.setMinimumClientVersion(1, 8, 24), { to: params.address })
-    // builder.addWeb3Tx()
-    // builder.addProxyRepointingTx
-
     const proposal = await builder.build()
     printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
-    const governance = await this.kit.contracts.getGovernance()
+    for (const tx of proposal) {
+      console.log(tx)
+      if (!tx.to) {
+        continue
+      }
 
-    await checkProposal(proposal, this.kit)
-
-    await displaySendTx(
-      'proposeTx',
-      governance.propose(proposal, res.flags.descriptionURL),
-      { value: deposit.toString() },
-      'ProposalQueued'
-    )
+      const txRes = toTxResult(
+        this.web3.eth.sendTransaction({ to: tx.to, from: account, value: tx.value, data: tx.input })
+      )
+      const receipt = await txRes.waitReceipt()
+      console.log(receipt)
+    }
   }
 }

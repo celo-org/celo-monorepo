@@ -46,8 +46,14 @@ yargs
   .command(
     'run-tar <filename>',
     "Run celo's devchain using given tar filename. Generates a copy and then delete it",
-    (args) => args.positional('filename', { type: 'string', description: 'Chain tar filename' }),
-    (args) => exitOnError(runDevChainFromTar(args.filename))
+    (args) =>
+      args
+        .positional('filename', { type: 'string', description: 'Chain tar filename' })
+        .option('saveto', {
+          type: 'string',
+          description: 'Save resultant chain to tar filename',
+        }),
+    (args) => exitOnError(runDevChainFromTar(args.filename, args.saveto))
   )
   .command(
     'generate <datadir>',
@@ -235,15 +241,18 @@ function deployReleaseGold(releaseGoldContracts: string) {
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
-async function runDevChainFromTar(filename: string) {
-  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
-  // tslint:disable-next-line: no-console
-  console.log(`Creating tmp folder: ${chainCopy.name}`)
-
-  await decompressChain(filename, chainCopy.name)
-
-  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
-  return stopGanache
+async function runDevChainFromTar(filename: string, saveToDir?: string) {
+  let datadir: string
+  if (!saveToDir) {
+    const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+    // tslint:disable-next-line: no-console
+    console.log(`Creating tmp folder: ${chainCopy.name}`)
+    datadir = chainCopy.name
+  } else {
+    datadir = saveToDir
+  }
+  await decompressChain(filename, datadir)
+  return runDevChain(datadir)
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {

@@ -13,12 +13,14 @@ BRANCH=""
 BUILD_DIR=""
 RE_BUILD_REPO=""
 LOG_FILE="/dev/null"
+SAVE_TO=""
 
-while getopts 'b:l:d:' flag; do
+while getopts 'b:l:d:s:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
     d) BUILD_DIR="${OPTARG}" ;;
+    s) SAVE_TO="--saveto ${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -33,7 +35,7 @@ then
 fi
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz $SAVE_TO >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
