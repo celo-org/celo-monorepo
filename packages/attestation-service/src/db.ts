@@ -1,5 +1,6 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { FileKeystore, KeystoreWalletWrapper } from '@celo/keystores'
 import { eqAddress } from '@celo/utils/lib/address'
 import Logger from 'bunyan'
 import moment from 'moment'
@@ -137,7 +138,34 @@ export async function verifyConfigurationAndGetURL() {
 
 export async function initializeKit(force: boolean = false) {
   if (kit === undefined || force) {
-    kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
+    // Prefer passed in keystore if these variables are set
+    const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
+    const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
+    if (keystoreDirpath == '' || keystorePassphrase == '') {
+      // Backwards compatibility -- assume this is the deployed full node
+      kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
+    } else {
+      const keystoreWalletWrapper = new KeystoreWalletWrapper(
+        new FileKeystore(fetchEnv('ATTESTATION_SIGNER_KEYSTORE_DIRPATH'))
+      )
+      try {
+        await keystoreWalletWrapper.unlockAccount(
+          fetchEnv('ATTESTATION_SIGNER_ADDRESS'),
+          fetchEnv('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE')
+        )
+      } catch (error) {
+        kit = undefined
+        throw new Error(
+          `Unlocking keystore file for account ${fetchEnv('ATTESTATION_SIGNER_ADDRESS')} failed: ` +
+            error.message
+        )
+      }
+      kit = newKitFromWeb3(
+        new Web3(fetchEnv('CELO_PROVIDER')),
+        keystoreWalletWrapper.getLocalWallet()
+      )
+    }
+
     // Copied from @celo/cli/src/utils/helpers
     try {
       await kit.connection.getBlock('latest')
