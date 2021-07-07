@@ -1,7 +1,6 @@
 import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast-version'
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
-import { checkImports } from '@celo/protocol/lib/web3-utils'
 import { writeJsonSync } from 'fs-extra'
 import path from 'path'
 import tmp from 'tmp'
@@ -44,11 +43,6 @@ const argv = yargs
     default: false,
     type: 'boolean',
   })
-  .option('ignore_initializable_v2', {
-    description: 'Skip check for InitializableV2 inheritance',
-    default: false,
-    type: 'boolean',
-  })
   .help()
   .alias('help', 'h')
   .showHelpOnFail(true)
@@ -79,21 +73,6 @@ try {
     new DefaultCategorizer(),
     out
   )
-
-  if (!argv.ignore_initializable_v2) {
-    const versionDeltas = backward.report.versionDeltas()
-    Object.entries(versionDeltas).forEach(([contract, delta]) => {
-      if (
-        delta.isVersionIncremented() &&
-        checkImports('Initializable', newArtifacts.getArtifactByName(contract), newArtifacts)
-      ) {
-        console.error(
-          `Contract ${contract} has positive version delta but is not using InitializableV2`
-        )
-        process.exit(1)
-      }
-    })
-  }
 
   out(`Writing compatibility report to ${outFile} ...`)
   writeJsonSync(outFile, backward, { spaces: 2 })
