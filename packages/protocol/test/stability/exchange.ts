@@ -337,10 +337,15 @@ contract('Exchange', (accounts: string[]) => {
 
       it(`should return the same value if updateFrequency seconds haven't passed yet`, async () => {
         await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+        //First call is done so that lastBucketUpdate is set to now,
+        //since _updateBucketsIfNeccesary() is no longer called
+        //in the constructor
+        await exchange.getBuyAndSellBuckets(true)
+        await fundReserve()
         const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
 
-        assertEqualBN(sellBucketSize, initialGoldBucket)
-        assertEqualBN(buyBucketSize, initialStableBucket)
+        assertEqualBN(sellBucketSize, initialGoldBucket.times(2))
+        assertEqualBN(buyBucketSize, initialStableBucket.times(2))
       })
 
       it(`should return a new value once updateFrequency seconds have passed`, async () => {
