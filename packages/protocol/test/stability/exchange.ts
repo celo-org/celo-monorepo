@@ -337,9 +337,9 @@ contract('Exchange', (accounts: string[]) => {
 
       it(`should return the same value if updateFrequency seconds haven't passed yet`, async () => {
         await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
-        //First call is done so that lastBucketUpdate is set to now,
-        //since _updateBucketsIfNeccesary() is no longer called
-        //in the constructor
+        // First call is done so that lastBucketUpdate is set to now,
+        // since _updateBucketsIfNeccesary() is no longer called
+        // in the constructor
         await exchange.getBuyAndSellBuckets(true)
         await fundReserve()
         const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
@@ -591,7 +591,8 @@ contract('Exchange', (accounts: string[]) => {
 
           beforeEach(async () => {
             await fundReserve()
-            await timeTravel(updateFrequency, web3)
+            await exchange.getBuyAndSellBuckets(true)
+            await timeTravel(updateFrequency * 2, web3)
             await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
           })
 
