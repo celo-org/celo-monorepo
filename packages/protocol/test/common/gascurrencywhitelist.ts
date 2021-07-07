@@ -11,7 +11,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
-    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new()
+    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
     await feeCurrencyWhitelist.initialize()
   })
 

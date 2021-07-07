@@ -8,7 +8,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./interfaces/IValidators.sol";
 
 import "../common/CalledByVm.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
@@ -24,7 +24,7 @@ contract Validators is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   UsingPrecompiles,
   CalledByVm
@@ -167,6 +167,12 @@ contract Validators is
   }
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param groupRequirementValue The Locked Gold requirement amount for groups.
@@ -206,12 +212,6 @@ contract Validators is
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
     setDowntimeGracePeriod(_downtimeGracePeriod);
   }
-
-  /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
-   */
-  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Updates the block delay for a ValidatorGroup's commission udpdate
