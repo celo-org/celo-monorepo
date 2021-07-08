@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@celo/base": "1.1.1",
-    "@celo/contractkit": "1.0.2",
+    "@celo/contractkit": "1.2.0",
     "@celo/phone-number-privacy-common": "1.0.33",
     "@celo/identity": "1.0.2",
     "@celo/utils": "1.0.2",
