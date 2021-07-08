@@ -37,8 +37,8 @@ contract('StableToken', (accounts: string[]) => {
   const amountToMint = 10
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    freezer = await Freezer.new()
+    registry = await Registry.new(true)
+    freezer = await Freezer.new(true)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     stableToken = await StableToken.new(true)
     const response = await stableToken.initialize(

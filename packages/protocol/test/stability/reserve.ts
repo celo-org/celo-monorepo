@@ -46,7 +46,7 @@ contract('Reserve', (accounts: string[]) => {
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
     reserve = await Reserve.new(true)
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
