@@ -4,8 +4,8 @@ import "./StableToken.sol";
 
 contract StableTokenEUR is StableToken {
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+   * @notice Sets initialized == true on implementation contracts.
+   * @param test Set to true to skip implementation initialization.
    */
   constructor(bool test) public StableToken(test) {}
 
@@ -15,6 +15,6 @@ contract StableTokenEUR is StableToken {
   * @return The storage, major, minor, and patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 1, 0, 1);
   }
 }
