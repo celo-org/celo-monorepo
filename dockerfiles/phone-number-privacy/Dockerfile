@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:12 as build-step
 
 WORKDIR /celo-phone-number-privacy/
 
@@ -16,7 +16,8 @@ ENV NODE_ENV production
 
 RUN yarn build
 
-WORKDIR /celo-phone-number-privacy/signer
-
+FROM node:12 as signer
+COPY --from=build-step /celo-phone-number-privacy/phone-number-privacy/signer /celo-phone-number-privacy/
+WORKDIR /celo-phone-number-privacy/
 EXPOSE 8080
 ENTRYPOINT ["yarn", "start:docker"]
