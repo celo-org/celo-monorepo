@@ -8,7 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -20,7 +20,7 @@ contract Reserve is
   IReserve,
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   ReentrancyGuard
 {
@@ -77,7 +77,7 @@ contract Reserve is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
