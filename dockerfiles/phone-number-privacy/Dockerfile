@@ -16,5 +16,7 @@ ENV NODE_ENV production
 
 RUN yarn build
 
+WORKDIR /celo-phone-number-privacy/signer
+
 EXPOSE 8080
 ENTRYPOINT ["yarn", "start:docker"]
