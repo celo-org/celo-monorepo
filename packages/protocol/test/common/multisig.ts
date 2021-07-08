@@ -15,7 +15,7 @@ contract('MultiSig', (accounts: any) => {
   const internalRequiredSignatures = 2
 
   beforeEach(async () => {
-    multiSig = await MultiSig.new()
+    multiSig = await MultiSig.new(true)
     await multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
   })
 
