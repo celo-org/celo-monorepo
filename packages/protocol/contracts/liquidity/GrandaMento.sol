@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -16,7 +16,7 @@ import "../stability/interfaces/IStableToken.sol";
 contract GrandaMento is
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   ReentrancyGuard
 {
@@ -154,7 +154,7 @@ contract GrandaMento is
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialization.
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.

@@ -8,7 +8,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
@@ -21,7 +21,7 @@ import "../common/UsingPrecompiles.sol";
 contract StableToken is
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   UsingPrecompiles,
   Freezable,
@@ -90,12 +90,6 @@ contract StableToken is
     }
     _;
   }
-
-  /**
-   * @notice Sets initialized == true on implementation contracts.
-   * @param test Set to true to skip implementation initialization.
-   */
-  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
