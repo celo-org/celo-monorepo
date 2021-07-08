@@ -39,7 +39,7 @@ export async function handleGetQuota(
       respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request, getContractKit() as any, logger))) {
+    if (!(await authenticateUser(request, getContractKit() as any, logger, 'test'))) {
       respondWithError(Endpoints.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }

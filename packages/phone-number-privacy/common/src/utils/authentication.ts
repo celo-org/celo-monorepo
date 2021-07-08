@@ -19,9 +19,10 @@ const ec = new EC('secp256k1')
 export async function authenticateUser(
   request: Request,
   contractKit: ContractKit,
-  logger: Logger
+  logger: Logger,
+  test: string
 ): Promise<boolean> {
-  logger.debug('Authenticating user')
+  logger.debug('Authenticating user', test)
 
   // https://tools.ietf.org/html/rfc7235#section-4.2
   const messageSignature = request.get('Authorization')
