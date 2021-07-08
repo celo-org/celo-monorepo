@@ -105,6 +105,14 @@ const DefaultConstitution = {
     default: 0.7,
     approveSlashing: 0.7,
   },
+  GrandaMento: {
+    default: 0.8,
+    cancelExchangeProposal: 0.6,
+    setApprover: 0.8,
+    setSpread: 0.8,
+    setStableTokenExchangeLimits: 0.8,
+    setVetoPeriodSeconds: 0.8,
+  },
   LockedGold: {
     default: 0.9,
     setRegistry: 0.9,
