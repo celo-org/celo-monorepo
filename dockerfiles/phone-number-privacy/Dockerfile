@@ -2,8 +2,10 @@ FROM node:12
 
 WORKDIR /celo-phone-number-privacy/
 
-#Copy monorepo yarn.lock
-COPY yarn.lock ./
+#Copy monorepo settings
+COPY lerna.json package.json yarn.lock ./
+COPY scripts/ scripts/
+COPY patches/ patches/
 
 #Copy identity code
 COPY packages/phone-number-privacy/ phone-number-privacy/
