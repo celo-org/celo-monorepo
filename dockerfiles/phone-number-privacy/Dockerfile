@@ -1,4 +1,4 @@
-FROM node:12 as build-step
+FROM node:12
 
 WORKDIR /celo-phone-number-privacy/
 
@@ -8,7 +8,7 @@ COPY scripts/ scripts/
 COPY patches/ patches/
 
 #Copy identity code
-COPY packages/phone-number-privacy/ phone-number-privacy/
+COPY packages/phone-number-privacy packages/phone-number-privacy
 
 RUN yarn install --network-timeout 100000 && yarn cache clean
 
@@ -16,8 +16,6 @@ ENV NODE_ENV production
 
 RUN yarn build
 
-FROM node:12 as signer
-COPY --from=build-step /celo-phone-number-privacy/phone-number-privacy/signer /celo-phone-number-privacy/
-WORKDIR /celo-phone-number-privacy/
+WORKDIR /celo-phone-number-privacy/packages/phone-number-privacy/signer
 EXPOSE 8080
 ENTRYPOINT ["yarn", "start:docker"]
