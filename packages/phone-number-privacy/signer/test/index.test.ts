@@ -1,4 +1,4 @@
-import { authenticateUser } from '@celo/phone-number-privacy-common'
+import { authenticateUser, REQUEST_EXPIRY_WINDOW_MS } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import request from 'supertest'
 import { ErrorMessage, WarningMessage } from '../../common/src/interfaces/error-utils'
@@ -11,7 +11,6 @@ import {
   createMockWeb3,
 } from '../../common/src/test/utils'
 import { BLINDED_PHONE_NUMBER } from '../../common/src/test/values'
-import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
 import { incrementQueryCount } from '../src/database/wrappers/account'
