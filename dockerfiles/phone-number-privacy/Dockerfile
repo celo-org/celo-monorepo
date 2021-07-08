@@ -2,10 +2,11 @@ FROM node:12
 
 WORKDIR /celo-phone-number-privacy/
 
-COPY packages/phone-number-privacy/signer signer
-
-WORKDIR /celo-phone-number-privacy/signer
+#Copy monorepo yarn.lock
 COPY yarn.lock ./
+
+#Copy identity code
+COPY packages/phone-number-privacy/ phone-number-privacy/
 
 RUN yarn install --network-timeout 100000 && yarn cache clean
 
