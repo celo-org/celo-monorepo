@@ -15,10 +15,10 @@ This guide steps you through setting up an Attestation Service:
 * Follow the instructions to set up a validator on [mainnet](../getting-started/running-a-validator-in-mainnet.md) or [baklava](../getting-started/running-a-validator-in-baklava.md)
 * Configure Twilio, MessageBird and Nexmo, the SMS providers used by Attestation Service
 * Generate and register an attestation signer key
-* Deploy a Celo full node, with the attestation signer key unlocked
+* (for versions prior to 1.3.0) Deploy a Celo full node, with the attestation signer key unlocked
 * Deploy the attestation service
 * Configure and publish validator metadata so that clients can find your attestation service
-* Configure monitoring for the full node and attestation service
+* Configure monitoring for the attestation service and if applicable the full node
 
 ## Recent releases
 
@@ -33,9 +33,13 @@ The `PORT` environment variable sets the listening port for the service on the l
 
 Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`, and (from version 1.2.0) GET (not POST) `/delivery_status_messagebird`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
 
-An Attestation Service is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
+From Attestation Service version 1.3.0 onwards, there are two ways of deploying the Attestation Service. We recommend that new validators use the file keystore method (instead of using a Celo full node) for key management, and that existing validators eventually migrate to the new architecture.
 
-Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers: one the attestation service, a Celo Blockchain node, and a single database instance.
+An Attestation Service prior to version 1.3.0 is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
+
+While it is still possible to use the full node method described above, from version 1.3.0 onwards, it is recommended to instead deploy the Attestation Service with access to a keystore file that encrypts the attestation signer key. This allows the service to sign attestations locally and then submit these to the proxy node, instead of depending on the separate full node instance to both sign and submit attestations. The passphrase for decrypting the keystore file must be passed in as an environment variable when starting up the Attestation Service. The new method of signing is expected to reduce Attestation Service errors due to the full node not being synced and generally reduce operating overhead.
+
+Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers (two for versions 1.3.0 onwards): one the attestation service, a Celo Blockchain node (only for versions prior to 1.3.0), and a single database instance.
 
 For a high availability setup, multiple instances can be deployed behind a load balancer and sharing a single database service. The load balancer should be configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can identify the matching record in the shared database and act on the receipt to resend if necessary.
 
@@ -101,7 +105,7 @@ MessageBird support is introduced in version 1.2.0 and later. After signing up f
 
 ## Installation
 
-This section uses several environment variables defined during the validator setup. You'll need to export `CELO_IMAGE` and `CELO_VALIDATOR_RG_ADDRESS` on this machine.
+Where necessary, the instructions will differentiate between pre-v1.3.0 (Celo full node for key management) and v1.3.0+ (recommended use of keystore files for key management). This section uses several environment variables defined during the validator setup. You'll need to export `CELO_IMAGE` and `CELO_VALIDATOR_RG_ADDRESS` on this machine.
 
 Setting up an Attestation Service first requires an [Attestation Signer key](key-management/detailed.md#authorized-attestation-signers) to be registered (Similar to Validator and Vote signer keys). For that let's start our node on the Attestations machine (keep track of the password you use for this account):
 
@@ -126,6 +130,21 @@ export CELO_ATTESTATION_SIGNER_SIGNATURE=<ATTESTATION-SIGNER-SIGNATURE>
 export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
+
+### Configuring Key Management
+
+#### (recommended) v1.3.0+ - Using Keystore Files
+
+It is no longer necessary to run a full node alongside the Attestation Service. Instead, you will simply need to set the optional Attestation Service environment variables `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` and `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the directory provided and password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS` respectively. If you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` to create the `CELO_ATTESTATION_SIGNER_ADDRESS`, then you would need to set:
+
+```sh
+export ATTESTATION_SIGNER_KEYSTORE_DIRPATH=$PWD
+export ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE=<CELO-ATTESTATION-SIGNER-PASSWORD>
+```
+
+Additionally, `CELO_PROVIDER` should point to a node to which you can submit signed attestations. This can be a separate full node or your validator proxy node.
+
+#### pre-v1.3.0 - Using Celo Full Node
 
 You can now run the node for the attestation service in the background with the following command. Remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.  And, if you want to run the attestation service for Baklava, add the `--baklava` flag.
 
@@ -176,7 +195,7 @@ Required options:
 | Variable                       | Explanation   |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `DATABASE_URL`                   | The URL to access the local database, e.g. `sqlite://db/attestations.db` |
-| `CELO_PROVIDER`                  | The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! |
+| `CELO_PROVIDER`                  | (pre-v1.3.0) The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! (v1.3.0+) The node URL for your proxy, to which you will send signed attestations. |
 | `CELO_VALIDATOR_ADDRESS`         | Address of the Validator account. If Validator is deployed via a `ReleaseGold` contract, this is the contract's address (i.e. `$CELO_VALIDATOR_RG_ADDRESS`), not the beneficiary. |
 | `ATTESTATION_SIGNER_ADDRESS`     | Address of the Validator's attestation signer key  |
 | `SMS_PROVIDERS`                  | Comma-separated list of all enabled SMS providers. Can include `twilio`, `nexmo`. From v1.2.0, can include `messagebird`. Providers are tried from first to last, unless `SMS_PROVIDERS_RANDOMIZED` is set to `1`, in which case they are tried in a random order. |
@@ -186,6 +205,8 @@ Optional environment variables:
 
 | Variable                       | Explanation    |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
+| `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` | (v1.3.0+) Path to the `keystore` directory containing the encrypted `ATTESTATION_SIGNER_ADDRESS`'s private key. Must be used with `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE`. |
+| `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` | (v1.3.0+) Passphrase used to encrypt `ATTESTATION_SIGNER_ADDRESS`'s keystore file. Must be used with `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` |
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `RATE_LIMIT_REQS_PER_MIN`        | (v1.2.0+) Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
@@ -265,10 +286,12 @@ celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
 
 ## Running the Attestation Service
 
-Before running the attestation service, ensure that your local node is fully synced and that the metadata has been registered.
+Before running the attestation service, ensure that the metadata has been registered.
+
+When using a Celo full node for key management, additionally ensure that your local node is fully synced:
 
 ```bash
-# On the Attestation machine
+# On the Attestation machine, if using a Celo full node for key management
 sudo celocli node:synced --node geth.ipc
 ```
 
@@ -316,7 +339,7 @@ If this works then your attestation service should be successfully deployed!
 
 ## Monitoring
 
-It is important to monitor the Attestation Service and also [monitor the full node](monitoring.md) that it depends on.
+It is important to monitor the Attestation Service and, if using a full node for key management, also [monitor the full node](monitoring.md) that it depends on.
 
 ### Logging
 
