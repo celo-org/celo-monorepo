@@ -77,21 +77,24 @@ jobs:
               export TWILIO_ADDRESS_SID=${{ secrets.STAGING_TWILIO_ADDRESS_SID }}
               export MNEMONIC="${{ secrets.STAGING_MNEMONIC }}"
               export RESERVE_SPENDER_MULTISIG_ADDRESS=0x64a7C6C6Ab63fb2b617849B579e555033BC551cb
+              env CELO_PROVIDER=http://127.0.0.1:8545 ./node_modules/.bin/jest --runInBand
               ;;
             'alfajores')
               export TWILIO_ADDRESS_SID=${{ secrets.ALFAJORES_TWILIO_ADDRESS_SID }}
               export MNEMONIC="${{ secrets.ALFAJORES_MNEMONIC }}"
               export RESERVE_SPENDER_MULTISIG_ADDRESS=0x64a7C6C6Ab63fb2b617849B579e555033BC551cb
+              env CELO_PROVIDER=http://127.0.0.1:8545 ./node_modules/.bin/jest --runInBand --testNamePattern='^(?!.*((report a rate)|(move funds from the Reserve to a custodian and back))).*$'
               ;;
             'baklava')
               export TWILIO_ADDRESS_SID=${{ secrets.BAKLAVA_TWILIO_ADDRESS_SID }}
               export MNEMONIC="${{ secrets.BAKLAVA_MNEMONIC }}"
               export RESERVE_SPENDER_MULTISIG_ADDRESS=0x57d0A6Ce0478074Fe577259D8cb07AfFb6D408f5
+              env CELO_PROVIDER=http://127.0.0.1:8545 ./node_modules/.bin/jest --runInBand --testNamePattern='^(?!.*((report a rate)|(move funds from the Reserve to a custodian and back))).*$'
               ;;
             'mainnet')
               export TWILIO_ADDRESS_SID=${{ secrets.MAINNET_TWILIO_ADDRESS_SID }}
               export MNEMONIC="${{ secrets.MAINNET_MNEMONIC }}"
               export RESERVE_SPENDER_MULTISIG_ADDRESS=0x554Fca0f7c465cd2F8C305a10bF907A2034d2a19
+              env CELO_PROVIDER=http://127.0.0.1:8545 ./node_modules/.bin/jest --runInBand --testNamePattern='^(?!.*((report a rate)|(move funds from the Reserve to a custodian and back))).*$'
               ;;
           esac
-          env CELO_PROVIDER=http://127.0.0.1:8545 yarn test --testNamePattern='^(?!.*((report a rate)|(move funds from the Reserve to a custodian and back))).*$'
