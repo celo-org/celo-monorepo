@@ -216,7 +216,7 @@ contract GrandaMento is
       // Get the minimum and maximum amount of stable token than can be involved
       // in the exchange. This reverts if exchange limits for the stable token have
       // not been set.
-      (uint256 minExchangeAmount, uint256 minExchangeAmount) = getStableTokenExchangeLimits(
+      (uint256 minExchangeAmount, uint256 maxExchangeAmount) = getStableTokenExchangeLimits(
         stableTokenRegistryId
       );
       // Ensure that the amount of stableToken being bought or sold is within
