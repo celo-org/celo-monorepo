@@ -27,23 +27,23 @@ export const getPhoneNumberTypeJSONLD = (
     ],
     type: ['VerifiableCredential', 'PhoneNumberType'],
     credentialSubject: {
-      id: `did:pkh:eth:${subject.toLowerCase()}`,
+      id: `did:pkh:celo:${subject.toLowerCase()}`,
       phoneNumberType,
       identifier,
       phoneNumberTypeProvider,
     },
     issuanceDate: new Date().toISOString(),
-    issuer: `did:pkh:eth:${issuer.toLowerCase()}`,
+    issuer: `did:pkh:celo:${issuer.toLowerCase()}`,
   })
 }
 
 /**
- * Returns an object used to describe the proofOptions for DIDKit
+ * Returns an object used to describe the proofOptions for DIDKit at EIP712 format
  * @param issuer Address of whom is issuing this credential, usually getAttestationSignerAddress()
  */
 export const getProofOptions = (issuer: string) => {
   return JSON.stringify({
-    verificationMethod: `did:pkh:eth:${issuer.toLowerCase()}#Recovery2020`,
+    verificationMethod: `did:pkh:celo:${issuer.toLowerCase()}#Recovery2020`,
     proofPurpose: 'assertionMethod',
     eip712Domain: {
       primaryType: 'VerifiableCredential',

@@ -258,7 +258,7 @@ export async function startSendSms(
       )
       attestation.credentials = `[${verifiableCredential}]`
     } catch (e) {
-      logger.error({ e })
+      logger.error({ e: e.message })
     }
 
     if (!countryCode) {
