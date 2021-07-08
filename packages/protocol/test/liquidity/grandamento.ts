@@ -135,7 +135,7 @@ contract('GrandaMento', (accounts: string[]) => {
   }
 
   beforeEach(async () => {
-    registry = await Registry.new()
+    registry = await Registry.new(true)
 
     goldToken = await GoldToken.new(true)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
