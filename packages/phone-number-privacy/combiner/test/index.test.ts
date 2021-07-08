@@ -1,6 +1,5 @@
-import { isVerified } from '@celo/phone-number-privacy-common'
+import { isVerified, REQUEST_EXPIRY_WINDOW_MS } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
