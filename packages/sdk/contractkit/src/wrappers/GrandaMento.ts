@@ -114,13 +114,15 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   async getAllStableTokenLimits(): Promise<AllStableConfig> {
     const out: AllStableConfig = new Map()
 
-    const res = await Promise.all([
-      this.stableTokenExchangeLimits(StableToken.cUSD),
-      this.stableTokenExchangeLimits(StableToken.cEUR),
-    ])
+    const res = await Promise.all(
+      Object.values(StableToken).map((key) => this.stableTokenExchangeLimits(key))
+    )
+    await Promise.all(
+      Object.values(StableToken).map((key, index) =>
+        out.set(this.kit.celoTokens.getContract(key), res[index])
+      )
+    )
 
-    out.set(this.kit.celoTokens.getContract(StableToken.cUSD), res[0])
-    out.set(this.kit.celoTokens.getContract(StableToken.cEUR), res[1])
     return out
   }
 
