@@ -18,7 +18,7 @@ This guide steps you through setting up an Attestation Service:
 * (for versions prior to 1.3.0) Deploy a Celo full node, with the attestation signer key unlocked
 * Deploy the attestation service
 * Configure and publish validator metadata so that clients can find your attestation service
-* Configure monitoring for the attestation service and if applicable the full node
+* Configure monitoring for the attestation service and the full node (if applicable)
 
 ## Recent releases
 
