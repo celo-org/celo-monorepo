@@ -259,7 +259,7 @@ To complete the metadata process, we have to claim which URL users can request a
 celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is. Note that the URL provided in the validator metadata should be the base path at which the serice is accessible; it should NOT include `/attestations`.
+The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is. Note that the URL provided in the validator metadata should be the base path at which the service is accessible; it should NOT include `/attestations`.
 
 ```bash
 # On your local machine
