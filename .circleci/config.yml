@@ -31,6 +31,11 @@ defaults: &defaults
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
 
+contract-defaults: &contract-defaults
+  <<: *defaults
+  environment:
+    RELEASE_TAG: core-contracts.v4
+
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
@@ -233,15 +238,13 @@ jobs:
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
   pre-protocol-test-release:
-    <<: *defaults
+    <<: *contract-defaults
     docker:
       # We override the default docker image here because this job builds the
       # previous release and requires node 10 rather than node 12 to build
       # properly.
       - image: celohq/node10-gcloud:v3
     resource_class: large
-    environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
     steps:
       - attach_workspace:
           at: ~/app
@@ -265,10 +268,8 @@ jobs:
             - 'packages/protocol/.tmp/released_chain/*'
 
   protocol-test-release:
-    <<: *defaults
+    <<: *contract-defaults
     resource_class: large
-    environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
     steps:
       - attach_workspace:
           at: ~/app
@@ -291,7 +292,7 @@ jobs:
             yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-release-snapshots:
-    <<: *defaults
+    <<: *contract-defaults
     resource_class: large
     steps:
       - attach_workspace:

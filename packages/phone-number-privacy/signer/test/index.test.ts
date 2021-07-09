@@ -1,4 +1,4 @@
-import { authenticateUser } from '@celo/phone-number-privacy-common'
+import { authenticateUser, REQUEST_EXPIRY_WINDOW_MS } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import request from 'supertest'
 import { ErrorMessage, WarningMessage } from '../../common/src/interfaces/error-utils'

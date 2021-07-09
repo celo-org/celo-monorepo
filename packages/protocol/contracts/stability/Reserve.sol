@@ -416,6 +416,7 @@ contract Reserve is
 
   /**
    * @notice Transfer unfrozen gold to any address, used for one side of CP-DOTO.
+   * @dev Transfers are not subject to a daily spending limit.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.

@@ -68,7 +68,7 @@ contract('Exchange', (accounts: string[]) => {
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
-  const goldAmountForRate = new BigNumber('0x10000000000000000')
+  const goldAmountForRate = new BigNumber('1000000000000000000000000')
   const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
   const initialStableBucket = initialGoldBucket.times(stableAmountForRate).div(goldAmountForRate)
   function getBuyTokenAmount(
