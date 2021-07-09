@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
-import { StableToken, StableTokenContract } from '../base'
+import { StableTokenContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { GrandaMento } from '../generated/GrandaMento'
 import {
   BaseWrapper,
@@ -98,8 +99,9 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   }
 
   async stableTokenExchangeLimits(
-    stableTokenRegistryId: StableTokenContract
+    stableTokenTymbol: StableToken
   ): Promise<StableTokenExchangeLimits> {
+    const stableTokenRegistryId = this.kit.celoTokens.getContract(stableTokenTymbol)
     const result = await this.contract.methods
       .stableTokenExchangeLimits(stableTokenRegistryId.toString())
       .call()
@@ -112,13 +114,13 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   async getAllStableTokenLimits(): Promise<AllStableConfig> {
     const out: AllStableConfig = new Map()
 
-    // TODO make this paralel and refactor to a map after having the right type for StableToken
-    for (const token in StableToken) {
-      const tokenRegistry: StableTokenContract = StableToken[token]
-      const value = await this.stableTokenExchangeLimits(tokenRegistry)
-      out.set(tokenRegistry, value)
-    }
+    const res = await Promise.all([
+      this.stableTokenExchangeLimits(StableToken.cUSD),
+      this.stableTokenExchangeLimits(StableToken.cEUR),
+    ])
 
+    out.set(this.kit.celoTokens.getContract(StableToken.cUSD), res[0])
+    out.set(this.kit.celoTokens.getContract(StableToken.cEUR), res[1])
     return out
   }
 
