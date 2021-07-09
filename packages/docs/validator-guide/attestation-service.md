@@ -135,14 +135,14 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attes
 
 #### (recommended) v1.3.0+ - Using Keystore Files
 
-It is no longer necessary to run a full node alongside the Attestation Service. Instead, you will simply need to set the optional Attestation Service environment variables `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` and `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the directory provided and password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS` respectively. If you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` to create the `CELO_ATTESTATION_SIGNER_ADDRESS`, then you would need to set:
+It is no longer necessary to run a full node alongside the Attestation Service. Instead, save the path to the keystore directory generated above and the password used when creating the `CELO_ATTESTATION_SIGNER_ADDRESS` above, as you will need these when running the service:
 
 ```sh
-export ATTESTATION_SIGNER_KEYSTORE_DIRPATH=$PWD
-export ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE=<CELO-ATTESTATION-SIGNER-PASSWORD>
+export KEYSTORE_PARENT_DIR=$PWD
+echo <CELO-ATTESTATION-SIGNER-PASSWORD> > $KEYSTORE_PARENT_DIR/.password
 ```
 
-Additionally, `CELO_PROVIDER` should point to a node to which you can submit signed attestations. This can be a separate full node or your validator proxy node.
+Then, follow the instructions in the `Running the Attestation Service` section below.
 
 #### pre-v1.3.0 - Using Celo Full Node
 
@@ -286,20 +286,46 @@ celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
 
 ## Running the Attestation Service
 
-Before running the attestation service, ensure that the metadata has been registered.
+There is a slight difference in starting up the service depending on the keystore management option (keystore files, full node) used, and both of these are described below.
 
-When using a Celo full node for key management, additionally ensure that your local node is fully synced:
+Before running the Attestation Service using either method, ensure that the metadata has been registered.
+
+Both of the following options for running the Attestation Service use `--network host` to access a local database (only works on Linux), and listen for connections on port 80.
+
+They both assume that all of the configuration options needed have been added to the config file located under `$CONFIG` which Docker will process. Alternatively, you can pass the config file for the service to read on startup using `-e CONFIG=<docker-path-to-config-file>`, and other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
+
+For both options below, set the `TAG` environment variable to determine which image to install. Use `attestation-service-mainnet` for the latest image suitable for mainnet (as below), `attestation-service-baklava` for the latest image suitable for baklava, or specify a specific build as given in the release notes linked above.
+
+### (recommended) Running the Attestation Service v1.3.0+
+
+The main difference between the old method of running the Attestation Service alongside a Celo full node is that you will need to ensure that Docker can access the directory containing the `keystore` which stores the `CELO_ATTESTATION_SIGNER_ADDRESS`'s private key as an encrypted file.
+
+To do this, you need to map the directory containing the `keystore` to the Attestation Service's Docker volume and set the environment variable `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` to the path to this directory relative to the Docker container. You will also need to set the environment variable `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.
+
+Additionally, ensure that the `CELO_PROVIDER` environment variable points to a node to which you can submit signed attestations. This can be a separate full node or your validator proxy node.
+
+The command below illustrates what this could look like, if you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` from earlier in the instructions above to create the `CELO_ATTESTATION_SIGNER_ADDRESS`. Recall that you set `KEYSTORE_PARENT_DIR` to the working directory (`$PWD`) during the instructions above, and saved the password to the file `KEYSTORE_PARENT_DIR/.password`. Note that environment variables can be set either in the `$CONFIG` file or passed into the `docker run` command directly using the `-e` flag. (In this example, two of these variables are passed in via the `-e` flag for clarity.)
+
+```sh
+
+# We will map $KEYSTORE_PARENT_DIR:DOCKER_VOLUME_PATH later
+export VOLUME_DIRPATH=/root/.celo
+
+# On the Attestation machine
+export TAG=attestation-service-mainnet
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -v $KEYSTORE_PARENT_DIR:$VOLUME_DIRPATH -e PORT=80 -e ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE=$(cat $KEYSTORE_PARENT_DIR/.password) -e ATTESTATION_SIGNER_KEYSTORE_DIRPATH=$VOLUME_DIRPATH -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:$TAG -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+```
+
+### Running the Attestation Service pre-v1.3.0
+
+First, ensure that your local node is fully synced:
 
 ```bash
 # On the Attestation machine, if using a Celo full node for key management
 sudo celocli node:synced --node geth.ipc
 ```
 
-The following command for running the Attestation Service uses `--network host` to access a local database (only works on Linux), and listens for connections on port 80.
-
-It assumes all of the configuration options needed have been added to the config file located under `$CONFIG` which Docker will process. Alternatively, you can pass the config file for the service to read on startup using `-e CONFIG=<docker-path-to-config-file>`, and other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
-
-Set the `TAG` environment variable to determine which image to install. Use `attestation-service-mainnet` for the latest image suitable for mainnet (as below), `attestation-service-baklava` for the latest image suitable for baklava, or specify a specific build as given in the release notes linked above.
+Then, start the Attestation Service by running:
 
 ```bash
 # On the Attestation machine
