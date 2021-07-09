@@ -18,6 +18,7 @@ COPY packages/sdk/wallets/wallet-base/package.json packages/sdk/wallets/wallet-b
 COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-local/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
+COPY packages/sdk/keystores/package.json packages/sdk/keystores/
 COPY packages/attestation-service/package.json packages/attestation-service/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 
@@ -33,6 +34,7 @@ COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base
 COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
 COPY packages/protocol packages/protocol/
 COPY packages/sdk/contractkit packages/sdk/contractkit/
+COPY packages/sdk/keystores packages/sdk/keystores/
 COPY packages/attestation-service packages/attestation-service/
 COPY packages/flake-tracker packages/flake-tracker
 
