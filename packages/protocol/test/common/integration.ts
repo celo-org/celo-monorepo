@@ -18,8 +18,8 @@ import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
-  ExchangeContract,
-  ExchangeInstance,
+  ExchangeTestContract,
+  ExchangeTestInstance,
   FeeCurrencyWhitelistInstance,
   FreezerInstance,
   GoldTokenInstance,
@@ -397,7 +397,7 @@ Array.from([
 ]).forEach(([exchangeId, stableTokenId]) =>
   contract(`Integration: ${exchangeId} ${stableTokenId}`, (accounts: string[]) => {
     const transferAmount = 10
-    let exchange: ExchangeInstance
+    let exchange: ExchangeTestInstance
     let multiSig: ReserveSpenderMultiSigInstance
     let reserve: ReserveInstance
     let goldToken: GoldTokenInstance
@@ -575,9 +575,9 @@ Array.from([
 )
 
 contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = artifacts.require('Exchange')
+  const Exchange: ExchangeTestContract = artifacts.require('ExchangeTest')
   const StableToken: StableTokenContract = artifacts.require('StableToken')
-  let exchangeAbc: ExchangeInstance
+  let exchangeAbc: ExchangeTestInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
   let stableTokenAbc: StableTokenInstance
