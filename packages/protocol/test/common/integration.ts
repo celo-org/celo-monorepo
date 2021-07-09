@@ -606,7 +606,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   d) Confirm mento is effectively frozen
   describe('When the contracts have been deployed and initialized', () => {
     before(async () => {
-      exchangeAbc = await Exchange.new()
+      exchangeAbc = await Exchange.new(true)
       stableTokenAbc = await StableToken.new(true)
 
       const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)

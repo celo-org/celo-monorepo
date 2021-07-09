@@ -15,6 +15,7 @@ import {
   GrandaMentoContract,
   GrandaMentoInstance,
   MockGoldTokenContract,
+  MockGoldTokenInstance,
   MockReserveContract,
   MockReserveInstance,
   MockSortedOraclesContract,
@@ -57,16 +58,17 @@ enum ExchangeProposalState {
 }
 
 function parseExchangeProposal(
-  proposalRaw: [string, string, BigNumber, BigNumber, BigNumber, BigNumber, any]
+  proposalRaw: [string, string, BigNumber, any, BigNumber, BigNumber, BigNumber, BigNumber]
 ) {
   return {
     exchanger: proposalRaw[0],
     stableToken: proposalRaw[1],
-    sellAmount: proposalRaw[2],
-    buyAmount: proposalRaw[3],
-    approvalTimestamp: proposalRaw[4],
-    state: proposalRaw[5].toNumber() as ExchangeProposalState,
-    sellCelo: typeof proposalRaw[6] === 'boolean' ? proposalRaw[6] : proposalRaw[6] === 'true',
+    state: proposalRaw[2].toNumber() as ExchangeProposalState,
+    sellCelo: typeof proposalRaw[3] === 'boolean' ? proposalRaw[3] : proposalRaw[3] === 'true',
+    sellAmount: proposalRaw[4],
+    buyAmount: proposalRaw[5],
+    celoStableTokenExchangeRate: proposalRaw[6],
+    approvalTimestamp: proposalRaw[7],
   }
 }
 
@@ -91,6 +93,11 @@ contract('GrandaMento', (accounts: string[]) => {
   const unit = new BigNumber(10).pow(decimals)
   // CELO quoted in StableToken (cUSD), ie $5
   const defaultCeloStableTokenRate = toFixed(5)
+  // StableToken quoted in CELO, ie 1 / $5 = $0.2
+  const defaultStableTokenCeloRate = reciprocal(defaultCeloStableTokenRate)
+
+  const maxApprovalExchangeRateChange = 0.3 // 30%
+  const maxApprovalExchangeRateChangeFixed = toFixed(maxApprovalExchangeRateChange)
 
   const spread = 0.01 // 1%
   const spreadFixed = toFixed(spread)
@@ -99,23 +106,44 @@ contract('GrandaMento', (accounts: string[]) => {
 
   const stableTokenInflationFactor = 1
 
-  // 2000 StableTokens
-  const ownerStableTokenBalance = unit.times(2000)
-
   const minExchangeAmount = unit.times(100)
   const maxExchangeAmount = unit.times(1000)
 
+  const stableTokenSellAmount = unit.times(500)
+  const celoSellAmount = unit.times(100)
+
   const stableTokenRegistryId = CeloContractName.StableToken
 
+  const createExchangeProposal = async (
+    sellCelo: boolean,
+    from: string = owner,
+    _stableTokenRegistryId?: CeloContractName
+  ) => {
+    // When a test sets sellCelo to true, the sender in the test must approve
+    // the CELO to grandaMento.
+    // The MockStableToken does not enforce allowances so there is no need
+    // to approve the stable token to grandaMento when sellCelo is false.
+    if (sellCelo) {
+      await goldToken.approve(grandaMento.address, celoSellAmount, { from })
+    }
+    return grandaMento.createExchangeProposal(
+      _stableTokenRegistryId || stableTokenRegistryId,
+      sellCelo ? celoSellAmount : stableTokenSellAmount,
+      sellCelo,
+      { from }
+    )
+  }
+
   beforeEach(async () => {
-    registry = await Registry.new()
+    registry = await Registry.new(true)
 
     goldToken = await GoldToken.new(true)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
 
     stableToken = await MockStableToken.new()
-    await stableToken.mint(owner, ownerStableTokenBalance)
-    await stableToken.mint(alice, ownerStableTokenBalance)
+    const balance = unit.times(2000)
+    await stableToken.mint(owner, balance)
+    await stableToken.mint(alice, balance)
     await stableToken.setInflationFactor(toFixed(stableTokenInflationFactor))
     await registry.setAddressFor(stableTokenRegistryId, stableToken.address)
 
@@ -132,7 +160,13 @@ contract('GrandaMento', (accounts: string[]) => {
     await goldToken.transfer(reserve.address, unit.times(50000), { from: owner })
 
     grandaMento = await GrandaMento.new(true)
-    await grandaMento.initialize(registry.address, approver, spreadFixed, vetoPeriodSeconds)
+    await grandaMento.initialize(
+      registry.address,
+      approver,
+      maxApprovalExchangeRateChangeFixed,
+      spreadFixed,
+      vetoPeriodSeconds
+    )
     await grandaMento.setStableTokenExchangeLimits(
       stableTokenRegistryId,
       minExchangeAmount,
@@ -153,6 +187,13 @@ contract('GrandaMento', (accounts: string[]) => {
       assert.equal(await grandaMento.approver(), approver)
     })
 
+    it('sets the maxApprovalExchangeRateChange', async () => {
+      assertEqualBN(
+        await grandaMento.maxApprovalExchangeRateChange(),
+        maxApprovalExchangeRateChangeFixed
+      )
+    })
+
     it('sets the spread', async () => {
       assertEqualBN(await grandaMento.spread(), spreadFixed)
     })
@@ -163,7 +204,13 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when called again', async () => {
       await assertRevertWithReason(
-        grandaMento.initialize(registry.address, approver, spreadFixed, vetoPeriodSeconds),
+        grandaMento.initialize(
+          registry.address,
+          approver,
+          maxApprovalExchangeRateChangeFixed,
+          spreadFixed,
+          vetoPeriodSeconds
+        ),
         'contract already initialized'
       )
     })
@@ -171,7 +218,6 @@ contract('GrandaMento', (accounts: string[]) => {
 
   describe('#createExchangeProposal', () => {
     it('returns the proposal ID', async () => {
-      const stableTokenSellAmount = unit.times(500)
       const id = await grandaMento.createExchangeProposal.call(
         stableTokenRegistryId,
         stableTokenSellAmount,
@@ -182,307 +228,171 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('increments the exchange proposal count', async () => {
       assertEqualBN(await grandaMento.exchangeProposalCount(), 0)
-      const stableTokenSellAmount = unit.times(500)
-      await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false // sellCelo = false as we are selling stableToken
-      )
+      await createExchangeProposal(false)
       assertEqualBN(await grandaMento.exchangeProposalCount(), 1)
     })
 
     it('assigns proposal IDs based off the exchange proposal count', async () => {
-      const stableTokenSellAmount = unit.times(200)
-      const receipt1 = await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false // sellCelo = false as we are selling stableToken
-      )
+      const receipt1 = await createExchangeProposal(false)
       assertEqualBN(receipt1.logs[0].args.proposalId, 1)
 
-      const receipt2 = await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false // sellCelo = false as we are selling stableToken
-      )
+      const receipt2 = await createExchangeProposal(false)
       assertEqualBN(receipt2.logs[0].args.proposalId, 2)
     })
 
-    it('adds the exchange proposal to the activeProposalIds linked list', async () => {
-      const stableTokenSellAmount = unit.times(200)
-      await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false // sellCelo = false as we are selling stableToken
-      )
-      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
+    it('adds the exchange proposal to the activeProposalIdsSuperset', async () => {
+      await createExchangeProposal(false)
+      assertEqualBN(await grandaMento.activeProposalIdsSuperset(0), new BigNumber(1))
 
       // Add another
-      await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false // sellCelo = false as we are selling stableToken
-      )
-      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-        new BigNumber(1),
-        new BigNumber(2),
-      ])
+      await createExchangeProposal(false)
+      assertEqualBN(await grandaMento.activeProposalIdsSuperset(0), new BigNumber(1))
+      assertEqualBN(await grandaMento.activeProposalIdsSuperset(1), new BigNumber(2))
     })
 
-    describe('when proposing an exchange that sells stable tokens', () => {
-      // Celo token price quoted in CELO
-      const stableTokenCeloRate = reciprocal(defaultCeloStableTokenRate)
-      const stableTokenSellAmount = unit.times(500)
-      it('emits the ExchangeProposalCreated event with the sell amount as the stable token value when its inflation factor is 1', async () => {
-        const receipt = await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false // sellCelo = false as we are selling stableToken
-        )
-        assertLogMatches2(receipt.logs[0], {
-          event: 'ExchangeProposalCreated',
-          args: {
-            exchanger: owner,
-            proposalId: 1,
-            stableToken: stableToken.address,
-            sellAmount: stableTokenSellAmount,
-            buyAmount: getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread),
-            sellCelo: false,
-          },
-        })
-      })
+    for (const sellCelo of [true, false]) {
+      let sellTokenString: string
+      let sellAmount: BigNumber
+      let oracleRate: BigNumber
+      let sellToken: GoldTokenInstance | MockStableTokenInstance
 
-      it('emits the ExchangeProposalCreated event with the sell amount as the stable token value when its inflation factor not 1', async () => {
-        // Set the inflationFactor to something that isn't 1
-        const inflationFactor = 1.05
-        await stableToken.setInflationFactor(toFixed(inflationFactor))
-
-        const receipt = await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false // sellCelo = false as we are selling stableToken
-        )
-        assertLogMatches2(receipt.logs[0], {
-          event: 'ExchangeProposalCreated',
-          args: {
-            exchanger: owner,
-            proposalId: 1,
-            stableToken: stableToken.address,
-            sellAmount: stableTokenSellAmount,
-            buyAmount: getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread),
-            sellCelo: false,
-          },
-        })
-      })
-
-      it('stores the exchange proposal with the sell amount in units when the stable token inflation factor is 1', async () => {
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false // sellCelo = false as we are selling stableToken
-        )
-        // 1 is the proposal ID
-        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
-        assert.equal(exchangeProposal.exchanger, owner)
-        assert.equal(exchangeProposal.stableToken, stableToken.address)
-        assertEqualBN(
-          exchangeProposal.sellAmount,
-          valueToUnits(stableTokenSellAmount, stableTokenInflationFactor)
-        )
-        assertEqualBN(
-          exchangeProposal.buyAmount,
-          getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread)
-        )
-        assertEqualBN(exchangeProposal.approvalTimestamp, 0)
-        assert.equal(exchangeProposal.state, ExchangeProposalState.Proposed)
-        assert.equal(exchangeProposal.sellCelo, false)
-      })
-
-      it('stores the exchange proposal with the sell amount in units when the stable token inflation factor is not 1', async () => {
-        // Set the inflationFactor to something that isn't 1
-        const inflationFactor = 1.05
-        await stableToken.setInflationFactor(toFixed(inflationFactor))
-
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false // sellCelo = false as we are selling stableToken
-        )
-        // 1 is the proposal ID
-        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
-        assert.equal(exchangeProposal.exchanger, owner)
-        assert.equal(exchangeProposal.stableToken, stableToken.address)
-        assertEqualBN(
-          exchangeProposal.sellAmount,
-          valueToUnits(stableTokenSellAmount, inflationFactor)
-        )
-        assertEqualBN(
-          exchangeProposal.buyAmount,
-          getBuyAmount(stableTokenSellAmount, fromFixed(stableTokenCeloRate), spread)
-        )
-        assertEqualBN(exchangeProposal.approvalTimestamp, 0)
-        assert.equal(exchangeProposal.state, ExchangeProposalState.Proposed)
-        assert.equal(exchangeProposal.sellCelo, false)
-      })
-
-      it('deposits the stable tokens to be sold', async () => {
-        const senderBalanceBefore = await stableToken.balanceOf(owner)
-        const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false // sellCelo = false as we are selling stableToken
-        )
-        const senderBalanceAfter = await stableToken.balanceOf(owner)
-        const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
-        // Sender paid
-        assertEqualBN(senderBalanceBefore.minus(senderBalanceAfter), stableTokenSellAmount)
-        // GrandaMento received
-        assertEqualBN(
-          grandaMentoBalanceAfter.minus(grandaMentoBalanceBefore),
-          stableTokenSellAmount
-        )
-      })
-
-      it('reverts if the amount being sold is less than the stable token min exchange amount', async () => {
-        await assertRevertWithReason(
-          grandaMento.createExchangeProposal(
-            stableTokenRegistryId,
-            minExchangeAmount.minus(1),
-            false // sellCelo = false as we are selling stableToken
-          ),
-          'Stable token exchange amount not within limits'
-        )
-      })
-
-      it('reverts if the amount being sold is greater than the stable token max exchange amount', async () => {
-        await assertRevertWithReason(
-          grandaMento.createExchangeProposal(
-            stableTokenRegistryId,
-            maxExchangeAmount.plus(1),
-            false // sellCelo = false as we are selling stableToken
-          ),
-          'Stable token exchange amount not within limits'
-        )
-      })
-
-      it('reverts if the stable token has not had exchange limits set', async () => {
-        // Add an entry for StableTokenEUR so the tx doesn't revert
-        // as a result of the registry lookup.
-        await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
-        await assertRevertWithReason(
-          grandaMento.createExchangeProposal(
-            CeloContractName.StableTokenEUR,
-            stableTokenSellAmount,
-            false // sellCelo = false as we are selling stableToken
-          ),
-          'Max stable token exchange amount must be > 0'
-        )
-      })
-    })
-
-    describe('when proposing an exchange that sells CELO', () => {
-      const createExchangeProposal = async (
-        _stableTokenRegistryId: string,
-        sellAmount: BigNumber
-      ) => {
-        await goldToken.approve(grandaMento.address, sellAmount)
-        // sellCelo = true as we are selling CELO
-        return grandaMento.createExchangeProposal(_stableTokenRegistryId, sellAmount, true)
+      if (sellCelo) {
+        sellTokenString = 'CELO'
+        sellAmount = celoSellAmount
+        oracleRate = defaultCeloStableTokenRate
+      } else {
+        sellTokenString = 'stable tokens'
+        sellAmount = stableTokenSellAmount
+        oracleRate = defaultStableTokenCeloRate
       }
-      const celoSellAmount = unit.times(100)
-      it('emits the ExchangeProposalCreated event', async () => {
-        const receipt = await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
-        assertLogMatches2(receipt.logs[0], {
-          event: 'ExchangeProposalCreated',
-          args: {
-            exchanger: owner,
-            proposalId: 1,
-            stableToken: stableToken.address,
-            sellAmount: celoSellAmount,
-            buyAmount: getBuyAmount(celoSellAmount, fromFixed(defaultCeloStableTokenRate), spread),
-            sellCelo: true,
-          },
+
+      beforeEach(() => {
+        // This must be done in beforeEach because goldToken and stableToken
+        // are assigned in a previous beforeEach hook.
+        sellToken = sellCelo ? goldToken : stableToken
+      })
+
+      describe(`when proposing an exchange that sells ${sellTokenString}`, () => {
+        for (const inflationFactor of sellCelo ? [1] : [1, 1.1]) {
+          it(`emits the ExchangeProposalCreated event${
+            sellCelo
+              ? ''
+              : ` with the sell amount as the stable token value when its inflation factor is ${inflationFactor}`
+          }`, async () => {
+            if (!sellCelo) {
+              await stableToken.setInflationFactor(toFixed(inflationFactor))
+            }
+
+            const receipt = await createExchangeProposal(sellCelo)
+            assertLogMatches2(receipt.logs[0], {
+              event: 'ExchangeProposalCreated',
+              args: {
+                exchanger: owner,
+                proposalId: 1,
+                stableTokenRegistryId,
+                sellAmount,
+                buyAmount: getBuyAmount(fromFixed(oracleRate), sellAmount, spread),
+                sellCelo,
+              },
+            })
+          })
+
+          it(`stores the exchange proposal${
+            sellCelo
+              ? ''
+              : ` with the sell amount in units when the stable token inflation factor is ${inflationFactor}`
+          }`, async () => {
+            if (!sellCelo) {
+              await stableToken.setInflationFactor(toFixed(inflationFactor))
+            }
+
+            await createExchangeProposal(sellCelo)
+            // 1 is the proposal ID
+            const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
+            assert.equal(exchangeProposal.exchanger, owner)
+            assert.equal(exchangeProposal.stableToken, stableToken.address)
+            assert.equal(exchangeProposal.state, ExchangeProposalState.Proposed)
+            assert.equal(exchangeProposal.sellCelo, sellCelo)
+            assertEqualBN(
+              exchangeProposal.sellAmount,
+              sellCelo ? sellAmount : valueToUnits(sellAmount, inflationFactor)
+            )
+            assertEqualBN(
+              exchangeProposal.buyAmount,
+              getBuyAmount(fromFixed(oracleRate), sellAmount, spread)
+            )
+            assertEqualBN(exchangeProposal.celoStableTokenExchangeRate, defaultCeloStableTokenRate)
+            assertEqualBN(exchangeProposal.approvalTimestamp, 0)
+          })
+        }
+
+        it(`deposits the ${sellTokenString} to be sold`, async () => {
+          const senderBalanceBefore = await sellToken.balanceOf(owner)
+          const grandaMentoBalanceBefore = await sellToken.balanceOf(grandaMento.address)
+          await createExchangeProposal(sellCelo)
+          const senderBalanceAfter = await sellToken.balanceOf(owner)
+          const grandaMentoBalanceAfter = await sellToken.balanceOf(grandaMento.address)
+          // Sender paid
+          assertEqualBN(senderBalanceBefore.minus(senderBalanceAfter), sellAmount)
+          // GrandaMento received
+          assertEqualBN(grandaMentoBalanceAfter.minus(grandaMentoBalanceBefore), sellAmount)
+        })
+
+        it('reverts if the amount of stable token being exchanged is less than the stable token min exchange amount', async () => {
+          const _sellAmount = sellCelo
+            ? getSellAmount(minExchangeAmount, fromFixed(oracleRate), spread).minus(1)
+            : minExchangeAmount.minus(1)
+
+          await assertRevertWithReason(
+            grandaMento.createExchangeProposal(stableTokenRegistryId, _sellAmount, sellCelo),
+            'Stable token exchange amount not within limits'
+          )
+        })
+
+        it('reverts if the amount of stable token being exchanged is greater than the stable token max exchange amount', async () => {
+          const _sellAmount = sellCelo
+            ? getSellAmount(maxExchangeAmount, fromFixed(oracleRate), spread).plus(1)
+            : maxExchangeAmount.plus(1)
+          await assertRevertWithReason(
+            grandaMento.createExchangeProposal(stableTokenRegistryId, _sellAmount, sellCelo),
+            'Stable token exchange amount not within limits'
+          )
+        })
+
+        it('reverts if the stable token has not had exchange limits set', async () => {
+          // Add an entry for StableTokenEUR so the tx doesn't revert
+          // as a result of the registry lookup.
+          await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
+          await assertRevertWithReason(
+            grandaMento.createExchangeProposal(
+              CeloContractName.StableTokenEUR,
+              stableTokenSellAmount,
+              sellCelo
+            ),
+            'Max stable token exchange amount must be defined'
+          )
+        })
+
+        it('reverts when there is no oracle price for the stable token', async () => {
+          await sortedOracles.setMedianRate(stableToken.address, 0)
+          await assertRevertWithReason(
+            grandaMento.createExchangeProposal(
+              CeloContractName.StableToken,
+              stableTokenSellAmount,
+              sellCelo
+            ),
+            'No oracle rates present for token'
+          )
         })
       })
-
-      it('stores the exchange proposal', async () => {
-        await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
-        // 1 is the proposal ID
-        const exchangeProposal = parseExchangeProposal(await grandaMento.exchangeProposals(1))
-        assert.equal(exchangeProposal.exchanger, owner)
-        assert.equal(exchangeProposal.stableToken, stableToken.address)
-        assertEqualBN(exchangeProposal.sellAmount, celoSellAmount)
-        assertEqualBN(
-          exchangeProposal.buyAmount,
-          getBuyAmount(celoSellAmount, fromFixed(defaultCeloStableTokenRate), spread)
-        )
-        assertEqualBN(exchangeProposal.approvalTimestamp, 0)
-        assert.equal(exchangeProposal.state, ExchangeProposalState.Proposed)
-        assert.equal(exchangeProposal.sellCelo, true)
-      })
-
-      it('deposits the stable tokens to be sold', async () => {
-        const senderBalanceBefore = await goldToken.balanceOf(owner)
-        const grandaMentoBalanceBefore = await goldToken.balanceOf(grandaMento.address)
-        await createExchangeProposal(stableTokenRegistryId, celoSellAmount)
-        const senderBalanceAfter = await goldToken.balanceOf(owner)
-        const grandaMentoBalanceAfter = await goldToken.balanceOf(grandaMento.address)
-        // Sender paid
-        assertEqualBN(senderBalanceBefore.minus(senderBalanceAfter), celoSellAmount)
-        // GrandaMento received
-        assertEqualBN(grandaMentoBalanceAfter.minus(grandaMentoBalanceBefore), celoSellAmount)
-      })
-
-      it('reverts if the amount being sold is less than the stable token min exchange amount', async () => {
-        const sellAmount = getSellAmount(
-          minExchangeAmount,
-          fromFixed(defaultCeloStableTokenRate),
-          spread
-        ).minus(1)
-        await assertRevertWithReason(
-          grandaMento.createExchangeProposal(
-            stableTokenRegistryId,
-            sellAmount,
-            true // sellCelo = true as we are selling CELO
-          ),
-          'Stable token exchange amount not within limits'
-        )
-      })
-
-      it('reverts if the amount being sold is greater than the stable token max exchange amount', async () => {
-        const sellAmount = getSellAmount(
-          maxExchangeAmount,
-          fromFixed(defaultCeloStableTokenRate),
-          spread
-        ).plus(1)
-        await assertRevertWithReason(
-          createExchangeProposal(stableTokenRegistryId, sellAmount),
-          'Stable token exchange amount not within limits'
-        )
-      })
-
-      it('reverts if the stable token has not had exchange limits set', async () => {
-        // Add an entry for StableTokenEUR so the tx doesn't revert
-        // as a result of the registry lookup.
-        await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
-        await assertRevertWithReason(
-          createExchangeProposal(CeloContractName.StableTokenEUR, celoSellAmount),
-          'Max stable token exchange amount must be > 0'
-        )
-      })
-    })
+    }
   })
 
   describe('#approveExchangeProposal', () => {
     const proposalId = 1
     beforeEach(async () => {
       // Create an exchange proposal in the Proposed state with proposal ID 1
-      await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        unit.times(500),
-        false // sellCelo = false as we are selling stableToken
-      )
+      await createExchangeProposal(false)
     })
     describe('when called by the approver', () => {
       it('emits the ExchangeProposalApproved event', async () => {
@@ -513,10 +423,33 @@ contract('GrandaMento', (accounts: string[]) => {
         assertEqualBN(proposal.approvalTimestamp, latestBlock.timestamp)
       })
 
-      it('does not remove the exchange proposal from the activeProposalIds linked list', async () => {
-        await grandaMento.approveExchangeProposal(proposalId, { from: approver })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
-      })
+      for (const rateChange of [-maxApprovalExchangeRateChange, maxApprovalExchangeRateChange]) {
+        it(`tolerates ${
+          rateChange > 0 ? 'an increase' : 'a decrease'
+        } in the exchange rate since exchange proposal creation within the maximum`, async () => {
+          // The absolute max change
+          const newCeloStableTokenRate = defaultCeloStableTokenRate.times(1 + rateChange)
+          await sortedOracles.setMedianRate(stableToken.address, newCeloStableTokenRate)
+          await grandaMento.approveExchangeProposal(proposalId, { from: approver })
+        })
+      }
+
+      for (const rateChange of [
+        -maxApprovalExchangeRateChange - 0.01,
+        maxApprovalExchangeRateChange + 0.01,
+      ]) {
+        it(`reverts when ${
+          rateChange > 0 ? 'an increase' : 'a decrease'
+        } in the exchange rate since exchange proposal creation not within the maximum`, async () => {
+          // Just in excess of the max change
+          const newCeloStableTokenRate = defaultCeloStableTokenRate.times(1 + rateChange)
+          await sortedOracles.setMedianRate(stableToken.address, newCeloStableTokenRate)
+          await assertRevertWithReason(
+            grandaMento.approveExchangeProposal(proposalId, { from: approver }),
+            'CELO exchange rate is too different from the proposed price'
+          )
+        })
+      }
 
       it('reverts if the exchange proposal does not exist', async () => {
         const nonexistentProposalId = 2
@@ -542,17 +475,9 @@ contract('GrandaMento', (accounts: string[]) => {
   })
 
   describe('#cancelExchangeProposal', () => {
-    const stableTokenSellAmount = unit.times(500)
     describe('when called by the exchanger', () => {
       beforeEach(async () => {
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false,
-          {
-            from: alice,
-          }
-        )
+        await createExchangeProposal(false, alice)
       })
 
       it('changes an exchange proposal from the Proposed state to the Cancelled state', async () => {
@@ -574,14 +499,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
     describe('when called by the owner', () => {
       beforeEach(async () => {
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false,
-          {
-            from: alice,
-          }
-        )
+        await createExchangeProposal(false, alice)
       })
 
       it('changes an exchange proposal from the Approved state to the Cancelled state', async () => {
@@ -604,183 +522,96 @@ contract('GrandaMento', (accounts: string[]) => {
 
     describe('when called by the appropriate sender for the proposal state', () => {
       it('emits the ExchangeProposalCancelled event', async () => {
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false,
-          {
-            from: alice,
-          }
-        )
+        await createExchangeProposal(false, alice)
         const receipt = await grandaMento.cancelExchangeProposal(1, { from: alice })
         assertLogMatches2(receipt.logs[0], {
           event: 'ExchangeProposalCancelled',
           args: {
             proposalId: 1,
-            sender: alice,
           },
         })
       })
 
-      it('removes the exchange proposal from the activeProposalIds linked list', async () => {
-        // proposalId 1
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false,
-          {
-            from: alice,
-          }
-        )
-        // proposalId 2
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false,
-          {
-            from: alice,
-          }
-        )
-        // proposalId 3
-        await grandaMento.createExchangeProposal(
-          stableTokenRegistryId,
-          stableTokenSellAmount,
-          false,
-          {
-            from: alice,
-          }
-        )
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-          new BigNumber(1),
-          new BigNumber(2),
-          new BigNumber(3),
-        ])
-        // Remove 2
-        await grandaMento.cancelExchangeProposal(2, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
-          new BigNumber(1),
-          new BigNumber(3),
-        ])
-        // Remove 1
-        await grandaMento.cancelExchangeProposal(1, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(3)])
-        // Remove 3
-        await grandaMento.cancelExchangeProposal(3, { from: alice })
-        assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
-      })
+      for (const sellCelo of [true, false]) {
+        let sellTokenString: string
+        let sellAmount: BigNumber
+        let sellToken: GoldTokenInstance | MockGoldTokenInstance | MockStableTokenInstance
 
-      describe('when selling the stable token', () => {
-        beforeEach(async () => {
-          await grandaMento.createExchangeProposal(
-            stableTokenRegistryId,
-            stableTokenSellAmount,
-            false,
-            {
-              from: alice,
+        if (sellCelo) {
+          sellTokenString = 'CELO'
+          sellAmount = celoSellAmount
+        } else {
+          sellTokenString = 'stable tokens'
+          sellAmount = stableTokenSellAmount
+        }
+
+        describe(`when selling ${sellTokenString}`, () => {
+          beforeEach(async () => {
+            sellToken = sellCelo ? goldToken : stableToken
+          })
+
+          for (const inflationFactor of sellCelo ? [1] : [1, 1.1]) {
+            it(`refunds the correct amount of ${sellTokenString}${
+              sellCelo ? '' : ` when the inflation factor is ${inflationFactor}`
+            }`, async () => {
+              await createExchangeProposal(sellCelo, alice)
+              if (!sellCelo) {
+                await stableToken.setInflationFactor(toFixed(inflationFactor))
+              }
+
+              const grandaMentoBalanceBefore = await sellToken.balanceOf(grandaMento.address)
+              const aliceBalanceBefore = await sellToken.balanceOf(alice)
+              await grandaMento.cancelExchangeProposal(1, { from: alice })
+              const grandaMentoBalanceAfter = await sellToken.balanceOf(grandaMento.address)
+              const aliceBalanceAfter = await sellToken.balanceOf(alice)
+
+              const valueAmount = sellCelo ? sellAmount : unitsToValue(sellAmount, inflationFactor)
+              assertEqualBN(grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter), valueAmount)
+              assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), valueAmount)
+            })
+          }
+
+          it('refunds the entire balance if the amount to refund is higher than the balance', async () => {
+            let newGrandaMentoBalance: BigNumber
+            // Simulate a situation where the refund amount is greater than
+            // Granda Mento's balance.
+            if (sellCelo) {
+              newGrandaMentoBalance = unit.times(40)
+              const mockGoldToken = await MockGoldToken.new()
+              sellToken = mockGoldToken
+              await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
+              await mockGoldToken.setBalanceOf(alice, celoSellAmount)
+
+              await createExchangeProposal(sellCelo, alice)
+
+              // Just directly set the balance of Granda Mento.
+              await mockGoldToken.setBalanceOf(grandaMento.address, newGrandaMentoBalance)
+            } else {
+              newGrandaMentoBalance = unit.times(400)
+              await createExchangeProposal(sellCelo, alice)
+              // Remove some stableToken from granda mento to artificially simulate a situation
+              // where the refund amount is > granda mento's balance.
+              await stableToken.transferFrom(
+                grandaMento.address,
+                owner,
+                stableTokenSellAmount.minus(newGrandaMentoBalance)
+              )
             }
-          )
-        })
 
-        it('refunds the same stable token amount as the original deposit when the inflation factor is 1', async () => {
-          const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
-          const aliceBalanceBefore = await stableToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(1, { from: alice })
-          const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
-          const aliceBalanceAfter = await stableToken.balanceOf(alice)
+            const aliceBalanceBefore = await sellToken.balanceOf(alice)
+            await grandaMento.cancelExchangeProposal(1, { from: alice })
+            const grandaMentoBalanceAfter = await sellToken.balanceOf(grandaMento.address)
+            const aliceBalanceAfter = await sellToken.balanceOf(alice)
 
-          assertEqualBN(
-            grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter),
-            stableTokenSellAmount
-          )
-          assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), stableTokenSellAmount)
-        })
-
-        it('refunds the appropriate stable token amount value when the inflation factor is not 1', async () => {
-          const inflationFactor = 1.1
-          await stableToken.setInflationFactor(toFixed(inflationFactor))
-
-          const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
-          const aliceBalanceBefore = await stableToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(1, { from: alice })
-          const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
-          const aliceBalanceAfter = await stableToken.balanceOf(alice)
-
-          const valueAmount = unitsToValue(stableTokenSellAmount, inflationFactor)
-          assertEqualBN(grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter), valueAmount)
-          assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), valueAmount)
-        })
-
-        it('refunds the entire balance if the amount to refund is higher than the balance', async () => {
-          const newGrandaMentoBalance = unit.times(400)
-          // Remove some stableToken from granda mento to artificially simulate a situation
-          // where the refund amount is > granda mento's balance.
-          await stableToken.transferFrom(
-            grandaMento.address,
-            owner,
-            stableTokenSellAmount.minus(newGrandaMentoBalance)
-          )
-
-          const aliceBalanceBefore = await stableToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(1, { from: alice })
-          const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
-          const aliceBalanceAfter = await stableToken.balanceOf(alice)
-
-          assertEqualBN(grandaMentoBalanceAfter, 0)
-          assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), newGrandaMentoBalance)
-        })
-      })
-
-      describe('when selling CELO', () => {
-        const celoSellAmount = unit.times(100)
-
-        it('refunds the same CELO amount as the original deposit', async () => {
-          await goldToken.approve(grandaMento.address, celoSellAmount, { from: alice })
-          await grandaMento.createExchangeProposal(stableTokenRegistryId, celoSellAmount, true, {
-            from: alice,
+            assertEqualBN(grandaMentoBalanceAfter, 0)
+            assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), newGrandaMentoBalance)
           })
-
-          const grandaMentoBalanceBefore = await goldToken.balanceOf(grandaMento.address)
-          const aliceBalanceBefore = await goldToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(1, { from: alice })
-          const grandaMentoBalanceAfter = await goldToken.balanceOf(grandaMento.address)
-          const aliceBalanceAfter = await goldToken.balanceOf(alice)
-
-          assertEqualBN(grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter), celoSellAmount)
-          assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), celoSellAmount)
         })
-
-        it('refunds the entire balance if the amount to refund is higher than the balance', async () => {
-          const mockGoldToken = await MockGoldToken.new()
-          await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
-          await mockGoldToken.setBalanceOf(alice, celoSellAmount)
-
-          await grandaMento.createExchangeProposal(stableTokenRegistryId, celoSellAmount, true, {
-            from: alice,
-          })
-          const newGrandaMentoBalance = unit.times(40)
-          // Artificially lower the granda mento CELO balance.
-          await mockGoldToken.setBalanceOf(grandaMento.address, newGrandaMentoBalance)
-
-          const aliceBalanceBefore = await mockGoldToken.balanceOf(alice)
-          await grandaMento.cancelExchangeProposal(1, { from: alice })
-          const grandaMentoBalanceAfter = await mockGoldToken.balanceOf(grandaMento.address)
-          const aliceBalanceAfter = await mockGoldToken.balanceOf(alice)
-
-          assertEqualBN(grandaMentoBalanceAfter, 0)
-          assertEqualBN(aliceBalanceAfter.minus(aliceBalanceBefore), newGrandaMentoBalance)
-        })
-      })
+      }
     })
 
     it('reverts when called by a sender that is not permitted', async () => {
-      await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        stableTokenSellAmount,
-        false,
-        {
-          from: alice,
-        }
-      )
+      await createExchangeProposal(false, alice)
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
         'Sender cannot cancel the exchange proposal'
@@ -796,25 +627,9 @@ contract('GrandaMento', (accounts: string[]) => {
   })
 
   describe('#executeExchangeProposal', () => {
-    const stableTokenSellAmount = unit.times(500)
-    const celoSellAmount = unit.times(100)
     let sellCelo = false
     beforeEach(async () => {
-      // When a test sets sellCelo to true, the sender in the test must approve
-      // the CELO to grandaMento.
-      // The MockStableToken does not enforce allowances so there is no need
-      // to approve the stable token to grandaMento when sellCelo is false.
-      if (sellCelo) {
-        await goldToken.approve(grandaMento.address, celoSellAmount, { from: alice })
-      }
-      await grandaMento.createExchangeProposal(
-        stableTokenRegistryId,
-        sellCelo ? celoSellAmount : stableTokenSellAmount,
-        sellCelo,
-        {
-          from: alice,
-        }
-      )
+      await createExchangeProposal(sellCelo, alice)
     })
     describe('when the proposal is in the Approved state', () => {
       beforeEach(async () => {
@@ -844,45 +659,26 @@ contract('GrandaMento', (accounts: string[]) => {
           assert.equal(exchangeProposalAfter.state, ExchangeProposalState.Executed)
         })
 
-        it('removes the exchange proposal from the activeProposalIds linked list', async () => {
-          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(1)])
-          await grandaMento.executeExchangeProposal(1)
-          assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
-        })
-
         describe('when selling stable token', () => {
           before(() => {
             sellCelo = false
           })
 
-          it('burns the correct stable token value when the inflation factor is 1', async () => {
-            const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
-            const totalSupplyBefore = await stableToken.totalSupply()
-            await grandaMento.executeExchangeProposal(1)
-            const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
-            const totalSupplyAfter = await stableToken.totalSupply()
+          for (const inflationFactor of sellCelo ? [1] : [1, 1.1]) {
+            it(`burns the correct stable token amount when the inflation factor is ${inflationFactor}`, async () => {
+              await stableToken.setInflationFactor(toFixed(inflationFactor))
 
-            assertEqualBN(
-              grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter),
-              stableTokenSellAmount
-            )
-            assertEqualBN(totalSupplyBefore.minus(totalSupplyAfter), stableTokenSellAmount)
-          })
+              const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
+              const totalSupplyBefore = await stableToken.totalSupply()
+              await grandaMento.executeExchangeProposal(1)
+              const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
+              const totalSupplyAfter = await stableToken.totalSupply()
 
-          it('burns the correct stable token value when the inflation factor is not 1', async () => {
-            const inflationFactor = 1.1
-            await stableToken.setInflationFactor(toFixed(inflationFactor))
-
-            const grandaMentoBalanceBefore = await stableToken.balanceOf(grandaMento.address)
-            const totalSupplyBefore = await stableToken.totalSupply()
-            await grandaMento.executeExchangeProposal(1)
-            const grandaMentoBalanceAfter = await stableToken.balanceOf(grandaMento.address)
-            const totalSupplyAfter = await stableToken.totalSupply()
-
-            const sellAmountValue = unitsToValue(stableTokenSellAmount, inflationFactor)
-            assertEqualBN(grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter), sellAmountValue)
-            assertEqualBN(totalSupplyBefore.minus(totalSupplyAfter), sellAmountValue)
-          })
+              const valueAmount = unitsToValue(stableTokenSellAmount, inflationFactor)
+              assertEqualBN(grandaMentoBalanceBefore.minus(grandaMentoBalanceAfter), valueAmount)
+              assertEqualBN(totalSupplyBefore.minus(totalSupplyAfter), valueAmount)
+            })
+          }
 
           it('burns the entire stable token balance if the sell amount value is higher than the balance', async () => {
             const newGrandaMentoBalance = unit.times(400)
@@ -1010,79 +806,120 @@ contract('GrandaMento', (accounts: string[]) => {
     })
   })
 
-  describe('#getBuyAmount', () => {
-    const sellAmount = unit.times(500)
-    describe('when selling stable token', () => {
-      // Price of stableToken quoted in CELO
-      const stableTokenCeloRate = fromFixed(reciprocal(defaultCeloStableTokenRate))
-      it('returns the amount being bought when the spread is 0', async () => {
-        // Set spread as 0%
-        await grandaMento.setSpread(0)
-        assertEqualBN(
-          await grandaMento.getBuyAmount(
-            stableToken.address,
-            sellAmount,
-            false // sellCelo = false as we are selling stableToken
-          ),
-          getBuyAmount(sellAmount, stableTokenCeloRate, 0)
-        )
-      })
-
-      it('returns the amount being bought when the spread is > 0', async () => {
-        // Set spread as 1%
-        const _spread = 0.01
-        await grandaMento.setSpread(toFixed(_spread))
-
-        assertEqualBN(
-          await grandaMento.getBuyAmount(
-            stableToken.address,
-            sellAmount,
-            false // sellCelo = false as we are selling stableToken
-          ),
-          getBuyAmount(sellAmount, stableTokenCeloRate, _spread)
-        )
-      })
+  describe('#removeFromActiveProposalIdsSuperset', () => {
+    beforeEach(async () => {
+      // proposalId 1
+      await createExchangeProposal(false, alice)
+      // proposalId 2
+      await createExchangeProposal(false, alice)
+      // proposalId 3
+      await createExchangeProposal(false, alice)
     })
 
-    describe('when selling CELO', () => {
-      // Price of CELO quoted in stable tokens
-      const celoStableTokenRate = fromFixed(defaultCeloStableTokenRate)
-      it('returns the amount being bought when the spread is 0', async () => {
-        // Set spread as 0%
-        await grandaMento.setSpread(0)
-        assertEqualBN(
-          await grandaMento.getBuyAmount(
-            stableToken.address,
-            sellAmount,
-            true // sellCelo = true as we are selling CELO
-          ),
-          getBuyAmount(sellAmount, celoStableTokenRate, 0)
-        )
-      })
+    it('removes the exchange proposal from the activeProposalIdsSuperset', async () => {
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(1),
+        new BigNumber(2),
+        new BigNumber(3),
+      ])
+      // Remove ID 3
+      await grandaMento.cancelExchangeProposal(3, { from: alice })
+      // Remove ID 3, which is at index 2
+      await grandaMento.removeFromActiveProposalIdsSuperset(2)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(1),
+        new BigNumber(2),
+      ])
 
-      it('returns the amount being bought when the spread is > 0', async () => {
-        // Set spread as 1%
-        const _spread = 0.01
-        await grandaMento.setSpread(toFixed(_spread))
+      // Remove ID 1
+      await grandaMento.cancelExchangeProposal(1, { from: alice })
+      // Remove ID 1, which is at index 0
+      await grandaMento.removeFromActiveProposalIdsSuperset(0)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [new BigNumber(2)])
 
-        assertEqualBN(
-          await grandaMento.getBuyAmount(
-            stableToken.address,
-            sellAmount,
-            true // sellCelo = true as we are selling CELO
-          ),
-          getBuyAmount(sellAmount, celoStableTokenRate, _spread)
-        )
-      })
+      // Remove ID 2
+      // Test with the exchange proposal being executed rather than cancelled
+      await grandaMento.approveExchangeProposal(2, { from: approver })
+      await timeTravel(vetoPeriodSeconds, web3)
+      await grandaMento.executeExchangeProposal(2)
+      // Remove ID 2, which is at index 0
+      await grandaMento.removeFromActiveProposalIdsSuperset(0)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [])
     })
 
-    it('reverts when there is no oracle price for the stable token', async () => {
-      const newStableToken = await MockStableToken.new()
+    it('reverts if the exchange proposal is active', async () => {
       await assertRevertWithReason(
-        grandaMento.getBuyAmount(newStableToken.address, sellAmount, true),
-        'No oracle rates present for token'
+        grandaMento.removeFromActiveProposalIdsSuperset(0),
+        'Exchange proposal not inactive'
       )
     })
+
+    it('reverts if the provided index is out of bounds', async () => {
+      await assertRevertWithReason(
+        grandaMento.removeFromActiveProposalIdsSuperset(3),
+        'Index out of bounds'
+      )
+    })
+  })
+
+  describe('#getActiveProposalIds', () => {
+    beforeEach(async () => {
+      // proposalId 1
+      await createExchangeProposal(false, alice)
+      // proposalId 2
+      await createExchangeProposal(false, alice)
+      // proposalId 3
+      await createExchangeProposal(false, alice)
+    })
+
+    it('returns the active exchange proposal IDs when the superset has no inactive proposal IDs', async () => {
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(1),
+        new BigNumber(2),
+        new BigNumber(3),
+      ])
+    })
+
+    it('returns the active exchange proposal IDs with 0s for any inactive proposal IDs in the superset', async () => {
+      // cancel proposal ID 1
+      await grandaMento.cancelExchangeProposal(1, { from: alice })
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(0),
+        new BigNumber(2),
+        new BigNumber(3),
+      ])
+
+      // execute proposal ID 3
+      await grandaMento.approveExchangeProposal(3, { from: approver })
+      await timeTravel(vetoPeriodSeconds, web3)
+      await grandaMento.executeExchangeProposal(3)
+      assertEqualBNArray(await grandaMento.getActiveProposalIds(), [
+        new BigNumber(0),
+        new BigNumber(2),
+        new BigNumber(0),
+      ])
+    })
+  })
+
+  describe('#getBuyAmount', () => {
+    const sellAmount = unit.times(500)
+
+    for (const sellCelo of [true, false]) {
+      const oracleRate = fromFixed(
+        sellCelo ? defaultCeloStableTokenRate : defaultStableTokenCeloRate
+      )
+      describe('when selling stable token', () => {
+        for (const _spread of [0, 0.01]) {
+          it(`returns the amount being bought when the spread is ${_spread}`, async () => {
+            await grandaMento.setSpread(toFixed(_spread))
+            assertEqualBN(
+              await grandaMento.getBuyAmount(defaultCeloStableTokenRate, sellAmount, sellCelo),
+              getBuyAmount(oracleRate, sellAmount, _spread)
+            )
+          })
+        }
+      })
+    }
   })
 
   describe('#setApprover', () => {
@@ -1116,6 +953,38 @@ contract('GrandaMento', (accounts: string[]) => {
     })
   })
 
+  describe('#setMaxApprovalExchangeRateChange', () => {
+    const newMaxApprovalExchangeRateChangeFixed = toFixed(0.4) // 40%
+    it('sets the maxApprovalExchangeRateChange', async () => {
+      await grandaMento.setMaxApprovalExchangeRateChange(newMaxApprovalExchangeRateChangeFixed)
+      assertEqualBN(
+        await grandaMento.maxApprovalExchangeRateChange(),
+        newMaxApprovalExchangeRateChangeFixed
+      )
+    })
+
+    it('emits the MaxApprovalExchangeRateChangeSet event', async () => {
+      const receipt = await grandaMento.setMaxApprovalExchangeRateChange(
+        newMaxApprovalExchangeRateChangeFixed
+      )
+      assertLogMatches2(receipt.logs[0], {
+        event: 'MaxApprovalExchangeRateChangeSet',
+        args: {
+          maxApprovalExchangeRateChange: newMaxApprovalExchangeRateChangeFixed,
+        },
+      })
+    })
+
+    it('reverts when the sender is not the owner', async () => {
+      await assertRevertWithReason(
+        grandaMento.setMaxApprovalExchangeRateChange(newMaxApprovalExchangeRateChangeFixed, {
+          from: accounts[1],
+        }),
+        'Ownable: caller is not the owner'
+      )
+    })
+  })
+
   describe('#setSpread', () => {
     // 0.5%
     const newSpreadFixed = toFixed(0.005)
@@ -1132,6 +1001,13 @@ contract('GrandaMento', (accounts: string[]) => {
           spread: newSpreadFixed,
         },
       })
+    })
+
+    it('reverts when the spread is greater than 1', async () => {
+      await assertRevertWithReason(
+        grandaMento.setSpread(toFixed(1.0001)),
+        'Spread must be smaller than 1'
+      )
     })
 
     it('reverts when the sender is not the owner', async () => {
@@ -1186,10 +1062,31 @@ contract('GrandaMento', (accounts: string[]) => {
       )
     })
   })
+
+  describe('#getStableTokenExchangeLimits', () => {
+    it('gets the exchange limits', async () => {
+      const min = new BigNumber(123)
+      const max = new BigNumber(321)
+      await grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, min, max)
+      const limits = await grandaMento.getStableTokenExchangeLimits(stableTokenRegistryId)
+      assertEqualBN(limits['0'], min)
+      assertEqualBN(limits['1'], max)
+    })
+
+    it('reverts if the exchange limits have not been set', async () => {
+      // Add an entry for StableTokenEUR so the tx doesn't revert
+      // as a result of the registry lookup.
+      await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
+      await assertRevertWithReason(
+        grandaMento.getStableTokenExchangeLimits(CeloContractName.StableTokenEUR),
+        'Max stable token exchange amount must be defined'
+      )
+    })
+  })
 })
 
 // exchangeRate is the price of the sell token quoted in buy token
-function getBuyAmount(sellAmount: BigNumber, exchangeRate: BigNumber, spread: BigNumber.Value) {
+function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
   return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
 }
 

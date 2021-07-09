@@ -4,9 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/InitializableV2.sol";
-import "../common/linkedlists/IntegerLinkedList.sol";
-import "../common/linkedlists/LinkedList.sol";
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -18,19 +16,18 @@ import "../stability/interfaces/IStableToken.sol";
 contract GrandaMento is
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   ReentrancyGuard
 {
   using FixidityLib for FixidityLib.Fraction;
-  using IntegerLinkedList for LinkedList.List;
   using SafeMath for uint256;
 
   // Emitted when a new exchange proposal is created.
   event ExchangeProposalCreated(
     uint256 indexed proposalId,
     address indexed exchanger,
-    address indexed stableToken,
+    string stableTokenRegistryId,
     uint256 sellAmount,
     uint256 buyAmount,
     bool sellCelo
@@ -40,13 +37,16 @@ contract GrandaMento is
   event ExchangeProposalApproved(uint256 indexed proposalId);
 
   // Emitted when an exchange proposal is cancelled.
-  event ExchangeProposalCancelled(uint256 indexed proposalId, address sender);
+  event ExchangeProposalCancelled(uint256 indexed proposalId);
 
   // Emitted when an exchange proposal is executed.
   event ExchangeProposalExecuted(uint256 indexed proposalId);
 
   // Emitted when the approver is set.
   event ApproverSet(address approver);
+
+  // Emitted when maxApprovalExchangeRateChange is set.
+  event MaxApprovalExchangeRateChangeSet(uint256 maxApprovalExchangeRateChange);
 
   // Emitted when the spread is set.
   event SpreadSet(uint256 spread);
@@ -73,8 +73,14 @@ contract GrandaMento is
   struct ExchangeProposal {
     // The exchanger/proposer of the exchange proposal.
     address payable exchanger;
-    // The stable token involved in this proposal.
+    // The stable token involved in this proposal. This is stored rather than
+    // the stable token's registry ID in case the contract address is changed
+    // while a stable token deposit
     address stableToken;
+    // The state of the exchange proposal.
+    ExchangeProposalState state;
+    // Whether CELO is being sold and stableToken is being bought.
+    bool sellCelo;
     // The amount of the sell token being sold. If a stable token is being sold,
     // the amount of stable token in "units" is stored rather than the "value."
     // This is because stable tokens may experience demurrage/inflation, where
@@ -87,17 +93,24 @@ contract GrandaMento is
     // The amount of the buy token being bought. For stable tokens, this is
     // kept track of as the value, not units.
     uint256 buyAmount;
+    // The price of CELO quoted in stableToken at the time of the exchange proposal
+    // creation. This is the price used to calculate the buyAmount. Used for a
+    // safety check when an approval is being made that the price isn't wildly
+    // different. Recalculating buyAmount is not sufficient because if a stable token
+    // is being sold that has demurrage enabled, the original value when the stable
+    // tokens were deposited cannot be calculated.
+    uint256 celoStableTokenExchangeRate;
     // The timestamp (`block.timestamp`) at which the exchange proposal was approved
     // in seconds. If the exchange proposal has not ever been approved, is 0.
     uint256 approvalTimestamp;
-    // The state of the exchange proposal.
-    ExchangeProposalState state;
-    // Whether CELO is being sold and stableToken is being bought.
-    bool sellCelo;
   }
 
   // The address with the authority to approve exchange proposals.
   address public approver;
+
+  // The maximum allowed change in the CELO/stable token price when an exchange proposal
+  // is being approved relative to the rate when the exchange proposal was created.
+  FixidityLib.Fraction public maxApprovalExchangeRateChange;
 
   // The percent fee imposed upon an exchange execution.
   FixidityLib.Fraction public spread;
@@ -112,12 +125,21 @@ contract GrandaMento is
   // State for all exchange proposals. Indexed by the exchange proposal ID.
   mapping(uint256 => ExchangeProposal) public exchangeProposals;
 
-  // A list of all exchange proposals that are currently in the Proposed or
-  // Approved state. Used for easily viewing all the active exchange proposals.
-  LinkedList.List private activeProposalIds;
+  // An array containing a superset of the IDs of exchange proposals that are currently
+  // in the Proposed or Approved state. Intended to allow easy viewing of all active
+  // exchange proposals. It's possible for a proposal ID in this array to no longer be
+  // active, so filtering is required to find the true set of active proposal IDs.
+  // A superset is kept because exchange proposal vetoes, intended to be done
+  // by Governance, effectively go through a multi-day timelock. If the veto
+  // call was required to provide the index in an array of activeProposalIds to
+  // remove corresponding to the vetoed exchange proposal, the timelock could result
+  // in the provided index being stale by the time the veto would be executed.
+  // Alternative approaches exist, like maintaining a linkedlist of active proposal
+  // IDs, but this approach was chosen for its low implementation complexity.
+  uint256[] public activeProposalIdsSuperset;
 
-  // Number of exchange proposals that exist. Used for assigning an exchange
-  // proposal ID to a new proposal.
+  // Number of exchange proposals that have ever been created. Used for assigning
+  // an exchange proposal ID to a new proposal.
   uint256 public exchangeProposalCount;
 
   /**
@@ -132,7 +154,7 @@ contract GrandaMento is
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialization.
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -145,17 +167,23 @@ contract GrandaMento is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _registry The address of the registry.
+   * @param _approver The approver that has the ability to approve exchange proposals.
+   * @param _maxApprovalExchangeRateChange The maximum allowed change in CELO price
+   * between an exchange proposal's creation and approval.
    * @param _spread The spread charged on exchanges.
+   * @param _vetoPeriodSeconds The length of the veto period in seconds.
    */
   function initialize(
     address _registry,
     address _approver,
+    uint256 _maxApprovalExchangeRateChange,
     uint256 _spread,
     uint256 _vetoPeriodSeconds
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registry);
     setApprover(_approver);
+    setMaxApprovalExchangeRateChange(_maxApprovalExchangeRateChange);
     setSpread(_spread);
     setVetoPeriodSeconds(_vetoPeriodSeconds);
   }
@@ -175,23 +203,31 @@ contract GrandaMento is
     bool sellCelo
   ) external nonReentrant returns (uint256) {
     address stableToken = registry.getAddressForStringOrDie(stableTokenRegistryId);
-    // Require the configurable stableToken max exchange amount to be > 0.
-    // This covers the case where a stableToken has never been explicitly permitted.
-    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryId];
-    require(exchangeLimits.maxExchangeAmount > 0, "Max stable token exchange amount must be > 0");
+
+    // Gets the price of CELO quoted in stableToken.
+    uint256 celoStableTokenExchangeRate = getOracleExchangeRate(stableToken).unwrap();
 
     // Using the current oracle exchange rate, calculate what the buy amount is.
     // This takes the spread into consideration.
-    uint256 buyAmount = getBuyAmount(stableToken, sellAmount, sellCelo);
+    uint256 buyAmount = getBuyAmount(celoStableTokenExchangeRate, sellAmount, sellCelo);
 
-    // Ensure that the amount of stableToken being bought or sold is within
-    // the configurable exchange limits.
-    uint256 stableTokenExchangeAmount = sellCelo ? buyAmount : sellAmount;
-    require(
-      stableTokenExchangeAmount <= exchangeLimits.maxExchangeAmount &&
-        stableTokenExchangeAmount >= exchangeLimits.minExchangeAmount,
-      "Stable token exchange amount not within limits"
-    );
+    // Create new scope to prevent a stack too deep error.
+    {
+      // Get the minimum and maximum amount of stable token than can be involved
+      // in the exchange. This reverts if exchange limits for the stable token have
+      // not been set.
+      (uint256 minExchangeAmount, uint256 maxExchangeAmount) = getStableTokenExchangeLimits(
+        stableTokenRegistryId
+      );
+      // Ensure that the amount of stableToken being bought or sold is within
+      // the configurable exchange limits.
+      uint256 stableTokenExchangeAmount = sellCelo ? buyAmount : sellAmount;
+      require(
+        stableTokenExchangeAmount <= maxExchangeAmount &&
+          stableTokenExchangeAmount >= minExchangeAmount,
+        "Stable token exchange amount not within limits"
+      );
+    }
 
     // Deposit the assets being sold.
     IERC20 sellToken = sellCelo ? getGoldToken() : IERC20(stableToken);
@@ -202,26 +238,29 @@ contract GrandaMento is
 
     // Record the proposal.
     // Add 1 to the running proposal count, and use the updated proposal count as
-    // the proposal ID. Proposal IDs intentionally start at 1 rather than 0 because
-    // LinkedList, which is used for keeping track of active proposal IDs, requires
-    // keys to be non-zero.
+    // the proposal ID. Proposal IDs intentionally start at 1.
     exchangeProposalCount = exchangeProposalCount.add(1);
+    // For stable tokens, the amount is stored in units to deal with demurrage.
+    uint256 storedSellAmount = sellCelo
+      ? sellAmount
+      : IStableToken(stableToken).valueToUnits(sellAmount);
     exchangeProposals[exchangeProposalCount] = ExchangeProposal({
       exchanger: msg.sender,
-      stableToken: stableToken, // for stable tokens, is saved in units to deal with demurrage.
-      sellAmount: sellCelo ? sellAmount : IStableToken(stableToken).valueToUnits(sellAmount),
-      buyAmount: buyAmount,
-      approvalTimestamp: 0, // initial value when not approved yet
+      stableToken: stableToken,
       state: ExchangeProposalState.Proposed,
-      sellCelo: sellCelo
+      sellCelo: sellCelo,
+      sellAmount: storedSellAmount,
+      buyAmount: buyAmount,
+      celoStableTokenExchangeRate: celoStableTokenExchangeRate,
+      approvalTimestamp: 0 // initial value when not approved yet
     });
     // Push it into the array of active proposals.
-    activeProposalIds.push(exchangeProposalCount);
+    activeProposalIdsSuperset.push(exchangeProposalCount);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
     emit ExchangeProposalCreated(
       exchangeProposalCount,
       msg.sender,
-      stableToken,
+      stableTokenRegistryId,
       sellAmount,
       buyAmount,
       sellCelo
@@ -234,10 +273,26 @@ contract GrandaMento is
    * @dev Sender must be the approver. Exchange proposal must be in the Proposed state.
    * @param proposalId The identifier of the proposal to approve.
    */
-  function approveExchangeProposal(uint256 proposalId) external onlyApprover {
+  function approveExchangeProposal(uint256 proposalId) external nonReentrant onlyApprover {
     ExchangeProposal storage proposal = exchangeProposals[proposalId];
     // Ensure the proposal is in the Proposed state.
     require(proposal.state == ExchangeProposalState.Proposed, "Proposal must be in Proposed state");
+    // Ensure the change in the current price of CELO quoted in the stable token
+    // relative to the value when the proposal was created is within the allowed limit.
+    FixidityLib.Fraction memory currentRate = getOracleExchangeRate(proposal.stableToken);
+    FixidityLib.Fraction memory proposalRate = FixidityLib.wrap(
+      proposal.celoStableTokenExchangeRate
+    );
+    (FixidityLib.Fraction memory lesserRate, FixidityLib.Fraction memory greaterRate) = currentRate
+      .lt(proposalRate)
+      ? (currentRate, proposalRate)
+      : (proposalRate, currentRate);
+    FixidityLib.Fraction memory rateChange = greaterRate.subtract(lesserRate).divide(proposalRate);
+    require(
+      rateChange.lte(maxApprovalExchangeRateChange),
+      "CELO exchange rate is too different from the proposed price"
+    );
+
     // Set the time the approval occurred and change the state.
     proposal.approvalTimestamp = block.timestamp;
     proposal.state = ExchangeProposalState.Approved;
@@ -262,8 +317,6 @@ contract GrandaMento is
     );
     // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
-    // Remove the proposal from the active list. This operation is O(1).
-    activeProposalIds.remove(proposalId);
     // Get the token and amount that will be refunded to the proposer.
     (IERC20 refundToken, uint256 refundAmount) = getSellTokenAndSellAmount(proposal);
     // Finally, transfer out the deposited funds.
@@ -271,7 +324,7 @@ contract GrandaMento is
       refundToken.transfer(proposal.exchanger, refundAmount),
       "Transfer out of refund token failed"
     );
-    emit ExchangeProposalCancelled(proposalId, msg.sender);
+    emit ExchangeProposalCancelled(proposalId);
   }
 
   /**
@@ -291,9 +344,6 @@ contract GrandaMento is
     );
     // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Executed;
-    // Remove the proposal from the active list. This operation is O(1).
-    activeProposalIds.remove(proposalId);
-
     // Perform the exchange.
     (IERC20 sellToken, uint256 sellAmount) = getSellTokenAndSellAmount(proposal);
     // If the exchange sells CELO, the CELO is sent to the Reserve from this contract
@@ -329,6 +379,7 @@ contract GrandaMento is
    * @dev For stable token sell amounts that are stored as units, the value
    * is returned. Ensures sell amount is not greater than this contract's balance.
    * @param proposal The proposal to get the sell token and sell amount for.
+   * @return (the IERC20 sell token, the value sell amount).
    */
   function getSellTokenAndSellAmount(ExchangeProposal memory proposal)
     private
@@ -366,18 +417,18 @@ contract GrandaMento is
    * the asset being bought.
    * @dev Stable token value amounts are used for the sellAmount, not unit amounts.
    * Assumes both CELO and the stable token have 18 decimals.
-   * @param stableToken The stableToken involved in the exchange.
+   * @param celoStableTokenExchangeRate The unwrapped fraction exchange rate of CELO
+   * quoted in the stable token.
    * @param sellAmount The amount of the sell token being sold.
    * @param sellCelo Whether CELO is being sold.
    * @return The amount of the asset being bought.
    */
-  function getBuyAmount(address stableToken, uint256 sellAmount, bool sellCelo)
+  function getBuyAmount(uint256 celoStableTokenExchangeRate, uint256 sellAmount, bool sellCelo)
     public
     view
     returns (uint256)
   {
-    // Gets the price of CELO quoted in stableToken.
-    FixidityLib.Fraction memory exchangeRate = getOracleExchangeRate(stableToken);
+    FixidityLib.Fraction memory exchangeRate = FixidityLib.wrap(celoStableTokenExchangeRate);
     // If stableToken is being sold, instead use the price of stableToken
     // quoted in CELO.
     if (!sellCelo) {
@@ -394,12 +445,53 @@ contract GrandaMento is
   }
 
   /**
-   * @notice Gets the proposal identifiers of all exchange proposals in the
-   * Proposed or Approved state.
+   * @notice Removes the proposal ID found at the provided index of activeProposalIdsSuperset
+   * if the exchange proposal is not active.
+   * @dev Anyone can call. Reverts if the exchange proposal is active.
+   * @param index The index of the proposal ID to remove from activeProposalIdsSuperset.
+   */
+  function removeFromActiveProposalIdsSuperset(uint256 index) external {
+    require(index < activeProposalIdsSuperset.length, "Index out of bounds");
+    uint256 proposalId = activeProposalIdsSuperset[index];
+    // Require the exchange proposal to be inactive.
+    require(
+      exchangeProposals[proposalId].state != ExchangeProposalState.Proposed &&
+        exchangeProposals[proposalId].state != ExchangeProposalState.Approved,
+      "Exchange proposal not inactive"
+    );
+    // If not removing the last element, overwrite the index with the value of
+    // the last element.
+    uint256 lastIndex = activeProposalIdsSuperset.length.sub(1);
+    if (index < lastIndex) {
+      activeProposalIdsSuperset[index] = activeProposalIdsSuperset[lastIndex];
+    }
+    // Delete the last element.
+    activeProposalIdsSuperset.length--;
+  }
+
+  /**
+   * @notice Gets the proposal identifiers of exchange proposals in the
+   * Proposed or Approved state. Returns a version of activeProposalIdsSuperset
+   * with inactive proposal IDs set as 0.
+   * @dev Elements with a proposal ID of 0 should be filtered out by the consumer.
    * @return An array of active exchange proposals IDs.
    */
   function getActiveProposalIds() external view returns (uint256[] memory) {
-    return activeProposalIds.getKeys();
+    // Solidity doesn't play well with dynamically sized memory arrays.
+    // Instead, this array is created with the same length as activeProposalIdsSuperset,
+    // and will replace elements that are inactive proposal IDs with the value 0.
+    uint256[] memory activeProposalIds = new uint256[](activeProposalIdsSuperset.length);
+
+    for (uint256 i = 0; i < activeProposalIdsSuperset.length; i = i.add(1)) {
+      uint256 proposalId = activeProposalIdsSuperset[i];
+      if (
+        exchangeProposals[proposalId].state == ExchangeProposalState.Proposed ||
+        exchangeProposals[proposalId].state == ExchangeProposalState.Approved
+      ) {
+        activeProposalIds[i] = proposalId;
+      }
+    }
+    return activeProposalIds;
   }
 
   /**
@@ -422,9 +514,31 @@ contract GrandaMento is
   }
 
   /**
+   * @notice Gets the minimum and maximum amount of a stable token that can be
+   * involved in a single exchange.
+   * @dev Reverts if there is no explicit exchange limit for the stable token.
+   * @param stableTokenRegistryId The string registry ID for the stable token.
+   * @return (minimum exchange amount, maximum exchange amount).
+   */
+  function getStableTokenExchangeLimits(string memory stableTokenRegistryId)
+    public
+    view
+    returns (uint256, uint256)
+  {
+    ExchangeLimits memory exchangeLimits = stableTokenExchangeLimits[stableTokenRegistryId];
+    // Require the configurable stableToken max exchange amount to be > 0.
+    // This covers the case where a stableToken has never been explicitly permitted.
+    require(
+      exchangeLimits.maxExchangeAmount > 0,
+      "Max stable token exchange amount must be defined"
+    );
+    return (exchangeLimits.minExchangeAmount, exchangeLimits.maxExchangeAmount);
+  }
+
+  /**
    * @notice Sets the approver.
    * @dev Sender must be owner. New approver is allowed to be address(0).
-   * @param newApprover The new value for the spread.
+   * @param newApprover The new value for the approver.
    */
   function setApprover(address newApprover) public onlyOwner {
     approver = newApprover;
@@ -432,23 +546,30 @@ contract GrandaMento is
   }
 
   /**
-   * @notice Sets the spread.
+   * @notice Sets the maximum allowed change in the CELO/stable token price when
+   * an exchange proposal is being approved relative to the price when the proposal
+   * was created.
    * @dev Sender must be owner.
-   * @param newSpread The new value for the spread.
+   * @param newMaxApprovalExchangeRateChange The new value for maxApprovalExchangeRateChange
+   * to be wrapped.
    */
-  function setSpread(uint256 newSpread) public onlyOwner {
-    spread = FixidityLib.wrap(newSpread);
-    emit SpreadSet(newSpread);
+  function setMaxApprovalExchangeRateChange(uint256 newMaxApprovalExchangeRateChange)
+    public
+    onlyOwner
+  {
+    maxApprovalExchangeRateChange = FixidityLib.wrap(newMaxApprovalExchangeRateChange);
+    emit MaxApprovalExchangeRateChangeSet(newMaxApprovalExchangeRateChange);
   }
 
   /**
-   * @notice Sets the veto period in seconds.
+   * @notice Sets the spread.
    * @dev Sender must be owner.
-   * @param newVetoPeriodSeconds The new value for the veto period in seconds.
+   * @param newSpread The new value for the spread to be wrapped. Must be <= fixed 1.
    */
-  function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
-    vetoPeriodSeconds = newVetoPeriodSeconds;
-    emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
+  function setSpread(uint256 newSpread) public onlyOwner {
+    require(newSpread <= FixidityLib.fixed1().unwrap(), "Spread must be smaller than 1");
+    spread = FixidityLib.wrap(newSpread);
+    emit SpreadSet(newSpread);
   }
 
   /**
@@ -473,5 +594,15 @@ contract GrandaMento is
       maxExchangeAmount: maxExchangeAmount
     });
     emit StableTokenExchangeLimitsSet(stableTokenRegistryId, minExchangeAmount, maxExchangeAmount);
+  }
+
+  /**
+   * @notice Sets the veto period in seconds.
+   * @dev Sender must be owner.
+   * @param newVetoPeriodSeconds The new value for the veto period in seconds.
+   */
+  function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
+    vetoPeriodSeconds = newVetoPeriodSeconds;
+    emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
   }
 }

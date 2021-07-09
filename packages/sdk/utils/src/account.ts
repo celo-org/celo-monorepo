@@ -196,6 +196,15 @@ export function getAllLanguages(): MnemonicLanguages[] {
   ]
 }
 
+export function mnemonicLengthFromStrength(strength: MnemonicStrength): number {
+  switch (strength) {
+    case MnemonicStrength.s128_12words:
+      return 12
+    case MnemonicStrength.s256_24words:
+      return 24
+  }
+}
+
 /**
  * Splits a mnemonic phrase into words, handling extra whitespace anywhere in the phrase.
  */
@@ -275,9 +284,16 @@ export function detectMnemonicLanguage(
  */
 export function* suggestMnemonicCorrections(
   mnemonic: string,
-  language?: MnemonicLanguages
+  language?: MnemonicLanguages,
+  strength?: MnemonicStrength
 ): Generator<string> {
   const words = splitMnemonic(mnemonic)
+
+  // Function does not currently attempt to correct phrases with an incorrect number of words.
+  const expectedLength = strength && mnemonicLengthFromStrength(strength)
+  if ((expectedLength && words.length !== expectedLength) || words.length % 3 !== 0) {
+    return
+  }
 
   // If the language is not provided or detected, no suggestions can be given.
   const lang = language ?? detectMnemonicLanguage(words)
