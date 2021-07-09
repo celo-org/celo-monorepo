@@ -140,8 +140,6 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   it('#getConfig', async () => {
     const config = await grandaMento.getConfig()
-    console.log(expConfig)
-    console.log(NetworkConfig)
     // expect(config.approver).toBe(expConfig.approver) // TODO FIX this tests, for some reason `expConfig.approver` is 0x0000...0 even it's writen on the migrations-override.json
     expect(config.spread).toEqBigNumber(expConfig.spread)
     expect(config.vetoPeriodSeconds).toEqBigNumber(expConfig.vetoPeriodSeconds)
