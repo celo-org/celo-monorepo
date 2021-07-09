@@ -123,6 +123,7 @@ export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
   async getHumanReadableConfig() {
     const config = await this.getConfig()
     const inflationParameters = {
+      ...config.inflationParameters,
       updatePeriod: secondsToDurationString(config.inflationParameters.updatePeriod),
       factorLastUpdated: unixSecondsTimestampToDateString(
         config.inflationParameters.factorLastUpdated
