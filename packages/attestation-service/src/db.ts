@@ -141,17 +141,15 @@ export async function initializeKit(force: boolean = false) {
     // Prefer passed in keystore if these variables are set
     const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
     const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
-    if (keystoreDirpath === '' || keystorePassphrase === '') {
+    if (!keystoreDirpath || !keystorePassphrase) {
       // Backwards compatibility -- assume this is the deployed full node
       kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
     } else {
-      const keystoreWalletWrapper = new KeystoreWalletWrapper(
-        new FileKeystore(fetchEnv('ATTESTATION_SIGNER_KEYSTORE_DIRPATH'))
-      )
+      const keystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore(keystoreDirpath))
       try {
         await keystoreWalletWrapper.unlockAccount(
           fetchEnv('ATTESTATION_SIGNER_ADDRESS'),
-          fetchEnv('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE')
+          keystorePassphrase
         )
       } catch (error) {
         kit = undefined
