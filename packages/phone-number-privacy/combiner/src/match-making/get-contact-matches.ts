@@ -116,6 +116,8 @@ export async function handleGetContactMatches(
           if (signedUserPhoneNumberRecord === '') {
             // Account has performed matchmaking before and has provided a phone number dek signature
             // but we do not have a record of their phone number signature in the db.
+            // This could be bc we were unable to verify the user phone number signature last time, or bc
+            // the user never provided a phone number signature.
             logger.info(
               { account },
               'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'

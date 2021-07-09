@@ -266,7 +266,6 @@ describe(`POST /getContactMatches endpoint`, () => {
           switch (description) {
             case 'w/o signedUserPhoneNumber':
               it('rejects more than one request to matchmake with 403', (done) => {
-                mockGetDidMatchmaking.mockReturnValue(true)
                 mockIsVerified.mockReturnValue(true)
                 getContactMatches(req, invalidResponseExpected(done, 403))
               })

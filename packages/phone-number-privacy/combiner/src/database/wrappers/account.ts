@@ -90,17 +90,13 @@ export async function setDidMatchmaking(
   logger.debug({ account }, 'Setting did matchmaking')
   if (await getAccountExists(account, logger)) {
     try {
-      if (signedUserPhoneNumber) {
-        return accounts()
-          .where(ACCOUNTS_COLUMNS.address, account)
-          .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
-          .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
-          .timeout(DB_TIMEOUT)
-      }
-      return accounts()
+      const query = accounts()
+        .timeout(DB_TIMEOUT)
         .where(ACCOUNTS_COLUMNS.address, account)
         .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
-        .timeout(DB_TIMEOUT)
+      return signedUserPhoneNumber
+        ? query.update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
+        : query
     } catch (err) {
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
       logger.error(err)
