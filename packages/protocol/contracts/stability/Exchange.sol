@@ -187,6 +187,7 @@ contract Exchange is
    */
   function _exchange(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
     IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    address stableToken = getStableTokenContractAddress();
 
     if (sellGold) {
       goldBucket = goldBucket.add(sellAmount);
@@ -196,17 +197,17 @@ contract Exchange is
         "Transfer of sell token failed"
       );
       require(
-        IStableToken(getStableTokenContractAddress()).mint(msg.sender, buyAmount),
+        IStableToken(stableToken).mint(msg.sender, buyAmount),
         "Mint of stable token failed"
       );
     } else {
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
       require(
-        IERC20(getStableTokenContractAddress()).transferFrom(msg.sender, address(this), sellAmount),
+        IERC20(stableToken).transferFrom(msg.sender, address(this), sellAmount),
         "Transfer of sell token failed"
       );
-      IStableToken(getStableTokenContractAddress()).burn(sellAmount);
+      IStableToken(stableToken).burn(sellAmount);
 
       require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
     }
@@ -445,13 +446,15 @@ contract Exchange is
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
-    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(getStableTokenContractAddress());
+    address stableToken = getStableTokenContractAddress();
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stableToken);
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
-    bool enoughReports = sortedOracles.numRates(getStableTokenContractAddress()) >= minimumReports;
+    bool enoughReports = sortedOracles.numRates(stableToken) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
-    bool medianReportRecent = sortedOracles.medianTimestamp(getStableTokenContractAddress()) >
+    bool medianReportRecent = sortedOracles.medianTimestamp(stableToken) >
       now.sub(updateFrequency);
+    // emit A(timePassed, enoughReports, medianReportRecent, !isReportExpired);
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
