@@ -156,14 +156,17 @@ fi
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    if grep -nri ${ACCOUNT_ADDRESS#0x} /root/.celo/keystore/ > /dev/null; then
+      :
     {{- if .proxy | default false }}
-    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+      [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- else }}
     {{- if not (.proxied | default false) }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- end }}
     {{- end }}
+    fi
     {{- end }}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -272,7 +275,7 @@ fi
 lifecycle:
   preStop:
     exec:
-      command: ["/bin/sh","-c","killall -HUP geth; while killall -0 geth; do sleep 1; done"]
+      command: ["/bin/sh","-c","killall -SIGTERM geth; while killall -0 geth; do sleep 1; done"]
 {{- end -}}
 
 {{- define "common.geth-configmap" -}}
@@ -491,7 +494,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - "-c"
   - |
     if [ -d /root/.celo/celo/chaindata ]; then
-      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      lastBlockTimestamp=$(timeout 60 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
       # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
@@ -513,7 +516,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- define "common.gsutil-sync-data-init-container" -}}
 - name: gsutil-sync-data
   image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   command:
   - /bin/sh
   - -c
