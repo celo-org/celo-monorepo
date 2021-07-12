@@ -117,10 +117,9 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     const res = await Promise.all(
       Object.values(StableToken).map((key) => this.stableTokenExchangeLimits(key))
     )
-    await Promise.all(
-      Object.values(StableToken).map((key, index) =>
-        out.set(this.kit.celoTokens.getContract(key), res[index])
-      )
+
+    Object.values(StableToken).map((key, index) =>
+      out.set(this.kit.celoTokens.getContract(key), res[index])
     )
 
     return out
