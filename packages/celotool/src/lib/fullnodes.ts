@@ -26,6 +26,7 @@ const contextFullNodeDeploymentEnvVars: {
   rollingUpdatePartition: DynamicEnvVar.FULL_NODES_ROLLING_UPDATE_PARTITION,
   rpcApis: DynamicEnvVar.FULL_NODES_RPC_API_METHODS,
   gcMode: DynamicEnvVar.FULL_NODES_GETH_GC_MODE,
+  wsPort: DynamicEnvVar.FULL_NODES_WS_PORT,
   useGstoreData: DynamicEnvVar.FULL_NODES_USE_GSTORAGE_DATA,
 }
 
@@ -155,6 +156,7 @@ function getFullNodeDeploymentConfig(context: string): BaseFullNodeDeploymentCon
     rollingUpdatePartition: parseInt(fullNodeDeploymentEnvVarValues.rollingUpdatePartition, 10),
     rpcApis: fullNodeDeploymentEnvVarValues.rpcApis,
     gcMode: fullNodeDeploymentEnvVarValues.gcMode,
+    wsPort: parseInt(fullNodeDeploymentEnvVarValues.wsPort, 10),
     useGstoreData: fullNodeDeploymentEnvVarValues.useGstoreData,
   }
   return fullNodeDeploymentConfig
