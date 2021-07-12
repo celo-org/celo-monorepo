@@ -39,7 +39,6 @@ resource "google_compute_backend_service" "backend_service" {
     for_each = var.context_info
     content {
       balancing_mode        = "RATE"
-      max_utilization       = 0
       max_rate_per_endpoint = var.backend_max_requests_per_second
       group                 = data.google_compute_network_endpoint_group.service_network_endpoint_group[backend.key].self_link
     }
