@@ -108,7 +108,7 @@ resource "random_id" "ssl_random_suffix" {
 
 resource "google_compute_url_map" "url_map" {
   name            = "${var.celo_env}-forno-url-map"
-  default_service = module.http_backends.backend_service_id
+  default_service = module.kong.backend_service_id
 
   host_rule {
     hosts        = ["*"]
@@ -117,7 +117,7 @@ resource "google_compute_url_map" "url_map" {
 
   path_matcher {
     name            = "${var.celo_env}-forno-path-matcher"
-    default_service = module.http_backends.backend_service_id
+    default_service = module.kong.backend_service_id
 
     path_rule {
       paths   = ["/ws"]
