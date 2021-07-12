@@ -1,4 +1,3 @@
-import { concurrentMap } from '@celo/base/lib/async'
 import { NetworkConfig, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
@@ -17,10 +16,12 @@ export async function assumeOwnership(web3: Web3, to: string, proposalId: number
   accountWrapper = await kit.contracts.getAccounts()
   const lockedGold = await kit.contracts.getLockedGold()
 
-  await concurrentMap(4, accounts.slice(0, 4), async (account) => {
-    await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_CGLD })
-  })
+  try {
+    await accountWrapper.createAccount().sendAndWaitForReceipt({ from: accounts[0] })
+    await lockedGold.lock().sendAndWaitForReceipt({ from: accounts[0], value: ONE_CGLD })
+  } catch (error) {
+    console.log('Account already created')
+  }
 
   const grandaMento = await kit._web3Contracts.getGrandaMento()
   const governance = await kit.contracts.getGovernance()
