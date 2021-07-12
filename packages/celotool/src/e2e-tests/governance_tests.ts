@@ -7,15 +7,17 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import path from 'path'
 import Web3 from 'web3'
-import { connectBipartiteClique, connectPeers, importGenesis, initAndStartGeth } from '../lib/geth'
+import { AccountType, generateAddress, generatePrivateKey } from '../lib/generate_utils'
+import { connectBipartiteClique, connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import {
   assertAlmostEqual,
   getHooks,
+  mnemonic,
   sleep,
+  waitForAnnounceToStabilize,
   waitForBlock,
   waitForEpochTransition,
   waitToFinishInstanceSyncing,
@@ -28,6 +30,14 @@ interface MemberSwapper {
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
 const carbonOffsettingPartnerAddress = '0x1234567812345678123456781234567812345678'
+const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
+// The tests calculate some expected values based on the rewards multiplier from the block
+// before an epoch block.  However, the actual rewards multiplier used for epoch rewards is
+// calculated inside the epoch block.  Since the multiplier depends on the timestamp, this means
+// the expected values will never exactly match the actual values, so we need some tolerance.
+// This constant defines the tolerance as a fraction of the expected value.
+// values.  We use 10^-6, so they have to be match to (nearly) 6 significant figures
+const tolerance = new BigNumber(10).pow(new BigNumber(-6))
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -165,15 +175,15 @@ async function calculateUptime(
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
 describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
-    migrate: true,
     runPath: TMP_PATH,
-    verbosity: 4,
-    migrateTo: 25,
+    verbosity: 3,
+    useMycelo: true,
     networkId: 1101,
     network: 'local',
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: 0,
+      epoch: 10,
     },
     instances: [
       // Validators 0 and 1 are swapped in and out of the group.
@@ -214,11 +224,6 @@ describe('governance tests', () => {
         rpcport: 8553,
       },
     ],
-    migrationOverrides: {
-      epochRewards: {
-        carbonOffsettingPartner: carbonOffsettingPartnerAddress,
-      },
-    },
   }
 
   const hooks: any = getHooks(gethConfig)
@@ -229,7 +234,6 @@ describe('governance tests', () => {
   let sortedOracles: any
   let epochRewards: any
   let goldToken: any
-  let registry: any
   let reserve: any
   let validators: any
   let accounts: any
@@ -250,16 +254,28 @@ describe('governance tests', () => {
     await hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
+    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
+    await sleep(2)
+    // Assuming empty password
+    await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     goldToken = await kit._web3Contracts.getGoldToken()
     stableToken = await kit._web3Contracts.getStableToken()
     sortedOracles = await kit._web3Contracts.getSortedOracles()
     validators = await kit._web3Contracts.getValidators()
-    registry = await kit._web3Contracts.getRegistry()
     reserve = await kit._web3Contracts.getReserve()
     election = await kit._web3Contracts.getElection()
     epochRewards = await kit._web3Contracts.getEpochRewards()
     accounts = await kit._web3Contracts.getAccounts()
+
+    await waitForBlock(web3, 1)
+    await waitForAnnounceToStabilize(web3)
+
+    const er = await kit._web3Contracts.getEpochRewards()
+    const fraction = await er.methods.getCarbonOffsettingFraction().call()
+    await er.methods
+      .setCarbonOffsettingFund(carbonOffsettingPartnerAddress, fraction)
+      .send({ from: validatorAddress })
   }
 
   const getValidatorGroupMembers = async (blockNumber?: number) => {
@@ -288,6 +304,12 @@ describe('governance tests', () => {
 
   const getValidatorGroupPrivateKey = async () => {
     const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
+    // If we're using mycelo, we can just generate the validator group key directly
+    const myceloAddress = generateAddress(mnemonic, AccountType.VALIDATOR_GROUP, 0)
+    if (myceloAddress === groupAddress) {
+      return '0x' + generatePrivateKey(mnemonic, AccountType.VALIDATOR_GROUP, 0)
+    }
+    // Otherwise, the validator group key is encoded in its name (see 25_elect_validators.ts)
     const name = await accounts.methods.getName(groupAddress).call()
     const encryptedKeystore64 = name.split(' ')[1]
     const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
@@ -315,7 +337,8 @@ describe('governance tests', () => {
     )
     assert.isFalse(currentBalance.isNaN())
     assert.isFalse(previousBalance.isNaN())
-    assertAlmostEqual(currentBalance.minus(previousBalance), expected)
+    const margin = expected.times(tolerance)
+    assertAlmostEqual(currentBalance.minus(previousBalance), expected, margin)
   }
 
   const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -407,7 +430,18 @@ describe('governance tests', () => {
       const groupKit = newKitFromWeb3(groupWeb3)
 
       const group: string = (await groupWeb3.eth.getAccounts())[0]
+      // Send some funds to the group, so it can afford fees
+      await (
+        await kit.sendTransaction({
+          from: validatorAddress,
+          to: group,
+          value: Web3.utils.toWei('1', 'ether'),
+        })
+      ).waitReceipt()
 
+      // groupKit uses a different node than kit does, so wait a second in case kit's node
+      // got the new block before groupKit's node did.
+      await sleep(1)
       const txos = await (await groupKit.contracts.getElection()).activate(group)
       for (const txo of txos) {
         await txo.sendAndWaitForReceipt({ from: group })
@@ -416,6 +450,8 @@ describe('governance tests', () => {
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
+      // The memberSwapper makes a change when it's created, so we wait for epoch change so it takes effect
+      await waitForEpochTransition(web3, epoch)
 
       const handled: any = {}
 
@@ -659,7 +695,8 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        assertAlmostEqual(currentVotes.minus(previousVotes), expected)
+        const margin = expected.times(tolerance)
+        assertAlmostEqual(currentVotes.minus(previousVotes), expected, margin)
       }
 
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
@@ -1071,32 +1108,6 @@ describe('governance tests', () => {
       for (let blockNumber = blockFrozen; blockNumber < latestBlock; blockNumber++) {
         await assertGoldTokenTotalSupplyUnchanged(blockNumber)
       }
-    })
-  })
-
-  describe('after the gold token smart contract is registered', () => {
-    let goldGenesisSupply = new BigNumber(0)
-    beforeEach(async function (this: any) {
-      this.timeout(0) // Disable test timeout
-      await restart()
-      const genesis = await importGenesis(path.join(gethConfig.runPath, 'genesis.json'))
-      Object.keys(genesis.alloc).forEach((address) => {
-        goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[address].balance)
-      })
-    })
-
-    it('should initialize the Celo Gold total supply correctly', async function (this: any) {
-      const events = await registry.getPastEvents('RegistryUpdated', { fromBlock: 0 })
-      let blockNumber = 0
-      for (const e of events) {
-        if (e.returnValues.identifier === 'GoldToken') {
-          blockNumber = e.blockNumber
-          break
-        }
-      }
-      assert.isAtLeast(blockNumber, 1)
-      const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
-      assert.equal(goldTotalSupply, goldGenesisSupply.toFixed())
     })
   })
 })
