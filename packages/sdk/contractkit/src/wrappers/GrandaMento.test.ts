@@ -3,12 +3,11 @@ import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableToken } from '../celo-tokens'
-// import { StableToken as StableToken } from '../base'
 import { newKitFromWeb3 } from '../kit'
+import { assumeOwnership } from '../test-utils/transferownership'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import { ExchangeProposalState, GrandaMentoWrapper } from './GrandaMento'
 import { StableTokenWrapper } from './StableTokenWrapper'
-import { assumeOwnership } from './transferownership'
 
 const expConfig = NetworkConfig.grandaMento
 
