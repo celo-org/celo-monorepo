@@ -24,7 +24,7 @@
     "executionStageDuration": 100,
     "minDeposit": 1,
     "concurrentProposals": 5,
-    "skipTransferOwnership": true
+    "skipTransferOwnership": false
   },
   "governanceApproverMultiSig": {
     "signatories": [

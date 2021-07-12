@@ -8,6 +8,7 @@ import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import { ExchangeProposalState, GrandaMentoWrapper } from './GrandaMento'
 import { StableTokenWrapper } from './StableTokenWrapper'
+import { assumeOwnership } from './transferownership'
 
 const expConfig = NetworkConfig.grandaMento
 
@@ -59,6 +60,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   describe('When Granda Mento is enabled', () => {
     beforeEach(async () => {
+      await assumeOwnership(web3, accounts[0])
       await increaseLimits()
     })
 
