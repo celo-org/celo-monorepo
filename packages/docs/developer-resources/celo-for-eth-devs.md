@@ -106,6 +106,6 @@ Logs created by these contract changes are included in a single additional recei
 
 ### Node management APIs
 
-Celo nodes have a slightly different RPC interface than geth nodes. There are some additional RPC endpoints to help validators manage their nodes, they can be found [here](https://docs.celo.org/validator-guide/proxy#rpc-api) and [here](https://docs.celo.org/validator-guide/node-upgrades#hotswapping-validator-nodes). 
+Celo nodes have a slightly different RPC interface than geth nodes. There are some additional RPC endpoints to help validators manage their nodes, they can be found [here](../validator-guide/proxy.md#rpc-api) and [here](../validator-guide/node-upgrades.md#hotswapping-validator-nodes). 
 
 You can find the full list of RPC API endpoints in [this file](https://github.com/celo-org/celo-blockchain/blob/master/internal/web3ext/web3ext.go).
