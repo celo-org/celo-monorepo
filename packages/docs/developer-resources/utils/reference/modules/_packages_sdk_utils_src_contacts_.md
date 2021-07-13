@@ -43,7 +43,7 @@ ___
 
 ▸ **getContactNameHash**(`contact`: MinimalContact): *string*
 
-*Defined in [packages/sdk/utils/src/contacts.ts:13](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/contacts.ts#L13)*
+*Defined in [packages/sdk/utils/src/contacts.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/contacts.ts#L13)*
 
 **Parameters:**
 

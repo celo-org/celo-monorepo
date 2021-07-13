@@ -13,7 +13,7 @@
 
 • **ACCOUNT_ADDRESS**: = "account_address"
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:6](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L6)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L6)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **SIGN_TX**: = "sign_tx"
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:7](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L7)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L7)*

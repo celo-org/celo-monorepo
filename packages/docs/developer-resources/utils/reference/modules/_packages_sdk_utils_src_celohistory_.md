@@ -13,7 +13,7 @@
 
 • **CELO_AMOUNT_FOR_ESTIMATE**: *BigNumber‹›* = new BigNumber(0.01 * WEI_PER_UNIT)
 
-*Defined in [packages/sdk/utils/src/celoHistory.ts:7](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/celoHistory.ts#L7)*
+*Defined in [packages/sdk/utils/src/celoHistory.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/celoHistory.ts#L7)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **DOLLAR_AMOUNT_FOR_ESTIMATE**: *BigNumber‹›* = new BigNumber(0.01 * WEI_PER_UNIT)
 
-*Defined in [packages/sdk/utils/src/celoHistory.ts:6](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/celoHistory.ts#L6)*
+*Defined in [packages/sdk/utils/src/celoHistory.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/celoHistory.ts#L6)*

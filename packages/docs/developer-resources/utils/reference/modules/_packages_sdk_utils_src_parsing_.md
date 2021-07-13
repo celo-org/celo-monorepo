@@ -29,7 +29,7 @@ ___
 
 ▸ **parseInputAmount**(`inputString`: string, `decimalSeparator`: string): *BigNumber*
 
-*Defined in [packages/sdk/utils/src/parsing.ts:7](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/parsing.ts#L7)*
+*Defined in [packages/sdk/utils/src/parsing.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/parsing.ts#L7)*
 
 **Parameters:**
 

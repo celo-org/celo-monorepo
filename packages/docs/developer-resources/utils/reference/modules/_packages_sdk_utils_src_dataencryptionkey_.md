@@ -18,7 +18,7 @@
 
 ▸ **compressedPubKey**(`privateKey`: Buffer): *string*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:13](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L13)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L13)*
 
 Turns a private key to a compressed public key (hex string with hex leader).
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **decompressPublicKey**(`publicKey`: Buffer): *Buffer*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:25](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L25)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L25)*
 
 Decompresses a public key and strips out the '0x04' leading constant. This makes
 any public key suitable to be used with this ECIES implementation.
@@ -59,7 +59,7 @@ ___
 
 ▸ **deriveDek**(`mnemonic`: string, `bip39ToUse?`: [Bip39](_packages_sdk_utils_src_account_.md#bip39)): *Promise‹object›*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:35](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L35)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L35)*
 
 Derives a data encryption key from the mnemonic
 
@@ -80,22 +80,22 @@ Comment Encryption Private key.
 
 ### ▪ **DataEncryptionKeyUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:49](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L49)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L49)*
 
 ###  compressedPubKey
 
 • **compressedPubKey**: *[compressedPubKey](_packages_sdk_utils_src_dataencryptionkey_.md#compressedpubkey)*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:50](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L50)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L50)*
 
 ###  decompressPublicKey
 
 • **decompressPublicKey**: *[decompressPublicKey](_packages_sdk_utils_src_dataencryptionkey_.md#decompresspublickey)*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:51](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L51)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L51)*
 
 ###  deriveDek
 
 • **deriveDek**: *[deriveDek](_packages_sdk_utils_src_dataencryptionkey_.md#derivedek)*
 
-*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:52](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L52)*
+*Defined in [packages/sdk/utils/src/dataEncryptionKey.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dataEncryptionKey.ts#L52)*

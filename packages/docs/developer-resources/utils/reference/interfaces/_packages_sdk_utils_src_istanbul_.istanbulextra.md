@@ -21,7 +21,7 @@
 
 • **addedValidators**: *[Address](../modules/_packages_sdk_utils_src_address_.md#address)[]*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:22](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L22)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L22)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **addedValidatorsPublicKeys**: *string[]*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:23](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L23)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L23)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **aggregatedSeal**: *[Seal](_packages_sdk_utils_src_istanbul_.seal.md)*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:26](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L26)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L26)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **parentAggregatedSeal**: *[Seal](_packages_sdk_utils_src_istanbul_.seal.md)*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:27](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L27)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L27)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **removedValidators**: *[Bitmap](../modules/_packages_sdk_utils_src_istanbul_.md#bitmap)*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:24](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L24)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L24)*
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 • **seal**: *string*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:25](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L25)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L25)*

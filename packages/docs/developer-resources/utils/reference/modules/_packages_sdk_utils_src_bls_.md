@@ -19,7 +19,7 @@
 
 • **BLS_POP_SIZE**: *48* = 48
 
-*Defined in [packages/sdk/utils/src/bls.ts:12](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L12)*
+*Defined in [packages/sdk/utils/src/bls.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L12)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **BLS_PUBLIC_KEY_SIZE**: *96* = 96
 
-*Defined in [packages/sdk/utils/src/bls.ts:11](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L11)*
+*Defined in [packages/sdk/utils/src/bls.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L11)*
 
 ## Functions
 
@@ -35,7 +35,7 @@ ___
 
 ▸ **blsPrivateKeyToProcessedPrivateKey**(`privateKeyHex`: string): *any*
 
-*Defined in [packages/sdk/utils/src/bls.ts:14](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L14)*
+*Defined in [packages/sdk/utils/src/bls.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L14)*
 
 **Parameters:**
 
@@ -51,7 +51,7 @@ ___
 
 ▸ **getBlsPoP**(`address`: string, `privateKeyHex`: string): *string*
 
-*Defined in [packages/sdk/utils/src/bls.ts:53](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L53)*
+*Defined in [packages/sdk/utils/src/bls.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L53)*
 
 **Parameters:**
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **getBlsPublicKey**(`privateKeyHex`: string): *string*
 
-*Defined in [packages/sdk/utils/src/bls.ts:48](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L48)*
+*Defined in [packages/sdk/utils/src/bls.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bls.ts#L48)*
 
 **Parameters:**
 

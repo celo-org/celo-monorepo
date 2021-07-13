@@ -20,7 +20,7 @@
 
 • **digits**: *BigNumber‹›* = new BigNumber('24')
 
-*Defined in [packages/sdk/utils/src/fixidity.ts:3](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L3)*
+*Defined in [packages/sdk/utils/src/fixidity.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L3)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **fixed1**: *BigNumber‹›* = new BigNumber('1000000000000000000000000')
 
-*Defined in [packages/sdk/utils/src/fixidity.ts:4](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L4)*
+*Defined in [packages/sdk/utils/src/fixidity.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L4)*
 
 ## Functions
 
@@ -36,7 +36,7 @@ ___
 
 ▸ **fixedToInt**(`f`: BigNumber): *BigNumber‹›*
 
-*Defined in [packages/sdk/utils/src/fixidity.ts:16](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L16)*
+*Defined in [packages/sdk/utils/src/fixidity.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L16)*
 
 **Parameters:**
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **fromFixed**(`f`: BigNumber): *BigNumber‹›*
 
-*Defined in [packages/sdk/utils/src/fixidity.ts:11](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L11)*
+*Defined in [packages/sdk/utils/src/fixidity.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L11)*
 
 **Parameters:**
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **multiply**(`a`: BigNumber, `b`: BigNumber): *BigNumber‹›*
 
-*Defined in [packages/sdk/utils/src/fixidity.ts:20](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L20)*
+*Defined in [packages/sdk/utils/src/fixidity.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L20)*
 
 **Parameters:**
 
@@ -85,7 +85,7 @@ ___
 
 ▸ **toFixed**(`n`: number | BigNumber): *BigNumber‹›*
 
-*Defined in [packages/sdk/utils/src/fixidity.ts:6](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L6)*
+*Defined in [packages/sdk/utils/src/fixidity.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/fixidity.ts#L6)*
 
 **Parameters:**
 

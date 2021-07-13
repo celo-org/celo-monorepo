@@ -16,7 +16,7 @@
 
 ▸ **computeSharedSecret**(`privateKey`: string, `publicKey`: string): *Buffer*
 
-*Defined in [packages/sdk/utils/src/ecdh.ts:7](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L7)*
+*Defined in [packages/sdk/utils/src/ecdh.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L7)*
 
 **Parameters:**
 
@@ -33,7 +33,7 @@ ___
 
 ▸ **ensureCompressed**(`publicKey`: string): *string*
 
-*Defined in [packages/sdk/utils/src/ecdh.ts:21](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L21)*
+*Defined in [packages/sdk/utils/src/ecdh.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L21)*
 
 **Parameters:**
 
@@ -49,7 +49,7 @@ ___
 
 ▸ **ensureUncompressed**(`publicKey`: string): *string*
 
-*Defined in [packages/sdk/utils/src/ecdh.ts:25](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L25)*
+*Defined in [packages/sdk/utils/src/ecdh.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L25)*
 
 **Parameters:**
 
@@ -65,7 +65,7 @@ ___
 
 ▸ **isCompressed**(`publicKey`: string): *boolean*
 
-*Defined in [packages/sdk/utils/src/ecdh.ts:13](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L13)*
+*Defined in [packages/sdk/utils/src/ecdh.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L13)*
 
 **Parameters:**
 
@@ -81,7 +81,7 @@ ___
 
 ▸ **trimUncompressedPrefix**(`publicKey`: string): *string*
 
-*Defined in [packages/sdk/utils/src/ecdh.ts:33](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L33)*
+*Defined in [packages/sdk/utils/src/ecdh.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L33)*
 
 **Parameters:**
 

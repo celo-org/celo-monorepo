@@ -60,7 +60,7 @@ ___
 
 ▸ **formatNonAccentedCharacters**(`mnemonic`: string): *string*
 
-*Defined in [packages/sdk/utils/src/account.ts:69](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L69)*
+*Defined in [packages/sdk/utils/src/account.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L69)*
 
 **Parameters:**
 
@@ -76,7 +76,7 @@ ___
 
 ▸ **generateDeterministicInviteCode**(`recipientPhoneHash`: string, `recipientPepper`: string, `addressIndex`: number, `changeIndex`: number, `derivationPath`: string): *object*
 
-*Defined in [packages/sdk/utils/src/account.ts:136](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L136)*
+*Defined in [packages/sdk/utils/src/account.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L136)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **generateKeys**(`mnemonic`: string, `password?`: undefined | string, `changeIndex`: number, `addressIndex`: number, `bip39ToUse`: Bip39, `derivationPath`: string): *Promise‹object›*
 
-*Defined in [packages/sdk/utils/src/account.ts:124](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L124)*
+*Defined in [packages/sdk/utils/src/account.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L124)*
 
 **Parameters:**
 
@@ -121,7 +121,7 @@ ___
 
 ▸ **generateKeysFromSeed**(`seed`: Buffer, `changeIndex`: number, `addressIndex`: number, `derivationPath`: string): *object*
 
-*Defined in [packages/sdk/utils/src/account.ts:164](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L164)*
+*Defined in [packages/sdk/utils/src/account.ts:164](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L164)*
 
 **Parameters:**
 
@@ -146,7 +146,7 @@ ___
 
 ▸ **generateMnemonic**(`strength`: [MnemonicStrength](_packages_sdk_utils_src_account_.md#mnemonicstrength), `language?`: [MnemonicLanguages](_packages_sdk_utils_src_account_.md#mnemoniclanguages), `bip39ToUse`: Bip39): *Promise‹string›*
 
-*Defined in [packages/sdk/utils/src/account.ts:50](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L50)*
+*Defined in [packages/sdk/utils/src/account.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L50)*
 
 **Parameters:**
 
@@ -164,7 +164,7 @@ ___
 
 ▸ **generateSeed**(`mnemonic`: string, `password?`: undefined | string, `bip39ToUse`: Bip39, `keyByteLength`: number): *Promise‹Buffer›*
 
-*Defined in [packages/sdk/utils/src/account.ts:149](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L149)*
+*Defined in [packages/sdk/utils/src/account.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L149)*
 
 **Parameters:**
 
@@ -183,7 +183,7 @@ ___
 
 ▸ **validateMnemonic**(`mnemonic`: string, `bip39ToUse`: Bip39): *boolean*
 
-*Defined in [packages/sdk/utils/src/account.ts:58](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L58)*
+*Defined in [packages/sdk/utils/src/account.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L58)*
 
 **Parameters:**
 
@@ -200,34 +200,34 @@ Name | Type | Default |
 
 ### ▪ **AccountUtils**: *object*
 
-*Defined in [packages/sdk/utils/src/account.ts:235](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L235)*
+*Defined in [packages/sdk/utils/src/account.ts:235](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L235)*
 
 ###  generateKeys
 
 • **generateKeys**: *[generateKeys](_packages_sdk_utils_src_account_.md#generatekeys)*
 
-*Defined in [packages/sdk/utils/src/account.ts:238](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L238)*
+*Defined in [packages/sdk/utils/src/account.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L238)*
 
 ###  generateKeysFromSeed
 
 • **generateKeysFromSeed**: *[generateKeysFromSeed](_packages_sdk_utils_src_account_.md#generatekeysfromseed)*
 
-*Defined in [packages/sdk/utils/src/account.ts:240](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L240)*
+*Defined in [packages/sdk/utils/src/account.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L240)*
 
 ###  generateMnemonic
 
 • **generateMnemonic**: *[generateMnemonic](_packages_sdk_utils_src_account_.md#generatemnemonic)*
 
-*Defined in [packages/sdk/utils/src/account.ts:236](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L236)*
+*Defined in [packages/sdk/utils/src/account.ts:236](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L236)*
 
 ###  generateSeed
 
 • **generateSeed**: *[generateSeed](_packages_sdk_utils_src_account_.md#generateseed)*
 
-*Defined in [packages/sdk/utils/src/account.ts:239](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L239)*
+*Defined in [packages/sdk/utils/src/account.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L239)*
 
 ###  validateMnemonic
 
 • **validateMnemonic**: *[validateMnemonic](_packages_sdk_utils_src_account_.md#validatemnemonic)*
 
-*Defined in [packages/sdk/utils/src/account.ts:237](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L237)*
+*Defined in [packages/sdk/utils/src/account.ts:237](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L237)*

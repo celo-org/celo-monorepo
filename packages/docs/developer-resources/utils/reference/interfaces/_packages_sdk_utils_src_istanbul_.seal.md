@@ -18,7 +18,7 @@
 
 • **bitmap**: *[Bitmap](../modules/_packages_sdk_utils_src_istanbul_.md#bitmap)*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:15](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L15)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L15)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **round**: *BigNumber*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:17](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L17)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L17)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **signature**: *string*
 
-*Defined in [packages/sdk/utils/src/istanbul.ts:16](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L16)*
+*Defined in [packages/sdk/utils/src/istanbul.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/istanbul.ts#L16)*

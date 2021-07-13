@@ -24,7 +24,7 @@
 
 Ƭ **EIP712ObjectValue**: *string | number | [EIP712Object](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712object.md)*
 
-*Defined in [packages/sdk/utils/src/sign-typed-data-utils.ts:14](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L14)*
+*Defined in [packages/sdk/utils/src/sign-typed-data-utils.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L14)*
 
 ## Functions
 
@@ -32,7 +32,7 @@
 
 ▸ **generateTypedDataHash**(`typedData`: [EIP712TypedData](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712typeddata.md)): *Buffer*
 
-*Defined in [packages/sdk/utils/src/sign-typed-data-utils.ts:32](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L32)*
+*Defined in [packages/sdk/utils/src/sign-typed-data-utils.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L32)*
 
 Generates the EIP712 Typed Data hash for signing
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **structHash**(`primaryType`: string, `data`: [EIP712Object](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712object.md), `types`: [EIP712Types](../interfaces/_packages_sdk_utils_src_sign_typed_data_utils_.eip712types.md)): *Buffer*
 
-*Defined in [packages/sdk/utils/src/sign-typed-data-utils.ts:107](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L107)*
+*Defined in [packages/sdk/utils/src/sign-typed-data-utils.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L107)*
 
 **Parameters:**
 
