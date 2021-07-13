@@ -63,11 +63,21 @@ To actually be able to send SMS, you need to create a messaging service under [P
 
 Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. It is strongly recommended that you purchase at least a US (`+1`) number which seem to provide high delivery success rates.  If you purchase numbers in other locales, Twilio will intelligently select the best number to send each SMS.
 
-#### Verify Service
+#### Verify Service (post v1.3.0)
 
-We're in the process of transitioning to [Twilio's Verify Service](https://www.twilio.com/verify) which will automatically manage a set of phone numbers for global reach. Create a Verify Service in the Twilio Portal by navigating to [Verify](https://www.twilio.com/console/verify/services) and click `+` to create a new service. It's important to provide `Celo` as the service friendly name, since this will show up in the text message content. Set the code length to `8 digits`. Enter `sell-oh` in the `TTS SERVICE NAME`. Enable `SMS`, `CALL`, and `EMAIL` delivery channels. Provide the resulting `SID` in the `TWILIO_VERIFY_SERVICE_SID` configuration variable. In the future, we'll likely switch entirely to the Verify Service and deprecate the Messaging Service, but for now it's important to specify both.
+We're in the process of transitioning to [Twilio's Verify Service](https://www.twilio.com/verify) which will automatically manage a set of phone numbers for global reach. Create a Verify Service in the Twilio Portal by navigating to [Verify](https://www.twilio.com/console/verify/services) and click `+` to create a new service. It's important to provide `Celo` as the service friendly name, since this will show up in the text message content.
+
+1. Set the code length to `8 digits`.
+2. Enter `sell-oh` in the `TTS SERVICE NAME`.
+3. Enable `SMS`, `CALL`, and `EMAIL` delivery channels.
 
 After you create the Verify Service, you **[must create a support ticket](https://www.twilio.com/console/support/tickets/create)** to enable the `custom code` feature. Provide Twilio support your new Verify SID and request enabling the `custom code` feature. Please monitor for a response and respond to any follow up questions.
+
+Support ticket request template
+
+> Hello, I'd like to enable custom codes for our Verify API with SID {YOUR_VERIFY_SID}. I understand that we will be charged on each attempted user verification.
+
+Once you have confirmation that custom codes are enabled on your Twilio account, you can provide the resulting `SID` in the `TWILIO_VERIFY_SERVICE_SID` configuration variable and start the service. In the future, we'll likely switch entirely to the Verify Service and deprecate the Messaging Service, but for now it's important to specify both.
 
 ### Nexmo
 
