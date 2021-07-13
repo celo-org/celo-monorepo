@@ -84,6 +84,8 @@ PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
 ```
 
+A `libraries.json` file is written to disk only necessary for `make-release` that describes linked library addresses.
+
 ### Check Backward Compatibility
 
 This script performs some automatic checks to ensure that the smart contract versions in source code have been set correctly with respect to the latest release. It is run as part of CI and helps ensure that backwards incompatibilities are not accidentally introduced by requiring that devs manually update version numbers whenever smart contract changes are made.
@@ -120,13 +122,13 @@ This should be used in tandem with `verify-deployed -b $PREVIOUS_RELEASE -n $NET
 
 ### Deploy the release candidate
 
-Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network. (Use `-d` to dry-run the deploy).
+Use the following script to build and deploy a candidate release. This takes as input the corresponding backwards compatibility report and canonical library address mapping to deploy **changed** contracts to the specified network. (Use `-d` to dry-run the deploy).
 STORAGE updates are adopted by deploying a new proxy/implementation pair. This script outputs a JSON contract upgrade governance proposal.
 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
-yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
+yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json" -l "libraries.json"
 ```
 
 The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.

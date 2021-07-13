@@ -19,7 +19,7 @@ Use these instructions to update non-validating nodes, such as your account node
 ### Pull the latest Docker image
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/geth:baklava
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 docker pull $CELO_IMAGE
 ```
 
@@ -27,8 +27,10 @@ docker pull $CELO_IMAGE
 
 Stop and remove the existing node. Make sure to stop the node gracefully (i.e. giving it time to shut down and complete any writes to disk) or your chain data may become corrupted.
 
+Note: The `docker run` commands in the documentation have been updated to now include `--stop-timeout 300`, which should make the `-t 300` in `docker stop` below redundant. However, it is still recommended to include it just in case.
+
 ```bash
-docker stop -t 60 celo-fullnode
+docker stop -t 300 celo-fullnode
 docker rm celo-fullnode
 ```
 
@@ -86,7 +88,7 @@ On startup, nodes will look to see if there is a `replicastate` folder inside it
 5. In the geth console of the replica run `istanbul.startAtBlock(xxxx)`
     * You can check what the start block is with `istanbul.replicaState` in the geth console.
     * You can run `istanbul.stop()` to clear the start block
-6. Confirm that the transition occurred with `istanbul.replicaState` 
+6. Confirm that the transition occurred with `istanbul.replicaState`
     * The last block that the old primary will sign is block number `xxxx - 1`
     * The first block that the new primary will sign is block number `xxxx`
 7. Tear down the old primary once the transition has occurred.
@@ -102,7 +104,7 @@ Example geth console on the old primary.
 }
 > istanbul.stopAtBlock(21000)
 null
-> istanbul.replicaState  
+> istanbul.replicaState
 {
   isPrimary: true,
   startValidatingBlock: null,

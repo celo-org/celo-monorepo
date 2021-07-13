@@ -10,4 +10,6 @@ The Celo protocol's stability mechanism comprises the following:
 
 {% page-ref page="stability-fees.md" %}
 
+{% page-ref page="adding_stable_assets.md" %}
+
 {% page-ref page="tobin-tax.md" %}

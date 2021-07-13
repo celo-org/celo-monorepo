@@ -21,7 +21,6 @@ interface ContactMatch {
   phoneNumber: string
 }
 
-// TODO (amyslawson) consider pagination or streaming of contacts?
 export async function handleGetContactMatches(
   request: Request<{}, {}, GetContactMatchesRequest>,
   response: Response

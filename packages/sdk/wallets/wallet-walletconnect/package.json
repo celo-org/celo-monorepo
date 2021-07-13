@@ -19,6 +19,7 @@
     "docs": "typedoc && ts-node ../../utils/scripts/linkdocs.ts wallet-walletconnect",
     "test": "jest --runInBand",
     "test-staging": "WALLET_CONNECT_BRIDGE=wss://walletconnect.celo-networks-dev.org yarn test",
+    "test-production": "WALLET_CONNECT_BRIDGE=wss://walletconnect.celo.org yarn test",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
@@ -27,8 +28,8 @@
     "@celo/utils": "1.2.2-dev",
     "@celo/wallet-base": "1.2.2-dev",
     "@celo/wallet-remote": "1.2.2-dev",
-    "@walletconnect/client": "2.0.0-alpha.35",
-    "@walletconnect/types": "2.0.0-alpha.35",
+    "@walletconnect/client": "2.0.0-beta.9",
+    "@walletconnect/types": "2.0.0-beta.9",
     "debug": "^4.1.1",
     "ethereumjs-util": "^7.0.8"
   },

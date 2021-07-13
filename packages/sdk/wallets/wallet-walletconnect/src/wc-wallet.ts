@@ -3,9 +3,9 @@ import { CeloTx } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
-import { ERROR, getError } from '@walletconnect/utils'
+import { ERROR } from '@walletconnect/utils'
 import debugConfig from 'debug'
-import { stagingEndpoint } from './constants'
+import { productionEndpoint } from './constants'
 import { SupportedMethods, WalletConnectWalletOptions } from './types'
 import { WalletConnectSigner } from './wc-signer'
 
@@ -31,7 +31,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
 }
 
 const defaultInitOptions: ClientOptions = {
-  relayProvider: stagingEndpoint,
+  relayProvider: productionEndpoint,
 }
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
@@ -86,7 +86,6 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     if (this.client.session?.values.length > 0 && this.client.pairing?.values.length > 0) {
       this.pairing = this.client.pairing.values[0]
       this.session = this.client.session.values[0]
-
       return
     }
 
@@ -180,7 +179,7 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
       throw new Error('Wallet must be initialized before calling close()')
     }
 
-    const reason = getError(ERROR.USER_DISCONNECTED)
+    const reason = ERROR.USER_DISCONNECTED.format()
     if (this.session) {
       await this.client.disconnect({
         topic: this.session.topic,

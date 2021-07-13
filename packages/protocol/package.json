@@ -34,6 +34,7 @@
     "govern": "./scripts/bash/govern.sh",
     "console": "./scripts/bash/console.sh",
     "check-versions": "./scripts/bash/check-versions.sh",
+    "check-opcodes": "ts-node scripts/check-opcodes.ts",
     "make-release": "./scripts/bash/make-release.sh",
     "verify-deployed": "./scripts/bash/verify-deployed.sh",
     "verify-release": "./scripts/bash/verify-release.sh",
@@ -43,7 +44,7 @@
     "truffle:migrate": "truffle migrate",
     "devchain": "ts-node scripts/devchain.ts",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "view-tags": "git for-each-ref 'refs/tags/celo-core-contracts-*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'"
+    "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",
@@ -70,7 +71,7 @@
     "glob-fs": "^0.1.7",
     "graphql": "^14.1.1",
     "j6": "^1.0.2",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.21",
     "mathjs": "^5.0.4",
     "node-fetch": "^2.6.1",
     "openzeppelin-solidity": "^2.5.0",
@@ -85,16 +86,16 @@
     "truffle-security": "^1.7.1",
     "twilio": "^3.57.0",
     "weak-map": "^1.0.5",
-    "web3": "1.3.5",
-    "web3-core": "1.3.5",
-    "web3-core-helpers": "1.3.5",
-    "web3-utils": "1.3.5",
+    "web3": "1.3.6",
+    "web3-core": "1.3.6",
+    "web3-core-helpers": "1.3.6",
+    "web3-utils": "1.3.6",
     "web3-provider-engine": "^15.0.0"
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
-    "@celo/typescript": "0.0.1",
     "@celo/typechain-target-web3-v1-celo": "0.2.0",
+    "@celo/typescript": "0.0.1",
     "@types/bn.js": "^4.11.0",
     "@types/chai": "^4.1.3",
     "@types/mathjs": "^4.4.1",
@@ -106,14 +107,14 @@
     "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
+    "merkle-patricia-tree": "4.0.0",
     "nodemailer": "^4.6.8",
     "targz": "^1.0.1",
     "tmp": "^0.1.0",
-    "ts-node": "8.3.0",
     "truffle-typings": "^1.0.6",
+    "ts-node": "8.3.0",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
-    "yargs": "^14.0.0",
-    "merkle-patricia-tree": "4.0.0"
+    "yargs": "^14.0.0"
   }
 }

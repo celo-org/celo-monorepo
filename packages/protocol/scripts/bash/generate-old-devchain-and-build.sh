@@ -48,3 +48,5 @@ fi
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
+
+git checkout -

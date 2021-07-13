@@ -49,7 +49,7 @@ Faucetted funds will come as two `ReleaseGold` contracts. At a high level, `Rele
 If you are new to validating on Celo, please follow the Non-ReleaseGold instructions for validating.
 {% endhint %}
 
-Faucetted funds will come as 2 transactions, one for your validator address and another for your validator group address. 
+Faucetted funds will come as 2 transactions, one for your validator address and another for your validator group address.
 
 ### Hardware requirements
 
@@ -107,7 +107,7 @@ To illustrate this, you may refer to the following table:
 
   See [Command Line Interface \(CLI\) ](../command-line-interface/introduction.md)for instructions on how to get set up.
 
-- **You are using the latest Node 10.x LTS**
+- **You are using the latest Node.js v12.x**
 
   Some users have reported issues using the most recent version of node. Use the LTS for greater reliability.
 
@@ -195,7 +195,7 @@ The `us.gcr.io/celo-org/geth:baklava` image contains the [genesis block](https:/
 Please complete this section if you are new to validating on Celo.
 {% endhint %}
 
-If you're a new validator, then you are going to follow the non-ReleaseGold flow method for this step to create your account keys. 
+If you're a new validator, then you are going to follow the non-ReleaseGold flow method for this step to create your account keys.
 
 ##### Account and Signer keys
 
@@ -237,7 +237,7 @@ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 
 ### Start your Accounts node
 
-Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator. 
+Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator.
 
 To run the node:
 
@@ -245,7 +245,7 @@ To run the node:
 # On your local machine
 mkdir celo-accounts-node
 cd celo-accounts-node
-docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --baklava --light.serve 0 --datadir /root/.celo
+docker run --name celo-accounts -it --restart always --stop-timeout 300 -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --baklava --light.serve 0 --datadir /root/.celo
 ```
 
 {% hint style="danger" %}
@@ -326,7 +326,7 @@ Notice the public address returned by this command, that can be exported and use
 ```bash
 # On the proxy machine
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --baklava --datadir /root/.celo --celostats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
+docker run --name celo-proxy -it --restart unless-stopped --stop-timeout 300 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --baklava --datadir /root/.celo --celostats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
 ```
 
 {% hint style="info" %}
@@ -373,7 +373,7 @@ You will also need to export `PROXY_EXTERNAL_IP` on your local machine.
 export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 ```
 
-### Connect the Validator to the Proxy 
+### Connect the Validator to the Proxy
 
 When your Validator starts up it will attempt to create a network connection with the proxy machine. You will need to make sure that your proxy machine has the appropriate firewall settings to allow the Validator to connect to it.
 
@@ -397,7 +397,7 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 ```bash
 # On the Validator machine
 cd celo-validator-node
-docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --mine --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpairs=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --celostats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org --baklava --datadir /root/.celo
+docker run --name celo-validator -it --restart unless-stopped --stop-timeout 300 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --mine --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpairs=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --celostats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org --baklava --datadir /root/.celo
 ```
 
 At this point your Validator and Proxy machines should be configured, and both should be syncing to the network. You should see `Imported new chain segment` in your node logs, about once every 5 seconds once the node is synced to the latest block which you can find on the [Baklava Network Stats](https://baklava-celostats.celo-testnet.org/) page.
@@ -930,7 +930,7 @@ screen -S <SESSION NAME> -d -m <YOUR COMMAND>
 For example:
 
 ```bash
-screen -S celo-validator -d -m docker run --name celo-validator -it --restart unless-stopped -p 127.0.0.1:8545:8545 .......
+screen -S celo-validator -d -m docker run --name celo-validator -it --restart unless-stopped  --stop-timeout 300 -p 127.0.0.1:8545:8545 .......
 ```
 
 You can list your existing `screen` sessions:

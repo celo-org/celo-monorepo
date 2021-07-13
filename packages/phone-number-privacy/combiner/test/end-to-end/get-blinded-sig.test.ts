@@ -4,6 +4,7 @@ import {
   ErrorMessages,
   SignMessageRequest,
 } from '@celo/identity/lib/odis/query'
+import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
 import {
@@ -37,6 +38,7 @@ describe('Running against a deployed service', () => {
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
         timestamp: Date.now(),
         version: 'ignore',
+        sessionID: genSessionID(),
       }
 
       await expect(
@@ -51,6 +53,7 @@ describe('Running against a deployed service', () => {
         blindedQueryPhoneNumber: '',
         timestamp: Date.now(),
         version: 'ignore',
+        sessionID: genSessionID(),
       }
       await expect(
         OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
@@ -98,6 +101,7 @@ describe('Running against a deployed service', () => {
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
         timestamp,
         version: 'ignore',
+        sessionID: genSessionID(),
       }
       // Query twice to test reusing the request
       for (let i = 0; i < 2; i++) {

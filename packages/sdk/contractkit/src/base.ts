@@ -30,7 +30,6 @@ export enum CeloContract {
 }
 
 export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
-export const stableTokenContractArray = [CeloContract.StableToken, CeloContract.StableTokenEUR]
 
 export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
 
@@ -46,6 +45,7 @@ const AuxiliaryContracts = [
   CeloContract.MultiSig,
   CeloContract.MetaTransactionWalletDeployer,
   CeloContract.MetaTransactionWallet,
+  CeloContract.ERC20,
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 

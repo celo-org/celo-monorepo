@@ -67,11 +67,15 @@ attestation_service_credentials = {
     sms_providers                = "twilio"
     nexmo_key                    = ""
     nexmo_secret                 = ""
-    nexmo_blacklist              = ""
+    nexmo_blacklist              = "CU,SY,KP,IR,SD"
+    nexmo_unsupported_regions    = "CU,SY,KP,IR,SD"
     twilio_account_sid           = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     twilio_messaging_service_sid = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     twilio_auth_token            = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    twilio_blacklist             = ""
+    twilio_blacklist             = "CU,SY,KP,IR,SD"
+    twilio_unsupported_regions   = "CU,SY,KP,IR,SD"
+    messagebird_api_key             = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    messagebird_unsupported_regions = "CU,SY,KP,IR,SD"
 }
 
 public_www_fqdn = "www.mysite.org"

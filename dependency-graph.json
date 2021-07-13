@@ -130,6 +130,7 @@
   "@celo/phone-number-privacy-signer": {
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/flake-tracker",
       "@celo/identity",
@@ -197,6 +198,13 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/utils",
+      "@celo/wallet-local"
+    ]
+  },
+  "@celo/keystores": {
+    "location": "packages/sdk/keystores",
+    "dependencies": [
       "@celo/utils",
       "@celo/wallet-local"
     ]

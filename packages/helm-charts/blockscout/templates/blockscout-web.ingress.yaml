@@ -13,12 +13,16 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
     nginx.ingress.kubernetes.io/configuration-snippet: |
       location ~ /admin/.* {
         deny all;
       }
       location ~ /wobserver/.* {
         deny all;
+      }
+      location ~ /address/(.*)/token_transfers {
+        return 301 /address/$1/token-transfers;
       }
 spec:
   tls:

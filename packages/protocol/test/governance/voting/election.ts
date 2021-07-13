@@ -61,13 +61,13 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = toFixed(1 / 100)
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
-    freezer = await Freezer.new()
+    freezer = await Freezer.new(true)
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)

@@ -102,7 +102,6 @@ async function requestSignatures(request: Request, response: Response) {
             data,
             res.status,
             response,
-            sentResult,
             responses,
             service.url,
             blsCryptoClient,
@@ -116,7 +115,6 @@ async function requestSignatures(request: Request, response: Response) {
             signers.length,
             failedRequests,
             response,
-            sentResult,
             controller,
             errorCodes
           )
@@ -143,7 +141,6 @@ async function requestSignatures(request: Request, response: Response) {
           signers.length,
           failedRequests,
           response,
-          sentResult,
           controller,
           errorCodes
         )
@@ -161,16 +158,26 @@ async function requestSignatures(request: Request, response: Response) {
 
   logResponseDiscrepancies(responses, logger)
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-  if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
+        request.body.blindedQueryPhoneNumber,
+        logger
+      )
+      response.json({ success: true, combinedSignature, version: VERSION })
+      return
+    } catch {
+      // May fail upon combining signatures if too many sigs are invalid
+      // Fallback to handleMissingSignatures
+    }
   }
+  handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
 }
 
 async function handleSuccessResponse(
   data: string,
   status: number,
   response: Response,
-  sentResult: { sent: boolean },
   responses: SignMsgRespWithStatus[],
   serviceUrl: string,
   blsCryptoClient: BLSCryptographyClient,
@@ -194,15 +201,26 @@ async function handleSuccessResponse(
   }
   responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
-  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
+  logger.info({ signer: serviceUrl }, 'Add signature')
+  const signatureAdditionStart = Date.now()
+  await blsCryptoClient.addSignature(partialSig)
+  logger.info(
+    {
+      signer: serviceUrl,
+      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(),
+      additionLatency: Date.now() - signatureAdditionStart,
+    },
+    'Added signature'
+  )
   // Send response immediately once we cross threshold
-  if (!sentResult.sent && blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    // Close outstanding requests
-    controller.abort()
-    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
-    if (!sentResult.sent) {
-      response.json({ success: true, combinedSignature, version: VERSION })
-      sentResult.sent = true
+  // BLS threshold signatures can be combined without all partial signatures
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      // Close outstanding requests
+      controller.abort()
+    } catch {
+      // Already logged, continue to collect signatures
     }
   }
 }
@@ -214,7 +232,6 @@ function handleFailedResponse(
   signerCount: number,
   failedRequests: Set<string>,
   response: Response,
-  sentResult: { sent: boolean },
   controller: AbortController,
   errorCodes: Map<number, number>
 ) {
@@ -227,12 +244,9 @@ function handleFailedResponse(
   failedRequests.add(service.url)
   const shouldFailFast = signerCount - failedRequests.size < config.thresholdSignature.threshold
   logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
-  if (!sentResult.sent && shouldFailFast) {
+  if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
-    const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
     controller.abort()
-    sentResult.sent = true
   }
 }
 

@@ -81,6 +81,7 @@ lerna-debug.log
 !.env.mnemonic*.enc
 
 .terraform/
+.terraform.lock.hcl
 tsconfig.tsbuildinfo
 
 # git mergetool

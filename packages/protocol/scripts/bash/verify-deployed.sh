@@ -14,7 +14,7 @@ set -euo pipefail
 BRANCH=""
 NETWORK=""
 FORNO=""
-LOG_FILE="/tmp/celo-verify-deployed.log"
+LOG_FILE="/dev/stdout"
 
 while getopts 'b:n:fl:' flag; do
   case "${flag}" in
@@ -32,4 +32,4 @@ done
 source scripts/bash/release-lib.sh
 build_tag $BRANCH $LOG_FILE
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $FORNO
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --librariesFile "libraries.json" $FORNO

@@ -33,8 +33,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 source ~/.bashrc
 
 # Setting up the right version of Nvm
-nvm install 10
-nvm alias default 10
+nvm install 12
+nvm alias default 12
 ```
 
 Running `$ node -v` in the terminal should print a node version if it is installed correctly.

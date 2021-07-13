@@ -167,7 +167,6 @@ describe('Running against a deployed service', () => {
     })
 
     it('Check that accounts are set up correctly', async () => {
-      // TODO Make this check more precise
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
       expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })

@@ -34,12 +34,12 @@ contract('GovernanceSlasher', (accounts: string[]) => {
   const validator = accounts[1]
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     validators = await MockValidators.new()
-    slasher = await GovernanceSlasher.new()
+    slasher = await GovernanceSlasher.new(true)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)

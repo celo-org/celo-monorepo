@@ -81,7 +81,7 @@ contract('EpochRewards', (accounts: string[]) => {
   const carbonOffsettingPartner = '0x0000000000000000000000000000000000000000'
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
-  const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
+  const sortedOraclesDenominator = new BigNumber('1000000000000000000000000')
   const timeTravelToDelta = async (timeDelta: BigNumber) => {
     // mine beforehand, just in case
     await jsonRpc(web3, 'evm_mine', [])
@@ -100,8 +100,8 @@ contract('EpochRewards', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
-    freezer = await Freezer.new()
-    registry = await Registry.new()
+    freezer = await Freezer.new(true)
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)

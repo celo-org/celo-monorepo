@@ -28,6 +28,9 @@ export async function installHelmChart(
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
+  const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${celoEnv}.yaml`)
+    ? `values-${celoEnv}.yaml`
+    : `values.yaml`
   return installGenericHelmChart(
     celoEnv,
     releaseName,
@@ -40,7 +43,7 @@ export async function installHelmChart(
       blockscoutDBConnectionName
     ),
     true,
-    `values-${celoEnv}.yaml`
+    valuesEnvFile
   )
 }
 
@@ -126,16 +129,27 @@ async function helmParameters(
       )}`
     )
   }
-  if (isVmBased()) {
+  if (
+    fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT, '') !== '' &&
+    fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT, '') !== ''
+  ) {
+    params.push(
+      `--set blockscout.jsonrpc_http_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT)}`
+    )
+    params.push(
+      `--set blockscout.jsonrpc_ws_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT)}`
+    )
+  } else if (isVmBased()) {
+    // TODO: Deprecated
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   } else if (privateNodes > 0) {
-    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private-headless:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private-headless:8546`)
+    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8545`)
   } else {
-    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-headless:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-headless:8546`)
+    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
   }
   return params
 }
@@ -156,6 +170,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
     nginx.ingress.kubernetes.io/configuration-snippet: |
       location ~ /admin/.* {
         deny all;

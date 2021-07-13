@@ -266,5 +266,7 @@ module "attestation-service" {
   twilio_auth_token                           = var.attestation_service_twilio_auth_token
   twilio_blacklist                            = var.attestation_service_twilio_blacklist
   twilio_unsupported_regions                  = var.attestation_service_twilio_unsupported_regions
+  messagebird_api_key                         = var.attestation_service_messagebird_api_key
+  messagebird_unsupported_regions             = var.attestation_service_messagebird_unsupported_regions
   service_account_scopes                      = var.service_account_scopes
 }

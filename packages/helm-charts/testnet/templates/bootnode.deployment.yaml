@@ -69,11 +69,11 @@ spec:
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command:
-        - /bin/sh
+        - /bin/bash
         - -c
-        args:
         - |
-          celotooljs.sh generate bip32 --mnemonic \"$MNEMONIC\" --accountType bootnode --index 0 > /etc/bootnode/node.key
+           celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /etc/bootnode/node.key
+           celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /etc/bootnode/enode.key
         env:
         - name: MNEMONIC
           valueFrom:

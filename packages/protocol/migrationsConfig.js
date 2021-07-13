@@ -116,6 +116,12 @@ const DefaultConfig = {
     numInternalRequiredConfirmations: 1,
     useMultiSig: true,
   },
+  grandaMento: {
+    approver: '0x0000000000000000000000000000000000000000',
+    maxApprovalExchangeRateChange: 0.3, // 30%
+    spread: 0.01, // 1%
+    vetoPeriodSeconds: 3 * HOUR, // > the 2 hour minimum possible governance proposal completion time.
+  },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
@@ -218,6 +224,12 @@ const NetworkConfigs = {
     election: {
       minElectableValidators: '10',
       frozen: false,
+    },
+    stableToken: {
+      initialBalances: {
+        addresses: ['0x5409ED021D9299bf6814279A6A1411A7e866A631'],
+        values: ['10000000000000000000'],
+      },
     },
     epochRewards: {
       frozen: false,

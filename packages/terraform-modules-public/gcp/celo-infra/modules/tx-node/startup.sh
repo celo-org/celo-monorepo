@@ -179,6 +179,8 @@ then
   echo "stopping geth to untar chaindata" | logger
   systemctl stop geth.service
   sleep 3
+  echo "Deleting old chaindata" | logger
+  rm -rf /root/.celo/celo/chaindata/*
   echo "untarring chaindata" | logger
   tar zxvf /root/.celo/celo/restore/chaindata.tgz --directory /root/.celo/celo
   echo "removing chaindata tarball" | logger
@@ -240,14 +242,6 @@ apt install -y google-fluentd
 apt install -y google-fluentd-catch-all-config-structured
 systemctl restart google-fluentd
 
-# ---- Setup swap
-echo "Setting up swapfile" | logger
-fallocate -l 2G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-swapon -s
-
 # ---- Set Up Persistent Disk ----
 
 # gives a path similar to `/dev/sdb`
@@ -276,6 +270,14 @@ mkdir -p $DATA_DIR
 DISK_UUID=$(blkid $DISK_PATH | cut -d '"' -f2)
 echo "UUID=$DISK_UUID     $DATA_DIR   auto    discard,defaults    0    0" >> /etc/fstab
 mount $DATA_DIR
+
+# ---- Setup swap
+echo "Setting up swapfile" | logger
+fallocate -l 4G /root/.celo/swapfile
+chmod 600 /root/.celo/swapfile
+mkswap /root/.celo/swapfile
+swapon /root/.celo/swapfile
+swapon -s
 
 # Remove existing chain data
 [[ ${reset_geth_data} == "true" ]] && rm -rf $DATA_DIR/geth
@@ -399,6 +401,7 @@ ExecStart=/usr/bin/docker run \\
       --pprof \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
       --light.serve 0 \\
+      --syncmode lightest \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
 
@@ -413,11 +416,12 @@ systemctl enable geth.service
 echo "Adding DC to docker group" | logger
 usermod -aG docker dc
 
+# note that we no longer restore chaindata since txnode is now using syncmode=lightest
 # --- run restore script
 # this script tries to restore chaindata from a GCS hosted tarball.
 # if the chaindata doesn't exist on GCS, geth will start normal (slow) p2p sync
-echo "Restoring chaindata from backup tarball" | logger
-bash /root/restore.sh
+#echo "Restoring chaindata from backup tarball" | logger
+#bash /root/restore.sh
 
 # todo: add some logic to look at the chaindata tarball bucket versus the rsync bucket and pick the best one.
 # for now we try both, with rsync taking precedence b/c it runs last.
@@ -425,8 +429,8 @@ bash /root/restore.sh
 # --- run rsync restore script
 # this script tries to restore chaindata from a GCS hosted bucket via rsync.
 # if the chaindata doesn't exist on GCS, geth will start normal (slow) p2p sync, perhaps boosted by what the tarball provided
-echo "Restoring chaindata from backup via rsync" | logger
-bash /root/restore_rsync.sh
+#echo "Restoring chaindata from backup via rsync" | logger
+#bash /root/restore_rsync.sh
 
 #--- remove compilers
 echo "Removing compilers" | logger
