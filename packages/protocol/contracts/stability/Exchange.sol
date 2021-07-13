@@ -118,10 +118,10 @@ contract Exchange is
   function sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     public
     onlyWhenNotFrozen
-    updateBucketsIfNecessary
     nonReentrant
     returns (uint256)
   {
+    _updateBucketsIfNecessary();
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
     uint256 buyAmount = _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
 
@@ -162,10 +162,10 @@ contract Exchange is
   function buy(uint256 buyAmount, uint256 maxSellAmount, bool buyGold)
     external
     onlyWhenNotFrozen
-    updateBucketsIfNecessary
     nonReentrant
     returns (uint256)
   {
+    _updateBucketsIfNecessary();
     bool sellGold = !buyGold;
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
     uint256 sellAmount = _getSellTokenAmount(buyTokenBucket, sellTokenBucket, buyAmount);
@@ -196,10 +196,7 @@ contract Exchange is
         getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
-      require(
-        IStableToken(stableToken).mint(msg.sender, buyAmount),
-        "Mint of stable token failed"
-      );
+      require(IStableToken(stableToken).mint(msg.sender, buyAmount), "Mint of stable token failed");
     } else {
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
@@ -452,8 +449,7 @@ contract Exchange is
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stableToken) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
-    bool medianReportRecent = sortedOracles.medianTimestamp(stableToken) >
-      now.sub(updateFrequency);
+    bool medianReportRecent = sortedOracles.medianTimestamp(stableToken) > now.sub(updateFrequency);
     // emit A(timePassed, enoughReports, medianReportRecent, !isReportExpired);
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
