@@ -302,7 +302,7 @@ The main difference between the old method of running the Attestation Service al
 
 To do this, you need to map the directory containing the `keystore` to the Attestation Service's Docker volume and set the environment variable `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` to the path to this directory relative to the Docker container. You will also need to set the environment variable `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.
 
-Additionally, ensure that the `CELO_PROVIDER` environment variable points to a node to which you can submit signed attestations. This can be a separate full node or your validator proxy node.
+Additionally, ensure that the `CELO_PROVIDER` environment variable points to a node to which you can submit signed attestations. This can be a separate full node (either one you run or forno) or, depending on your configuration, your validator proxy node.
 
 The command below illustrates what this could look like, if you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` from earlier in the instructions above to create the `CELO_ATTESTATION_SIGNER_ADDRESS`. Recall that you set `KEYSTORE_PARENT_DIR` to the working directory (`$PWD`) during the instructions above, and saved the password to the file `KEYSTORE_PARENT_DIR/.password`. Note that environment variables can be set either in the `$CONFIG` file or passed into the `docker run` command directly using the `-e` flag. (In this example, two of these variables are passed in via the `-e` flag for clarity.)
 
