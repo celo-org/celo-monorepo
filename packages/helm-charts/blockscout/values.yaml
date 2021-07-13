@@ -165,7 +165,7 @@ blockscout:
     name: blockscout
     drop: "false"
   jsonrpc_http_url: http://tx-nodes-private:8545
-  jsonrpc_ws_url: ws://tx-nodes-private:8546
+  jsonrpc_ws_url: ws://tx-nodes-private:8545
   metadata_crawler:
     schedule: "*/30 * * * *"
     image:
