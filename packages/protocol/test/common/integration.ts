@@ -574,7 +574,6 @@ Array.from([
   })
 )
 
-if (x) {
 contract('Integration: Adding StableToken', (accounts: string[]) => {
   const Exchange: ExchangeContract = artifacts.require('Exchange')
   const StableToken: StableTokenContract = artifacts.require('StableToken')
