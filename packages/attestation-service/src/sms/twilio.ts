@@ -143,11 +143,12 @@ export class TwilioSmsProvider extends SmsProvider {
     // user is not requesting a deeplink
     if (this.verifyServiceSid && attestation.securityCode) {
       const requestParams: any = {
-        to: attestation.message,
+        to: attestation.phoneNumber,
         channel: 'sms',
         customCode: attestation.securityCode,
       }
 
+      // This param tells Twilio to add the <#> prefix and app hash postfix
       if (attestation.appSignature) {
         requestParams.appHash = attestation.appSignature
       }
