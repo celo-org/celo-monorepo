@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "@celo/base": "1.2.3-dev",
-    "didkit-wasm-node": "^0.1.5-celo",
+    "didkit-wasm-node": "0.1.5-celo",
     "@types/country-data": "^0.0.0",
     "@types/elliptic": "^6.4.9",
     "@types/ethereumjs-util": "^5.2.0",
