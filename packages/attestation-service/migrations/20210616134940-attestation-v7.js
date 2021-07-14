@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -31,5 +31,5 @@ module.exports = {
       await transaction.rollback()
       throw error
     }
-  }
-};
+  },
+}
