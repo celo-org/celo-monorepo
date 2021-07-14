@@ -102,12 +102,12 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         )
     })
     // Backwards compatibility check
-    it('provides signature w/ timestamp', (done) => {
+    it('provides signature w/ expired timestamp', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockGetBlockNumber.mockResolvedValue(10000)
       request(app)
         .post('/getBlindedMessagePartialSig')
-        .send({ ...validRequest, timestamp: Date.now() })
+        .send({ ...validRequest, timestamp: Date.now() - 10 * 60 * 1000 }) // 10 minutes ago
         .expect('Content-Type', /json/)
         .expect(
           200,
