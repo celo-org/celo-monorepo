@@ -1,4 +1,5 @@
 import { serializeSignature } from '@celo/utils/lib/signatureUtils'
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -32,10 +33,6 @@ export default class ProofOfPossession extends BaseCommand {
     const res = this.parse(ProofOfPossession)
     const accounts = await this.kit.contracts.getAccounts()
     const pop = await accounts.generateProofOfKeyPossession(res.flags.account, res.flags.signer)
-    if (res.flags.role) {
-      printValueMap({ signature: serializeSignature(pop, res.flags.role) })
-    } else {
-      printValueMap({ signature: serializeSignature(pop) })
-    }
+    printValueMap({ signature: serializeSignature(pop) })
   }
 }
