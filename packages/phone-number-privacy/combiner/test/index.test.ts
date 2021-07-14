@@ -1,6 +1,7 @@
 import { ACCOUNT_ADDRESSES, PRIVATE_KEYS } from '@celo/dev-utils'
 import { signWithDEK } from '@celo/identity/src/odis'
 import { getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
@@ -20,6 +21,7 @@ jest.mock('@celo/phone-number-privacy-common', () => ({
 const mockIsVerified = isVerified as jest.Mock
 const mockGetDataEncryptionKey = getDataEncryptionKey as jest.Mock
 mockGetDataEncryptionKey.mockReturnValue(ACCOUNT_ADDRESSES[0])
+const mockVerifySignature = verifySignature as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = jest.fn()
@@ -172,71 +174,111 @@ describe(`POST /getContactMatches endpoint`, () => {
   }
 
   describe('with valid input', () => {
+    const expectMatches = (req: Request, numbers: string[], done: jest.DoneCallback) => {
+      mockGetNumberPairContacts.mockReturnValue(numbers)
+      mockIsVerified.mockReturnValue(true)
+      const res = {
+        json(body: any) {
+          try {
+            expect(body.success).toEqual(true)
+            expect(body.matchedContacts).toEqual(
+              numbers.map((number) => {
+                phoneNumber: number
+              })
+            )
+            done()
+          } catch (e) {
+            done(e)
+          }
+        },
+        status(status: any) {
+          try {
+            expect(status).toEqual(200)
+            done()
+          } catch (e) {
+            done(e)
+          }
+          return {
+            json() {
+              return {}
+            },
+          }
+        },
+      } as Response
+
+      getContactMatches(req, res)
+    }
+
     const expectSuccessfulMatchmaking = (req: Request) => {
-      it('provides matches', (done) => {
-        mockGetNumberPairContacts.mockReturnValue(validInput.contactPhoneNumbers)
-        mockIsVerified.mockReturnValue(true)
-        const res = {
-          json(body: any) {
-            try {
-              expect(body.success).toEqual(true)
-              expect(body.matchedContacts).toEqual([
-                { phoneNumber: validInput.contactPhoneNumbers[0] },
-              ])
-              done()
-            } catch (e) {
-              done(e)
-            }
-          },
-          status(status: any) {
-            try {
-              expect(status).toEqual(200)
-              done()
-            } catch (e) {
-              done(e)
-            }
-            return {
-              json() {
-                return {}
-              },
-            }
-          },
-        } as Response
+      it('provides matches', (done) => expectMatches(req, req.body.contactPhoneNumbers, done))
+      it('provides matches empty array', (done) => expectMatches(req, [], done))
+    }
 
-        getContactMatches(req, res)
-      })
-
-      it('provides matches empty array', (done) => {
-        mockGetNumberPairContacts.mockReturnValue([])
-        mockIsVerified.mockReturnValue(true)
-        const res = {
-          json(body: any) {
-            try {
-              expect(body.success).toEqual(true)
-              expect(body.matchedContacts).toEqual([])
-              done()
-            } catch (e) {
-              done(e)
-            }
-          },
-          status(status: any) {
-            try {
-              expect(status).toEqual(200)
-              done()
-            } catch (e) {
-              done(e)
-            }
-            return {
-              json() {
-                return {}
-              },
-            }
-          },
-        } as Response
-
-        getContactMatches(req, res)
+    const expectAllReplaysToFail = (req: Request) => {
+      describe('With replayed requests', () => {
+        mockGetDidMatchmaking.mockReturnValue(true)
+        it('rejects more than one request to matchmake with 403', (done) => {
+          mockIsVerified.mockReturnValue(true)
+          getContactMatches(req, invalidResponseExpected(done, 403))
+        })
       })
     }
+
+    describe('w/o signedUserPhoneNumber', () => {
+      const req = {
+        body: validInput,
+        headers: mockHeaders,
+      } as Request
+      expectSuccessfulMatchmaking(req)
+      expectAllReplaysToFail(req)
+    })
+
+    describe('w/ signedUserPhoneNumber', () => {
+      const req = {
+        body: {
+          ...validInput,
+          signedUserPhoneNumber: signWithDEK(validInput.userPhoneNumber, PRIVATE_KEYS[0]),
+        },
+        headers: mockHeaders,
+      } as Request
+
+      expectSuccessfulMatchmaking(req)
+      // TODO check storage
+
+      describe('When DEK cannot be read', () => {
+        mockGetDataEncryptionKey.mockRejectedValueOnce(false)
+        expectSuccessfulMatchmaking(req)
+        expectAllReplaysToFail(req)
+      })
+
+      describe('When DEK signedUserPhoneNumber signature is invalid', () => {
+        mockVerifySignature.mockReturnValueOnce(true)
+        it('Rejects request to matchmake with 403', (done) => {
+          getContactMatches(req, invalidResponseExpected(done, 403))
+        })
+      })
+
+      describe('With replayed requests', () => {
+        mockGetDidMatchmaking.mockReturnValue(true)
+
+        describe('When a signedUserPhoneNumber record exists in the db', () => {
+          describe('When the signedUserPhoneNumber record in the db matches the request', () => {
+            expectSuccessfulMatchmaking(req)
+            // TODO check storage
+          })
+          describe('When the signedUserPhoneNumber record in the db does not match the request', () => {
+            it('Rejects request to matchmake with 403', (done) => {
+              getContactMatches(req, invalidResponseExpected(done, 403))
+            })
+          })
+        })
+
+        describe('When a signedUserPhoneNumber does not exist in the db', () => {
+          expectSuccessfulMatchmaking(req)
+          // TODO check storage
+        })
+      })
+    })
 
     const reqs = new Map([
       [
