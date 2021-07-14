@@ -10,7 +10,7 @@ You can run the development Celo blockchain in two ways:
 
 ### 1. Use the celo-devchain NPM package
 
-The easiest is to use a "pre-generated" devchain from the celo-devchain NPM package. For that all you have to do is:
+The easiest is to use a "pre-generated" devchain from the [celo-devchain](https://github.com/zviadm/celo-devchain) NPM package. For that all you have to do is:
 
 ```sh
 > npm install --save-dev celo-devchain
