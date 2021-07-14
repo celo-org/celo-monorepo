@@ -1,8 +1,7 @@
 import countryData from 'country-data'
-import { getExampleNumber } from './phoneNumbers'
-
 // more countries @ https://github.com/umpirsky/country-list
-const esData = require('../data/countries/es/country.json')
+import esData from './data/countries/es/country.json'
+import { getExampleNumber } from './phoneNumbers'
 
 interface CountryNames {
   [name: string]: string
@@ -80,7 +79,7 @@ export class Countries {
         // are fallback languages 'es-US' and 'es-LA' that are not covered
         const names: CountryNames = {
           'en-us': country.name,
-          'es-419': esData[country.alpha2],
+          'es-419': (esData as { [code: string]: string })[country.alpha2],
         }
 
         const displayName = names[this.language] || country.name
