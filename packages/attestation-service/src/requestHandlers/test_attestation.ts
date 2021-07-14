@@ -55,6 +55,7 @@ export async function handleTestAttestationRequest(
       testRequest.phoneNumber,
       testRequest.message,
       '12345678',
+      '2345678',
       testRequest.message,
       undefined,
       undefined,

@@ -164,7 +164,7 @@ class AttestationRequestHandler {
       const attestationCodeDeeplink = `celo://wallet/v/${toBase64(attestationCode)}`
 
       // Determine if we're sending a security code, or the full deep link.
-      let messageBase, securityCode
+      let messageBase, securityCode, prefixedSecurityCode
       if (this.attestationRequest.securityCodePrefix) {
         if (this.attestationRequest.securityCodePrefix.length !== 1) {
           throw new ErrorWithResponse('Invalid securityCodePrefix', 422)
@@ -174,8 +174,10 @@ class AttestationRequestHandler {
         securityCode = randomBytes(7)
           .map((x) => x % 10)
           .join('')
-        securityCode = `${this.attestationRequest.securityCodePrefix}${securityCode}`
-        messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${securityCode}`
+        prefixedSecurityCode = `${this.attestationRequest.securityCodePrefix}${securityCode}`
+        messageBase = `${getSecurityCodeText(
+          this.attestationRequest.language
+        )}: ${prefixedSecurityCode}`
       } else {
         // Client is requesting direct SMS with the deeplink.
         messageBase = attestationCodeDeeplink
@@ -198,6 +200,7 @@ class AttestationRequestHandler {
         this.attestationRequest.phoneNumber,
         textMessage,
         securityCode,
+        prefixedSecurityCode,
         attestationCodeDeeplink,
         this.attestationRequest.smsRetrieverAppSig,
         this.attestationRequest.language,

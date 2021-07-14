@@ -12,6 +12,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       })
+      await queryInterface.addColumn('Attestations', 'prefixedSecurityCode', {
+        type: Sequelize.STRING,
+        allowNull: true,
+      })
 
       await transaction.commit()
     } catch (error) {
@@ -24,6 +28,7 @@ module.exports = {
     try {
       await queryInterface.removeColumn('Attestations', 'appSignature')
       await queryInterface.removeColumn('Attestations', 'language')
+      await queryInterface.removeColumn('Attestations', 'prefixedSecurityCode')
     } catch (error) {
       await transaction.rollback()
       throw error
