@@ -80,3 +80,32 @@ You can [view the implementation here.](https://explorer.celo.org/address/0xaa93
  and to allow users to [pay transaction fees in different currencies.](../overview.md#richer-transactions) As of May 19th, 2021, with the [Donut hardfork](https://medium.com/celoorg/dissecting-the-donut-hardfork-23cad6015fa2), the Celo network accepts both Celo transaction objects and Ethereum transaction objects as valid Celo transactions. This means that you can use most Ethereum tools with Celo, right out of the box (just point them at the Celo network). When sending Ethereum formatted transactions on Celo, you will not be able to use Celo features of specifying transaction fee currencies or full node incentives.
 
  3. When using mnemonic seed phrases (or secret phrases), Celo accounts (a private key and corresponding address) are derived differently from Ethereum accounts. The Celo key derivation path is `m/44'/52752'/0'/0` whereas Ethereum’s is `m/44'/60'/0'/0`. This means that going from a seed phrase to accounts will be different when using Ethereum vs Celo wallets.
+
+## Deploying Ethereum Contracts to Celo
+
+Celo runs the EVM which means that smart contracts written for Ethereum can easily be deployed to Celo, the main difference being that you just need to connect to a Celo node instead of an Ethereum node. You can connect to your own Celo node or to a Celo node service provider like [Figment Datahub](https://figment.io/datahub/celo/). 
+
+[This tutorial](./walkthroughs/hellocontracts.md) goes over how to start an ultralight node that runs locally and use it to deploy a contract to the Alfajores testnet using Truffle.
+
+[This tutorial](./walkthroughs/hello-contract-remote-node.md) goes over how to connect to a remote node and use ContractKit to deploy a contract to Alfajores using Truffle.
+
+## Protocol Differences
+
+### OPCODES & Block headers
+
+Celo does not support the `DIFFICULTY` or `GASLIMIT` opcodes. These fields are also absent from Celo block headers.
+
+### Precompiled Contracts
+
+Celo includes all of the precompiled contracts in Ethereum, but also adds additional contracts. [Here](https://github.com/celo-org/celo-blockchain/blob/v1.3.2/core/vm/contracts.go#L157) is the list of Celo precompiled contracts as of Celo version 1.3.2. You can find the latest updates by selecting the most recent release tag.
+
+### Core Contract Calls
+
+The blockchain client makes some core contract calls at the end of a block, outside of transactions.  Many are done on epoch blocks ([epoch rewards](../celo-codebase/protocol/proof-of-stake/epoch-rewards.md), [validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md), etc.), but not all.  For example, the [gas price minimum](../celo-codebase/protocol/transactions/gas-pricing.md) update can happen on any block.
+Logs created by these contract changes are included in a single additional receipt in that block, which references the block hash as its transaction hash, even though there is no transaction with this hash. If no logs were created by such calls in that block, no receipt is added.
+
+### Node management APIs
+
+Celo nodes have a slightly different RPC interface than geth nodes. There are some additional RPC endpoints to help validators manage their nodes, they can be found [here](../validator-guide/proxy.md#rpc-api) and [here](../validator-guide/node-upgrades.md#hotswapping-validator-nodes). 
+
+You can find the full list of RPC API endpoints in [this file](https://github.com/celo-org/celo-blockchain/blob/master/internal/web3ext/web3ext.go).

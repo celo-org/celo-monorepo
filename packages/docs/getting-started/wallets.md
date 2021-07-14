@@ -46,6 +46,14 @@ Celo Extension Wallet is a fork of Metamask for the Celo Network. It's a browser
 - Maintainers: [DSRV Labs](https://www.dsrvlabs.com/en/)
 - Ledger support: Yes
 
+### Steakwallet
+
+Steakwallet is a non-custodial, multi chain staking wallet. It aims to be the hub for mobile DeFi, supporting Celo from the very start.
+
+- [steakwallet.fi](https://steakwallet.fi)
+- Platforms: Android, iOS
+- Maintainers: [Steakwallet LLC](https://steakwallet.fi)
+
 ## Celo Compatible Wallets
 
 There are currently a few other compatible wallets. When the upcoming [Donut hard-fork](https://github.com/celo-org/celo-proposals/issues/94) is live, Celo transactions will become compatible with Ethereum transactions. This will allow some Ethereum wallets to work with Celo. More updates on this coming soon.
