@@ -121,7 +121,7 @@ export const issueCredential = async (
 
   const signature = await signFunction(preparation.signingInput)
 
-  let vc = await completeIssueCredential(credential, JSON.stringify(preparation), signature)
+  const vc = await completeIssueCredential(credential, JSON.stringify(preparation), signature)
 
   try {
     await validateVerifiableCredential(vc)

@@ -17,7 +17,7 @@ export class TwilioLookupProvider extends LookupProvider {
   }
 
   async lookup(phoneNumber: E164Number): Promise<LookupResult> {
-    return await this.client.lookups.v1
+    return this.client.lookups.v1
       .phoneNumbers(phoneNumber)
       .fetch({ type: 'carrier' })
       .then(({ countryCode, carrier }) => ({ countryCode, phoneNumberType: carrier.type }))

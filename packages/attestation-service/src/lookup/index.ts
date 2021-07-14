@@ -81,7 +81,7 @@ export const issueAttestationPhoneNumberTypeCredential = async (
       credential,
       proofOptions,
       async (signInput) =>
-        await useKit(async (kit) =>
+        useKit(async (kit) =>
           SignatureUtils.serializeSignature(
             await kit.connection.signTypedData(
               getAttestationSignerAddress().toLowerCase(),

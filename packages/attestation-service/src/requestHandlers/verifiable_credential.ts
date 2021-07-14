@@ -17,7 +17,7 @@ export class VerifiableCredentialHandler {
   constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {}
 
   async signVerifiableCredential(signingInput: string) {
-    return await useKit((kit) =>
+    return useKit((kit) =>
       kit.connection.sign(signingInput, getAttestationSignerAddress().toLowerCase())
     )
   }

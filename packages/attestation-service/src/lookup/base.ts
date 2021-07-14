@@ -14,7 +14,7 @@ export enum LookupProviderType {
   TWILIO = 'twilio',
 }
 
-export type LookupResult = {
+export interface LookupResult {
   phoneNumberType: string
   countryCode: string
 }

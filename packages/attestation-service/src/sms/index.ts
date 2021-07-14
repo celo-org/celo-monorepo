@@ -252,7 +252,7 @@ export async function startSendSms(
 
     try {
       // Issues verifiable credential for phone number type
-      let verifiableCredential = await issueAttestationPhoneNumberTypeCredential(
+      const verifiableCredential = await issueAttestationPhoneNumberTypeCredential(
         attestation,
         logger
       )

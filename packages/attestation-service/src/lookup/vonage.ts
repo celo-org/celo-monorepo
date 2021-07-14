@@ -46,7 +46,9 @@ export class VonageLookupProvider extends LookupProvider {
           number,
         },
         (error: any, { current_carrier, country_code }: any) => {
-          if (error) reject(error)
+          if (error) {
+            reject(error)
+          }
           resolve({ phoneNumberType: current_carrier.network_type, countryCode: country_code })
         }
       )
