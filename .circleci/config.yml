@@ -439,7 +439,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/voting/lockedgold
+            yarn --cwd packages/protocol test --coverage governance/voting/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-voting.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -458,7 +458,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/voting/release_gold
+            yarn --cwd packages/protocol test --coverage governance/network/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-network.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -477,7 +477,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/validators/validators
+            yarn --cwd packages/protocol test --coverage governance/validators/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-validators.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -496,7 +496,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/voting/election
+            yarn --cwd packages/protocol test --coverage common/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-common.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -515,7 +515,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/network/governance
+            yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestations|identity/escrow|identity/identityproxy)'
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-identity.json
       - store_artifacts:
           path: packages/protocol/coverage

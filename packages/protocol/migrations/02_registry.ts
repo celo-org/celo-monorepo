@@ -10,7 +10,7 @@ const ContractProxy = artifacts.require(name + 'Proxy')
 
 module.exports = (deployer: any, networkName: string, _accounts: string[]) => {
   process.env.NETWORK = networkName
-  if (networkName === 'coverage1') {
+  if (networkName === 'coveragenomigrate') {
     return
   }
 

@@ -199,7 +199,7 @@ const networks = {
 }
 // Equivalent
 networks.mainnet = networks.rc1
-networks.coverage1 = networks.coverage
+networks.coveragenomigrate = networks.coverage
 
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.

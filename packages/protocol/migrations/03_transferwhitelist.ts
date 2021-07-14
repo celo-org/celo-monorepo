@@ -7,7 +7,7 @@ const name = CeloContractName.TransferWhitelist
 const Contract = artifacts.require(name)
 
 module.exports = (deployer: any, networkName: string) => {
-  if (networkName === 'coverage1') {
+  if (networkName === 'coveragenomigrate') {
     console.info('Skipping transfer whitelist')
     return
   }
