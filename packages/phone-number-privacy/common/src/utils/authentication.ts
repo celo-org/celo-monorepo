@@ -8,6 +8,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
+import { ErrorMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 const ec = new EC('secp256k1')
@@ -36,9 +37,8 @@ export async function authenticateUser(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit)
+      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
     } catch (error) {
-      logger.error('Failed to retrieve DEK: ' + error.message)
       logger.warn('Assuming request is authenticated')
       return true
     }
@@ -72,7 +72,8 @@ export async function authenticateUser(
 
 export async function getDataEncryptionKey(
   address: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  logger: Logger
 ): Promise<string> {
   return retryAsyncWithBackOffAndTimeout(
     async () => {
@@ -84,7 +85,11 @@ export async function getDataEncryptionKey(
     RETRY_DELAY_IN_MS,
     1.5,
     FULL_NODE_TIMEOUT_IN_MS
-  )
+  ).catch((error) => {
+    logger.error('Failed to retrieve DEK: ' + error.message)
+    logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+    throw error
+  })
 }
 
 export async function isVerified(
