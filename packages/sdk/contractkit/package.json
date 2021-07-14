@@ -17,7 +17,7 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf src/generated",
-    "build:gen": "yarn --cwd ../../protocol build",
+    "build:gen": "BUILD_DIR=./build/$RELEASE_TAG yarn --cwd ../../protocol build:sol --web3TypesDir ../sdk/contractkit/src/generated/$RELEASE_TAG",
     "prepublishOnly": "yarn build:gen && yarn build",
     "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts contractkit",
     "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 25",
