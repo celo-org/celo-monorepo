@@ -22,11 +22,9 @@ async function tryProposal(
   from: string,
   call: boolean
 ) {
-  const governance = await kit.contracts.getGovernance()
-
   console.log('Simulating proposal execution')
   let ok = true
-  for (let [i, tx] of proposal.entries()) {
+  for (const [i, tx] of proposal.entries()) {
     if (!tx.to) {
       continue
     }
