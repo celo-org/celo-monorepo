@@ -152,36 +152,41 @@ class AttestationRequestHandler {
   // Main process for handling an attestation.
   async doAttestation() {
     Counters.attestationRequestsTotal.inc()
+    if (
+      !this.attestationRequest.securityCodePrefix ||
+      this.attestationRequest.securityCodePrefix.length !== 1
+    ) {
+      throw new ErrorWithResponse('Invalid securityCodePrefix', 422)
+    }
+
     let attestation = await this.findOrValidateRequest()
 
     if (attestation && attestation.message) {
       // Re-request existing attestation. In this case, security code prefix is ignored (the message sent is the same as before)
-      attestation = await rerequestAttestation(this.key, this.logger, this.sequelizeLogger)
+      attestation = await rerequestAttestation(
+        this.key,
+        this.attestationRequest.smsRetrieverAppSig,
+        this.attestationRequest.language,
+        this.attestationRequest.securityCodePrefix,
+        this.logger,
+        this.sequelizeLogger
+      )
     } else {
       // New attestation: create new attestation code, new delivery.
       const attestationCode = await this.signAttestation()
       await this.validateAttestationCode(attestationCode)
+      // This attestation code is stored in the attestation object
+      // and will be returned to the user with the get_attestation call
       const attestationCodeDeeplink = `celo://wallet/v/${toBase64(attestationCode)}`
 
-      // Determine if we're sending a security code, or the full deep link.
-      let messageBase, securityCode, prefixedSecurityCode
-      if (this.attestationRequest.securityCodePrefix) {
-        if (this.attestationRequest.securityCodePrefix.length !== 1) {
-          throw new ErrorWithResponse('Invalid securityCodePrefix', 422)
-        }
+      let messageBase, securityCode
 
-        // Client is requesting a security code SMS. Generate a challenge and just store the deeplink.
-        securityCode = randomBytes(7)
-          .map((x) => x % 10)
-          .join('')
-        prefixedSecurityCode = `${this.attestationRequest.securityCodePrefix}${securityCode}`
-        messageBase = `${getSecurityCodeText(
-          this.attestationRequest.language
-        )}: ${prefixedSecurityCode}`
-      } else {
-        // Client is requesting direct SMS with the deeplink.
-        messageBase = attestationCodeDeeplink
-      }
+      // Generate a security code to be sent over SMS
+      securityCode = randomBytes(7)
+        .map((x) => x % 10)
+        .join('')
+      securityCode = `${this.attestationRequest.securityCodePrefix}${securityCode}`
+      messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${securityCode}`
 
       let textMessage
 
@@ -200,7 +205,6 @@ class AttestationRequestHandler {
         this.attestationRequest.phoneNumber,
         textMessage,
         securityCode,
-        prefixedSecurityCode,
         attestationCodeDeeplink,
         this.attestationRequest.smsRetrieverAppSig,
         this.attestationRequest.language,

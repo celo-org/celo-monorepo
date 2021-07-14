@@ -139,13 +139,12 @@ export class TwilioSmsProvider extends SmsProvider {
   }
 
   async sendSms(attestation: AttestationModel) {
-    // Prefer Verify API if Verify Service is present and
-    // user is not requesting a deeplink
-    if (this.verifyServiceSid && attestation.prefixedSecurityCode) {
+    // Prefer Verify API if Verify Service is present
+    if (this.verifyServiceSid) {
       const requestParams: any = {
         to: attestation.phoneNumber,
         channel: 'sms',
-        customCode: attestation.prefixedSecurityCode,
+        customCode: attestation.securityCode,
       }
 
       // This param tells Twilio to add the <#> prefix and app hash postfix
