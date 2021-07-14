@@ -46,7 +46,7 @@ async function startGanache() {
 
 async function test() {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ['gas', 'coverage', 'verbose-rpc'],
+    boolean: ['gas', 'coverage', 'verbose-rpc', 'skip-migrations'],
   })
 
   try {
@@ -61,8 +61,10 @@ async function test() {
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }
-    if (argv.coverage) {
+    if (argv.coverage && argv['skip-migrations']) {
       testArgs = testArgs.concat(['--network', 'coveragenomigrate'])
+    } else if (argv.coverage) {
+      testArgs = testArgs.concat(['--network', 'coverage'])
     } else {
       testArgs = testArgs.concat(['--network', networkName])
     }

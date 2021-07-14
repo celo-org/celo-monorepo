@@ -420,7 +420,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage stability/
+            yarn --cwd packages/protocol test --coverage --skip-migrations stability/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-stability.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -439,7 +439,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/voting/
+            yarn --cwd packages/protocol test --coverage --skip-migrations governance/voting/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-voting.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -458,7 +458,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/network/
+            yarn --cwd packages/protocol test --coverage --skip-migrations governance/network/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-network.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -477,7 +477,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage governance/validators/
+            yarn --cwd packages/protocol test --coverage --skip-migrations governance/validators/
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-validators.json
       - store_artifacts:
           path: packages/protocol/coverage
@@ -515,7 +515,7 @@ jobs:
       - run:
           name: test
           command: |
-            yarn --cwd packages/protocol test --coverage '(identity/random|identity/attestations|identity/escrow|identity/identityproxy)'
+            yarn --cwd packages/protocol test --coverage --skip-migrations '(identity/random|identity/attestations|identity/escrow|identity/identityproxy)'
             cp packages/protocol/coverage/coverage.json packages/protocol/coverage/coverage-identity.json
       - store_artifacts:
           path: packages/protocol/coverage
