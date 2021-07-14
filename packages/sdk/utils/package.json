@@ -9,7 +9,7 @@
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",
-    "clean": "tsc -b . --clean",
+    "clean": "tsc -b . --clean && rm -r lib",
     "docs": "typedoc && ts-node scripts/linkdocs.ts utils",
     "test": "jest --runInBand --ci",
     "test:verbose": "jest --verbose",
