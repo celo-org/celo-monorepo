@@ -195,7 +195,7 @@ Required options:
 | Variable                       | Explanation   |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `DATABASE_URL`                   | The URL to access the local database, e.g. `sqlite://db/attestations.db` |
-| `CELO_PROVIDER`                  | (pre-v1.3.0) The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! (v1.3.0+) The node URL for your proxy, to which you will send signed attestations. |
+| `CELO_PROVIDER`                  | (pre-v1.3.0) The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! (v1.3.0+) The node URL for your proxy, used to connect to the chain. |
 | `CELO_VALIDATOR_ADDRESS`         | Address of the Validator account. If Validator is deployed via a `ReleaseGold` contract, this is the contract's address (i.e. `$CELO_VALIDATOR_RG_ADDRESS`), not the beneficiary. |
 | `ATTESTATION_SIGNER_ADDRESS`     | Address of the Validator's attestation signer key  |
 | `SMS_PROVIDERS`                  | Comma-separated list of all enabled SMS providers. Can include `twilio`, `nexmo`. From v1.2.0, can include `messagebird`. Providers are tried from first to last, unless `SMS_PROVIDERS_RANDOMIZED` is set to `1`, in which case they are tried in a random order. |
@@ -302,7 +302,7 @@ The main difference between the old method of running the Attestation Service al
 
 To do this, you need to map the directory containing the `keystore` to the Attestation Service's Docker volume and set the environment variable `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` to the path to this directory relative to the Docker container. You will also need to set the environment variable `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.
 
-Additionally, ensure that the `CELO_PROVIDER` environment variable points to a Celo node that can be used to instantiate ContractKit; this can be a separate full node (either one you run or forno) or, depending on your configuration, your validator proxy node.
+Additionally, ensure that the `CELO_PROVIDER` environment variable points to a Celo node that can be used to instantiate ContractKit; this can be a separate full node or, depending on your configuration, your validator proxy node.
 
 The command below illustrates what this could look like, if you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` from earlier in the instructions above to create the `CELO_ATTESTATION_SIGNER_ADDRESS`. Recall that you set `KEYSTORE_PARENT_DIR` to the working directory (`$PWD`) during the instructions above, and saved the password to the file `KEYSTORE_PARENT_DIR/.password`. Note that environment variables can be set either in the `$CONFIG` file or passed into the `docker run` command directly using the `-e` flag. (In this example, two of these variables are passed in via the `-e` flag for clarity.)
 
