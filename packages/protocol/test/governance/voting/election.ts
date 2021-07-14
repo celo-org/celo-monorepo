@@ -5,6 +5,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
+  isCoverage,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
 import { normalizeAddressWith0x } from '@celo/utils/lib/address'
@@ -1083,7 +1084,9 @@ contract('Election', (accounts: string[]) => {
 
     describe('when there is a large number of groups', () => {
       const numbers: any = {}
-      if (process.env.NETWORK === 'coverage' || process.env.NETWORK === 'coveragenomigrate') return
+      if (isCoverage()) {
+        return
+      }
       beforeEach(async () => {
         await mockLockedGold.setTotalLockedGold(new BigNumber(1e25))
         await mockValidators.setNumRegisteredValidators(400)
@@ -1889,7 +1892,9 @@ contract('Election', (accounts: string[]) => {
   })
 
   describe('#consistencyChecks', () => {
-    if (process.env.NETWORK === 'coverage' || process.env.NETWORK === 'coveragenomigrate') return
+    if (isCoverage()) {
+      return
+    }
     const debug = false
     const group = accounts[0]
     const voters = accounts.slice(1)

@@ -19,9 +19,9 @@ contract('HeapTest', () => {
   })
 
   describe('#sort()', () => {
-    const num_tests = process.env.NETWORK === 'coverage' ? 10 : 100
+    const numTests = isCoverage() ? 10 : 100
     it('test with random lists', async () => {
-      for (let i = 0; i < num_tests; i++) {
+      for (let i = 0; i < numTests; i++) {
         const testLst = makeRandomList(1000000000)
         const res: any = await heapTest.sort(testLst)
         assert.deepEqual(
@@ -31,7 +31,7 @@ contract('HeapTest', () => {
       }
     })
     it('test with random lists including repeated items', async () => {
-      for (let i = 0; i < num_tests; i++) {
+      for (let i = 0; i < numTests; i++) {
         const testLst = makeRandomList(10)
         const res: any = await heapTest.sort(testLst)
         assert.deepEqual(

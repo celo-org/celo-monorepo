@@ -531,3 +531,7 @@ export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, ac
     from: account,
   })
 }
+
+export const isCoverage = () => {
+  return process.env.NETWORK === 'coverage' || process.env.NETWORK === 'coveragenomigrate'
+}
