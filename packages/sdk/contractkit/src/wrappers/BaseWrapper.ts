@@ -11,6 +11,8 @@ import {
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import moment from 'moment'
+import { ContractVersion } from '../base'
+import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
 import { ContractKit } from '../kit'
 
 /** Represents web3 native contract Method */
@@ -24,11 +26,37 @@ type EventsEnum<T extends Contract> = {
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
+  private _version?: T['methods'] extends ICeloVersionedContract['methods']
+    ? ContractVersion
+    : never
+
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
 
   /** Contract address */
   get address(): string {
     return this.contract.options.address
+  }
+
+  async version() {
+    if (!this._version) {
+      const raw = await this.contract.methods.getVersionNumber().call()
+      // @ts-ignore
+      this._version = {
+        storage: parseInt(raw[0]),
+        major: parseInt(raw[1]),
+        minor: parseInt(raw[2]),
+        patch: parseInt(raw[3]),
+      }
+    }
+    return this._version!
+  }
+
+  async onlyVersion(version: ContractVersion) {
+    if ((await this.version()) !== version) {
+      throw new Error(
+        `specified version ${version} does not match onchain version ${this._version}`
+      )
+    }
   }
 
   /** Contract getPastEvents */
