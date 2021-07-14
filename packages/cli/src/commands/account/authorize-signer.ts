@@ -32,7 +32,7 @@ export default class AuthorizeSigner extends BaseCommand {
   ]
 
   async run() {
-    const res = this.parse(Authorize)
+    const res = this.parse(AuthorizeSigner)
 
     const accounts = await this.kit.contracts.getAccounts()
     const sig = accounts.parseSignatureOfAddress(

@@ -311,13 +311,20 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     signer: Address,
     role: string,
     v: number,
-    r: number[],
-    s: number[]
+    r: string,
+    s: string
   ) {
     const hashedRole = keccak256(role)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.authorizeSignerWithSignature(signer, hashedRole, v, r, s)
+    )
+  }
+
+  async setIndexedSigner(signer: Address, role: string) {
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.setIndexedSigner(signer, role)
     )
   }
 
