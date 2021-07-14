@@ -29,6 +29,7 @@ export default class BuildProposal extends BaseCommand {
     console.info(`Outputting proposal to ${res.flags.output}`)
     writeFileSync(res.flags.output!, JSON.stringify(output))
 
+    output.forEach((tx) => builder.addJsonTx(tx))
     const proposal = await builder.build()
 
     await checkProposal(proposal, this.kit)

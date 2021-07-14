@@ -15,6 +15,7 @@ export default class HashHotfix extends BaseCommand {
       required: true,
       description: 'Path to json transactions of the hotfix',
     }),
+    force: flags.boolean({ description: 'Skip execution check', default: false }),
     salt: flags.string({ required: true, description: 'Secret salt associated with hotfix' }),
   }
 
@@ -32,7 +33,12 @@ export default class HashHotfix extends BaseCommand {
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
     const hotfix = await builder.build()
 
-    await checkProposal(hotfix, this.kit)
+    if (!res.flags.force) {
+      const ok = await checkProposal(hotfix, this.kit)
+      if (!ok) {
+        return
+      }
+    }
 
     // Combine with the salt and hash the proposal.
     const saltBuff = Buffer.from(trimLeading0x(res.flags.salt), 'hex')

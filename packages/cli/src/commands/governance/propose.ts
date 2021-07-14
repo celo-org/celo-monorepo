@@ -18,6 +18,7 @@ export default class Propose extends BaseCommand {
     }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
+    force: flags.boolean({ description: 'Skip execution check', default: false }),
     descriptionURL: flags.string({
       required: true,
       description: 'A URL where further information about the proposal can be viewed',
@@ -57,7 +58,12 @@ export default class Propose extends BaseCommand {
 
     const governance = await this.kit.contracts.getGovernance()
 
-    await checkProposal(proposal, this.kit)
+    if (!res.flags.force) {
+      const ok = await checkProposal(proposal, this.kit)
+      if (!ok) {
+        return
+      }
+    }
 
     await displaySendTx(
       'proposeTx',

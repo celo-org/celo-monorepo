@@ -1,12 +1,14 @@
-import { toTxResult } from '@celo/connect'
 import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/governance'
 import { flags } from '@oclif/command'
 import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-export default class Propose extends BaseCommand {
+import { executeProposal } from '../../utils/governance'
+export default class TestProposal extends BaseCommand {
   static description = 'Test a governance proposal'
+
+  static hidden = true
 
   static flags = {
     ...BaseCommand.flags,
@@ -18,11 +20,11 @@ export default class Propose extends BaseCommand {
   }
 
   static examples = [
-    'propose --jsonTransactions ./transactions.json --deposit 10000 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33',
+    'test-proposal --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --jsonTransactions proposal.json',
   ]
 
   async run() {
-    const res = this.parse(Propose)
+    const res = this.parse(TestProposal)
     const account = res.flags.from
     this.kit.defaultAccount = account
 
@@ -36,17 +38,6 @@ export default class Propose extends BaseCommand {
     const proposal = await builder.build()
     printValueMapRecursive(await proposalToJSON(this.kit, proposal))
 
-    for (const tx of proposal) {
-      console.log(tx)
-      if (!tx.to) {
-        continue
-      }
-
-      const txRes = toTxResult(
-        this.web3.eth.sendTransaction({ to: tx.to, from: account, value: tx.value, data: tx.input })
-      )
-      const receipt = await txRes.waitReceipt()
-      console.log(receipt)
-    }
+    await executeProposal(proposal, this.kit, account)
   }
 }
