@@ -10,6 +10,7 @@ export interface AttestationModel extends Model {
   phoneNumber: E164Number
   message: string
   securityCode: string | null
+  prefixedSecurityCode: string | null
   securityCodeAttempt: number
   attestationCode: string | null
   ongoingDeliveryId: string | null
