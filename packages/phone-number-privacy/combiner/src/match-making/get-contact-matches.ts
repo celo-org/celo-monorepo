@@ -19,7 +19,6 @@ import { VERSION } from '../config'
 import {
   getAccountSignedUserPhoneNumberRecord,
   getDidMatchmaking,
-  setAccountSignedUserPhoneNumberRecord,
   setDidMatchmaking,
 } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
@@ -57,9 +56,8 @@ export async function handleGetContactMatches(
       return
     }
 
-    let signedUserPhoneNumberHash: string | undefined
-
     // Verify that signedUserPhoneNumber was signed by the account's DEK
+    let signedUserPhoneNumberHash: string | undefined
     if (signedUserPhoneNumber) {
       let isValidSig = false
       let didRetrieveDEK = true
@@ -106,41 +104,15 @@ export async function handleGetContactMatches(
         )
         respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
         return
-      } else {
-        // Account has performed matchmaking before and has provided a phone number dek signature
+      } else if (signedUserPhoneNumberHash) {
+        // Account has performed matchmaking before and has provided a valid phone number dek signature
         const signedUserPhoneNumberRecord = await getAccountSignedUserPhoneNumberRecord(
           account,
           logger
         )
-        if (!signedUserPhoneNumberRecord) {
-          if (signedUserPhoneNumberRecord === '') {
-            // Account has performed matchmaking before and has provided a phone number dek signature
-            // but we do not have a record of their phone number signature in the db.
-            // This could be bc we were unable to verify the user phone number signature last time, or bc
-            // the user never provided a phone number signature.
-            logger.info(
-              { account },
-              'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
-            )
-            if (signedUserPhoneNumberHash) {
-              await setAccountSignedUserPhoneNumberRecord(
-                account,
-                signedUserPhoneNumberHash,
-                logger
-              )
-            }
-          } else if (signedUserPhoneNumber === undefined) {
-            // Account has performed matchmaking before and has provided a phone number dek signature
-            // but we were unable to find a record of their phone number signature due to a db error.
-            logger.info(
-              { account },
-              'Allowing account to perform matchmaking due to db error finding phone number record. We will not record the phone number this time.'
-            )
-            signedUserPhoneNumberHash = undefined // To prevent overwriting the old number
-          }
-        } else if (signedUserPhoneNumberHash) {
+        if (signedUserPhoneNumberRecord) {
           if (signedUserPhoneNumberRecord !== signedUserPhoneNumberHash) {
-            // Account has performed matchmaking before and has provided a phone number dek signature
+            // Account has performed matchmaking before and has provided a valid phone number dek signature
             // but the phone number signature we have stored in the db does not match what they provided.
             logger.info(
               { account },
@@ -150,11 +122,30 @@ export async function handleGetContactMatches(
             return
           }
           // Account has performed matchmaking before and has provided a phone number dek signature
-          // and the phone number signature we have stored in the db matches what they provided.
+          // matching what we have stored in the db.
           logger.info(
             { account },
             'Allowing account to requery matches for the same phone number as before.'
           )
+        } else {
+          if (signedUserPhoneNumberRecord === '') {
+            // Account has performed matchmaking before and has provided a phone number dek signature
+            // but we do not have a record of their phone number signature in the db.
+            // This could be bc we were unable to verify the user phone number signature last time, or bc
+            // the user never provided a phone number signature.
+            logger.info(
+              { account },
+              'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
+            )
+          } else if (signedUserPhoneNumberRecord === undefined) {
+            // Account has performed matchmaking before and has provided a phone number dek signature
+            // but we were unable to find a record of their phone number signature due to a db error.
+            logger.info(
+              { account },
+              'Allowing account to perform matchmaking due to db error finding phone number record. We will not record the phone number this time.'
+            )
+            signedUserPhoneNumberHash = undefined // To prevent overwriting the old number
+          }
         }
       }
     }
