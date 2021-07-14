@@ -1549,6 +1549,26 @@
     is-base64 "^1.1.0"
     libphonenumber-js "^1.9.11"
 
+"@celo/phone-number-privacy-common@1.0.34":
+  version "1.0.34"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.34.tgz#59b3b4d03a0482c967f26f7638d1afd326d4115b"
+  integrity sha512-xAIusO9N66lBG11/21ro0w8BZTLcRs6sWluam2qlTCf5e1vSPAxQeDx8GaqpcAJ2500zSsvmFOzlAA1iZiAD8g==
+  dependencies:
+    "@celo/base" "1.1.1"
+    "@celo/contractkit" "1.2.0"
+    "@celo/identity" "1.2.0"
+    "@celo/utils" "1.0.2"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "^6.5.4"
+    is-base64 "^1.1.0"
+    libphonenumber-js "^1.9.11"
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
@@ -7618,6 +7638,11 @@ blakejs@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.1.0.tgz#69df92ef953aa88ca51a32df6ab1c54a155fc7a5"
   integrity sha1-ad+S75U6qIylGjLfarHFShVfx6U=
+
+"blind-threshold-bls@git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a":
+  version "0.1.0"
+  uid e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208
+  resolved "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
 
 "blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a":
   version "0.1.0"
