@@ -40,6 +40,6 @@ export default class PrepareHotfix extends BaseCommand {
       )
       .runChecks()
 
-    await displaySendTx('prepareHotfixTx', governance.prepareHotfix(hash), {}, 'HotfixPrepared')
+    await displaySendTx('prepareHotfixTx', governance.prepareHotfix(hash))
   }
 }

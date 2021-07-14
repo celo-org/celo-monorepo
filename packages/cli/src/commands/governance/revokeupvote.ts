@@ -23,11 +23,6 @@ export default class RevokeUpvote extends BaseCommand {
     // TODO(nategraf): Check whether there are upvotes to revoke before sending transaction.
     const governance = await this.kit.contracts.getGovernance()
     const account = await (await this.kit.contracts.getAccounts()).voteSignerToAccount(signer)
-    await displaySendTx(
-      'revokeUpvoteTx',
-      await governance.revokeUpvote(account),
-      {},
-      'ProposalUpvoteRevoked'
-    )
+    await displaySendTx('revokeUpvoteTx', await governance.revokeUpvote(account))
   }
 }

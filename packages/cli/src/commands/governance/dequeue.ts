@@ -18,6 +18,6 @@ export default class Dequeue extends BaseCommand {
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
 
-    await displaySendTx('dequeue', governance.dequeueProposalsIfReady(), {}, 'ProposalsDequeued')
+    await displaySendTx('dequeue', governance.dequeueProposalsIfReady())
   }
 }

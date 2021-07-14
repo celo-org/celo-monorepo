@@ -19,6 +19,6 @@ export default class Withdraw extends BaseCommand {
     await newCheckBuilder(this, res.flags.from).hasRefundedDeposits(res.flags.from).runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx('withdraw', governance.withdraw(), {}, 'DepositWithdrawn')
+    await displaySendTx('withdraw', governance.withdraw())
   }
 }

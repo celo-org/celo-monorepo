@@ -27,11 +27,6 @@ export default class WhitelistHotfix extends BaseCommand {
     await newCheckBuilder(this).hotfixNotExecuted(hash).runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx(
-      'whitelistHotfixTx',
-      governance.whitelistHotfix(hash),
-      {},
-      'HotfixWhitelisted'
-    )
+    await displaySendTx('whitelistHotfixTx', governance.whitelistHotfix(hash))
   }
 }
