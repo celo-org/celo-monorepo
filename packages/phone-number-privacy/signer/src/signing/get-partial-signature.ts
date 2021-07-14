@@ -29,6 +29,7 @@ export interface GetBlindedMessagePartialSigRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
+  timestamp?: number
   sessionID?: string
 }
 
