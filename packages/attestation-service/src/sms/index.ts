@@ -259,6 +259,9 @@ export async function startSendSms(
     if (!attestation.language) {
       attestation.language = language
     }
+    if (!attestation.prefixedSecurityCode) {
+      attestation.prefixedSecurityCode = prefixedSecurityCode
+    }
 
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()
