@@ -20,7 +20,7 @@ export default class SetIndexedSigner extends BaseCommand {
   }
 
   static examples = [
-    'proof-of-possession --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb',
+    'set-indexed-signer --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb',
   ]
 
   async run() {
