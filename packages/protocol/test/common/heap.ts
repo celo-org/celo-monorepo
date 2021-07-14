@@ -1,3 +1,4 @@
+import { isCoverage } from '@celo/protocol/lib/test-utils'
 import { HeapTestContract, HeapTestInstance } from 'types'
 
 const HeapTest: HeapTestContract = artifacts.require('HeapTest')
