@@ -6,9 +6,25 @@ At the end of this tutorial, you will have a local Celo development blockchain r
 
 Running the development Celo blockchain is helpful because it greatly speeds up development time. You will start with 10 accounts pre-funded with cGLD and cUSD and all transactions on the network are virtually instant.
 
-### **Download the Celo monorepo**
+You can run the development Celo blockchain in two ways:
 
-To start, download the Celo monorepo [here](https://github.com/celo-org/celo-monorepo) or with the following command.
+### 1. Use the celo-devchain NPM package
+
+The easiest is to use a "pre-generated" devchain from the celo-devchain NPM package. For that all you have to do is:
+
+```sh
+> npm install --save-dev celo-devchain
+> npx celo-devchain --port 7545
+
+or
+
+> yarn add --dev celo-devchain
+> yarn run celo-devchain --port 7545
+```
+
+### 2. Initialize your own devchain from the monorepo
+
+If you prefer, you can initialize your own devchain and build it from scratch. To start, download the Celo monorepo [here](https://github.com/celo-org/celo-monorepo) or with the following command.
 
 ```text
 git clone https://github.com/celo-org/celo-monorepo.git
@@ -31,6 +47,8 @@ yarn test:reset && yarn test:livechain
 This will start the development Celo blockchain. It will take at least a few minutes to start. The contract migrations will be printed in the terminal as they are deployed. 
 
 The process will finish and print `Ganache started`. Leave this terminal window open to leave the development chain running.
+
+## Interacting with the chain
 
 ### **Inspecting the chain**
 
