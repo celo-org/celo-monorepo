@@ -95,7 +95,9 @@ const isProxySetFunction = (tx: ProposalTransactionJSON) =>
  * @returns The JSON encoding of the proposal.
  */
 export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
+  // @ts-ignore
   const contractDetails = await obtainKitContractDetails(kit)
+  // @ts-ignore
   const blockExplorer = new BlockExplorer(kit, contractDetails)
 
   const proposalJson: ProposalTransactionJSON[] = []

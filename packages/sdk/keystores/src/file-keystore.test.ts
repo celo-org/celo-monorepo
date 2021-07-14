@@ -20,7 +20,7 @@ describe('FileKeystore tests', () => {
   })
 
   afterAll(() => {
-    rmdirSync(parentWorkdir, { recursive: true })
+    rmdirSync(parentWorkdir)
   })
   it('initializes keystore, imports key into keystore file, and deletes', async () => {
     const keystore = new FileKeystore(testWorkdir)
