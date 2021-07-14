@@ -307,6 +307,20 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     )
   }
 
+  async authorizeSignerWithSignature(
+    signer: Address,
+    role: string,
+    v: number,
+    r: number[],
+    s: number[]
+  ) {
+    const hashedRole = keccak256(role)
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.authorizeSignerWithSignature(signer, hashedRole, v, r, s)
+    )
+  }
+
   async startSignerAuthorization(signer: Address, role: string) {
     return toTransactionObject(
       this.kit.connection,
