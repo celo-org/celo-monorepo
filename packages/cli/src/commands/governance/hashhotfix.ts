@@ -4,6 +4,7 @@ import { flags } from '@oclif/command'
 import { readFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
+import { checkProposal } from '../../utils/governance'
 
 export default class HashHotfix extends BaseCommand {
   static description = 'Hash a governance hotfix specified by JSON and a salt'
@@ -14,6 +15,7 @@ export default class HashHotfix extends BaseCommand {
       required: true,
       description: 'Path to json transactions of the hotfix',
     }),
+    force: flags.boolean({ description: 'Skip execution check', default: false }),
     salt: flags.string({ required: true, description: 'Secret salt associated with hotfix' }),
   }
 
@@ -30,6 +32,13 @@ export default class HashHotfix extends BaseCommand {
     const builder = new ProposalBuilder(this.kit)
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
     const hotfix = await builder.build()
+
+    if (!res.flags.force) {
+      const ok = await checkProposal(hotfix, this.kit)
+      if (!ok) {
+        return
+      }
+    }
 
     // Combine with the salt and hash the proposal.
     const saltBuff = Buffer.from(trimLeading0x(res.flags.salt), 'hex')
