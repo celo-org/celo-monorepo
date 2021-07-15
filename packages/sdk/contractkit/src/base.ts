@@ -1,3 +1,5 @@
+import { ContactPhoneNumber } from '@celo/base'
+
 export enum CeloContract {
   Accounts = 'Accounts',
   Attestations = 'Attestations',
@@ -57,3 +59,14 @@ export const suffixProxy = (contract: CeloContract) =>
 export const ProxyContracts = AllContracts.map((c) => suffixProxy(c))
 
 export type ContractVersion = { storage: number; major: number; minor: number; patch: number }
+export const newContractVersion = (
+  storage: number,
+  major: number,
+  minor: number,
+  patch: number
+): ContractVersion => ({
+  storage,
+  major,
+  minor,
+  patch,
+})

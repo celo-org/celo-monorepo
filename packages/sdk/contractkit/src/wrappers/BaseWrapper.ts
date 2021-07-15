@@ -10,6 +10,7 @@ import {
 } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { debug } from 'debug'
 import moment from 'moment'
 import { ContractVersion } from '../base'
 import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
@@ -51,11 +52,14 @@ export abstract class BaseWrapper<T extends Contract> {
     return this._version!
   }
 
-  async onlyVersion(version: ContractVersion) {
-    if ((await this.version()) !== version) {
-      throw new Error(
-        `specified version ${version} does not match onchain version ${this._version}`
-      )
+  protected async onlyVersionOrGreater(version: ContractVersion) {
+    const actual = await this.version()
+    if (
+      actual.storage < version.storage ||
+      actual.major < version.major ||
+      actual.minor < version.minor // ignore patch changes for wrapper compatibility
+    ) {
+      throw new Error(`onchain version ${this._version} is not at least ${version} yet`)
     }
   }
 
