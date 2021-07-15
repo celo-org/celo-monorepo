@@ -6,9 +6,9 @@ import {
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
   hasValidAccountParam,
+  identifierIsValidIfExists,
   isBodyReasonablySized,
   isVerified,
-  phoneNumberHashIsValidIfExists,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
   WarningMessage,
@@ -68,7 +68,7 @@ export async function handleGetQuota(
 function isValidGetQuotaInput(requestBody: GetQuotaRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
-    phoneNumberHashIsValidIfExists(requestBody) &&
+    identifierIsValidIfExists(requestBody) &&
     isBodyReasonablySized(requestBody)
   )
 }

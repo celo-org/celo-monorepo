@@ -48,6 +48,7 @@ export async function getPhoneNumberIdentifier(
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
+
   // Fallback to using Wasm version if not specified
   if (!blsBlindingClient) {
     debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
@@ -98,7 +99,6 @@ export async function getBlindedPhoneNumberSignature(
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
-    timestamp: Date.now(),
     blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,
     version: clientVersion ? clientVersion : 'unknown',
