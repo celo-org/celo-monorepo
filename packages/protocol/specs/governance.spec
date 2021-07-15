@@ -28,8 +28,8 @@ methods {
     getVotedId(address, uint256) returns uint256 envfree
 
     // dispatches to Accounts
-    voteSignerToAccount(address) envfree => DISPATCHER(true)
-    getVoteSigner(address) returns address envfree => DISPATCHER(true)
+    voteSignerToAccount(address) envfree => DISPATCHER(true) UNRESOLVED
+    getVoteSigner(address) returns address envfree => DISPATCHER(true) UNRESOLVED
 }
 
 ghost votedFor(address,uint256) returns bool { // voter to proposal id voted for
