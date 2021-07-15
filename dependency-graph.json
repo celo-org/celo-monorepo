@@ -202,6 +202,13 @@
       "@celo/wallet-local"
     ]
   },
+  "@celo/keystores": {
+    "location": "packages/sdk/keystores",
+    "dependencies": [
+      "@celo/utils",
+      "@celo/wallet-local"
+    ]
+  },
   "@celo/network-utils": {
     "location": "packages/sdk/network-utils",
     "dependencies": [

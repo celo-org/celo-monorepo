@@ -26,10 +26,12 @@ export class NexmoSmsProvider extends SmsProvider {
   nexmoNumbers: Array<{
     code: string
     phoneNumber: string
+    type: string
   }> = []
   balanceMetric: boolean
   deliveryStatusURL: string | undefined
   applicationId: string | null = null
+  tollFreeType: string = 'landline-toll-free'
 
   constructor(
     apiKey: string,
@@ -69,6 +71,7 @@ export class NexmoSmsProvider extends SmsProvider {
     this.nexmoNumbers = availableNumbers.map((number: any) => ({
       phoneNumber: number.msisdn,
       code: phoneUtil.getRegionCodeForNumber(phoneUtil.parse('+' + number.msisdn)),
+      type: number.type,
     }))
   }
 
@@ -139,7 +142,7 @@ export class NexmoSmsProvider extends SmsProvider {
   private getAvailableNumbers = async (): Promise<any> => {
     return new Promise((resolve, reject) => {
       const options = this.applicationId
-        ? { applicationId: this.applicationId, has_application: true }
+        ? { application_id: this.applicationId, has_application: true }
         : null
       this.client.number.get(options, (err: Error, responseData: any) => {
         if (err) {
@@ -152,10 +155,20 @@ export class NexmoSmsProvider extends SmsProvider {
   }
 
   private getMatchingNumber = (countryCode: string) => {
-    const matchingNumber = this.nexmoNumbers.find((number) => number.code === countryCode)
+    // Use toll-free number for +1 numbers to satisfy 10DLC requirements
+    const matchingNumber = this.nexmoNumbers.find(
+      (number) =>
+        number.code === countryCode && (countryCode !== 'US' || number.type === this.tollFreeType)
+    )
     if (matchingNumber !== undefined) {
       return matchingNumber.phoneNumber
     }
-    return this.nexmoNumbers[0].phoneNumber
+
+    // Toll free numbers cannot send internationally
+    let defaultNumber = this.nexmoNumbers.find((number) => number.type !== this.tollFreeType)
+    if (!defaultNumber) {
+      defaultNumber = this.nexmoNumbers[0]
+    }
+    return defaultNumber.phoneNumber
   }
 }

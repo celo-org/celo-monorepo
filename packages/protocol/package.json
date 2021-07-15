@@ -44,7 +44,7 @@
     "truffle:migrate": "truffle migrate",
     "devchain": "ts-node scripts/devchain.ts",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "view-tags": "git for-each-ref 'refs/tags/celo-core-contracts-*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'"
+    "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",
@@ -52,10 +52,10 @@
     "@0x/sol-profiler": "^3.0.0",
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
-    "@celo/base": "1.2.2-dev",
-    "@celo/connect": "1.2.2-dev",
+    "@celo/base": "1.2.3-dev",
+    "@celo/connect": "1.2.3-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#e933297",
-    "@celo/utils": "1.2.2-dev",
+    "@celo/utils": "1.2.3-dev",
     "@openzeppelin/upgrades": "^2.8.0",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
