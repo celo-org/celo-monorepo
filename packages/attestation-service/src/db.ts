@@ -53,20 +53,42 @@ export function isDBOnline() {
 }
 
 let kit: ContractKit | undefined
+let backupKit: ContractKit | undefined
+
+async function execWithFallback<T>(
+  f: (kit: ContractKit) => T,
+  k: ContractKit,
+  backup?: ContractKit | undefined,
+): Promise<T> {
+  // Decorator to wrap execution of f with a retry using the backup kit
+  // if execution initially fails
+  try {
+    return await (f(k))
+  } catch (error) {
+    rootLogger.warn(`Using ContractKit failed: ${error}`)
+    if (backup) {
+      rootLogger.info(`Attempting to use backup ContractKit`)
+      return await f(backup!)
+    } else {
+      throw error
+    }
+  }
+}
 
 // Wrapper that on error tries once to reinitialize connection to node.
 export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
+
   if (!kit) {
     await initializeKit(true)
     // tslint:disable-next-line: no-return-await
-    return await f(kit!)
+    return await execWithFallback(f, kit!, backupKit)
   } else {
     try {
-      return await f(kit!)
+      return await execWithFallback(f, kit!, backupKit)
     } catch (error) {
       await initializeKit(true)
       // tslint:disable-next-line: no-return-await
-      return await f(kit!)
+      return await execWithFallback(f, kit!, backupKit)
     }
   }
 }
@@ -162,6 +184,15 @@ export async function initializeKit(force: boolean = false) {
         new Web3(fetchEnv('CELO_PROVIDER')),
         keystoreWalletWrapper.getLocalWallet()
       )
+      // Backup kit can only work if signer has been set; this is optional
+      const celoProviderBackup = fetchEnvOrDefault('CELO_PROVIDER_BACKUP', '')
+      if (celoProviderBackup && !backupKit) {
+        console.log("INITIALIZING BACKUP KIT")
+        backupKit = newKitFromWeb3(
+          new Web3(celoProviderBackup),
+          keystoreWalletWrapper.getLocalWallet()
+        )
+      }
     }
 
     // Copied from @celo/cli/src/utils/helpers
