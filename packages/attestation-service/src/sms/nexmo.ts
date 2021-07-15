@@ -142,7 +142,7 @@ export class NexmoSmsProvider extends SmsProvider {
   private getAvailableNumbers = async (): Promise<any> => {
     return new Promise((resolve, reject) => {
       const options = this.applicationId
-        ? { applicationId: this.applicationId, has_application: true }
+        ? { application_id: this.applicationId, has_application: true }
         : null
       this.client.number.get(options, (err: Error, responseData: any) => {
         if (err) {
