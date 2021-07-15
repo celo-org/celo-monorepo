@@ -1,5 +1,5 @@
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
-import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
+import { Address, CeloTransactionObject, Contract, toTransactionObject } from '@celo/connect'
 import {
   hashMessageWithPrefix,
   LocalSigner,
@@ -9,7 +9,11 @@ import {
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { keccak256 } from 'web3-utils'
-import { Accounts } from '../generated/Accounts'
+import { Accounts as Accounts_v3 } from '../generated/core-contracts.v3/Accounts'
+import {
+  Accounts as Accounts_v4,
+  ABI as Accounts_v4_ABI,
+} from '../generated/core-contracts.v4/Accounts'
 import {
   BaseWrapper,
   proxyCall,
@@ -34,7 +38,13 @@ interface AccountSummary {
 /**
  * Contract for handling deposits needed for voting.
  */
-export class AccountsWrapper extends BaseWrapper<Accounts> {
+export class AccountsWrapper extends BaseWrapper<Accounts_v3 | Accounts_v4> {
+  private assertv4(contract: Contract): asserts contract is Accounts_v4 {
+    if (contract.options.jsonInterface !== Accounts_v4_ABI) {
+      throw new Error('wrapper function not supported by provided contract interface')
+    }
+  }
+
   /**
    * Creates an account.
    */
@@ -301,6 +311,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     })
 
     const sig = await this.kit.connection.signTypedData(signer, typedData)
+    this.assertv4(this.contract)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.authorizeSignerWithSignature(signer, hashedRole, sig.v, sig.r, sig.s)
@@ -308,6 +319,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async startSignerAuthorization(signer: Address, role: string) {
+    this.assertv4(this.contract)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.authorizeSigner(signer, keccak256(role))
@@ -315,6 +327,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async completeSignerAuthorization(account: Address, role: string) {
+    this.assertv4(this.contract)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.completeSignerAuthorization(account, keccak256(role))
@@ -322,6 +335,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async generateProofOfKeyPossession(account: Address, signer: Address) {
+    this.assertv4(this.contract)
     return this.getParsedSignatureOfAddress(
       account,
       signer,
