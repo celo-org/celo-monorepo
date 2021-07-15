@@ -111,6 +111,13 @@ rewards:
       prometheusPort: 9090
     walletType: azure-hsm
     gasPriceUpdateIntervalMs: "1200000"
+  db:
+    host: komenci-komenci-postgresql
+    port: 5432
+    username: 'postgres'
+    database: 'postgres'
+    synchronize: true
+    ssl: true
 
 loggingAgent:
   credentials: eydleGFtcGxlJzogJ2NyZWRlbnRpYWxzJ30K # base64 credentials.json of a gcloud service account
