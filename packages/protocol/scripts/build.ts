@@ -6,7 +6,7 @@ import path from 'path'
 import { tsGenerator } from 'ts-generator'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
-const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR)
+const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
 export const ProxyContracts = [
   'AccountsProxy',
