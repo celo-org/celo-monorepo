@@ -1,4 +1,4 @@
-import { Address, EventLog } from '@celo/connect'
+import { Address } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { newContractVersion } from '../base'
 import { Reserve } from '../generated/Reserve'

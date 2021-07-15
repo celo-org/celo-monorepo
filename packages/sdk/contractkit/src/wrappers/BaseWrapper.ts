@@ -10,7 +10,6 @@ import {
 } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { debug } from 'debug'
 import moment from 'moment'
 import { ContractVersion } from '../base'
 import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'

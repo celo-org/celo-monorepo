@@ -85,8 +85,6 @@ const OtherContracts = [
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
-const ContractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
-
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
 function getArtifact(fileName: string) {
@@ -137,7 +135,8 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const globPattern = `${BUILD_DIR}/contracts/@(${ContractKitContracts.join('|')}).json`
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 

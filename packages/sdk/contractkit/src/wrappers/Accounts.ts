@@ -1,5 +1,5 @@
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
-import { Address, CeloTransactionObject, Contract, toTransactionObject } from '@celo/connect'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import {
   hashMessageWithPrefix,
   LocalSigner,
@@ -9,7 +9,7 @@ import {
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { keccak256 } from 'web3-utils'
-import { ContractVersion, newContractVersion } from '../base'
+import { newContractVersion } from '../base'
 import { Accounts } from '../generated/Accounts'
 import {
   BaseWrapper,

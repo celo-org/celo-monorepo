@@ -1,5 +1,3 @@
-import { ContactPhoneNumber } from '@celo/base'
-
 export enum CeloContract {
   Accounts = 'Accounts',
   Attestations = 'Attestations',
