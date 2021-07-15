@@ -15,6 +15,8 @@ import { ContractVersion } from '../base'
 import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
 import { ContractKit } from '../kit'
 
+const semverLt = require('semver/functions/lt')
+
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
 
@@ -53,11 +55,9 @@ export abstract class BaseWrapper<T extends Contract> {
 
   protected async onlyVersionOrGreater(version: ContractVersion) {
     const actual = await this.version()
-    if (
-      actual.storage < version.storage ||
-      actual.major < version.major ||
-      actual.minor < version.minor // ignore patch changes for wrapper compatibility
-    ) {
+    // ignore patch changes in semver comparison for wrapper compatibility
+    const toSemver = (v: ContractVersion) => `${v.storage}.${v.major}.${v.minor}`
+    if (semverLt(toSemver(actual), toSemver(version))) {
       throw new Error(`onchain version ${this._version} is not at least ${version} yet`)
     }
   }
