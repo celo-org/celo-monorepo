@@ -20,6 +20,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
           command:
             - bash
             - "-c"
@@ -40,3 +43,5 @@ spec:
 {{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.rewards.relayer "value_name" "host") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.rewards.relayer "value_name" "port") | indent 10 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 10 }}
+{{ include "common.env-var" (dict "name" "SEGMENT_API_KEY" "dict" .Values.rewards "value_name" "segmentApiKey") | indent 10 }}
+{{ include "common.env-var" (dict "name" "SHOULD_SEND_REWARDS" "dict" .Values.rewards "value_name" "shouldSendRewards") | indent 10 }}
