@@ -87,6 +87,9 @@ export const AttestationServiceStatusResponseType = t.type({
   ageOfLatestBlock: t.number,
   isNodeSyncing: t.boolean,
   appSignature: t.string,
+  smsProvidersRandomized: t.boolean,
+  maxDeliveryAttempts: t.number,
+  maxRerequestMins: t.number,
 })
 
 export const AttestationServiceTestRequestType = t.type({

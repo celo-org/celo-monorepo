@@ -736,29 +736,20 @@ export async function initAndStartGeth(
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
-  const datadir = getDatadir(gethConfig.runPath, instance)
-
-  if (verbose) {
-    console.info(`geth:${instance.name}: init datadir ${datadir}`)
-  }
-
-  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
-  await init(gethBinaryPath, datadir, genesisPath, verbose)
-
-  if (instance.privateKey) {
-    await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
-  }
-
+  await initGeth(gethConfig, gethBinaryPath, instance, verbose)
   return startGeth(gethConfig, gethBinaryPath, instance, verbose)
 }
 
-export async function init(
+export async function initGeth(
+  gethConfig: GethRunConfig,
   gethBinaryPath: string,
-  datadir: string,
-  genesisPath: string,
+  instance: GethInstanceConfig,
   verbose: boolean
 ) {
+  const datadir = getDatadir(gethConfig.runPath, instance)
+  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   if (verbose) {
+    console.info(`geth:${instance.name}: init datadir ${datadir}`)
     console.log(`init geth with genesis at ${genesisPath}`)
   }
 
@@ -766,6 +757,9 @@ export async function init(
   await spawnCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
     silent: !verbose,
   })
+  if (instance.privateKey) {
+    await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
+  }
 }
 
 export async function importPrivateKey(
@@ -895,8 +889,6 @@ export async function startGeth(
   if (instance.validating && !minerValidator) {
     throw new Error('miner.validator address from the instance is required')
   }
-  // TODO(ponti): add flag after Donut fork
-  // const txFeeRecipient = instance.txFeeRecipient || minerValidator
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
 
   instance.args = [
@@ -908,7 +900,6 @@ export async function startGeth(
     '--metrics',
     '--port',
     port.toString(),
-    '--rpcvhosts=*',
     '--networkid',
     gethConfig.networkId.toString(),
     `--verbosity=${verbosity}`,
@@ -921,32 +912,28 @@ export async function startGeth(
   ]
 
   if (minerValidator) {
-    instance.args.push(
-      '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
-      minerValidator
-    )
-    // TODO(ponti): add flag after Donut fork
-    // '--tx-fee-recipient',
-    // txFeeRecipient
+    const txFeeRecipient = instance.txFeeRecipient || minerValidator
+    instance.args.push('--miner.validator', minerValidator, '--tx-fee-recipient', txFeeRecipient)
   }
 
   if (rpcport) {
     instance.args.push(
-      '--rpc',
-      '--rpcport',
+      '--http',
+      '--http.port',
       rpcport.toString(),
-      '--rpccorsdomain=*',
-      '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
+      '--http.corsdomain=*',
+      '--http.vhosts=*',
+      '--http.api=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
     instance.args.push(
-      '--wsorigins=*',
       '--ws',
-      '--wsport',
+      '--ws.origins=*',
+      '--ws.port',
       wsport.toString(),
-      '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
+      '--ws.api=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
@@ -1050,6 +1037,9 @@ export async function startGeth(
       console.info(`geth:${instance.name}: ws port open ${wsport}`)
     }
   }
+
+  // Geth startup isn't fully done even when the port is open, so give it another second
+  await sleep(1000)
 
   console.log(
     `${instance.name}: running.`,

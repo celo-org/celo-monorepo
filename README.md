@@ -6,7 +6,7 @@
 
 **Celo Monorepo - Official repository for core projects comprising the Celo platform**
 
-This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [wallet app](https://github.com/celo-org/celo-monorepo/tree/master/packages/mobile),
+This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [contractKit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit),
 and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
 
 <!-- row 1 - status -->
@@ -109,7 +109,7 @@ The repository has the following packages (sub projects):
 - [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
 - [blockchain-api](packages/blockchain-api) - service that uses Blockscout to present view of transactions by account for Celo Wallet activity feed
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
-- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/getting-started/using-the-cli))
+- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [contractkit](packages/contractkit) - library to help developers and validators interact with the protocol and it's smart contracts ([docs](https://docs.celo.org/celo-sdk/contractkit))
 - [dappkit](packages/dappkit) - set of functions for mobile DApps to work with the wallet app (ex. sign transactions and access the user's account) ([docs](https://docs.celo.org/celo-sdk/dappkit))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency

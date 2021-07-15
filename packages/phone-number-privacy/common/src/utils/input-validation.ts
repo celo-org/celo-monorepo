@@ -4,34 +4,33 @@ import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetQuotaRequest,
+  OdisRequest,
 } from '../interfaces'
-import { REASONABLE_BODY_CHAR_LIMIT, REQUEST_EXPIRY_WINDOW_MS } from './constants'
+import { REASONABLE_BODY_CHAR_LIMIT } from './constants'
 
-export function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && isValidAddress(requestBody.account)
-}
-
-function isValidPhoneNumberHash(phoneNumber: string) {
-  return isBase64(phoneNumber) && Buffer.from(phoneNumber, 'base64').length === 32
+export function hasValidAccountParam(requestBody: OdisRequest): boolean {
+  return !!requestBody.account && isValidAddress(requestBody.account)
 }
 
 export function hasValidUserPhoneNumberParam(requestBody: GetContactMatchesRequest): boolean {
-  return !!requestBody.userPhoneNumber && isValidPhoneNumberHash(requestBody.userPhoneNumber)
+  return !!requestBody.userPhoneNumber && isValidObfuscatedPhoneNumber(requestBody.userPhoneNumber)
 }
 
 export function hasValidContactPhoneNumbersParam(requestBody: GetContactMatchesRequest): boolean {
   return (
     Array.isArray(requestBody.contactPhoneNumbers) &&
     requestBody.contactPhoneNumbers.length > 0 &&
-    requestBody.contactPhoneNumbers.every((contact) => isValidPhoneNumberHash(contact))
+    requestBody.contactPhoneNumbers.every((contact) => isValidObfuscatedPhoneNumber(contact))
   )
 }
 
-export function isBodyReasonablySized(requestBody: any): boolean {
+export function isBodyReasonablySized(
+  requestBody: GetBlindedMessageSigRequest | GetQuotaRequest
+): boolean {
   return JSON.stringify(requestBody).length <= REASONABLE_BODY_CHAR_LIMIT
 }
 
-export function hasValidQueryPhoneNumberParam(requestBody: GetBlindedMessageSigRequest): boolean {
+export function hasValidBlindedPhoneNumberParam(requestBody: GetBlindedMessageSigRequest): boolean {
   return (
     !!requestBody.blindedQueryPhoneNumber &&
     requestBody.blindedQueryPhoneNumber.length === 64 &&
@@ -39,16 +38,18 @@ export function hasValidQueryPhoneNumberParam(requestBody: GetBlindedMessageSigR
   )
 }
 
-export function hasValidTimestamp(requestBody: any): boolean {
-  return (
-    !requestBody.timestamp ||
-    (typeof requestBody.timestamp === 'number' &&
-      requestBody.timestamp > Date.now() - REQUEST_EXPIRY_WINDOW_MS)
-  )
+export function identifierIsValidIfExists(
+  requestBody: GetQuotaRequest | GetBlindedMessageSigRequest
+): boolean {
+  return !requestBody.hashedPhoneNumber || isByte32(requestBody.hashedPhoneNumber)
 }
 
-export function phoneNumberHashIsValidIfExists(requestBody: GetQuotaRequest): boolean {
-  return !requestBody.hashedPhoneNumber || isByte32(requestBody.hashedPhoneNumber)
+export function hasValidIdentifier(requestBody: GetContactMatchesRequest): boolean {
+  return !!requestBody.hashedPhoneNumber && isByte32(requestBody.hashedPhoneNumber)
+}
+
+function isValidObfuscatedPhoneNumber(phoneNumber: string) {
+  return isBase64(phoneNumber) && Buffer.from(phoneNumber, 'base64').length === 32
 }
 
 function isByte32(hashedData: string): boolean {

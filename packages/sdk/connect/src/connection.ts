@@ -8,6 +8,7 @@ import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import {
   Address,
   Block,
+  BlockHeader,
   BlockNumber,
   CeloTx,
   CeloTxObject,
@@ -25,6 +26,7 @@ import {
   inputSignFormatter,
   outputBigNumberFormatter,
   outputBlockFormatter,
+  outputBlockHeaderFormatter,
   outputCeloTxFormatter,
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
@@ -407,23 +409,35 @@ export class Connection {
     return hexToNumber(response.result)!
   }
 
+  private isBlockNumberHash = (blockNumber: BlockNumber) =>
+    blockNumber instanceof String && blockNumber.indexOf('0x') === 0
+
   getBlock = async (
     blockHashOrBlockNumber: BlockNumber,
     fullTxObjects: boolean = true
   ): Promise<Block> => {
-    // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
-    let fnCall = 'eth_getBlockByNumber'
-    if (blockHashOrBlockNumber instanceof String && blockHashOrBlockNumber.indexOf('0x') === 0) {
-      // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
-      fnCall = 'eth_getBlockByHash'
-    }
+    const endpoint = this.isBlockNumberHash(blockHashOrBlockNumber)
+      ? 'eth_getBlockByHash' // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
+      : 'eth_getBlockByNumber' // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
 
-    const response = await this.rpcCaller.call(fnCall, [
+    const response = await this.rpcCaller.call(endpoint, [
       inputBlockNumberFormatter(blockHashOrBlockNumber),
       fullTxObjects,
     ])
 
     return outputBlockFormatter(response.result)
+  }
+
+  getBlockHeader = async (blockHashOrBlockNumber: BlockNumber): Promise<BlockHeader> => {
+    const endpoint = this.isBlockNumberHash(blockHashOrBlockNumber)
+      ? 'eth_getHeaderByHash'
+      : 'eth_getHeaderByNumber'
+
+    const response = await this.rpcCaller.call(endpoint, [
+      inputBlockNumberFormatter(blockHashOrBlockNumber),
+    ])
+
+    return outputBlockHeaderFormatter(response.result)
   }
 
   getBalance = async (address: Address, defaultBlock?: BlockNumber): Promise<string> => {

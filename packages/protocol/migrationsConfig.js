@@ -116,6 +116,12 @@ const DefaultConfig = {
     numInternalRequiredConfirmations: 1,
     useMultiSig: true,
   },
+  grandaMento: {
+    approver: '0x0000000000000000000000000000000000000000',
+    maxApprovalExchangeRateChange: 0.3, // 30%
+    spread: 0.01, // 1%
+    vetoPeriodSeconds: 3 * HOUR, // > the 2 hour minimum possible governance proposal completion time.
+  },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
