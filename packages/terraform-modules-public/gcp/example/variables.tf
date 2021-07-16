@@ -171,7 +171,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-v1.2.0"
+    tag        = "attestation-service-v1.2.2"
   }
 }
 
@@ -181,8 +181,7 @@ variable attestation_service_credentials {
   type        = map(string)
 
   default = {
-    sms_providers                   = "twilio"
-    #sms_providers                   = "twilio,messagebird"
+    sms_providers                   = "twilio,messagebird"
     nexmo_key                       = ""
     nexmo_secret                    = ""
     nexmo_blacklist                 = "CU,SY,KP,IR,SD"
