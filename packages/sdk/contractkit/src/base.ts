@@ -15,6 +15,7 @@ export enum CeloContract {
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
+  GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
   MetaTransactionWallet = 'MetaTransactionWallet',
   MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
@@ -45,6 +46,7 @@ const AuxiliaryContracts = [
   CeloContract.MultiSig,
   CeloContract.MetaTransactionWalletDeployer,
   CeloContract.MetaTransactionWallet,
+  CeloContract.ERC20,
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
