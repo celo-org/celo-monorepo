@@ -53,36 +53,84 @@ export function isDBOnline() {
 }
 
 let kit: ContractKit | undefined
+let backupKit: ContractKit | undefined
 
-// Wrapper that on error tries once to reinitialize connection to node.
-export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
-  if (!kit) {
-    await initializeKit(true)
-    // tslint:disable-next-line: no-return-await
-    return await f(kit!)
-  } else {
-    try {
-      return await f(kit!)
-    } catch (error) {
-      await initializeKit(true)
-      // tslint:disable-next-line: no-return-await
-      return await f(kit!)
+async function execWithFallback<T>(
+  f: (kit: ContractKit) => T,
+  kit1: ContractKit,
+  kit2?: ContractKit | undefined,
+  smartFallback = true
+): Promise<T> {
+  // Decorator to wrap execution of f with a retry using the kit2 kit
+  // if execution initially fails
+
+  let primaryKit = kit1
+  let secondaryKit = kit2
+  if (
+    smartFallback &&
+    kit2 &&
+    (!kit1 ||
+      ((await isNodeSyncingFromKit(kit1)) &&
+        (!(await isNodeSyncingFromKit(kit2)) ||
+          (await getAgeOfLatestBlockFromKit(kit2)).ageOfLatestBlock <
+            (await getAgeOfLatestBlockFromKit(kit1)).ageOfLatestBlock)))
+  ) {
+    // Prioritize more-synced celo provider
+    rootLogger.info('Prioritizing CELO_PROVIDER_BACKUP')
+    primaryKit = kit2
+    secondaryKit = kit1
+  }
+  try {
+    return await f(primaryKit)
+  } catch (error) {
+    rootLogger.warn(`Using ContractKit failed: ${error}`)
+    if (secondaryKit) {
+      rootLogger.info(`Attempting to use secondary ContractKit`)
+      return await f(secondaryKit!)
+    } else {
+      throw error
     }
   }
 }
 
-export async function isNodeSyncing() {
-  const syncProgress = await useKit((k) => k.connection.isSyncing())
+// Wrapper that on error tries once to reinitialize connection to node.
+export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
+  const smartFallback = !(fetchEnvOrDefault('DISABLE_SMART_FALLBACK', 'false') === 'true')
+  if (!kit && !backupKit) {
+    await initializeKit(true)
+    // tslint:disable-next-line: no-return-await
+    return await execWithFallback(f, kit!, backupKit, smartFallback)
+  } else {
+    try {
+      return await execWithFallback(f, kit!, backupKit, smartFallback)
+    } catch (error) {
+      await initializeKit(true)
+      // tslint:disable-next-line: no-return-await
+      return await execWithFallback(f, kit!, backupKit, smartFallback)
+    }
+  }
+}
+
+async function isNodeSyncingFromKit(k: ContractKit) {
+  const syncProgress = await k.connection.isSyncing()
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
-export async function getAgeOfLatestBlock() {
-  const latestBlock = await useKit((k) => k.connection.getBlock('latest'))
+export async function isNodeSyncing() {
+  return useKit(isNodeSyncingFromKit)
+}
+
+export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
+  const latestBlock = await k!.connection.getBlock('latest')
   const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
   return {
     ageOfLatestBlock,
     number: latestBlock.number,
   }
+}
+
+export async function getAgeOfLatestBlock() {
+  return useKit(getAgeOfLatestBlockFromKit)
 }
 
 export async function isAttestationSignerUnlocked() {
@@ -141,9 +189,13 @@ export async function initializeKit(force: boolean = false) {
     // Prefer passed in keystore if these variables are set
     const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
     const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
+    const celoProviderBackup = fetchEnvOrDefault('CELO_PROVIDER_BACKUP', '')
     if (!keystoreDirpath || !keystorePassphrase) {
       // Backwards compatibility -- assume this is the deployed full node
       kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
+      if (celoProviderBackup && (!backupKit || force)) {
+        backupKit = newKitFromWeb3(new Web3(celoProviderBackup))
+      }
     } else {
       const keystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore(keystoreDirpath))
       try {
@@ -162,6 +214,12 @@ export async function initializeKit(force: boolean = false) {
         new Web3(fetchEnv('CELO_PROVIDER')),
         keystoreWalletWrapper.getLocalWallet()
       )
+      if (celoProviderBackup && (!backupKit || force)) {
+        backupKit = newKitFromWeb3(
+          new Web3(celoProviderBackup),
+          keystoreWalletWrapper.getLocalWallet()
+        )
+      }
     }
 
     // Copied from @celo/cli/src/utils/helpers
@@ -170,10 +228,19 @@ export async function initializeKit(force: boolean = false) {
       rootLogger.info(`Connected to Celo node at ${fetchEnv('CELO_PROVIDER')}`)
     } catch (error) {
       kit = undefined
-      throw new Error(
-        'Initializing ContractKit failed. Is the Celo node running and accessible via ' +
-          `the "CELO_PROVIDER" env var? Currently set as ${fetchEnv('CELO_PROVIDER')}`
-      )
+      rootLogger.warn(`Failed to connect to Celo node at ${fetchEnv('CELO_PROVIDER')}`)
+      if (backupKit) {
+        try {
+          await backupKit.connection.getBlock('latest')
+          rootLogger.info(`Connected to Celo node at ${fetchEnv('CELO_PROVIDER_BACKUP')}`)
+        } catch (error2) {
+          backupKit = undefined
+          throw new Error(
+            'Initializing ContractKit failed for both providers. Is the Celo node running and accessible via ' +
+              `the "CELO_PROVIDER" env var? Currently set as ${fetchEnv('CELO_PROVIDER')}`
+          )
+        }
+      }
     }
   }
 }
