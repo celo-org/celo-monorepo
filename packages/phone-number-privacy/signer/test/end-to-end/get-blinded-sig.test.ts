@@ -68,23 +68,16 @@ describe('Running against a deployed service', () => {
     })
 
     it('With auth header signer mismatch', async () => {
-      const timestamp = Date.now()
       // Sign body with different account
       const body = JSON.stringify({
         hashedPhoneNumber: '+1455556600',
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER.trim(),
         ACCOUNT_ADDRESS1,
-        timestamp,
       })
       const signature = signMessage(JSON.stringify(body), PRIVATE_KEY2, ACCOUNT_ADDRESS2)
       const authHeader = serializeSignature(signature)
 
-      const response = await postToSignMessage(
-        BLINDED_PHONE_NUMBER,
-        ACCOUNT_ADDRESS1,
-        timestamp,
-        authHeader
-      )
+      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS1, authHeader)
       expect(response.status).toBe(401)
     })
 
@@ -102,50 +95,62 @@ describe('Running against a deployed service', () => {
   describe('When account address has enough quota', () => {
     // if these tests are failing, it may just be that the address needs to be fauceted:
     // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
-    let initialQueryCount: number
-    let timestamp: number
+
     beforeAll(async () => {
       console.log('ACCOUNT_ADDRESS1 ' + ACCOUNT_ADDRESS1)
       console.log('ACCOUNT_ADDRESS2 ' + ACCOUNT_ADDRESS2)
       console.log('ACCOUNT_ADDRESS3 ' + ACCOUNT_ADDRESS3)
 
       contractkit.defaultAccount = ACCOUNT_ADDRESS2
-
-      initialQueryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      timestamp = Date.now()
     })
 
-    it('Returns sig when querying succeeds with unused request', async () => {
-      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, timestamp)
-      expect(response.status).toBe(200)
-    })
-
-    it('Returns count when querying with unused request increments query count', async () => {
-      const queryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      expect(queryCount).toEqual(initialQueryCount + 1)
-    })
-
-    it('Returns sig when querying succeeds with used request', async () => {
-      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, timestamp)
-      expect(response.status).toBe(200)
-    })
-
-    it('Returns count when querying with used request does not increment query count', async () => {
-      const queryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      expect(queryCount).toEqual(initialQueryCount + 1)
-    })
-
-    it('Returns sig when querying succeeds with missing timestamp', async () => {
+    it('Returns sig when querying succeeds', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
       expect(response.status).toBe(200)
     })
 
-    it('Returns count when querying with missing timestamp increments query count', async () => {
+    // Backwards compatibility check
+    it('Returns sig when querying succeeds w/ timestamp', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
+      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, Date.now())
+      expect(response.status).toBe(200)
+    })
+
+    it('Increments query count when querying succeeds', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
+      const initialQueryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
+      await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
+      expect(initialQueryCount).toEqual((await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)) - 1)
+    })
+
+    // Backwards compatibility check
+    it('Increments query count when querying succeeds w/ timestamp', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
+      const initialQueryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
+      await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, Date.now())
+      expect(initialQueryCount).toEqual((await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)) - 1)
+    })
+
+    it('Returns sig when querying succeeds with replayed request without incrementing query count', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
+      const res1 = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
+      expect(res1.status).toBe(200)
       const queryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      expect(queryCount).toEqual(initialQueryCount + 2)
+      const res2 = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
+      expect(res2.status).toBe(200)
+      expect(queryCount).toEqual(await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER))
+    })
+
+    // Backwards compatibility check
+    it('Returns sig when querying succeeds with replayed request without incrementing query count w/ timestamp', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
+      const res1 = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, Date.now())
+      expect(res1.status).toBe(200)
+      const queryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
+      const res2 = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, Date.now())
+      expect(res2.status).toBe(200)
+      expect(queryCount).toEqual(await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER))
     })
   })
 
@@ -155,7 +160,6 @@ describe('Running against a deployed service', () => {
     // NOTE: DO NOT FAUCET ACCOUNT_ADDRESS3
     let initialQuota: number
     let initialQueryCount: number
-    let timestamp: number
     beforeAll(async () => {
       contractkit.defaultAccount = ACCOUNT_ADDRESS3
       await registerWalletAddress(ACCOUNT_ADDRESS3, ACCOUNT_ADDRESS2, PRIVATE_KEY2, contractkit)
@@ -163,7 +167,6 @@ describe('Running against a deployed service', () => {
       // and ACCOUNT_ADDRESS3 is account address (does not have quota on it's own, only bc of walletAddress)
       initialQuota = await getQuota(ACCOUNT_ADDRESS3, IDENTIFIER)
       initialQueryCount = await getQueryCount(ACCOUNT_ADDRESS3, IDENTIFIER)
-      timestamp = Date.now()
     })
 
     it('Check that accounts are set up correctly', async () => {
@@ -173,7 +176,7 @@ describe('Running against a deployed service', () => {
 
     it('Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS3, timestamp)
+      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS3)
       expect(response.status).toBe(200)
     })
 
@@ -184,24 +187,13 @@ describe('Running against a deployed service', () => {
 
     it('Returns sig when querying succeeds with used request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS3, timestamp)
+      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS3)
       expect(response.status).toBe(200)
     })
 
     it('Returns count when querying with used request does not increment query count', async () => {
       const queryCount = await getQueryCount(ACCOUNT_ADDRESS3, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
-    })
-
-    it('Returns sig when querying succeeds with missing timestamp', async () => {
-      await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS3)
-      expect(response.status).toBe(200)
-    })
-
-    it('Returns count when querying with missing timestamp increments query count', async () => {
-      const queryCount = await getQueryCount(ACCOUNT_ADDRESS3, IDENTIFIER)
-      expect(queryCount).toEqual(initialQueryCount + 2)
     })
   })
 })

@@ -6,6 +6,10 @@ Additionally, head over to [Celo Hub](https://celohub.org) and [Electric Capital
 
 ## [Celo Camp](https://www.celocamp.com/) Projects
 
+### GoodGhosting
+[GoodGosting](https://www.goodghosting.com) is a no-loss DeFi saving game. Users can compete with others to get higher interest rates than when they would save by themselves. We created a shared saving pool smart contract, which plugs into existing Celo DeFi projects (e.g. Moola) to generate interest for all winning players.
+[Github](https://github.com/Good-Ghosting/goodghosting-smart-contracts/tree/feature/celo)
+
 ### Infibridge
 
 [Infibridge](https://www.infibridge.com) is a "Metamask like" browser extension wallet for Celo. It will support payment of gas fees in Celo or stable currencies like cUSD and cEUR. It has deep integration with Celo to allow staking, voting and token swaps. [Github](https://github.com/infibridge/browser-extension-wallet)
@@ -111,6 +115,15 @@ Savings Circles let you pool funds with your friends to save for large purchases
 ### Symmetric
 
 [Symmetric](https://symmetric.finance/) is a fork of Balancer for Celo. Symmetric is [open source on GitHub](https://github.com/centfinance), has a tokenomics model that includes a risk fund protecting traders, is to be DAO controlled and has a roadmap of new features.
+
+### Tradegen
+
+[Tradegen](https://www.tradegen.io/) is a decentralized social trading platform that aims to make algo trading more inclusive and transparent. The platform consists of trading strategies, user-managed pools, and a marketplace for custom indicators/comparators to use in on-chain trading bots. Tradegen is [open source on GitHub](https://github.com/Tradegen/tradegen).
+
+## Umoja
+
+UMOJA is an open banking platform that enables NGOs and FSPs to provide flexible micro-financing to anyone with a phone. Umoja is [open source on GitHub](https://github.com/Emerging-Impact) and consists of a suite of APIs and products to make digital money accounts more accessible (and more easily to develop for other financial applications). 
+
 
 ## Add your app to this list
 

@@ -174,16 +174,16 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3.eth.getBlock('latest').then((block) => Number(block.timestamp))
 
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
-    freezerInstance = await Freezer.new()
+    accountsInstance = await Accounts.new(true)
+    freezerInstance = await Freezer.new(true)
     goldTokenInstance = await GoldToken.new(true)
-    lockedGoldInstance = await LockedGold.new()
+    lockedGoldInstance = await LockedGold.new(true)
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
     mockValidators = await MockValidators.new()
     mockStableToken = await MockStableToken.new()
 
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezerInstance.address)

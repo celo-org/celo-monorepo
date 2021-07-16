@@ -49,7 +49,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
   const identifier: string = '0x00000000000000000000000000000000000000000000000000000000babecafe'
 
   beforeEach(async () => {
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.initialize()
     attestations = await MockAttestations.new()
     await registry.setAddressFor('Attestations', attestations.address)

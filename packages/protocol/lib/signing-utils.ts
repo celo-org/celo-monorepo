@@ -81,9 +81,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
         privateKey
       )
 
-      const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 9)
-        .concat(Account.decodeSignature(signature))
+      const rawTx = RLP.decode(rlpEncoded).slice(0, 9).concat(Account.decodeSignature(signature))
 
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))

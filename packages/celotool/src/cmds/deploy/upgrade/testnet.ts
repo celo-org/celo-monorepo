@@ -8,7 +8,6 @@ import {
 } from 'src/lib/helm_deploy'
 import {
   uploadEnvFileToGoogleStorage,
-  uploadGenesisBlockToGoogleStorage,
   uploadTestnetStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
 import yargs from 'yargs'
@@ -45,9 +44,6 @@ export const handler = async (argv: TestnetArgv) => {
 
   if (argv.reset === true) {
     await resetAndUpgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
-    if (!argv.useExistingGenesis) {
-      await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
-    }
   } else {
     await upgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
   }
