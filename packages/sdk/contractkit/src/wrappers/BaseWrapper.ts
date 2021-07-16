@@ -11,7 +11,7 @@ import {
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import moment from 'moment'
-import { ContractVersion } from '../base'
+import { ContractVersion, newContractVersion } from '../base'
 import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
 import { ContractKit } from '../kit'
 
@@ -28,7 +28,7 @@ type EventsEnum<T extends Contract> = {
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
-  private _version?: T['methods'] extends ICeloVersionedContract['methods']
+  protected _version?: T['methods'] extends ICeloVersionedContract['methods']
     ? ContractVersion
     : never
 
@@ -43,12 +43,12 @@ export abstract class BaseWrapper<T extends Contract> {
     if (!this._version) {
       const raw = await this.contract.methods.getVersionNumber().call()
       // @ts-ignore
-      this._version = {
-        storage: parseInt(raw[0]),
-        major: parseInt(raw[1]),
-        minor: parseInt(raw[2]),
-        patch: parseInt(raw[3]),
-      }
+      this._version = newContractVersion(
+        parseInt(raw[0]),
+        parseInt(raw[1]),
+        parseInt(raw[2]),
+        parseInt(raw[3])
+      )
     }
     return this._version!
   }
@@ -58,7 +58,7 @@ export abstract class BaseWrapper<T extends Contract> {
     // ignore patch changes in semver comparison for wrapper compatibility
     const toSemver = (v: ContractVersion) => `${v.storage}.${v.major}.${v.minor}`
     if (semverLt(toSemver(actual), toSemver(version))) {
-      throw new Error(`onchain version ${this._version} is not at least ${version} yet`)
+      throw new Error(`Bytecode version ${this._version} is not compatible with ${version} yet`)
     }
   }
 
