@@ -55,26 +55,6 @@ export function isDBOnline() {
 let kit: ContractKit | undefined
 let backupKit: ContractKit | undefined
 
-// async function execWithFallback<T>(
-//   f: (kit: ContractKit) => T,
-//   k: ContractKit,
-//   backup?: ContractKit | undefined
-// ): Promise<T> {
-//   // Decorator to wrap execution of f with a retry using the backup kit
-//   // if execution initially fails
-//   try {
-//     return await f(k)
-//   } catch (error) {
-//     rootLogger.warn(`Using ContractKit failed: ${error}`)
-//     if (backup) {
-//       rootLogger.info(`Attempting to use backup ContractKit`)
-//       return await f(backup!)
-//     } else {
-//       throw error
-//     }
-//   }
-// }
-
 async function execWithFallback<T>(
   f: (kit: ContractKit) => T,
   kit1: ContractKit,
@@ -86,24 +66,19 @@ async function execWithFallback<T>(
 
   let primaryKit = kit1
   let secondaryKit = kit2
-  console.log('BEEP 4')
-  try {
-    if (
-      smartFallback &&
-      secondaryKit &&
-      isNodeSyncingFromKit(primaryKit) &&
-      (!isNodeSyncingFromKit(secondaryKit) ||
-        (await getAgeOfLatestBlockFromKit(secondaryKit)).ageOfLatestBlock <
-          (await getAgeOfLatestBlockFromKit(primaryKit)).ageOfLatestBlock)
-    ) {
-      // Prioritize more-synced celo provider
-      console.log('BEEP 4.5')
-      rootLogger.info('Prioritizing CELO_PROVIDER_BACKUP')
-      primaryKit = kit2!
-      secondaryKit = kit1
-    }
-  } catch (error) {
-    rootLogger.error('Error while prioritizing: ', error)
+  if (
+    smartFallback &&
+    kit2 &&
+    (!kit1 ||
+      ((await isNodeSyncingFromKit(kit1)) &&
+        (!(await isNodeSyncingFromKit(kit2)) ||
+          (await getAgeOfLatestBlockFromKit(kit2)).ageOfLatestBlock <
+            (await getAgeOfLatestBlockFromKit(kit1)).ageOfLatestBlock)))
+  ) {
+    // Prioritize more-synced celo provider
+    rootLogger.info('Prioritizing CELO_PROVIDER_BACKUP')
+    primaryKit = kit2
+    secondaryKit = kit1
   }
   try {
     return await f(primaryKit)
@@ -121,18 +96,14 @@ async function execWithFallback<T>(
 // Wrapper that on error tries once to reinitialize connection to node.
 export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
   const smartFallback = !(fetchEnvOrDefault('DISABLE_SMART_FALLBACK', 'false') === 'true')
-  console.log('SMART FALLBACK:', smartFallback)
-  if (!kit) {
+  if (!kit && !backupKit) {
     await initializeKit(true)
-    console.log('BEEP')
     // tslint:disable-next-line: no-return-await
     return await execWithFallback(f, kit!, backupKit, smartFallback)
   } else {
     try {
-      console.log('BEEP 2')
       return await execWithFallback(f, kit!, backupKit, smartFallback)
     } catch (error) {
-      console.log('BEEP 3')
       await initializeKit(true)
       // tslint:disable-next-line: no-return-await
       return await execWithFallback(f, kit!, backupKit, smartFallback)
@@ -140,39 +111,12 @@ export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
   }
 }
 
-// export async function useKit2<T>(f: (kit: ContractKit) => T, smartFallback=false): Promise<T> {
-//   let primaryKit = kit
-//   let secondaryKit = backupKit
-
-//   if (smartFallback) {
-//     // Preference kit over backup unless it is behind
-//     if (isNodeSyncing())
-//   }
-
-//   if (!kit) {
-//     await initializeKit(true)
-//     // tslint:disable-next-line: no-return-await
-//     return await execWithFallback(f, kit!, backupKit)
-//   } else {
-//     try {
-//       return await execWithFallback(f, kit!, backupKit)
-//     } catch (error) {
-//       await initializeKit(true)
-//       // tslint:disable-next-line: no-return-await
-//       return await execWithFallback(f, kit!, backupKit)
-//     }
-//   }
-// }
-
 async function isNodeSyncingFromKit(k: ContractKit) {
   const syncProgress = await k.connection.isSyncing()
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
 export async function isNodeSyncing() {
-  // const syncProgress = await useKit((k) => k.connection.isSyncing())
-  // return typeof syncProgress === 'boolean' && syncProgress
-  console.log('BEEP 5')
   return useKit(isNodeSyncingFromKit)
 }
 
@@ -186,14 +130,7 @@ export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
 }
 
 export async function getAgeOfLatestBlock() {
-  console.log('BEEP 6')
   return useKit(getAgeOfLatestBlockFromKit)
-  // const latestBlock = await useKit((k) => k.connection.getBlock('latest'))
-  // const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
-  // return {
-  //   ageOfLatestBlock,
-  //   number: latestBlock.number,
-  // }
 }
 
 export async function isAttestationSignerUnlocked() {
@@ -252,9 +189,13 @@ export async function initializeKit(force: boolean = false) {
     // Prefer passed in keystore if these variables are set
     const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
     const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
+    const celoProviderBackup = fetchEnvOrDefault('CELO_PROVIDER_BACKUP', '')
     if (!keystoreDirpath || !keystorePassphrase) {
       // Backwards compatibility -- assume this is the deployed full node
       kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
+      if (celoProviderBackup && (!backupKit || force)) {
+        backupKit = newKitFromWeb3(new Web3(celoProviderBackup))
+      }
     } else {
       const keystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore(keystoreDirpath))
       try {
@@ -273,10 +214,7 @@ export async function initializeKit(force: boolean = false) {
         new Web3(fetchEnv('CELO_PROVIDER')),
         keystoreWalletWrapper.getLocalWallet()
       )
-      // Backup kit can only work if signer has been set; this is optional
-      const celoProviderBackup = fetchEnvOrDefault('CELO_PROVIDER_BACKUP', '')
-      if (celoProviderBackup && !backupKit) {
-        console.log('INITIALIZING BACKUP KIT')
+      if (celoProviderBackup && (!backupKit || force)) {
         backupKit = newKitFromWeb3(
           new Web3(celoProviderBackup),
           keystoreWalletWrapper.getLocalWallet()
@@ -290,10 +228,19 @@ export async function initializeKit(force: boolean = false) {
       rootLogger.info(`Connected to Celo node at ${fetchEnv('CELO_PROVIDER')}`)
     } catch (error) {
       kit = undefined
-      throw new Error(
-        'Initializing ContractKit failed. Is the Celo node running and accessible via ' +
-          `the "CELO_PROVIDER" env var? Currently set as ${fetchEnv('CELO_PROVIDER')}`
-      )
+      rootLogger.warn(`Failed to connect to Celo node at ${fetchEnv('CELO_PROVIDER')}`)
+      if (backupKit) {
+        try {
+          await backupKit.connection.getBlock('latest')
+          rootLogger.info(`Connected to Celo node at ${fetchEnv('CELO_PROVIDER_BACKUP')}`)
+        } catch (error2) {
+          backupKit = undefined
+          throw new Error(
+            'Initializing ContractKit failed for both providers. Is the Celo node running and accessible via ' +
+              `the "CELO_PROVIDER" env var? Currently set as ${fetchEnv('CELO_PROVIDER')}`
+          )
+        }
+      }
     }
   }
 }
@@ -416,7 +363,6 @@ export async function doHealthCheck(): Promise<string | null> {
     }
 
     const { ageOfLatestBlock } = await getAgeOfLatestBlock()
-    console.log(ageOfLatestBlock)
     if (ageOfLatestBlock > maxAgeLatestBlock) {
       Gauges.healthy.set(0)
       return ErrorMessages.NODE_IS_STUCK
