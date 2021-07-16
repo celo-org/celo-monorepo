@@ -4,9 +4,9 @@ import {
   GetContactMatchesRequest,
   hasValidAccountParam,
   hasValidContactPhoneNumbersParam,
+  hasValidIdentifier,
   hasValidUserPhoneNumberParam,
   isVerified,
-  phoneNumberHashIsValidIfExists,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -71,7 +71,6 @@ function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): b
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
     hasValidContactPhoneNumbersParam(requestBody) &&
-    !!requestBody.hashedPhoneNumber &&
-    phoneNumberHashIsValidIfExists(requestBody)
+    hasValidIdentifier(requestBody)
   )
 }

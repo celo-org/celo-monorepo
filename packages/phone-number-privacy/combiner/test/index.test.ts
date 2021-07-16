@@ -1,6 +1,5 @@
 import { isVerified } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
@@ -141,17 +140,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
         body: {
           ...validRequest,
           hashedPhoneNumber: '+1234567890',
-        },
-        headers: mockHeaders,
-      } as Request
-
-      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
-    })
-    it('expired timestamp returns 400', (done) => {
-      const req = {
-        body: {
-          ...validRequest,
-          timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
         },
         headers: mockHeaders,
       } as Request

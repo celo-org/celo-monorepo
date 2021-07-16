@@ -43,7 +43,7 @@ done
 [ -z "$DEPLOYED_GRANTS" ] && echo 'No deployed grants file provided via -d flag: defaulting to `scripts/truffle/deployedGrants.json`' && DEPLOYED_GRANTS="scripts/truffle/deployedGrants.json"
 [ -z "$OUTPUT_FILE" ] && echo "Need to set output file via the -o flag" && exit 1;
 
-CONTRACT_ARTIFACTS_DIR="$PWD/build/$NETWORK"
+CONTRACT_ARTIFACTS_DIR="$PWD/build"
 
 if [[ ! -d "$CONTRACT_ARTIFACTS_DIR" ]]; then
   echo "Error: no contract artifacts found in $CONTRACT_ARTIFACTS_DIR. Use download-artifacts to obtain them, or build them locally." >&2
