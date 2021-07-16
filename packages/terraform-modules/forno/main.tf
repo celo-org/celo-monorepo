@@ -49,6 +49,7 @@ module "http_backends" {
   context_info                    = var.context_info_http
   health_check_destination_port   = 6000
   type                            = "http"
+  timeout_sec                     = 120 # 2 minutes
   security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
@@ -73,7 +74,7 @@ module "kong" {
   health_check_destination_port   = 8000
   health_check_request_path       = "/kong/status"
   type                            = "kong"
-  timeout_sec                     = 1200 # 20 minutes
+  timeout_sec                     = 120 # 2 minutes
   security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
@@ -104,7 +105,7 @@ resource "random_id" "ssl_random_suffix" {
   keepers = {
     domains = join(",", var.ssl_cert_domains)
   }
-}
+}:
 
 resource "google_compute_url_map" "url_map" {
   name            = "${var.celo_env}-forno-url-map"
