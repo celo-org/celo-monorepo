@@ -27,10 +27,8 @@ data:
       # Label the metrics with a custom label if using multiple prometheus for same environments
       external_labels:
         cluster_name: {{ .Values.cluster }}
-        enable_alerts: {{ .Values.enable_alerts }}
 
     {{- with .Values.remote_write }}
-
     remote_write:
 {{ toYaml . | indent 6 }}
     {{- end }}

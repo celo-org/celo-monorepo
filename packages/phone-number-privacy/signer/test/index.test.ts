@@ -1,4 +1,4 @@
-import { authenticateUser, REQUEST_EXPIRY_WINDOW_MS } from '@celo/phone-number-privacy-common'
+import { authenticateUser } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import request from 'supertest'
 import { ErrorMessage, WarningMessage } from '../../common/src/interfaces/error-utils'
@@ -78,7 +78,6 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
     account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
-    timestamp: Date.now(),
   }
 
   describe('with valid input', () => {
@@ -88,6 +87,27 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       request(app)
         .post('/getBlindedMessagePartialSig')
         .send(validRequest)
+        .expect('Content-Type', /json/)
+        .expect(
+          200,
+          {
+            success: true,
+            signature: BLS_SIGNATURE,
+            version: getVersion(),
+            performedQueryCount: 1,
+            totalQuota: 10,
+            blockNumber: 10000,
+          },
+          done
+        )
+    })
+    // Backwards compatibility check
+    it('provides signature w/ expired timestamp', (done) => {
+      mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetBlockNumber.mockResolvedValue(10000)
+      request(app)
+        .post('/getBlindedMessagePartialSig')
+        .send({ ...validRequest, timestamp: Date.now() - 10 * 60 * 1000 }) // 10 minutes ago
         .expect('Content-Type', /json/)
         .expect(
           200,
@@ -208,15 +228,6 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       const mockRequestData = {
         ...validRequest,
         hashedPhoneNumber: '+1234567890',
-      }
-
-      request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-    })
-
-    it('expired timestamp returns 400', (done) => {
-      const mockRequestData = {
-        ...validRequest,
-        timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
       }
 
       request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
