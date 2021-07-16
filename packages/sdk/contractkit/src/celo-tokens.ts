@@ -221,6 +221,8 @@ export class CeloTokens {
    * @return an promise resolving to the wrapper for the token
    */
   getWrapper(token: StableToken): Promise<StableTokenWrapper>
+  getWrapper(token: Token): Promise<GoldTokenWrapper>
+  getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper>
   getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper> {
     return this.kit.contracts.getContract(celoTokenInfos[token].contract)
   }

@@ -27,7 +27,8 @@
     "baklava-test": "CELO_ENV=baklava CELO_PROVIDER=https://baklava-forno.celo-testnet.org jest --runInBand",
     "alfajores-test": "CELO_ENV=alfajores CELO_PROVIDER=https://alfajores-forno.celo-testnet.org jest --runInBand",
     "mainnet-test": "CELO_ENV=rc1 CELO_PROVIDER=https://forno.celo.org jest --runInBand",
-    "staging-test": "CELO_ENV=staging CELO_PROVIDER=https://staging-forno.celo-networks-dev.org jest --runInBand"
+    "staging-test": "CELO_ENV=staging CELO_PROVIDER=https://staging-forno.celo-networks-dev.org jest --runInBand",
+    "trevor-test": "CELO_ENV=trevor CELO_PROVIDER=http://localhost:8545 jest --runInBand"
   },
   "devDependencies": {
     "typescript": "^3.8.3"

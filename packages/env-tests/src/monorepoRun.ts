@@ -5,6 +5,7 @@ import { rootLogger } from './logger'
 import { clearAllFundsToRoot, StableTokenToRegistryName } from './scaffold'
 import { runAttestationTest } from './tests/attestation'
 import { runExchangeTest } from './tests/exchange'
+import { runGrandaMentoTest } from './tests/granda-mento'
 import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
@@ -37,12 +38,16 @@ function runTests() {
       reserveSpenderMultiSigAddress,
     }
 
-    // TODO: Assert maximum loss after test
-    runTransfersTest(context, stableTokensToTest)
-    runExchangeTest(context, stableTokensToTest)
-    runOracleTest(context)
-    runReserveTest(context)
-    runAttestationTest(context)
+    runGrandaMentoTest(context, stableTokensToTest)
+
+    if (false) {
+      // TODO: Assert maximum loss after test
+      runTransfersTest(context, stableTokensToTest)
+      runExchangeTest(context, stableTokensToTest)
+      runOracleTest(context)
+      runReserveTest(context)
+      runAttestationTest(context)
+    }
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing

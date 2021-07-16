@@ -1,5 +1,6 @@
 import { concurrentMap } from '@celo/base'
-import { CeloContract, ContractKit } from '@celo/contractkit'
+// import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
+import { CeloContract, CeloTokenType, ContractKit, StableToken, Token } from '@celo/contractkit'
 import { newExchange } from '@celo/contractkit/lib/generated/Exchange'
 import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
 import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
@@ -11,6 +12,12 @@ import { EnvTestContext } from './context'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
+interface KeyInfo {
+  address: string
+  privateKey: string
+  publicKey: string
+}
+
 export const StableTokenToRegistryName: Record<string, CeloContract> = {
   cUSD: CeloContract.StableToken,
   cEUR: 'StableTokenEUR' as CeloContract,
@@ -21,12 +28,22 @@ export const ExchangeToRegistryName: Record<string, CeloContract> = {
   cEUR: 'ExchangeEUR' as CeloContract,
 }
 
+export async function fundAccountWithCELO(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber
+) {
+  // Use validator 0 instead of root because it has a CELO balance
+  const validator0 = await getValidatorKey(context.mnemonic, 0)
+  return fundAccount(context, account, value, Token.CELO, validator0, true)
+}
+
 export async function fundAccountWithcUSD(
   context: EnvTestContext,
   account: TestAccounts,
   value: BigNumber
 ) {
-  await fundAccountWithStableToken(context, account, value, 'cUSD')
+  await fundAccountWithStableToken(context, account, value, StableToken.cUSD)
 }
 
 export async function fundAccountWithStableToken(
@@ -35,36 +52,61 @@ export async function fundAccountWithStableToken(
   value: BigNumber,
   stableToken: string
 ) {
-  const root = await getKey(context.mnemonic, TestAccounts.Root)
+  return fundAccount(context, account, value, stableToken as StableToken)
+}
+
+async function fundAccount(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber,
+  token: CeloTokenType,
+  fromKey?: KeyInfo,
+  isCELO: boolean = false
+) {
+  const from = fromKey ? fromKey : await getKey(context.mnemonic, TestAccounts.Root)
   const recipient = await getKey(context.mnemonic, account)
   const logger = context.logger.child({
     index: account,
-    account: root.address,
+    account: from.address,
     value: value.toString(),
     address: recipient.address,
   })
-  context.kit.connection.addAccount(root.privateKey)
+  context.kit.connection.addAccount(from.privateKey)
 
-  const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+  const tokenWrapper = await context.kit.celoTokens.getWrapper(token)
 
-  const rootBalance = await stableTokenInstance.balanceOf(root.address)
+  console.log('root', from.address)
+  const rootBalance = await tokenWrapper.balanceOf(from.address)
+  console.log('root balance', await context.kit.getTotalBalance(from.address))
+  console.log('context.mnemonic', context.mnemonic)
   if (rootBalance.lte(value)) {
     logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
     throw new Error(
-      `Root account ${root.address}'s ${stableToken} balance (${rootBalance.toPrecision(
+      `From account ${from.address}'s /*stableToken*/ balance (${rootBalance.toPrecision(
         4
       )}) is not enough for transferring ${value.toPrecision(4)}`
     )
   }
-  const receipt = await stableTokenInstance
+  const receipt = await tokenWrapper
     .transfer(recipient.address, value.toString())
-    .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
+    .sendAndWaitForReceipt({
+      from: from.address,
+      feeCurrency: isCELO ? undefined : tokenWrapper.address,
+    })
 
-  logger.debug({ stabletoken: stableToken, receipt }, `funded test account with ${stableToken}`)
+  logger.debug({ token, receipt }, `funded test account with /*stableToken*/`)
 }
 
-export async function getKey(mnemonic: string, account: TestAccounts) {
-  const key = await generateKeys(mnemonic, undefined, 0, account)
+export async function getValidatorKey(mnemonic: string, index: number): Promise<KeyInfo> {
+  return getKey(mnemonic, index, '')
+}
+
+export async function getKey(
+  mnemonic: string,
+  account: TestAccounts,
+  derivationPath?: string
+): Promise<KeyInfo> {
+  const key = await generateKeys(mnemonic, undefined, 0, account, undefined, derivationPath)
   return { ...key, address: privateKeyToAddress(key.privateKey) }
 }
 
@@ -77,6 +119,7 @@ export enum TestAccounts {
   GovernanceApprover,
   ReserveSpender,
   ReserveCustodian,
+  GrandaMentoExchanger,
 }
 
 export const ONE = new BigNumber('1000000000000000000')
