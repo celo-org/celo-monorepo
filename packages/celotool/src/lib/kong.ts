@@ -82,7 +82,7 @@ function kongaHelmParamenters(celoEnv: string) {
  * Configuration is read from a kong config file inside the kong chart folder
  */
 export async function createUpdateKongConfigMap(celoEnv: string) {
-  let kongConfig = readFileSync(`${kongChartPath}/kong.conf`).toString()
+  const kongConfig = readFileSync(`${kongChartPath}/kong.conf`).toString()
   // We need to patch this file with the forno public ip as this ip will forward
   // the requests and need to put in the config file so kong/nginx can consider
   // that ip as internal
