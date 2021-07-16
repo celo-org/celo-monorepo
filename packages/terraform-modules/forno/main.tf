@@ -49,7 +49,7 @@ module "http_backends" {
   context_info                    = var.context_info_http
   health_check_destination_port   = 6000
   type                            = "http"
-  timeout_sec                     = 120 # 2 minutes
+  timeout_sec                     = 60 # 1 minute
   security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
@@ -74,7 +74,7 @@ module "kong" {
   health_check_destination_port   = 8000
   health_check_request_path       = "/kong/status"
   type                            = "kong"
-  timeout_sec                     = 120 # 2 minutes
+  timeout_sec                     = 60 # 1 minute
   security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
