@@ -7,7 +7,6 @@ import {
   fetchEnv,
   fetchEnvOrFallback,
   getDynamicEnvVarValue,
-  isProduction,
 } from './env-utils'
 import {
   installGenericHelmChart,
@@ -111,6 +110,30 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     '__name__!~"workqueue_.+"',
     '__name__!~"nginx_.+"',
     '__name__!~"etcd_.+"',
+    '__name__!~"erlang_.+"',
+    '__name__!~"container_tasks_state"',
+    '__name__!~"storage_.+"',
+    '__name__!~"container_memory_[^w].*"',
+    '__name__!~"rest_client_.+"',
+    '__name__!~"container_fs_.+"',
+    '__name__!~"container_file_.+"',
+    '__name__!~"container_spec_.+"',
+    '__name__!~"container_start_.+"',
+    '__name__!~"container_last_.+"',
+    '__name__!~"kube_pod_[^cs].+"',
+    '__name__!~"kube_pod_container_[^r].+"',
+    '__name__!~"kube_pod_container_status_waiting_reason"',
+    '__name__!~"kube_pod_container_status_terminated_reason"',
+    '__name__!~"kube_pod_container_status_last_terminated_reason"',
+    '__name__!~"container_network_.+"',
+    '__name__!~"container_cpu_user_seconds_total"',
+    '__name__!~"container_cpu_load_average_10s"',
+    '__name__!~"container_cpu_system_seconds_total"',
+    '__name__!~"container_sockets"',
+    '__name__!~"container_processes"',
+    '__name__!~"container_threads"',
+    '__name__!~"container_threads_max"',
+    '__name__!~"kube_node_status_condition"',
   ]
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
@@ -153,18 +176,52 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   ]
 
   if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
+    const droppedRemoteWriteSeries = [
+      'apiserver_.+',
+      'etcd_.+',
+      'nginx_.+',
+      'erlang_.+',
+      'kubelet_[^v].+',
+      'container_tasks_state',
+      'storage_.+',
+      'container_memory_[^w].*',
+      'rest_client_.+',
+      'container_fs_.+',
+      'container_file_.+',
+      'container_spec_.+',
+      'container_start_.+',
+      'container_last_.+',
+      'kube_pod_container_status_waiting_reason',
+      'kube_pod_container_status_terminated_reason',
+      'kube_pod_status_phase',
+      'container_network_.+',
+      'container_cpu_user_seconds_total',
+      'container_cpu_load_average_10s',
+      'container_cpu_system_seconds_total',
+      'container_sockets',
+      'container_processes',
+      'container_threads',
+      'container_threads_max',
+      'kube_node_status_condition',
+      'kube_pod_container_status_last_terminated_reason',
+      'kube_pod_container_[^r].+',
+      'kube_pod_[^cs].+',
+      'workqueue_.+',
+      'kube_secret_.+',
+    ]
     params.push(
-      `--set remote_write[0].url=${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}`,
-      `--set remote_write[0].basic_auth.username=${fetchEnv(
+      `--set remote_write[0].url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
+      `--set remote_write[0].basic_auth.username='${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
-      )}`,
-      `--set remote_write[0].basic_auth.password=${fetchEnv(
+      )}'`,
+      `--set remote_write[0].basic_auth.password='${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
-      )}`,
-      `--set remote_write[0].write_relabel_configs[0].source_labels=[__name__]`,
-      `--set remote_write[0].write_relabel_configs[0].regex='(apiserver_(.+)|etcd_(.+)|nginx_(.+))'`,
-      `--set remote_write[0].write_relabel_configs[0].action='drop'`,
-      `--set enable_alerts="${isProduction()}"`
+      )}'`,
+      `--set remote_write[0].write_relabel_configs[0].source_labels='[__name__]'`,
+      `--set remote_write[0].write_relabel_configs[0].regex='(${droppedRemoteWriteSeries.join(
+        '|'
+      )})'`,
+      `--set remote_write[0].write_relabel_configs[0].action='drop'`
     )
   }
 
