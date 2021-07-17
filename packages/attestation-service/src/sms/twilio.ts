@@ -175,10 +175,7 @@ export class TwilioSmsProvider extends SmsProvider {
           const m = await this.client.verify
             .services(this.verifyServiceSid)
             .verifications.create(requestParams)
-          // SID will not be unique if it's to the same number
-          // We use the SID to query for status callback, which isn't
-          // applicable for Verify API
-          return `${m.sid}${Math.random().toString(36).substring(2)}`
+          return m.sid
         } else {
           throw e
         }

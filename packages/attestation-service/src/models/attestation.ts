@@ -66,6 +66,8 @@ export default (sequelize: Sequelize) => {
     errors: DataTypes.STRING,
     createdAt: DataTypes.DATE,
     completedAt: DataTypes.DATE,
+    appSignature: DataTypes.STRING,
+    language: DataTypes.STRING,
   }) as AttestationStatic
 
   model.prototype.key = function (): AttestationKey {
