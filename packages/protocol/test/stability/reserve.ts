@@ -41,12 +41,12 @@ contract('Reserve', (accounts: string[]) => {
   const aTobinTax = toFixed(0.005)
   const aTobinTaxReserveRatio = toFixed(2)
   const aDailySpendingRatio: string = '1000000000000000000000000'
-  const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
+  const sortedOraclesDenominator = new BigNumber('1000000000000000000000000')
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
     reserve = await Reserve.new(true)
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)

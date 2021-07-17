@@ -2,6 +2,7 @@ import { InteractiveProposalBuilder, ProposalBuilder } from '@celo/governance/li
 import { flags } from '@oclif/command'
 import { writeFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
+import { checkProposal } from '../../utils/governance'
 
 export default class BuildProposal extends BaseCommand {
   static description = 'Interactively build a governance proposal'
@@ -27,5 +28,10 @@ export default class BuildProposal extends BaseCommand {
     const output = await promptBuilder.promptTransactions()
     console.info(`Outputting proposal to ${res.flags.output}`)
     writeFileSync(res.flags.output!, JSON.stringify(output))
+
+    output.forEach((tx) => builder.addJsonTx(tx))
+    const proposal = await builder.build()
+
+    await checkProposal(proposal, this.kit)
   }
 }

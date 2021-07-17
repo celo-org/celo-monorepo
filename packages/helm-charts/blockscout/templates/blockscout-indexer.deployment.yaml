@@ -21,6 +21,12 @@ spec:
       component: blockscout-indexer
   template:
     metadata:
+      {{- if .Values.blockscout.indexer.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/indexer
+        prometheus.io/port: "4001"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
@@ -46,13 +52,13 @@ spec:
         - |
            exec mix cmd --app indexer "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix"
         ports:
-        - name: http
+        - name: health
           containerPort: {{ .Values.blockscout.indexer.port }}
         {{- if .Values.blockscout.indexer.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
             path: /health/readiness
-            port: http
+            port: health
           initialDelaySeconds: {{ .Values.blockscout.indexer.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.blockscout.indexer.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.blockscout.indexer.readinessProbe.timeoutSeconds }}
@@ -63,7 +69,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /health/liveness
-            port: http
+            port: health
           initialDelaySeconds: {{ .Values.blockscout.indexer.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.blockscout.indexer.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.blockscout.indexer.livenessProbe.timeoutSeconds }}
@@ -75,6 +81,8 @@ spec:
             memory: {{ .Values.blockscout.indexer.resources.requests.memory }}
             cpu: {{ .Values.blockscout.indexer.resources.requests.cpu }}
         env:
+        - name: HEALTH_CHECK_PORT
+          value: {{ .Values.blockscout.indexer.port | quote }}
         - name: DISABLE_WEBAPP
           value: "true"
         - name: POOL_SIZE
