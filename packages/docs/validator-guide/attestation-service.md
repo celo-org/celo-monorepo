@@ -77,6 +77,10 @@ Support ticket request template
 
 > Hello, I'd like to enable custom codes for our Verify API with SID {YOUR_VERIFY_SID}. I understand that we will be charged on each attempted user verification.
 
+After Twilio enables custom codes, you'll see the following property in the Twilio dashboard when viewing your Verify Service:
+
+![Custom Code Property](https://storage.googleapis.com/celo-website/docs/custom-code.png)
+
 Once you have confirmation that custom codes are enabled on your Twilio account, you can provide the resulting `SID` in the `TWILIO_VERIFY_SERVICE_SID` configuration variable and start the service. In the future, we'll likely switch entirely to the Verify Service and deprecate the Messaging Service, but for now it's important to specify both.
 
 ### Nexmo
