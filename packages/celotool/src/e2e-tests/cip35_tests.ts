@@ -128,7 +128,7 @@ function generateTestCases(cipIsActivated: boolean) {
 function getGethRunConfig(withDonut: boolean): GethRunConfig {
   console.log('getGethRunConfig', withDonut)
   return {
-    useMycelo: true,
+    migrate: true,
     runPath: TMP_PATH,
     keepData: false,
     networkId: 1101,
