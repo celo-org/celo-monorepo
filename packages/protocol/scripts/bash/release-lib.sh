@@ -11,6 +11,8 @@ function build_tag() {
   local BRANCH="$1"
   local LOG_FILE="$2"
 
+  git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >> $LOG_FILE
+
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
   [ -d contracts ] && rm -r contracts
