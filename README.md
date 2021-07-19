@@ -29,7 +29,7 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 [![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.gg/RfHQKtY)
 [![Twitter CeloDevs](https://img.shields.io/twitter/follow/celodevs?style=social)](https://twitter.com/celodevs)
 [![Twitter CeloOrg](https://img.shields.io/twitter/follow/celoorg?style=social)](https://twitter.com/CeloOrg)
-[![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/CeloHQ?style=social)](https://www.reddit.com/r/CeloHQ/)
+[![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/celo?style=social)](https://www.reddit.com/r/celo/)
 
 <!-- row 3 - detailed status -->
 
@@ -152,7 +152,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [Forum](https://forum.celo.org)
 - [Discord](https://discord.gg/vRbExjv)
 - [Twitter](https://twitter.com/CeloDevs)
-- [Reddit](https://www.reddit.com/r/CeloHQ/)
+- [Reddit](https://www.reddit.com/r/celo/)
 - [Community Events](https://celo.org/community)
 
 ## 📜 <a id="license"></a>License
