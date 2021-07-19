@@ -86,7 +86,7 @@ export async function installFullNodeChart(
   createNEG: boolean = false
 ) {
   const deployer = getFullNodeDeployerForContext(celoEnv, context, staticNodes, createNEG)
-  const enodes = await deployer.installChart()
+  const enodes = await deployer.installChart(context)
   if (enodes) {
     await uploadStaticNodeEnodes(celoEnv, context, enodes)
   }
@@ -104,7 +104,7 @@ export async function upgradeFullNodeChart(
   createNEG: boolean = false
 ) {
   const deployer = getFullNodeDeployerForContext(celoEnv, context, generateNodeKeys, createNEG)
-  const enodes = await deployer.upgradeChart(reset)
+  const enodes = await deployer.upgradeChart(context, reset)
   if (enodes) {
     await uploadStaticNodeEnodes(celoEnv, context, enodes)
   }
