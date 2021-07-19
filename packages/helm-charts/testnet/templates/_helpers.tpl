@@ -57,8 +57,11 @@ spec:
   ports:
   - port: 8545
     name: rpc
-  - port: {{ .ws_port | default .Values.geth.ws_port }}
+{{- $wsPort := ((.ws_port | default .Values.geth.ws_port) | int) -}}
+{{- if ne $wsPort 8545 }}
+  - port: {{ $wsPort }}
     name: ws
+{{- end }}
   selector:
 {{- if .proxy | default false }}
 {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
@@ -82,8 +85,10 @@ spec:
   ports:
   - port: 8545
     name: rpc
+{{- if ne $wsPort 8545 }}
   - port: {{ .ws_port | default .Values.geth.ws_port }}
     name: ws
+{{- end }}
   selector:
 {{- if .proxy | default false }}
 {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
