@@ -37,9 +37,6 @@ if [ ! -z "$REPORT" ]; then
   REPORT_FLAG="--output_file "$REPORT
 fi
 
-# fetch tags
-git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' >> $LOG_FILE
-
 source scripts/bash/release-lib.sh
 
 build_tag $OLD_BRANCH $LOG_FILE

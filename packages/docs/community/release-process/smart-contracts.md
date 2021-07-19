@@ -31,25 +31,20 @@ Whenever Celo Core Contracts need to be re-initialized, their initialization arg
 
 ### Release management in Git/Github
 
-Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut). Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo.
+Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut). Every smart contract release has a designated release branch, e.g. `release/core-contracts/${N}` in the celo-monorepo.
 
 #### When a new release branch is cut:
 
-1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
-2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`.
+1. A new release branch is created `release/core-contracts/${N}` with the contracts to be audited.
+2. The latest commit on the release branch is tagged with `core-contracts.v${N}.pre-audit`.
 3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
-4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.pre-audit` so that all future changes to master are versioned against the new release.
-5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`.
-
-#### During the release proposal stage:
-
-1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
-2. When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
+4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `core-contracts.v${N}.pre-audit` so that all future changes to master are versioned against the new release.
+5. Ongoing audit responses/fixes should continue to go into `release/core-contracts/${N}`.
 
 #### After a completed release process:
 
 1. The release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
-2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.mainnet`
+2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `core-contracts.v${N}`
 
 ## Release Process
 
@@ -78,8 +73,8 @@ yarn view-tags
 
 ```bash
 # Run from `packages/protocol` in the celo-monorepo
+PREVIOUS_RELEASE="core-contracts.v${N-1}"
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
 yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
 ```
@@ -112,9 +107,8 @@ check for it.
 The script generates a detailed report on version changes in JSON format.
 
 ```bash
-NETWORK=${"baklava"|"alfajores"|"mainnet"}
-PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
-RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+PREVIOUS_RELEASE="core-contracts.v${N-1}"
+RELEASE_CANDIDATE="core-contracts.v${N}"
 yarn check-versions -a $PREVIOUS_RELEASE -b $RELEASE_CANDIDATE -r "report.json"
 ```
 
@@ -127,7 +121,7 @@ STORAGE updates are adopted by deploying a new proxy/implementation pair. This s
 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+RELEASE_CANDIDATE="core-contracts.v${N}"
 yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json" -l "libraries.json"
 ```
 
@@ -159,7 +153,7 @@ accepted contract upgrade (in the form of the proposal.json you fetched in the s
 Additionally, include `initialization_data.json` from the CGP if any of the contracts have to be initialized.
 
 ```bash
-RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+RELEASE_CANDIDATE="core-contracts.v${N}"
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
 yarn verify-release -p "upgrade_proposal.json" -b $RELEASE_CANDIDATE -n $NETWORK -f -i initialization_data.json
@@ -170,7 +164,7 @@ yarn verify-release -p "upgrade_proposal.json" -b $RELEASE_CANDIDATE -n $NETWORK
 After a release executes via Governance, you can use `verify-deployed` again to check that the resulting network state does indeed reflect the tagged release candidate:
 
 ```bash
-RELEASE="celo-core-contracts-v${N}.rc${X}"
+RELEASE="core-contracts.v${N}"
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 yarn verify-deployed -n $NETWORK -b $RELEASE -f
 ```
@@ -288,13 +282,9 @@ Deploying a new contract release should occur with the following process. On-cha
     <td>T+2w</td>
     <td>
       <ol>
-        <li>On Tuesday: Run the <a href="#build-and-release-process">smart contract release script</a> in order to to deploy the contracts to Baklava as well as submit a governance proposal.
-         <ul>
-          <li>Transition proposal through Baklava <a href="https://docs.celo.org/celo-codebase/protocol/governance"> governance process.</a></li>
-          <li>Tag the commit that is being proposed with <code>celo-core-contracts-v${N}.baklava</code></li>
-         </ul>
-       </li>
-       <li>Update your forum post with the Baklava <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
+        <li>On Tuesday: Run the <a href="#build-and-release-process">smart contract release script</a> in order to to deploy the contracts to Baklava as well as submit a governance proposal. 
+        <li>Transition proposal through Baklava <a href="https://docs.celo.org/celo-codebase/protocol/governance"> governance process.</a></li>
+        <li>Update your forum post with the Baklava <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
       </ol>
     </td>
   </tr>
@@ -304,7 +294,6 @@ Deploying a new contract release should occur with the following process. On-cha
       <ol>
         <li>Confirm all contracts working as intended on Baklava.</li>
         <li>Run the <a href="https://docs.celo.org/community/release-process/smart-contracts#build-process">smart contract release script</a> in order to to deploy the contracts to Alfajores as well as submit a governance proposal.</li>
-        <li>Tag the commit that is being proposed with <code>celo-core-contracts-v${N}.alfajores</code></li>
         <li>Update your forum post with the Alfajores <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
       </ol>
     </td>
@@ -316,7 +305,6 @@ Deploying a new contract release should occur with the following process. On-cha
         <li>Confirm all contracts working as intended on Alfajores.</li>
         <li>Confirm audit is complete and make the release notes and forum post contain a link to it.</li>
         <li>On Tuesday: Run the <a href="https://docs.celo.org/community/release-process/smart-contracts#build-process">smart contract release script</a> in order to to deploy the contracts to Mainnet as well as submit a governance proposal.</li>
-        <li>Tag the commit that is being proposed with <code>celo-core-contracts-v${N}.mainnet</code></li>
         <li>Update the corresponding governance proposal with the updated on-chain <code>PROPOSAL_ID</code> and mark CGP status as "PROPOSED".</li>
         <li>Update your forum post with the Mainnet <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
         <li>At this point all stakeholders are encouraged to <a href="#verify-release-process">verify</a> the proposed contracts deployed match the contracts from the release branch.</li>
