@@ -27,14 +27,16 @@ export async function destroyForno(celoEnv: string) {
 }
 
 interface ContextInfoTerraformVars {
-  rpc_service_network_endpoint_group_name: string
+  service_network_endpoint_group_name: string
   zone: string
 }
 
 async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promise<TerraformVars> {
   let gcloudProject: string | undefined
   const getContextInfos = async (
-    port: number
+    port: number,
+    service: string,
+    namespace: string
   ): Promise<{ [context: string]: ContextInfoTerraformVars }> =>
     contexts.reduce(async (aggPromise, context: string) => {
       const agg = await aggPromise
@@ -56,12 +58,10 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
       // context for the cluster yet.
       await clusterManager.switchToClusterContext(true)
       const [output] = await execCmd(
-        `kubectl get svc ${celoEnv}-fullnodes-rpc -n ${celoEnv} -o jsonpath="{.metadata.annotations.cloud\\.google\\.com/neg-status}"`
+        `kubectl get svc ${service} -n ${namespace} -o jsonpath="{.metadata.annotations.cloud\\.google\\.com/neg-status}"`
       )
       if (!output.trim()) {
-        throw Error(
-          `Expected cloud.google.com/neg-status annotation for service ${celoEnv}-fullnodes-rpc`
-        )
+        throw Error(`Expected cloud.google.com/neg-status annotation for service ${service}`)
       }
       const outputParsed = JSON.parse(output)
       if (!outputParsed.network_endpoint_groups[port] || !outputParsed.zones.length) {
@@ -72,7 +72,7 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
       return {
         ...agg,
         [readableContext(context)]: {
-          rpc_service_network_endpoint_group_name: outputParsed.network_endpoint_groups[port],
+          service_network_endpoint_group_name: outputParsed.network_endpoint_groups[port],
           // Only expect a single zone
           zone: outputParsed.zones[0],
         },
@@ -90,15 +90,19 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
     })
   const HTTP_RPC_PORT = 8545
   const WS_RPC_PORT = 8546
-  const contextInfosHttp = await getContextInfos(HTTP_RPC_PORT)
-  const contextInfosWs = await getContextInfos(WS_RPC_PORT)
+  const KONG_RPC_PORT = 80
+  const contextInfosHttp = await getContextInfos(HTTP_RPC_PORT, `${celoEnv}-fullnodes-rpc`, celoEnv)
+  const contextInfosWs = await getContextInfos(WS_RPC_PORT, `${celoEnv}-fullnodes-rpc`, celoEnv)
+  const contextInfosKong = await getContextInfos(KONG_RPC_PORT, 'kong', 'kong')
   const bannedCIDRs = fetchEnv(envVar.FORNO_BANNED_CIDR).split(',')
 
   return {
     backend_max_requests_per_second: '100',
+    backend_max_requests_per_second_kong: '10000',
     celo_env: celoEnv,
     context_info_http: JSON.stringify(contextInfosHttp),
     context_info_ws: JSON.stringify(contextInfosWs),
+    context_info_kong: JSON.stringify(contextInfosKong),
     gcloud_credentials_path: fetchEnv(envVar.GOOGLE_APPLICATION_CREDENTIALS),
     gcloud_project: gcloudProject!,
     ssl_cert_domains: JSON.stringify(domains),

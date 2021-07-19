@@ -1,0 +1,39 @@
+ingress:
+  enabled: true
+  hostname: kong.local
+
+ingressController:
+  ingressClass: kong
+
+postgresql:
+  postgresqlPassword: kong
+
+service:
+  exposeAdmin: true
+  annotations:
+    cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
+
+extraVolumes:
+- name: kong-config
+  configMap:
+    name: kong-config
+
+kong:
+  extraVolumeMounts:
+  - name: kong-config
+    mountPath: /opt/bitnami/kong/conf/kong.conf.backup
+    subPath: kong.conf
+
+  extraEnvVars:
+  - name: KONG_TRUSTED_IPS
+    value: 130.211.0.0/22,35.191.0.0/16,34.120.148.61/32
+  - name: KONG_REAL_IP_HEADER
+    value: X-Forwarded-For
+  - name: KONG_REAL_IP_RECURSIVE
+    value: "on"
+  - name: KONG_PROXY_ACCESS_LOG
+    value: /dev/stdout geth
+  - name: KONG_ADMIN_ACCESS_LOG
+    value: /dev/stdout geth
+  - name: KONG_NGINX_HTTP_LOG_FORMAT
+    value: geth '$remote_addr - $remote_user [$time_local] "$request" $status  $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for" "$remote_addr"'
