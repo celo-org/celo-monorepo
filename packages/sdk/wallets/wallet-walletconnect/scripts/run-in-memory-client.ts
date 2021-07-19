@@ -38,7 +38,8 @@ async function main() {
   }
 
   console.log(`=== START OUT OF BAND URI FOR ${name} ===
-${uri.toString()}
+URI (deep link): ${uri.toString()}
+Valora specific deep link: celo://wallet/wc?uri=${uri.toString()}
 === END OUT OF BAND URI ===`)
   await wallet.init()
 
