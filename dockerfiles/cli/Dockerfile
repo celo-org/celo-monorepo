@@ -34,7 +34,7 @@ ADD https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celo_env}?alt=med
 ADD https://www.googleapis.com/storage/v1/b/static_nodes/o/${celo_env}?alt=media /celo/static-nodes.json
 
 # Build Celocli
-FROM node:10-alpine as node
+FROM node:12-alpine as node
 
 ARG celo_env
 
@@ -46,14 +46,14 @@ WORKDIR /celo-monorepo/
 RUN npm install @celo/celocli
 
 # Build the combined image
-FROM node:10-alpine as final_image
+FROM node:12-alpine as final_image
 
 ARG network_name="alfajores"
 ARG network_id="44787"
 
 # Without musl-dev, geth will fail with a confusing "No such file or directory" error.
 # bash is required for start_geth.sh
-RUN apk update && apk add musl-dev && apk add bash
+RUN apk update && apk add musl-dev && apk add bash eudev-dev
 
 WORKDIR /celo-monorepo/
 
