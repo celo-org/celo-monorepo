@@ -1,5 +1,8 @@
+import { ensureLeading0x } from '@celo/base/lib/address'
+import { BigNumber } from 'bignumber.js'
 import { Connection } from '../connection'
 import { CeloTx } from '../types'
+import { GasPriceStrategy, NodeGasPriceStrategy } from './gas-price-strategy'
 
 function isEmpty(value: string | undefined) {
   return (
@@ -14,6 +17,7 @@ function isEmpty(value: string | undefined) {
 export class TxParamsNormalizer {
   private chainId: number | null = null
   private gatewayFeeRecipient: string | null = null
+  public gasPriceStrategy: GasPriceStrategy = new NodeGasPriceStrategy()
 
   constructor(readonly connection: Connection) {}
 
@@ -33,10 +37,24 @@ export class TxParamsNormalizer {
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
-      txParams.gasPrice = await this.connection.gasPrice(txParams.feeCurrency)
+      txParams.gasPrice = ensureLeading0x((await this.calculateGasPrice(txParams)).toString(16))
     }
 
     return txParams
+  }
+
+  public async calculateGasPrice(celoTxParams: CeloTx): Promise<BigNumber> {
+    let baseGasPrice
+    try {
+      baseGasPrice = new BigNumber(await this.connection.gasPrice(celoTxParams.feeCurrency))
+    } catch {
+      // TODO: remove once stables gasPrice are available on minimumClientVersion node rpc (1.1.0)
+      baseGasPrice = new BigNumber(0)
+    }
+    return this.gasPriceStrategy.caculateGasPrice(
+      { ...celoTxParams }, // Shallow copy to avoid changing parameters
+      baseGasPrice
+    )
   }
 
   private async getChainId(): Promise<number> {

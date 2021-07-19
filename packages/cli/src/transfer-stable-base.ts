@@ -35,7 +35,6 @@ export abstract class TransferStableBase extends BaseCommand {
     } catch {
       failWith(`The ${this._stableCurrency} token was not deployed yet`)
     }
-    await this.kit.updateGasPriceInConnectionLayer(stableToken.address)
 
     const tx = res.flags.comment
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
@@ -48,12 +47,11 @@ export abstract class TransferStableBase extends BaseCommand {
         this.kit.connection.defaultFeeCurrency === stableToken.address,
         async () => {
           const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
-          // TODO: replace with gasPrice rpc once supported by min client version
-          const { gasPrice } = await this.kit.connection.fillGasPrice({
+          const gasPrice = await this.kit.connection.calculateGasPrice({
             gasPrice: '0',
             feeCurrency: stableToken.address,
           })
-          const gasValue = new BigNumber(gas).times(gasPrice as string)
+          const gasValue = new BigNumber(gas).times(gasPrice)
           const balance = await stableToken.balanceOf(from)
           return balance.gte(value.plus(gasValue))
         },
