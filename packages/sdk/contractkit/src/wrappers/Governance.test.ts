@@ -90,7 +90,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       const tx = await governance.upvote(proposalID, upvoter)
       await tx.sendAndWaitForReceipt({ from: upvoter })
       if (shouldTimeTravel) {
-        await timeTravel(expConfig.dequeueFrequency, web3)
+        const duration = await governance.timeToNextDequeue()
+        await timeTravel(duration, web3)
         await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
       }
     }
