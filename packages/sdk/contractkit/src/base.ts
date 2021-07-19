@@ -56,3 +56,25 @@ export const suffixProxy = (contract: CeloContract) =>
   contract.endsWith('Proxy') ? contract : (`${contract}Proxy` as CeloContract)
 
 export const ProxyContracts = AllContracts.map((c) => suffixProxy(c))
+
+export type ContractVersion = {
+  storage: number
+  major: number
+  minor: number
+  patch: number
+  toString?: () => string
+  toRaw?: () => [string, string, string, string]
+}
+export const newContractVersion = (
+  storage: number,
+  major: number,
+  minor: number,
+  patch: number
+): ContractVersion => ({
+  storage,
+  major,
+  minor,
+  patch,
+  toString: () => `${storage}.${major}.${minor}.${patch}`,
+  toRaw: () => [storage.toString(), major.toString(), minor.toString(), patch.toString()],
+})
