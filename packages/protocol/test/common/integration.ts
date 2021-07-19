@@ -626,7 +626,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       )
       await exchangeAbc.initialize(
         registry.address,
-        stableTokenAbc.address,
+        'StableTokenABC',
         '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
         '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
         '300', // updateFrequency, matches mainnet for cUSD and cEUR

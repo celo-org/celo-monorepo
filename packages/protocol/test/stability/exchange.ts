@@ -9,8 +9,8 @@ import {
 import { fixed1, fromFixed, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  ExchangeContract,
-  ExchangeInstance,
+  ExchangeTestContract,
+  ExchangeTestInstance,
   FreezerContract,
   FreezerInstance,
   GoldTokenContract,
@@ -26,7 +26,7 @@ import {
 } from 'types'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
-const Exchange: ExchangeContract = artifacts.require('Exchange')
+const Exchange: ExchangeTestContract = artifacts.require('ExchangeTest')
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
@@ -45,7 +45,7 @@ MockReserve.numberFormat = 'BigNumber'
 GoldToken.numberFormat = 'BigNumber'
 
 contract('Exchange', (accounts: string[]) => {
-  let exchange: ExchangeInstance
+  let exchange: ExchangeTestInstance
   let freezer: FreezerInstance
   let registry: RegistryInstance
   let stableToken: StableTokenInstance
@@ -140,13 +140,17 @@ contract('Exchange', (accounts: string[]) => {
     exchange = await Exchange.new(true)
     await exchange.initialize(
       registry.address,
-      stableToken.address,
+      'StableToken',
       spread,
       reserveFraction,
       updateFrequency,
       minimumReports
     )
+
+    await registry.setAddressFor(CeloContractName.StableToken, stableToken.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
+
+    await exchange.updateBuckets()
   })
 
   describe('#initialize()', () => {
@@ -155,11 +159,15 @@ contract('Exchange', (accounts: string[]) => {
       assert.equal(expectedOwner, accounts[0])
     })
 
+    it('should set stable token identfier', async () => {
+      // TODO:
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         exchange.initialize(
           registry.address,
-          stableToken.address,
+          'StableToken',
           spread,
           reserveFraction,
           updateFrequency,
@@ -355,6 +363,7 @@ contract('Exchange', (accounts: string[]) => {
 
       it(`should return the same value if updateFrequency seconds haven't passed yet`, async () => {
         await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+
         const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
 
         assertEqualBN(sellBucketSize, initialGoldBucket)
@@ -412,7 +421,7 @@ contract('Exchange', (accounts: string[]) => {
       const user = accounts[1]
 
       // This test is run for both the `sell` and `exchange` functions
-      let sellFunction: ExchangeInstance['sell'] | ExchangeInstance['exchange']
+      let sellFunction: ExchangeTestInstance['sell'] | ExchangeTestInstance['exchange']
       beforeEach(() => {
         sellFunction = exchange[sellFunctionName]
       })
@@ -580,7 +589,7 @@ contract('Exchange', (accounts: string[]) => {
 
           beforeEach(async () => {
             await fundReserve()
-            await timeTravel(updateFrequency, web3)
+            await timeTravel(updateFrequency * 2, web3)
             await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
           })
 
