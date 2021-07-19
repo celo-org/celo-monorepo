@@ -17,7 +17,6 @@
     "reset-yarn": "yarn cache clean",
     "test": "yarn run lerna run test",
     "build": "yarn run lerna run build",
-    "build:wallet": "yarn build --scope @celo/mobile --include-filtered-dependencies && cd packages/mobile/ios && bundle exec pod install && cd ../../..",
     "docs": "yarn run lerna run docs",
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
     "report-coverage": "yarn run lerna run test-coverage",
