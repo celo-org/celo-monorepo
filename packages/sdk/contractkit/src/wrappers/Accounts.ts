@@ -307,6 +307,26 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     )
   }
 
+  async authorizeSignerWithSignature(
+    signer: Address,
+    role: string,
+    v: number,
+    r: string,
+    s: string
+  ) {
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.authorizeSignerWithSignature(signer, keccak256(role), v, r, s)
+    )
+  }
+
+  async setIndexedSigner(signer: Address, role: string) {
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.setIndexedSigner(signer, keccak256(role))
+    )
+  }
+
   async startSignerAuthorization(signer: Address, role: string) {
     return toTransactionObject(
       this.kit.connection,
@@ -321,10 +341,11 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     )
   }
 
-  async generateProofOfKeyPossession(account: Address, signer: Address) {
-    return this.getParsedSignatureOfAddress(
+  async generateProofOfKeyPossession(account: Address, signer: Address, role: string) {
+    return this.getParsedSignatureOfAddressWithRole(
       account,
       signer,
+      role,
       NativeSigner(this.kit.connection.web3.eth.sign, signer)
     )
   }
@@ -459,6 +480,17 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
     const hash = soliditySha3({ type: 'address', value: address })
+    const signature = await signerFn.sign(hash!)
+    return parseSignature(hash!, signature, signer)
+  }
+
+  private async getParsedSignatureOfAddressWithRole(
+    address: Address,
+    signer: string,
+    role: string,
+    signerFn: Signer
+  ) {
+    const hash = soliditySha3({ type: 'address', value: address }, { type: 'role', value: role })
     const signature = await signerFn.sign(hash!)
     return parseSignature(hash!, signature, signer)
   }

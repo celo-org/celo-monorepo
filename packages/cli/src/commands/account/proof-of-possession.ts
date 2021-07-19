@@ -1,4 +1,5 @@
 import { serializeSignature } from '@celo/utils/lib/signatureUtils'
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -16,10 +17,16 @@ export default class ProofOfPossession extends BaseCommand {
       required: true,
       description: 'Address of the account that needs to prove possession of the signer key.',
     }),
+    role: flags.string({
+      char: 'r',
+      options: ['vote', 'validator', 'attestation'],
+      description: 'Role to delegate',
+      required: false,
+    }),
   }
 
   static examples = [
-    'proof-of-possession --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb',
+    'proof-of-possession --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --role validator',
   ]
 
   async run() {
