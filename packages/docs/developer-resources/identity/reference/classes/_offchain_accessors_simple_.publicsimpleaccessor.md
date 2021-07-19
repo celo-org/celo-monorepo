@@ -39,15 +39,15 @@ in a type parameter is supported for runtime type safety.
 
 ###  constructor
 
-\+ **new PublicSimpleAccessor**(`wrapper`: [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹DataType›, `dataPath`: string): *[PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md)*
+\+ **new PublicSimpleAccessor**(`wrapper`: [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹DataType›, `dataPath`: string): *[PublicSimpleAccessor](_offchain_accessors_simple_.publicsimpleaccessor.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L17)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L23)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`wrapper` | [OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md) |
+`wrapper` | [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md) |
 `type` | Type‹DataType› |
 `dataPath` | string |
 
@@ -59,7 +59,7 @@ Name | Type |
 
 • **dataPath**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L21)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L27)*
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 *Implementation of [PublicAccessor](../interfaces/_offchain_accessors_interfaces_.publicaccessor.md).[read](../interfaces/_offchain_accessors_interfaces_.publicaccessor.md#read)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L61)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L67)*
 
 #### Type declaration:
 
@@ -87,15 +87,15 @@ ___
 
 • **type**: *Type‹DataType›*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L20)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L26)*
 
 ___
 
 ### `Readonly` wrapper
 
-• **wrapper**: *[OffchainDataWrapper](_offchain_data_wrapper_.offchaindatawrapper.md)*
+• **wrapper**: *[OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L19)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L25)*
 
 ## Methods
 
@@ -103,7 +103,7 @@ ___
 
 ▸ **readAsResult**(`account`: Address): *Promise‹Result‹DataType, [SchemaErrors](../modules/_offchain_accessors_errors_.md#schemaerrors)››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L46)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L52)*
 
 **Parameters:**
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **write**(`data`: DataType): *Promise‹undefined | [InvalidDataError](_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_offchain_accessors_errors_.offchainerror.md)‹››*
 
-*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L30)*
+*Defined in [packages/sdk/identity/src/offchain/accessors/simple.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/accessors/simple.ts#L36)*
 
 **Parameters:**
 

@@ -8,7 +8,15 @@
 
 ### Classes
 
-* [OffchainDataWrapper](../classes/_offchain_data_wrapper_.offchaindatawrapper.md)
+* [BasicDataWrapper](../classes/_offchain_data_wrapper_.basicdatawrapper.md)
+* [FetchError](../classes/_offchain_data_wrapper_.fetcherror.md)
+* [InvalidSignature](../classes/_offchain_data_wrapper_.invalidsignature.md)
+* [NoStorageProvider](../classes/_offchain_data_wrapper_.nostorageprovider.md)
+* [NoStorageRootProvidedData](../classes/_offchain_data_wrapper_.nostoragerootprovideddata.md)
+
+### Interfaces
+
+* [OffchainDataWrapper](../interfaces/_offchain_data_wrapper_.offchaindatawrapper.md)
 
 ### Type aliases
 
@@ -18,6 +26,6 @@
 
 ###  OffchainErrors
 
-Ƭ **OffchainErrors**: *FetchError | InvalidSignature | NoStorageRootProvidedData | NoStorageProvider*
+Ƭ **OffchainErrors**: *[FetchError](../classes/_offchain_data_wrapper_.fetcherror.md) | [InvalidSignature](../classes/_offchain_data_wrapper_.invalidsignature.md) | [NoStorageRootProvidedData](../classes/_offchain_data_wrapper_.nostoragerootprovideddata.md) | [NoStorageProvider](../classes/_offchain_data_wrapper_.nostorageprovider.md)*
 
-*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L48)*
+*Defined in [packages/sdk/identity/src/offchain-data-wrapper.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain-data-wrapper.ts#L52)*

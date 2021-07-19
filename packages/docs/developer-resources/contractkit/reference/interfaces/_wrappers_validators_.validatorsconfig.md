@@ -9,6 +9,7 @@
 ### Properties
 
 * [commissionUpdateDelay](_wrappers_validators_.validatorsconfig.md#commissionupdatedelay)
+* [downtimeGracePeriod](_wrappers_validators_.validatorsconfig.md#downtimegraceperiod)
 * [groupLockedGoldRequirements](_wrappers_validators_.validatorsconfig.md#grouplockedgoldrequirements)
 * [maxGroupSize](_wrappers_validators_.validatorsconfig.md#maxgroupsize)
 * [membershipHistoryLength](_wrappers_validators_.validatorsconfig.md#membershiphistorylength)
@@ -22,6 +23,14 @@
 • **commissionUpdateDelay**: *BigNumber*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L63)*
+
+___
+
+###  downtimeGracePeriod
+
+• **downtimeGracePeriod**: *BigNumber*
+
+*Defined in [contractkit/src/wrappers/Validators.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L64)*
 
 ___
 

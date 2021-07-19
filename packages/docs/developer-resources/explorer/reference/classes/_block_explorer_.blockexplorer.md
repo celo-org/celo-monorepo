@@ -151,7 +151,7 @@ ___
 
 ###  updateContractDetailsMapping
 
-▸ **updateContractDetailsMapping**(`name`: string, `address`: string): *Promise‹void›*
+▸ **updateContractDetailsMapping**(`name`: CeloContract, `address`: string): *Promise‹void›*
 
 *Defined in [block-explorer.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L60)*
 
@@ -159,7 +159,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`name` | CeloContract |
 `address` | string |
 
 **Returns:** *Promise‹void›*

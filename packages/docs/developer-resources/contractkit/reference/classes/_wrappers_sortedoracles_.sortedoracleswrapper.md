@@ -118,7 +118,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L106)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L107)*
 
 Returns the report expiry parameter.
 
@@ -154,7 +154,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[SortedOraclesConfig](../interfaces/_wrappers_sortedoracles_.sortedoraclesconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:194](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L194)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:198](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L198)*
 
 Returns current configuration parameters.
 
@@ -166,7 +166,7 @@ ___
 
 ▸ **getHumanReadableConfig**(): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:204](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L204)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:208](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L208)*
 
 **`dev`** Returns human readable configuration of the sortedoracles contract
 
@@ -180,7 +180,7 @@ ___
 
 ▸ **getOracles**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹Address[]›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L97)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L98)*
 
 Returns the list of whitelisted oracles for a given target
 
@@ -221,7 +221,7 @@ ___
 
 ▸ **getRates**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹[OracleRate](../interfaces/_wrappers_sortedoracles_.oraclerate.md)[]›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:222](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L222)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L226)*
 
 Gets all elements from the doubly linked list.
 
@@ -241,7 +241,7 @@ ___
 
 ▸ **getReports**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹[OracleReport](../interfaces/_wrappers_sortedoracles_.oraclereport.md)[]›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L257)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:261](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L261)*
 
 **Parameters:**
 
@@ -257,7 +257,7 @@ ___
 
 ▸ **getStableTokenRates**(): *Promise‹[OracleRate](../interfaces/_wrappers_sortedoracles_.oraclerate.md)[]›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L215)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:219](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L219)*
 
 Helper function to get the rates for StableToken, by passing the address
 of StableToken to `getRates`.
@@ -270,7 +270,7 @@ ___
 
 ▸ **getTimestamps**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹[OracleTimestamp](../interfaces/_wrappers_sortedoracles_.oracletimestamp.md)[]›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L242)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:246](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L246)*
 
 Gets all elements from the doubly linked list.
 
@@ -290,7 +290,7 @@ ___
 
 ▸ **getTokenReportExpirySeconds**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹BigNumber›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L117)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L118)*
 
 Returns the expiry for the target if exists, if not the default.
 
@@ -310,7 +310,7 @@ ___
 
 ▸ **isOldestReportExpired**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹[boolean, Address]›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:127](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L127)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L128)*
 
 Checks if the oldest report for a given target is expired
 
@@ -328,7 +328,7 @@ ___
 
 ▸ **isOracle**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget), `oracle`: Address): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L87)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L88)*
 
 Checks if the given address is whitelisted as an oracle for the target
 
@@ -349,7 +349,7 @@ ___
 
 ▸ **medianRate**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹[MedianRate](../interfaces/_wrappers_sortedoracles_.medianrate.md)›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L73)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L74)*
 
 Returns the median rate for the given target
 
@@ -370,7 +370,7 @@ ___
 
 ▸ **numRates**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget)): *Promise‹number›*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L61)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L62)*
 
 Gets the number of rates that have been reported for the given target
 
@@ -390,7 +390,7 @@ ___
 
 ▸ **removeExpiredReports**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget), `numReports?`: undefined | number): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L140)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:141](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L141)*
 
 Removes expired reports, if any exist
 
@@ -409,7 +409,7 @@ ___
 
 ▸ **report**(`target`: [ReportTarget](../modules/_wrappers_sortedoracles_.md#reporttarget), `value`: BigNumber.Value, `oracleAddress`: Address): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:159](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L159)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L160)*
 
 Updates an oracle value and the median.
 
@@ -427,17 +427,18 @@ ___
 
 ###  reportStableToken
 
-▸ **reportStableToken**(`value`: BigNumber.Value, `oracleAddress`: Address): *Promise‹CeloTransactionObject‹void››*
+▸ **reportStableToken**(`value`: BigNumber.Value, `oracleAddress`: Address, `token`: [StableToken](../enums/_base_.celocontract.md#stabletoken)): *Promise‹CeloTransactionObject‹void››*
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:184](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L184)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:187](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L187)*
 
 Updates an oracle value and the median.
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`value` | BigNumber.Value | The amount of US Dollars equal to one CELO.  |
-`oracleAddress` | Address | - |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`value` | BigNumber.Value | - | The amount of US Dollars equal to one CELO. |
+`oracleAddress` | Address | - | The address to report as |
+`token` | [StableToken](../enums/_base_.celocontract.md#stabletoken) | StableToken.cUSD | The token to report for  |
 
 **Returns:** *Promise‹CeloTransactionObject‹void››*

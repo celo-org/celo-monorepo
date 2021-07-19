@@ -20,7 +20,7 @@
 
 • **currentThreshold**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L61)*
+*Defined in [contractkit/src/wrappers/Election.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L66)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **electabilityThreshold**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L58)*
+*Defined in [contractkit/src/wrappers/Election.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L63)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **electableValidators**: *[ElectableValidators](_wrappers_election_.electablevalidators.md)*
 
-*Defined in [contractkit/src/wrappers/Election.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L57)*
+*Defined in [contractkit/src/wrappers/Election.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L62)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **maxNumGroupsVotedFor**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L59)*
+*Defined in [contractkit/src/wrappers/Election.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L64)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **totalVotes**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L60)*
+*Defined in [contractkit/src/wrappers/Election.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L65)*

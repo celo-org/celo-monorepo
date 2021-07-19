@@ -57,7 +57,7 @@ ___
 
 ▸ **addressMapping**(): *Promise‹Map‹[CeloContract](../enums/_base_.celocontract.md), string››*
 
-*Defined in [contractkit/src/address-registry.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L47)*
+*Defined in [contractkit/src/address-registry.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L46)*
 
 Get the address mapping for known registered contracts
 
