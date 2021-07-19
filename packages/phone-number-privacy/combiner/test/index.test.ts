@@ -72,7 +72,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
     blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
     account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
-    timestamp: Date.now(),
   }
 
   beforeEach(() => {
