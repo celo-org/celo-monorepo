@@ -191,7 +191,7 @@ fi
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1200 }} \
+      --maxpeers={{- if kindIs "invalid" .maxpeers -}}1200{{- else -}}{{- .maxpeers -}}{{- end }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \

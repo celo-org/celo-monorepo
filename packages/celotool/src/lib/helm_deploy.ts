@@ -24,7 +24,12 @@ import {
 } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { buildGethAll, checkoutGethRepo, retrieveBootnodeIPAddress } from './geth'
+import {
+  buildGethAll,
+  checkoutGethRepo,
+  getEnodesWithExternalIPAddresses,
+  retrieveBootnodeIPAddress,
+} from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -755,6 +760,9 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
+
   const gethMetricsOverrides =
     fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === 'true'
       ? [
@@ -783,6 +791,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   )
 
   return [
+    `-f ${valueFilePath}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
@@ -1102,6 +1111,26 @@ function rollingUpdateHelmVariables() {
       '0'
     )}`,
   ]
+}
+
+export async function saveHelmValuesFile(
+  celoEnv: string,
+  valueFilePath: string,
+  useExistingGenesis: boolean
+) {
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
+
+  const valueFileContent = `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+staticnodes:
+  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
 const celoBlockchainDir: string = path.join(os.tmpdir(), 'celo-blockchain-celotool')

@@ -56,7 +56,7 @@ geth:
     imagePullPolicy: IfNotPresent
   resources:
     requests:
-      memory: "8Gi"
+      memory: "6Gi"
       cpu: "3"
     # limits:
     #   memory: "1Gi"
