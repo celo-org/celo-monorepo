@@ -34,7 +34,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-remote_write: []
+remote_write: {}
 # - url: https://prometheus-us-central1.grafana.net/api/prom/push
 #   basic_auth:
 #     username: 51505
