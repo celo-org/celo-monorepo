@@ -287,7 +287,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async authorizeSigner(signer: Address, role: string) {
-    this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     const [accounts, chainId, accountsContract] = await Promise.all([
       this.kit.connection.getAccounts(),
       this.kit.connection.chainId(),
@@ -312,7 +312,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async startSignerAuthorization(signer: Address, role: string) {
-    this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.authorizeSigner(signer, keccak256(role))
@@ -320,7 +320,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async completeSignerAuthorization(account: Address, role: string) {
-    this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.completeSignerAuthorization(account, keccak256(role))

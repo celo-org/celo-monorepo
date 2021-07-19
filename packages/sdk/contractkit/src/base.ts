@@ -56,7 +56,7 @@ export const suffixProxy = (contract: CeloContract) =>
 
 export const ProxyContracts = AllContracts.map((c) => suffixProxy(c))
 
-export type ContractVersion = {
+export interface ContractVersion {
   storage: number
   major: number
   minor: number

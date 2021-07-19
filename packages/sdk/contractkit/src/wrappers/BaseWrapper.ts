@@ -44,10 +44,10 @@ export abstract class BaseWrapper<T extends Contract> {
       const raw = await this.contract.methods.getVersionNumber().call()
       // @ts-ignore
       this._version = newContractVersion(
-        parseInt(raw[0]),
-        parseInt(raw[1]),
-        parseInt(raw[2]),
-        parseInt(raw[3])
+        parseInt(raw[0], 10),
+        parseInt(raw[1], 10),
+        parseInt(raw[2], 10),
+        parseInt(raw[3], 10)
       )
     }
     return this._version!

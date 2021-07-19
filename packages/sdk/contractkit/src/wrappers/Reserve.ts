@@ -111,7 +111,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   isOtherReserveAddress = proxyCall(this.contract.methods.isOtherReserveAddress)
 
   async getSpenders(): Promise<Address[]> {
-    this.onlyVersionOrGreater(newContractVersion(1, 1, 2, 1))
+    await this.onlyVersionOrGreater(newContractVersion(1, 1, 2, 1))
     return this.contract.methods.getExchangeSpenders().call()
   }
 }
