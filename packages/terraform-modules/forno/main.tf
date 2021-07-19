@@ -105,7 +105,7 @@ resource "random_id" "ssl_random_suffix" {
   keepers = {
     domains = join(",", var.ssl_cert_domains)
   }
-}:
+}
 
 resource "google_compute_url_map" "url_map" {
   name            = "${var.celo_env}-forno-url-map"
