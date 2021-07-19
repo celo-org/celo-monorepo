@@ -1,6 +1,6 @@
 {
   "name": "@celo/attestation-service",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Issues attestation messages for Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

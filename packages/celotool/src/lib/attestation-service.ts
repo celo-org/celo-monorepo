@@ -49,6 +49,7 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.twilio.accountSid="${fetchEnv(envVar.TWILIO_ACCOUNT_SID)}"`,
     `--set attestation_service.twilio.authToken="${fetchEnv(envVar.TWILIO_ACCOUNT_AUTH_TOKEN)}"`,
     `--set attestation_service.twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
+    `--set attestation_service.twilio.verifySid="${fetchEnv(envVar.TWILIO_VERIFY_SERVICE_SID)}"`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
     `--set attestation_service.telekom.apiKey="${fetchEnv(envVar.TELEKOM_API_KEY)}"`,

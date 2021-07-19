@@ -130,9 +130,11 @@ spec:
         args:
         - "-c"
         - |
+          RID=`cat /root/.celo/replica_id`
+          export DATABASE_URL=$DATABASE_URL_PREFIX$DATABASE_NAME
+          yarn sequelize db:create $DATABASE_NAME
           yarn db:migrate
           sleep 5
-          RID=`cat /root/.celo/replica_id`
           NEXMO_APPLICATIONS={{- range $index, $application := .Values.attestation_service.nexmo.applications -}}{{ $application }},{{- end }}
           NEXMO_APPLICATION=`echo -n $NEXMO_APPLICATIONS | cut -d ',' -f $((RID + 1))` ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` exec yarn start
         ports:
@@ -143,8 +145,12 @@ spec:
             cpu: 50m
             memory: 150Mi
         env:
-        - name: DATABASE_URL
-          value: postgres://postgres:password@{{ .Release.Namespace }}-attestation-service-postgresql:5432/AttestationService
+        - name: DATABASE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: DATABASE_URL_PREFIX
+          value: postgres://postgres:password@{{ .Release.Namespace }}-attestation-service-postgresql:5432/
         - name: NODE_ENV
           value: production
         - name: CELO_PROVIDER
@@ -182,6 +188,11 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}
               key: TWILIO_MESSAGING_SERVICE_SID
+        - name: TWILIO_VERIFY_SERVICE_SID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: TWILIO_VERIFY_SERVICE_SID
         - name: TWILIO_AUTH_TOKEN
           valueFrom:
             secretKeyRef:

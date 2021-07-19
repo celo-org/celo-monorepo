@@ -28,6 +28,7 @@ module "celo_cluster" {
   celo_image_attestation       = var.celo_image_attestation
   ethstats_host                = var.ethstats_host
   twilio_messaging_service_sid = var.twilio_messaging_service_sid
+  twilio_verify_service_sid    = var.twilio_verify_service_sid
   twilio_account_sid           = var.twilio_account_sid
   twilio_unsupported_regions   = var.twilio_unsupported_regions
   twilio_auth_token            = var.twilio_auth_token

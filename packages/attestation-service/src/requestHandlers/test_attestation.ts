@@ -54,8 +54,10 @@ export async function handleTestAttestationRequest(
       key,
       testRequest.phoneNumber,
       testRequest.message,
-      null,
+      '12345678',
       testRequest.message,
+      undefined,
+      undefined,
       logger,
       sequelizeLogger,
       testRequest.provider

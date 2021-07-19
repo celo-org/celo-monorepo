@@ -203,6 +203,8 @@ export async function startSendSms(
   messageToSend: string,
   securityCode: string | null = null,
   attestationCode: string | null = null,
+  appSignature: string | undefined,
+  language: string | undefined,
   logger: Logger,
   sequelizeLogger: SequelizeLogger,
   onlyUseProvider: string | null = null
@@ -243,6 +245,8 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
+        appSignature,
+        language,
       },
       transaction
     )
@@ -285,6 +289,9 @@ export async function startSendSms(
 // immediately if there are sufficient attempts remaining.
 export async function rerequestAttestation(
   key: AttestationKey,
+  appSignature: string | undefined,
+  language: string | undefined,
+  securityCodePrefix: string,
   logger: Logger,
   sequelizeLogger: SequelizeLogger
 ): Promise<AttestationModel> {
@@ -300,6 +307,18 @@ export async function rerequestAttestation(
     attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
     if (!attestation) {
       throw new Error('Cannot retrieve attestation')
+    }
+    // For backward compatibility
+    // Can be removed after 1.3.0
+    if (!attestation.appSignature) {
+      attestation.appSignature = appSignature
+    }
+    if (!attestation.language) {
+      attestation.language = language
+    }
+    // Old security code approach did not store the prefix
+    if (attestation.securityCode?.length === 7) {
+      attestation.securityCode = `${securityCodePrefix}${attestation.securityCode}`
     }
 
     if (attestation.completedAt) {

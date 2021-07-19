@@ -71,6 +71,7 @@ attestation_service_credentials = {
     nexmo_unsupported_regions    = "CU,SY,KP,IR,SD"
     twilio_account_sid           = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     twilio_messaging_service_sid = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    twilio_verify_service_sid    = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     twilio_auth_token            = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     twilio_blacklist             = "CU,SY,KP,IR,SD"
     twilio_unsupported_regions   = "CU,SY,KP,IR,SD"
