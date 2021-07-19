@@ -6,7 +6,7 @@ import express from 'express'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { ErrorMessages, respondWithAttestation, respondWithError } from '../request'
 import { startSendSms } from '../sms'
-import { obfuscateNumber } from '../sms/base'
+import { obfuscateNumber } from '../utils/phone_number'
 
 export async function handleTestAttestationRequest(
   _req: express.Request,

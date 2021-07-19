@@ -14,14 +14,16 @@ import {
   SequelizeLogger,
 } from '../db'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
+import { issueAttestationPhoneNumberTypeCredential } from '../lookup'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
-import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
+import { obfuscateNumber } from '../utils/phone_number'
+import { SmsProvider, SmsProviderType } from './base'
 import { MessageBirdSmsProvider } from './messagebird'
-import { NexmoSmsProvider } from './nexmo'
 import { TelekomSmsProvider } from './telekom'
 import { TwilioSmsProvider } from './twilio'
+import { VonageSmsProvider } from './vonage'
 
 // Maximum delivery attempts (including first) regardless of provider
 const maxDeliveryAttempts = parseInt(
@@ -98,11 +100,11 @@ export async function initializeSmsProviders(
         smsProviders.push(messageBirdProvider)
         smsProvidersByType[SmsProviderType.MESSAGEBIRD] = messageBirdProvider
         break
-      case SmsProviderType.NEXMO:
-        const nexmoProvider = NexmoSmsProvider.fromEnv()
-        await nexmoProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
-        smsProviders.push(nexmoProvider)
-        smsProvidersByType[SmsProviderType.NEXMO] = nexmoProvider
+      case SmsProviderType.VONAGE:
+        const vonageProvider = VonageSmsProvider.fromEnv()
+        await vonageProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
+        smsProviders.push(vonageProvider)
+        smsProvidersByType[SmsProviderType.VONAGE] = vonageProvider
         break
       case SmsProviderType.TWILIO:
         const twilioProvider = TwilioSmsProvider.fromEnv()
@@ -217,7 +219,6 @@ export async function startSendSms(
 
   try {
     const parsedNumber = phoneUtil.parse(phoneNumber)
-    const numberType = parsedNumber ? phoneUtil.getNumberType(parsedNumber) : null
     const countryCode = parsedNumber ? phoneUtil.getRegionCodeForNumber(parsedNumber) : null
 
     let providers: SmsProvider[] = countryCode
@@ -228,6 +229,8 @@ export async function startSendSms(
       // If onlyUseProvider is specified, filter returned list to make it only item.
       providers = providers.filter((provider) => provider.type === onlyUseProvider!)
     }
+
+    const numberType = parsedNumber ? phoneUtil.getNumberType(parsedNumber) : null
 
     attestation = await findOrCreateAttestation(
       key,
@@ -246,6 +249,17 @@ export async function startSendSms(
       },
       transaction
     )
+
+    try {
+      // Issues verifiable credential for phone number type
+      const verifiableCredential = await issueAttestationPhoneNumberTypeCredential(
+        attestation,
+        logger
+      )
+      attestation.credentials = `[${verifiableCredential}]`
+    } catch (e) {
+      logger.error({ e: e.message })
+    }
 
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()

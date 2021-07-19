@@ -111,7 +111,7 @@ The repository has the following packages (sub projects):
 - [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
 - [blockchain-api](packages/blockchain-api) - service that uses Blockscout to present view of transactions by account for Celo Wallet activity feed
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
-- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/getting-started/using-the-cli))
+- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [contractkit](packages/contractkit) - library to help developers and validators interact with the protocol and it's smart contracts ([docs](https://docs.celo.org/celo-sdk/contractkit))
 - [dappkit](packages/dappkit) - set of functions for mobile DApps to work with the wallet app (ex. sign transactions and access the user's account) ([docs](https://docs.celo.org/celo-sdk/dappkit))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency

@@ -9,6 +9,7 @@
 ### Properties
 
 * [address](_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md#address)
+* [pepper](_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md#pepper)
 * [phoneNumber](_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md#phonenumber)
 * [status](_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md#status)
 * [type](_packages_sdk_utils_src_dappkit_.accountauthresponsesuccess.md#type)
@@ -20,6 +21,14 @@
 • **address**: *string*
 
 *Defined in [packages/sdk/utils/src/dappkit.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L40)*
+
+___
+
+###  pepper
+
+• **pepper**: *string | undefined*
+
+*Defined in [packages/sdk/utils/src/dappkit.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L42)*
 
 ___
 

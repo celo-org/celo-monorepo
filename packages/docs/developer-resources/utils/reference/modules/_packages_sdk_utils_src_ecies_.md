@@ -33,7 +33,7 @@
 
 ▸ **AES128Decrypt**(`encryptionKey`: Buffer, `iv`: Buffer, `ciphertext`: Buffer): *Buffer‹›*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L100)*
+*Defined in [packages/sdk/utils/src/ecies.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L98)*
 
 AES-128 CTR decrypt
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **AES128DecryptAndHMAC**(`encryptionKey`: Buffer, `macKey`: Buffer, `ciphertext`: Buffer): *Buffer*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L115)*
+*Defined in [packages/sdk/utils/src/ecies.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L113)*
 
 AES-128 CTR decrypt with message authentication
 
@@ -121,7 +121,7 @@ ___
 
 ▸ **Decrypt**(`privKey`: Buffer, `encrypted`: Buffer): *Buffer‹›*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L166)*
+*Defined in [packages/sdk/utils/src/ecies.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L160)*
 
 ECIES decrypt
 
@@ -142,7 +142,7 @@ ___
 
 ▸ **Encrypt**(`pubKeyTo`: Buffer, `plaintext`: Buffer): *Buffer‹›*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L140)*
+*Defined in [packages/sdk/utils/src/ecies.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L136)*
 
 ECIES encrypt
 
@@ -163,28 +163,28 @@ Encrypted message, serialized, 113+ bytes
 
 ### ▪ **ECIES**: *object*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:183](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L183)*
+*Defined in [packages/sdk/utils/src/ecies.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L175)*
 
 ###  AES128DecryptAndHMAC
 
 • **AES128DecryptAndHMAC**: *[AES128DecryptAndHMAC](_packages_sdk_utils_src_ecies_.md#aes128decryptandhmac)*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:187](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L187)*
+*Defined in [packages/sdk/utils/src/ecies.ts:179](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L179)*
 
 ###  AES128EncryptAndHMAC
 
 • **AES128EncryptAndHMAC**: *[AES128EncryptAndHMAC](_packages_sdk_utils_src_ecies_.md#aes128encryptandhmac)*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:186](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L186)*
+*Defined in [packages/sdk/utils/src/ecies.ts:178](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L178)*
 
 ###  Decrypt
 
 • **Decrypt**: *[Decrypt](_packages_sdk_utils_src_ecies_.md#decrypt)*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:185](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L185)*
+*Defined in [packages/sdk/utils/src/ecies.ts:177](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L177)*
 
 ###  Encrypt
 
 • **Encrypt**: *[Encrypt](_packages_sdk_utils_src_ecies_.md#encrypt)*
 
-*Defined in [packages/sdk/utils/src/ecies.ts:184](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L184)*
+*Defined in [packages/sdk/utils/src/ecies.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L176)*

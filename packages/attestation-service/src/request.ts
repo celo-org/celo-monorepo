@@ -1,4 +1,4 @@
-import { AttestationResponseType } from '@celo/utils/lib/io'
+import { AttestationResponseType, VerifiableCredentialResponseType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
@@ -102,6 +102,20 @@ export function respondWithAttestation(
         ? attestation.completedAt!.getTime() - attestation.createdAt.getTime()
         : undefined,
       attestationCode: attestationCode ?? undefined,
+      phoneNumberType: attestation.phoneNumberType,
+      credentials: attestation.credentials,
+    })
+  )
+}
+
+export function respondWithVerifiableCredential(res: express.Response, verifiableCredential: any) {
+  res.status(200).json(
+    VerifiableCredentialResponseType.encode({
+      success: true,
+      account: verifiableCredential.credentialSubject.id,
+      issuer: verifiableCredential.issuer,
+      phoneNumberType: verifiableCredential.credentialSubject.phoneNumberType,
+      credentials: [verifiableCredential],
     })
   )
 }

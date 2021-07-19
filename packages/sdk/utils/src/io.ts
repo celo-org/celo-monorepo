@@ -95,10 +95,18 @@ export const AttestationServiceStatusResponseType = t.type({
 export const AttestationServiceTestRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   message: t.string,
+  account: AddressType,
   signature: SignatureType,
   provider: t.union([t.string, t.undefined]),
 })
 export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>
+
+export const VerifiableCredentialRequestType = t.type({
+  issuer: AddressType,
+  account: AddressType,
+  identifier: t.string,
+})
+export type VerifiableCredentialRequest = t.TypeOf<typeof VerifiableCredentialRequestType>
 
 export type Signature = t.TypeOf<typeof SignatureType>
 export type Address = t.TypeOf<typeof AddressType>
@@ -150,6 +158,8 @@ export const AttestationResponseType = t.type({
   status: t.union([t.undefined, t.string]),
   attempt: t.union([t.undefined, t.number]),
   countryCode: t.union([t.undefined, t.string]),
+  phoneNumberType: t.union([t.undefined, t.string]),
+  credentials: t.union([t.undefined, t.string]),
 
   // Time to receive eventual delivery/failure (inc retries)
   duration: t.union([t.undefined, t.number]),
@@ -163,3 +173,16 @@ export const AttestationResponseType = t.type({
 })
 
 export type AttestationResponse = t.TypeOf<typeof AttestationResponseType>
+
+export const VerifiableCredentialResponseType = t.type({
+  // Always returned in 1.0.x
+  success: t.boolean,
+
+  // New fields
+  account: t.union([t.undefined, AddressType]),
+  issuer: t.union([t.undefined, AddressType]),
+  phoneNumberType: t.union([t.undefined, t.string]),
+  credentials: t.union([t.undefined, t.array(t.string)]),
+})
+
+export type VerifiableCredentialResponse = t.TypeOf<typeof VerifiableCredentialResponseType>

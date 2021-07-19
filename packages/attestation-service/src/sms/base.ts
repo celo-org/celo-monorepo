@@ -24,7 +24,7 @@ export abstract class SmsProvider {
 }
 
 export enum SmsProviderType {
-  NEXMO = 'nexmo',
+  VONAGE = 'nexmo',
   UNKNOWN = 'unknown',
   TWILIO = 'twilio',
   MESSAGEBIRD = 'messagebird',
@@ -40,12 +40,4 @@ export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {
         .filter((code) => code !== '')
     )
     .reduce((acc, v) => acc.concat(v), [])
-}
-
-export function obfuscateNumber(phoneNumber: string): string {
-  try {
-    return phoneNumber.slice(0, 7) + '...'
-  } catch {
-    return ''
-  }
 }

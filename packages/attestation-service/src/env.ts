@@ -5,18 +5,22 @@ if (process.env.CONFIG) {
   dotenv.config({ path: process.env.CONFIG })
 }
 
+const checkEnv = (name: string) =>
+  (process.env[name] === undefined || process.env[name] === '') &&
+  (process.env[name.toLowerCase()] === undefined || process.env[name.toLowerCase()] === '')
+
 export function fetchEnv(name: string): string {
-  if (process.env[name] === undefined || process.env[name] === '') {
+  if (checkEnv(name)) {
     console.error(`ENV var '${name}' was not defined`)
     throw new Error(`ENV var '${name}' was not defined`)
   }
-  return process.env[name] as string
+  return (process.env[name] || process.env[name.toLowerCase()]) as string
 }
 
 export function fetchEnvOrDefault(name: string, defaultValue: string): string {
-  return process.env[name] === undefined || process.env[name] === ''
+  return checkEnv(name)
     ? defaultValue
-    : (process.env[name] as string)
+    : ((process.env[name] || process.env[name.toLowerCase()]) as string)
 }
 
 export function isYes(value: string) {

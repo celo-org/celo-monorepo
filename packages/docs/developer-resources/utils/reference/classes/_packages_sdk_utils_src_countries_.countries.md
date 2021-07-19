@@ -28,7 +28,7 @@
 
 \+ **new Countries**(`language?`: undefined | string): *[Countries](_packages_sdk_utils_src_countries_.countries.md)*
 
-*Defined in [packages/sdk/utils/src/countries.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L39)*
+*Defined in [packages/sdk/utils/src/countries.ts:41](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L41)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ Name | Type |
 
 • **countryMap**: *Map‹string, [LocalizedCountry](../interfaces/_packages_sdk_utils_src_countries_.localizedcountry.md)›*
 
-*Defined in [packages/sdk/utils/src/countries.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L38)*
+*Defined in [packages/sdk/utils/src/countries.ts:40](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L40)*
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • **language**: *string*
 
-*Defined in [packages/sdk/utils/src/countries.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L37)*
+*Defined in [packages/sdk/utils/src/countries.ts:39](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L39)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • **localizedCountries**: *[LocalizedCountry](../interfaces/_packages_sdk_utils_src_countries_.localizedcountry.md)[]*
 
-*Defined in [packages/sdk/utils/src/countries.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L39)*
+*Defined in [packages/sdk/utils/src/countries.ts:41](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L41)*
 
 ## Methods
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **getCountry**(`countryName?`: string | null): *[LocalizedCountry](../interfaces/_packages_sdk_utils_src_countries_.localizedcountry.md) | undefined*
 
-*Defined in [packages/sdk/utils/src/countries.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L49)*
+*Defined in [packages/sdk/utils/src/countries.ts:51](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L51)*
 
 **Parameters:**
 
@@ -84,7 +84,7 @@ ___
 
 ▸ **getCountryByCodeAlpha2**(`countryCode`: string): *[LocalizedCountry](../interfaces/_packages_sdk_utils_src_countries_.localizedcountry.md) | undefined*
 
-*Defined in [packages/sdk/utils/src/countries.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L59)*
+*Defined in [packages/sdk/utils/src/countries.ts:61](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L61)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **getFilteredCountries**(`query`: string): *[LocalizedCountry](../interfaces/_packages_sdk_utils_src_countries_.localizedcountry.md)[]*
 
-*Defined in [packages/sdk/utils/src/countries.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L63)*
+*Defined in [packages/sdk/utils/src/countries.ts:65](https://github.com/spruceid/celo-monorepo/blob/master/packages/sdk/utils/src/countries.ts#L65)*
 
 **Parameters:**
 

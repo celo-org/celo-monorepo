@@ -2,6 +2,7 @@ import {
   AttestationRequestType,
   AttestationServiceTestRequestType,
   GetAttestationRequestType,
+  VerifiableCredentialRequestType,
 } from '@celo/utils/lib/io'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
@@ -15,6 +16,7 @@ import {
 } from './db'
 import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
 import { rootLogger } from './logger'
+import { initializeLookupProviders } from './lookup'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { handleAttestationRequest } from './requestHandlers/attestation'
 import { handleAttestationDeliveryStatus } from './requestHandlers/delivery'
@@ -22,6 +24,7 @@ import { handleGetAttestationRequest } from './requestHandlers/get_attestation'
 import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
+import { handleVerifiableCredentialRequest } from './requestHandlers/verifiable_credential'
 import { initializeSmsProviders, smsProvidersWithDeliveryStatus } from './sms'
 
 async function init() {
@@ -42,6 +45,8 @@ async function init() {
   const deliveryStatusURLForProviderType = (t: string) => `${externalURL}/delivery_status_${t}`
 
   await initializeSmsProviders(deliveryStatusURLForProviderType)
+
+  await initializeLookupProviders()
 
   await startPeriodicHealthCheck()
 
@@ -79,6 +84,11 @@ async function init() {
     '/test_attestations',
     express.json(),
     createValidatedHandler(AttestationServiceTestRequestType, handleTestAttestationRequest)
+  )
+  app.post(
+    '/vc',
+    express.json(),
+    createValidatedHandler(VerifiableCredentialRequestType, handleVerifiableCredentialRequest)
   )
 
   for (const p of smsProvidersWithDeliveryStatus()) {
