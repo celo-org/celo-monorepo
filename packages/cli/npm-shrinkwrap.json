@@ -2614,7 +2614,7 @@
     },
     "blind-threshold-bls": {
       "version": "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
-      "from": "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a"
+      "from": "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
     },
     "bls12377js": {
       "version": "git+https://github.com/celo-org/bls12377js.git#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
