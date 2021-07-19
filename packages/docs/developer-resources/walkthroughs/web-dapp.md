@@ -19,13 +19,32 @@ touch tsconfig.json
 yarn add --dev typescript @types/react @types/node
 ```
 
-Now running `yarn dev` should open up our new Next.js website on `localhost:3000`.
-
 Next we'll need to add a few Celo specific dependencies so we can work with our core contracts.
 
 ```bash
 yarn add @celo/contractkit @celo-tools/use-contractkit bignumber.js
 ```
+
+Finally, we'll need to add this configuration below to `next.config.js` so [@celo-tools/use-contractkit](https://github.com/celo-tools/use-contractkit) can work properly on the client side
+
+```javascript
+module.exports = {
+  target: 'serverless',
+  webpack: (config, { webpack }) => {
+    config.node = {
+      fs: 'empty',
+      net: 'empty',
+      child_process: 'empty',
+      readline: 'empty',
+    };
+    config.plugins.push(new webpack.IgnorePlugin(/^electron$/));
+
+    return config;
+  },
+};
+```
+
+Now running `yarn dev` should open up our new Next.js website on `localhost:3000`.
 
 Here's what we'll be using each of these packages for:
 
