@@ -1,10 +1,6 @@
 import { concurrentMap } from '@celo/base'
 // import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
-import { CeloContract, CeloTokenType, ContractKit, StableToken, Token } from '@celo/contractkit'
-import { newExchange } from '@celo/contractkit/lib/generated/Exchange'
-import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
-import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { CeloContract, CeloTokenType, StableToken, Token } from '@celo/contractkit'
 import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
@@ -50,9 +46,9 @@ export async function fundAccountWithStableToken(
   context: EnvTestContext,
   account: TestAccounts,
   value: BigNumber,
-  stableToken: string
+  stableToken: StableToken
 ) {
-  return fundAccount(context, account, value, stableToken as StableToken)
+  return fundAccount(context, account, value, stableToken)
 }
 
 async function fundAccount(
@@ -124,7 +120,10 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensToClear: string[]) {
+export async function clearAllFundsToRoot(
+  context: EnvTestContext,
+  stableTokensToClear: StableToken[]
+) {
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
@@ -146,7 +145,7 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
       await goldToken
         .transfer(
           root.address,
-          celoBalance.times(0.99).integerValue(BigNumber.ROUND_DOWN).toString()
+          celoBalance.times(0.999).integerValue(BigNumber.ROUND_DOWN).toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
       context.logger.debug(
@@ -159,11 +158,14 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
       )
     }
     for (const stableToken of stableTokensToClear) {
-      const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+      const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
       const balance = await stableTokenInstance.balanceOf(account.address)
       if (balance.gt(maxBalanceBeforeCollecting)) {
         await stableTokenInstance
-          .transfer(root.address, balance.times(0.99).integerValue(BigNumber.ROUND_DOWN).toString())
+          .transfer(
+            root.address,
+            balance.times(0.999).integerValue(BigNumber.ROUND_DOWN).toString()
+          )
           .sendAndWaitForReceipt({
             feeCurrency: stableTokenInstance.address,
             from: account.address,
@@ -184,20 +186,17 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
   })
 }
 
-// This function creates an stabletoken instance from a registry address and the StableToken ABI and wraps it with StableTokenWrapper.
-// It is required for cEUR testing until cEUR stabletoken wrapper is included in ContractKit.
-// Function is supposed to be deprecated as soon as cEUR stabletoken is wrapped.
-export async function initStableTokenFromRegistry(stableToken: string, kit: ContractKit) {
-  const stableTokenAddress = await kit.registry.addressFor(StableTokenToRegistryName[stableToken])
-  const stableTokenContract = newStableToken(kit.web3, stableTokenAddress)
-  return new StableTokenWrapper(kit, stableTokenContract)
-}
+export function parseStableTokensList(stableTokenList: string): StableToken[] {
+  const stableTokenStrs = stableTokenList.split(',')
+  const validStableTokens = Object.values(StableToken)
+  const stableTokens: StableToken[] = []
 
-// This function creates an exchange instance from a registry address and the Exchange ABI and wraps it with ExchangeWrapper.
-// It is required for cEUR testing until cEUR exchange wrapper is included in ContractKit.
-// Function is supposed to be deprecated as soon as cEUR exchange is wrapped.
-export async function initExchangeFromRegistry(stableToken: string, kit: ContractKit) {
-  const exchangeAddress = await kit.registry.addressFor(ExchangeToRegistryName[stableToken])
-  const exchangeContract = newExchange(kit.web3, exchangeAddress)
-  return new ExchangeWrapper(kit, exchangeContract)
+  for (const stableTokenStr of stableTokenStrs) {
+    if (validStableTokens.includes(stableTokenStr as StableToken)) {
+      stableTokens.push(stableTokenStr as StableToken)
+    } else {
+      throw Error(`String ${stableTokenStr} not a valid StableToken`)
+    }
+  }
+  return stableTokens
 }

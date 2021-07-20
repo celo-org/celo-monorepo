@@ -1,28 +1,31 @@
-// import { sleep } from '@celo/base'
+import { sleep } from '@celo/base'
+import { StableToken } from '@celo/contractkit'
 import { describe, test } from '@jest/globals'
-// import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
 import {
   fundAccountWithCELO,
   fundAccountWithStableToken,
   getKey,
-  // initExchangeFromRegistry,
-  // initStableTokenFromRegistry,
   ONE,
   TestAccounts,
 } from '../scaffold'
 
-export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: string[]) {
-  const celoAmountToFund = ONE
-  const stableTokenAmountToFund = ONE
+export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: StableToken[]) {
+  const celoAmountToFund = ONE.times(61000)
+  const stableTokenAmountToFund = ONE.times(61000)
+
+  const celoAmountToSell = ONE.times(60000)
+  const stableTokenAmountToSell = ONE.times(60000)
+
   describe('Granda Mento Test', () => {
     beforeAll(async () => {
       await fundAccountWithCELO(context, TestAccounts.GrandaMentoExchanger, celoAmountToFund)
     })
 
-    const logger = context.logger.child({ test: 'grandaMento' })
+    const baseLogger = context.logger.child({ test: 'grandaMento' })
 
-    for (const sellCelo of [/*true, */ false]) {
+    for (const sellCelo of [true, false]) {
       for (const stableToken of stableTokensToTest) {
         const sellTokenStr = sellCelo ? 'CELO' : stableToken
         const buyTokenStr = sellCelo ? stableToken : 'CELO'
@@ -39,88 +42,104 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
           })
 
           test('exchanger creates and cancels an exchange proposal', async () => {
-            // const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
             const from = await getKey(context.mnemonic, TestAccounts.GrandaMentoExchanger)
             context.kit.connection.addAccount(from.privateKey)
             context.kit.defaultAccount = from.address
 
-            logger.info('from balance', await context.kit.getTotalBalance(from.address))
+            const logger = baseLogger.child({ from: from.address })
 
-            // const creationReceipt = await
+            const grandaMento = await context.kit.contracts.getGrandaMento()
+
+            let sellToken
+            let sellAmount
+            if (sellCelo) {
+              sellToken = await context.kit.contracts.getGoldToken()
+              sellAmount = celoAmountToSell
+            } else {
+              sellToken = await context.kit.celoTokens.getWrapper(stableToken as StableToken)
+              sellAmount = stableTokenAmountToSell
+            }
+            await sellToken
+              .approve(grandaMento.address, sellAmount.toFixed())
+              .sendAndWaitForReceipt({
+                from: from.address,
+              })
+            logger.debug(
+              {
+                sellAmount,
+                sellTokenStr,
+                spender: grandaMento.address,
+              },
+              'Approved GrandaMento to spend sell token'
+            )
+
+            // Some flakiness has been observed after approving, so we sleep
+            await sleep(5000)
+
+            const sellTokenBalanceBeforeCreation = await sellToken.balanceOf(from.address)
+
+            const creationTx = await grandaMento.createExchangeProposal(
+              context.kit.celoTokens.getContract(stableToken as StableToken),
+              sellAmount,
+              sellCelo
+            )
+            const creationReceipt = await creationTx.sendAndWaitForReceipt({
+              from: from.address,
+            })
+            const minedCreationTx = await context.kit.web3.eth.getTransaction(
+              creationReceipt.transactionHash
+            )
+            const proposalId = creationReceipt.events!.ExchangeProposalCreated.returnValues
+              .proposalId
+
+            logger.debug(
+              {
+                sellAmount,
+                sellCelo,
+                proposalId,
+              },
+              'Created exchange proposal'
+            )
+
+            let celoFees = new BigNumber(creationReceipt.gasUsed).times(minedCreationTx.gasPrice)
+
+            const sellTokenBalanceAfterCreation = await sellToken.balanceOf(from.address)
+
+            // If we are looking at the CELO balance, take the fees spent into consideration.
+            const expectedBalanceDifference = sellCelo ? sellAmount.plus(celoFees) : sellAmount
+
+            expect(
+              sellTokenBalanceBeforeCreation.minus(sellTokenBalanceAfterCreation).toString()
+            ).toBe(expectedBalanceDifference.toString())
+
+            const cancelReceipt = await grandaMento
+              .cancelExchangeProposal(proposalId)
+              .sendAndWaitForReceipt({
+                from: from.address,
+              })
+            const minedCancelTx = await context.kit.web3.eth.getTransaction(
+              cancelReceipt.transactionHash
+            )
+
+            logger.debug(
+              {
+                proposalId,
+              },
+              'Cancelled exchange proposal'
+            )
+
+            celoFees = celoFees.plus(
+              new BigNumber(cancelReceipt.gasUsed).times(minedCancelTx.gasPrice)
+            )
+
+            const sellTokenBalanceAfterCancel = await sellToken.balanceOf(from.address)
+            // If we are looking at the CELO balance, take the fees spent into consideration.
+            const expectedBalance = sellCelo
+              ? sellTokenBalanceBeforeCreation.minus(celoFees)
+              : sellTokenBalanceBeforeCreation
+            expect(sellTokenBalanceAfterCancel.toString()).toBe(expectedBalance.toString())
           })
         })
-
-        //
-        //   test(`exchange ${stableToken} for CELO`, async () => {
-        //     const stableTokenAmountToFund = ONE
-        //     await fundAccountWithStableToken(
-        //       context,
-        //       TestAccounts.Exchange,
-        //       stableTokenAmountToFund,
-        //       stableToken
-        //     )
-        //     const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
-        //
-        //     const from = await getKey(context.mnemonic, TestAccounts.Exchange)
-        //     context.kit.connection.addAccount(from.privateKey)
-        //     context.kit.defaultAccount = from.address
-        //     context.kit.connection.defaultFeeCurrency = stableTokenInstance.address
-        //     const goldToken = await context.kit.contracts.getGoldToken()
-        //
-        //     const exchange = await initExchangeFromRegistry(stableToken, context.kit)
-        //     const previousGoldBalance = await goldToken.balanceOf(from.address)
-        //     const stableTokenAmountToSell = stableTokenAmountToFund.times(0.5)
-        //     const goldAmount = await exchange.getBuyTokenAmount(stableTokenAmountToSell, false)
-        //     logger.debug(
-        //       { rate: goldAmount.toString(), stabletoken: stableToken },
-        //       `quote selling ${stableToken}`
-        //     )
-        //
-        //     const approveTx = await stableTokenInstance
-        //       .approve(exchange.address, stableTokenAmountToSell.toString())
-        //       .send()
-        //     await approveTx.waitReceipt()
-        //     const sellTx = await exchange
-        //       .sell(
-        //         stableTokenAmountToSell,
-        //         // Allow 5% deviation from the quoted price
-        //         goldAmount.times(0.95).integerValue(BigNumber.ROUND_DOWN).toString(),
-        //         false
-        //       )
-        //       .send()
-        //     await sellTx.getHash()
-        //     const receipt = await sellTx.waitReceipt()
-        //     logger.debug({ stabletoken: stableToken, receipt }, `Sold ${stableToken}`)
-        //
-        //     const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(
-        //       previousGoldBalance
-        //     )
-        //
-        //     logger.debug(
-        //       {
-        //         goldAmount: goldAmount.toString(),
-        //         goldAmountToSell: goldAmountToSell.toString(),
-        //         stabletoken: stableToken,
-        //       },
-        //       'Loss to exchange'
-        //     )
-        //
-        //     const approveGoldTx = await goldToken
-        //       .approve(exchange.address, goldAmountToSell.toString())
-        //       .send()
-        //     await approveGoldTx.waitReceipt()
-        //     await sleep(5000)
-        //     const sellGoldTx = await exchange
-        //       .sellGold(
-        //         goldAmountToSell,
-        //         // Assume we can get at least 80 % back
-        //         stableTokenAmountToSell.times(0.8).integerValue(BigNumber.ROUND_DOWN).toString()
-        //       )
-        //       .send()
-        //     const sellGoldReceipt = await sellGoldTx.waitReceipt()
-        //
-        //     logger.debug({ stabletoken: stableToken, receipt: sellGoldReceipt }, 'Sold CELO')
-        //   })
       }
     }
   })
