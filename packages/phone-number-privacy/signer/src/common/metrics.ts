@@ -22,8 +22,8 @@ export const Counters = {
     labelNames: ['endpoint', 'statusCode'],
   }),
   databaseErrors: new Counter({
-    name: 'database_read_errors',
-    help: 'Counter for the number of database read errors',
+    name: 'database_errors',
+    help: 'Counter for the number of database errors',
     labelNames: ['type'],
   }),
   blockchainErrors: new Counter({
