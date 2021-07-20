@@ -59,11 +59,11 @@ async function fundAccount(
 
   const tokenWrapper = await context.kit.celoTokens.getWrapper(token)
 
-  const rootBalance = await tokenWrapper.balanceOf(from.address)
-  if (rootBalance.lte(value)) {
-    logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
+  const fromBalance = await tokenWrapper.balanceOf(from.address)
+  if (fromBalance.lte(value)) {
+    logger.error({ fromBalance: fromBalance.toString() }, 'error funding test account')
     throw new Error(
-      `From account ${from.address}'s ${token} balance (${rootBalance.toPrecision(
+      `From account ${from.address}'s ${token} balance (${fromBalance.toPrecision(
         4
       )}) is not enough for transferring ${value.toPrecision(4)}`
     )
@@ -105,7 +105,7 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(
+export async function clearAllFundsToOriginalAddress(
   context: EnvTestContext,
   stableTokensToClear: StableToken[]
 ) {
@@ -113,6 +113,7 @@ export async function clearAllFundsToRoot(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
   )
+  const validator0 = await getValidatorKey(context.mnemonic, 0)
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   context.logger.debug({ account: root.address }, 'clear test fund accounts')
   const goldToken = await context.kit.contracts.getGoldToken()
@@ -129,7 +130,7 @@ export async function clearAllFundsToRoot(
     if (celoBalance.gt(maxBalanceBeforeCollecting)) {
       await goldToken
         .transfer(
-          root.address,
+          validator0.address,
           celoBalance.times(0.999).integerValue(BigNumber.ROUND_DOWN).toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
