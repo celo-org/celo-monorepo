@@ -59,7 +59,7 @@ export default class Approve extends BaseCommand {
     let logEvent: string
     if (id) {
       if (await governance.isQueued(id)) {
-        displaySendTx(
+        await displaySendTx(
           'Dequeueing proposal...',
           governance.dequeueProposalsIfReady(),
           {},
