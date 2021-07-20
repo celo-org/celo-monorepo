@@ -11,11 +11,9 @@ import {
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import moment from 'moment'
-import { ContractVersion, newContractVersion } from '../base'
 import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
 import { ContractKit } from '../kit'
-
-const semverLt = require('semver/functions/lt')
+import { ContractVersion } from '../versions'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
@@ -42,22 +40,14 @@ export abstract class BaseWrapper<T extends Contract> {
   async version() {
     if (!this._version) {
       const raw = await this.contract.methods.getVersionNumber().call()
-      // @ts-ignore
-      this._version = newContractVersion(
-        parseInt(raw[0], 10),
-        parseInt(raw[1], 10),
-        parseInt(raw[2], 10),
-        parseInt(raw[3], 10)
-      )
+      // @ts-ignore conditional type
+      this._version = ContractVersion.fromRaw(raw)
     }
     return this._version!
   }
 
   protected async onlyVersionOrGreater(version: ContractVersion) {
-    const actual = await this.version()
-    // ignore patch changes in semver comparison for wrapper compatibility
-    const toSemver = (v: ContractVersion) => `${v.storage}.${v.major}.${v.minor}`
-    if (semverLt(toSemver(actual), toSemver(version))) {
+    if (!(await this.version()).isAtLeast(version)) {
       throw new Error(`Bytecode version ${this._version} is not compatible with ${version} yet`)
     }
   }

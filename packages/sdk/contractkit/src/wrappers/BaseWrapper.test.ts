@@ -1,7 +1,7 @@
 import { NULL_ADDRESS } from '@celo/base'
 import { CeloTxObject } from '@celo/connect'
 import Web3 from 'web3'
-import { ContractVersion, newContractVersion } from '../base'
+import { ContractVersion, newContractVersion } from '../versions'
 import {
   ICeloVersionedContract,
   newICeloVersionedContract,
@@ -14,7 +14,7 @@ const mockContract = newICeloVersionedContract(web3, NULL_ADDRESS)
 const mockVersion = newContractVersion(1, 1, 1, 1)
 // @ts-ignore
 mockContract.methods.getVersionNumber = (): CeloTxObject<any> => ({
-  call: async () => mockVersion.toRaw!(),
+  call: async () => mockVersion.toRaw(),
 })
 
 class TestWrapper extends BaseWrapper<ICeloVersionedContract> {
