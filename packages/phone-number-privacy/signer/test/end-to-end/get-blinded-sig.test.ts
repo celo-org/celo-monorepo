@@ -4,7 +4,10 @@ import {
   rootLogger as logger,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
+import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
+import { PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
+import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import config from '../../src/config'
@@ -38,7 +41,16 @@ contractkit.addAccount(PRIVATE_KEY3)
 
 jest.setTimeout(30000)
 
+const getRandomBlindedPhoneNumber = () => {
+  return getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32))
+}
+
 describe('Running against a deployed service', () => {
+  beforeAll(() => {
+    console.log(DEFAULT_FORNO_URL)
+    console.log(ODIS_SIGNER)
+  })
+
   describe('Returns status 400 with invalid input', () => {
     it('With invalid address', async () => {
       const response = await postToSignMessage(BLINDED_PHONE_NUMBER, '0x1234', Date.now(), 'ignore')
@@ -77,17 +89,17 @@ describe('Running against a deployed service', () => {
       const signature = signMessage(JSON.stringify(body), PRIVATE_KEY2, ACCOUNT_ADDRESS2)
       const authHeader = serializeSignature(signature)
 
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS1, authHeader)
+      const response = await postToSignMessage(
+        BLINDED_PHONE_NUMBER,
+        ACCOUNT_ADDRESS1,
+        undefined,
+        authHeader
+      )
       expect(response.status).toBe(401)
-    })
-
-    it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignMessage('', ACCOUNT_ADDRESS1, Date.now())
-      expect(response.status).toBe(400)
     })
   })
 
-  it('Returns error when querying out of quota', async () => {
+  it('Returns 403 error when querying out of quota', async () => {
     const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS1, Date.now())
     expect(response.status).toBe(403)
   })
@@ -111,16 +123,20 @@ describe('Running against a deployed service', () => {
     })
 
     // Backwards compatibility check
-    it('Returns sig when querying succeeds w/ timestamp', async () => {
+    it('Returns sig when querying succeeds w/ expired timestamp', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, Date.now())
+      const response = await postToSignMessage(
+        BLINDED_PHONE_NUMBER,
+        ACCOUNT_ADDRESS2,
+        Date.now() - 10 * 60 * 1000
+      ) // 10 minutes ago
       expect(response.status).toBe(200)
     })
 
-    it('Increments query count when querying succeeds', async () => {
+    it('Increments query count when querying succeeds w/ unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const initialQueryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
+      await postToSignMessage(getRandomBlindedPhoneNumber(), ACCOUNT_ADDRESS2)
       expect(initialQueryCount).toEqual((await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)) - 1)
     })
 
@@ -128,16 +144,17 @@ describe('Running against a deployed service', () => {
     it('Increments query count when querying succeeds w/ timestamp', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const initialQueryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2, Date.now())
+      await postToSignMessage(getRandomBlindedPhoneNumber(), ACCOUNT_ADDRESS2, Date.now())
       expect(initialQueryCount).toEqual((await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)) - 1)
     })
 
     it('Returns sig when querying succeeds with replayed request without incrementing query count', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const res1 = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
+      const blindedPhoneNumber = getRandomBlindedPhoneNumber()
+      const res1 = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS2)
       expect(res1.status).toBe(200)
       const queryCount = await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER)
-      const res2 = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS2)
+      const res2 = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS2)
       expect(res2.status).toBe(200)
       expect(queryCount).toEqual(await getQueryCount(ACCOUNT_ADDRESS2, IDENTIFIER))
     })
@@ -176,7 +193,7 @@ describe('Running against a deployed service', () => {
 
     it('Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS3)
+      const response = await postToSignMessage(getRandomBlindedPhoneNumber(), ACCOUNT_ADDRESS3)
       expect(response.status).toBe(200)
     })
 

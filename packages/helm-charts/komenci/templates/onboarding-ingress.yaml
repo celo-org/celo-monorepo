@@ -14,6 +14,10 @@ spec:
   - host: {{ .Values.onboarding.publicHostname }}
     http:
       paths:
+      - path: /rewards
+        backend:
+          serviceName: {{ .Release.Namespace }}-rewards
+          servicePort: 3000
       - path: /
         backend:
           serviceName: {{ .Release.Namespace }}-onboarding
