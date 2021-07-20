@@ -1,12 +1,12 @@
 import { NULL_ADDRESS } from '@celo/base'
 import { CeloTxObject } from '@celo/connect'
 import Web3 from 'web3'
-import { ContractVersion, newContractVersion } from '../versions'
 import {
   ICeloVersionedContract,
   newICeloVersionedContract,
 } from '../generated/ICeloVersionedContract'
 import { newKitFromWeb3 } from '../kit'
+import { ContractVersion, newContractVersion } from '../versions'
 import { BaseWrapper } from './BaseWrapper'
 
 const web3 = new Web3('http://localhost:8545')

@@ -9,8 +9,8 @@ import {
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { keccak256 } from 'web3-utils'
-import { newContractVersion } from '../versions'
 import { Accounts } from '../generated/Accounts'
+import { newContractVersion } from '../versions'
 import {
   BaseWrapper,
   proxyCall,
