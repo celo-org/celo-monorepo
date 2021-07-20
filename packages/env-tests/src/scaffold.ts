@@ -1,6 +1,5 @@
 import { concurrentMap } from '@celo/base'
-// import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
-import { CeloContract, CeloTokenType, StableToken, Token } from '@celo/contractkit'
+import { CeloTokenType, StableToken, Token } from '@celo/contractkit'
 import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
@@ -14,16 +13,6 @@ interface KeyInfo {
   publicKey: string
 }
 
-export const StableTokenToRegistryName: Record<string, CeloContract> = {
-  cUSD: CeloContract.StableToken,
-  cEUR: 'StableTokenEUR' as CeloContract,
-}
-
-export const ExchangeToRegistryName: Record<string, CeloContract> = {
-  cUSD: CeloContract.Exchange,
-  cEUR: 'ExchangeEUR' as CeloContract,
-}
-
 export async function fundAccountWithCELO(
   context: EnvTestContext,
   account: TestAccounts,
@@ -31,7 +20,7 @@ export async function fundAccountWithCELO(
 ) {
   // Use validator 0 instead of root because it has a CELO balance
   const validator0 = await getValidatorKey(context.mnemonic, 0)
-  return fundAccount(context, account, value, Token.CELO, validator0, true)
+  return fundAccount(context, account, value, Token.CELO, validator0)
 }
 
 export async function fundAccountWithcUSD(
@@ -56,8 +45,7 @@ async function fundAccount(
   account: TestAccounts,
   value: BigNumber,
   token: CeloTokenType,
-  fromKey?: KeyInfo,
-  isCELO: boolean = false
+  fromKey?: KeyInfo
 ) {
   const from = fromKey ? fromKey : await getKey(context.mnemonic, TestAccounts.Root)
   const recipient = await getKey(context.mnemonic, account)
@@ -71,14 +59,11 @@ async function fundAccount(
 
   const tokenWrapper = await context.kit.celoTokens.getWrapper(token)
 
-  console.log('root', from.address)
   const rootBalance = await tokenWrapper.balanceOf(from.address)
-  console.log('root balance', await context.kit.getTotalBalance(from.address))
-  console.log('context.mnemonic', context.mnemonic)
   if (rootBalance.lte(value)) {
     logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
     throw new Error(
-      `From account ${from.address}'s /*stableToken*/ balance (${rootBalance.toPrecision(
+      `From account ${from.address}'s ${token} balance (${rootBalance.toPrecision(
         4
       )}) is not enough for transferring ${value.toPrecision(4)}`
     )
@@ -87,10 +72,10 @@ async function fundAccount(
     .transfer(recipient.address, value.toString())
     .sendAndWaitForReceipt({
       from: from.address,
-      feeCurrency: isCELO ? undefined : tokenWrapper.address,
+      feeCurrency: token === Token.CELO ? undefined : tokenWrapper.address,
     })
 
-  logger.debug({ token, receipt }, `funded test account with /*stableToken*/`)
+  logger.debug({ token, receipt }, `funded test account with ${token}`)
 }
 
 export async function getValidatorKey(mnemonic: string, index: number): Promise<KeyInfo> {

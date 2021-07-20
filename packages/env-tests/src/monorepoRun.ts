@@ -36,16 +36,13 @@ function runTests() {
       reserveSpenderMultiSigAddress,
     }
 
+    // TODO: Assert maximum loss after test
+    runTransfersTest(context, stableTokensToTest)
+    runExchangeTest(context, stableTokensToTest)
+    runOracleTest(context)
+    runReserveTest(context)
+    runAttestationTest(context)
     runGrandaMentoTest(context, stableTokensToTest)
-
-    if (false) {
-      // TODO: Assert maximum loss after test
-      runTransfersTest(context, stableTokensToTest)
-      runExchangeTest(context, stableTokensToTest)
-      runOracleTest(context)
-      runReserveTest(context)
-      runAttestationTest(context)
-    }
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing
