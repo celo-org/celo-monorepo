@@ -370,6 +370,18 @@ export function assertGteBN(
   )
 }
 
+export function assertGtBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gt(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
+      ''}`
+  )
+}
+
 export const isSameAddress = (minerAddress, otherAddress) => {
   return minerAddress.toLowerCase() === otherAddress.toLowerCase()
 }

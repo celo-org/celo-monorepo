@@ -4,6 +4,7 @@ import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertBalance,
   assertEqualBN,
+  assertGtBN,
   assertLogMatches2,
   assertRevert,
   matchAny,
@@ -82,7 +83,6 @@ interface Transaction {
   data: Buffer
 }
 
-// TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
@@ -115,6 +115,17 @@ contract('Governance', (accounts: string[]) => {
   )
   const descriptionUrl = 'https://descriptionUrl.sample.com'
   let transactionSuccess1: Transaction
+  const proposeTx1 = () =>
+    governance.propose(
+      [transactionSuccess1.value],
+      [transactionSuccess1.destination],
+      // @ts-ignore bytes type
+      transactionSuccess1.data,
+      [transactionSuccess1.data.length],
+      descriptionUrl,
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+      { value: minDeposit }
+    )
   let transactionSuccess2: Transaction
   let transactionFail: Transaction
   let salt: string
@@ -265,6 +276,78 @@ contract('Governance', (accounts: string[]) => {
           baselineQuorumFactor
         )
       )
+    })
+  })
+
+  describe.only('#dequeueProposalsIfReady', () => {
+    it('should have no effect when dequeueFrequency has not elapsed', async () => {
+      const resp = await governance.dequeueProposalsIfReady()
+      assert.equal(resp.logs.length, 0)
+    })
+
+    describe('when dequeueFrequency has elapsed since last dequeue', () => {
+      beforeEach(async () => {
+        const lastDequeue = await governance.lastDequeue()
+        const nextDequeue = lastDequeue.plus(dequeueFrequency)
+        const now = Math.floor(Date.now() / 1000)
+        await timeTravel(now - nextDequeue.toNumber(), web3)
+      })
+
+      it('should have no effect when queue is empty', async () => {
+        const resp = await governance.dequeueProposalsIfReady()
+        assert.equal(resp.logs.length, 0)
+      })
+
+      describe(`when queue is not empty`, () => {
+        beforeEach(async () => await proposeTx1())
+
+        it('should update lastDequeue', async () => {
+          const checkpointBefore = await governance.lastDequeue()
+          await governance.dequeueProposalsIfReady()
+          const checkpointAfter = await governance.lastDequeue()
+          assertGtBN(checkpointAfter, checkpointBefore)
+        })
+
+        it('should emit ProposalDequeued', async () => {
+          const resp = await governance.dequeueProposalsIfReady()
+          assertLogMatches2(resp.logs[0], {
+            event: 'ProposalDequeued',
+            args: {
+              proposalId: 1,
+            },
+          })
+        })
+
+        describe('when queued proposal is expired', () => {
+          beforeEach(async () => await timeTravel(queueExpiry, web3))
+
+          it('should emit ProposalExpired event', async () => {
+            const resp = await governance.dequeueProposalsIfReady()
+            assertLogMatches2(resp.logs[0], {
+              event: 'ProposalExpired',
+              args: {
+                proposalId: 1,
+              },
+            })
+          })
+
+          it('should not dequeue expired proposal', async () => {
+            const resp = await governance.dequeueProposalsIfReady()
+            const dequeueLogs = resp.logs.filter((log) => log.event === 'ProposalDequeued')
+            assert.equal(dequeueLogs.length, 0)
+          })
+        })
+
+        describe('when queue.length > concurrentProposals', () => {
+          beforeEach(async () => await proposeTx1())
+
+          it('should only dequeue concurrentProposals', async () => {
+            const resp = await governance.dequeueProposalsIfReady()
+            const dequeueLogs = resp.logs.filter((log) => log.event === 'ProposalDequeued')
+            assert.equal(dequeueLogs.length, concurrentProposals)
+          })
+        })
+      })
     })
   })
 
