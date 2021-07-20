@@ -1,6 +1,5 @@
-import { Address } from '@celo/connect'
+import { Address, EventLog } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { newContractVersion } from '../base'
 import { Reserve } from '../generated/Reserve'
 import {
   BaseWrapper,
@@ -111,7 +110,18 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   isOtherReserveAddress = proxyCall(this.contract.methods.isOtherReserveAddress)
 
   async getSpenders(): Promise<Address[]> {
-    await this.onlyVersionOrGreater(newContractVersion(1, 1, 2, 1))
-    return this.contract.methods.getExchangeSpenders().call()
+    const spendersAdded = (
+      await this.getPastEvents('SpenderAdded', {
+        fromBlock: 0,
+        toBlock: 'latest',
+      })
+    ).map((eventlog: EventLog) => eventlog.returnValues.spender)
+    const spendersRemoved = (
+      await this.getPastEvents('SpenderRemoved', {
+        fromBlock: 0,
+        toBlock: 'latest',
+      })
+    ).map((eventlog: EventLog) => eventlog.returnValues.spender)
+    return spendersAdded.filter((spender) => !spendersRemoved.includes(spender))
   }
 }
