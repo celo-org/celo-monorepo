@@ -1,7 +1,7 @@
 /* tslint:disable no-console */
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import fs from 'fs'
+import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 
@@ -87,11 +87,6 @@ const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
-function getArtifact(fileName: string) {
-  const file = fs.readFileSync(fileName).toString()
-  return JSON.parse(file)
-}
-
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
 }
@@ -107,7 +102,7 @@ function compile(outdir: string) {
 
   for (const contractName of ImplContracts) {
     try {
-      const fileStr = getArtifact(`${outdir}/contracts/${contractName}.json`)
+      const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
       if (hasEmptyBytecode(fileStr)) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
@@ -153,24 +148,30 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`yarn prettier --write "${outdir}/**/*.ts"`)
 }
 
-async function main(solidityBuildDir?: string, truffleTypesDir?: string, web3TypesDir?: string) {
-  if (solidityBuildDir) {
-    compile(solidityBuildDir)
+const _buildTargets = {
+  solidity: undefined,
+  truffleTypes: undefined,
+  web3Types: undefined,
+}
+
+async function main(buildTargets: typeof _buildTargets) {
+  if (buildTargets.solidity) {
+    compile(buildTargets.solidity)
   }
-  if (truffleTypesDir) {
-    generateFilesForTruffle(truffleTypesDir)
+  if (buildTargets.truffleTypes) {
+    generateFilesForTruffle(buildTargets.truffleTypes)
   }
-  if (web3TypesDir) {
-    await generateFilesForContractKit(web3TypesDir)
+  if (buildTargets.web3Types) {
+    await generateFilesForContractKit(buildTargets.web3Types)
   }
 }
 
 const minimist = require('minimist')
 const argv = minimist(process.argv.slice(2), {
-  string: ['solidityBuildDir', 'truffleTypesDir', 'web3TypesDir'],
+  string: Object.keys(_buildTargets),
 })
 
-main(argv.solidityBuildDir, argv.truffleTypesDir, argv.web3TypesDir).catch((err) => {
+main(argv).catch((err) => {
   console.error(err)
   process.exit(1)
 })

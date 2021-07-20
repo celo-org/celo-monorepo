@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build:ts": "tsc -b .",
-    "build:gen": "BUILD_DIR=./build/$RELEASE_TAG yarn --cwd ../../protocol ts-node ./scripts/build.ts --web3TypesDir ../sdk/contractkit/src/generated",
+    "build:gen": "BUILD_DIR=./build/$RELEASE_TAG yarn --cwd ../../protocol ts-node ./scripts/build.ts --web3Types ../sdk/contractkit/src/generated",
     "build": "yarn build:gen && yarn build:ts",
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf src/generated",
