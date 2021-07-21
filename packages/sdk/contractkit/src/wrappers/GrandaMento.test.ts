@@ -64,7 +64,6 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   describe('When Granda Mento is enabled', () => {
     beforeEach(async () => {
-      await assumeOwnership(web3, accounts[0])
       await setLimits()
     })
 
