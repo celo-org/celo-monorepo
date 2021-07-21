@@ -138,6 +138,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   ])
   console.info('  Deploying ReleaseGoldMultiSig...')
   const releaseGoldMultiSigInstance = await retryTx(ReleaseGoldMultiSig.new, [
+    false,
     { from: fromAddress },
   ])
   const multiSigTxHash = await _setInitialProxyImplementation(

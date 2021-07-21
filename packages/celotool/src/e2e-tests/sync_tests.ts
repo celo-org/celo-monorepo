@@ -21,7 +21,6 @@ describe('sync tests', function (this: any) {
       churritoBlock: 0,
       donutBlock: 0,
     },
-    useMycelo: true,
     instances: [
       {
         name: 'validator0',
