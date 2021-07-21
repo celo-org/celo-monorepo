@@ -85,6 +85,15 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   )
 
   /**
+   * Returns the account address given the wallet address
+   * @param signer Wallet address of the account
+   * @return The Account address
+   */
+  walletAddressToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.walletAddressToAccount
+  )
+
+  /**
    * Returns the account address given the signer for validating
    * @param signer Address that is authorized to sign the tx as validator
    * @return The Account address

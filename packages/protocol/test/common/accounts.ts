@@ -98,11 +98,16 @@ contract('Accounts', (accounts: string[]) => {
     describe('when the account has been created', () => {
       beforeEach(async () => {
         await accountsInstance.createAccount()
+        console.log('account created')
       })
 
-      it('should set the name, dataEncryptionKey and walletAddress', async () => {
+      it.only('should set the name, dataEncryptionKey and walletAddress', async () => {
+        console.log('doing')
         await accountsInstance.setAccount(name, dataEncryptionKey, caller, '0x0', '0x0', '0x0')
+        console.log('account set')
         const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
+        console.log(expectedWalletAddress)
+        console.log(caller)
         assert.equal(expectedWalletAddress, caller)
         const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
         assert.equal(expectedKey, dataEncryptionKey)

@@ -74,6 +74,7 @@ contract Accounts is
   bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
   bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
+  bytes32 constant WalletAddress = keccak256(abi.encodePacked("celo.org/core/wallet"));
 
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
@@ -206,8 +207,8 @@ contract Accounts is
       address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
       require(signer == walletAddress, "Invalid signature");
     }
-    Account storage account = accounts[msg.sender];
-    account.walletAddress = walletAddress;
+    legacyAuthorizeSignerWithSignature(walletAddress, WalletAddress, v, r, s);
+    setIndexedSigner(walletAddress, WalletAddress);
     emit AccountWalletAddressSet(msg.sender, walletAddress);
   }
 
@@ -636,6 +637,10 @@ contract Accounts is
     return signerToAccountWithRole(signer, VoteSigner);
   }
 
+  function walletAddressToAccount(address signer) external view returns (address) {
+    return signerToAccountWithRole(signer, WalletAddress);
+  }
+
   /**
    * @notice Returns the account associated with `signer`.
    * @param signer The address of the account or previously authorized signer.
@@ -854,7 +859,8 @@ contract Accounts is
    * @return Wallet address
    */
   function getWalletAddress(address account) external view returns (address) {
-    return accounts[account].walletAddress;
+    address defaultSigner = defaultSigners[account][WalletAddress];
+    return defaultSigner == address(0) ? accounts[account].walletAddress : defaultSigner;
   }
 
   /**
