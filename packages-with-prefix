@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# This script expects a string as its only agrument and will produce output of
+# the form '--include XXX --include XXX' where XXX is the package name for all
+# workspaces where the given string is a prefix of the workspace path.
+#
+# It is intended for use with the 'yarn workspaces foreach' command to make it
+# easy to run commands for all workspaces in a given directory.
+
+for x in $(yarn workspaces list | grep $1 | awk '{print $3}'); do (cd $x && node -p "'--include ' + require('./package').name"); done | tr '\n' ' '
