@@ -210,18 +210,16 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       'kube_secret_.+',
     ]
     params.push(
-      `--set remote_write[0].url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
-      `--set remote_write[0].basic_auth.username='${fetchEnv(
+      `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
+      `--set remote_write.basic_auth.username='${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
       )}'`,
-      `--set remote_write[0].basic_auth.password='${fetchEnv(
+      `--set remote_write.basic_auth.password='${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
       )}'`,
-      `--set remote_write[0].write_relabel_configs[0].source_labels='[__name__]'`,
-      `--set remote_write[0].write_relabel_configs[0].regex='(${droppedRemoteWriteSeries.join(
-        '|'
-      )})'`,
-      `--set remote_write[0].write_relabel_configs[0].action='drop'`
+      `--set remote_write.write_relabel_configs.source_labels='[__name__]'`,
+      `--set remote_write.write_relabel_configs.regex='(${droppedRemoteWriteSeries.join('|')})'`,
+      `--set remote_write.write_relabel_configs.action='drop'`
     )
   }
 
