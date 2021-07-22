@@ -17,7 +17,7 @@ module.exports = (deployer: any, networkName: string, _accounts: string[]) => {
   // tslint:disable-next-line: no-console
   console.info('Deploying Registry')
   deployer.deploy(ContractProxy)
-  deployer.deploy(Contract)
+  deployer.deploy(Contract, false)
   deployer.then(async () => {
     const networkId = await web3.eth.net.getId()
     // Hack to create build artifact.

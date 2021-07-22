@@ -261,11 +261,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     const testingDeployment = false
     console.log('Deploying', name, networkName)
     deployer.deploy(ContractProxy)
-    if (checkImports('InitializableV2', Contract, artifacts)) {
-      deployer.deploy(Contract, testingDeployment)
-    } else {
-      deployer.deploy(Contract)
-    }
+    deployer.deploy(Contract, testingDeployment)
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(ContractProxy.defaults().from)

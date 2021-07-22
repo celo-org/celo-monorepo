@@ -24,6 +24,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
 const Exchange: ExchangeContract = artifacts.require('Exchange')
 const Freezer: FreezerContract = artifacts.require('Freezer')
@@ -60,7 +61,6 @@ contract('Exchange', (accounts: string[]) => {
 
   const updateFrequency = 60 * 60
   const minimumReports = 2
-  const SECONDS_IN_A_WEEK = 604800
 
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000)
@@ -68,7 +68,7 @@ contract('Exchange', (accounts: string[]) => {
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
-  const goldAmountForRate = new BigNumber('0x10000000000000000')
+  const goldAmountForRate = new BigNumber('1000000000000000000000000')
   const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
   const initialStableBucket = initialGoldBucket.times(stableAmountForRate).div(goldAmountForRate)
   function getBuyTokenAmount(
@@ -105,11 +105,11 @@ contract('Exchange', (accounts: string[]) => {
   }
 
   beforeEach(async () => {
-    freezer = await Freezer.new()
+    freezer = await Freezer.new(true)
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
-    stableToken = await StableToken.new()
-    registry = await Registry.new()
+    stableToken = await StableToken.new(true)
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
@@ -137,7 +137,7 @@ contract('Exchange', (accounts: string[]) => {
 
     await fundReserve()
 
-    exchange = await Exchange.new()
+    exchange = await Exchange.new(true)
     await exchange.initialize(
       registry.address,
       stableToken.address,

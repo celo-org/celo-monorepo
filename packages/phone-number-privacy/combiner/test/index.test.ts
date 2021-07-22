@@ -1,6 +1,5 @@
 import { isVerified } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
@@ -23,7 +22,7 @@ const mockComputeBlindedSignature = jest.fn()
 BLSCryptographyClient.prototype.combinePartialBlindedSignatures = mockComputeBlindedSignature
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 const mockSufficientVerifiedSigs = jest.fn()
-BLSCryptographyClient.prototype.hasSufficientVerifiedSignatures = mockSufficientVerifiedSigs
+BLSCryptographyClient.prototype.hasSufficientSignatures = mockSufficientVerifiedSigs
 mockSufficientVerifiedSigs.mockReturnValue(true)
 
 jest.mock('../src/database/wrappers/account')
@@ -73,7 +72,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
     blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
     account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
-    timestamp: Date.now(),
   }
 
   beforeEach(() => {
@@ -141,17 +139,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
         body: {
           ...validRequest,
           hashedPhoneNumber: '+1234567890',
-        },
-        headers: mockHeaders,
-      } as Request
-
-      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
-    })
-    it('expired timestamp returns 400', (done) => {
-      const req = {
-        body: {
-          ...validRequest,
-          timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
         },
         headers: mockHeaders,
       } as Request
