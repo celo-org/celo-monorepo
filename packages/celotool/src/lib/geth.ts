@@ -600,7 +600,7 @@ export const simulateClient = async (
         nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
       } else {
         nonce = (await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')) - 1
-        gasPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15))
+        gasPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
         console.warn(
           `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
         )
