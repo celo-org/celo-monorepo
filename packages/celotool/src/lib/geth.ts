@@ -591,7 +591,7 @@ export const simulateClient = async (
       const gasPriceBase = feeCurrency
         ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
         : await gasPriceMinimum.gasPriceMinimum()
-      let gasPrice = new BigNumber(gasPriceBase).times(2)
+      let gasPrice = new BigNumber(gasPriceBase).times(2).dp(0)
 
       // Check if last tx was mined. If not, reuse the same nonce
       if (lastTx === '' || lastNonce === -1) {
