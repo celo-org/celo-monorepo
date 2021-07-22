@@ -10,6 +10,7 @@ import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { keccak256 } from 'web3-utils'
 import { Accounts } from '../generated/Accounts'
+import { newContractVersion } from '../versions'
 import {
   BaseWrapper,
   proxyCall,
@@ -35,6 +36,8 @@ interface AccountSummary {
  * Contract for handling deposits needed for voting.
  */
 export class AccountsWrapper extends BaseWrapper<Accounts> {
+  private RELEASE_4_VERSION = newContractVersion(1, 1, 2, 0)
+
   /**
    * Creates an account.
    */
@@ -284,6 +287,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async authorizeSigner(signer: Address, role: string) {
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     const [accounts, chainId, accountsContract] = await Promise.all([
       this.kit.connection.getAccounts(),
       this.kit.connection.chainId(),
@@ -308,6 +312,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async startSignerAuthorization(signer: Address, role: string) {
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.authorizeSigner(signer, keccak256(role))
@@ -315,6 +320,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async completeSignerAuthorization(account: Address, role: string) {
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
       this.kit.connection,
       this.contract.methods.completeSignerAuthorization(account, keccak256(role))
