@@ -5,6 +5,7 @@ import {
   assertEqualBN,
   assertRevert,
   assumeOwnership,
+  isCoverage,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -105,13 +106,14 @@ contract('Integration: Running elections', (_accounts: string[]) => {
   })
 
   describe('When getting the elected validators', () => {
-    it('should elect all 30 validators', async () => {
+    const numKeys = isCoverage() ? 10 : 30
+    it(`should elect all ${numKeys} validators`, async () => {
       const elected = await election.electValidatorSigners()
-      assert.equal(elected.length, 30)
+      assert.equal(elected.length, numKeys)
     })
     it('should elect specified number validators with electNValidatorSigners', async () => {
-      const elected = await election.electNValidatorSigners(1, 20)
-      assert.equal(elected.length, 20)
+      const elected = await election.electNValidatorSigners(1, numKeys - 5)
+      assert.equal(elected.length, numKeys - 5)
     })
   })
 })

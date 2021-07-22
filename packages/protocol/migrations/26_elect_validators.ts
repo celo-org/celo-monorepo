@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
+import { isCoverage } from '@celo/protocol/lib/test-utils'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
@@ -260,7 +261,8 @@ module.exports = async (_deployer: any, networkName: string) => {
       await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
       await web3.eth.sendTransaction({ from: addr0, to: addr, value: new BigNumber(11000e18) })
     }
-    config.validators.validatorKeys = [...Array(30)].map((_, i) => ganachePrivateKey(i))
+    const numKeys = isCoverage() ? 10 : 30
+    config.validators.validatorKeys = [...Array(numKeys)].map((_, i) => ganachePrivateKey(i))
     extraKeys = [...Array(6)].map((_, i) => ganachePrivateKey(i + 30))
     config.validators.attestationKeys = config.validators.validatorKeys
   }
