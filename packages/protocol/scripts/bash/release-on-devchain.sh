@@ -47,8 +47,7 @@ yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development
 
 echo "- Check versions of current branch"
 # From check-versions.sh
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles"
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
+./scripts/bash/check-versions.sh -a $BRANCH -b $CURR_BRANCH -r "report.json" -l $LOG_FILE
 
 # From make-release.sh
 echo "- Deploy release of current branch"
