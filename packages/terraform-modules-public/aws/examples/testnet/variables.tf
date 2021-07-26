@@ -169,6 +169,10 @@ variable twilio_messaging_service_sid {
   type = string
 }
 
+variable twilio_verify_service_sid {
+  type = string
+}
+
 variable twilio_account_sid {
   type = string
 }

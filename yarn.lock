@@ -1549,6 +1549,26 @@
     is-base64 "^1.1.0"
     libphonenumber-js "^1.9.11"
 
+"@celo/phone-number-privacy-common@1.0.34":
+  version "1.0.34"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.34.tgz#59b3b4d03a0482c967f26f7638d1afd326d4115b"
+  integrity sha512-xAIusO9N66lBG11/21ro0w8BZTLcRs6sWluam2qlTCf5e1vSPAxQeDx8GaqpcAJ2500zSsvmFOzlAA1iZiAD8g==
+  dependencies:
+    "@celo/base" "1.1.1"
+    "@celo/contractkit" "1.2.0"
+    "@celo/identity" "1.2.0"
+    "@celo/utils" "1.0.2"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "^6.5.4"
+    is-base64 "^1.1.0"
+    libphonenumber-js "^1.9.11"
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
@@ -22973,6 +22993,13 @@ semver@^6.0.0, semver@^6.2.0, semver@^6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
+
+semver@^7.3.5:
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.5.tgz#0b621c879348d8998e4b0e4be94b3f12e6018ef7"
+  integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
+  dependencies:
+    lru-cache "^6.0.0"
 
 semver@~5.4.1:
   version "5.4.1"
