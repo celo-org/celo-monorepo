@@ -65,6 +65,8 @@ contract Accounts is
   // All signers and their roles for a given account
   // solhint-disable-next-line max-line-length
   mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
+  // A per-account list of CIP8 storage roots, bypassing CIP3.
+  mapping(address => bytes[]) public offchainStorageRoots;
 
   bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
     "AuthorizeSigner(address account,address signer,bytes32 role)"
@@ -96,6 +98,8 @@ contract Accounts is
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
+  event OffchainStorageRootAdded(address indexed account, bytes url);
+  event OffchainStorageRootRemoved(address indexed account, bytes url);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -236,6 +240,66 @@ contract Accounts is
     Account storage account = accounts[msg.sender];
     account.metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
+  }
+
+  /**
+   * @notice Adds a new CIP8 storage root.
+   * @param url The URL pointing to the offchain storage root.
+   */
+  function addStorageRoot(bytes calldata url) external {
+    require(isAccount(msg.sender), "Unknown account");
+    offchainStorageRoots[msg.sender].push(url);
+    emit OffchainStorageRootAdded(msg.sender, url);
+  }
+
+  /**
+   * @notice Removes a CIP8 storage root.
+   * @param index The index of the storage root to be removed in the account's
+   * list of storage roots.
+   * @dev The order of storage roots may change after this operation (the last
+   * storage root will be moved to `index`), be aware of this if removing
+   * multiple storage roots at a time.
+   */
+  function removeStorageRoot(uint256 index) external {
+    require(isAccount(msg.sender), "Unknown account");
+    require(index < offchainStorageRoots[msg.sender].length);
+    uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
+    bytes memory url = offchainStorageRoots[msg.sender][index];
+    offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
+    offchainStorageRoots[msg.sender].length--;
+    emit OffchainStorageRootRemoved(msg.sender, url);
+  }
+
+  /**
+   * @notice Returns the full list of offchain storage roots for an account.
+   * @param account The account whose storage roots to return.
+   * @return List of storage root URLs.
+   */
+  function getOffchainStorageRoots(address account)
+    external
+    view
+    returns (bytes memory, uint256[] memory)
+  {
+    require(isAccount(account), "Unknown account");
+    uint256 numberRoots = offchainStorageRoots[account].length;
+    uint256 totalLength = 0;
+    for (uint256 i = 0; i < numberRoots; i++) {
+      totalLength += offchainStorageRoots[account][i].length;
+    }
+
+    bytes memory concatenated = new bytes(totalLength);
+    uint256 lastIndex = 0;
+    uint256[] memory lengths = new uint256[](numberRoots);
+    for (uint256 i = 0; i < numberRoots; i++) {
+      bytes storage root = offchainStorageRoots[account][i];
+      lengths[i] = root.length;
+      for (uint256 j = 0; j < lengths[i]; j++) {
+        concatenated[lastIndex] = root[j];
+        lastIndex++;
+      }
+    }
+
+    return (concatenated, lengths);
   }
 
   /**
