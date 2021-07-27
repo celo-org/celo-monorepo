@@ -1,18 +1,30 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { getDatabase } from '../database'
+import { getDatabase, getTransaction } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
 function accounts() {
   return getDatabase()<Account>(ACCOUNTS_TABLE)
 }
 
-async function getAccountExists(account: string): Promise<boolean> {
-  const existingAccountRecord = await accounts()
-    .where(ACCOUNTS_COLUMNS.address, account)
-    .first()
-    .timeout(DB_TIMEOUT)
-  return !!existingAccountRecord
+export async function getAccountSignedUserPhoneNumberRecord(
+  account: string,
+  logger: Logger
+): Promise<string | undefined> {
+  try {
+    const signedUserPhoneNumberRecord = await accounts()
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .select(ACCOUNTS_COLUMNS.signedUserPhoneNumber)
+      .first()
+      .timeout(DB_TIMEOUT)
+    return signedUserPhoneNumberRecord
+      ? signedUserPhoneNumberRecord[ACCOUNTS_COLUMNS.signedUserPhoneNumber]
+      : undefined
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
+    throw err
+  }
 }
 
 /*
@@ -39,27 +51,39 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
 /*
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
-export async function setDidMatchmaking(account: string, logger: Logger) {
+export async function setDidMatchmaking(
+  account: string,
+  logger: Logger,
+  signedUserPhoneNumber?: string
+) {
   logger.debug({ account }, 'Setting did matchmaking')
-  try {
-    if (await getAccountExists(account)) {
-      return accounts()
-        .where(ACCOUNTS_COLUMNS.address, account)
-        .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
-        .timeout(DB_TIMEOUT)
-    } else {
-      const newAccount = new Account(account)
-      newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
-      return insertRecord(newAccount)
-    }
-  } catch (err) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    return null
-  }
-}
-
-async function insertRecord(data: Account) {
-  await accounts().insert(data).timeout(DB_TIMEOUT)
-  return true
+  const trx = await getTransaction()
+  const accountTrxBase = () =>
+    accounts().transacting(trx).timeout(DB_TIMEOUT).where(ACCOUNTS_COLUMNS.address, account)
+  return accountTrxBase()
+    .then(async (res) => {
+      if (res.length) {
+        // If account exists in db
+        await accountTrxBase()
+          .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
+          .then(async () => {
+            if (signedUserPhoneNumber) {
+              await accountTrxBase()
+                .having(ACCOUNTS_COLUMNS.signedUserPhoneNumber, 'is', null) // prevents overwriting
+                .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
+            }
+          })
+      } else {
+        const newAccount = new Account(account, signedUserPhoneNumber)
+        newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
+        await accounts().transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
+      }
+      trx.commit()
+    })
+    .catch((err) => {
+      logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+      logger.error(err)
+      trx.rollback()
+      throw err
+    })
 }
