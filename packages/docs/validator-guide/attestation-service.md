@@ -37,7 +37,7 @@ From Attestation Service version 1.3.0 onwards, there are two ways of deploying 
 
 An Attestation Service prior to version 1.3.0 is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host.
 
-While it is still possible to use the full node method described below, from version 1.3.0 onwards, it is recommended to instead deploy the Attestation Service with access to a keystore file that encrypts the attestation signer key. This allows the service to sign attestations locally instead of depending on the separate full node instance to sign attestations. The passphrase for decrypting the keystore file must be passed in as an environment variable when starting up the Attestation Service. A Celo Provider (environment variable `CELO_PROVIDER`) is currently still required, in order to connect to ContractKit and read necessary information from the chain. It may be possible based on your particular configuration to use your validator proxy node as the associated Celo Provider, but in this case ensure RPC access is locked down only to the Attestation Service. Other options would be providing the endpoint to a Celo node that you run or to a node service provider like Figment Datahub. The new method of signing is expected to reduce Attestation Service errors due to the full node not being synced and generally reduce operating overhead.
+While it is still possible to use the full node method described below, from version 1.3.0 onwards, it is recommended to instead deploy the Attestation Service with access to a keystore file that encrypts the attestation signer key. This allows the service to sign attestations locally instead of depending on the separate full node instance to sign attestations. The passphrase for decrypting the keystore file must be passed in as an environment variable when starting up the Attestation Service. A Celo Provider (environment variable `CELO_PROVIDER`) is currently still required, in order to connect to ContractKit and read necessary information from the chain. More details on this are in the [Running the Attestation Service v1.3.0+](#recommended-running-the-attestation-service-v130) section below. The new method of signing is expected to reduce Attestation Service errors due to the full node not being synced and generally reduce operating overhead.
 
 The Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers (two for versions 1.3.0 onwards): one the attestation service, a Celo Blockchain node (only for versions prior to 1.3.0), and a single database instance.
 
@@ -142,7 +142,7 @@ export KEYSTORE_PARENT_DIR=$PWD
 echo <CELO-ATTESTATION-SIGNER-PASSWORD> > $KEYSTORE_PARENT_DIR/.password
 ```
 
-Then, follow the instructions in the `Running the Attestation Service` section below.
+Then, follow the instructions in the [Running the Attestation Service](#running-the-attestation-service) section below.
 
 #### pre-v1.3.0 - Using Celo Full Node
 
@@ -302,7 +302,7 @@ The main difference between the old method of running the Attestation Service al
 
 To do this, you need to map the directory containing the `keystore` to the Attestation Service's Docker volume and set the environment variable `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` to the path to this directory relative to the Docker container. You will also need to set the environment variable `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.
 
-Additionally, ensure that the `CELO_PROVIDER` environment variable points to a Celo node that can be used to instantiate ContractKit; this can be a separate full node or, depending on your configuration, your validator proxy node.
+Additionally, ensure that the `CELO_PROVIDER` environment variable points to a Celo node that can be used to instantiate ContractKit; this can be a separate full node or, depending on your configuration, your validator proxy node. To use your validator proxy node, you would need to allow RPC access, but for security reasons, ensure that this is locked down only to the Attestation Service. Alternatively, provide the endpoint to a Celo node that you run or to a node service provider like Figment Datahub.
 
 The command below illustrates what this could look like, if you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` from earlier in the instructions above to create the `CELO_ATTESTATION_SIGNER_ADDRESS`. Recall that you set `KEYSTORE_PARENT_DIR` to the working directory (`$PWD`) during the instructions above, and saved the password to the file `KEYSTORE_PARENT_DIR/.password`. Note that environment variables can be set either in the `$CONFIG` file or passed into the `docker run` command directly using the `-e` flag. (In this example, two of these variables are passed in via the `-e` flag for clarity.)
 
