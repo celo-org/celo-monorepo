@@ -18,6 +18,7 @@ import { respondWithError } from '../common/error-utils'
 import { VERSION } from '../config'
 import {
   getAccountSignedUserPhoneNumberRecord,
+  getDekSignerRecord,
   getDidMatchmaking,
   setDidMatchmaking,
 } from '../database/wrappers/account'
@@ -26,6 +27,10 @@ import { getContractKit } from '../web3/contracts'
 
 interface ContactMatch {
   phoneNumber: string
+}
+export interface MatchmakingIdentifier {
+  signedUserPhoneNumberHash: string
+  dekSigner: string
 }
 
 export async function handleGetContactMatches(
@@ -56,46 +61,44 @@ export async function handleGetContactMatches(
       return
     }
 
+    // If errors prevent us from validating a matchmaking request we fulfill the request anyway
+    // and set matchmakingId to undefined so that it won't be stored in the db (potentially overwriting
+    // the original request).
+    let matchmakingId: MatchmakingIdentifier | undefined
+
     // Verify that signedUserPhoneNumber was signed by the account's DEK
-    let signedUserPhoneNumberHash: string | undefined // If this ends up undefined, we won't write it to the db
     if (signedUserPhoneNumber) {
-      let isValidSig = false
-      let didRetrieveDEK = true
-      try {
-        isValidSig = await verifySignedUserPhoneNumberSignature(
-          account,
-          userPhoneNumber,
-          signedUserPhoneNumber,
-          logger
+      const dekSigner = await getDataEncryptionKey(account, getContractKit(), logger).catch(() => {
+        logger.warn(
+          'Failed to retrieve DEK to verify signedUserPhoneNumber. Signature is assumed valid and request wont be recorded.'
         )
-      } catch (error) {
-        if (error.message === ErrorMessage.CONTRACT_GET_FAILURE) {
-          logger.warn(
-            'Failed to retrieve DEK to verify signedUserPhoneNumber. Signature is assumed valid and request wont be recorded.'
+      })
+      if (dekSigner) {
+        if (!verifySignature(userPhoneNumber, signedUserPhoneNumber, dekSigner)) {
+          respondWithError(
+            response,
+            403,
+            WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE,
+            logger
           )
-          isValidSig = true
-          didRetrieveDEK = false
-        } else {
-          throw error
+          return
         }
-      }
-      if (!isValidSig) {
-        respondWithError(response, 403, WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE, logger)
-        return
-      }
-      if (didRetrieveDEK) {
-        // Hash signed number for good measure
-        // If we did not retrieve the DEK, then signedUserPhoneNumberHash will remain undefined and wont be stored in db.
-        signedUserPhoneNumberHash = crypto
-          .createHash('sha256')
-          .update(signedUserPhoneNumber)
-          .digest('base64')
+        matchmakingId = {
+          dekSigner,
+          signedUserPhoneNumberHash: crypto
+            .createHash('sha256')
+            .update(signedUserPhoneNumber)
+            .digest('base64'),
+        }
       }
     }
 
     const hasDoneMatchmaking = await getDidMatchmaking(account, logger).catch(() => {
-      signedUserPhoneNumberHash = undefined
-      return false
+      // If we don't know if the user has performed matchmaking before, we can't ensure the request is valid.
+      logger.warn(
+        'Failed to determine if user has performed matchmaking. Request will be fulfilled but not recorded.'
+      )
+      matchmakingId = undefined
     })
 
     if (hasDoneMatchmaking) {
@@ -109,7 +112,7 @@ export async function handleGetContactMatches(
         )
         respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
         return
-      } else if (signedUserPhoneNumberHash) {
+      } else if (matchmakingId) {
         // Account has performed matchmaking before and has provided a phone number dek signature which we have verified.
         const signedUserPhoneNumberRecord = await getAccountSignedUserPhoneNumberRecord(
           account,
@@ -121,9 +124,9 @@ export async function handleGetContactMatches(
             { account },
             'Allowing account to perform matchmaking due to db error finding phone number record. We will not record their phone number this time.'
           )
-          signedUserPhoneNumberHash = undefined // To prevent overwriting the old number
+          matchmakingId = undefined
         })
-        if (signedUserPhoneNumberHash) {
+        if (matchmakingId) {
           if (!signedUserPhoneNumberRecord) {
             // Account has performed matchmaking before and has provided a valid phone number dek signature
             // but we do not have a record of their previous phone number signature in the db.
@@ -134,22 +137,45 @@ export async function handleGetContactMatches(
               'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
             )
           } else {
-            if (signedUserPhoneNumberRecord !== signedUserPhoneNumberHash) {
+            if (signedUserPhoneNumberRecord !== matchmakingId.signedUserPhoneNumberHash) {
               // Account has performed matchmaking before and has provided a valid phone number dek signature
               // but the phone number signature we have stored in the db does not match what they provided.
+              const dekSignerRecord = await getDekSignerRecord(account, logger)
+              if (
+                dekSignerRecord &&
+                matchmakingId.dekSigner !== dekSignerRecord &&
+                verifySignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord)
+              ) {
+                // The phone number signature we have stored in the db wont match if the user has rotated their dek.
+                logger.info(
+                  {
+                    account,
+                    dekSignerRecord,
+                    dekSigner: matchmakingId.dekSigner,
+                  },
+                  'User has rotated their dek since first requesting matches. Updating dekSigner record for account.'
+                )
+              } else {
+                logger.info(
+                  { account },
+                  'Blocking account from querying matches for a different phone number than before.'
+                )
+                respondWithError(
+                  response,
+                  403,
+                  WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE,
+                  logger
+                )
+                return
+              }
+            } else {
+              // Account has performed matchmaking before and has provided a phone number dek signature
+              // matching what we have stored in the db.
               logger.info(
                 { account },
-                'Blocking account from querying matches for a different phone number than before.'
+                'Allowing account to requery matches for the same phone number as before.'
               )
-              respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
-              return
             }
-            // Account has performed matchmaking before and has provided a phone number dek signature
-            // matching what we have stored in the db.
-            logger.info(
-              { account },
-              'Allowing account to requery matches for the same phone number as before.'
-            )
           }
         }
       }
@@ -167,28 +193,13 @@ export async function handleGetContactMatches(
     )
 
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
-    await setDidMatchmaking(account, logger, signedUserPhoneNumberHash)
+    await setDidMatchmaking(account, logger, matchmakingId)
     response.json({ success: true, matchedContacts, version: VERSION })
   } catch (err) {
     logger.error('Failed to getContactMatches')
     logger.error(err)
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
-}
-
-async function verifySignedUserPhoneNumberSignature(
-  account: string,
-  userPhoneNumber: string,
-  signedUserPhoneNumber: string,
-  logger: Logger
-) {
-  let dekPublic
-  try {
-    dekPublic = await getDataEncryptionKey(account, getContractKit(), logger)
-  } catch (error) {
-    throw new Error(ErrorMessage.CONTRACT_GET_FAILURE)
-  }
-  return verifySignature(userPhoneNumber, signedUserPhoneNumber, dekPublic)
 }
 
 function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): boolean {

@@ -1,5 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { MatchmakingIdentifier } from '../../match-making/get-contact-matches'
 import { getDatabase, getTransaction } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -27,6 +28,24 @@ export async function getAccountSignedUserPhoneNumberRecord(
   }
 }
 
+export async function getDekSignerRecord(
+  account: string,
+  logger: Logger
+): Promise<string | undefined> {
+  try {
+    const dekSignerRecord = await accounts()
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .select(ACCOUNTS_COLUMNS.dekSigner)
+      .first()
+      .timeout(DB_TIMEOUT)
+    return dekSignerRecord ? dekSignerRecord[ACCOUNTS_COLUMNS.dekSigner] : undefined
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
+    return undefined
+  }
+}
+
 /*
  * Returns whether account has already performed matchmaking
  */
@@ -51,7 +70,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
 export async function setDidMatchmaking(
   account: string,
   logger: Logger,
-  signedUserPhoneNumber?: string
+  matchmakingId?: MatchmakingIdentifier
 ) {
   logger.debug({ account }, 'Setting did matchmaking')
   const trx = await getTransaction()
@@ -64,14 +83,20 @@ export async function setDidMatchmaking(
         await accountTrxBase()
           .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
           .then(async () => {
-            if (signedUserPhoneNumber) {
+            if (matchmakingId) {
               await accountTrxBase()
                 .having(ACCOUNTS_COLUMNS.signedUserPhoneNumber, 'is', null) // prevents overwriting
-                .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, signedUserPhoneNumber)
+                .update(
+                  ACCOUNTS_COLUMNS.signedUserPhoneNumber,
+                  matchmakingId.signedUserPhoneNumberHash
+                )
+              await accountTrxBase()
+                .having(ACCOUNTS_COLUMNS.dekSigner, 'is', null)
+                .update(ACCOUNTS_COLUMNS.dekSigner, matchmakingId.dekSigner)
             }
           })
       } else {
-        const newAccount = new Account(account, signedUserPhoneNumber)
+        const newAccount = new Account(account, matchmakingId)
         newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
         await accounts().transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
       }
