@@ -3,10 +3,12 @@ import crypto from 'crypto'
 import debugFactory from 'debug'
 import {
   AuthSigner,
+  EncryptionKeySigner,
   MatchmakingRequest,
   MatchmakingResponse,
   queryOdis,
   ServiceContext,
+  signWithDEK,
 } from './query'
 
 const debug = debugFactory('kit:odis:matchmaking')
@@ -24,6 +26,7 @@ export async function getContactMatches(
   phoneNumberIdentifier: string,
   signer: AuthSigner,
   context: ServiceContext,
+  dekSigner?: EncryptionKeySigner,
   clientVersion?: string,
   sessionID?: string
 ): Promise<E164Number[]> {
@@ -41,6 +44,11 @@ export async function getContactMatches(
 
   if (sessionID) {
     body.sessionID = sessionID
+  }
+  if (dekSigner) {
+    body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
+  } else {
+    console.warn('Failure to provide DEK will prevent users from requerying their matches')
   }
 
   const response = await queryOdis<MatchmakingResponse>(signer, body, context, MATCHMAKING_ENDPOINT)
