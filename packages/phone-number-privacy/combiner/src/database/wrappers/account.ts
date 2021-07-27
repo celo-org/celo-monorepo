@@ -37,14 +37,11 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
       .timeout(DB_TIMEOUT)
-    if (!didMatchmaking) {
-      return false
-    }
-    return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
+    return !!didMatchmaking && !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    return false
+    throw err
   }
 }
 
@@ -84,6 +81,5 @@ export async function setDidMatchmaking(
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
       logger.error(err)
       trx.rollback()
-      throw err
     })
 }
