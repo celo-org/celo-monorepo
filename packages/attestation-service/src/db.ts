@@ -69,11 +69,14 @@ async function execWithFallback<T>(
   if (
     smartFallback &&
     kit2 &&
+    // TODO: look into whether we need to split this up out of the if statement
+    // check if not undefined, and have extra handling for that (i.e. take the other)
+
+    // Prioritize block age over syncing/not; avoids complex checks for stalls
+    // and assumes that if one is stalled, the next block number check will correct this.
     (!kit1 ||
-      ((await isNodeSyncingFromKit(kit1)) &&
-        (!(await isNodeSyncingFromKit(kit2)) ||
-          (await getAgeOfLatestBlockFromKit(kit2)).ageOfLatestBlock <
-            (await getAgeOfLatestBlockFromKit(kit1)).ageOfLatestBlock)))
+      (await getAgeOfLatestBlockFromKit(kit2)).number >
+        (await getAgeOfLatestBlockFromKit(kit1)).number)
   ) {
     // Prioritize more-synced celo provider
     rootLogger.info('Prioritizing CELO_PROVIDER_BACKUP')
@@ -112,7 +115,7 @@ export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
 }
 
 async function isNodeSyncingFromKit(k: ContractKit) {
-  const syncProgress = await k.connection.isSyncing()
+  const syncProgress = await k.isSyncing()
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
