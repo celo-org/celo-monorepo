@@ -12,7 +12,7 @@ contract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloV
      * @return The storage, major, minor, and patch version of the contract.
      */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 1);
+    return (1, 1, 0, 2);
   }
 
   /**
@@ -23,7 +23,7 @@ contract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloV
      * @param initCallData calldata pointing to a method on implementation used to initialize
      */
   function deploy(address owner, address implementation, bytes calldata initCallData) external {
-    MetaTransactionWalletProxy proxy = new MetaTransactionWalletProxy();
+    MetaTransactionWalletProxy proxy = new MetaTransactionWalletProxy(msg.sender);
     proxy._setAndInitializeImplementation(implementation, initCallData);
     proxy._transferOwnership(owner);
 
