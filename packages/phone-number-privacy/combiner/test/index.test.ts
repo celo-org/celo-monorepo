@@ -1,21 +1,50 @@
-import { isVerified } from '@celo/phone-number-privacy-common'
+import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
+import { AuthenticationMethod, EncryptionKeySigner } from '@celo/identity/lib/odis/query'
+import { getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
+import { hexToBuffer } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
-import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
+import {
+  getAccountSignedUserPhoneNumberRecord,
+  getDekSignerRecord,
+  getDidMatchmaking,
+  setDidMatchmaking,
+} from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSig, getContactMatches } from '../src/index'
 import { BLINDED_PHONE_NUMBER } from './end-to-end/resources'
 
+const ec = new EC('secp256k1')
+
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
+
+const ENCRYPTION_KEY: EncryptionKeySigner = {
+  rawKey: ACCOUNT_PRIVATE_KEYS[0],
+  authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+}
+
+const signWithDEK = (message: string, signer: EncryptionKeySigner) => {
+  const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
+  return JSON.stringify(key.sign(message).toDER())
+}
 
 jest.mock('@celo/phone-number-privacy-common', () => ({
   ...jest.requireActual('@celo/phone-number-privacy-common'),
   authenticateUser: jest.fn().mockReturnValue(true),
   isVerified: jest.fn(),
+  getDataEncryptionKey: jest.fn(),
+  verifySignature: jest.fn(),
 }))
 const mockIsVerified = isVerified as jest.Mock
+const mockGetDataEncryptionKey = getDataEncryptionKey as jest.Mock
+mockGetDataEncryptionKey.mockResolvedValue(ACCOUNT_ADDRESSES[0])
+
+jest.mock('@celo/utils/lib/signatureUtils')
+const mockVerifySignature = verifySignature as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = jest.fn()
@@ -30,6 +59,10 @@ const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
 mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 mockSetDidMatchmaking.mockImplementation()
+const mockGetAccountSignedUserPhoneNumberRecord = getAccountSignedUserPhoneNumberRecord as jest.Mock
+mockGetAccountSignedUserPhoneNumberRecord.mockReturnValue(false)
+const mockGetDekSignerRecord = getDekSignerRecord as jest.Mock
+mockGetDekSignerRecord.mockImplementation()
 
 jest.mock('../src/database/wrappers/number-pairs')
 const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
@@ -168,21 +201,18 @@ describe(`POST /getContactMatches endpoint`, () => {
   }
 
   describe('with valid input', () => {
-    const req = {
-      body: validInput,
-      headers: mockHeaders,
-    } as Request
-
-    it('provides matches', (done) => {
-      mockGetNumberPairContacts.mockReturnValue(validInput.contactPhoneNumbers)
-      mockIsVerified.mockReturnValue(true)
+    mockIsVerified.mockReturnValue(true)
+    const expectMatches = (req: Request, numbers: string[], done: jest.DoneCallback) => {
+      mockGetNumberPairContacts.mockReturnValue(numbers)
       const res = {
         json(body: any) {
           try {
             expect(body.success).toEqual(true)
-            expect(body.matchedContacts).toEqual([
-              { phoneNumber: validInput.contactPhoneNumbers[0] },
-            ])
+            expect(body.matchedContacts).toEqual(
+              numbers.map((number) => {
+                phoneNumber: number
+              })
+            )
             done()
           } catch (e) {
             done(e)
@@ -204,43 +234,73 @@ describe(`POST /getContactMatches endpoint`, () => {
       } as Response
 
       getContactMatches(req, res)
+    }
+
+    const expectSuccessfulMatchmaking = (req: Request) => {
+      it('provides matches', (done) => expectMatches(req, req.body.contactPhoneNumbers, done))
+      it('provides matches empty array', (done) => expectMatches(req, [], done))
+    }
+
+    const expectAllReplaysToFail = (req: Request) => {
+      describe('With replayed requests', () => {
+        mockGetDidMatchmaking.mockReturnValue(true)
+        it('rejects more than one request to matchmake with 403', (done) => {
+          getContactMatches(req, invalidResponseExpected(done, 403))
+        })
+      })
+    }
+
+    describe('w/o signedUserPhoneNumber', () => {
+      const req = {
+        body: validInput,
+        headers: mockHeaders,
+      } as Request
+      expectSuccessfulMatchmaking(req)
+      expectAllReplaysToFail(req)
     })
 
-    it('provides matches empty array', (done) => {
-      mockGetNumberPairContacts.mockReturnValue([])
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        json(body: any) {
-          try {
-            expect(body.success).toEqual(true)
-            expect(body.matchedContacts).toEqual([])
-            done()
-          } catch (e) {
-            done(e)
-          }
+    describe('w/ signedUserPhoneNumber', () => {
+      const req = {
+        body: {
+          ...validInput,
+          signedUserPhoneNumber: signWithDEK(validInput.userPhoneNumber, ENCRYPTION_KEY),
         },
-        status(status: any) {
-          try {
-            expect(status).toEqual(200)
-            done()
-          } catch (e) {
-            done(e)
-          }
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      } as Response
+        headers: mockHeaders,
+      } as Request
 
-      getContactMatches(req, res)
-    })
+      expectSuccessfulMatchmaking(req)
 
-    it('rejects more than one attempt to matchmake with 403', (done) => {
-      mockGetDidMatchmaking.mockReturnValue(true)
-      mockIsVerified.mockReturnValue(true)
-      getContactMatches(req, invalidResponseExpected(done, 403))
+      describe('When DEK cannot be read', () => {
+        mockGetDataEncryptionKey.mockRejectedValue(false)
+        expectSuccessfulMatchmaking(req)
+        expectAllReplaysToFail(req)
+      })
+
+      describe('When DEK signedUserPhoneNumber signature is invalid', () => {
+        mockVerifySignature.mockReturnValue(false)
+        it('Rejects request to matchmake with 403', (done) => {
+          getContactMatches(req, invalidResponseExpected(done, 403))
+        })
+      })
+
+      describe('With replayed requests', () => {
+        mockGetDidMatchmaking.mockReturnValue(true)
+
+        describe('When a signedUserPhoneNumber record exists in the db', () => {
+          describe('When the signedUserPhoneNumber record in the db matches the request', () => {
+            expectSuccessfulMatchmaking(req)
+          })
+          describe('When the signedUserPhoneNumber record in the db does not match the request', () => {
+            it('Rejects request to matchmake with 403', (done) => {
+              getContactMatches(req, invalidResponseExpected(done, 403))
+            })
+          })
+        })
+
+        describe('When a signedUserPhoneNumber does not exist in the db', () => {
+          expectSuccessfulMatchmaking(req)
+        })
+      })
     })
   })
 
