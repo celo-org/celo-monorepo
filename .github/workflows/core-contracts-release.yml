@@ -39,12 +39,12 @@ jobs:
 
       - name: Verify previous release
         run: |
-          export OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
+          export OLD_BRANCH=core-contracts.v$((${{ env.VERSION }}-1))
           cd packages/protocol && yarn run verify-deployed -b $OLD_BRANCH -n ${{ env.NETWORK }} -f;
 
       - name: Verify version compatibility
         run: |
-          OLD_BRANCH=celo-core-contracts-v$((${{ env.VERSION }}-1)).${{ env.NETWORK }}
+          OLD_BRANCH=core-contracts.v$((${{ env.VERSION }}-1))
           NEW_BRANCH=alexbharley/github-actions-deployment-2
           cd packages/protocol && yarn run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json;
 
