@@ -12,8 +12,6 @@ blockscout:
       requests:
         memory: 700Mi
         cpu: 1500m
-    metrics:
-      enabled: true
   api:
     autoscaling:
         maxReplicas: 3
@@ -49,3 +47,5 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
+  metrics:
+    enabled: false

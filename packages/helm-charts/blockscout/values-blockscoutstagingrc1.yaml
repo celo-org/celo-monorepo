@@ -49,3 +49,5 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
+  metrics:
+    enabled: false
