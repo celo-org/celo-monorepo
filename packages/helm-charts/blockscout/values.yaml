@@ -145,6 +145,10 @@ blockscout:
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
+    sourcify:
+      enabled: true
+      serverUrl: https://sourcify.dev/server
+      repoUrl: https://repo.sourcify.dev/contracts/full_match/
     resources:
       requests:
         memory: 250M
