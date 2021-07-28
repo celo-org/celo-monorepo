@@ -6,7 +6,13 @@ import Logger from 'bunyan'
 import moment from 'moment'
 import { FindOptions, Op, Sequelize, Transaction } from 'sequelize'
 import Web3 from 'web3'
-import { fetchEnv, fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from './env'
+import {
+  fetchEnv,
+  fetchEnvOrDefault,
+  getAccountAddress,
+  getAttestationSignerAddress,
+  isYes,
+} from './env'
 import { rootLogger } from './logger'
 import { Gauges } from './metrics'
 import Attestation, {
@@ -98,7 +104,7 @@ async function execWithFallback<T>(
 
 // Wrapper that on error tries once to reinitialize connection to node.
 export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
-  const smartFallback = !(fetchEnvOrDefault('DISABLE_SMART_FALLBACK', 'false') === 'true')
+  const smartFallback = !isYes(fetchEnvOrDefault('DISABLE_SMART_FALLBACK', 'false'))
   if (!kit && !backupKit) {
     await initializeKit(true)
     // tslint:disable-next-line: no-return-await
