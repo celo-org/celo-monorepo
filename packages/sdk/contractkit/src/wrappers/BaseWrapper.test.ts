@@ -1,6 +1,7 @@
 import { NULL_ADDRESS } from '@celo/base'
 import { CeloTxObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
+import timezoneMock from 'timezone-mock'
 import Web3 from 'web3'
 import {
   ICeloVersionedContract,
@@ -58,24 +59,31 @@ describe('TestWrapper', () => {
 describe('unixSecondsTimestampToDateString()', () => {
   const date = new BigNumber(1627489780)
 
-  // describe("when Brazil/East", () => {
-  //   it("returns local time", () => {
-  //     expect(unixSecondsTimestampToDateString(date)).toEqual("")
-  //   })
-  // })
-  describe('when UTC', () => {
-    it('returns utc time', () => {
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 9:29 AM UTC-07:00')
+  describe('when Brazil/East', () => {
+    it('returns local time', () => {
+      timezoneMock.register('Brazil/East')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 1:29 PM UTC-03:00')
     })
   })
-  // describe("when Australia/Adelaide", () => {
-  //   it("returns local time", () => {
-  //     expect(unixSecondsTimestampToDateString(date)).toEqual("")
-  //   })
-  // })
-  // describe("when Europe/London", () => {
-  //   it("returns local time", () => {
-  //     expect(unixSecondsTimestampToDateString(date)).toEqual("")
-  //   })
-  // })
+  describe('when UTC', () => {
+    it('returns utc time', () => {
+      timezoneMock.register('UTC')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 4:29 PM UTC+00:00')
+    })
+  })
+  describe('when Australia/Adelaide', () => {
+    it('returns local time', () => {
+      timezoneMock.register('Australia/Adelaide')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Thu, Jul 29, 2021 1:59 AM UTC+09:30')
+    })
+  })
+  describe('when Europe/London', () => {
+    it('returns local time', () => {
+      timezoneMock.register('Europe/London')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 5:29 PM UTC+01:00')
+    })
+  })
+  afterEach(() => {
+    timezoneMock.unregister()
+  })
 })
