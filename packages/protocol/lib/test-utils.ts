@@ -128,6 +128,9 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
 }
 
 export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
+  if (isCoverage()) {
+    return assertRevert(promise)
+  }
   try {
     await promise
     assert.fail('Expected transaction to revert')
