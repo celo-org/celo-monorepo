@@ -282,7 +282,7 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
     describe('With EIP-1167', () => {
       let proxyCloneFactory: ProxyCloneFactoryInstance
       before(async () => {
-        const proxy: ProxyInstance = await Proxy.new()
+        const proxy: ProxyInstance = await Proxy.new(accounts[0])
         proxyCloneFactory = await ProxyCloneFactory.new()
         await proxyCloneFactory.setImplementationAddress(proxy.address)
         mtw = await MTW.new(false)

@@ -134,6 +134,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   }
   console.info('  Deploying ReleaseGoldMultiSigProxy...')
   const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
+    fromAddress,
     { from: fromAddress },
   ])
   console.info('  Deploying ReleaseGoldMultiSig...')
@@ -161,7 +162,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     },
   ])
   console.info('  Deploying ReleaseGoldProxy...')
-  const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
+  const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [fromAddress, { from: fromAddress }])
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [false, { from: fromAddress }])
 

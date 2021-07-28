@@ -29,7 +29,7 @@ contract('Proxy', (accounts: string[]) => {
   const owner = accounts[0]
 
   beforeEach(async () => {
-    proxy = await Proxy.new({ from: owner })
+    proxy = await Proxy.new(owner)
     getSet = await GetSetV0.new({ from: owner })
     proxiedGetSet = await GetSetV0.at(proxy.address)
   })

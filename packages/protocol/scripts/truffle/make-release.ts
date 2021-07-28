@@ -123,16 +123,14 @@ const deployProxy = async (
   if (from) {
     Proxy.defaults({ from }) // override truffle with provided from address
   }
-  // Hack to trick truffle, which checks that the provided address has code
-  const proxy = await (dryRun ? Proxy.at(celoRegistryAddress) : Proxy.new())
 
-  // This makes essentially every contract dependent on Governance.
-  console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
-  if (!dryRun) {
-    await proxy._transferOwnership(addresses.get('Governance'))
+  if (dryRun) {
+    // Hack to trick truffle, which checks that the provided address has code
+    return Proxy.at(celoRegistryAddress)
+  } else {
+    // This makes essentially every contract dependent on Governance.
+    return Proxy.new(addresses.get('Governance'))
   }
-
-  return proxy
 }
 
 const shouldDeployProxy = (report: ASTDetailedVersionedReport, contractName: string) => {
@@ -161,9 +159,7 @@ const deployCoreContract = async (
     value: '0',
   }
 
-  if (!shouldDeployProxy(report, contractName)) {
-    proposal.push(setImplementationTx)
-  } else {
+  if (shouldDeployProxy(report, contractName)) {
     const proxy = await deployProxy(contractName, addresses, isDryRun, from)
 
     // Update the contract's address to the new proxy in the proposal
@@ -195,11 +191,11 @@ const deployCoreContract = async (
       setImplementationTx.function = '_setAndInitializeImplementation'
       setImplementationTx.args.push(callData)
     }
-    console.log(
-      `Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`
-    )
-    proposal.push(setImplementationTx)
   }
+  console.log(
+    `Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`
+  )
+  proposal.push(setImplementationTx)
 }
 
 const deployLibrary = async (

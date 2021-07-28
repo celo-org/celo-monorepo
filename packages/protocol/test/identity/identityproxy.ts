@@ -14,7 +14,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
   let identityProxyTest: IdentityProxyTestInstance
 
   beforeEach(async () => {
-    identityProxy = await IdentityProxy.new()
+    identityProxy = await IdentityProxy.new(accounts[0])
     identityProxyTest = await IdentityProxyTest.new()
   })
 

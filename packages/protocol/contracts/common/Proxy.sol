@@ -17,8 +17,8 @@ contract Proxy {
   event OwnerSet(address indexed owner);
   event ImplementationSet(address indexed implementation);
 
-  constructor() public {
-    _setOwner(msg.sender);
+  constructor(address owner) public {
+    _setOwner(owner);
   }
 
   /**

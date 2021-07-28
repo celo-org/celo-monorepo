@@ -29,7 +29,7 @@ const makeTruffleContract = (artifact: Artifact) => {
 }
 
 const deployProxiedContract = async (Contract: any, from: string) => {
-  const proxy = await Proxy.new()
+  const proxy = await Proxy.new(from)
   const contract = await Contract.new({ from })
   await proxy._setImplementation(contract.address)
   return Contract.at(proxy.address)

@@ -24,7 +24,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const Proxy: ProxyContract = artifacts.require('Proxy')
 
     console.info('  Deploying MultiSigProxy...')
-    const proxy = await retryTx(Proxy.new, [{ from: argv.from }])
+    const proxy = await retryTx(Proxy.new, [argv.from, { from: argv.from }])
     console.info('  Deploying MultiSig...')
     const multiSig = await retryTx(multSig.new, [{ from: argv.from }])
     await _setInitialProxyImplementation(
