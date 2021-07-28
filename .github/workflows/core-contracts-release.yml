@@ -36,6 +36,11 @@ jobs:
 
       - name: Build packages
         run: yarn lerna run build --ignore docs
+      
+      - name: Get branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: get_branch
 
       - name: Verify previous release
         run: |
@@ -45,10 +50,10 @@ jobs:
       - name: Verify version compatibility
         run: |
           OLD_BRANCH=core-contracts.v$((${{ env.VERSION }}-1))
-          NEW_BRANCH=alexbharley/github-actions-deployment-2
+          NEW_BRANCH=${{ steps.get_branch.outputs.branch }}
           cd packages/protocol && yarn run check-versions -a $OLD_BRANCH -b $NEW_BRANCH -r report.json;
 
       - name: Make release
         run: |
-          NEW_BRANCH=alexbharley/github-actions-deployment-2
+          NEW_BRANCH=${{ steps.get_branch.outputs.branch }}
           cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";
