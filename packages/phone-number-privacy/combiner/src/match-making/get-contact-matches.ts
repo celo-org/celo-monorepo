@@ -92,7 +92,6 @@ export async function handleGetContactMatches(
         'Failed to determine if user has performed matchmaking. Request will be fulfilled but not recorded.'
       )
       matchmakingId = undefined
-      return false
     })
 
     if (hasDoneMatchmaking) {

@@ -56,13 +56,11 @@ mockSufficientVerifiedSigs.mockReturnValue(true)
 
 jest.mock('../src/database/wrappers/account')
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
-mockGetDidMatchmaking.mockReturnValue(false)
+mockGetDidMatchmaking.mockResolvedValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 mockSetDidMatchmaking.mockImplementation()
 const mockGetAccountSignedUserPhoneNumberRecord = getAccountSignedUserPhoneNumberRecord as jest.Mock
-mockGetAccountSignedUserPhoneNumberRecord.mockReturnValue(false)
 const mockGetDekSignerRecord = getDekSignerRecord as jest.Mock
-mockGetDekSignerRecord.mockImplementation()
 
 jest.mock('../src/database/wrappers/number-pairs')
 const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
@@ -199,6 +197,11 @@ describe(`POST /getContactMatches endpoint`, () => {
     account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
   }
+
+  mockGetDekSignerRecord.mockResolvedValue(ENCRYPTION_KEY.rawKey)
+  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+    signWithDEK(validInput.userPhoneNumber, ENCRYPTION_KEY)
+  )
 
   describe('with valid input', () => {
     mockIsVerified.mockReturnValue(true)
