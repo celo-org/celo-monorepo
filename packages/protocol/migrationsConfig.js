@@ -234,11 +234,10 @@ const NetworkConfigs = {
     epochRewards: {
       frozen: false,
     },
-    /*
     exchange: {
       frozen: false,
       minimumReports: 1,
-    },*/
+    },
     goldToken: {
       frozen: false,
     },
