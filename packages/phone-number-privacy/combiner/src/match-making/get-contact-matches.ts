@@ -12,7 +12,6 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
-import crypto from 'crypto'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
 import { VERSION } from '../config'
@@ -29,7 +28,7 @@ interface ContactMatch {
   phoneNumber: string
 }
 export interface MatchmakingIdentifier {
-  signedUserPhoneNumberHash: string
+  signedUserPhoneNumber: string
   dekSigner: string
 }
 
@@ -83,13 +82,7 @@ export async function handleGetContactMatches(
           )
           return
         }
-        matchmakingId = {
-          dekSigner,
-          signedUserPhoneNumberHash: crypto
-            .createHash('sha256')
-            .update(signedUserPhoneNumber)
-            .digest('base64'),
-        }
+        matchmakingId = { signedUserPhoneNumber, dekSigner }
       }
     }
 
@@ -99,6 +92,7 @@ export async function handleGetContactMatches(
         'Failed to determine if user has performed matchmaking. Request will be fulfilled but not recorded.'
       )
       matchmakingId = undefined
+      return false
     })
 
     if (hasDoneMatchmaking) {
@@ -137,7 +131,7 @@ export async function handleGetContactMatches(
               'Allowing account to perform matchmaking since we have no record of the phone number it used before. We will record the phone number this time.'
             )
           } else {
-            if (signedUserPhoneNumberRecord !== matchmakingId.signedUserPhoneNumberHash) {
+            if (signedUserPhoneNumberRecord !== matchmakingId.signedUserPhoneNumber) {
               // Account has performed matchmaking before and has provided a valid phone number dek signature
               // but the phone number signature we have stored in the db does not match what they provided.
               const dekSignerRecord = await getDekSignerRecord(account, logger)

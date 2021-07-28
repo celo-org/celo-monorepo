@@ -19,7 +19,7 @@ export class Account {
   constructor(address: string, matchmakingId?: MatchmakingIdentifier) {
     this.address = address
     if (matchmakingId) {
-      this.signedUserPhoneNumber = matchmakingId.signedUserPhoneNumberHash
+      this.signedUserPhoneNumber = matchmakingId.signedUserPhoneNumber
       this.dekSigner = matchmakingId.dekSigner
     }
   }

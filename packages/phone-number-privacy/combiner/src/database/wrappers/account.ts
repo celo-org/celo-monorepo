@@ -24,7 +24,7 @@ export async function getAccountSignedUserPhoneNumberRecord(
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    throw err
+    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
@@ -60,7 +60,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    throw err
+    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
@@ -86,10 +86,7 @@ export async function setDidMatchmaking(
             if (matchmakingId) {
               await accountTrxBase()
                 .having(ACCOUNTS_COLUMNS.signedUserPhoneNumber, 'is', null) // prevents overwriting
-                .update(
-                  ACCOUNTS_COLUMNS.signedUserPhoneNumber,
-                  matchmakingId.signedUserPhoneNumberHash
-                )
+                .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, matchmakingId.signedUserPhoneNumber)
               await accountTrxBase()
                 .having(ACCOUNTS_COLUMNS.dekSigner, 'is', null)
                 .update(ACCOUNTS_COLUMNS.dekSigner, matchmakingId.dekSigner)
