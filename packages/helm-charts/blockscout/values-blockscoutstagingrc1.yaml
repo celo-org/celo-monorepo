@@ -5,34 +5,18 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
-    pool_size: 20
+            memory: 4Gi
+            cpu: 2
+    pool_size: 100
     resources:
       requests:
-        memory: 700Mi
-        cpu: 1500m
+        memory: 12Gi
+        cpu: 5
+    metrics:
+      enabled: true
   api:
     autoscaling:
-        maxReplicas: 3
-        minReplicas: 2
-        target:
-          cpu: 70
-    db:
-      proxy:
-        resources:
-          requests:
-            memory: 250Mi
-            cpu: 200m
-    pool_size: 10
-    resources:
-      requests:
-        memory: 250Mi
-        cpu: 500m
-  web:
-    host: alfajores-blockscout.celo-testnet.org
-    autoscaling:
-      maxReplicas: 3
+      maxReplicas: 10
       minReplicas: 2
       target:
         cpu: 70
@@ -40,8 +24,26 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
+            memory: 500Mi
+            cpu: 700m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 500m
+  web:
+    host: blockscoutstagingrc1-blockscout3.celo-testnet.org
+    autoscaling:
+      maxReplicas: 10
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 700m
     pool_size: 10
     resources:
       requests:
