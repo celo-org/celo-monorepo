@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "jsx": "preserve",
-    "lib": ["dom", "es2015", "es2016"],
+    "lib": ["dom","dom.iterable","es2015", "es2016"],
     "module": "commonjs",
     "moduleResolution": "node",
     "noUnusedLocals": true,
