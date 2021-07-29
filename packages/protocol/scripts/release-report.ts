@@ -77,6 +77,9 @@ const req = (
     headers,
     body: params ? new URLSearchParams(params) : undefined,
   })
+  if (!resp.ok) {
+    throw new Error(`Request failed: ${JSON.stringify(resp, null, 2)}`)
+  }
   return JSON.parse(await resp.text())
 }
 
@@ -156,4 +159,4 @@ const main = async (releaseReport: ReleaseReport): Promise<void> => {
   })
 }
 
-main(release_report).catch((error) => console.error('error', error))
+main(release_report).catch((error) => console.error(error))
