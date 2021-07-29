@@ -66,19 +66,22 @@ const release_report: ReleaseReport = {
 const req = (
   url_prefix: string,
   headers: Record<string, string>,
-  base_query: URLSearchParams
-) => async (
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH',
-  url: string,
-  params?: Record<string, any>
-) => {
-  const resp = await fetch(`${url_prefix}/${url}?${base_query}`, {
-    method,
-    headers,
-    body: params ? new URLSearchParams(params) : undefined,
-  })
+  base_query?: URLSearchParams
+) => async (method: 'GET' | 'POST' | 'PUT' | 'PATCH', url: string, params: Record<string, any>) => {
+  const options = { method, headers, body: undefined }
+  let full_url = `${url_prefix}/${url}?${(base_query ?? '').toString()}`
+
+  if (method === 'GET') {
+    full_url += new URLSearchParams(params).toString()
+  } else {
+    options.body = JSON.stringify(params)
+  }
+
+  const resp = await fetch(full_url, options)
   if (!resp.ok) {
-    throw new Error(`Request failed: ${JSON.stringify(resp, null, 2)}`)
+    throw new Error(
+      `Request failed: ${method} ${full_url} with ${resp.status} (${resp.statusText})`
+    )
   }
   return JSON.parse(await resp.text())
 }
@@ -87,14 +90,11 @@ const issue_labels = ['Component: Contracts', 'audit', 'CAP']
 const gh_org = 'celo-org'
 const gh_repo = 'celo-monorepo'
 
-const github_req = req(
-  `https://api.github.com/repos/${gh_org}/${gh_repo}/`,
-  {
-    Authorization: process.env.GITHUB_PAT ?? '',
-    'Content-Type': 'application/json',
-  },
-  new URLSearchParams()
-)
+const github_req = req(`https://api.github.com/repos/${gh_org}/${gh_repo}`, {
+  Authorization: `token ${process.env.GITHUB_PAT ?? ''}`,
+  Accept: 'application/vnd.github.v3+json',
+  'Content-Type': 'application/json',
+})
 
 const repo_id = '197642503'
 const workspace_id = '600598462807be0011921c65'
@@ -109,7 +109,10 @@ const zenhub_req = req(
 )
 
 const convertGithubToZenhubIssues = (githubIssues: Array<any>) =>
-  githubIssues.map((gh_issue) => ({ repo_id, issue_number: gh_issue.number }))
+  githubIssues.map((gh_issue) => ({
+    repo_id: parseInt(repo_id),
+    issue_number: parseInt(gh_issue.number),
+  }))
 
 const main = async (releaseReport: ReleaseReport): Promise<void> => {
   // create release
@@ -118,11 +121,11 @@ const main = async (releaseReport: ReleaseReport): Promise<void> => {
     description: releaseReport.description,
     start_date: new Date(releaseReport.start).toISOString(),
     desired_end_date: new Date(releaseReport.end).toISOString(),
-    repositories: [repo_id],
+    repositories: [parseInt(repo_id)],
   })
 
   // create epics
-  const gh_epics = await concurrentMap(3, releaseReport.epics, async (epic) => {
+  const gh_epics = await concurrentMap(1, releaseReport.epics, async (epic) => {
     // create github issue representing epic
     const gh_epic = await github_req('POST', 'issues', {
       title: epic.title,
@@ -131,13 +134,13 @@ const main = async (releaseReport: ReleaseReport): Promise<void> => {
     })
 
     // create github issues representing epic contents
-    const gh_issues = await concurrentMap(4, epic.issues, (title) =>
-      github_req('POST', 'issues', { title })
+    const gh_issues = await concurrentMap(1, epic.issues, (issue) =>
+      github_req('POST', 'issues', { title: issue.title, labels: issue_labels })
     )
     const zh_issues = convertGithubToZenhubIssues(gh_issues)
 
     // assign estimates to github issues
-    await concurrentMap(4, zh_issues, (zh_issue, i) =>
+    await concurrentMap(1, zh_issues, (zh_issue, i) =>
       zenhub_req('PUT', `repositories/${repo_id}/issues/${zh_issue.issue_number}/estimate`, {
         estimate: epic.issues[i].estimate,
       })
@@ -146,6 +149,12 @@ const main = async (releaseReport: ReleaseReport): Promise<void> => {
     // convert github issue to epic and add contents
     await zenhub_req('POST', `repositories/${repo_id}/issues/${gh_epic.number}/convert_to_epic`, {
       issues: zh_issues,
+    })
+
+    // add issues to release report
+    await zenhub_req('PATCH', `reports/release/${newReport.release_id}/issues`, {
+      add_issues: zh_issues,
+      remove_issues: [],
     })
 
     return gh_epic
