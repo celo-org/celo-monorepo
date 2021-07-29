@@ -1,3 +1,4 @@
+import { Block } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { FileKeystore, KeystoreWalletWrapper } from '@celo/keystores'
@@ -69,9 +70,10 @@ async function execWithFallback<T>(
 ): Promise<T> {
   // Decorator to wrap execution of f with a retry using the kit2 kit
   // if execution initially fails
-
+  console.log("in execWithFallback")
   let primaryKit = kit1
   let secondaryKit = kit2
+  // Check if backup kit is ahead of primary kit; change prioritization as such
   if (
     smartFallback &&
     kit2 &&
@@ -84,7 +86,6 @@ async function execWithFallback<T>(
       (await getAgeOfLatestBlockFromKit(kit2)).number >
         (await getAgeOfLatestBlockFromKit(kit1)).number)
   ) {
-    // Prioritize more-synced celo provider
     rootLogger.info('Prioritizing CELO_PROVIDER_BACKUP')
     primaryKit = kit2
     secondaryKit = kit1
@@ -130,15 +131,47 @@ export async function isNodeSyncing() {
 }
 
 export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
-  const latestBlock = await k!.connection.getBlock('latest')
-  const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
-  return {
-    ageOfLatestBlock,
-    number: latestBlock.number,
+  // TODO implement timeout -- if it times out/throws an error, could return block number of 0 and age of inf?
+  // alt. need to figure out how to handle that in a reasonable way/throw
+  console.log("starting to get block")
+  // const startTime = Date.now()
+
+  // const latestBlock = await k!.connection.getBlock('latest')
+  try {
+    return await withTimeout(10, async () => {
+      let latestBlock: Block
+      try {
+        // Differentiate between errors with getBlock and timeouts
+        latestBlock = await k!.connection.getBlock('latest')
+      } catch (error) {
+        throw new Error(`Error fetching latest block: ${error.message}`)
+      }
+      const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
+      return {
+        ageOfLatestBlock,
+        number: latestBlock.number,
+      }
+    })
+  } catch (error) {
+    rootLogger.warn(error.message)
+    // Set this to values that should always be comparitively out-of-date
+    return {
+      ageOfLatestBlock: maxAgeLatestBlock + 1,
+      number: -1,
+    }
   }
+  // setTimeout(() => findAttestationAndSendSms(key, childLogger, sequelizeLogger), timeout)
+
+  // console.log("time to get block:", Date.now() - startTime)
+  // const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
+  // return {
+  //   ageOfLatestBlock,
+  //   number: latestBlock.number,
+  // }
 }
 
 export async function getAgeOfLatestBlock() {
+  console.log("in getAgeOfLatestBlock")
   return useKit(getAgeOfLatestBlockFromKit)
 }
 
@@ -390,4 +423,37 @@ export async function doHealthCheck(): Promise<string | null> {
     Gauges.healthy.set(0)
     return ErrorMessages.UNKNOWN_ERROR
   }
+}
+
+// Copied from packages/faucet/src/database-helper.ts
+function withTimeout<A>(
+  timeout: number,
+  fn: () => Promise<A>,
+  onTimeout?: () => A | Promise<A>
+): Promise<A> {
+  return new Promise((resolve, reject) => {
+    let timeoutHandler: number | null = setTimeout(() => {
+      timeoutHandler = null
+
+      if (onTimeout) {
+        resolve(onTimeout())
+      } else {
+        reject(new Error(`Timeout after ${timeout} ms`))
+      }
+    }, timeout)
+
+    fn()
+      .then((val) => {
+        if (timeoutHandler !== null) {
+          clearTimeout(timeoutHandler)
+          resolve(val)
+        }
+      })
+      .catch((err) => {
+        if (timeoutHandler !== null) {
+          clearTimeout(timeoutHandler)
+          reject(err)
+        }
+      })
+  })
 }
