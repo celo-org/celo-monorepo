@@ -67,3 +67,8 @@ There are currently a few other compatible wallets. When the upcoming [Donut har
 
 - [pesabase.com](https://pesabase.com/)
 - Platforms: iOS, Android
+
+### D’CENT
+
+- [https://dcentwallet.com/](https://dcentwallet.com/)
+- Platforms: Browser, iOS, Android
