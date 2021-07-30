@@ -28,8 +28,14 @@ export let sequelize: Sequelize | undefined
 let dbRecordExpiryMins: number | null
 
 const maxAgeLatestBlock: number = parseInt(fetchEnvOrDefault('MAX_AGE_LATEST_BLOCK_SECS', '20'), 10)
+const getBlockTimeout = parseInt(fetchEnvOrDefault('GET_BLOCK_TIMEOUT_MS', '500'), 10)
+
+// Process these once instead of at each reinitialization of the kits
 const celoProviders = getCeloProviders()
 const smartFallback = !isYes(fetchEnvOrDefault('DISABLE_SMART_FALLBACK', 'false'))
+const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
+const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
+const signerAddress = fetchEnv('ATTESTATION_SIGNER_ADDRESS')
 
 export type SequelizeLogger = boolean | ((sql: string, timing?: number) => void)
 
@@ -143,7 +149,7 @@ export async function isNodeSyncing() {
 
 export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
   try {
-    return await withTimeout(500, async () => {
+    return await withTimeout(getBlockTimeout, async () => {
       let latestBlock: Block
       try {
         // Differentiate between errors with getBlock and timeouts
@@ -226,14 +232,11 @@ export async function verifyConfigurationAndGetURL() {
 
 export async function initializeKits(force: boolean = false) {
   console.log('initializing kits')
-  // Prefer passed in keystore if these variables are set
-  const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
-  const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
 
   let keystoreWalletWrapper: KeystoreWalletWrapper | undefined
+  // Prefer to use keystore if these variables are set
   if (keystoreDirpath && keystorePassphrase) {
     keystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore(keystoreDirpath))
-    const signerAddress = fetchEnv('ATTESTATION_SIGNER_ADDRESS')
     try {
       await keystoreWalletWrapper.unlockAccount(signerAddress, keystorePassphrase)
     } catch (error) {
@@ -266,11 +269,6 @@ export async function initializeKits(force: boolean = false) {
     })
   )
   // No kits successfully reinitialized or existing kits that work
-  console.log('num failedConnections: ', failedConnections)
-  console.log('kits.length: ', kits.length)
-  // if (failedConnections == kits.length) {
-  //   throw new Error(`Initializing ContractKit failed for all providers: ${celoProviders}.`)
-  // }
   if (failedConnections && failedConnections.filter(Boolean).length == kits.length) {
     throw new Error(`Initializing ContractKit failed for all providers: ${celoProviders}.`)
   }
