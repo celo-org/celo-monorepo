@@ -1,6 +1,5 @@
-name: core-contracts-release
+name: contracts-release
 
-# Run this workflow manually
 on:
   workflow_dispatch:
     inputs:
@@ -10,7 +9,6 @@ on:
       network:
         description: 'Network to deploy core contracts release on'
         required: true
-
 
 env:
   NETWORK: ${{ github.event.inputs.network }}
