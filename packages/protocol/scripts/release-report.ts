@@ -1,6 +1,6 @@
 import { generateReleaseReport, ReleaseReport } from '@celo/dev-utils/lib/release-report'
 
-const n = '5'
+const n = 5
 const networks = ['staging', 'alfajores', 'baklava', 'mainnet']
 
 const releaseReport: ReleaseReport = {
@@ -46,7 +46,12 @@ const releaseReport: ReleaseReport = {
 }
 
 generateReleaseReport(
-  { labels: ['Component: Contracts', 'audit', 'CAP'], org: 'celo-org', repo: 'celo-monorepo' },
-  { repo_id: '197642503', workspace_id: '600598462807be0011921c65' },
+  {
+    labels: ['Component: Contracts', 'audit', 'CAP'],
+    org: 'celo-org',
+    repo: 'celo-monorepo',
+    apiToken: process.env.GITHUB_KEY,
+  },
+  { repoId: '197642503', workspaceId: '600598462807be0011921c65', apiKey: process.env.ZENHUB_KEY },
   releaseReport
 ).catch((error) => console.error(error))
