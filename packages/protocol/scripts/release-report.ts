@@ -3,7 +3,7 @@ import { generateReleaseReport, ReleaseReport } from '@celo/dev-utils/lib/releas
 const n = '5'
 const networks = ['staging', 'alfajores', 'baklava', 'mainnet']
 
-const release_report: ReleaseReport = {
+const releaseReport: ReleaseReport = {
   title: `Celo Core Contracts Release ${n}`,
   description: `Manage rollout of core contracts release ${n}`,
   start: 'July 12, 2021',
@@ -48,5 +48,5 @@ const release_report: ReleaseReport = {
 generateReleaseReport(
   { labels: ['Component: Contracts', 'audit', 'CAP'], org: 'celo-org', repo: 'celo-monorepo' },
   { repo_id: '197642503', workspace_id: '600598462807be0011921c65' },
-  release_report
+  releaseReport
 ).catch((error) => console.error(error))
