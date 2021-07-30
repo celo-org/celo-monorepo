@@ -1,18 +1,22 @@
 name: contracts-release
 
-on:
-  workflow_dispatch:
-    inputs:
-      release_version:
-        description: 'Version number of the release to be deployed'
-        required: true
-      network:
-        description: 'Network to deploy core contracts release on'
-        required: true
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       release_version:
+#         description: 'Version number of the release to be deployed'
+#         required: true
+#       network:
+#         description: 'Network to deploy core contracts release on'
+#         required: true
 
+on: push
 env:
-  NETWORK: ${{ github.event.inputs.network }}
-  VERSION: ${{ github.event.inputs.release_version }}
+  NETWORK: alfajores
+  VERSION: 5
+# env:
+#   NETWORK: ${{ github.event.inputs.network }}
+#   VERSION: ${{ github.event.inputs.release_version }}
 
 
 jobs:
@@ -55,4 +59,4 @@ jobs:
       - name: Make release
         run: |
           NEW_BRANCH=${{ steps.get_branch.outputs.branch }}
-          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json -z -f "worry weekend curtain couch rifle feel combine warm employ cheap estate figure civil siege catch yard catch monkey business group bag cup hand frequent";
+          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json -z -f "${{ secrets.ALFAJORES_MNEMONIC }}";
