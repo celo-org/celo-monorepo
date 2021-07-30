@@ -128,6 +128,7 @@ export async function clearAllFundsToOriginalAddress(
     // Exchange and transfer tests move ~0.5, so setting the threshold slightly below
     const maxBalanceBeforeCollecting = ONE.times(0.4)
     if (celoBalance.gt(maxBalanceBeforeCollecting)) {
+      // Transfer CELO back to validator 0, which is used for CELO funding.
       await goldToken
         .transfer(
           validator0.address,
@@ -147,6 +148,7 @@ export async function clearAllFundsToOriginalAddress(
       const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
       const balance = await stableTokenInstance.balanceOf(account.address)
       if (balance.gt(maxBalanceBeforeCollecting)) {
+        // Transfer stable tokens back to root, which is used for stable token funding.
         await stableTokenInstance
           .transfer(
             root.address,
@@ -175,14 +177,11 @@ export async function clearAllFundsToOriginalAddress(
 export function parseStableTokensList(stableTokenList: string): StableToken[] {
   const stableTokenStrs = stableTokenList.split(',')
   const validStableTokens = Object.values(StableToken)
-  const stableTokens: StableToken[] = []
 
   for (const stableTokenStr of stableTokenStrs) {
-    if (validStableTokens.includes(stableTokenStr as StableToken)) {
-      stableTokens.push(stableTokenStr as StableToken)
-    } else {
+    if (!validStableTokens.includes(stableTokenStr as StableToken)) {
       throw Error(`String ${stableTokenStr} not a valid StableToken`)
     }
   }
-  return stableTokens
+  return stableTokenStrs as StableToken[]
 }
