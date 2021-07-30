@@ -59,4 +59,4 @@ jobs:
       - name: Make release
         run: |
           NEW_BRANCH=${{ steps.get_branch.outputs.branch }}
-          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json -z -f "${{ secrets.ALFAJORES_MNEMONIC }}";
+          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -f "dinosaur tuna kiwi peasant spray receive jeans bubble city mention puzzle brother" -l libraries.json;
