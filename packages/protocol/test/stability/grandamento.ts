@@ -778,6 +778,16 @@ contract('GrandaMento', (accounts: string[]) => {
         })
       })
 
+      it("executes the proposal when time since approval is between the proposal's vetoPeriodSeconds and the contract's vetoPeriodSeconds", async () => {
+        const newContractVetoPeriodSeconds = vetoPeriodSeconds * 2
+        // Set the contract's vetoPeriodSeconds to a higher value than the proposal's
+        // vetoPeriodSeconds to illustrate that the proposal's vetoPeriodSeconds is used
+        // in the require.
+        await grandaMento.setVetoPeriodSeconds(newContractVetoPeriodSeconds)
+        await timeTravel(vetoPeriodSeconds, web3)
+        await grandaMento.executeExchangeProposal(1)
+      })
+
       it("reverts when the proposal's vetoPeriodSeconds has not elapsed since the approval time", async () => {
         // Set the contract's vetoPeriodSeconds to 0 to illustrate that
         // the proposal's vetoPeriodSeconds is used rather than the contract's
