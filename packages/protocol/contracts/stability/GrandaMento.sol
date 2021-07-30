@@ -75,11 +75,12 @@ contract GrandaMento is
     address payable exchanger;
     // The stable token involved in this proposal. This is stored rather than
     // the stable token's registry ID in case the contract address is changed
-    // while a stable token deposit
+    // after a proposal is created, which could affect refunding or burning the
+    // stable token.
     address stableToken;
     // The state of the exchange proposal.
     ExchangeProposalState state;
-    // Whether CELO is being sold and stableToken is being bought.
+    // Whether the exchanger is selling CELO and buying stableToken.
     bool sellCelo;
     // The amount of the sell token being sold. If a stable token is being sold,
     // the amount of stable token in "units" is stored rather than the "value."
@@ -316,11 +317,13 @@ contract GrandaMento is
     // Require the appropriate state and sender.
     // This will also revert if a proposalId is given that does not correspond
     // to a previously created exchange proposal.
-    require(
-      (proposal.state == ExchangeProposalState.Proposed && proposal.exchanger == msg.sender) ||
-        (proposal.state == ExchangeProposalState.Approved && isOwner()),
-      "Sender cannot cancel the exchange proposal"
-    );
+    if (proposal.state == ExchangeProposalState.Proposed) {
+      require(proposal.exchanger == msg.sender, "Sender must be exchanger");
+    } else if (proposal.state == ExchangeProposalState.Approved) {
+      require(isOwner(), "Sender must be owner");
+    } else {
+      revert("Proposal must be in Proposed or Approved state");
+    }
     // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
     // Get the token and amount that will be refunded to the proposer.

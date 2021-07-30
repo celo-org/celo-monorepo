@@ -503,7 +503,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Try to have Alice cancel it when the exchange proposal is in the Approved state.
         await assertRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: alice }),
-          'Sender cannot cancel the exchange proposal'
+          'Sender must be owner'
         )
       })
     })
@@ -526,7 +526,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Try to cancel it when the exchange proposal is in the Proposed state.
         await assertRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: owner }),
-          'Sender cannot cancel the exchange proposal'
+          'Sender must be exchanger'
         )
       })
     })
@@ -625,14 +625,14 @@ contract('GrandaMento', (accounts: string[]) => {
       await createExchangeProposal(false, alice)
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
-        'Sender cannot cancel the exchange proposal'
+        'Sender must be exchanger'
       )
     })
 
     it('reverts when the proposalId does not exist', async () => {
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
-        'Sender cannot cancel the exchange proposal'
+        'Proposal must be in Proposed or Approved state'
       )
     })
   })
