@@ -1,5 +1,7 @@
 import { NULL_ADDRESS } from '@celo/base'
 import { CeloTxObject } from '@celo/connect'
+import BigNumber from 'bignumber.js'
+import timezoneMock from 'timezone-mock'
 import Web3 from 'web3'
 import {
   ICeloVersionedContract,
@@ -7,7 +9,7 @@ import {
 } from '../generated/ICeloVersionedContract'
 import { newKitFromWeb3 } from '../kit'
 import { ContractVersion, newContractVersion } from '../versions'
-import { BaseWrapper } from './BaseWrapper'
+import { BaseWrapper, unixSecondsTimestampToDateString } from './BaseWrapper'
 
 const web3 = new Web3('http://localhost:8545')
 const mockContract = newICeloVersionedContract(web3, NULL_ADDRESS)
@@ -51,5 +53,37 @@ describe('TestWrapper', () => {
         await expect(tw.protectedFunction(v)).resolves.not.toThrow()
       })
     })
+  })
+})
+
+describe('unixSecondsTimestampToDateString()', () => {
+  const date = new BigNumber(1627489780)
+
+  describe('when Brazil/East', () => {
+    it('returns local time', () => {
+      timezoneMock.register('Brazil/East')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 1:29 PM UTC-03:00')
+    })
+  })
+  describe('when UTC', () => {
+    it('returns utc time', () => {
+      timezoneMock.register('UTC')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 4:29 PM UTC+00:00')
+    })
+  })
+  describe('when Australia/Adelaide', () => {
+    it('returns local time', () => {
+      timezoneMock.register('Australia/Adelaide')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Thu, Jul 29, 2021 1:59 AM UTC+09:30')
+    })
+  })
+  describe('when Europe/London', () => {
+    it('returns local time', () => {
+      timezoneMock.register('Europe/London')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 5:29 PM UTC+01:00')
+    })
+  })
+  afterEach(() => {
+    timezoneMock.unregister()
   })
 })
