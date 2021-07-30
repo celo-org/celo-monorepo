@@ -157,7 +157,7 @@ export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
     })
   } catch (error) {
     rootLogger.warn(error.message)
-    // On failure return values that should always be comparitively out-of-date
+    // On failure return values that should always be comparatively out-of-date
     return {
       ageOfLatestBlock: maxAgeLatestBlock + 1,
       number: -1,
