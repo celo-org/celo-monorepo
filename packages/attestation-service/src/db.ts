@@ -79,7 +79,6 @@ async function execWithFallback<T>(
   // with an optional prioritization of kit1 and kit2
   // an retry logic if execution with the first kit fails
 
-  console.log('in execWithFallback')
   let primaryKit = kit1
   let secondaryKit = kit2
   // Check if backup kit is ahead of primary kit; change prioritization as such
@@ -110,29 +109,22 @@ async function execWithFallback<T>(
 }
 
 export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
-  console.log('in useKit')
   let usableKits = kits.filter((k) => k !== undefined)
-  console.log('usableKits length: ', usableKits.length)
 
   const reinitAndRetry = async () => {
-    console.log('in reinitAndRetry')
     await initializeKits(true)
     usableKits = kits.filter((k) => k !== undefined)
-    console.log('usableKits length: ', usableKits.length)
     // tslint:disable-next-line: no-return-await
     return await execWithFallback(f, usableKits[0]!, usableKits[1], smartFallback)
   }
 
   if (!usableKits.length) {
     // This throws an error if no kits are initialized
-    console.log('in useKit if block')
     return await reinitAndRetry()
   } else {
     try {
-      console.log('in useKit try block')
       return await execWithFallback(f, usableKits[0]!, usableKits[1], smartFallback)
     } catch (error) {
-      console.log('in useKit except block')
       return await reinitAndRetry()
     }
   }
@@ -158,7 +150,6 @@ export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
         throw new Error(`Error fetching latest block: ${error.message}`)
       }
       const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
-      console.log('latest block number: ', latestBlock.number)
       return {
         ageOfLatestBlock,
         number: latestBlock.number,
@@ -175,7 +166,6 @@ export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
 }
 
 export async function getAgeOfLatestBlock() {
-  console.log('in getAgeOfLatestBlock')
   return useKit(getAgeOfLatestBlockFromKit)
 }
 
@@ -231,8 +221,7 @@ export async function verifyConfigurationAndGetURL() {
 }
 
 export async function initializeKits(force: boolean = false) {
-  console.log('initializing kits')
-
+  rootLogger.info('Initializing Contract Kit(s)')
   let keystoreWalletWrapper: KeystoreWalletWrapper | undefined
   // Prefer to use keystore if these variables are set
   if (keystoreDirpath && keystorePassphrase) {
@@ -248,11 +237,8 @@ export async function initializeKits(force: boolean = false) {
 
   const failedConnections = await Promise.all(
     kits.map(async (kit, i) => {
-      console.log('trying to intialize kit ', i)
       if (kit == undefined || force) {
-        console.log('in if branch of initialize')
         try {
-          console.log('trying to init')
           kits[i] = keystoreWalletWrapper
             ? newKit(celoProviders[i], keystoreWalletWrapper.getLocalWallet())
             : newKit(celoProviders[i])
