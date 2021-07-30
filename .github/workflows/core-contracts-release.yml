@@ -14,7 +14,7 @@ on:
 
 env:
   NETWORK: ${{ github.event.inputs.network }}
-  VERSION: ${{ github.event.inputs.version }}
+  VERSION: ${{ github.event.inputs.release_version }}
 
 
 jobs:
