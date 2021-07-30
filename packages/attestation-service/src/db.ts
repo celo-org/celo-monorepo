@@ -1,5 +1,5 @@
 import { Block } from '@celo/connect'
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { FileKeystore, KeystoreWalletWrapper } from '@celo/keystores'
 import { eqAddress } from '@celo/utils/lib/address'
@@ -12,6 +12,7 @@ import {
   fetchEnvOrDefault,
   getAccountAddress,
   getAttestationSignerAddress,
+  getCeloProviders,
   isYes,
 } from './env'
 import { rootLogger } from './logger'
@@ -28,6 +29,7 @@ export let sequelize: Sequelize | undefined
 let dbRecordExpiryMins: number | null
 
 const maxAgeLatestBlock: number = parseInt(fetchEnvOrDefault('MAX_AGE_LATEST_BLOCK_SECS', '20'), 10)
+const celoProviders = getCeloProviders()
 
 export type SequelizeLogger = boolean | ((sql: string, timing?: number) => void)
 
@@ -61,6 +63,7 @@ export function isDBOnline() {
 
 let kit: ContractKit | undefined
 let backupKit: ContractKit | undefined
+const kits = new Array<ContractKit | undefined>(celoProviders.length)
 
 async function execWithFallback<T>(
   f: (kit: ContractKit) => T,
@@ -284,6 +287,54 @@ export async function initializeKit(force: boolean = false) {
         }
       }
     }
+  }
+}
+
+// TODO rename
+export async function initializeKits(force: boolean = false) {
+  console.log('initializing kits')
+  // Prefer passed in keystore if these variables are set
+  const keystoreDirpath = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_DIRPATH', '')
+  const keystorePassphrase = fetchEnvOrDefault('ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE', '')
+
+  let keystoreWalletWrapper: KeystoreWalletWrapper | undefined
+  if (!keystoreDirpath || !keystorePassphrase) {
+    keystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore(keystoreDirpath))
+    const signerAddress = fetchEnv('ATTESTATION_SIGNER_ADDRESS')
+    try {
+      await keystoreWalletWrapper.unlockAccount(signerAddress, keystorePassphrase)
+    } catch (error) {
+      throw new Error(
+        `Unlocking keystore file for account ${signerAddress} failed: ` + error.message
+      )
+    }
+  }
+
+  let failedConnections = 0
+  // TODO make sure we do not throw an error if we do not try to actually reinit any kits
+  // to match prev behavior
+
+  // TODO rename this to kit once the old kit global has been replaced
+  kits.forEach(async (k, i) => {
+    if (k == undefined || force) {
+      try {
+        // TODO test Double check that this is actually reinitializing these kits in place?
+        kits[i] = keystoreWalletWrapper
+          ? newKit(celoProviders[i], keystoreWalletWrapper.getLocalWallet())
+          : newKit(celoProviders[i])
+        // Copied from @celo/cli/src/utils/helpers
+        await kits[i]!.connection.getBlock('latest')
+        rootLogger.info(`Connected to Celo node at ${celoProviders[i]}`)
+      } catch (error) {
+        kits[i] = undefined
+        rootLogger.warn(`Failed to connect to Celo node at ${celoProviders[i]}`)
+        failedConnections++
+      }
+    }
+  })
+  // No kits successfully reinitialized or existing kits that work
+  if (failedConnections == kits.length) {
+    throw new Error(`Initializing ContractKit failed for all providers: ${celoProviders}.`)
   }
 }
 
