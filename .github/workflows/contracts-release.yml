@@ -37,8 +37,8 @@ jobs:
           yarn
           yarn lerna bootstrap
 
-      # - name: Build packages
-      #   run: yarn lerna run build --ignore docs
+      - name: Build packages
+        run: yarn lerna run build --ignore docs
       # - name: Setup lightest node
       #   if: ${{ env.NETWORK != 'staging' }}
       #   run: |
