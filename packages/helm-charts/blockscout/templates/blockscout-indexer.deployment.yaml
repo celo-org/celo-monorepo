@@ -21,6 +21,12 @@ spec:
       component: blockscout-indexer
   template:
     metadata:
+      {{- if .Values.blockscout.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/indexer
+        prometheus.io/port: "4001"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
@@ -81,6 +87,8 @@ spec:
           value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.indexer.pool_size | quote }}
+        - name: METRICS_ENABLED
+          value: "{{.Values.blockscout.indexer.metrics.enabled}}"
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

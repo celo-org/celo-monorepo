@@ -142,7 +142,8 @@ fi
     {{- end }}
     {{- if .expose }}
     RPC_APIS="{{ .rpc_apis | default "eth,net,web3,debug,txpool" }}"
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=*"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS} --wsport={{ default .Values.geth.ws_port .ws_port }}"
     {{- end }}
     {{- if .ping_ip_from_packet | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
@@ -190,7 +191,7 @@ fi
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1200 }} \
+      --maxpeers={{- if kindIs "invalid" .maxpeers -}}1200{{- else -}}{{- .maxpeers -}}{{- end }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -252,7 +253,7 @@ fi
   - name: rpc
     containerPort: 8545
   - name: ws
-    containerPort: 8546
+    containerPort: {{ default .Values.geth.ws_port .ws_port }}
 {{ end }}
 {{- if .pprof }}
   - name: pprof

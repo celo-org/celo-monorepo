@@ -7,7 +7,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
 import "../common/CalledByVm.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
@@ -21,7 +21,7 @@ contract Election is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   UsingPrecompiles,
   CalledByVm
@@ -136,7 +136,7 @@ contract Election is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 1, 2, 1);
   }
 
   /**
@@ -166,7 +166,7 @@ contract Election is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Updates the minimum and maximum number of validators that can be elected.
