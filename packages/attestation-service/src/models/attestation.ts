@@ -24,6 +24,8 @@ export interface AttestationModel extends Model {
   recordError: (error: string) => void
   failure: () => boolean
   currentError: () => string | undefined
+  appSignature: string | undefined
+  language: string | undefined
 }
 
 export interface AttestationKey {
@@ -64,6 +66,8 @@ export default (sequelize: Sequelize) => {
     errors: DataTypes.STRING,
     createdAt: DataTypes.DATE,
     completedAt: DataTypes.DATE,
+    appSignature: DataTypes.STRING,
+    language: DataTypes.STRING,
   }) as AttestationStatic
 
   model.prototype.key = function (): AttestationKey {

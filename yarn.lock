@@ -22994,6 +22994,13 @@ semver@^6.0.0, semver@^6.2.0, semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
+semver@^7.3.5:
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.5.tgz#0b621c879348d8998e4b0e4be94b3f12e6018ef7"
+  integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
+  dependencies:
+    lru-cache "^6.0.0"
+
 semver@~5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.4.1.tgz#e059c09d8571f0540823733433505d3a2f00b18e"
@@ -24780,6 +24787,11 @@ timers-ext@^0.1.5:
   dependencies:
     es5-ext "~0.10.46"
     next-tick "1"
+
+timezone-mock@1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/timezone-mock/-/timezone-mock-1.1.4.tgz#3dfc0c8a864132873e1de8459c4bb7757dd8a96e"
+  integrity sha512-TeDA/tpbgJPC6dFkFpz3+sZmjtma8n+ECQbf7FQK9+TqIa38PUzIx8LBJGv0v3994Z9FFwLU0zJT/ABeb3bZWQ==
 
 tiny-async-pool@^1.0.4:
   version "1.0.4"
