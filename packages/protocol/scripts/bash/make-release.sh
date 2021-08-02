@@ -32,7 +32,7 @@ while getopts 'b:n:p:i:r:df:l:z' flag; do
     i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     d) DRYRUN="--dry_run" ;;
-    f) FROM="${OPTARG}" ;;
+    f) FROM="--from ${OPTARG}" ;;
     l) LIBRARIES="${OPTARG}" ;;
     z) FORNO="--forno" ;;
     *) error "Unexpected option ${flag}" ;;
@@ -55,5 +55,5 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --report $REPORT \
   --librariesFile $LIBRARIES \
   --proposal $PROPOSAL \
-  --from $FROM \
+  $FROM \
   --initialize_data $INITIALIZE_DATA $DRYRUN $FORNO
