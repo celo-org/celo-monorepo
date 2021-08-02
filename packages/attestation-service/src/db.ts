@@ -72,8 +72,7 @@ const kits = new Array<ContractKit | undefined>(celoProviders.length).fill(undef
 async function execWithFallback<T>(
   f: (kit: ContractKit) => T,
   kit1: ContractKit,
-  kit2?: ContractKit | undefined,
-  smartFallback = true
+  kit2?: ContractKit | undefined
 ): Promise<T> {
   // Decorator to wrap execution of f
   // with an optional prioritization of kit1 and kit2
@@ -101,7 +100,7 @@ async function execWithFallback<T>(
     rootLogger.warn(`Using ContractKit failed: ${error}`)
     if (secondaryKit) {
       rootLogger.info(`Attempting to use secondary ContractKit`)
-      return await f(secondaryKit!)
+      return f(secondaryKit!)
     } else {
       throw error
     }
@@ -114,18 +113,17 @@ export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
   const reinitAndRetry = async () => {
     await initializeKits(true)
     usableKits = kits.filter((k) => k !== undefined)
-    // tslint:disable-next-line: no-return-await
-    return await execWithFallback(f, usableKits[0]!, usableKits[1], smartFallback)
+    return execWithFallback(f, usableKits[0]!, usableKits[1])
   }
 
   if (!usableKits.length) {
     // This throws an error if no kits are initialized
-    return await reinitAndRetry()
+    return reinitAndRetry()
   } else {
     try {
-      return await execWithFallback(f, usableKits[0]!, usableKits[1], smartFallback)
+      return await execWithFallback(f, usableKits[0]!, usableKits[1])
     } catch (error) {
-      return await reinitAndRetry()
+      return reinitAndRetry()
     }
   }
 }
@@ -237,7 +235,7 @@ export async function initializeKits(force: boolean = false) {
 
   const failedConnections = await Promise.all(
     kits.map(async (kit, i) => {
-      if (kit == undefined || force) {
+      if (kit === undefined || force) {
         try {
           kits[i] = keystoreWalletWrapper
             ? newKit(celoProviders[i], keystoreWalletWrapper.getLocalWallet())
@@ -255,7 +253,7 @@ export async function initializeKits(force: boolean = false) {
     })
   )
   // No kits successfully reinitialized or existing kits that work
-  if (failedConnections && failedConnections.filter(Boolean).length == kits.length) {
+  if (failedConnections && failedConnections.filter(Boolean).length === kits.length) {
     throw new Error(`Initializing ContractKit failed for all providers: ${celoProviders}.`)
   }
 }
@@ -272,7 +270,11 @@ export async function startPeriodicKitsCheck() {
   const checkUndefinedKits = async () => {
     if (kits.filter((k) => k !== undefined).length < kits.length) {
       // Only attempt to reinitialize undefined kits
-      initializeKits(false)
+      try {
+        await initializeKits(false)
+      } catch (error) {
+        rootLogger.error(`Periodic kits check failed: ${error.message}`)
+      }
     }
   }
   setInterval(checkUndefinedKits, 60 * 1000)
