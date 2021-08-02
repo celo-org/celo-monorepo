@@ -88,4 +88,4 @@ jobs:
         run: |
           export MNEMONIC='dinosaur tuna kiwi peasant spray receive jeans bubble city mention puzzle brother'
           NEW_BRANCH=${{ steps.get_branch.outputs.branch }}
-          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -f $CELO_ACCOUNT_ADDRESS -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json;
+          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -f 0x7F871c887e6a430D3c1F434737F568B07559F9E7 -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json;
