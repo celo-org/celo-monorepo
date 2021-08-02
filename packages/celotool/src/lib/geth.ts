@@ -6,6 +6,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
+import { randomBytes } from 'crypto'
 import fs from 'fs'
 import { merge, range } from 'lodash'
 import fetch from 'node-fetch'
@@ -532,6 +533,8 @@ export const simulateClient = async (
   let lastGasPriceMinimum: BigNumber = new BigNumber(0)
   let nonce: number = 0
   let unlockNeeded: boolean = true
+  let recipientAddressFinal: string = recipientAddress
+  const useRandomRecipient = fetchEnv(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT)
 
   const sleepTime = 5000
   while (await kit.connection.isSyncing()) {
@@ -553,7 +556,7 @@ export const simulateClient = async (
     loadTestID: index,
     threadID: thread,
     sender: senderAddress,
-    recipient: recipientAddress,
+    recipient: recipientAddressFinal,
     feeCurrency: '',
     txHash: '',
   }
@@ -571,6 +574,12 @@ export const simulateClient = async (
 
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
+
+    // randomly choose the recipientAddress if configured
+    if (useRandomRecipient === 'true') {
+      recipientAddressFinal = `0x${randomBytes(40).toString('hex')}`
+      baseLogMessage.recipient = recipientAddressFinal
+    }
 
     let feeCurrency, txOptions
     try {
@@ -622,7 +631,7 @@ export const simulateClient = async (
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
+    await transferFn(kit, senderAddress, recipientAddressFinal, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
         lastTx = await txResult.getHash()
         lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
