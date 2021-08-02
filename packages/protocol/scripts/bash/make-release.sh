@@ -24,7 +24,7 @@ FROM=""
 LIBRARIES=""
 FORNO=""
 
-while getopts 'b:n:p:i:r:df:l:z:' flag; do
+while getopts 'b:n:p:i:r:df:l:z' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
