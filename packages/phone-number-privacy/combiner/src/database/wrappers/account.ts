@@ -24,7 +24,7 @@ export async function getAccountSignedUserPhoneNumberRecord(
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   }
 }
 
@@ -60,7 +60,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
   } catch (err) {
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   }
 }
 

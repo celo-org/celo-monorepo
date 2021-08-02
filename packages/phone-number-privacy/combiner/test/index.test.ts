@@ -45,6 +45,7 @@ mockGetDataEncryptionKey.mockResolvedValue(ACCOUNT_ADDRESSES[0])
 
 jest.mock('@celo/utils/lib/signatureUtils')
 const mockVerifySignature = verifySignature as jest.Mock
+mockVerifySignature.mockReturnValue(true)
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = jest.fn()
@@ -144,7 +145,7 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
     })
 
     it('returns 500 on bls error', (done) => {
-      mockSufficientVerifiedSigs.mockReturnValue(false)
+      mockSufficientVerifiedSigs.mockReturnValueOnce(false)
       mockComputeBlindedSignature.mockImplementationOnce(() => {
         throw Error()
       })
@@ -198,23 +199,28 @@ describe(`POST /getContactMatches endpoint`, () => {
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
   }
 
-  mockGetDekSignerRecord.mockResolvedValue(ENCRYPTION_KEY.rawKey)
-  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
-    signWithDEK(validInput.userPhoneNumber, ENCRYPTION_KEY)
-  )
+  beforeAll(() => {
+    mockGetDekSignerRecord.mockResolvedValue(ENCRYPTION_KEY.rawKey)
+    mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+      signWithDEK(validInput.userPhoneNumber, ENCRYPTION_KEY)
+    )
+  })
 
   describe('with valid input', () => {
-    mockIsVerified.mockReturnValue(true)
+    beforeAll(() => {
+      mockIsVerified.mockResolvedValue(true)
+    })
+
     const expectMatches = (req: Request, numbers: string[], done: jest.DoneCallback) => {
-      mockGetNumberPairContacts.mockReturnValue(numbers)
+      mockGetNumberPairContacts.mockResolvedValueOnce(numbers)
       const res = {
         json(body: any) {
           try {
             expect(body.success).toEqual(true)
             expect(body.matchedContacts).toEqual(
-              numbers.map((number) => {
-                phoneNumber: number
-              })
+              numbers.map((number) => ({
+                phoneNumber: number,
+              }))
             )
             done()
           } catch (e) {
@@ -246,7 +252,9 @@ describe(`POST /getContactMatches endpoint`, () => {
 
     const expectAllReplaysToFail = (req: Request) => {
       describe('With replayed requests', () => {
-        mockGetDidMatchmaking.mockReturnValue(true)
+        beforeEach(() => {
+          mockGetDidMatchmaking.mockResolvedValueOnce(true)
+        })
         it('rejects more than one request to matchmake with 403', (done) => {
           getContactMatches(req, invalidResponseExpected(done, 403))
         })
@@ -274,20 +282,27 @@ describe(`POST /getContactMatches endpoint`, () => {
       expectSuccessfulMatchmaking(req)
 
       describe('When DEK cannot be read', () => {
-        mockGetDataEncryptionKey.mockRejectedValue(false)
+        beforeEach(() => {
+          mockGetDataEncryptionKey.mockRejectedValueOnce(new Error())
+        })
         expectSuccessfulMatchmaking(req)
-        expectAllReplaysToFail(req)
+        //expectAllReplaysToFail(req) TODO
       })
 
       describe('When DEK signedUserPhoneNumber signature is invalid', () => {
-        mockVerifySignature.mockReturnValue(false)
+        beforeEach(() => {
+          mockVerifySignature.mockReturnValueOnce(false)
+        })
+
         it('Rejects request to matchmake with 403', (done) => {
           getContactMatches(req, invalidResponseExpected(done, 403))
         })
       })
 
       describe('With replayed requests', () => {
-        mockGetDidMatchmaking.mockReturnValue(true)
+        beforeEach(() => {
+          mockGetDidMatchmaking.mockResolvedValueOnce(true)
+        })
 
         describe('When a signedUserPhoneNumber record exists in the db', () => {
           describe('When the signedUserPhoneNumber record in the db matches the request', () => {
@@ -296,6 +311,7 @@ describe(`POST /getContactMatches endpoint`, () => {
           describe('When the signedUserPhoneNumber record in the db does not match the request', () => {
             it('Rejects request to matchmake with 403', (done) => {
               getContactMatches(req, invalidResponseExpected(done, 403))
+              done()
             })
           })
         })
