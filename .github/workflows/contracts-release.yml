@@ -39,6 +39,16 @@ jobs:
 
       - name: Build packages
         run: yarn lerna run build --ignore docs
+
+      - name: Set up full node
+        run: |
+          export CELO_IMAGE=us.gcr.io/celo-org/geth:alfajores
+          docker pull $CELO_IMAGE
+          mkdir celo-data-dir
+          cd celo-data-dir
+          export CELO_ACCOUNT_ADDRESS=0x7F871c887e6a430D3c1F434737F568B07559F9E7
+          docker run --name celo-fullnode -d --restart unless-stopped --stop-timeout 300 -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --nousb --alfajores --datadir /root/.celo
+          cd ..
       # - name: Setup lightest node
       #   if: ${{ env.NETWORK != 'staging' }}
       #   run: |
@@ -78,4 +88,4 @@ jobs:
         run: |
           export MNEMONIC='dinosaur tuna kiwi peasant spray receive jeans bubble city mention puzzle brother'
           NEW_BRANCH=${{ steps.get_branch.outputs.branch }}
-          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json;
+          cd packages/protocol && yarn run make-release -b $NEW_BRANCH -f $MNEMONIC -n ${{ env.NETWORK }} -p proposal.json -r report.json -i ./releaseData/initializationData/release${{ env.VERSION }}.json -l libraries.json;
