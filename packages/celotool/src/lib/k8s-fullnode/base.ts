@@ -104,6 +104,9 @@ export abstract class BaseFullNodeDeployer {
       ? this._deploymentConfig.rpcApis
       : 'eth,net,rpc,web3'
     const gcMode = this._deploymentConfig.gcMode ? this._deploymentConfig.gcMode : 'full'
+    const customValuesFile = `${helmChartPath}/${this._celoEnv}-${readableContext(
+      context
+    )}-values.yaml`
     return [
       `--set namespace=${this.kubeNamespace}`,
       `--set replicaCount=${this._deploymentConfig.replicas}`,
@@ -128,9 +131,7 @@ export abstract class BaseFullNodeDeployer {
       )}`,
       ...(await this.additionalHelmParameters()),
       nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '',
-      fs.existsSync(`${helmChartPath}/${this._celoEnv}-${readableContext(context)}-values.yaml`)
-        ? `-f ${helmChartPath}/${this._celoEnv}-${readableContext(context)}-values.yaml`
-        : '',
+      fs.existsSync(customValuesFile) ? `-f ${customValuesFile}` : '',
     ]
   }
 
