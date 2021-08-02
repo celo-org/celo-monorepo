@@ -1,3 +1,4 @@
+import { timeout } from '@celo/base'
 import { Block } from '@celo/connect'
 import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
@@ -139,20 +140,25 @@ export async function isNodeSyncing() {
 
 export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
   try {
-    return await withTimeout(getBlockTimeout, async () => {
-      let latestBlock: Block
-      try {
-        // Differentiate between errors with getBlock and timeouts
-        latestBlock = await k!.connection.getBlock('latest')
-      } catch (error) {
-        throw new Error(`Error fetching latest block: ${error.message}`)
-      }
-      const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
-      return {
-        ageOfLatestBlock,
-        number: latestBlock.number,
-      }
-    })
+    return await timeout(
+      async () => {
+        let latestBlock: Block
+        try {
+          // Differentiate between errors with getBlock and timeouts
+          latestBlock = await k!.connection.getBlock('latest')
+        } catch (error) {
+          throw new Error(`Error fetching latest block: ${error.message}`)
+        }
+        const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
+        return {
+          ageOfLatestBlock,
+          number: latestBlock.number,
+        }
+      },
+      [],
+      getBlockTimeout,
+      new Error(`Timeout fetching block after ${getBlockTimeout} ms`)
+    )
   } catch (error) {
     rootLogger.warn(error.message)
     // On failure return values that should always be comparatively out-of-date
@@ -411,37 +417,4 @@ export async function doHealthCheck(): Promise<string | null> {
     Gauges.healthy.set(0)
     return ErrorMessages.UNKNOWN_ERROR
   }
-}
-
-// Copied from packages/faucet/src/database-helper.ts
-function withTimeout<A>(
-  timeout: number,
-  fn: () => Promise<A>,
-  onTimeout?: () => A | Promise<A>
-): Promise<A> {
-  return new Promise((resolve, reject) => {
-    let timeoutHandler: number | null = setTimeout(() => {
-      timeoutHandler = null
-
-      if (onTimeout) {
-        resolve(onTimeout())
-      } else {
-        reject(new Error(`Timeout after ${timeout} ms`))
-      }
-    }, timeout)
-
-    fn()
-      .then((val) => {
-        if (timeoutHandler !== null) {
-          clearTimeout(timeoutHandler)
-          resolve(val)
-        }
-      })
-      .catch((err) => {
-        if (timeoutHandler !== null) {
-          clearTimeout(timeoutHandler)
-          reject(err)
-        }
-      })
-  })
 }
