@@ -6,6 +6,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
+import { randomBytes } from 'crypto'
 import fs from 'fs'
 import { merge, range } from 'lodash'
 import fetch from 'node-fetch'
@@ -222,6 +223,13 @@ const validateGethRPC = async (
   handleError: HandleErrorCallback
 ) => {
   const transaction = await kit.connection.getTransaction(txHash)
+  handleError(!transaction || !transaction.from, {
+    location: '[GethRPC]',
+    error: `Contractkit did not return a valid transaction`,
+  })
+  if (transaction == null) {
+    return
+  }
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -452,6 +460,7 @@ export const transferCeloGold = async (
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
@@ -459,9 +468,10 @@ export const transferCeloGold = async (
     from: fromAddress,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    feeCurrency: txOptions.feeCurrency,
+    feeCurrency: txOptions.feeCurrency || undefined,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
   })
 }
 
@@ -476,6 +486,7 @@ export const transferCeloDollars = async (
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
@@ -483,10 +494,24 @@ export const transferCeloDollars = async (
     from: fromAddress,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    feeCurrency: txOptions.feeCurrency,
+    feeCurrency: txOptions.feeCurrency || undefined,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
   })
+}
+
+export const unlock = async (
+  kit: ContractKit,
+  address: string,
+  password: string,
+  unlockPeriod: number
+) => {
+  try {
+    await kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
+  } catch (error) {
+    console.error(`Unlock account ${address} failed:`, error)
+  }
 }
 
 export const simulateClient = async (
@@ -495,23 +520,53 @@ export const simulateClient = async (
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
-  index: number
+  index: number,
+  thread: number,
+  web3Provider: string = 'http://localhost:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
-  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+  const kit = newKitFromWeb3(new Web3(web3Provider))
+  const password = fetchEnv('PASSWORD')
+
+  let lastNonce: number = -1
+  let lastTx: string = ''
+  let lastGasPriceMinimum: BigNumber = new BigNumber(0)
+  let nonce: number = 0
+  let unlockNeeded: boolean = true
+  let recipientAddressFinal: string = recipientAddress
+  const useRandomRecipient = fetchEnv(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT)
+
+  const sleepTime = 5000
+  while (await kit.connection.isSyncing()) {
+    console.info(
+      `LoadTestId ${index} waiting for web3Provider to be synced. Sleeping ${sleepTime}ms`
+    )
+    await sleep(sleepTime)
+  }
   kit.defaultAccount = senderAddress
+
+  // sleep a random amount of time in the range [0, txPeriodMs) before starting so
+  // that if multiple simulations are started at the same time, they don't all
+  // submit transactions at the same time
+  const randomSleep = Math.random() * txPeriodMs
+  console.info(`Sleeping for ${randomSleep} ms`)
+  await sleep(randomSleep)
 
   const baseLogMessage: any = {
     loadTestID: index,
+    threadID: thread,
     sender: senderAddress,
-    recipient: recipientAddress,
+    recipient: recipientAddressFinal,
     feeCurrency: '',
     txHash: '',
   }
 
   while (true) {
     const sendTransactionTime = Date.now()
-
+    if (unlockNeeded) {
+      await unlock(kit, kit.defaultAccount, password, 9223372036)
+      unlockNeeded = false
+    }
     // randomly choose which token to use
     const transferGold = Boolean(Math.round(Math.random()))
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
@@ -520,26 +575,66 @@ export const simulateClient = async (
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
 
-    let feeCurrency
-    if (!feeCurrencyGold) {
-      try {
-        feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-      } catch (error) {
-        tracerLog({
-          tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
-      }
+    // randomly choose the recipientAddress if configured
+    if (useRandomRecipient === 'true') {
+      recipientAddressFinal = `0x${randomBytes(40).toString('hex')}`
+      baseLogMessage.recipient = recipientAddressFinal
     }
-    baseLogMessage.feeCurrency = feeCurrency || ''
+
+    let feeCurrency, txOptions
+    try {
+      feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
+    } catch (error) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
+    }
+
+    try {
+      baseLogMessage.feeCurrency = feeCurrency
+
+      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+
+      const gasPriceBase = feeCurrency
+        ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+        : await gasPriceMinimum.gasPriceMinimum()
+      let gasPrice = new BigNumber(gasPriceBase).times(2).dp(0)
+
+      // Check if last tx was mined. If not, reuse the same nonce
+      if (lastTx === '' || lastNonce === -1) {
+        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
+      } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
+        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
+      } else {
+        nonce = (await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')) - 1
+        gasPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
+        console.warn(
+          `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
+        )
+      }
+
+      lastGasPriceMinimum = gasPrice
+      txOptions = {
+        gasPrice: gasPrice.toString(),
+        feeCurrency,
+        nonce,
+      }
+    } catch (error) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
+    }
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
-      feeCurrency,
-    })
+    await transferFn(kit, senderAddress, recipientAddressFinal, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
+        lastTx = await txResult.getHash()
+        lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
         await onLoadTestTxResult(
           kit,
           senderAddress,
@@ -551,14 +646,24 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        console.error('Load test transaction failed with error:', JSON.stringify(error))
-        tracerLog({
-          tag: LOG_TAG_TRANSACTION_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
+        if (
+          typeof error === 'string' &&
+          error.includes('Error: authentication needed: password or unlock')
+        ) {
+          console.warn('Load test transaction failed with locked account:', error)
+          unlockNeeded = true
+        } else {
+          console.error('Load test transaction failed with error:', error)
+          tracerLog({
+            tag: LOG_TAG_TRANSACTION_ERROR,
+            error: error.toString(),
+            ...baseLogMessage,
+          })
+        }
       })
-    await sleep(txPeriodMs)
+    if (sendTransactionTime + txPeriodMs > Date.now()) {
+      await sleep(sendTransactionTime + txPeriodMs - Date.now())
+    }
   }
 }
 
@@ -582,7 +687,6 @@ export const onLoadTestTxResult = async (
     p_time: receiptTime - sendTransactionTime,
     ...baseLogMessage,
   })
-
   // Continuing only with receipt received
   validateTransactionAndReceipt(senderAddress, txReceipt, (isError, data) => {
     if (isError) {
@@ -613,6 +717,18 @@ export const onLoadTestTxResult = async (
       })
     }
   })
+}
+
+/**
+ * This method generates key derivation index for loadtest clients and threads
+ *
+ * @param pod the pod replica number
+ * @param thread the thread number inside the pod
+ */
+export function getIndexForLoadTestThread(pod: number, thread: number) {
+  // max number of threads to avoid overlap is [0, base)
+  const base = 10000
+  return pod * base + thread
 }
 
 /**
@@ -1071,7 +1187,7 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote   genesis to ${genesisPath}`)
+    console.log(`wrote genesis to ${genesisPath}`)
   }
 }
 
