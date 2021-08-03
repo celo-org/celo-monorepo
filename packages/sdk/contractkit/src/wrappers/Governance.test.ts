@@ -76,28 +76,33 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       [CeloContract.Random, '0x0000000000000000000000000000000000000001'],
       [CeloContract.Escrow, '0x0000000000000000000000000000000000000002'],
     ]
-    const proposalID = new BigNumber(1)
 
     let proposal: Proposal
     beforeAll(() => (proposal = registryRepointProposal(repoints)))
 
-    const proposeFn = async (proposer: Address) =>
-      governance
+    const proposeFn = async (proposer: Address) => {
+      const receipt = await governance
         .propose(proposal, 'URL')
         .sendAndWaitForReceipt({ from: proposer, value: minDeposit })
+      return new BigNumber(receipt.events!['ProposalQueued'].returnValues['proposalId'])
+    }
 
-    const upvoteFn = async (upvoter: Address, shouldTimeTravel = true) => {
+    const upvoteFn = async (
+      upvoter: Address,
+      proposalID: BigNumber.Value,
+      shouldTimeTravel = true
+    ) => {
       const tx = await governance.upvote(proposalID, upvoter)
       await tx.sendAndWaitForReceipt({ from: upvoter })
       if (shouldTimeTravel) {
-        const duration = await governance.timeToNextDequeue()
-        await timeTravel(duration, web3)
+        const dequeueFrequency = await governance.dequeueFrequency()
+        await timeTravel(dequeueFrequency.toNumber(), web3)
         await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
       }
     }
 
     // protocol/truffle-config defines approver address as accounts[0]
-    const approveFn = async () => {
+    const approveFn = async (proposalID: BigNumber.Value) => {
       const tx = await governance.approve(proposalID)
       const multisigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
         governance.address,
@@ -107,14 +112,14 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       await timeTravel(expConfig.approvalStageDuration, web3)
     }
 
-    const voteFn = async (voter: Address) => {
+    const voteFn = async (voter: Address, proposalID: BigNumber.Value) => {
       const tx = await governance.vote(proposalID, 'Yes')
       await tx.sendAndWaitForReceipt({ from: voter })
       await timeTravel(expConfig.referendumStageDuration, web3)
     }
 
     it('#propose', async () => {
-      await proposeFn(accounts[0])
+      const proposalID = await proposeFn(accounts[0])
 
       const proposalRecord = await governance.getProposalRecord(proposalID)
       expect(proposalRecord.metadata.proposer).toBe(accounts[0])
@@ -124,9 +129,9 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     })
 
     it('#upvote', async () => {
-      await proposeFn(accounts[0])
+      const proposalID = await proposeFn(accounts[0])
       // shouldTimeTravel is false so getUpvotes isn't on dequeued proposal
-      await upvoteFn(accounts[1], false)
+      await upvoteFn(accounts[1], proposalID, false)
 
       const voteWeight = await governance.getVoteWeight(accounts[1])
       const upvotes = await governance.getUpvotes(proposalID)
@@ -135,9 +140,9 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     })
 
     it('#revokeUpvote', async () => {
-      await proposeFn(accounts[0])
+      const proposalID = await proposeFn(accounts[0])
       // shouldTimeTravel is false so revoke isn't on dequeued proposal
-      await upvoteFn(accounts[1], false)
+      await upvoteFn(accounts[1], proposalID, false)
 
       const before = await governance.getUpvotes(proposalID)
       const upvoteRecord = await governance.getUpvoteRecord(accounts[1])
@@ -150,19 +155,19 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     })
 
     it('#approve', async () => {
-      await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
-      await approveFn()
+      const proposalID = await proposeFn(accounts[0])
+      await upvoteFn(accounts[1], proposalID)
+      await approveFn(proposalID)
 
       const approved = await governance.isApproved(proposalID)
       expect(approved).toBeTruthy()
     })
 
     it('#vote', async () => {
-      await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
-      await approveFn()
-      await voteFn(accounts[2])
+      const proposalID = await proposeFn(accounts[0])
+      await upvoteFn(accounts[1], proposalID)
+      await approveFn(proposalID)
+      await voteFn(accounts[2], proposalID)
 
       const voteWeight = await governance.getVoteWeight(accounts[2])
       const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
@@ -172,10 +177,10 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     it(
       '#execute',
       async () => {
-        await proposeFn(accounts[0])
-        await upvoteFn(accounts[1])
-        await approveFn()
-        await voteFn(accounts[2])
+        const proposalID = await proposeFn(accounts[0])
+        await upvoteFn(accounts[1], proposalID)
+        await approveFn(proposalID)
+        await voteFn(accounts[2], proposalID)
 
         const tx = await governance.execute(proposalID)
         await tx.sendAndWaitForReceipt()
@@ -189,10 +194,10 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     )
 
     it('#getVoter', async () => {
-      await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
-      await approveFn()
-      await voteFn(accounts[2])
+      const proposalID = await proposeFn(accounts[0])
+      await upvoteFn(accounts[1], proposalID)
+      await approveFn(proposalID)
+      await voteFn(accounts[2], proposalID)
 
       const proposer = await governance.getVoter(accounts[0])
       expect(proposer.refundedDeposits).toEqBigNumber(minDeposit)
