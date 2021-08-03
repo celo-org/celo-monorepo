@@ -762,7 +762,7 @@ async function helmIPParameters(celoEnv: string) {
 async function helmParameters(
   celoEnv: string,
   useExistingGenesis: boolean,
-  overwriteGCSFiles = false
+  overwriteGenesisGCS = false
 ) {
   const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
   await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
@@ -778,7 +778,7 @@ async function helmParameters(
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
   const useMyCelo = stringToBoolean(fetchEnvOrFallback(envVar.GETH_USE_MYCELO, 'false'))
-  if (overwriteGCSFiles === true) {
+  if (overwriteGenesisGCS === true) {
     await createAndPushGenesis(celoEnv, !useExistingGenesis, useMyCelo)
   }
 
@@ -977,10 +977,10 @@ export async function installHelmChart(celoEnv: string, useExistingGenesis: bool
 export async function upgradeHelmChart(
   celoEnv: string,
   useExistingGenesis: boolean,
-  overwriteGCSFiles: boolean
+  overwriteGenesisGCS: boolean
 ) {
   console.info(`Upgrading helm release ${celoEnv}`)
-  const parameters = await helmParameters(celoEnv, useExistingGenesis, overwriteGCSFiles)
+  const parameters = await helmParameters(celoEnv, useExistingGenesis, overwriteGenesisGCS)
   await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
 }
 
@@ -993,7 +993,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
 
   if (isCelotoolHelmDryRun()) {
     // If running dryrun we just want to simulate the helm changes
-    await upgradeHelmChart(celoEnv, useExistingGenesis)
+    await upgradeHelmChart(celoEnv, useExistingGenesis, false)
   } else {
     // scale down nodes
     await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
@@ -1006,7 +1006,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
     await deletePersistentVolumeClaims(celoEnv, persistentVolumeClaimsLabels)
     await sleep(10000)
 
-    await upgradeHelmChart(celoEnv, useExistingGenesis)
+    await upgradeHelmChart(celoEnv, useExistingGenesis, true)
     await sleep(10000)
 
     const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
