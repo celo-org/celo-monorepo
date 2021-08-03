@@ -1108,6 +1108,39 @@ contract('GrandaMento', (accounts: string[]) => {
       )
     })
   })
+
+  describe('#setVetoPeriodSeconds', () => {
+    const newVetoPeriodSeconds = 60 * 60 * 24 * 7 // 7 days
+    it('sets the spread', async () => {
+      await grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds)
+      assertEqualBN(await grandaMento.vetoPeriodSeconds(), newVetoPeriodSeconds)
+    })
+
+    it('emits the VetoPeriodSecondsSet event', async () => {
+      const receipt = await grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds)
+      assertLogMatches2(receipt.logs[0], {
+        event: 'VetoPeriodSecondsSet',
+        args: {
+          vetoPeriodSeconds: newVetoPeriodSeconds,
+        },
+      })
+    })
+
+    it('reverts when the veto period is greater than 4 weeks', async () => {
+      const fourWeeks = 60 * 60 * 24 * 7 * 4
+      await assertRevertWithReason(
+        grandaMento.setVetoPeriodSeconds(fourWeeks + 1),
+        'Veto period cannot exceed 4 weeks'
+      )
+    })
+
+    it('reverts when the sender is not the owner', async () => {
+      await assertRevertWithReason(
+        grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds, { from: accounts[1] }),
+        'Ownable: caller is not the owner'
+      )
+    })
+  })
 })
 
 // exchangeRate is the price of the sell token quoted in buy token
