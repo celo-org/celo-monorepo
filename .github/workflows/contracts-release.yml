@@ -39,7 +39,10 @@ jobs:
 
       - name: Build packages
         run: yarn lerna run build --ignore docs
-
+      - name: Geth Test
+        run: |
+          geth attach http://127.0.0.1:8545
+          geth account list
       - name: Set up full node
         run: |
           export CELO_IMAGE=us.gcr.io/celo-org/geth:alfajores
