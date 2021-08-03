@@ -279,7 +279,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#dequeueProposalsIfReady', () => {
+  describe('#dequeueProposalsIfReady', () => {
     it('should have no effect when dequeueFrequency has not elapsed', async () => {
       const resp = await governance.dequeueProposalsIfReady()
       assert.equal(resp.logs.length, 0)
