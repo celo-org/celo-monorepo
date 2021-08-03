@@ -45,12 +45,13 @@ spec:
       - name: blockscout-indexer
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        workingDir: /opt/app/apps/indexer
         command:
         - /bin/sh
         - -c
         args:
         - |
-           exec mix cmd --app indexer "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix"
+           exec iex --name {{ .Values.blockscout.indexer.nodeName }}@127.0.0.1 -S mix
         ports:
         - name: health
           containerPort: {{ .Values.blockscout.indexer.port }}
