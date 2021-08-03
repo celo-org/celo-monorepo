@@ -759,7 +759,11 @@ async function helmIPParameters(celoEnv: string) {
   return ipAddressParameters
 }
 
-async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+async function helmParameters(
+  celoEnv: string,
+  useExistingGenesis: boolean,
+  overwriteGCSFiles = false
+) {
   const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
   await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
 
@@ -774,7 +778,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
   const useMyCelo = stringToBoolean(fetchEnvOrFallback(envVar.GETH_USE_MYCELO, 'false'))
-  await createAndPushGenesis(celoEnv, !useExistingGenesis, useMyCelo)
+  if (overwriteGCSFiles === true) {
+    await createAndPushGenesis(celoEnv, !useExistingGenesis, useMyCelo)
+  }
 
   const bootnodeOverwritePkey =
     fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== ''
@@ -964,13 +970,17 @@ export async function installHelmChart(celoEnv: string, useExistingGenesis: bool
     celoEnv,
     celoEnv,
     '../helm-charts/testnet',
-    await helmParameters(celoEnv, useExistingGenesis)
+    await helmParameters(celoEnv, useExistingGenesis, true)
   )
 }
 
-export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
+export async function upgradeHelmChart(
+  celoEnv: string,
+  useExistingGenesis: boolean,
+  overwriteGCSFiles: boolean
+) {
   console.info(`Upgrading helm release ${celoEnv}`)
-  const parameters = await helmParameters(celoEnv, useExistingGenesis)
+  const parameters = await helmParameters(celoEnv, useExistingGenesis, overwriteGCSFiles)
   await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
 }
 

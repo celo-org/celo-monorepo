@@ -19,6 +19,7 @@ export const describe = 'upgrade an existing deploy of the testnet package'
 type TestnetArgv = UpgradeArgv & {
   reset: boolean
   useExistingGenesis: boolean
+  overwriteGCSFiles: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -33,6 +34,11 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Instead of generating a new genesis, use an existing genesis in GCS',
       default: false,
     })
+    .option('overwriteGCSFiles', {
+      type: 'boolean',
+      description: 'Force upload to GCS of newly generated genesis and static-nodes files',
+      default: false,
+    })
 }
 
 export const handler = async (argv: TestnetArgv) => {
@@ -45,7 +51,7 @@ export const handler = async (argv: TestnetArgv) => {
   if (argv.reset === true) {
     await resetAndUpgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
   } else {
-    await upgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
+    await upgradeHelmChart(argv.celoEnv, argv.useExistingGenesis, argv.overwriteGCSFiles)
   }
   if (!isCelotoolHelmDryRun()) {
     await uploadTestnetStaticNodesToGoogleStorage(argv.celoEnv)
