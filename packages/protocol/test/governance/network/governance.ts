@@ -299,7 +299,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       describe(`when queue is not empty`, () => {
-        beforeEach(async () => await proposeTx1())
+        beforeEach(async () => proposeTx1())
 
         it('should update lastDequeue', async () => {
           const checkpointBefore = await governance.lastDequeue()
@@ -319,7 +319,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         describe('when queued proposal is expired', () => {
-          beforeEach(async () => await timeTravel(queueExpiry, web3))
+          beforeEach(async () => timeTravel(queueExpiry, web3))
 
           it('should emit ProposalExpired event', async () => {
             const resp = await governance.dequeueProposalsIfReady()
@@ -339,7 +339,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         describe('when queue.length > concurrentProposals', () => {
-          beforeEach(async () => await proposeTx1())
+          beforeEach(async () => proposeTx1())
 
           it('should only dequeue concurrentProposals', async () => {
             const resp = await governance.dequeueProposalsIfReady()
