@@ -101,11 +101,6 @@ contract GrandaMento is
     // is being sold that has demurrage enabled, the original value when the stable
     // tokens were deposited cannot be calculated.
     uint256 celoStableTokenExchangeRate;
-    // The veto period in seconds at the time the proposal was created. This is kept
-    // track of on a per-proposal basis to lock-in the veto period for a proposal so
-    // that changes to the contract's vetoPeriodSeconds do not affect existing
-    // proposals.
-    uint256 vetoPeriodSeconds;
     // The timestamp (`block.timestamp`) at which the exchange proposal was approved
     // in seconds. If the exchange proposal has not ever been approved, is 0.
     uint256 approvalTimestamp;
@@ -258,7 +253,6 @@ contract GrandaMento is
       sellAmount: storedSellAmount,
       buyAmount: buyAmount,
       celoStableTokenExchangeRate: celoStableTokenExchangeRate,
-      vetoPeriodSeconds: vetoPeriodSeconds,
       approvalTimestamp: 0 // initial value when not approved yet
     });
     // Push it into the array of active proposals.
@@ -339,7 +333,7 @@ contract GrandaMento is
   /**
    * @notice Executes an exchange proposal that's been approved and not vetoed.
    * @dev Callable by anyone. Reverts if the proposal is not in the Approved state
-   * or proposal.vetoPeriodSeconds has not elapsed since approval.
+   * or vetoPeriodSeconds has not elapsed since approval.
    * @param proposalId The identifier of the proposal to execute.
    */
   function executeExchangeProposal(uint256 proposalId) external nonReentrant {
@@ -348,7 +342,7 @@ contract GrandaMento is
     require(proposal.state == ExchangeProposalState.Approved, "Proposal must be in Approved state");
     // Require that the veto period has elapsed since the approval time.
     require(
-      proposal.approvalTimestamp.add(proposal.vetoPeriodSeconds) <= block.timestamp,
+      proposal.approvalTimestamp.add(vetoPeriodSeconds) <= block.timestamp,
       "Veto period not elapsed"
     );
     // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
