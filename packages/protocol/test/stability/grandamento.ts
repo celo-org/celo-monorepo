@@ -8,6 +8,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import _ from 'lodash'
 import {
   GoldTokenContract,
   GoldTokenInstance,
@@ -491,7 +492,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Try to have Alice cancel it when the exchange proposal is in the Approved state.
         await assertRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: alice }),
-          'Sender must be owner'
+          'Sender cannot cancel the exchange proposal'
         )
       })
     })
@@ -514,7 +515,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Try to cancel it when the exchange proposal is in the Proposed state.
         await assertRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: owner }),
-          'Sender must be exchanger'
+          'Sender cannot cancel the exchange proposal'
         )
       })
     })
@@ -613,14 +614,14 @@ contract('GrandaMento', (accounts: string[]) => {
       await createExchangeProposal(false, alice)
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
-        'Sender must be exchanger'
+        'Sender cannot cancel the exchange proposal'
       )
     })
 
     it('reverts when the proposalId does not exist', async () => {
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
-        'Proposal must be in Proposed or Approved state'
+        'Sender cannot cancel the exchange proposal'
       )
     })
   })
