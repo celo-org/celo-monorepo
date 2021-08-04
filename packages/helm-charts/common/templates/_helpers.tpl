@@ -191,7 +191,7 @@ fi
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1200 }} \
+      --maxpeers={{- if kindIs "invalid" .maxpeers -}}1200{{- else -}}{{- .maxpeers -}}{{- end }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -494,7 +494,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - "-c"
   - |
     if [ -d /root/.celo/celo/chaindata ]; then
-      lastBlockTimestamp=$(timeout 60 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      lastBlockTimestamp=$(timeout 120 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp")
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
       # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
