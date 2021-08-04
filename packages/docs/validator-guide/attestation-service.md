@@ -15,7 +15,7 @@ This guide steps you through setting up an Attestation Service:
 * Follow the instructions to set up a validator on [mainnet](../getting-started/running-a-validator-in-mainnet.md) or [baklava](../getting-started/running-a-validator-in-baklava.md)
 * Configure Twilio, MessageBird and Nexmo, the SMS providers used by Attestation Service
 * Generate and register an attestation signer key
-* (for versions prior to 1.3.0) Deploy a Celo full node, with the attestation signer key unlocked
+* (for versions prior to 1.4.0) Deploy a Celo full node, with the attestation signer key unlocked
 * Deploy the attestation service
 * Configure and publish validator metadata so that clients can find your attestation service
 * Configure monitoring for the attestation service and the full node (if applicable)
@@ -33,13 +33,13 @@ The `PORT` environment variable sets the listening port for the service on the l
 
 Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`, and (from version 1.2.0) GET (not POST) `/delivery_status_messagebird`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
 
-From Attestation Service version 1.3.0 onwards, there are two ways of deploying the Attestation Service. We recommend that new validators use the file keystore method (instead of using a Celo full node) for key management, and that existing validators eventually migrate to the new architecture.
+From Attestation Service version 1.4.0 onwards, there are two ways of deploying the Attestation Service. We recommend that new validators use the file keystore method (instead of using a Celo full node) for key management, and that existing validators eventually migrate to the new architecture.
 
-An Attestation Service prior to version 1.3.0 is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host.
+An Attestation Service prior to version 1.4.0 is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host.
 
-While it is still possible to use the full node method described below, from version 1.3.0 onwards, it is recommended to instead deploy the Attestation Service with access to a keystore file that encrypts the attestation signer key. This allows the service to sign attestations locally instead of depending on the separate full node instance to sign attestations. The passphrase for decrypting the keystore file must be passed in as an environment variable when starting up the Attestation Service. A Celo Provider (environment variable `CELO_PROVIDER`) is currently still required, in order to connect to ContractKit and read necessary information from the chain. More details on this are in the [Running the Attestation Service v1.3.0+](#recommended-running-the-attestation-service-v130) section below. The new method of signing is expected to reduce Attestation Service errors due to the full node not being synced and generally reduce operating overhead.
+While it is still possible to use the full node method described below, from version 1.4.0 onwards, it is recommended to instead deploy the Attestation Service with access to a keystore file that encrypts the attestation signer key. This allows the service to sign attestations locally instead of depending on the separate full node instance to sign attestations. The passphrase for decrypting the keystore file must be passed in as an environment variable when starting up the Attestation Service. At least one Celo Provider (environment variable `CELO_PROVIDERS` (recommended) or `CELO_PROVIDER`) is currently still required, in order to connect to ContractKit and read necessary information from the chain. Listing a couple of providers is recommended, as if the first node is behind or syncing, the Attestation Service will use one of the backup nodes listed. More details on this are in the [Running the Attestation Service v1.4.0+](#recommended-running-the-attestation-service-v130) section below. The new method of signing is expected to reduce Attestation Service errors due to the full node not being synced and generally reduce operating overhead.
 
-The Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers (two for versions 1.3.0 onwards): one the attestation service, a Celo Blockchain node (only for versions prior to 1.3.0), and a single database instance.
+The Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers (two for versions 1.4.0 onwards): one the attestation service, a Celo Blockchain node (only for versions prior to 1.4.0), and a single database instance.
 
 For a high availability setup, multiple instances can be deployed behind a load balancer and sharing a single database service. The load balancer should be configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can identify the matching record in the shared database and act on the receipt to resend if necessary.
 
@@ -67,7 +67,7 @@ To actually be able to send SMS, you need to create a messaging service under [P
 
 Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. It is strongly recommended that you purchase at least a US (`+1`) number which seem to provide high delivery success rates.  If you purchase numbers in other locales, Twilio will intelligently select the best number to send each SMS.
 
-#### Verify Service (post v1.3.0)
+#### Verify Service (post v1.4.0)
 
 We're in the process of transitioning to [Twilio's Verify Service](https://www.twilio.com/verify) which will automatically manage a set of phone numbers for global reach. Create a Verify Service in the Twilio Portal by navigating to [Verify](https://www.twilio.com/console/verify/services) and click `+` to create a new service. It's important to provide `Celo` as the service friendly name, since this will show up in the text message content.
 
@@ -105,7 +105,7 @@ MessageBird support is introduced in version 1.2.0 and later. After signing up f
 
 ## Installation
 
-Where necessary, the instructions will differentiate between pre-v1.3.0 (Celo full node for key management) and v1.3.0+ (recommended use of keystore files for key management). This section uses several environment variables defined during the validator setup. You'll need to export `CELO_IMAGE` and `CELO_VALIDATOR_RG_ADDRESS` on this machine.
+Where necessary, the instructions will differentiate between pre-v1.4.0 (Celo full node for key management) and v1.4.0+ (recommended use of keystore files for key management). This section uses several environment variables defined during the validator setup. You'll need to export `CELO_IMAGE` and `CELO_VALIDATOR_RG_ADDRESS` on this machine.
 
 Setting up an Attestation Service first requires an [Attestation Signer key](key-management/detailed.md#authorized-attestation-signers) to be registered (Similar to Validator and Vote signer keys). For that let's start our node on the Attestations machine (keep track of the password you use for this account):
 
@@ -133,7 +133,7 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attes
 
 ### Configuring Key Management
 
-#### (recommended) v1.3.0+ - Using Keystore Files
+#### (recommended) v1.4.0+ - Using Keystore Files
 
 It is no longer necessary to run a full node alongside the Attestation Service. Instead, save the path to the keystore directory generated above and the password used when creating the `CELO_ATTESTATION_SIGNER_ADDRESS` above, as you will need these when running the service:
 
@@ -144,7 +144,7 @@ echo <CELO-ATTESTATION-SIGNER-PASSWORD> > $KEYSTORE_PARENT_DIR/.password
 
 Then, follow the instructions in the [Running the Attestation Service](#running-the-attestation-service) section below.
 
-#### pre-v1.3.0 - Using Celo Full Node
+#### pre-v1.4.0 - Using Celo Full Node
 
 You can now run the node for the attestation service in the background with the following command. Remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.  And, if you want to run the attestation service for Baklava, add the `--baklava` flag.
 
@@ -195,7 +195,8 @@ Required options:
 | Variable                       | Explanation   |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `DATABASE_URL`                   | The URL to access the local database, e.g. `sqlite://db/attestations.db` |
-| `CELO_PROVIDER`                  | (pre-v1.3.0) The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! (v1.3.0+) The node URL for the Celo node used to connect to the chain. |
+| `CELO_PROVIDERS`                  | (v1.4.0+) Recommended over `CELO_PROVIDER`; only one of the two may be used. A list of prioritized Celo node URLs used to connect to the chain. 2-3 providers are recommended. |
+| `CELO_PROVIDER`                  | (required pre-v1.4.0; not recommended v1.4.0+) The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! (v1.4.0+ optional) node URL for the Celo node used to connect to the chain. |
 | `CELO_VALIDATOR_ADDRESS`         | Address of the Validator account. If Validator is deployed via a `ReleaseGold` contract, this is the contract's address (i.e. `$CELO_VALIDATOR_RG_ADDRESS`), not the beneficiary. |
 | `ATTESTATION_SIGNER_ADDRESS`     | Address of the Validator's attestation signer key  |
 | `SMS_PROVIDERS`                  | Comma-separated list of all enabled SMS providers. Can include `twilio`, `nexmo`. From v1.2.0, can include `messagebird`. Providers are tried from first to last, unless `SMS_PROVIDERS_RANDOMIZED` is set to `1`, in which case they are tried in a random order. |
@@ -205,8 +206,8 @@ Optional environment variables:
 
 | Variable                       | Explanation    |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
-| `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` | (v1.3.0+) Path to the `keystore` directory containing the encrypted `ATTESTATION_SIGNER_ADDRESS`'s private key. Must be used with `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE`. |
-| `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` | (v1.3.0+) Passphrase used to encrypt `ATTESTATION_SIGNER_ADDRESS`'s keystore file. Must be used with `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` |
+| `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` | (v1.4.0+) Path to the `keystore` directory containing the encrypted `ATTESTATION_SIGNER_ADDRESS`'s private key. Must be used with `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE`. |
+| `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` | (v1.4.0+) Passphrase used to encrypt `ATTESTATION_SIGNER_ADDRESS`'s keystore file. Must be used with `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` |
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `RATE_LIMIT_REQS_PER_MIN`        | (v1.2.0+) Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
@@ -216,6 +217,8 @@ Optional environment variables:
 | `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
 | `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
 | `MAX_AGE_LATEST_BLOCK_SECS`      | (v1.2.0+) Maximum age of the latest received block, in seconds, before the health check reports failure. Default is `20`. |
+| `GET_BLOCK_TIMEOUT_MS`      | (v1.4.0+) Maximum time in milliseconds to wait after fetching the latest block from a connection, before it times out. Default is `500 ms`. |
+| `DISABLE_SMART_FALLBACK`      | (v1.4.0+) If `true`, only uses the first `CELO_PROVIDER` listed and does not attempt to select the most up-to-date provider nor retry with a backup provider on a failed call. Default is `false`. |
 | `DB_RECORD_EXPIRY_MINS`          | Time in minutes before a record of an attestation in the database may be deleted. Default 60 minutes. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
@@ -296,13 +299,13 @@ They both assume that all of the configuration options needed have been added to
 
 For both options below, set the `TAG` environment variable to determine which image to install. Use `attestation-service-mainnet` for the latest image suitable for mainnet (as below), `attestation-service-baklava` for the latest image suitable for baklava, or specify a specific build as given in the release notes linked above.
 
-### (recommended) Running the Attestation Service v1.3.0+
+### (recommended) Running the Attestation Service v1.4.0+
 
 The main difference between the old method of running the Attestation Service alongside a Celo full node is that you will need to ensure that Docker can access the directory containing the `keystore` which stores the `CELO_ATTESTATION_SIGNER_ADDRESS`'s private key as an encrypted file.
 
 To do this, you need to map the directory containing the `keystore` to the Attestation Service's Docker volume and set the environment variable `ATTESTATION_SIGNER_KEYSTORE_DIRPATH` to the path to this directory relative to the Docker container. You will also need to set the environment variable `ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE` to the password used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.
 
-Additionally, ensure that the `CELO_PROVIDER` environment variable points to a Celo node that can be used to instantiate ContractKit; this can be a separate full node or, depending on your configuration, your validator proxy node. To use your validator proxy node, you would need to allow RPC access, but for security reasons, ensure that this is locked down only to the Attestation Service. Alternatively, provide the endpoint to a Celo node that you run or to a node service provider like Figment Datahub.
+Additionally, ensure that the `CELO_PROVIDERS` environment variable points to at least one (recommended: 2-3 in total) Celo node that can be used to instantiate ContractKit; this can be a separate full node or, depending on your configuration, your validator proxy node. To use your validator proxy node, you would need to allow RPC access, but for security reasons, ensure that this is locked down only to the Attestation Service. Alternatively, provide the endpoint to a Celo node that you run or to a node service provider like Figment Datahub. When passing in multiple providers to this environment variable, prioritize this in the order that they should be used. Unless `DISABLE_SMART_FALLBACK` is set, the Attestation Service will try to use the most up-to-date connection and will retry failed calls with one of the backup providers if possible.
 
 The command below illustrates what this could look like, if you used the command `docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new` from earlier in the instructions above to create the `CELO_ATTESTATION_SIGNER_ADDRESS`. Recall that you set `KEYSTORE_PARENT_DIR` to the working directory (`$PWD`) during the instructions above, and saved the password to the file `KEYSTORE_PARENT_DIR/.password`. Note that environment variables can be set either in the `$CONFIG` file or passed into the `docker run` command directly using the `-e` flag. (In this example, two of these variables are passed in via the `-e` flag for clarity.)
 
@@ -316,7 +319,7 @@ export TAG=attestation-service-mainnet
 docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -v $KEYSTORE_PARENT_DIR:$VOLUME_DIRPATH -e PORT=80 -e ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE=$(cat $KEYSTORE_PARENT_DIR/.password) -e ATTESTATION_SIGNER_KEYSTORE_DIRPATH=$VOLUME_DIRPATH -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:$TAG -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
-### Running the Attestation Service pre-v1.3.0
+### Running the Attestation Service pre-v1.4.0
 
 First, ensure that your local node is fully synced:
 
