@@ -602,11 +602,6 @@ contract GrandaMento is
    * @param newVetoPeriodSeconds The new value for the veto period in seconds.
    */
   function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
-    // Hardcode a max of 4 weeks.
-    // A minimum is not enforced for flexibility. A case of interest is if
-    // Governance were to be set as the `approver`, it would be desirable to
-    // set the veto period to 0 seconds.
-    require(newVetoPeriodSeconds <= 4 weeks, "Veto period cannot exceed 4 weeks");
     vetoPeriodSeconds = newVetoPeriodSeconds;
     emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
   }
