@@ -51,7 +51,7 @@ spec:
         - -c
         args:
         - |
-           exec iex --name {{ .Values.blockscout.indexer.nodeName }}@127.0.0.1 -S mix
+           exec iex --name {{ .Values.blockscout.indexer.nodeName }}@0.0.0.0 -S mix
         ports:
         - name: health
           containerPort: {{ .Values.blockscout.indexer.port }}

@@ -50,7 +50,7 @@ spec:
         - -c
         args:
         - |
-           exec iex --name {{ .Values.blockscout.api.nodeName }}@127.0.0.1 -S mix phx.server
+           exec iex --name {{ .Values.blockscout.api.nodeName }}@0.0.0.0 -S mix phx.server
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.api.port }}
