@@ -75,12 +75,11 @@ contract GrandaMento is
     address payable exchanger;
     // The stable token involved in this proposal. This is stored rather than
     // the stable token's registry ID in case the contract address is changed
-    // after a proposal is created, which could affect refunding or burning the
-    // stable token.
+    // while a stable token deposit
     address stableToken;
     // The state of the exchange proposal.
     ExchangeProposalState state;
-    // Whether the exchanger is selling CELO and buying stableToken.
+    // Whether CELO is being sold and stableToken is being bought.
     bool sellCelo;
     // The amount of the sell token being sold. If a stable token is being sold,
     // the amount of stable token in "units" is stored rather than the "value."
@@ -101,11 +100,6 @@ contract GrandaMento is
     // is being sold that has demurrage enabled, the original value when the stable
     // tokens were deposited cannot be calculated.
     uint256 celoStableTokenExchangeRate;
-    // The veto period in seconds at the time the proposal was created. This is kept
-    // track of on a per-proposal basis to lock-in the veto period for a proposal so
-    // that changes to the contract's vetoPeriodSeconds do not affect existing
-    // proposals.
-    uint256 vetoPeriodSeconds;
     // The timestamp (`block.timestamp`) at which the exchange proposal was approved
     // in seconds. If the exchange proposal has not ever been approved, is 0.
     uint256 approvalTimestamp;
@@ -258,7 +252,6 @@ contract GrandaMento is
       sellAmount: storedSellAmount,
       buyAmount: buyAmount,
       celoStableTokenExchangeRate: celoStableTokenExchangeRate,
-      vetoPeriodSeconds: vetoPeriodSeconds,
       approvalTimestamp: 0 // initial value when not approved yet
     });
     // Push it into the array of active proposals.
@@ -317,13 +310,11 @@ contract GrandaMento is
     // Require the appropriate state and sender.
     // This will also revert if a proposalId is given that does not correspond
     // to a previously created exchange proposal.
-    if (proposal.state == ExchangeProposalState.Proposed) {
-      require(proposal.exchanger == msg.sender, "Sender must be exchanger");
-    } else if (proposal.state == ExchangeProposalState.Approved) {
-      require(isOwner(), "Sender must be owner");
-    } else {
-      revert("Proposal must be in Proposed or Approved state");
-    }
+    require(
+      (proposal.state == ExchangeProposalState.Proposed && proposal.exchanger == msg.sender) ||
+        (proposal.state == ExchangeProposalState.Approved && isOwner()),
+      "Sender cannot cancel the exchange proposal"
+    );
     // Mark the proposal as cancelled. Do so prior to refunding as a measure against reentrancy.
     proposal.state = ExchangeProposalState.Cancelled;
     // Get the token and amount that will be refunded to the proposer.
@@ -339,7 +330,7 @@ contract GrandaMento is
   /**
    * @notice Executes an exchange proposal that's been approved and not vetoed.
    * @dev Callable by anyone. Reverts if the proposal is not in the Approved state
-   * or proposal.vetoPeriodSeconds has not elapsed since approval.
+   * or vetoPeriodSeconds has not elapsed since approval.
    * @param proposalId The identifier of the proposal to execute.
    */
   function executeExchangeProposal(uint256 proposalId) external nonReentrant {
@@ -348,7 +339,7 @@ contract GrandaMento is
     require(proposal.state == ExchangeProposalState.Approved, "Proposal must be in Approved state");
     // Require that the veto period has elapsed since the approval time.
     require(
-      proposal.approvalTimestamp.add(proposal.vetoPeriodSeconds) <= block.timestamp,
+      proposal.approvalTimestamp.add(vetoPeriodSeconds) <= block.timestamp,
       "Veto period not elapsed"
     );
     // Mark the proposal as executed. Do so prior to exchanging as a measure against reentrancy.
@@ -611,11 +602,6 @@ contract GrandaMento is
    * @param newVetoPeriodSeconds The new value for the veto period in seconds.
    */
   function setVetoPeriodSeconds(uint256 newVetoPeriodSeconds) public onlyOwner {
-    // Hardcode a max of 4 weeks.
-    // A minimum is not enforced for flexibility. A case of interest is if
-    // Governance were to be set as the `approver`, it would be desirable to
-    // set the veto period to 0 seconds.
-    require(newVetoPeriodSeconds <= 4 weeks, "Veto period cannot exceed 4 weeks");
     vetoPeriodSeconds = newVetoPeriodSeconds;
     emit VetoPeriodSecondsSet(newVetoPeriodSeconds);
   }
