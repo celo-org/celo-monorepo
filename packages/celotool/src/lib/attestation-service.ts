@@ -37,6 +37,10 @@ async function helmParameters(celoEnv: string) {
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
   const genesisContents = await getGenesisBlockFromGoogleStorage(celoEnv)
   const genesisFileJsonB64 = Buffer.from(genesisContents).toString('base64')
+
+  const celoProviderBackups = fetchEnvOrFallback(envVar.CELO_PROVIDER_BACKUPS, '')
+  console.log(`${celoProviderBackups ? '\\,' + celoProviderBackups.split(',').join('\\,') : ''}`)
+
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
@@ -54,6 +58,9 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
     `--set attestation_service.telekom.apiKey="${fetchEnv(envVar.TELEKOM_API_KEY)}"`,
     `--set attestation_service.telekom.from="${fetchEnv(envVar.TELEKOM_FROM)}"`,
+    `--set attestation_service.celo_provider_backups_str="${
+      celoProviderBackups ? '\\,' + celoProviderBackups.split(',').join('\\,') : ''
+    }"`,
     `--set attestation_service.sms_providers="${fetchEnv(envVar.SMS_PROVIDERS)
       .split(',')
       .join('\\,')}"`,
