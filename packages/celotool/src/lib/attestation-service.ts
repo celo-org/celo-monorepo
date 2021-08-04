@@ -39,7 +39,6 @@ async function helmParameters(celoEnv: string) {
   const genesisFileJsonB64 = Buffer.from(genesisContents).toString('base64')
 
   const celoProviderBackups = fetchEnvOrFallback(envVar.CELO_PROVIDER_BACKUPS, '')
-  console.log(`${celoProviderBackups ? '\\,' + celoProviderBackups.split(',').join('\\,') : ''}`)
 
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
