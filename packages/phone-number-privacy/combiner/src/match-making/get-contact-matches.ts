@@ -60,46 +60,47 @@ export async function handleGetContactMatches(
       return
     }
 
+    // If we are unsure whether a phone number signature is valid but we don't want to block the user,
+    // we just set verifiedPhoneNumberDekSig to undefined so that it is not stored in the database
+    // and fulfill the request as usual.
     let verifiedPhoneNumberDekSig: VerifiedPhoneNumberDekSignature | undefined
     if (signedUserPhoneNumber) {
-      try {
-        verifiedPhoneNumberDekSig = await verifySignedUserPhoneNumber(
-          signedUserPhoneNumber,
-          userPhoneNumber,
-          account,
-          logger
+      const dekSigner = await getDataEncryptionKey(account, getContractKit(), logger).catch(() => {
+        logger.warn(
+          'Failed to retrieve DEK to verify signedUserPhoneNumber. Request wont be recorded.'
         )
-      } catch {
-        respondWithError(response, 403, WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE, logger)
-        return
+      })
+      if (dekSigner) {
+        if (!verifySignature(userPhoneNumber, signedUserPhoneNumber, dekSigner)) {
+          // TODO
+          respondWithError(
+            response,
+            403,
+            WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE,
+            logger
+          )
+          return
+        }
+        verifiedPhoneNumberDekSig = { dekSigner, signedUserPhoneNumber }
       }
     }
 
-    const hasDoneMatchmaking = await getDidMatchmaking(account, logger).catch(() => {
-      // If we don't know if the user has performed matchmaking before, we can't ensure the request is valid.
+    const invalidReplay = await isInvalidReplay(
+      account,
+      userPhoneNumber,
+      logger,
+      signedUserPhoneNumber
+    ).catch(() => {
       logger.warn(
-        'Failed to determine if user has performed matchmaking. Request will be fulfilled but not recorded.'
+        'Failed to determine that user is not requerying matches for a new number. Fullfilling request without recording signature.'
       )
       verifiedPhoneNumberDekSig = undefined
-      return false
     })
-    if (hasDoneMatchmaking) {
-      logger.info({ account }, 'Account has performed matchmaking before.')
-
-      const validReplay = await isValidReplay(
-        account,
-        userPhoneNumber,
-        logger,
-        signedUserPhoneNumber
-      ).catch(() => {
-        verifiedPhoneNumberDekSig = undefined
-        return true
-      })
-      if (!validReplay) {
-        respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
-        return
-      }
+    if (invalidReplay) {
+      respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
+      return
     }
+
     await finishMatchmaking(
       account,
       userPhoneNumber,
@@ -137,34 +138,22 @@ async function finishMatchmaking(
   response.json({ success: true, matchedContacts, version: VERSION })
 }
 
-function verifySignedUserPhoneNumber(
-  signedUserPhoneNumber: string,
-  userPhoneNumber: string,
-  account: string,
-  logger: Logger
-) {
-  return getDataEncryptionKey(account, getContractKit(), logger).then(
-    (dekSigner) => {
-      if (!verifySignature(userPhoneNumber, signedUserPhoneNumber, dekSigner)) {
-        throw new Error()
-      }
-      return { signedUserPhoneNumber, dekSigner } as VerifiedPhoneNumberDekSignature
-    },
-    () => {
-      logger.warn(
-        'Failed to retrieve DEK to verify signedUserPhoneNumber. Request wont be recorded.'
-      )
-      return undefined
-    }
-  )
+async function isReplay(account: string, logger: Logger): Promise<boolean> {
+  return getDidMatchmaking(account, logger).catch((err) => {
+    logger.warn('Failed to determine if user has performed matchmaking.')
+    throw err
+  })
 }
 
-async function isValidReplay(
+async function isInvalidReplay(
   account: string,
   userPhoneNumber: string,
   logger: Logger,
   signedUserPhoneNumber?: string
 ) {
+  if (!(await isReplay(account, logger))) {
+    return false
+  }
   if (!signedUserPhoneNumber) {
     // If the account has performed matchmaking before and does not provide their signed phone number in the request,
     // we return an error bc they could be querying matches for a new number that isn't theirs.
@@ -172,9 +161,8 @@ async function isValidReplay(
       { account },
       'Blocking account from requerying matches without providing a phone number signature.'
     )
-    return false
+    return true
   }
-
   const signedUserPhoneNumberRecord = await getAccountSignedUserPhoneNumberRecord(
     account,
     logger
@@ -190,24 +178,24 @@ async function isValidReplay(
       { account },
       'Allowing account to perform matchmaking since we have no record of the phone number it used before.'
     )
-    return true
+    return false
   }
   if (signedUserPhoneNumberRecord !== signedUserPhoneNumber) {
     if (await userHasNewDek(account, userPhoneNumber, signedUserPhoneNumberRecord, logger)) {
       logger.info({ account }, 'Allowing account to requery matches after key rotation.')
-      return true
+      return false
     }
     logger.info(
       { account },
       'Blocking account from querying matches for a different phone number than before.'
     )
-    return false
+    return true
   }
   logger.info(
     { account },
     'Allowing account to requery matches for the same phone number as before.'
   )
-  return true
+  return false
 }
 
 async function userHasNewDek(

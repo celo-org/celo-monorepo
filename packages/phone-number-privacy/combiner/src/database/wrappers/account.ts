@@ -1,6 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { MatchmakingIdentifier } from '../../match-making/get-contact-matches'
+import { VerifiedPhoneNumberDekSignature } from '../../match-making/get-contact-matches'
 import { getDatabase, getTransaction } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -70,7 +70,7 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
 export async function setDidMatchmaking(
   account: string,
   logger: Logger,
-  matchmakingId?: MatchmakingIdentifier
+  verifiedPhoneNumberDekSig?: VerifiedPhoneNumberDekSignature
 ) {
   logger.debug({ account }, 'Setting did matchmaking')
   const trx = await getTransaction()
@@ -83,17 +83,20 @@ export async function setDidMatchmaking(
         await accountTrxBase()
           .update(ACCOUNTS_COLUMNS.didMatchmaking, new Date())
           .then(async () => {
-            if (matchmakingId) {
+            if (verifiedPhoneNumberDekSig) {
               await accountTrxBase()
                 .having(ACCOUNTS_COLUMNS.signedUserPhoneNumber, 'is', null) // prevents overwriting
-                .update(ACCOUNTS_COLUMNS.signedUserPhoneNumber, matchmakingId.signedUserPhoneNumber)
+                .update(
+                  ACCOUNTS_COLUMNS.signedUserPhoneNumber,
+                  verifiedPhoneNumberDekSig.signedUserPhoneNumber
+                )
               await accountTrxBase()
                 .having(ACCOUNTS_COLUMNS.dekSigner, 'is', null)
-                .update(ACCOUNTS_COLUMNS.dekSigner, matchmakingId.dekSigner)
+                .update(ACCOUNTS_COLUMNS.dekSigner, verifiedPhoneNumberDekSig.dekSigner)
             }
           })
       } else {
-        const newAccount = new Account(account, matchmakingId)
+        const newAccount = new Account(account, verifiedPhoneNumberDekSig)
         newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
         await accounts().transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
       }

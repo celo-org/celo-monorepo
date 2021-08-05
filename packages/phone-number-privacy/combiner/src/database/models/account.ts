@@ -1,4 +1,4 @@
-import { MatchmakingIdentifier } from '../../match-making/get-contact-matches'
+import { VerifiedPhoneNumberDekSignature } from '../../match-making/get-contact-matches'
 
 export const ACCOUNTS_TABLE = 'accounts'
 export enum ACCOUNTS_COLUMNS {
@@ -16,11 +16,11 @@ export class Account {
   [ACCOUNTS_COLUMNS.createdAt]: Date = new Date();
   [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
 
-  constructor(address: string, matchmakingId?: MatchmakingIdentifier) {
+  constructor(address: string, verifiedPhoneNumberDekSig?: VerifiedPhoneNumberDekSignature) {
     this.address = address
-    if (matchmakingId) {
-      this.signedUserPhoneNumber = matchmakingId.signedUserPhoneNumber
-      this.dekSigner = matchmakingId.dekSigner
+    if (verifiedPhoneNumberDekSig) {
+      this.signedUserPhoneNumber = verifiedPhoneNumberDekSig.signedUserPhoneNumber
+      this.dekSigner = verifiedPhoneNumberDekSig.dekSigner
     }
   }
 }
