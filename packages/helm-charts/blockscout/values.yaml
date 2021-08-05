@@ -47,7 +47,7 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
-    nodeName: blockscout-indexer
+    erlangNodeName: blockscout-indexer
   api:
     port: 4000
     strategy:
@@ -99,7 +99,7 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
-    nodeName: blockscout-api
+    erlangNodeName: blockscout-api
   web:
     port: 4000
     strategy:
@@ -159,7 +159,7 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
-    nodeName: blockscout-web
+    erlangNodeName: blockscout-web
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
