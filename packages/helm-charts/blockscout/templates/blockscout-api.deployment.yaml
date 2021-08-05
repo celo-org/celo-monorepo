@@ -21,6 +21,12 @@ spec:
       component: blockscout-api
   template:
     metadata:
+      {{- if .Values.blockscout.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/web
+        prometheus.io/port: "4000"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}

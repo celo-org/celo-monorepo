@@ -27,17 +27,16 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@types/debug": "^4.1.5",
     "@celo/base": "1.2.3-dev",
     "@celo/connect": "1.2.3-dev",
     "@celo/utils": "1.2.3-dev",
     "@celo/wallet-local": "1.2.3-dev",
+    "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
-    "moment": "^2.29.0",
     "semver": "^7.3.5",
     "web3": "1.3.6"
   },
@@ -59,7 +58,7 @@
   "engines": {
     "node": ">=8.13.0"
   },
-  "browser":{
+  "browser": {
     "child_process": false
-  }  
+  }
 }
