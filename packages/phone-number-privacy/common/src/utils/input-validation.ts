@@ -52,6 +52,8 @@ function isValidObfuscatedPhoneNumber(phoneNumber: string) {
   return isBase64(phoneNumber) && Buffer.from(phoneNumber, 'base64').length === 32
 }
 
+const hexString = new RegExp(/[0-9A-Fa-f]{32}/, 'i')
+
 function isByte32(hashedData: string): boolean {
-  return Buffer.byteLength(trimLeading0x(hashedData), 'hex') === 32
+  return hexString.test(trimLeading0x(hashedData))
 }
