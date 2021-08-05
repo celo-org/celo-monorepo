@@ -44,13 +44,12 @@ spec:
       - name: blockscout-web
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        workingDir: /opt/app/apps/block_scout_web
         command:
         - /bin/sh
         - -c
         args:
         - |
-           exec iex --name {{ .Values.blockscout.web.nodeName }}@0.0.0.0 -S mix phx.server
+           exec mix cmd --app block_scout_web "iex --name {{ .Values.blockscout.web.nodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.web.port }}
