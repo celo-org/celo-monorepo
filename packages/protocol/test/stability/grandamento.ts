@@ -8,6 +8,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import _ from 'lodash'
 import {
   GoldTokenContract,
   GoldTokenInstance,
@@ -57,17 +58,7 @@ enum ExchangeProposalState {
 }
 
 function parseExchangeProposal(
-  proposalRaw: [
-    string,
-    string,
-    BigNumber,
-    any,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber
-  ]
+  proposalRaw: [string, string, BigNumber, any, BigNumber, BigNumber, BigNumber, BigNumber]
 ) {
   return {
     exchanger: proposalRaw[0],
@@ -77,8 +68,7 @@ function parseExchangeProposal(
     sellAmount: proposalRaw[4],
     buyAmount: proposalRaw[5],
     celoStableTokenExchangeRate: proposalRaw[6],
-    vetoPeriodSeconds: proposalRaw[7],
-    approvalTimestamp: proposalRaw[8],
+    approvalTimestamp: proposalRaw[7],
   }
 }
 
@@ -332,7 +322,6 @@ contract('GrandaMento', (accounts: string[]) => {
               getBuyAmount(fromFixed(oracleRate), sellAmount, spread)
             )
             assertEqualBN(exchangeProposal.celoStableTokenExchangeRate, defaultCeloStableTokenRate)
-            assertEqualBN(exchangeProposal.vetoPeriodSeconds, vetoPeriodSeconds)
             assertEqualBN(exchangeProposal.approvalTimestamp, 0)
           })
         }
@@ -503,7 +492,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Try to have Alice cancel it when the exchange proposal is in the Approved state.
         await assertRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: alice }),
-          'Sender must be owner'
+          'Sender cannot cancel the exchange proposal'
         )
       })
     })
@@ -526,7 +515,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Try to cancel it when the exchange proposal is in the Proposed state.
         await assertRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: owner }),
-          'Sender must be exchanger'
+          'Sender cannot cancel the exchange proposal'
         )
       })
     })
@@ -625,14 +614,14 @@ contract('GrandaMento', (accounts: string[]) => {
       await createExchangeProposal(false, alice)
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
-        'Sender must be exchanger'
+        'Sender cannot cancel the exchange proposal'
       )
     })
 
     it('reverts when the proposalId does not exist', async () => {
       await assertRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
-        'Proposal must be in Proposed or Approved state'
+        'Sender cannot cancel the exchange proposal'
       )
     })
   })
@@ -778,21 +767,7 @@ contract('GrandaMento', (accounts: string[]) => {
         })
       })
 
-      it("executes the proposal when time since approval is between the proposal's vetoPeriodSeconds and the contract's vetoPeriodSeconds", async () => {
-        const newContractVetoPeriodSeconds = vetoPeriodSeconds * 2
-        // Set the contract's vetoPeriodSeconds to a higher value than the proposal's
-        // vetoPeriodSeconds to illustrate that the proposal's vetoPeriodSeconds is used
-        // in the require.
-        await grandaMento.setVetoPeriodSeconds(newContractVetoPeriodSeconds)
-        await timeTravel(vetoPeriodSeconds, web3)
-        await grandaMento.executeExchangeProposal(1)
-      })
-
-      it("reverts when the proposal's vetoPeriodSeconds has not elapsed since the approval time", async () => {
-        // Set the contract's vetoPeriodSeconds to 0 to illustrate that
-        // the proposal's vetoPeriodSeconds is used rather than the contract's
-        // vetoPeriodSeconds.
-        await grandaMento.setVetoPeriodSeconds(0)
+      it('reverts when the vetoPeriodSeconds has not elapsed since the approval time', async () => {
         // Traveling vetoPeriodSeconds - 1 can be flaky due to block times,
         // so instead just subtract by 10 to be safe.
         await timeTravel(vetoPeriodSeconds - 10, web3)
@@ -1105,39 +1080,6 @@ contract('GrandaMento', (accounts: string[]) => {
       await assertRevertWithReason(
         grandaMento.getStableTokenExchangeLimits(CeloContractName.StableTokenEUR),
         'Max stable token exchange amount must be defined'
-      )
-    })
-  })
-
-  describe('#setVetoPeriodSeconds', () => {
-    const newVetoPeriodSeconds = 60 * 60 * 24 * 7 // 7 days
-    it('sets the spread', async () => {
-      await grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds)
-      assertEqualBN(await grandaMento.vetoPeriodSeconds(), newVetoPeriodSeconds)
-    })
-
-    it('emits the VetoPeriodSecondsSet event', async () => {
-      const receipt = await grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds)
-      assertLogMatches2(receipt.logs[0], {
-        event: 'VetoPeriodSecondsSet',
-        args: {
-          vetoPeriodSeconds: newVetoPeriodSeconds,
-        },
-      })
-    })
-
-    it('reverts when the veto period is greater than 4 weeks', async () => {
-      const fourWeeks = 60 * 60 * 24 * 7 * 4
-      await assertRevertWithReason(
-        grandaMento.setVetoPeriodSeconds(fourWeeks + 1),
-        'Veto period cannot exceed 4 weeks'
-      )
-    })
-
-    it('reverts when the sender is not the owner', async () => {
-      await assertRevertWithReason(
-        grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds, { from: accounts[1] }),
-        'Ownable: caller is not the owner'
       )
     })
   })
