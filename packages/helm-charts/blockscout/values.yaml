@@ -133,10 +133,6 @@ blockscout:
             memory: 500Mi
             cpu: 700m
     pool_size: 10
-    sourcify:
-      enabled: false
-      serverUrl: ""
-      repoUrl: ""
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
