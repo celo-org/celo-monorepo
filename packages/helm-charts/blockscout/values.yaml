@@ -47,6 +47,7 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
+    erlangNodeName: blockscout-indexer
   api:
     port: 4000
     strategy:
@@ -98,6 +99,7 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
+    erlangNodeName: blockscout-api
   web:
     port: 4000
     strategy:
@@ -153,6 +155,7 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
+    erlangNodeName: blockscout-web
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
@@ -165,7 +168,7 @@ blockscout:
     name: blockscout
     drop: "false"
   jsonrpc_http_url: http://tx-nodes-private:8545
-  jsonrpc_ws_url: ws://tx-nodes-private:8546
+  jsonrpc_ws_url: ws://tx-nodes-private:8545
   metadata_crawler:
     schedule: "*/30 * * * *"
     image:
