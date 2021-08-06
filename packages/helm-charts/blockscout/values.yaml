@@ -173,4 +173,4 @@ blockscout:
     schedule: "*/30 * * * *"
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
-      tag: metadata-crawler-33bb740ffb4ee7804046f48299f8686416afbe47
+      tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34
