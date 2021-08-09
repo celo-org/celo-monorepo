@@ -12,6 +12,7 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   priceSources: "[[{exchange: 'BITTREX', symbol: 'CELOBTC', toInvert: false}],[{exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false}]]"
+  minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
