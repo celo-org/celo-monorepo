@@ -1,3 +1,4 @@
+import { concurrentMap, objectFromEntries, zip } from '@celo/base'
 import {
   Address,
   CeloTx,
@@ -12,12 +13,13 @@ import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
 import net from 'net'
 import Web3 from 'web3'
+import { CeloTokenType } from '.'
 import { AddressRegistry } from './address-registry'
-import { CeloContract, CeloTokenContract } from './base'
-import { CeloTokens, EachCeloToken } from './celo-tokens'
-import { WrapperCache } from './contract-cache'
-import { Web3ContractCache } from './web3-contract-cache'
-import { AttestationsConfig } from './wrappers/Attestations'
+import { CeloContract, CeloTokenContract, RegisteredContracts } from './base'
+import { celoTokenInfos, CeloTokens, EachCeloToken } from './celo-tokens'
+import { WrapperCache, WrapperFactories } from './contract-cache'
+import { UndeployedError, Web3ContractCache } from './web3-contract-cache'
+import { AttestationsConfig, AttestationsWrapper } from './wrappers/Attestations'
 import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
@@ -114,102 +116,69 @@ export class ContractKit {
     }
   }
 
-  async getNetworkConfig(): Promise<NetworkConfig> {
-    const celoTokenAddresses = await this.celoTokens.getAddresses()
-    // There can only be `10` unique parametrized types in Promise.all call, that is how
-    // its typescript typing is setup. Thus, since we crossed threshold of 10
-    // have to explicitly cast it to just any type and discard type information.
-    const promises: Array<Promise<any>> = [
-      this.contracts.getElection(),
-      this.contracts.getAttestations(),
-      this.contracts.getGovernance(),
-      this.contracts.getLockedGold(),
-      this.contracts.getSortedOracles(),
-      this.contracts.getGasPriceMinimum(),
-      this.contracts.getReserve(),
-      this.contracts.getValidators(),
-      this.contracts.getDowntimeSlasher(),
-      this.contracts.getBlockchainParameters(),
-      this.contracts.getGrandaMento(),
+  getWrappers = async (filterContracts = RegisteredContracts) =>
+    concurrentMap(
+      4,
+      Object.keys(WrapperFactories).filter((factory) =>
+        filterContracts.includes(factory as CeloContract)
+      ),
+      async (contract) => {
+        try {
+          // @ts-ignore
+          return await this.contracts.getContract(contract)
+        } catch (e) {
+          if (e instanceof UndeployedError) {
+            return undefined
+          } else {
+            throw e
+          }
+        }
+      }
+    )
+
+  async getNetworkConfig(humanReadable = false) {
+    const celoTokenInfos = await this.celoTokens.validCeloTokenInfos()
+    const tokenAddresses = Object.values(await this.celoTokens.getAddresses()) as string[]
+
+    const configContracts = [
+      ...celoTokenInfos.map((i) => i.contract),
+      CeloContract.Attestations,
+      CeloContract.BlockchainParameters,
+      CeloContract.DowntimeSlasher,
+      CeloContract.Election,
+      CeloContract.GasPriceMinimum,
+      CeloContract.GrandaMento,
+      CeloContract.Governance,
+      CeloContract.LockedGold,
+      CeloContract.Reserve,
+      CeloContract.SortedOracles,
+      CeloContract.Validators,
     ]
-    const contracts = await Promise.all(promises)
-    const res = await Promise.all([
-      this.celoTokens.getExchangesConfigs(),
-      this.celoTokens.getStablesConfigs(),
-      contracts[0].getConfig(),
-      contracts[1].getConfig(Object.values(celoTokenAddresses)),
-      contracts[2].getConfig(),
-      contracts[3].getConfig(),
-      contracts[4].getConfig(),
-      contracts[5].getConfig(),
-      contracts[6].getConfig(),
-      contracts[7].getConfig(),
-      contracts[8].getConfig(),
-      contracts[9].getConfig(),
-      contracts[10].getConfig(),
-    ])
-    return {
-      exchanges: res[0],
-      stableTokens: res[1],
-      election: res[2],
-      attestations: res[3],
-      governance: res[4],
-      lockedGold: res[5],
-      sortedOracles: res[6],
-      gasPriceMinimum: res[7],
-      reserve: res[8],
-      validators: res[9],
-      downtimeSlasher: res[10],
-      blockchainParameters: res[11],
-    }
+
+    const configWrappers = await this.getWrappers(configContracts)
+
+    const configValues = await concurrentMap(4, configWrappers, async (wrapper) => {
+      if (wrapper instanceof AttestationsWrapper) {
+        return humanReadable
+          ? wrapper.getHumanReadableConfig(tokenAddresses)
+          : wrapper.getConfig(tokenAddresses)
+      } else if (wrapper !== undefined) {
+        // @ts-ignore
+        return humanReadable && wrapper.getHumanReadableConfig
+          ? // @ts-ignore
+            wrapper.getHumanReadableConfig()
+          : // @ts-ignore
+            wrapper.getConfig()
+      }
+      return 'failed to fetch config'
+    })
+
+    return objectFromEntries(
+      zip((contract, value) => [contract, value], configContracts, configValues)
+    )
   }
 
-  async getHumanReadableNetworkConfig() {
-    const celoTokenAddresses = await this.celoTokens.getAddresses()
-    const promises: Array<Promise<any>> = [
-      this.contracts.getElection(),
-      this.contracts.getAttestations(),
-      this.contracts.getGovernance(),
-      this.contracts.getLockedGold(),
-      this.contracts.getSortedOracles(),
-      this.contracts.getGasPriceMinimum(),
-      this.contracts.getReserve(),
-      this.contracts.getValidators(),
-      this.contracts.getDowntimeSlasher(),
-      this.contracts.getBlockchainParameters(),
-      this.contracts.getGrandaMento(),
-    ]
-    const contracts = await Promise.all(promises)
-    const res = await Promise.all([
-      this.celoTokens.getExchangesConfigs(true),
-      this.celoTokens.getStablesConfigs(true),
-      contracts[0].getConfig(),
-      contracts[1].getHumanReadableConfig(Object.values(celoTokenAddresses)),
-      contracts[2].getHumanReadableConfig(),
-      contracts[3].getHumanReadableConfig(),
-      contracts[4].getHumanReadableConfig(),
-      contracts[5].getConfig(),
-      contracts[6].getConfig(),
-      contracts[7].getHumanReadableConfig(),
-      contracts[8].getHumanReadableConfig(),
-      contracts[9].getConfig(),
-      contracts[10].getConfig(),
-    ])
-    return {
-      exchanges: res[0],
-      stableTokens: res[1],
-      election: res[2],
-      attestations: res[3],
-      governance: res[4],
-      lockedGold: res[5],
-      sortedOracles: res[6],
-      gasPriceMinimum: res[7],
-      reserve: res[8],
-      validators: res[9],
-      downtimeSlasher: res[10],
-      blockchainParameters: res[11],
-    }
-  }
+  getHumanReadableNetworkConfig = () => this.getNetworkConfig(true)
 
   /**
    * Set CeloToken to use to pay for gas fees

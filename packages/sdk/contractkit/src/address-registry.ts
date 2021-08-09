@@ -1,8 +1,10 @@
+import { concurrentMap, objectFromEntries } from '@celo/base'
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import debugFactory from 'debug'
 import { CeloContract, RegisteredContracts, stripProxy } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
+import { UndeployedError } from './web3-contract-cache'
 
 const debug = debugFactory('kit:registry')
 
@@ -25,42 +27,40 @@ export class AddressRegistry {
    * Get the address for a `CeloContract`
    */
   async addressFor(contract: CeloContract): Promise<Address> {
-    if (!this.cache.has(contract)) {
-      debug('Fetching address from Registry for %s', contract)
-      const address = await this.registry.methods.getAddressForString(stripProxy(contract)).call()
+    if (this.cache.has(contract)) {
+      return this.cache.get(contract)!
+    }
 
-      debug('Fetched address %s', address)
-      if (!address || address === NULL_ADDRESS) {
+    debug('Fetching address from Registry for %s', contract)
+    const address = await this.registry.methods.getAddressForString(stripProxy(contract)).call()
+
+    debug('Fetched address %s', address)
+    if (!address || address === NULL_ADDRESS) {
+      if (RegisteredContracts.includes(contract)) {
+        throw new UndeployedError(contract)
+      } else {
         throw new Error(`Failed to get address for ${contract} from the Registry`)
       }
-      this.cache.set(contract, address)
     }
-    const cachedAddress = this.cache.get(contract)!
-    return cachedAddress
+
+    this.cache.set(contract, address)
+    return address
   }
 
   /**
    * Get the address mapping for known registered contracts
    */
-  async addressMapping() {
-    const allContracts = await this.addressMappingWithNotDeployedContracts()
-    const contracts: Map<CeloContract, string> = new Map()
-    allContracts.forEach((value, key) => (value ? contracts.set(key, value) : undefined))
-    return contracts
-  }
-
-  async addressMappingWithNotDeployedContracts(notDeployedValue?: string) {
-    const contracts: Map<CeloContract, string | undefined> = new Map()
-    await Promise.all(
-      RegisteredContracts.map(async (r) => {
+  addressMapping = async (): Promise<{ [key in CeloContract]: string }> =>
+    objectFromEntries(
+      await concurrentMap(4, RegisteredContracts, async (contract) => {
         try {
-          const address = await this.addressFor(r)
-          contracts.set(r, address)
-        } catch {
-          contracts.set(r, notDeployedValue)
+          return [contract, await this.addressFor(contract)]
+        } catch (e) {
+          if (e instanceof UndeployedError) {
+            return [contract, e.message]
+          }
+          throw e
         }
       })
-    )
-    return contracts
-  }
+    ) as any
 }

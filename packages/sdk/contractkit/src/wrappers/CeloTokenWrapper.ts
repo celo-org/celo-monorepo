@@ -36,4 +36,18 @@ export class CeloTokenWrapper<T extends Ierc20 & ICeloToken> extends Erc20Wrappe
    * @return True if the transaction succeeds.
    */
   transferWithComment = proxySend(this.kit, this.contract.methods.transferWithComment)
+
+  async getConfig() {
+    const name = await this.name()
+    const symbol = await this.symbol()
+    const decimals = await this.decimals()
+    const totalSupply = await this.totalSupply()
+    return { name, symbol, decimals, totalSupply }
+  }
 }
+
+export type CeloTokenConfig = ReturnType<CeloTokenWrapper<any>['getConfig']> extends PromiseLike<
+  infer U
+>
+  ? U
+  : never

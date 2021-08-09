@@ -1,5 +1,9 @@
 import { eqAddress, NULL_ADDRESS } from './address'
 
+export function objectFromEntries(a: any[][]) {
+  return a.reduce((o, [key, value]) => ({ ...o, [key]: value }), {})
+}
+
 export function zip<A, B, C>(fn: (a: A, b: B) => C, as: A[], bs: B[]) {
   const len = Math.min(as.length, bs.length)
   const res: C[] = []

@@ -11,7 +11,7 @@ import {
   valueToBigNumber,
   valueToString,
 } from './BaseWrapper'
-import { CeloTokenWrapper } from './CeloTokenWrapper'
+import { CeloTokenConfig, CeloTokenWrapper } from './CeloTokenWrapper'
 
 export interface InflationParameters {
   rate: BigNumber
@@ -20,10 +20,7 @@ export interface InflationParameters {
   factorLastUpdated: BigNumber
 }
 
-export interface StableTokenConfig {
-  decimals: number
-  name: string
-  symbol: string
+export interface StableTokenConfig extends CeloTokenConfig {
   inflationParameters: InflationParameters
 }
 
@@ -88,33 +85,24 @@ export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
    * Querying the inflation parameters.
    * @returns Inflation rate, inflation factor, inflation update period and the last time factor was updated.
    */
-  async getInflationParameters(): Promise<InflationParameters> {
-    const res = await this.contract.methods.getInflationParameters().call()
-    return {
+  getInflationParameters = proxyCall(
+    this.contract.methods.getInflationParameters,
+    undefined,
+    (res) => ({
       rate: fromFixed(valueToBigNumber(res[0])),
       factor: fromFixed(valueToBigNumber(res[1])),
       updatePeriod: valueToBigNumber(res[2]),
       factorLastUpdated: valueToBigNumber(res[3]),
-    }
-  }
+    })
+  )
 
   /**
    * Returns current configuration parameters.
    */
-  async getConfig(): Promise<StableTokenConfig> {
-    const res = await Promise.all([
-      this.name(),
-      this.symbol(),
-      this.decimals(),
-      this.getInflationParameters(),
-    ])
-    return {
-      name: res[0],
-      symbol: res[1],
-      decimals: res[2],
-      inflationParameters: res[3],
-    }
-  }
+  getConfig = async () => ({
+    ...(await super.getConfig()),
+    inflationParameters: await this.getInflationParameters(),
+  })
 
   /**
    * @dev Returns human readable configuration of the stabletoken contract

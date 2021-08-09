@@ -69,6 +69,17 @@ export const ContractFactories = {
 export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
+export class UndeployedError implements Error {
+  name: string
+  message: string
+  stack?: string | undefined
+
+  constructor(contract: CeloContract) {
+    this.name = contract
+    this.message = `${contract} not yet deployed for this chain`
+  }
+}
+
 /**
  * Native Web3 contracts factory and cache.
  *
@@ -173,7 +184,7 @@ export class Web3ContractCache {
         try {
           address = await this.kit.registry.addressFor(contract)
         } catch (e) {
-          throw new Error(`${contract} not yet deployed for this chain`)
+          throw new UndeployedError(contract)
         }
       }
       debug('Initiating contract %s', contract)
