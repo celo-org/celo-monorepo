@@ -14,6 +14,7 @@ import {
   RegistryContract,
 } from 'types'
 import { keccak256 } from 'web3-utils'
+
 import BigNumber from 'bignumber.js'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -447,22 +448,20 @@ contract('Accounts', (accounts: string[]) => {
   })
 
   describe('#batchGetOffchainStorageRoots', () => {
-    it.only('returns storage roots for multiple accounts', async () => {
+    it('returns storage roots for multiple accounts', async () => {
       const metadataURLs1 = [metadataURL, otherMetadataURL]
-      const storageRoots1 = [storageRoot, otherStorageRoot]
+      const storageRoots1: string[] = [storageRoot, otherStorageRoot]
       const metadataURLs2 = ['abc', 'def', 'ghi']
-      const storageRoots2 = metadataURLs2.map(web3.utils.utf8ToHex)
+      const storageRoots2: string[] = metadataURLs2.map(web3.utils.utf8ToHex)
       await accountsInstance.createAccount()
 
       await accountsInstance.createAccount({ from: accounts[1] })
-      for (let i = 0; i < storageRoots1.length; i++) {
-        const root = storageRoots1[i]
+      for (const root of storageRoots1) {
         await accountsInstance.addStorageRoot(root, { from: accounts[1] })
       }
 
       await accountsInstance.createAccount({ from: accounts[2] })
-      for (let i = 0; i < storageRoots2.length; i++) {
-        const root = storageRoots2[i] as string
+      for (const root of storageRoots2) {
         await accountsInstance.addStorageRoot(root, { from: accounts[2] })
       }
 
