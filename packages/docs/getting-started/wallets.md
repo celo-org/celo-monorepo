@@ -16,7 +16,7 @@ Valora is a mobile wallet focused on making global peer-to-peer payments simple 
 
 - [valoraapp.com](https://valoraapp.com)
 - Platforms: iOS, Android
-- Maintainers: [cLabs](https://clabs.co)
+- Maintainers: [Valora](https://valoraapp.com)
 - Ledger support: No
 
 ### CeloWallet.app
