@@ -78,6 +78,7 @@ resource "google_compute_instance" "attestation_service" {
       nexmo_unsupported_regions : var.nexmo_unsupported_regions,
       twilio_account_sid : var.twilio_account_sid,
       twilio_messaging_service_sid : var.twilio_messaging_service_sid,
+      twilio_verify_service_sid : var.twilio_verify_service_sid,
       twilio_auth_token : var.twilio_auth_token,
       twilio_blacklist : var.twilio_blacklist,
       twilio_unsupported_regions : var.twilio_unsupported_regions,

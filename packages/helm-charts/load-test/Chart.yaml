@@ -8,5 +8,5 @@ keywords:
 appVersion: v1.7.3
 dependencies:
 - name: common
-  version: 0.1.0
+  version: 0.1.1
   repository: file://../common
