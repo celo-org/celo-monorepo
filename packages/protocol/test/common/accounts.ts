@@ -446,6 +446,43 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
+  describe('#batchGetOffchainStorageRoots', () => {
+    it.only('returns storage roots for multiple accounts', async () => {
+      const metadataURLs1 = [metadataURL, otherMetadataURL]
+      const storageRoots1 = [storageRoot, otherStorageRoot]
+      const metadataURLs2 = ['abc', 'def', 'ghi']
+      const storageRoots2 = metadataURLs2.map(web3.utils.utf8ToHex)
+      await accountsInstance.createAccount()
+
+      await accountsInstance.createAccount({ from: accounts[1] })
+      for (let i = 0; i < storageRoots1.length; i++) {
+        const root = storageRoots1[i]
+        await accountsInstance.addStorageRoot(root, { from: accounts[1] })
+      }
+
+      await accountsInstance.createAccount({ from: accounts[2] })
+      for (let i = 0; i < storageRoots2.length; i++) {
+        const root = storageRoots2[i] as string
+        await accountsInstance.addStorageRoot(root, { from: accounts[2] })
+      }
+
+      const [
+        rootsHex,
+        lengths,
+        lengthLengths,
+      ] = await accountsInstance.batchGetOffchainStorageRoots(accounts.slice(0, 3))
+
+      const roots = web3.utils.hexToUtf8(rootsHex)
+
+      const allURLs = metadataURLs1.concat(metadataURLs2)
+      const concatanatedURLs = allURLs.join('')
+
+      assert.equal(lengthLengths.length, 3)
+      assert.equal(lengths.length, 5)
+      assert.equal(roots, concatanatedURLs)
+    })
+  })
+
   describe('#setName', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
