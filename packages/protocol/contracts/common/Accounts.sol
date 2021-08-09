@@ -921,6 +921,16 @@ contract Accounts is
     return (sizes, data);
   }
 
+  /**
+   * @notice Getter for the storage roots of multiple accounts.
+   * @param accountsToQuery The addresses of the accounts to get the storage roots for.
+   * @return (
+   *          data - all strings concatenated
+   *          rootLengths[] - the length of each string in `data` in bytes
+   *          accountRootNumbers[] - the number of storage roots per account
+   *         )
+   */
+
   function batchGetOffchainStorageRoots(address[] calldata accountsToQuery)
     external
     view
