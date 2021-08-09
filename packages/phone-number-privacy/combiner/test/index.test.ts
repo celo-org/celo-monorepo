@@ -248,7 +248,7 @@ describe(`POST /getContactMatches endpoint`, () => {
     expectSignatureWasNotRecorded()
   }
   const expectFirstMatchmakingToSucceed = (req: Request) => {
-    mockGetDidMatchmaking.mockReturnValue(false)
+    mockGetDidMatchmaking.mockResolvedValue(false)
     expectSuccess(req)
   }
   const expectFirstMatchmakingToSucceedWithoutRecord = (req: Request) => {
@@ -298,13 +298,12 @@ describe(`POST /getContactMatches endpoint`, () => {
       mockIsVerified.mockResolvedValue(true)
     })
 
-    describe.skip('w/o signedUserPhoneNumber', () => {
-      // TODO
+    describe('w/o signedUserPhoneNumber', () => {
       const req = {
         body: validInput,
         headers: mockHeaders,
       } as Request
-      expectFirstMatchmakingToSucceedWithRecord(req)
+      expectFirstMatchmakingToSucceedWithoutRecord(req)
       expectReplaysToFail(req)
       expectPotentialReplaysToSucceedWithoutRecord(req)
     })
@@ -335,14 +334,14 @@ describe(`POST /getContactMatches endpoint`, () => {
         })
 
         describe('When DEK signedUserPhoneNumber signature is valid', () => {
-          // expectFirstMatchmakingToSucceedWithRecord(req) TODO
+          expectFirstMatchmakingToSucceedWithRecord(req)
           expectPotentialReplaysToSucceedWithoutRecord(req)
 
           describe('With replayed requests', () => {
             beforeAll(() => {
               mockGetDidMatchmaking.mockResolvedValue(true)
             })
-            describe.skip('When signedUserPhoneNumberRecord matches request', () => {
+            describe('When signedUserPhoneNumberRecord matches request', () => {
               beforeAll(() => {
                 mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
                   req.body.signedUserPhoneNumber
