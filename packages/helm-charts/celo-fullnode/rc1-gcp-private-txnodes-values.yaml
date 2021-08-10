@@ -1,0 +1,5 @@
+geth:
+  resources:
+    requests:
+      memory: "14Gi"
+      cpu: "7"
