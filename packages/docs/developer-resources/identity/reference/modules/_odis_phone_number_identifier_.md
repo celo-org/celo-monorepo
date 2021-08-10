@@ -42,7 +42,7 @@ ___
 
 ▸ **getBlindedPhoneNumber**(`e164Number`: string, `blsBlindingClient`: [BlsBlindingClient](../interfaces/_odis_bls_blinding_client_.blsblindingclient.md)): *Promise‹string›*
 
-*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L76)*
+*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L78)*
 
 Blinds the phone number in preparation for the ODIS request
 Caller should use the same blsBlindingClient instance for unblinding
@@ -62,7 +62,7 @@ ___
 
 ▸ **getBlindedPhoneNumberSignature**(`account`: string, `signer`: [AuthSigner](_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_odis_query_.servicecontext.md), `base64BlindedMessage`: string, `selfPhoneHash?`: undefined | string, `clientVersion?`: undefined | string, `sessionID?`: undefined | string): *Promise‹string›*
 
-*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L90)*
+*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L92)*
 
 Query ODIS for the blinded signature
 Response can be passed into getPhoneNumberIdentifierFromSignature
@@ -88,7 +88,7 @@ ___
 
 ▸ **getPepperFromThresholdSignature**(`sigBuf`: Buffer): *string*
 
-*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:141](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L141)*
+*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:142](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L142)*
 
 **Parameters:**
 
@@ -130,7 +130,7 @@ ___
 
 ▸ **getPhoneNumberIdentifierFromSignature**(`e164Number`: string, `base64BlindedSignature`: string, `blsBlindingClient`: [BlsBlindingClient](../interfaces/_odis_bls_blinding_client_.blsblindingclient.md)): *Promise‹[PhoneNumberHashDetails](../interfaces/_odis_phone_number_identifier_.phonenumberhashdetails.md)›*
 
-*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L124)*
+*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L125)*
 
 Unblind the response and return the on-chain identifier
 
@@ -150,7 +150,7 @@ ___
 
 ▸ **isBalanceSufficientForSigRetrieval**(`dollarBalance`: BigNumber.Value, `celoBalance`: BigNumber.Value): *boolean*
 
-*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L152)*
+*Defined in [packages/sdk/identity/src/odis/phone-number-identifier.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/phone-number-identifier.ts#L150)*
 
 Check if balance is sufficient for quota retrieval
 
