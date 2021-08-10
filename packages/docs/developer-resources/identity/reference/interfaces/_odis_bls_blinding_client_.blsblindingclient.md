@@ -25,14 +25,14 @@
 
 #### Type declaration:
 
-▸ (`base64PhoneNumber`: string, `seed?`: Uint8Array): *Promise‹string›*
+▸ (`base64PhoneNumber`: string, `seed?`: Buffer): *Promise‹string›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `base64PhoneNumber` | string |
-`seed?` | Uint8Array |
+`seed?` | Buffer |
 
 ___
 

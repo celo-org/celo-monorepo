@@ -39,7 +39,7 @@ Name | Type |
 
 ###  blindMessage
 
-▸ **blindMessage**(`base64PhoneNumber`: string, `seed?`: Uint8Array): *Promise‹string›*
+▸ **blindMessage**(`base64PhoneNumber`: string, `seed?`: Buffer): *Promise‹string›*
 
 *Defined in [packages/sdk/identity/src/odis/bls-blinding-client.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/bls-blinding-client.ts#L39)*
 
@@ -48,7 +48,7 @@ Name | Type |
 Name | Type |
 ------ | ------ |
 `base64PhoneNumber` | string |
-`seed?` | Uint8Array |
+`seed?` | Buffer |
 
 **Returns:** *Promise‹string›*
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **unblindAndVerifyMessage**(`base64BlindSig`: string): *Promise‹string›*
 
-*Defined in [packages/sdk/identity/src/odis/bls-blinding-client.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/bls-blinding-client.ts#L55)*
+*Defined in [packages/sdk/identity/src/odis/bls-blinding-client.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/bls-blinding-client.ts#L52)*
 
 **Parameters:**
 
