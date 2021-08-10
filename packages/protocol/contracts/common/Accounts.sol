@@ -65,13 +65,14 @@ contract Accounts is
   // All signers and their roles for a given account
   // solhint-disable-next-line max-line-length
   mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
-  // A per-account list of CIP8 storage roots, bypassing CIP3.
-  mapping(address => bytes[]) public offchainStorageRoots;
 
   bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
     "AuthorizeSigner(address account,address signer,bytes32 role)"
   );
   bytes32 public eip712DomainSeparator;
+
+  // A per-account list of CIP8 storage roots, bypassing CIP3.
+  mapping(address => bytes[]) public offchainStorageRoots;
 
   bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
   bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
