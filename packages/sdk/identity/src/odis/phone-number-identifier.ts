@@ -5,6 +5,7 @@ import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
+  AuthenticationMethod,
   AuthSigner,
   queryOdis,
   ServiceContext,
@@ -48,6 +49,12 @@ export async function getPhoneNumberIdentifier(
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
+
+  const seed =
+    signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY
+      ? Buffer.from(signer.rawKey)
+      : undefined
+
   // Fallback to using Wasm version if not specified
 
   if (!blsBlindingClient) {
@@ -55,7 +62,7 @@ export async function getPhoneNumberIdentifier(
     blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
   }
 
-  const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient)
+  const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient, seed)
 
   const base64BlindSig = await getBlindedPhoneNumberSignature(
     account,
@@ -76,11 +83,12 @@ export async function getPhoneNumberIdentifier(
  */
 export async function getBlindedPhoneNumber(
   e164Number: string,
-  blsBlindingClient: BlsBlindingClient
+  blsBlindingClient: BlsBlindingClient,
+  seed?: Buffer
 ): Promise<string> {
   debug('Retrieving blinded message')
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
-  return blsBlindingClient.blindMessage(base64PhoneNumber)
+  return blsBlindingClient.blindMessage(base64PhoneNumber, seed)
 }
 
 /**
