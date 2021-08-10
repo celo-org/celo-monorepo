@@ -70,7 +70,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   async createExchangeProposal(
     stableTokenRegistryId: StableTokenContract,
     sellAmount: BigNumber,
-    sellCelo: true
+    sellCelo: boolean
   ) {
     const createExchangeProposalInner = proxySend(
       this.kit,

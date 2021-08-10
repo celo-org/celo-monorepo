@@ -18,9 +18,14 @@ export default class Propse extends BaseCommand {
       description: 'The value of CELO to exchange for a StableToken',
     }),
     stableToken: flags.enum({
+      required: true,
       options: Object.keys(stableTokenOptions),
       description: 'Name of the stable to receive',
       default: 'cUSD',
+    }),
+    sellCelo: flags.boolean({
+      required: true,
+      description: 'Name of the stable to receive',
     }),
   }
 
@@ -31,19 +36,22 @@ export default class Propse extends BaseCommand {
     const res = this.parse(Propse)
     const sellAmount = res.flags.value
     const stableToken = stableTokenOptions[res.flags.stableToken]
+    const sellCelo = res.flags.sellCelo
+
+    const tokenToSell = sellCelo ? celoToken : await this.kit.contracts.getStableToken(stableToken)
 
     await displaySendTx(
       'increaseAllowance',
-      celoToken.increaseAllowance(grandaMento.address, sellAmount.toFixed())
+      tokenToSell.increaseAllowance(grandaMento.address, sellAmount.toFixed())
     )
 
     await displaySendTx(
-      'proposeTx',
+      'propose',
       await grandaMento.createExchangeProposal(
         this.kit.celoTokens.getContract(stableToken),
         sellAmount,
-        true
-      ), // TODO make the last flag explicit?
+        sellCelo
+      ),
       { value: sellAmount.toString() },
       'ProposalQueued'
     )
