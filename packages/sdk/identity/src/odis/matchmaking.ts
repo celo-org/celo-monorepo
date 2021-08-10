@@ -2,6 +2,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
 import {
+  AuthenticationMethod,
   AuthSigner,
   EncryptionKeySigner,
   MatchmakingRequest,
@@ -45,6 +46,11 @@ export async function getContactMatches(
   if (sessionID) {
     body.sessionID = sessionID
   }
+
+  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    dekSigner = signer
+  }
+
   if (dekSigner) {
     body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
   } else {
