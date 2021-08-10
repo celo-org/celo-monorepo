@@ -10,8 +10,9 @@ import {
   isVerified,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { trimLeading0x } from '@celo/utils/lib/address'
 import Logger from 'bunyan'
+import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
 import { VERSION } from '../config'
@@ -23,6 +24,8 @@ import {
 } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { getContractKit } from '../web3/contracts'
+
+const ec = new EC('secp256k1')
 
 interface ContactMatch {
   phoneNumber: string
@@ -71,8 +74,7 @@ export async function handleGetContactMatches(
         )
       })
       if (dekSigner) {
-        if (!verifySignature(userPhoneNumber, signedUserPhoneNumber, dekSigner)) {
-          // TODO
+        if (!verifyDEKSignature(userPhoneNumber, signedUserPhoneNumber, dekSigner, logger)) {
           respondWithError(
             response,
             403,
@@ -198,6 +200,24 @@ async function isInvalidReplay(
   return false
 }
 
+export function verifyDEKSignature(
+  message: string,
+  messageSignature: string,
+  registeredEncryptionKey: string,
+  logger?: Logger
+) {
+  try {
+    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
+    return key.verify(message, JSON.parse(messageSignature))
+  } catch (err) {
+    if (logger) {
+      logger.error('Failed to verify signature with DEK')
+      logger.error({ err, dek: registeredEncryptionKey })
+    }
+    return false
+  }
+}
+
 async function userHasNewDek(
   account: string,
   userPhoneNumber: string,
@@ -207,7 +227,7 @@ async function userHasNewDek(
   const dekSignerRecord = await getDekSignerRecord(account, logger)
   const isKeyRotation =
     !!dekSignerRecord &&
-    verifySignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord)
+    verifyDEKSignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord, logger)
   if (isKeyRotation) {
     logger.info(
       {

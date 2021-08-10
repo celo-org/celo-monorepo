@@ -1,8 +1,5 @@
-import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
-import { AuthenticationMethod, EncryptionKeySigner } from '@celo/identity/lib/odis/query'
 import { getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
 import { hexToBuffer } from '@celo/utils/lib/address'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
@@ -21,14 +18,14 @@ import { BLINDED_PHONE_NUMBER } from './end-to-end/resources'
 const ec = new EC('secp256k1')
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
-
-const ENCRYPTION_KEY: EncryptionKeySigner = {
-  rawKey: ACCOUNT_PRIVATE_KEYS[0],
-  authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+interface DEK {
+  privateKey: string
+  publicKey: string
+  address: string
 }
 
-const signWithDEK = (message: string, signer: EncryptionKeySigner) => {
-  const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
+const signWithDEK = (message: string, dek: DEK) => {
+  const key = ec.keyFromPrivate(hexToBuffer(dek.privateKey))
   return JSON.stringify(key.sign(message).toDER())
 }
 
@@ -37,14 +34,9 @@ jest.mock('@celo/phone-number-privacy-common', () => ({
   authenticateUser: jest.fn().mockReturnValue(true),
   isVerified: jest.fn(),
   getDataEncryptionKey: jest.fn(),
-  verifySignature: jest.fn(),
 }))
 const mockIsVerified = isVerified as jest.Mock
 const mockGetDataEncryptionKey = getDataEncryptionKey as jest.Mock
-
-jest.mock('@celo/utils/lib/signatureUtils')
-const mockVerifySignature = verifySignature as jest.Mock
-mockVerifySignature.mockReturnValue(true) // TODO
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = jest.fn()
@@ -65,6 +57,7 @@ jest.mock('../src/database/wrappers/number-pairs')
 const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
 mockSetNumberPairContacts.mockImplementation()
 const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
+mockGetNumberPairContacts.mockResolvedValue([])
 
 jest.mock('../src/database/database')
 const mockGetTransaction = getTransaction as jest.Mock
@@ -97,7 +90,7 @@ const invalidResponseExpected = (done: any, code: number) =>
     },
   } as Response)
 
-describe.skip(`POST /getBlindedMessageSig endpoint`, () => {
+describe(`POST /getBlindedMessageSig endpoint`, () => {
   const validRequest = {
     blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
@@ -309,7 +302,24 @@ describe(`POST /getContactMatches endpoint`, () => {
     })
 
     describe('w/ signedUserPhoneNumber', () => {
-      const signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, ENCRYPTION_KEY)
+      const deks = [
+        {
+          privateKey: 'bf8a2b73baf8402f8fe906ad3f42b560bf14b39f7df7797ece9e293d6f162188',
+          publicKey: '034846bc781cacdafc66f3a77aa9fc3c56a9dadcd683c72be3c446fee8da041070',
+          address: '0x7b33dF2607b85e3211738a49A6Ad6E8Ed4d13F6E',
+        },
+        {
+          privateKey: '0975b0c565abc75b6638a749ea3008cb52676af3eabe4b80e19c516d82330364',
+          publicKey: '03b1ac8c445f0796978018c087b97e8213b32c39e6a8642ae63dce71da33a19f65',
+          address: '0x34332049B07Fab9a2e843A7C8991469d93cF6Ae6',
+        },
+      ]
+      // The following code can be used to generate more test DEKs
+      // const generateDEKs = (n: number): Promise<DEK[]> => Promise.all([...Array(n).keys()].map(
+      //   async () => await deriveDek(await generateMnemonic())
+      // ))
+
+      const signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, deks[0])
       const req = {
         body: {
           ...validInput,
@@ -320,10 +330,10 @@ describe(`POST /getContactMatches endpoint`, () => {
 
       describe('When DEK is fetched successfully', () => {
         beforeAll(() => {
-          mockGetDataEncryptionKey.mockResolvedValue(ACCOUNT_ADDRESSES[0])
+          mockGetDataEncryptionKey.mockResolvedValue(deks[0].publicKey)
         })
 
-        describe.skip('When DEK signedUserPhoneNumber signature is invalid', () => {
+        describe('When DEK signedUserPhoneNumber signature is invalid', () => {
           beforeAll(() => {
             req.body.signedUserPhoneNumber = 'fake'
           })
@@ -351,26 +361,28 @@ describe(`POST /getContactMatches endpoint`, () => {
             })
 
             describe('When signedUserPhoneNumberRecord does not match request', () => {
-              beforeAll(() => {
-                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
-              })
-
-              describe.skip('When user has rotated their dek', () => {
+              describe('When user has not rotated their dek', () => {
                 beforeAll(() => {
-                  mockVerifySignature.mockReturnValue(true)
-                })
-                expectSuccessWithRecord(req)
-              })
-
-              describe.skip('When user has not rotated their dek', () => {
-                beforeAll(() => {
-                  mockVerifySignature.mockReturnValue(false)
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
                 })
                 expectFailure(req, 403)
               })
 
+              describe('When user has rotated their dek', () => {
+                beforeAll(() => {
+                  mockGetDataEncryptionKey.mockResolvedValue(deks[1].publicKey)
+                  req.body.signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, deks[1])
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                    signWithDEK(validInput.userPhoneNumber, deks[0])
+                  )
+                  mockGetDekSignerRecord.mockResolvedValue(deks[0].publicKey)
+                })
+                expectSuccessWithRecord(req)
+              })
+
               describe('When we cannot find a dekSignerRecord for the user', () => {
                 beforeAll(() => {
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
                   mockGetDekSignerRecord.mockResolvedValue(undefined)
                 })
                 expectFailure(req, 403)
@@ -409,30 +421,30 @@ describe(`POST /getContactMatches endpoint`, () => {
 
           describe('When signedUserPhoneNumberRecord matches request', () => {
             beforeAll(() => {
-              mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
-                req.body.signedUserPhoneNumber
-              )
+              req.body.signedUserPhoneNumber = signedUserPhoneNumber
+              mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(signedUserPhoneNumber)
             })
             expectSuccessWithoutRecord(req)
           })
 
           describe('When signedUserPhoneNumberRecord does not match request', () => {
-            beforeAll(() => {
-              mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
-            })
-
-            describe.skip('When user has rotated their dek', () => {
+            describe('When user has not rotated their dek', () => {
               beforeAll(() => {
-                mockVerifySignature.mockReturnValue(true)
-              })
-              expectSuccessWithoutRecord(req)
-            })
-            describe.skip('When user has not rotated their dek', () => {
-              beforeAll(() => {
-                mockVerifySignature.mockReturnValue(false)
+                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
               })
               expectFailure(req, 403)
             })
+
+            describe('When user has rotated their dek', () => {
+              beforeAll(() => {
+                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                  signWithDEK(validInput.userPhoneNumber, deks[1])
+                )
+                mockGetDekSignerRecord.mockResolvedValue(deks[1].publicKey)
+              })
+              expectSuccessWithoutRecord(req)
+            })
+
             describe('When we cannot find a dekSignerRecord for the user', () => {
               beforeAll(() => {
                 mockGetDekSignerRecord.mockResolvedValue(undefined)
