@@ -33,17 +33,29 @@ contract MetaTransactionWallet is
   event WalletRecovered(address indexed newSigner);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event Deposit(address indexed sender, uint256 value);
+
   event TransactionExecution(
     address indexed destination,
     uint256 value,
     bytes data,
     bytes returnData
   );
+
   event MetaTransactionExecution(
     address indexed destination,
     uint256 value,
     bytes data,
     uint256 indexed nonce,
+    bytes returnData
+  );
+
+  event MetaTransactionWithRefundExecution(
+    address indexed destination,
+    uint256 value,
+    bytes data,
+    uint256 indexed nonce,
+    uint256 maxGasPrice,
+    uint256 metaGasLimit,
     bytes returnData
   );
 
@@ -168,6 +180,41 @@ contract MetaTransactionWallet is
   }
 
   /**
+   * @notice Returns the struct hash of the refundable meta-transaction
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @param maxGasPrice The maximum gas price the user is willing to pay.
+   * @param gasLimit The gas limit for entire relayed transaction.
+   * @param metaGasLimit The gas limit for just the meta-transaction.
+   * @return The digest of the provided meta-transaction.
+   */
+  function _getMetaTransactionWithRefundStructHash(
+    address destination,
+    uint256 value,
+    bytes memory data,
+    uint256 _nonce,
+    uint256 maxGasPrice,
+    uint256 gasLimit,
+    uint256 metaGasLimit
+  ) internal view returns (bytes32) {
+    return
+      keccak256(
+        abi.encode(
+          EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
+          destination,
+          value,
+          keccak256(data),
+          _nonce,
+          maxGasPrice,
+          gasLimit,
+          metaGasLimit
+        )
+      );
+  }
+
+  /**
    * @notice Returns the digest of the provided meta-transaction, to be signed by `sender`.
    * @param destination The address to which the meta-transaction is to be sent.
    * @param value The CELO value to be sent with the meta-transaction.
@@ -182,6 +229,38 @@ contract MetaTransactionWallet is
     uint256 _nonce
   ) external view returns (bytes32) {
     bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
+    return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
+  }
+
+  /**
+   * @notice Returns the digest of the provided meta-transaction, to be signed by `sender`.
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @param maxGasPrice The maximum gas price the user is willing to pay.
+   * @param gasLimit The gas limit for entire relayed transaction.
+   * @param metaGasLimit The gas limit for just the meta-transaction.
+   * @return The digest of the provided meta-transaction.
+   */
+  function getMetaTransactionWithRefundDigest(
+    address destination,
+    uint256 value,
+    bytes calldata data,
+    uint256 _nonce,
+    uint256 maxGasPrice,
+    uint256 gasLimit,
+    uint256 metaGasLimit
+  ) external view returns (bytes32) {
+    bytes32 structHash = _getMetaTransactionWithRefundStructHash(
+      destination,
+      value,
+      data,
+      _nonce,
+      maxGasPrice,
+      gasLimit,
+      metaGasLimit
+    );
     return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
   }
 
@@ -210,6 +289,42 @@ contract MetaTransactionWallet is
   }
 
   /**
+   * @notice Returns the address that signed the provided refundable meta-transaction.
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @param maxGasPrice The maximum gas price the user is willing to pay.
+   * @param gasLimit The gas limit for entire relayed transaction.
+   * @param metaGasLimit The gas limit for just the meta-transaction.
+   * @param v The recovery id of the ECDSA signature of the meta-transaction.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @return The address that signed the provided meta-transaction.
+   */
+  function getMetaTransactionWithRefundSigner(
+    address destination,
+    uint256 value,
+    bytes memory data,
+    uint256 _nonce,
+    uint256 maxGasPrice,
+    uint256 metaGasLimit,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public view returns (address) {
+    bytes32 structHash = _getMetaTransactionWithRefundStructHash(
+      destination,
+      value,
+      data,
+      _nonce,
+      maxGasPrice,
+      maxGasLimit
+    );
+    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
+  }
+
+  /**
    * @notice Executes a meta-transaction on behalf of the signer.
    * @param destination The address to which the meta-transaction is to be sent.
    * @param value The CELO value to be sent with the meta-transaction.
@@ -232,6 +347,74 @@ contract MetaTransactionWallet is
     nonce = nonce.add(1);
     bytes memory returnData = ExternalCall.execute(destination, value, data);
     emit MetaTransactionExecution(destination, value, data, nonce.sub(1), returnData);
+    return returnData;
+  }
+
+  /*
+  * 
+  * 
+  * relayer? TODO determine if we can predict this request (question for komenci folks)
+  * gatewayFee / gateWayFeeRecipient? (TODO: ask Yorke if better to omit these or add them for forward compatibility) 
+  */
+
+  /**
+   * @notice Executes a refundable meta-transaction on behalf of the signer.
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param maxGasPrice The maximum gas price the user is willing to pay.
+   * @param gasLimit The gas limit for entire relayed transaction.
+   * @param metaGasLimit The gas limit for just the meta-transaction.
+   * @param v The recovery id of the ECDSA signature of the meta-transaction.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @return The return value of the meta-transaction execution.
+   */
+  function executeMetaTransactionWithRefund(
+    address destination,
+    uint256 value,
+    bytes calldata data,
+    uint256 maxGasPrice,
+    uint256 gasLimit,
+    uint256 metaGasLimit,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external returns (bytes memory) {
+    require(gasLimit == gasLeft(), "gasLimit different than limit authorized by signer"); // To ensure Komenci actually set the correct gas limit TODO ask Yorke about this
+    require(this.balance >= value + gasLimit, "insufficient balance");
+    require(tx.gasprice <= maxGasPrice, "gasprice exceeds limit authorized by signer");
+
+    address _signer = getMetaTransactionWithRefundSigner(
+      destination,
+      value,
+      data,
+      nonce,
+      maxGasPrice,
+      metaGasLimit,
+      v,
+      r,
+      s
+    );
+    require(_signer == signer, "Invalid meta-transaction signer");
+    nonce = nonce.add(1);
+    bytes memory returnData = ExternalCall.executeWithRefund(
+      destination,
+      value,
+      data,
+      gasLimit,
+      metaGasLimit
+    );
+
+    emit MetaTransactionWithRefundExecution(
+      destination,
+      value,
+      data,
+      nonce.sub(1),
+      maxGasPrice,
+      metaGasLimit,
+      returnData
+    );
     return returnData;
   }
 
