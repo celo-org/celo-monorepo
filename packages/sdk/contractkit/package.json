@@ -14,11 +14,12 @@
     "contractkit"
   ],
   "scripts": {
-    "build": "tsc -b .",
+    "build:ts": "tsc -b .",
+    "build:gen": "BUILD_DIR=./build/$RELEASE_TAG yarn --cwd ../../protocol ts-node ./scripts/build.ts --web3Types ../sdk/contractkit/src/generated",
+    "build": "yarn build:gen && yarn build:ts",
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf src/generated",
-    "build:gen": "yarn --cwd ../../protocol build",
-    "prepublishOnly": "yarn build:gen && yarn build",
+    "prepublishOnly": "yarn build",
     "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts contractkit",
     "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 25",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
@@ -26,17 +27,17 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@types/debug": "^4.1.5",
     "@celo/base": "1.2.3-dev",
     "@celo/connect": "1.2.3-dev",
     "@celo/utils": "1.2.3-dev",
     "@celo/wallet-local": "1.2.3-dev",
+    "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
-    "moment": "^2.29.0",
+    "semver": "^7.3.5",
     "web3": "1.3.6"
   },
   "devDependencies": {
@@ -57,7 +58,7 @@
   "engines": {
     "node": ">=8.13.0"
   },
-  "browser":{
+  "browser": {
     "child_process": false
-  }  
+  }
 }

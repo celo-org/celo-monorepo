@@ -21,6 +21,12 @@ spec:
       component: blockscout-web
   template:
     metadata:
+      {{- if .Values.blockscout.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/web
+        prometheus.io/port: "4000"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
@@ -43,7 +49,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app block_scout_web "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
+           exec mix cmd --app block_scout_web "iex --name {{ .Values.blockscout.web.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.web.port }}
