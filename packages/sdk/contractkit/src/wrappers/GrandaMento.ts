@@ -38,6 +38,7 @@ export interface ExchangeProposal {
   approvalTimestamp: BigNumber
   state: ExchangeProposalState
   sellCelo: boolean
+  id: string | number
 }
 
 type AllStableConfig = Map<StableTokenContract, StableTokenExchangeLimits>
@@ -95,6 +96,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
       approvalTimestamp: new BigNumber(result.approvalTimestamp),
       sellCelo: result.sellCelo,
       state,
+      id: exchangeProposalID,
     }
   }
 
