@@ -33,6 +33,7 @@ contract MetaTransactionWallet is
   event WalletRecovered(address indexed newSigner);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event Deposit(address indexed sender, uint256 value);
+  event FailedMetaTransaction(string error);
 
   event TransactionExecution(
     address indexed destination,
@@ -350,11 +351,9 @@ contract MetaTransactionWallet is
     return returnData;
   }
 
-  /*
-  * 
-  * 
+  /**
   * relayer? TODO determine if we can predict this request (question for komenci folks)
-  * gatewayFee / gateWayFeeRecipient? (TODO: ask Yorke if better to omit these or add them for forward compatibility) 
+  * gatewayFee / gateWayFeeRecipient? (TODO: ask Contracts if better to omit these or add them for forward compatibility) 
   */
 
   /**
@@ -381,9 +380,15 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) external returns (bytes memory) {
-    require(gasLimit == gasLeft(), "gasLimit different than limit authorized by signer"); // To ensure Komenci actually set the correct gas limit TODO ask Yorke about this
-    require(this.balance >= value + gasLimit, "insufficient balance");
+    require(gasLimit == gasLeft(), "gasLimit different than limit authorized by signer"); // To ensure Komenci actually set the correct gas limit TODO ask Contracts about this
     require(tx.gasprice <= maxGasPrice, "gasprice exceeds limit authorized by signer");
+    require(address(this).balance >= gasLimit.mul(tx.gasprice).add(value), "insufficient balance");
+    require(msg.sender == tx.origin, "relayer must be EOA");
+    require(gasLimit <= block.gaslimit, "Impossible gas limit");
+    require(metaGasLimit < gasLimit, "metaGasLimit must be less than gasLimit");
+    if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
+
+    // checking gasCurrency is out of scope, would require pre-compile
 
     address _signer = getMetaTransactionWithRefundSigner(
       destination,
@@ -398,13 +403,17 @@ contract MetaTransactionWallet is
     );
     require(_signer == signer, "Invalid meta-transaction signer");
     nonce = nonce.add(1);
-    bytes memory returnData = ExternalCall.executeWithRefund(
-      destination,
-      value,
-      data,
-      gasLimit,
-      metaGasLimit
-    );
+
+    // TODO: ask Contracts
+    uint256 buffer1 = 4949; // TODO: determine this constant (gas required for operations after destination.call.value)
+    uint256 buffer2 = 4747; // TODO: determine this constant (gas required for operations after and including msg.sender.transfer)
+
+    if (address(this).balance >= metaGasLimit.add(buffer1).mul(tx.gasprice).add(value)) {
+      (success, returnData) = destination.call.value(value).gas(metaGasLimit)(data);
+      if (!success) {
+        emit FailedMetaTransaction("Meta Transaction with refund failed");
+      }
+    }
 
     emit MetaTransactionWithRefundExecution(
       destination,
@@ -415,11 +424,13 @@ contract MetaTransactionWallet is
       metaGasLimit,
       returnData
     );
+
+    msg.sender.transfer(gasLimit.sub(gasLeft()).add(buffer2).mul(tx.gasprice));
     return returnData;
   }
 
   /**
-   * @notice Executes a transaction on behalf of the signer.`
+   * @notice Executes a transaction on behalf of the signer.
    * @param destination The address to which the transaction is to be sent.
    * @param value The CELO value to be sent with the transaction.
    * @param data The data to be sent with the transaction.
