@@ -275,12 +275,12 @@ contract('GrandaMento', (accounts: string[]) => {
       // We need to deploy the real StableToken contract because MockStableToken
       // calls balanceOf during transfers which can overflow before the overflow
       // we actually want to detect.
-      const stableToken: StableTokenInstance = await StableToken.new(true)
-      await registry.setAddressFor(stableTokenRegistryId, stableToken.address)
+      const realStableToken: StableTokenInstance = await StableToken.new(true)
+      await registry.setAddressFor(realStableTokenRegistryId, realStableToken.address)
 
-      await sortedOracles.setMedianRate(stableToken.address, defaultCeloStableTokenRate)
-      await sortedOracles.setMedianTimestampToNow(stableToken.address)
-      await sortedOracles.setNumRates(stableToken.address, 2)
+      await sortedOracles.setMedianRate(realStableToken.address, defaultCeloStableTokenRate)
+      await sortedOracles.setMedianTimestampToNow(realStableToken.address)
+      await sortedOracles.setNumRates(realStableToken.address, 2)
 
       // StableToken.transferFrom is freezable so it looks up Freezer in the
       // Registry
@@ -290,7 +290,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
       // We set ourselves as the Exchange to be able to mint
       await registry.setAddressFor('Exchange', owner)
-      await stableToken.initialize(
+      await realStableToken.initialize(
         'Celo Dollar',
         'cUSD',
         18,
@@ -303,16 +303,16 @@ contract('GrandaMento', (accounts: string[]) => {
       )
 
       await grandaMento.setStableTokenExchangeLimits(
-        stableTokenRegistryId,
+        realStableTokenRegistryId,
         minExchangeAmount,
         unit.times(2e12)
       )
       const sellAmount = unit.times(2e11)
-      await stableToken.mint(owner, sellAmount)
-      await stableToken.approve(grandaMento.address, sellAmount)
+      await realStableToken.mint(owner, sellAmount)
+      await realStableToken.approve(grandaMento.address, sellAmount)
 
       await assertRevertWithReason(
-        createExchangeProposal(false, owner, stableTokenRegistryId, sellAmount),
+        createExchangeProposal(false, owner, realStableTokenRegistryId, sellAmount),
         'overflow at divide'
       )
     })
