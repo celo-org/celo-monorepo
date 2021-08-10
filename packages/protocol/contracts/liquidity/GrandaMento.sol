@@ -261,6 +261,12 @@ contract GrandaMento is
       vetoPeriodSeconds: vetoPeriodSeconds,
       approvalTimestamp: 0 // initial value when not approved yet
     });
+    // StableToken.unitsToValue (called within getSellTokenAndSellAmount) can
+    // overflow for very large StableToken amounts. Call it here as a sanity
+    // check, so that the overflow happens here, blocking proposal creation
+    // rather than when attempting to execute the proposal, which would lock
+    // funds in this contrac.
+    getSellTokenAndSellAmount(exchangeProposals[exchangeProposalCount]);
     // Push it into the array of active proposals.
     activeProposalIdsSuperset.push(exchangeProposalCount);
     // Even if stable tokens are being sold, the sellAmount emitted is the "value."
