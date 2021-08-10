@@ -120,7 +120,7 @@ const DefaultConfig = {
     approver: network.from,
     maxApprovalExchangeRateChange: 0.3, // 30%
     spread: 0, // 0%
-    vetoPeriodSeconds: 3 * HOUR, // > the 2 hour minimum possible governance proposal completion time.
+    vetoPeriodSeconds: 10, // Set to 10 seconds for env-tests, this should be > time needed for a governance proposal in practice
     stableTokenExchangeLimits: {
       StableToken: {
         min: '50000000000000000000000', // 50,000

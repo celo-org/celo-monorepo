@@ -1,12 +1,16 @@
 import { sleep } from '@celo/base'
 import { StableToken } from '@celo/contractkit'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
+import Logger from 'bunyan'
 import { EnvTestContext } from '../context'
 import {
   fundAccountWithCELO,
   fundAccountWithStableToken,
   getKey,
+  getValidatorKey,
   ONE,
   TestAccounts,
 } from '../scaffold'
@@ -41,30 +45,36 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             }
           })
 
-          test('exchanger creates and cancels an exchange proposal', async () => {
-            const from = await getKey(context.mnemonic, TestAccounts.GrandaMentoExchanger)
-            context.kit.connection.addAccount(from.privateKey)
-            context.kit.defaultAccount = from.address
+          let buyToken: GoldTokenWrapper | StableTokenWrapper
+          let sellToken: GoldTokenWrapper | StableTokenWrapper
+          let stableTokenAddress: string
+          let sellAmount: BigNumber
 
-            const logger = baseLogger.child({ from: from.address })
-
-            const grandaMento = await context.kit.contracts.getGrandaMento()
-
-            let sellToken
-            let sellAmount
+          beforeEach(async () => {
+            const goldTokenWrapper = await context.kit.contracts.getGoldToken()
+            const stableTokenWrapper = await context.kit.celoTokens.getWrapper(
+              stableToken as StableToken
+            )
+            stableTokenAddress = stableTokenWrapper.address
             if (sellCelo) {
-              sellToken = await context.kit.contracts.getGoldToken()
+              buyToken = stableTokenWrapper
+              sellToken = goldTokenWrapper
               sellAmount = celoAmountToSell
             } else {
-              sellToken = await context.kit.celoTokens.getWrapper(stableToken as StableToken)
+              buyToken = goldTokenWrapper
+              sellToken = stableTokenWrapper
               sellAmount = stableTokenAmountToSell
             }
-            await sellToken
+          })
+
+          const createExchangeProposal = async (logger: Logger, fromAddress: string) => {
+            const grandaMento = await context.kit.contracts.getGrandaMento()
+            const tokenApprovalReceipt = await sellToken
               .approve(grandaMento.address, sellAmount.toFixed())
               .sendAndWaitForReceipt({
-                from: from.address,
+                from: fromAddress,
               })
-            logger.debug(
+            logger.info(
               {
                 sellAmount,
                 sellTokenStr,
@@ -72,11 +82,15 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               },
               'Approved GrandaMento to spend sell token'
             )
+            const minedTokenApprovalTx = await context.kit.web3.eth.getTransaction(
+              tokenApprovalReceipt.transactionHash
+            )
+            const tokenApprovalCeloFees = new BigNumber(tokenApprovalReceipt.gasUsed).times(
+              minedTokenApprovalTx.gasPrice
+            )
 
             // Some flakiness has been observed after approving, so we sleep
             await sleep(5000)
-
-            const sellTokenBalanceBeforeCreation = await sellToken.balanceOf(from.address)
 
             const creationTx = await grandaMento.createExchangeProposal(
               context.kit.celoTokens.getContract(stableToken as StableToken),
@@ -84,15 +98,14 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               sellCelo
             )
             const creationReceipt = await creationTx.sendAndWaitForReceipt({
-              from: from.address,
+              from: fromAddress,
             })
-            const minedCreationTx = await context.kit.web3.eth.getTransaction(
-              creationReceipt.transactionHash
-            )
+            // Some flakiness has been observed after proposing, so we sleep
+            await sleep(5000)
             const proposalId = creationReceipt.events!.ExchangeProposalCreated.returnValues
               .proposalId
 
-            logger.debug(
+            logger.info(
               {
                 sellAmount,
                 sellCelo,
@@ -100,8 +113,32 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               },
               'Created exchange proposal'
             )
+            const minedCreationTx = await context.kit.web3.eth.getTransaction(
+              creationReceipt.transactionHash
+            )
+            const creationCeloFees = new BigNumber(creationReceipt.gasUsed).times(
+              minedCreationTx.gasPrice
+            )
+            return {
+              creationReceipt,
+              minedCreationTx,
+              proposalId,
+              celoFees: tokenApprovalCeloFees.plus(creationCeloFees),
+            }
+          }
 
-            let celoFees = new BigNumber(creationReceipt.gasUsed).times(minedCreationTx.gasPrice)
+          test('exchanger creates and cancels an exchange proposal', async () => {
+            const from = await getKey(context.mnemonic, TestAccounts.GrandaMentoExchanger)
+            context.kit.connection.addAccount(from.privateKey)
+            context.kit.defaultAccount = from.address
+
+            const logger = baseLogger.child({ from: from.address })
+            const grandaMento = await context.kit.contracts.getGrandaMento()
+
+            const sellTokenBalanceBeforeCreation = await sellToken.balanceOf(from.address)
+
+            const creationInfo = await createExchangeProposal(logger, from.address)
+            let celoFees = creationInfo.celoFees
 
             const sellTokenBalanceAfterCreation = await sellToken.balanceOf(from.address)
 
@@ -113,7 +150,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             ).toBe(expectedBalanceDifference.toString())
 
             const cancelReceipt = await grandaMento
-              .cancelExchangeProposal(proposalId)
+              .cancelExchangeProposal(creationInfo.proposalId)
               .sendAndWaitForReceipt({
                 from: from.address,
               })
@@ -121,9 +158,9 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               cancelReceipt.transactionHash
             )
 
-            logger.debug(
+            logger.info(
               {
-                proposalId,
+                proposalId: creationInfo.proposalId,
               },
               'Cancelled exchange proposal'
             )
@@ -139,8 +176,88 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               : sellTokenBalanceBeforeCreation
             expect(sellTokenBalanceAfterCancel.toString()).toBe(expectedBalance.toString())
           })
+
+          test('exchanger creates and executes an approved exchange proposal', async () => {
+            const from = await getKey(context.mnemonic, TestAccounts.GrandaMentoExchanger)
+            context.kit.connection.addAccount(from.privateKey)
+            context.kit.defaultAccount = from.address
+
+            const logger = baseLogger.child({ from: from.address })
+
+            const grandaMento = await context.kit.contracts.getGrandaMento()
+
+            const sellTokenBalanceBefore = await sellToken.balanceOf(from.address)
+            const buyTokenBalanceBefore = await buyToken.balanceOf(from.address)
+
+            const creationInfo = await createExchangeProposal(logger, from.address)
+
+            const approver = await getValidatorKey(context.mnemonic, 0)
+            await grandaMento
+              .approveExchangeProposal(creationInfo.proposalId)
+              .sendAndWaitForReceipt({
+                from: approver.address,
+              })
+
+            const vetoPeriodSeconds = await grandaMento.vetoPeriodSeconds()
+            // Sleep for the veto period, add 5 seconds for extra measure
+            const sleepPeriodMs = vetoPeriodSeconds.plus(5).times(1000).toNumber()
+            logger.info(
+              {
+                sleepPeriodMs,
+                vetoPeriodSeconds,
+              },
+              'Sleeping so the veto period elapses'
+            )
+            await sleep(sleepPeriodMs)
+
+            // Executing from the approver to avoid needing to calculate additional gas paid
+            // by the approver in this test.
+            await grandaMento
+              .executeExchangeProposal(creationInfo.proposalId)
+              .sendAndWaitForReceipt({
+                from: approver.address,
+              })
+
+            logger.info(
+              {
+                proposalId: creationInfo.proposalId,
+              },
+              'Executed exchange proposal'
+            )
+
+            const sellTokenBalanceAfter = await sellToken.balanceOf(from.address)
+            let expectedSellTokenBalanceAfter = sellTokenBalanceBefore.minus(sellAmount)
+            if (sellCelo) {
+              expectedSellTokenBalanceAfter = expectedSellTokenBalanceAfter.minus(
+                creationInfo.celoFees
+              )
+            }
+            expect(sellTokenBalanceAfter.toString()).toBe(expectedSellTokenBalanceAfter.toString())
+
+            const sortedOracles = await context.kit.contracts.getSortedOracles()
+            const celoStableTokenRate = (await sortedOracles.medianRate(stableTokenAddress)).rate
+
+            const exchangeRate = sellCelo
+              ? celoStableTokenRate
+              : new BigNumber(1).div(celoStableTokenRate)
+            const buyAmount = getBuyAmount(exchangeRate, sellAmount, await grandaMento.spread())
+
+            const buyTokenBalanceAfter = await buyToken.balanceOf(from.address)
+            let expectedBuyTokenBalanceAfter = buyTokenBalanceBefore.plus(buyAmount)
+            if (!sellCelo) {
+              expectedBuyTokenBalanceAfter = expectedBuyTokenBalanceAfter.minus(
+                creationInfo.celoFees
+              )
+            }
+            expect(buyTokenBalanceAfter.toString()).toBe(expectedBuyTokenBalanceAfter.toString())
+          })
         })
       }
     }
   })
+}
+
+// exchangeRate is the price of the sell token quoted in buy token
+function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
+  return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
 }

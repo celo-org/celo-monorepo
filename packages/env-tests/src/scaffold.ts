@@ -18,9 +18,7 @@ export async function fundAccountWithCELO(
   account: TestAccounts,
   value: BigNumber
 ) {
-  // Use validator 0 instead of root because it has a CELO balance
-  const validator0 = await getValidatorKey(context.mnemonic, 0)
-  return fundAccount(context, account, value, Token.CELO, validator0)
+  return fundAccount(context, account, value, Token.CELO)
 }
 
 export async function fundAccountWithcUSD(
@@ -44,10 +42,9 @@ async function fundAccount(
   context: EnvTestContext,
   account: TestAccounts,
   value: BigNumber,
-  token: CeloTokenType,
-  fromKey?: KeyInfo
+  token: CeloTokenType
 ) {
-  const from = fromKey ? fromKey : await getKey(context.mnemonic, TestAccounts.Root)
+  const from = await getValidatorKey(context.mnemonic, 0)
   const recipient = await getKey(context.mnemonic, account)
   const logger = context.logger.child({
     index: account,
@@ -93,6 +90,7 @@ export async function getKey(
 
 export enum TestAccounts {
   Root,
+  GrandaMentoExchanger,
   TransferFrom,
   TransferTo,
   Exchange,
@@ -100,7 +98,6 @@ export enum TestAccounts {
   GovernanceApprover,
   ReserveSpender,
   ReserveCustodian,
-  GrandaMentoExchanger,
 }
 
 export const ONE = new BigNumber('1000000000000000000')
@@ -114,10 +111,9 @@ export async function clearAllFundsToOriginalAddress(
     (_val, index) => index
   )
   const validator0 = await getValidatorKey(context.mnemonic, 0)
-  const root = await getKey(context.mnemonic, TestAccounts.Root)
-  context.logger.debug({ account: root.address }, 'clear test fund accounts')
+  context.logger.debug({ account: validator0.address }, 'clear test fund accounts')
   const goldToken = await context.kit.contracts.getGoldToken()
-  await concurrentMap(5, accounts, async (_val, index) => {
+  await concurrentMap(1, accounts, async (_val, index) => {
     if (index === 0) {
       return
     }
@@ -132,10 +128,13 @@ export async function clearAllFundsToOriginalAddress(
       await goldToken
         .transfer(
           validator0.address,
-          celoBalance.times(0.999).integerValue(BigNumber.ROUND_DOWN).toString()
+          celoBalance
+            .minus(maxBalanceBeforeCollecting)
+            .integerValue(BigNumber.ROUND_DOWN)
+            .toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
-      context.logger.debug(
+      context.logger.info(
         {
           index,
           value: celoBalance.toString(),
@@ -148,18 +147,18 @@ export async function clearAllFundsToOriginalAddress(
       const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
       const balance = await stableTokenInstance.balanceOf(account.address)
       if (balance.gt(maxBalanceBeforeCollecting)) {
-        // Transfer stable tokens back to root, which is used for stable token funding.
+        // Transfer stable tokens back to validator 0, which is used for stable token funding.
         await stableTokenInstance
           .transfer(
-            root.address,
-            balance.times(0.999).integerValue(BigNumber.ROUND_DOWN).toString()
+            validator0.address,
+            balance.minus(maxBalanceBeforeCollecting).integerValue(BigNumber.ROUND_DOWN).toString()
           )
           .sendAndWaitForReceipt({
             feeCurrency: stableTokenInstance.address,
             from: account.address,
           })
         const balanceAfter = await stableTokenInstance.balanceOf(account.address)
-        context.logger.debug(
+        context.logger.info(
           {
             index,
             stabletoken: stableToken,
