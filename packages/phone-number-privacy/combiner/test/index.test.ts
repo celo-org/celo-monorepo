@@ -13,7 +13,7 @@ import {
 } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSig, getContactMatches } from '../src/index'
-import { BLINDED_PHONE_NUMBER } from './end-to-end/resources'
+import { BLINDED_PHONE_NUMBER, deks } from './end-to-end/resources'
 
 const ec = new EC('secp256k1')
 
@@ -302,23 +302,6 @@ describe(`POST /getContactMatches endpoint`, () => {
     })
 
     describe('w/ signedUserPhoneNumber', () => {
-      const deks = [
-        {
-          privateKey: 'bf8a2b73baf8402f8fe906ad3f42b560bf14b39f7df7797ece9e293d6f162188',
-          publicKey: '034846bc781cacdafc66f3a77aa9fc3c56a9dadcd683c72be3c446fee8da041070',
-          address: '0x7b33dF2607b85e3211738a49A6Ad6E8Ed4d13F6E',
-        },
-        {
-          privateKey: '0975b0c565abc75b6638a749ea3008cb52676af3eabe4b80e19c516d82330364',
-          publicKey: '03b1ac8c445f0796978018c087b97e8213b32c39e6a8642ae63dce71da33a19f65',
-          address: '0x34332049B07Fab9a2e843A7C8991469d93cF6Ae6',
-        },
-      ]
-      // The following code can be used to generate more test DEKs
-      // const generateDEKs = (n: number): Promise<DEK[]> => Promise.all([...Array(n).keys()].map(
-      //   async () => await deriveDek(await generateMnemonic())
-      // ))
-
       const signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, deks[0])
       const req = {
         body: {

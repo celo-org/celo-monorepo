@@ -15,7 +15,7 @@ import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
-import { VERSION } from '../config'
+import { E2E_TEST_PHONE_HASH_IDENTIFIER, VERSION } from '../config'
 import {
   getAccountSignedUserPhoneNumberRecord,
   getDekSignerRecord,
@@ -58,7 +58,11 @@ export async function handleGetContactMatches(
       signedUserPhoneNumber,
     } = request.body
 
-    if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
+    const _isVerified =
+      hashedPhoneNumber === E2E_TEST_PHONE_HASH_IDENTIFIER ||
+      (await isVerified(account, hashedPhoneNumber, getContractKit(), logger))
+
+    if (!_isVerified) {
       respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
       return
     }

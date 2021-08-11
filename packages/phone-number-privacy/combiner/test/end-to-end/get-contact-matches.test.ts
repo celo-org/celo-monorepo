@@ -1,6 +1,7 @@
 import { OdisUtils } from '@celo/identity/lib/odis'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import 'isomorphic-fetch'
+import { E2E_TEST_PHONE_HASH_IDENTIFIER, E2E_TEST_PHONE_NUMBER } from '../../src/config'
 import {
   ACCOUNT_ADDRESS,
   CONTACT_PHONE_NUMBERS,
@@ -89,20 +90,32 @@ describe('Running against a deployed service', () => {
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
 
-  it('Returns success when requerying matches with same phone number', async () => {
+  it.only('Returns success when requerying matches with same phone number', async () => {
+    // const accounts = await contractKit.contracts.getAccounts()
+    // await accounts.setAccountDataEncryptionKey(ensureLeading0x(deks[0].publicKey)).sendAndWaitForReceipt()
+
+    // const identifier = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(PHONE_NUMBER, ACCOUNT_ADDRESS, walletAuthSigner, SERVICE_CONTEXT)
+    // const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
+    // expect(await attestationsWrapper.getVerifiedStatus(identifier.phoneHash, ACCOUNT_ADDRESS)).resolves.toBeTruthy()
     await expect(
       OdisUtils.Matchmaking.getContactMatches(
-        PHONE_NUMBER,
+        E2E_TEST_PHONE_NUMBER,
         CONTACT_PHONE_NUMBERS,
         ACCOUNT_ADDRESS,
-        PHONE_HASH_IDENTIFIER,
-        dekAuthSigner,
-        SERVICE_CONTEXT
+        E2E_TEST_PHONE_HASH_IDENTIFIER,
+        walletAuthSigner,
+        SERVICE_CONTEXT,
+        dekAuthSigner
       )
-    ).resolves.toBeInstanceOf(Response)
+    ).resolves.toBeInstanceOf(Array)
   })
 
-  it('Returns success when requerying matches with same phone number after key rotation', async () => {
+  it.skip('Returns success when requerying matches with same phone number after key rotation', async () => {
+    // const accounts = await this.kit.contracts.getAccounts()
+    // await displaySendTx(
+    //   'RegisterDataEncryptionKey',
+    //   accounts.setAccountDataEncryptionKey(ensureLeading0x(publicKey))
+    // )
     // TODO
     // await expect(
     //   OdisUtils.Matchmaking.getContactMatches(
