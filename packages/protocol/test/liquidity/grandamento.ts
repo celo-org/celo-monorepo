@@ -9,6 +9,8 @@ import {
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
+  FreezerContract,
+  FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
   GrandaMentoContract,
@@ -23,8 +25,12 @@ import {
   MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
+  StableTokenContract,
+  StableTokenInstance,
 } from 'types'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
+const Freezer: FreezerContract = artifacts.require('Freezer')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const GrandaMento: GrandaMentoContract = artifacts.require('GrandaMento')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
@@ -32,6 +38,7 @@ const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSort
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockReserve: MockReserveContract = artifacts.require('MockReserve')
+const StableToken: StableTokenContract = artifacts.require('StableToken')
 
 // @ts-ignore
 GoldToken.numberFormat = 'BigNumber'
@@ -127,18 +134,22 @@ contract('GrandaMento', (accounts: string[]) => {
   const createExchangeProposal = async (
     sellCelo: boolean,
     from: string = owner,
-    _stableTokenRegistryId?: CeloContractName
+    _stableTokenRegistryId?: CeloContractName,
+    sellAmount?: BigNumber
   ) => {
+    if (!sellAmount) {
+      sellAmount = sellCelo ? celoSellAmount : stableTokenSellAmount
+    }
     // When a test sets sellCelo to true, the sender in the test must approve
     // the CELO to grandaMento.
     // The MockStableToken does not enforce allowances so there is no need
     // to approve the stable token to grandaMento when sellCelo is false.
     if (sellCelo) {
-      await goldToken.approve(grandaMento.address, celoSellAmount, { from })
+      await goldToken.approve(grandaMento.address, sellAmount, { from })
     }
     return grandaMento.createExchangeProposal(
       _stableTokenRegistryId || stableTokenRegistryId,
-      sellCelo ? celoSellAmount : stableTokenSellAmount,
+      sellAmount,
       sellCelo,
       { from }
     )
@@ -258,6 +269,52 @@ contract('GrandaMento', (accounts: string[]) => {
       await createExchangeProposal(false)
       assertEqualBN(await grandaMento.activeProposalIdsSuperset(0), new BigNumber(1))
       assertEqualBN(await grandaMento.activeProposalIdsSuperset(1), new BigNumber(2))
+    })
+
+    it('fails if the stable token amount would overflow in a unitsToValue call', async () => {
+      // We need to deploy the real StableToken contract because MockStableToken
+      // calls balanceOf during transfers which can overflow before the overflow
+      // we actually want to detect.
+      const realStableToken: StableTokenInstance = await StableToken.new(true)
+      await registry.setAddressFor(stableTokenRegistryId, realStableToken.address)
+
+      await sortedOracles.setMedianRate(realStableToken.address, defaultCeloStableTokenRate)
+      await sortedOracles.setMedianTimestampToNow(realStableToken.address)
+      await sortedOracles.setNumRates(realStableToken.address, 2)
+
+      // StableToken.transferFrom is freezable so it looks up Freezer in the
+      // Registry
+      const freezer: FreezerInstance = await Freezer.new(true)
+      await freezer.initialize()
+      await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
+
+      // We set ourselves as the Exchange to be able to mint
+      await registry.setAddressFor('Exchange', owner)
+      await realStableToken.initialize(
+        'Celo Dollar',
+        'cUSD',
+        18,
+        registry.address,
+        unit,
+        SECONDS_IN_A_WEEK,
+        [],
+        [],
+        'Exchange' // USD
+      )
+
+      await grandaMento.setStableTokenExchangeLimits(
+        stableTokenRegistryId,
+        minExchangeAmount,
+        unit.times(2e12)
+      )
+      const sellAmount = unit.times(2e11)
+      await realStableToken.mint(owner, sellAmount)
+      await realStableToken.approve(grandaMento.address, sellAmount)
+
+      await assertRevertWithReason(
+        createExchangeProposal(false, owner, stableTokenRegistryId, sellAmount),
+        'overflow at divide'
+      )
     })
 
     for (const sellCelo of [true, false]) {
