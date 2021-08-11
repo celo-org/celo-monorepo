@@ -276,7 +276,7 @@ contract('GrandaMento', (accounts: string[]) => {
       // calls balanceOf during transfers which can overflow before the overflow
       // we actually want to detect.
       const realStableToken: StableTokenInstance = await StableToken.new(true)
-      await registry.setAddressFor(realStableTokenRegistryId, realStableToken.address)
+      await registry.setAddressFor(stableTokenRegistryId, realStableToken.address)
 
       await sortedOracles.setMedianRate(realStableToken.address, defaultCeloStableTokenRate)
       await sortedOracles.setMedianTimestampToNow(realStableToken.address)
@@ -303,7 +303,7 @@ contract('GrandaMento', (accounts: string[]) => {
       )
 
       await grandaMento.setStableTokenExchangeLimits(
-        realStableTokenRegistryId,
+        stableTokenRegistryId,
         minExchangeAmount,
         unit.times(2e12)
       )
@@ -312,7 +312,7 @@ contract('GrandaMento', (accounts: string[]) => {
       await realStableToken.approve(grandaMento.address, sellAmount)
 
       await assertRevertWithReason(
-        createExchangeProposal(false, owner, realStableTokenRegistryId, sellAmount),
+        createExchangeProposal(false, owner, stableTokenRegistryId, sellAmount),
         'overflow at divide'
       )
     })
