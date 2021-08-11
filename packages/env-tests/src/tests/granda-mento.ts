@@ -74,7 +74,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               .sendAndWaitForReceipt({
                 from: fromAddress,
               })
-            logger.info(
+            logger.debug(
               {
                 sellAmount,
                 sellTokenStr,
@@ -105,7 +105,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             const proposalId = creationReceipt.events!.ExchangeProposalCreated.returnValues
               .proposalId
 
-            logger.info(
+            logger.debug(
               {
                 sellAmount,
                 sellCelo,
@@ -158,7 +158,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
               cancelReceipt.transactionHash
             )
 
-            logger.info(
+            logger.debug(
               {
                 proposalId: creationInfo.proposalId,
               },
@@ -201,7 +201,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             const vetoPeriodSeconds = await grandaMento.vetoPeriodSeconds()
             // Sleep for the veto period, add 5 seconds for extra measure
             const sleepPeriodMs = vetoPeriodSeconds.plus(5).times(1000).toNumber()
-            logger.info(
+            logger.debug(
               {
                 sleepPeriodMs,
                 vetoPeriodSeconds,
@@ -218,7 +218,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
                 from: approver.address,
               })
 
-            logger.info(
+            logger.debug(
               {
                 proposalId: creationInfo.proposalId,
               },

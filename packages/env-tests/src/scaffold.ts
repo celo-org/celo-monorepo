@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import { EnvTestContext } from './context'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
+const ONE_TOKEN = new BigNumber(10).pow(18)
 
 interface KeyInfo {
   address: string
@@ -44,35 +45,70 @@ async function fundAccount(
   value: BigNumber,
   token: CeloTokenType
 ) {
-  const from = await getValidatorKey(context.mnemonic, 0)
-  const recipient = await getKey(context.mnemonic, account)
-  const logger = context.logger.child({
-    index: account,
-    account: from.address,
-    value: value.toString(),
-    address: recipient.address,
-  })
-  context.kit.connection.addAccount(from.privateKey)
-
   const tokenWrapper = await context.kit.celoTokens.getWrapper(token)
-
-  const fromBalance = await tokenWrapper.balanceOf(from.address)
-  if (fromBalance.lte(value)) {
-    logger.error({ fromBalance: fromBalance.toString() }, 'error funding test account')
-    throw new Error(
-      `From account ${from.address}'s ${token} balance (${fromBalance.toPrecision(
-        4
-      )}) is not enough for transferring ${value.toPrecision(4)}`
-    )
-  }
-  const receipt = await tokenWrapper
-    .transfer(recipient.address, value.toString())
-    .sendAndWaitForReceipt({
-      from: from.address,
+  const transfer = (to: string, amount: BigNumber, fromAddress: string) =>
+    tokenWrapper.transfer(to, amount.toString()).sendAndWaitForReceipt({
+      from: fromAddress,
       feeCurrency: token === Token.CELO ? undefined : tokenWrapper.address,
     })
 
-  logger.debug({ token, receipt }, `funded test account with ${token}`)
+  const validator0 = await getValidatorKey(context.mnemonic, 0)
+  const root = await getKey(context.mnemonic, TestAccounts.Root)
+  context.kit.connection.addAccount(validator0.privateKey)
+  context.kit.connection.addAccount(root.privateKey)
+
+  const recipient = await getKey(context.mnemonic, account)
+  const logger = context.logger.child({
+    token,
+    index: account,
+    validator0: validator0.address,
+    root: root.address,
+    value: value.toString(),
+    recipient: recipient.address,
+  })
+
+  let rootAmountToFund = value
+  const rootBalance = await tokenWrapper.balanceOf(root.address)
+  // Make sure to leave Root at least 1 token, this is useful for paying TX fees.
+  const minRootBalance = ONE_TOKEN
+  // Check if Root has enough to fund the recipient.
+  if (rootBalance.lte(value.plus(minRootBalance))) {
+    // If not, check if validator 0 can supply the rest of the balance.
+    const validator0Balance = await tokenWrapper.balanceOf(validator0.address)
+    // Calculate the amount for validator 0 to fund, ensuring that root retains
+    // its minimum balance.
+    const amountNeededFromValidator0 = value.plus(minRootBalance).minus(rootBalance)
+    if (validator0Balance.isGreaterThanOrEqualTo(amountNeededFromValidator0)) {
+      // Have validator 0 send the amount needed to the recipient
+      const validator0FundingReceipt = await transfer(
+        recipient.address,
+        amountNeededFromValidator0,
+        validator0.address
+      )
+      logger.debug(
+        {
+          validator0FundingReceipt,
+          amountNeededFromValidator0,
+          rootAmountToFund,
+        },
+        'Validator 0 funded recipient'
+      )
+      rootAmountToFund = rootAmountToFund.minus(amountNeededFromValidator0)
+    } else {
+      logger.error({ fromBalance: rootBalance.toString() }, 'error funding test account')
+      throw new Error(
+        `Root account ${root.address}'s balance (${rootBalance.toPrecision(4)}) and validator 0 ${
+          validator0.address
+        }'s of ${validator0Balance.toPrecision(
+          4
+        )} ${token} is not enough for transferring ${value.toPrecision(4)}`
+      )
+    }
+  }
+  if (rootAmountToFund.isGreaterThan(0)) {
+    const receipt = await transfer(recipient.address, rootAmountToFund, root.address)
+    logger.debug({ rootFundingReceipt: receipt, rootAmountToFund }, `Root funded recipient`)
+  }
 }
 
 export async function getValidatorKey(mnemonic: string, index: number): Promise<KeyInfo> {
@@ -110,8 +146,9 @@ export async function clearAllFundsToOriginalAddress(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
   )
-  const validator0 = await getValidatorKey(context.mnemonic, 0)
-  context.logger.debug({ account: validator0.address }, 'clear test fund accounts')
+  // Refund all to root
+  const root = await getKey(context.mnemonic, TestAccounts.Root)
+  context.logger.debug({ root: root.address }, 'Clearing funds of test accounts back to root')
   const goldToken = await context.kit.contracts.getGoldToken()
   await concurrentMap(1, accounts, async (_val, index) => {
     if (index === 0) {
@@ -124,17 +161,16 @@ export async function clearAllFundsToOriginalAddress(
     // Exchange and transfer tests move ~0.5, so setting the threshold slightly below
     const maxBalanceBeforeCollecting = ONE.times(0.4)
     if (celoBalance.gt(maxBalanceBeforeCollecting)) {
-      // Transfer CELO back to validator 0, which is used for CELO funding.
       await goldToken
         .transfer(
-          validator0.address,
+          root.address,
           celoBalance
             .minus(maxBalanceBeforeCollecting)
             .integerValue(BigNumber.ROUND_DOWN)
             .toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
-      context.logger.info(
+      context.logger.debug(
         {
           index,
           value: celoBalance.toString(),
@@ -147,10 +183,9 @@ export async function clearAllFundsToOriginalAddress(
       const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
       const balance = await stableTokenInstance.balanceOf(account.address)
       if (balance.gt(maxBalanceBeforeCollecting)) {
-        // Transfer stable tokens back to validator 0, which is used for stable token funding.
         await stableTokenInstance
           .transfer(
-            validator0.address,
+            root.address,
             balance.minus(maxBalanceBeforeCollecting).integerValue(BigNumber.ROUND_DOWN).toString()
           )
           .sendAndWaitForReceipt({
@@ -158,7 +193,7 @@ export async function clearAllFundsToOriginalAddress(
             from: account.address,
           })
         const balanceAfter = await stableTokenInstance.balanceOf(account.address)
-        context.logger.info(
+        context.logger.debug(
           {
             index,
             stabletoken: stableToken,
