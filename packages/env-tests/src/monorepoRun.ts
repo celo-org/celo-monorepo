@@ -2,7 +2,7 @@ import { newKitFromWeb3, StableToken } from '@celo/contractkit'
 import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
-import { clearAllFundsToOriginalAddress, parseStableTokensList } from './scaffold'
+import { clearAllFundsToRoot, parseStableTokensList } from './scaffold'
 import { runAttestationTest } from './tests/attestation'
 import { runExchangeTest } from './tests/exchange'
 import { runGrandaMentoTest } from './tests/granda-mento'
@@ -48,7 +48,7 @@ function runTests() {
     // TODO: Validator election + Slashing
 
     afterAll(async () => {
-      await clearAllFundsToOriginalAddress(context, stableTokensToTest)
+      await clearAllFundsToRoot(context, stableTokensToTest)
     })
   })
 }

@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js'
 import { EnvTestContext } from './context'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
-const ONE_TOKEN = new BigNumber(10).pow(18)
 
 interface KeyInfo {
   address: string
@@ -46,69 +45,35 @@ async function fundAccount(
   token: CeloTokenType
 ) {
   const tokenWrapper = await context.kit.celoTokens.getWrapper(token)
-  const transfer = (to: string, amount: BigNumber, fromAddress: string) =>
-    tokenWrapper.transfer(to, amount.toString()).sendAndWaitForReceipt({
-      from: fromAddress,
-      feeCurrency: token === Token.CELO ? undefined : tokenWrapper.address,
-    })
 
-  const validator0 = await getValidatorKey(context.mnemonic, 0)
   const root = await getKey(context.mnemonic, TestAccounts.Root)
-  context.kit.connection.addAccount(validator0.privateKey)
   context.kit.connection.addAccount(root.privateKey)
 
   const recipient = await getKey(context.mnemonic, account)
   const logger = context.logger.child({
     token,
     index: account,
-    validator0: validator0.address,
     root: root.address,
     value: value.toString(),
     recipient: recipient.address,
   })
 
-  let rootAmountToFund = value
   const rootBalance = await tokenWrapper.balanceOf(root.address)
-  // Make sure to leave Root at least 1 token, this is useful for paying TX fees.
-  const minRootBalance = ONE_TOKEN
-  // Check if Root has enough to fund the recipient.
-  if (rootBalance.lte(value.plus(minRootBalance))) {
-    // If not, check if validator 0 can supply the rest of the balance.
-    const validator0Balance = await tokenWrapper.balanceOf(validator0.address)
-    // Calculate the amount for validator 0 to fund, ensuring that root retains
-    // its minimum balance.
-    const amountNeededFromValidator0 = value.plus(minRootBalance).minus(rootBalance)
-    if (validator0Balance.isGreaterThanOrEqualTo(amountNeededFromValidator0)) {
-      // Have validator 0 send the amount needed to the recipient
-      const validator0FundingReceipt = await transfer(
-        recipient.address,
-        amountNeededFromValidator0,
-        validator0.address
-      )
-      logger.debug(
-        {
-          validator0FundingReceipt,
-          amountNeededFromValidator0,
-          rootAmountToFund,
-        },
-        'Validator 0 funded recipient'
-      )
-      rootAmountToFund = rootAmountToFund.minus(amountNeededFromValidator0)
-    } else {
-      logger.error({ fromBalance: rootBalance.toString() }, 'error funding test account')
-      throw new Error(
-        `Root account ${root.address}'s balance (${rootBalance.toPrecision(4)}) and validator 0 ${
-          validator0.address
-        }'s of ${validator0Balance.toPrecision(
-          4
-        )} ${token} is not enough for transferring ${value.toPrecision(4)}`
-      )
-    }
+  if (rootBalance.lte(value)) {
+    logger.error({ rootBalance: rootBalance.toString() }, 'Error funding test account')
+    throw new Error(
+      `Root account ${root.address}'s ${token} balance (${rootBalance.toPrecision(
+        4
+      )}) is not enough for transferring ${value.toPrecision(4)}`
+    )
   }
-  if (rootAmountToFund.isGreaterThan(0)) {
-    const receipt = await transfer(recipient.address, rootAmountToFund, root.address)
-    logger.debug({ rootFundingReceipt: receipt, rootAmountToFund }, `Root funded recipient`)
-  }
+  const receipt = await tokenWrapper
+    .transfer(recipient.address, value.toString())
+    .sendAndWaitForReceipt({
+      from: root.address,
+      feeCurrency: token === Token.CELO ? undefined : tokenWrapper.address,
+    })
+  logger.info({ rootFundingReceipt: receipt, value }, `Root funded recipient`)
 }
 
 export async function getValidatorKey(mnemonic: string, index: number): Promise<KeyInfo> {
@@ -138,7 +103,7 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToOriginalAddress(
+export async function clearAllFundsToRoot(
   context: EnvTestContext,
   stableTokensToClear: StableToken[]
 ) {
@@ -150,7 +115,7 @@ export async function clearAllFundsToOriginalAddress(
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   context.logger.debug({ root: root.address }, 'Clearing funds of test accounts back to root')
   const goldToken = await context.kit.contracts.getGoldToken()
-  await concurrentMap(1, accounts, async (_val, index) => {
+  await concurrentMap(5, accounts, async (_val, index) => {
     if (index === 0) {
       return
     }
