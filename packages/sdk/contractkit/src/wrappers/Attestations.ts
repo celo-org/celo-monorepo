@@ -708,6 +708,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       smsProvidersRandomized: null,
       maxDeliveryAttempts: null,
       maxRerequestMins: null,
+      twilioVerifySidProvided: null,
     }
 
     if (!hasAttestationSigner) {
@@ -767,6 +768,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.smsProvidersRandomized = statusResponseBody.smsProvidersRandomized
       ret.maxDeliveryAttempts = statusResponseBody.maxDeliveryAttempts
       ret.maxRerequestMins = statusResponseBody.maxRerequestMins
+      ret.twilioVerifySidProvided = statusResponseBody.twilioVerifySidProvided
 
       // Healthcheck was added in 1.0.1, same time version started being reported.
       if (statusResponseBody.version) {
@@ -853,4 +855,5 @@ export interface AttestationServiceStatusResponse {
   smsProvidersRandomized: boolean | null
   maxDeliveryAttempts: number | null
   maxRerequestMins: number | null
+  twilioVerifySidProvided: boolean | null
 }

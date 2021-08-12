@@ -9,5 +9,5 @@ metadata:
     heritage: {{ .Release.Service }}
     component: load-test
 data:
-  genesis.json: {{ .Values.geth.genesisFile | b64dec | quote }}
+  genesis.json: {{ .Values.genesis.genesisFileBase64 | b64dec | quote }}
   static-nodes.json: {{ .Values.geth.staticNodes | b64dec | quote }}

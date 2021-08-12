@@ -43,7 +43,6 @@ export interface PhoneNumberPrivacyRequest {
 
 export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
   blindedQueryPhoneNumber: string
-  timestamp?: number
   hashedPhoneNumber?: string
 }
 
