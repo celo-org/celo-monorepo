@@ -402,7 +402,6 @@ contract MetaTransactionWallet is
 
     nonce = nonce.add(1);
 
-    bool success;
     bytes memory returnData;
 
     {
@@ -413,6 +412,7 @@ contract MetaTransactionWallet is
         address(this).balance >= metaGasLimit.add(buffer1).mul(tx.gasprice).add(value) &&
         metaGasLimit < (gasleft() * 63) / 64
       ) {
+        bool success;
         (success, returnData) = destination.call.value(value).gas(metaGasLimit)(data);
 
         if (!success) {
@@ -430,7 +430,7 @@ contract MetaTransactionWallet is
         }
 
       } else {
-        (success, returnData) = (false, "");
+        returnData = "";
       }
     }
 
