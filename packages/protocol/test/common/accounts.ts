@@ -31,6 +31,8 @@ contract('Accounts', (accounts: string[]) => {
     '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
     '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
+  const walletAddress = accounts[1]
+
   beforeEach(async () => {
     accountsInstance = await Accounts.new(true, { from: account })
     mockValidators = await MockValidators.new()
@@ -98,20 +100,23 @@ contract('Accounts', (accounts: string[]) => {
     describe('when the account has been created', () => {
       beforeEach(async () => {
         await accountsInstance.createAccount()
-        console.log('account created')
       })
 
-      it.only('should set the name, dataEncryptionKey and walletAddress', async () => {
-        console.log('doing')
-        await accountsInstance.setAccount(name, dataEncryptionKey, caller, '0x0', '0x0', '0x0')
-        console.log('account set')
-        const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
-        console.log(expectedWalletAddress)
-        console.log(caller)
-        assert.equal(expectedWalletAddress, caller)
-        const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
+      it('should set the name, dataEncryptionKey and walletAddress', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
+        await accountsInstance.setAccount(
+          name,
+          dataEncryptionKey,
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+        const expectedWalletAddress = await accountsInstance.getWalletAddress(account)
+        assert.equal(expectedWalletAddress, walletAddress)
+        const expectedKey = await accountsInstance.getDataEncryptionKey(account)
         assert.equal(expectedKey, dataEncryptionKey)
-        const expectedName = await accountsInstance.getName(caller)
+        const expectedName = await accountsInstance.getName(account)
         assert.equal(expectedName, name)
       })
 
@@ -146,26 +151,35 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountWalletAddressSet event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
-        assertLogMatches2(resp.logs[2], {
+        assertLogMatches2(resp.logs[4], {
           event: 'AccountWalletAddressSet',
-          args: { account: caller, walletAddress: caller },
+          args: { account, walletAddress },
         })
       })
     })
 
     describe('when the account has not yet been created', () => {
       it('should set the name, dataEncryptionKey and walletAddress', async () => {
-        await accountsInstance.setAccount(name, dataEncryptionKey, caller, '0x0', '0x0', '0x0')
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
+        await accountsInstance.setAccount(
+          name,
+          dataEncryptionKey,
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
+        )
         const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
-        assert.equal(expectedWalletAddress, caller)
+        assert.equal(expectedWalletAddress, walletAddress)
         const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
         assert.equal(expectedKey, dataEncryptionKey)
         const expectedName = await accountsInstance.getName(caller)
@@ -174,12 +188,12 @@ contract('Accounts', (accounts: string[]) => {
         assert.isTrue(isAccount)
       })
 
-      it('should set a different address with the appropriate signature', async () => {
-        const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
-        await accountsInstance.setAccount(name, dataEncryptionKey, accounts[1], sig.v, sig.r, sig.s)
-        const result = await accountsInstance.getWalletAddress(caller)
-        assert.equal(result, accounts[1])
-      })
+      // it('should set a different address with the appropriate signature', async () => {
+      //   const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
+      //   await accountsInstance.setAccount(name, dataEncryptionKey, accounts[1], sig.v, sig.r, sig.s)
+      //   const result = await accountsInstance.getWalletAddress(caller)
+      //   assert.equal(result, accounts[1])
+      // })
 
       it('emits the AccountCreated event', async () => {
         const resp = await accountsInstance.setAccount(
@@ -227,17 +241,18 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountWalletAddressSet event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
-        assertLogMatches2(resp.logs[3], {
+        assertLogMatches2(resp.logs[5], {
           event: 'AccountWalletAddressSet',
-          args: { account: caller, walletAddress: caller },
+          args: { account, walletAddress },
         })
       })
 
@@ -263,31 +278,34 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('should set the walletAddress', async () => {
-        await accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0')
-        const result = await accountsInstance.getWalletAddress(caller)
-        assert.equal(result, caller)
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
+        await accountsInstance.setWalletAddress(walletAddress, sig.v, sig.r, sig.s)
+        const result = await accountsInstance.getWalletAddress(account)
+        assert.equal(result, walletAddress)
       })
 
-      it('should set a different address with the appropriate signature', async () => {
-        const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
-        await accountsInstance.setWalletAddress(accounts[1], sig.v, sig.r, sig.s)
-        const result = await accountsInstance.getWalletAddress(caller)
-        assert.equal(result, accounts[1])
-      })
+      // it('should set a different address with the appropriate signature', async () => {
+      //   const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
+      //   await accountsInstance.setWalletAddress(accounts[1], sig.v, sig.r, sig.s)
+      //   const result = await accountsInstance.getWalletAddress(caller)
+      //   assert.equal(result, accounts[1])
+      // })
 
       it('should set the NULL_ADDRESS', async () => {
-        await accountsInstance.setWalletAddress(NULL_ADDRESS, '0x0', '0x0', '0x0')
-        const result = await accountsInstance.getWalletAddress(caller)
+        const sig = await getParsedSignatureOfAddress(web3, account, NULL_ADDRESS)
+        await accountsInstance.setWalletAddress(NULL_ADDRESS, sig.v, sig.r, sig.s)
+        const result = await accountsInstance.getWalletAddress(account)
         assert.equal(result, NULL_ADDRESS)
       })
 
       it('should emit the AccountWalletAddressSet event', async () => {
-        const response = await accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0')
-        assert.lengthOf(response.logs, 1)
-        const event = response.logs[0]
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
+        const response = await accountsInstance.setWalletAddress(walletAddress, sig.v, sig.r, sig.s)
+        assert.lengthOf(response.logs, 3)
+        const event = response.logs[2]
         assertLogMatches2(event, {
           event: 'AccountWalletAddressSet',
-          args: { account: caller, walletAddress: caller },
+          args: { account, walletAddress },
         })
       })
 

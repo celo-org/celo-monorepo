@@ -202,14 +202,12 @@ contract Accounts is
    *      is 0x0 or msg.sender).
    */
   function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public {
-    require(isAccount(msg.sender), "Unknown account");
     if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
-      address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-      require(signer == walletAddress, "Invalid signature");
+      require(isAccount(msg.sender), "Unknown account");
+      legacyAuthorizeSignerWithSignature(walletAddress, WalletAddress, v, r, s);
+      setIndexedSigner(walletAddress, WalletAddress);
+      emit AccountWalletAddressSet(msg.sender, walletAddress);
     }
-    legacyAuthorizeSignerWithSignature(walletAddress, WalletAddress, v, r, s);
-    setIndexedSigner(walletAddress, WalletAddress);
-    emit AccountWalletAddressSet(msg.sender, walletAddress);
   }
 
   /**
