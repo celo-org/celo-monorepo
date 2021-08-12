@@ -188,13 +188,6 @@ contract('Accounts', (accounts: string[]) => {
         assert.isTrue(isAccount)
       })
 
-      // it('should set a different address with the appropriate signature', async () => {
-      //   const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
-      //   await accountsInstance.setAccount(name, dataEncryptionKey, accounts[1], sig.v, sig.r, sig.s)
-      //   const result = await accountsInstance.getWalletAddress(caller)
-      //   assert.equal(result, accounts[1])
-      // })
-
       it('emits the AccountCreated event', async () => {
         const resp = await accountsInstance.setAccount(
           name,
@@ -283,13 +276,6 @@ contract('Accounts', (accounts: string[]) => {
         const result = await accountsInstance.getWalletAddress(account)
         assert.equal(result, walletAddress)
       })
-
-      // it('should set a different address with the appropriate signature', async () => {
-      //   const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
-      //   await accountsInstance.setWalletAddress(accounts[1], sig.v, sig.r, sig.s)
-      //   const result = await accountsInstance.getWalletAddress(caller)
-      //   assert.equal(result, accounts[1])
-      // })
 
       it('should set the NULL_ADDRESS', async () => {
         const sig = await getParsedSignatureOfAddress(web3, account, NULL_ADDRESS)
