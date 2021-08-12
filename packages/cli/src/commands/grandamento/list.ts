@@ -9,11 +9,13 @@ export default class List extends BaseCommand {
 
     console.log('Active proposals:')
 
-    const proposalsDetails = proposals.map((id) => {
-      // todo format this
-      // console.log(id)
-      return grandaMento.getExchangeProposal(id)
-    })
+    if (!proposals.length) {
+      console.log('No active Granda Mento proposals')
+      throw 'lala'
+      return
+    }
+
+    const proposalsDetails = proposals.map((id) => grandaMento.getExchangeProposal(id))
 
     const res = await Promise.all(proposalsDetails)
 

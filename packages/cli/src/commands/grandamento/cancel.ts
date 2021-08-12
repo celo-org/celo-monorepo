@@ -1,11 +1,8 @@
-import { StableToken } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { enumEntriesDupWithLowercase } from '../../utils/helpers'
-
-const stableTokenOptions = enumEntriesDupWithLowercase(Object.entries(StableToken))
 
 export default class Propse extends BaseCommand {
   static description = 'Proposes a Granda Mento exchange Celo to Stable Token'
@@ -21,13 +18,12 @@ export default class Propse extends BaseCommand {
   }
 
   async run() {
-    const celoToken = await this.kit.contracts.getGoldToken()
     const grandaMento = await this.kit.contracts.getGrandaMento()
 
     const res = this.parse(Propse)
     const proposalID = res.flags.proposalID
 
-    // TODO add checks (proposal exists)
+    await newCheckBuilder(this).grandaMentoProposalExists(proposalID)
 
     await displaySendTx(
       'cancell',

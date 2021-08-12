@@ -80,6 +80,12 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     return createExchangeProposalInner(stableTokenRegistryId, sellAmount.toNumber(), sellCelo)
   }
 
+  async exchangeProposalExists(exchangeProposalID: string | number) {
+    const result = await this.contract.methods.exchangeProposals(exchangeProposalID).call()
+    const state = parseInt(result.state, 10)
+    return !(state === ExchangeProposalState.None)
+  }
+
   async getExchangeProposal(exchangeProposalID: string | number): Promise<ExchangeProposal> {
     const result = await this.contract.methods.exchangeProposals(exchangeProposalID).call()
     const state = parseInt(result.state, 10)
