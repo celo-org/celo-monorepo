@@ -3,7 +3,7 @@ import { hexToBuffer } from '@celo/utils/lib/address'
 import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
-import { VERSION } from '../src/config'
+import { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS, VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import {
   getAccountSignedUserPhoneNumberRecord,
@@ -234,7 +234,7 @@ describe(`POST /getContactMatches endpoint`, () => {
   }
   const expectSuccessWithRecord = (req: Request) => {
     expectSuccess(req)
-    expectSignatureWasRecorded()
+    expectSignatureWasRecorded(req)
   }
   const expectSuccessWithoutRecord = (req: Request) => {
     expectSuccess(req)
@@ -250,12 +250,12 @@ describe(`POST /getContactMatches endpoint`, () => {
   }
   const expectFirstMatchmakingToSucceedWithRecord = (req: Request) => {
     expectFirstMatchmakingToSucceed(req)
-    expectSignatureWasRecorded()
+    expectSignatureWasRecorded(req)
   }
-  const expectSignatureWasRecorded = () => {
+  const expectSignatureWasRecorded = (req: Request) => {
     it('Should have recorded dek phone number signature for the last request', () => {
       expect(mockSetDidMatchmaking).toHaveBeenLastCalledWith(
-        validInput.account,
+        req.body.account,
         expect.anything(),
         expect.anything()
       )
@@ -341,6 +341,27 @@ describe(`POST /getContactMatches endpoint`, () => {
                 )
               })
               expectSuccessWithRecord(req)
+              describe('Should bypass verification when e2e test phone number and account are provided', () => {
+                beforeAll(() => {
+                  mockIsVerified.mockResolvedValue(false)
+                  req.body.account = E2E_TEST_ACCOUNTS[0]
+                  req.body.userPhoneNumber = E2E_TEST_PHONE_NUMBERS[0]
+                  req.body.signedUserPhoneNumber = signWithDEK(req.body.userPhoneNumber, deks[0])
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                    req.body.signedUserPhoneNumber
+                  )
+                })
+                afterAll(() => {
+                  mockIsVerified.mockResolvedValue(true)
+                  req.body.account = validInput.account
+                  req.body.userPhoneNumber = validInput.userPhoneNumber
+                  req.body.signedUserPhoneNumber = signWithDEK(req.body.userPhoneNumber, deks[0])
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                    req.body.signedUserPhoneNumber
+                  )
+                })
+                expectSuccessWithRecord(req)
+              })
             })
 
             describe('When signedUserPhoneNumberRecord does not match request', () => {

@@ -6,7 +6,11 @@ import {
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/utils'
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  normalizeAddressWith0x,
+  privateKeyToAddress,
+} from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
 import { getBlindedPhoneNumber } from '../../../common/src/test/utils'
 
@@ -28,8 +32,7 @@ export const PRIVATE_KEY_NO_QUOTA =
   '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890000000'
 export const ACCOUNT_ADDRESS_NO_QUOTA = privateKeyToAddress(PRIVATE_KEY_NO_QUOTA)
 
-export const PHONE_NUMBER = '+14155550123'
-export const PHONE_NUMBER_2 = '+14155550124'
+export const PHONE_NUMBER = '+17777777777'
 export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 export const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 
@@ -71,7 +74,7 @@ export const deks = [
 
 export const dekAuthSigner: EncryptionKeySigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
-  rawKey: deks[0].privateKey,
+  rawKey: ensureLeading0x(deks[0].privateKey),
 }
 
 export const walletAuthSigner: WalletKeySigner = {

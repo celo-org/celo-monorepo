@@ -15,7 +15,12 @@ import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
-import { E2E_TEST_PHONE_HASH_IDENTIFIER, VERSION } from '../config'
+import config, {
+  E2E_TEST_ACCOUNTS,
+  E2E_TEST_PHONE_NUMBERS,
+  FORNO_ALFAJORES,
+  VERSION,
+} from '../config'
 import {
   getAccountSignedUserPhoneNumberRecord,
   getDekSignerRecord,
@@ -58,13 +63,16 @@ export async function handleGetContactMatches(
       signedUserPhoneNumber,
     } = request.body
 
-    const _isVerified =
-      hashedPhoneNumber === E2E_TEST_PHONE_HASH_IDENTIFIER ||
-      (await isVerified(account, hashedPhoneNumber, getContractKit(), logger))
-
-    if (!_isVerified) {
-      respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
-      return
+    if (!shouldBypassVerificationForE2ETesting(userPhoneNumber, account)) {
+      if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
+        respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
+        return
+      }
+    } else {
+      logger.warn(
+        { account, userPhoneNumber },
+        'Allowing request to bypass verification for e2e testing'
+      )
     }
 
     // If we are unsure whether a phone number signature is valid but we don't want to block the user,
@@ -250,5 +258,13 @@ function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): b
     hasValidUserPhoneNumberParam(requestBody) &&
     hasValidContactPhoneNumbersParam(requestBody) &&
     hasValidIdentifier(requestBody)
+  )
+}
+
+function shouldBypassVerificationForE2ETesting(userPhoneNumber: string, account: string): boolean {
+  return (
+    config.blockchain.provider === FORNO_ALFAJORES &&
+    E2E_TEST_PHONE_NUMBERS.includes(userPhoneNumber) &&
+    E2E_TEST_ACCOUNTS.includes(account)
   )
 }
