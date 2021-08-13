@@ -1,8 +1,7 @@
-import sleep from 'sleep-promise'
+/* tslint:disable no-console */
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
-import { simulateClient } from 'src/lib/geth'
+import { getIndexForLoadTestThread, simulateClient } from 'src/lib/geth'
 import * as yargs from 'yargs'
-
 export const command = 'simulate-client'
 
 export const describe = 'command for simulating client behavior'
@@ -14,6 +13,8 @@ interface SimulateClientArgv extends yargs.Argv {
   index: number
   mnemonic: string
   recipientIndex: number
+  clientCount: number
+  reuseClient: boolean
 }
 
 export const builder = () => {
@@ -38,7 +39,6 @@ export const builder = () => {
       type: 'number',
       description:
         'Index of the load test account to send transactions from. Used to generate account address',
-      default: 0,
     })
     .option('recipient-index', {
       type: 'number',
@@ -51,30 +51,53 @@ export const builder = () => {
       description: 'Mnemonic used to generate account addresses',
       demand: 'A mnemonic must be provided',
     })
+    .options('client-count', {
+      type: 'number',
+      description: 'Number of clients to simulate',
+      default: 1,
+    })
+    .options('reuse-client', {
+      type: 'boolean',
+      description: 'Use the same client for all the threads/accounts',
+      default: false,
+    })
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
-  // So we can transactions to another load testing account
-  const senderAddress = generateAddress(argv.mnemonic, AccountType.LOAD_TESTING_ACCOUNT, argv.index)
-  const recipientAddress = generateAddress(
-    argv.mnemonic,
-    AccountType.LOAD_TESTING_ACCOUNT,
-    argv.recipientIndex
-  )
+  for (let thread = 0; thread < argv.clientCount; thread++) {
+    const senderIndex = getIndexForLoadTestThread(argv.index, thread)
+    const recipientIndex = getIndexForLoadTestThread(argv.recipientIndex, thread)
+    const senderAddress = generateAddress(
+      argv.mnemonic,
+      AccountType.LOAD_TESTING_ACCOUNT,
+      senderIndex
+    )
+    const recipientAddress = generateAddress(
+      argv.mnemonic,
+      AccountType.LOAD_TESTING_ACCOUNT,
+      recipientIndex
+    )
 
-  // sleep a random amount of time in the range [0, argv.delay] before starting so
-  // that if multiple simulations are started at the same time, they don't all
-  // submit transactions at the same time
-  const sleepMs = Math.random() * argv.delay
-  console.info(`Sleeping for ${sleepMs} ms`)
-  await sleep(sleepMs)
+    const web3ProviderPort = argv.reuseClient ? 8545 : 8545 + thread
 
-  await simulateClient(
-    senderAddress,
-    recipientAddress,
-    argv.delay,
-    argv.blockscoutUrl,
-    argv.blockscoutMeasurePercent,
-    argv.index
-  )
+    console.log(
+      `Account for sender index ${argv.index} thread ${thread}, final index ${senderIndex}: ${senderAddress}`
+    )
+    console.log(
+      `Account for recipient index ${argv.recipientIndex} thread ${thread}, final index ${recipientIndex}: ${recipientAddress}`
+    )
+    console.log(`web3ProviderPort for thread ${thread}: ${web3ProviderPort}`)
+
+    // tslint:disable-next-line: no-floating-promises
+    simulateClient(
+      senderAddress,
+      recipientAddress,
+      argv.delay,
+      argv.blockscoutUrl,
+      argv.blockscoutMeasurePercent,
+      argv.index,
+      thread,
+      `http://localhost:${web3ProviderPort}`
+    )
+  }
 }
