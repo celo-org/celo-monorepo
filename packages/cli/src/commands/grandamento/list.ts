@@ -7,13 +7,12 @@ export default class List extends BaseCommand {
     const grandaMento = await this.kit.contracts.getGrandaMento()
     const proposals = await grandaMento.getActiveProposalIds()
 
-    console.log('Active proposals:')
-
     if (!proposals.length) {
       console.log('No active Granda Mento proposals')
-      throw 'lala'
       return
     }
+
+    console.log('Active proposals:')
 
     const proposalsDetails = proposals.map((id) => grandaMento.getExchangeProposal(id))
 
