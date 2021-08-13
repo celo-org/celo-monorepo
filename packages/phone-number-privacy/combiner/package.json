@@ -21,7 +21,8 @@
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test\/end-to-end",
     "test:e2e": "jest test/end-to-end --verbose",
-    "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts"
+    "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts",
+    "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
     "@celo/contractkit": "1.2.3-dev",
