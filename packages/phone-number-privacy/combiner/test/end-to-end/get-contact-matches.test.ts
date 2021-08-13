@@ -29,7 +29,7 @@ describe('Running against a deployed service', () => {
         'invalid-phone-hash',
         walletAuthSigner,
         SERVICE_CONTEXT,
-        dekAuthSigner
+        dekAuthSigner(0)
       )
     ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
   })
@@ -41,7 +41,7 @@ describe('Running against a deployed service', () => {
         CONTACT_PHONE_NUMBERS,
         ACCOUNT_ADDRESS,
         PHONE_HASH_IDENTIFIER,
-        { ...dekAuthSigner, rawKey: 'fake' },
+        { ...dekAuthSigner(0), rawKey: 'fake' },
         SERVICE_CONTEXT
       )
     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
@@ -56,7 +56,7 @@ describe('Running against a deployed service', () => {
         PHONE_HASH_IDENTIFIER,
         walletAuthSigner,
         SERVICE_CONTEXT,
-        dekAuthSigner
+        dekAuthSigner(0)
       )
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
@@ -70,7 +70,7 @@ describe('Running against a deployed service', () => {
         PHONE_HASH_IDENTIFIER,
         walletAuthSigner,
         SERVICE_CONTEXT,
-        { ...dekAuthSigner, rawKey: 'fake' }
+        { ...dekAuthSigner(0), rawKey: 'fake' }
       )
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
@@ -100,42 +100,40 @@ describe('Running against a deployed service', () => {
         CONTACT_PHONE_NUMBERS,
         E2E_TEST_ACCOUNTS[0],
         PHONE_HASH_IDENTIFIER,
-        dekAuthSigner,
+        dekAuthSigner(0),
         SERVICE_CONTEXT
       )
     ).resolves.toBeInstanceOf(Array)
   })
 
-  // TODO fix these 2 tests
-  it.skip('Returns error when requerying matches with different phone number', async () => {
+  it('Returns error when requerying matches with different phone number', async () => {
     await expect(
       OdisUtils.Matchmaking.getContactMatches(
         E2E_TEST_PHONE_NUMBERS_RAW[1],
         CONTACT_PHONE_NUMBERS,
         E2E_TEST_ACCOUNTS[0],
         PHONE_HASH_IDENTIFIER,
-        dekAuthSigner,
+        dekAuthSigner(0),
         SERVICE_CONTEXT
       )
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
 
-  it.skip('Returns success when requerying matches with same phone number after key rotation', async () => {
-    // const accounts = await this.kit.contracts.getAccounts()
-    // await displaySendTx(
-    //   'RegisterDataEncryptionKey',
-    //   accounts.setAccountDataEncryptionKey(ensureLeading0x(publicKey))
-    // )
-    // TODO
-    // await expect(
-    //   OdisUtils.Matchmaking.getContactMatches(
-    //     PHONE_NUMBER,
-    //     CONTACT_PHONE_NUMBERS,
-    //     ACCOUNT_ADDRESS,
-    //     PHONE_HASH_IDENTIFIER,
-    //     dekAuthSigner,
-    //     SERVICE_CONTEXT
-    //   )
-    // ).resolves.toBeInstanceOf(Response)
+  it('Returns success when requerying matches with same phone number after key rotation', async () => {
+    const accounts = await contractKit.contracts.getAccounts()
+    await accounts
+      .setAccountDataEncryptionKey(ensureLeading0x(deks[1].publicKey))
+      .sendAndWaitForReceipt()
+
+    await expect(
+      OdisUtils.Matchmaking.getContactMatches(
+        E2E_TEST_PHONE_NUMBERS_RAW[0],
+        CONTACT_PHONE_NUMBERS,
+        E2E_TEST_ACCOUNTS[0],
+        PHONE_HASH_IDENTIFIER,
+        dekAuthSigner(1),
+        SERVICE_CONTEXT
+      )
+    ).resolves.toBeInstanceOf(Array)
   })
 })

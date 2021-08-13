@@ -72,9 +72,11 @@ export const deks = [
 //   async () => await deriveDek(await generateMnemonic())
 // ))
 
-export const dekAuthSigner: EncryptionKeySigner = {
-  authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
-  rawKey: ensureLeading0x(deks[0].privateKey),
+export const dekAuthSigner = (index: number): EncryptionKeySigner => {
+  return {
+    authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+    rawKey: ensureLeading0x(deks[index].privateKey),
+  }
 }
 
 export const walletAuthSigner: WalletKeySigner = {
