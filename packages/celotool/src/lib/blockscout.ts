@@ -140,12 +140,13 @@ async function helmParameters(
       `--set blockscout.jsonrpc_ws_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT)}`
     )
   } else if (isVmBased()) {
+    // TODO: Deprecated
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   } else if (privateNodes > 0) {
     params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8546`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8545`)
   } else {
     params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
