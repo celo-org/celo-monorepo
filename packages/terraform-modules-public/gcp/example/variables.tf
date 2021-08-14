@@ -18,7 +18,7 @@ variable replicas {
   default = {
     validator           = 1 # Each validator will create a dedicated proxy that is exposed to the Internet
     txnode              = 1 
-    backup_node         = 1 
+    backup_node         = 1
     attestation_service = 1 # Attestation service requires >= 1 txnode
   }
 }
@@ -31,7 +31,7 @@ variable instance_types {
     validator           = "n1-standard-2"   #use n1-standard-2 or better for production
     proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
-    backup_node         = "n1-standard-1"
+    backup_node         = "custom-1-4864"   # 1 vCPU, 4.75G RAM
     attestation_service = "n1-standard-1"
   }
 }
@@ -171,13 +171,13 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-v1.2.2"
+    tag        = "attestation-service-v1.3.0"
   }
 }
 
 # SMS provider configuration
 variable attestation_service_credentials {
-  description = "Provider with the credentials for the SMS provider. Provider must be nexmo or twilio"
+  description = "Provider with the credentials for the SMS provider. Provider must be nexmo or twilio or messagebird"
   type        = map(string)
 
   default = {
@@ -318,6 +318,16 @@ variable "stackdriver_logging_metrics" {
     tf_validator_not_elected = {
       description = "Validator failed to be elected"
       filter = "resource.type=gce_instance \"Validator Election Results\" AND \"\\\"elected\\\":\\\"false\\\"\" AND NOT \"tx-node\""
+    }
+
+    tf_eth_fork_rejected = {
+      description = "Remote peer not running current software"
+      filter = "resource.type=gce_instance \"Fork ID rejected - remote needs update\""
+    }
+
+    tf_eth_too_many_peers = {
+      description = "Disconnecting peer in excess of max_peers threshold"
+      filter = "resource.type=gce_instance \"too many peers\" AND \"Disconnecting from static or trusted peer\""
     }
 
   }

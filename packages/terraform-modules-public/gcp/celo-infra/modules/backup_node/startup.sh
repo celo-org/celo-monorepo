@@ -123,7 +123,7 @@ set -x
 echo "Starting chaindata backup" | logger
 systemctl stop geth.service
 sleep 5
-tar -C /root/.celo/celo -zcvf /root/.celo/celo/chaindata.tgz chaindata
+tar -I "pigz --fast" -C /root/.celo/celo -cvf /root/.celo/celo/chaindata.tgz chaindata
 gsutil cp /root/.celo/celo/chaindata.tgz gs://${gcloud_project}-chaindata
 rm -f /root/.celo/celo/chaindata.tgz
 echo "Chaindata backup completed" | logger
@@ -290,7 +290,7 @@ mkdir -p $DATA_DIR/account
 
 echo "Installing Docker..." | logger
 apt update -y && apt upgrade -y
-apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 htop screen
+apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 htop screen pigz
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 apt update -y && apt upgrade -y

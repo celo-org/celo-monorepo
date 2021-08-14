@@ -81,6 +81,6 @@ resource "google_compute_disk" "validator" {
   #type = "pd-ssd"
   type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 50
+  size                      = 100
   physical_block_size_bytes = 4096
 }
