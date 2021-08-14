@@ -28,9 +28,16 @@ data:
       external_labels:
         cluster_name: {{ .Values.cluster }}
 
-    {{- with .Values.remote_write }}
+    {{- if .Values.remote_write }}
     remote_write:
-{{ toYaml . | indent 6 }}
+      - basic_auth:
+          password: {{ .Values.remote_write.basic_auth.password }}
+          username: {{ .Values.remote_write.basic_auth.username }}
+        url: {{ .Values.remote_write.url }}
+        write_relabel_configs:
+        - action: {{ .Values.remote_write.write_relabel_configs.action }}
+          regex: {{ .Values.remote_write.write_relabel_configs.regex }}
+          source_labels: {{ .Values.remote_write.write_relabel_configs.source_labels }}
     {{- end }}
 
     scrape_configs:
