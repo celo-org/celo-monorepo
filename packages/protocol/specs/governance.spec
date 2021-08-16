@@ -23,13 +23,15 @@ methods {
 	getVoteTotals(uint256) returns uint256,uint256,uint256 envfree
 	approver() returns address envfree
 	getVoteRecord(address,uint256) returns uint256, uint256, uint256 envfree
-    getMostRecentReferendumProposal(address) returns uint256 envfree
-    proposalExists(uint256) returns bool
-    getVotedId(address, uint256) returns uint256 envfree
+  getMostRecentReferendumProposal(address) returns uint256 envfree
+  proposalExists(uint256) returns bool
+  getVotedId(address, uint256) returns uint256 envfree
 
-    // dispatches to Accounts
-    voteSignerToAccount(address) envfree => DISPATCHER(true) UNRESOLVED
-    getVoteSigner(address) returns address envfree => DISPATCHER(true) UNRESOLVED
+  // dispatches to Accounts
+  voteSignerToAccount(address) => DISPATCHER(true) UNRESOLVED
+  getVoteSigner(address) returns address => DISPATCHER(true) UNRESOLVED
+  accounts.voteSignerToAccount(address) returns (address) envfree
+  accounts.getVoteSigner(address) returns (address) envfree
 }
 
 ghost votedFor(address,uint256) returns bool { // voter to proposal id voted for
