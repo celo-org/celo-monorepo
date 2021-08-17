@@ -1,7 +1,6 @@
 import FormData from 'form-data'
-import { createReadStream, readdirSync, readFileSync, readJsonSync } from 'fs-extra'
+import { createReadStream, readdirSync, readFileSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { ASTDetailedVersionedReport } from 'lib/compatibility/report'
-import fetch from 'node-fetch'
 import { basename, join } from 'path'
 
 const network = process.env.NETWORK ?? 'mainnet'
@@ -42,10 +41,10 @@ for (let i = 0; i <= latestVersion; i++) {
   })
 }
 
-const verifyList = ['Accounts']
+// const verifyList = ['Attestations']
 
 Object.entries(versionedSourceMap)
-  .filter(([contract]) => verifyList.includes(contract))
+  // .filter(([contract]) => verifyList.includes(contract))
   .forEach(([contract, artifact]) => {
     try {
       const formdata = new FormData()
@@ -85,11 +84,13 @@ Object.entries(versionedSourceMap)
         body: formdata,
       }
 
-      fetch('https://sourcify.dev/server/input-files', requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.error('request error', error))
+      writeJsonSync(`${contract}Request.json`, requestOptions, { spaces: 2 })
+
+      // fetch('https://sourcify.dev/server/input-files', requestOptions)
+      //   .then((response) => response.text())
+      //   .then((result) => console.log(result))
+      //   .catch((error) => console.error('request error', error))
     } catch (e) {
-      console.error(`skipping ${contract}: \n ${e}`)
+      console.error(`skipping ${contract}`)
     }
   })
