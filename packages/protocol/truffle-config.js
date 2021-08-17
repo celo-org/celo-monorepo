@@ -213,30 +213,31 @@ if (process.argv.includes('--forno')) {
   }
 }
 
-module.exports = {
-  plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
-  compilers: {
-    solc: {
-      version: SOLC_VERSION,
-      settings: {
-        evmVersion: 'istanbul',
-      },
+const defaultCompilerSettings = {
+  solc: {
+    version: SOLC_VERSION,
+    docker: false,
+    settings: {
+      // optimizer: {
+      //   enabled: true,
+      //   runs: 50,
+      // },
+      evmVersion: 'istanbul',
+      metadata: { useLiteralContent: true },
     },
   },
+}
+
+module.exports = {
+  plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
+  compilers: defaultCompilerSettings,
   networks,
   mocha: flakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {
   module.exports = {
-    compilers: {
-      solc: {
-        version: SOLC_VERSION,
-        settings: {
-          evmVersion: 'istanbul',
-        },
-      },
-    },
+    compilers: defaultCompilerSettings,
     plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
     networks,
     reporter: 'eth-gas-reporter',
