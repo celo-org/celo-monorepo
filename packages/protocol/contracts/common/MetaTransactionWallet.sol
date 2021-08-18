@@ -418,10 +418,11 @@ contract MetaTransactionWallet is
 
     {
       // TODO: ask Contracts about a more accurate estimate
-      uint256 buffer1 = 7900; // estimated by emitting gasleft() at desired benchmark times
+      uint256 gasAfterMTxExecution = 7900; // estimated by emitting gasleft() at desired benchmark times
 
       if (
-        address(this).balance >= metaGasLimit.add(buffer1).mul(tx.gasprice).add(value) &&
+        address(this).balance >=
+        metaGasLimit.add(gasAfterMTxExecution).mul(tx.gasprice).add(value) &&
         metaGasLimit < (gasleft() * 63) / 64
       ) {
         bool success;
@@ -450,8 +451,8 @@ contract MetaTransactionWallet is
     }
 
     {
-      uint256 buffer2 = 4747; // TODO: determine this constant (gas required for operations after and including msg.sender.transfer)
-      msg.sender.transfer(gasLimit.sub(gasleft()).add(buffer2).mul(tx.gasprice));
+      uint256 gasAfterRefund = 4747; // TODO: determine this constant (gas required for operations after and including msg.sender.transfer)
+      msg.sender.transfer(gasLimit.sub(gasleft()).add(gasAfterRefund).mul(tx.gasprice));
     }
 
     return returnData;
