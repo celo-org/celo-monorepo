@@ -631,7 +631,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
-  describe('#executeMetaTransactionWithRefund()', () => {
+  describe.only('#executeMetaTransactionWithRefund()', () => {
     const value = 0
     const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
     const data = '0x'
@@ -691,7 +691,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         })
 
         let res: any
-        describe.only('when signed by the signer', () => {
+        describe('when signed by the signer', () => {
           beforeEach(async () => {
             transferSigner = signer
           })
@@ -705,7 +705,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                   destination: wallet.address,
                   value,
                   data,
-                  nonce: 0,
+                  nonce,
                   maxGasPrice,
                   gasLimit,
                   metaGasLimit,
@@ -734,7 +734,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                   destination: wallet.address,
                   value,
                   data: innerData,
-                  nonce: 0,
+                  nonce,
                   maxGasPrice,
                   gasLimit,
                   metaGasLimit,

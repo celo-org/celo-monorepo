@@ -40,7 +40,6 @@ contract MetaTransactionWallet is
   event WalletRecovered(address indexed newSigner);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event Deposit(address indexed sender, uint256 value);
-  event MetaTransactionFailed(string error);
   event DebugNumber(uint256 number, string message);
   event DebugAddress(address indexed dAddress, string message);
   event DebugBytes32(bytes32 value);
@@ -72,6 +71,8 @@ contract MetaTransactionWallet is
     bytes returnData,
     bool success
   );
+
+  event RefundBalanceCheckFailed(address destination, uint256 value, uint256 walletBalance);
 
   // onlyGuardian functions can only be called when the guardian is not the zero address and
   // the caller is the guardian.
@@ -443,7 +444,7 @@ contract MetaTransactionWallet is
           success
         );
       } else {
-        // emit not-enough-balance event
+        emit RefundBalanceCheckFailed(destination, value, address(this).balance);
         returnData = "";
       }
     }
