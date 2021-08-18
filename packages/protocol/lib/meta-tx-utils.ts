@@ -8,6 +8,18 @@ export interface MetaTransaction {
   data: string
   nonce: number
 }
+
+export interface MetaTransactionWithRefund {
+  destination: Address
+  value: number
+  data: string
+  nonce: number
+  maxGasPrice: number,
+  gasLimit: number,
+  metaGasLimit: number
+}
+
+
 // The value currently returned by the chainId assembly code in ganache.
 const chainId = 1
 const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
@@ -38,6 +50,37 @@ const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
   return typedData
 }
 
+const getWithRefundTypedData = (walletAddress: Address, tx?: MetaTransactionWithRefund) => {
+  const typedData = {
+    types: {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      ExecuteMetaTransactionWithRefund: [
+        { name: 'destination', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'data', type: 'bytes' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'maxGasPrice', type: 'uint256' },
+        { name: 'gasLimit', type: 'uint256' },
+        { name: 'metaGasLimit', type: 'uint256' },
+      ],
+    },
+    primaryType: 'ExecuteMetaTransactionWithRefund',
+    domain: {
+      name: 'MetaTransactionWallet',
+      version: '1.1',
+      chainId,
+      verifyingContract: walletAddress,
+    },
+    message: tx ? tx : {},
+  }
+  return typedData
+}
+
 export const getDomainDigest = (walletAddress: Address) => {
   const typedData = getTypedData(walletAddress)
   return ensureLeading0x(
@@ -47,6 +90,11 @@ export const getDomainDigest = (walletAddress: Address) => {
 
 export const constructMetaTransactionExecutionDigest = (walletAddress: Address, tx: MetaTransaction) => {
   const typedData = getTypedData(walletAddress, tx)
+  return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+}
+
+export const constructMetaTransactionWithRefundExecutionDigest = (walletAddress: Address, tx: MetaTransactionWithRefund) => {
+  const typedData = getWithRefundTypedData(walletAddress, tx)
   return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
 }
 
@@ -74,6 +122,34 @@ export const getSignatureForMetaTransaction = async (
   })
 
   const messageHash = constructMetaTransactionExecutionDigest(walletAddress, tx)
+  const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
+  return parsedSignature
+}
+
+export const getSignatureForMetaTransactionWithRefund = async (
+  signer: Address,
+  walletAddress: Address,
+  tx: MetaTransactionWithRefund
+) => {
+  const typedData = getWithRefundTypedData(walletAddress, tx)
+
+  const signature = await new Promise<string>((resolve, reject) => {
+    web3.currentProvider.send(
+      {
+        method: 'eth_signTypedData',
+        params: [signer, typedData],
+      },
+      (error, resp) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(resp.result)
+        }
+      }
+    )
+  })
+
+  const messageHash = constructMetaTransactionWithRefundExecutionDigest(walletAddress, tx)
   const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
   return parsedSignature
 }

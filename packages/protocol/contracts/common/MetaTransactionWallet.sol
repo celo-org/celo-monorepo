@@ -443,6 +443,7 @@ contract MetaTransactionWallet is
           success
         );
       } else {
+        // emit not-enough-balance event
         returnData = "";
       }
     }
