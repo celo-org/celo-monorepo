@@ -25,7 +25,11 @@ contract MetaTransactionWallet is
     0x509c6e92324b7214543573524d0bb493d654d3410fa4f4937b3d2f4a903edd33
   );
 
-  // TODO: Add EIP712_EXECUTE_META_TRANSACTION_WITH_REFUND_TYPEHASH
+  // The EIP712 typehash for ExecuteMetaTransactionWithRefund, i.e. keccak256(
+  // "ExecuteMetaTransactionWithRefund(address destination,uint256 value,bytes data,uint256 nonce,uint256 maxGasPrice,uint256 gasLimit,uint256 metaGasLimit)");
+  bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_WITH_REFUND_TYPEHASH = (
+    0x95707181981ad9f01682078772d0bad84382576ec52b2bd02cc6ad296a5a5fde
+  );
 
   uint256 public nonce;
   address public signer;
@@ -36,7 +40,11 @@ contract MetaTransactionWallet is
   event WalletRecovered(address indexed newSigner);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event Deposit(address indexed sender, uint256 value);
-  event FailedMetaTransaction(string error);
+  event MetaTransactionFailed(string error);
+  event DebugNumber(uint256 number, string message);
+  event DebugAddress(address indexed dAddress, string message);
+  event DebugBytes32(bytes32 value);
+  event DebugString(string message);
 
   event TransactionExecution(
     address indexed destination,
@@ -59,8 +67,10 @@ contract MetaTransactionWallet is
     bytes data,
     uint256 indexed nonce,
     uint256 maxGasPrice,
+    uint256 gasLimit,
     uint256 metaGasLimit,
-    bytes returnData
+    bytes returnData,
+    bool success
   );
 
   // onlyGuardian functions can only be called when the guardian is not the zero address and
@@ -199,17 +209,19 @@ contract MetaTransactionWallet is
     bytes memory data,
     uint256 _nonce,
     uint256 maxGasPrice,
+    uint256 gasLimit,
     uint256 metaGasLimit
   ) internal view returns (bytes32) {
     return
       keccak256(
         abi.encode(
-          EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
+          EIP712_EXECUTE_META_TRANSACTION_WITH_REFUND_TYPEHASH,
           destination,
           value,
           keccak256(data),
           _nonce,
           maxGasPrice,
+          gasLimit,
           metaGasLimit
         )
       );
@@ -249,6 +261,7 @@ contract MetaTransactionWallet is
     bytes calldata data,
     uint256 _nonce,
     uint256 maxGasPrice,
+    uint256 gasLimit,
     uint256 metaGasLimit
   ) external view returns (bytes32) {
     bytes32 structHash = _getMetaTransactionWithRefundStructHash(
@@ -257,6 +270,7 @@ contract MetaTransactionWallet is
       data,
       _nonce,
       maxGasPrice,
+      gasLimit,
       metaGasLimit
     );
     return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
@@ -305,6 +319,7 @@ contract MetaTransactionWallet is
     bytes memory data,
     uint256 _nonce,
     uint256 maxGasPrice,
+    uint256 gasLimit,
     uint256 metaGasLimit,
     uint8 v,
     bytes32 r,
@@ -316,6 +331,7 @@ contract MetaTransactionWallet is
       data,
       _nonce,
       maxGasPrice,
+      gasLimit,
       metaGasLimit
     );
     return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
@@ -348,11 +364,6 @@ contract MetaTransactionWallet is
   }
 
   /**
-  * relayer? TODO determine if we can predict this request (question for komenci folks)
-  * gatewayFee / gateWayFeeRecipient? (TODO: ask Contracts if better to omit these or add them for forward compatibility) 
-  */
-
-  /**
    * @notice Executes a refundable meta-transaction on behalf of the signer.
    * @param destination The address to which the meta-transaction is to be sent.
    * @param value The CELO value to be sent with the meta-transaction.
@@ -376,12 +387,11 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) external returns (bytes memory) {
-    require(gasLimit == gasleft(), "gasLimit different than limit authorized by signer"); // To ensure Komenci actually set the correct gas limit TODO ask Contracts about this
+    require(gasLimit >= gasleft(), "gasLimit different than limit authorized by signer"); // To ensure Komenci actually set the correct gas limit TODO ask Contracts about this
     require(tx.gasprice <= maxGasPrice, "gasprice exceeds limit authorized by signer");
     require(address(this).balance >= gasLimit.mul(tx.gasprice).add(value), "insufficient balance");
     require(msg.sender == tx.origin, "relayer must be EOA");
     if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
-    require(gasLimit <= block.gaslimit, "Impossible gas limit");
     require(metaGasLimit < gasLimit, "metaGasLimit must be less than gasLimit");
 
     // checking gasCurrency is out of scope, would require pre-compile
@@ -392,6 +402,7 @@ contract MetaTransactionWallet is
         data,
         nonce,
         maxGasPrice,
+        gasLimit,
         metaGasLimit,
         v,
         r,
@@ -405,30 +416,32 @@ contract MetaTransactionWallet is
     bytes memory returnData;
 
     {
-      // TODO: ask Contracts
-      uint256 buffer1 = 4949; // TODO: determine this constant (gas required for operations after destination.call.value)
+      // TODO: ask Contracts about a more accurate estimate
+      uint256 buffer1 = 7900; // estimated by emitting gasleft() at desired benchmark times
 
       if (
         address(this).balance >= metaGasLimit.add(buffer1).mul(tx.gasprice).add(value) &&
         metaGasLimit < (gasleft() * 63) / 64
       ) {
         bool success;
-        (success, returnData) = destination.call.value(value).gas(metaGasLimit)(data);
-
-        if (!success) {
-          emit FailedMetaTransaction("Meta Transaction with refund failed");
-        } else {
-          emit MetaTransactionWithRefundExecution(
-            destination,
-            value,
-            data,
-            nonce.sub(1),
-            maxGasPrice,
-            metaGasLimit,
-            returnData
-          );
+        {
+          // if value is non-zero, destination.call seems to add 2300 gas to metaGasLimit.
+          // We want this to execute with exactly the metaGasLimit specified by the signer
+          // so we subtract 2300 from metaGasLimit if value is non-zero
+          if (value > 0) metaGasLimit = metaGasLimit.sub(2300);
+          (success, returnData) = destination.call.value(value).gas(metaGasLimit)(data);
         }
-
+        emit MetaTransactionWithRefundExecution(
+          destination,
+          value,
+          data,
+          nonce.sub(1),
+          maxGasPrice,
+          gasLimit,
+          metaGasLimit,
+          returnData,
+          success
+        );
       } else {
         returnData = "";
       }
