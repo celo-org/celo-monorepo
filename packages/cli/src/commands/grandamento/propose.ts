@@ -57,9 +57,7 @@ export default class Propse extends BaseCommand {
         this.kit.celoTokens.getContract(stableToken),
         sellAmount,
         sellCelo
-      ),
-      { value: sellAmount.toString() },
-      'Proposed'
+      )
     )
   }
 }

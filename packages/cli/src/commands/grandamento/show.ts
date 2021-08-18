@@ -28,8 +28,6 @@ export default class Propse extends BaseCommand {
 
     const proposal = await grandaMento.getExchangeProposal(proposalID)
 
-    // TODO add checks (proposal exists)
-
     await newCheckBuilder(this).grandaMentoProposalExists(proposalID)
 
     printValueMap(proposal) // TODO This function should parse the token addresses
