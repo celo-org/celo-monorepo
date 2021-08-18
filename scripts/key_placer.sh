@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Processing encrypted files v2"
+echo "Processing encrypted files"
 
 # Set list of secret files to encrypt and decrypt.
 files=(
