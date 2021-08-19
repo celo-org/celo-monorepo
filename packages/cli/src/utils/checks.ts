@@ -143,7 +143,6 @@ class CheckBuilder {
     this.addCheck(
       `${proposalID} is an existing proposal`,
       this.withGrandaMento((grandaMento) => grandaMento.exchangeProposalExists(proposalID))
-      // TODO getExchangeProposal throws, verifiy if that works of it needs to return false
     )
 
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>

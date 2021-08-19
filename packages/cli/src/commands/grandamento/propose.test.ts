@@ -12,7 +12,6 @@ import Web3 from 'web3'
 import Propose from './propose'
 
 testWithGanache('grandamento:propose cmd', (web3: Web3) => {
-  // jest.spyOn(console, 'log')
   const kit = newKitFromWeb3(web3)
   let grandaMento: GrandaMentoWrapper
   let accounts: Address[] = []

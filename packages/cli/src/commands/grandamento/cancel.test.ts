@@ -9,7 +9,6 @@ import Cancel from './cancel'
 import Propose from './propose'
 
 testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
-  // jest.spyOn(console, 'log')
   const kit = newKitFromWeb3(web3)
   let grandaMento: GrandaMentoWrapper
   const newLimitMin = new BigNumber('1000')
