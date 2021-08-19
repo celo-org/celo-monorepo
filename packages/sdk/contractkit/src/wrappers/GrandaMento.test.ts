@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
+import { increaseLimits } from '../test-utils/grandaMento'
 import { assumeOwnership } from '../test-utils/transferownership'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import { ExchangeProposalState, GrandaMentoWrapper } from './GrandaMento'
@@ -30,16 +31,6 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     celoToken = await kit.contracts.getGoldToken()
   })
 
-  const increaseLimits = async () => {
-    await (
-      await grandaMento.setStableTokenExchangeLimits(
-        'StableToken',
-        newLimitMin.toString(),
-        newLimitMax.toString()
-      )
-    ).sendAndWaitForReceipt()
-  }
-
   describe('No limits sets', () => {
     it('gets the proposals', async () => {
       const activeProposals = await grandaMento.getActiveProposalIds()
@@ -60,7 +51,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
   describe('When Granda Mento is enabled', () => {
     beforeEach(async () => {
       await assumeOwnership(web3, accounts[0])
-      await increaseLimits()
+      await increaseLimits(grandaMento)
     })
 
     it('updated the config', async () => {

@@ -8,9 +8,9 @@ import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
-import List from './list'
+import Show from './show'
 
-testWithGanache('grandamento:list cmd', (web3: Web3) => {
+testWithGanache('grandamento:show cmd', (web3: Web3) => {
   const kit = newKitFromWeb3(web3)
   let grandaMento: GrandaMentoWrapper
   let accounts: Address[] = []
@@ -29,16 +29,13 @@ testWithGanache('grandamento:list cmd', (web3: Web3) => {
     await increaseLimits(grandaMento)
   })
 
-  it('shows an empty list of proposals', async () => {
-    await List.run([])
-  })
-
   it('shows proposals', async () => {
     // create mock proposal
     const sellAmount = new BigNumber('100000000')
     await (
       await celoToken.increaseAllowance(grandaMento.address, sellAmount)
     ).sendAndWaitForReceipt()
+
     await (
       await grandaMento.createExchangeProposal(
         kit.celoTokens.getContract(StableToken.cUSD),
@@ -47,6 +44,6 @@ testWithGanache('grandamento:list cmd', (web3: Web3) => {
       )
     ).sendAndWaitForReceipt()
 
-    await List.run([])
+    await Show.run(['--proposalID', '1'])
   })
 })
