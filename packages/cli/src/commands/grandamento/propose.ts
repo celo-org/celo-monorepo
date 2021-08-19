@@ -13,20 +13,20 @@ export default class Propse extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'The address with CELO to exchange' }),
+    from: Flags.address({ required: true, description: 'The address with tokens to exchange' }),
     value: Flags.wei({
       required: true,
-      description: 'The value of CELO to exchange for a StableToken',
+      description: 'The value of the tokens to exchange',
     }),
     stableToken: flags.enum({
       required: true,
       options: Object.keys(stableTokenOptions),
-      description: 'Name of the stable to receive',
+      description: 'Name of the stable to receive or send',
       default: 'cUSD',
     }),
     sellCelo: flags.boolean({
       required: true,
-      description: 'Name of the stable to receive',
+      description: 'Sell or buy CELO',
     }),
   }
 

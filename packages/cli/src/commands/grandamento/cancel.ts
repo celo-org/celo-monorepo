@@ -9,7 +9,10 @@ export default class Propse extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'The address with CELO to exchange' }),
+    from: Flags.address({
+      required: true,
+      description: 'The address allowed to cancell the proposal',
+    }),
     proposalID: flags.string({
       required: true,
       exclusive: ['account', 'hotfix'],
