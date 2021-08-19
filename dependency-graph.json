@@ -102,7 +102,6 @@
     "location": "packages/phone-number-privacy/combiner",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
