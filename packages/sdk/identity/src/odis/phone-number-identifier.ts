@@ -39,6 +39,7 @@ export async function getPhoneNumberIdentifier(
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
+  blindingFactor?: string,
   selfPhoneHash?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
@@ -50,10 +51,12 @@ export async function getPhoneNumberIdentifier(
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
 
-  const seed =
-    signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY
-      ? Buffer.from(signer.rawKey)
-      : undefined
+  let seed: Buffer | undefined = undefined
+  if (blindingFactor) {
+    seed = Buffer.from(blindingFactor)
+  } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    seed = Buffer.from(signer.rawKey)
+  }
 
   // Fallback to using Wasm version if not specified
 
