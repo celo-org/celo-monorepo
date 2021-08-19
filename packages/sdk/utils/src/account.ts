@@ -444,7 +444,9 @@ export function generateKeysFromSeed(
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): { privateKey: string; publicKey: string; address: string } {
   const node = bip32.fromSeed(seed)
-  const newNode = node.derivePath(`${derivationPath}/${changeIndex}/${addressIndex}`)
+  const newNode = node.derivePath(
+    `${derivationPath ? `${derivationPath}/` : ''}${changeIndex}/${addressIndex}`
+  )
   if (!newNode.privateKey) {
     // As we are generating the node from a seed, the node will always have a private key and this would never happened
     throw new Error('utils-accounts@generateKeys: invalid node to derivate')
