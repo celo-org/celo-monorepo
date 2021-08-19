@@ -31,5 +31,10 @@ module.exports = deploymentForCoreContract<GrandaMentoInstance>(
       artifacts
     )
     await reserve.addExchangeSpender(grandaMento.address)
+
+    for (const stableToken of Object.keys(config.grandaMento.stableTokenExchangeLimits)) {
+      const { min, max } = config.grandaMento.stableTokenExchangeLimits[stableToken]
+      await grandaMento.setStableTokenExchangeLimits(stableToken, min, max)
+    }
   }
 )
