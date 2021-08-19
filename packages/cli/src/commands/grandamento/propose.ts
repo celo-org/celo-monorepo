@@ -9,7 +9,7 @@ import { enumEntriesDupWithLowercase } from '../../utils/helpers'
 const stableTokenOptions = enumEntriesDupWithLowercase(Object.entries(StableToken))
 
 export default class Propse extends BaseCommand {
-  static description = 'Proposes a Granda Mento exchange Celo to Stable Token'
+  static description = 'Proposes a Granda Mento exchange'
 
   static flags = {
     ...BaseCommand.flags,

@@ -56,7 +56,11 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
 
   owner = proxyCall(this.contract.methods.owner)
 
-  getActiveProposalIds = proxyCall(this.contract.methods.getActiveProposalIds)
+  async getActiveProposalIds() {
+    const unfilteredIds = await this.contract.methods.getActiveProposalIds().call()
+    // '0' is given to signify an ID that is no longer active, so we filter them out.
+    return unfilteredIds.filter((id) => id !== '0')
+  }
 
   setStableTokenExchangeLimits = proxySend(
     this.kit,
@@ -77,7 +81,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
       this.kit,
       this.contract.methods.createExchangeProposal
     )
-    return createExchangeProposalInner(stableTokenRegistryId, sellAmount.toNumber(), sellCelo)
+    return createExchangeProposalInner(stableTokenRegistryId, sellAmount.toFixed(), sellCelo)
   }
 
   async exchangeProposalExists(exchangeProposalID: string | number) {

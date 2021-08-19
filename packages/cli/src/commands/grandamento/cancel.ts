@@ -5,7 +5,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Propse extends BaseCommand {
-  static description = 'Proposes a Granda Mento exchange Celo to Stable Token'
+  static description = 'Cancels a Granda Mento exchange proposal'
 
   static flags = {
     ...BaseCommand.flags,

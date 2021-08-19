@@ -1,7 +1,7 @@
 import { Address } from '@celo/base/lib/address'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { StableToken } from '@celo/contractkit/lib/celo-tokens'
-import { increaseLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
+import { setGrandaMentoLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
@@ -26,7 +26,7 @@ testWithGanache('grandamento:list cmd', (web3: Web3) => {
 
   beforeEach(async () => {
     await assumeOwnership(web3, accounts[0])
-    await increaseLimits(grandaMento)
+    await setGrandaMentoLimits(grandaMento)
   })
 
   it('shows an empty list of proposals', async () => {

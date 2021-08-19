@@ -4,7 +4,7 @@ import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap } from '../../utils/cli'
 
 export default class Propse extends BaseCommand {
-  static description = 'Proposes a Granda Mento exchange Celo to Stable Token'
+  static description = 'Shows details of a Granda Mento exchange proposal'
 
   static flags = {
     ...BaseCommand.flags,

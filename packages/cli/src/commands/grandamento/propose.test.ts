@@ -1,6 +1,6 @@
 import { Address } from '@celo/base/lib/address'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { increaseLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
+import { setGrandaMentoLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import {
   ExchangeProposalState,
@@ -24,7 +24,7 @@ testWithGanache('grandamento:propose cmd', (web3: Web3) => {
 
   beforeEach(async () => {
     await assumeOwnership(web3, accounts[0])
-    await increaseLimits(grandaMento)
+    await setGrandaMentoLimits(grandaMento)
     await Propose.run([
       '--from',
       accounts[0],

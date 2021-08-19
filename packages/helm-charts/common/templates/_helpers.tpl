@@ -494,7 +494,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - "-c"
   - |
     if [ -d /root/.celo/celo/chaindata ]; then
-      lastBlockTimestamp=$(timeout 120 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp")
+      lastBlockTimestamp=$(timeout 120 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --txpool.nolocals --exec "eth.getBlock(\"latest\").timestamp")
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
       # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.

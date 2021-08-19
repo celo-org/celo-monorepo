@@ -1,14 +1,15 @@
 import BigNumber from 'bignumber.js'
 import { GrandaMentoWrapper } from '../wrappers/GrandaMento'
 
-export const increaseLimits = async (
+export const setGrandaMentoLimits = async (
   grandaMento: GrandaMentoWrapper,
   newLimitMin: BigNumber = new BigNumber('1000'),
-  newLimitMax: BigNumber = new BigNumber('1000000000000')
+  newLimitMax: BigNumber = new BigNumber('1000000000000'),
+  stableToken: string = 'StableToken'
 ) => {
   await (
     await grandaMento.setStableTokenExchangeLimits(
-      'StableToken',
+      stableToken,
       newLimitMin.toString(),
       newLimitMax.toString()
     )
