@@ -14,8 +14,8 @@ USAGE
   $ celocli grandamento:cancel
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to
-                                                     exchange
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address allowed to
+                                                     cancell the proposal
 
   --globalHelp                                       View all available global flags
 
@@ -51,19 +51,18 @@ USAGE
   $ celocli grandamento:propose
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to
-                                                     exchange
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with tokens
+                                                     to exchange
 
   --globalHelp                                       View all available global flags
 
-  --sellCelo                                         (required) Name of the stable to
-                                                     receive
+  --sellCelo                                         (required) Sell or buy CELO
 
   --stableToken=(cUSD|cusd|cEUR|ceur)                (required) [default: cUSD] Name of
-                                                     the stable to receive
+                                                     the stable to receive or send
 
-  --value=10000000000000000000000                    (required) The value of CELO to
-                                                     exchange for a StableToken
+  --value=10000000000000000000000                    (required) The value of the tokens
+                                                     to exchange
 ```
 
 _See code: [src/commands/grandamento/propose.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/grandamento/propose.ts)_
