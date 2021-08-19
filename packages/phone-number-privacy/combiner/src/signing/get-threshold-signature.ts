@@ -16,6 +16,7 @@ import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
+import CircuitBreaker from 'opossum'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
@@ -28,6 +29,7 @@ type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface SignerService {
   url: string
+  fallbackUrl: string
 }
 
 interface SignMsgRespWithStatus {
@@ -310,8 +312,25 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  logger.debug({ signer: service.url }, `Requesting partial sig`)
-  const url = service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT
+  const signerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest)
+  signerCircuitBreaker.fallback(() =>
+    parametrizedSignatureRequest(service.fallbackUrl, request, controller, logger)
+  )
+  signerCircuitBreaker.on('fallback', () =>
+    logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
+  )
+
+  return signerCircuitBreaker.fire(service.url, request, controller, logger)
+}
+
+function parametrizedSignatureRequest(
+  baseUrl: string,
+  request: Request,
+  controller: AbortController,
+  logger: Logger
+): Promise<FetchResponse> {
+  logger.debug({ signer: baseUrl }, `Requesting partial sig`)
+  const url = baseUrl + PARTIAL_SIGN_MESSAGE_ENDPOINT
   return fetch(url, {
     method: 'POST',
     headers: {
