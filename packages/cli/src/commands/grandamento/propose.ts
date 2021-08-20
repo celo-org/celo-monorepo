@@ -59,7 +59,11 @@ export default class Propose extends BaseCommand {
         this.kit.celoTokens.getContract(stableToken),
         sellAmount,
         sellCelo
-      )
+      ),
+      undefined,
+      'ExchangeProposalCreated'
     )
+
+    // console.log(`ExchangeProposal: ${proposalID}`)
   }
 }

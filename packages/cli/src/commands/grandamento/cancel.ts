@@ -31,8 +31,8 @@ export default class Cancel extends BaseCommand {
     await displaySendTx(
       'cancelExchangeProposal',
       await grandaMento.cancelExchangeProposal(proposalID),
-      {},
-      'ProposalCancelled'
+      undefined,
+      'ExchangeProposalCancelled'
     )
   }
 }

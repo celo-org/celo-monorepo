@@ -19,7 +19,7 @@ export default class List extends BaseCommand {
 
     console.log('Active proposals:')
 
-    const proposalsDetails = proposals.map((id) => grandaMento.getExchangeProposal(id))
+    const proposalsDetails = proposals.map((id) => grandaMento.getHumanRedableExchangeProposal(id))
 
     const res = await Promise.all(proposalsDetails)
 
