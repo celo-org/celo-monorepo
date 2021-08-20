@@ -551,6 +551,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     let transferSigner
 
     const doTransfer = async () => {
+      //This function is defined in '@celo/protocol/lib/meta-tx-utils', need to be able to pass in refund params
       const { v, r, s } = await getSignatureForMetaTransaction(transferSigner, wallet.address, {
         value,
         destination,
@@ -635,9 +636,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     const value = 0
     const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
     const data = '0x'
-    const maxGasPrice = 5
-    const gasLimit = 1000000000000
-    const metaGasLimit = 100000
+    const maxGasPrice = 20
+    const gasLimit = 10000000000000
+    const metaGasLimit = 1000000
     let submitter
     let submitterBalance
     let nonce
@@ -697,7 +698,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
 
           describe('re-entrancy attempt', () => {
-            it('should revert on re-entrancy attempt', async () => {
+            it('should emit MetaTransactionWithRefundExecution with success set to false', async () => {
               const { v: _v, r: _r, s: _s } = await getSignatureForMetaTransactionWithRefund(
                 transferSigner,
                 wallet.address,
@@ -756,14 +757,28 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 }
               )
 
-              console.log(res)
+              let _returnData = res.receipt.logs[0].args.returnData
+
+              assertLogMatches2(res.logs[0], {
+                event: 'MetaTransactionWithRefundExecution',
+                args: {
+                  destination: wallet.address,
+                  value,
+                  data: innerData,
+                  nonce: 0,
+                  maxGasPrice,
+                  gasLimit,
+                  metaGasLimit,
+                  returnData: _returnData,
+                  success: false,
+                },
+              })
             })
           })
 
           describe('when not a re-entrancy attempt', () => {
             beforeEach(async () => {
               submitterBalance = await web3.eth.getBalance(submitter)
-              console.log(submitterBalance)
               res = await doTransfer()
             })
 
@@ -773,7 +788,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
             it('should refund sender', async () => {
               //maybe check a range since it won't be exact, like within 1%
-              console.log(res)
               console.log(await web3.eth.getBalance(submitter))
               //assert.equal(await web3.eth.getBalance(submitter), submitterBalance)
             })
