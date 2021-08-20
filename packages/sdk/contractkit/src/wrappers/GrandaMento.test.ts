@@ -28,16 +28,21 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
     stableToken = await kit.contracts.getStableToken(StableToken.cUSD)
     celoToken = await kit.contracts.getGoldToken()
+    // Reset limits
+    await assumeOwnership(web3, accounts[0])
+    const zero = new BigNumber(0)
+    await setLimits('StableToken', zero, zero)
+    await setLimits('StableTokenEUR', zero, zero)
   })
 
-  const increaseLimits = async () => {
-    await (
-      await grandaMento.setStableTokenExchangeLimits(
-        'StableToken',
-        newLimitMin.toString(),
-        newLimitMax.toString()
-      )
-    ).sendAndWaitForReceipt()
+  const setLimits = async (
+    registryId: string = 'StableToken',
+    min: BigNumber = newLimitMin,
+    max: BigNumber = newLimitMax
+  ) => {
+    await grandaMento
+      .setStableTokenExchangeLimits(registryId, min.toString(), max.toString())
+      .sendAndWaitForReceipt()
   }
 
   describe('No limits sets', () => {
@@ -59,8 +64,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   describe('When Granda Mento is enabled', () => {
     beforeEach(async () => {
-      await assumeOwnership(web3, accounts[0])
-      await increaseLimits()
+      await setLimits()
     })
 
     it('updated the config', async () => {
