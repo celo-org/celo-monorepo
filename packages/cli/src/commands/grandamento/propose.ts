@@ -24,9 +24,11 @@ export default class Propose extends BaseCommand {
       description: 'Name of the stable to receive or send',
       default: 'cUSD',
     }),
-    sellCelo: flags.boolean({
+    sellCelo: flags.enum({
+      options: ['true', 'false'],
       required: true,
       description: 'Sell or buy CELO',
+      exclusive: ['buyCelo'],
     }),
   }
 
@@ -38,7 +40,7 @@ export default class Propose extends BaseCommand {
     const signer = res.flags.from
     const sellAmount = res.flags.value
     const stableToken = stableTokenOptions[res.flags.stableToken]
-    const sellCelo = res.flags.sellCelo
+    const sellCelo = res.flags.sellCelo === 'true'
 
     this.kit.defaultAccount = signer
 
@@ -52,7 +54,7 @@ export default class Propose extends BaseCommand {
     )
 
     await displaySendTx(
-      'propose',
+      'createExchangeProposal',
       await grandaMento.createExchangeProposal(
         this.kit.celoTokens.getContract(stableToken),
         sellAmount,

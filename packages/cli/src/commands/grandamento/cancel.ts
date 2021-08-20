@@ -29,7 +29,7 @@ export default class Cancel extends BaseCommand {
     await newCheckBuilder(this).grandaMentoProposalExists(proposalID)
 
     await displaySendTx(
-      'cancel',
+      'cancelExchangeProposal',
       await grandaMento.cancelExchangeProposal(proposalID),
       {},
       'ProposalCancelled'
