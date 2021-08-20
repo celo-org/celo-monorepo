@@ -1,5 +1,6 @@
 import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
 import {
+  AbiCoder,
   ABIDefinition,
   CeloTransactionObject,
   CeloTxObject,
@@ -8,7 +9,7 @@ import {
   getAbiTypes,
   parseDecodedParams,
 } from '@celo/connect'
-import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
+import { CeloContract, ContractKit, RegisteredContracts, RegistryABI } from '@celo/contractkit'
 import { stripProxy, suffixProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 // tslint:disable: ordered-imports
@@ -25,13 +26,14 @@ import {
   Proposal,
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
-import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
+import { AddressOverride, BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
+import { REGISTRY_CONTRACT_ADDRESS } from '../../contractkit/lib/address-registry'
 
 const debug = debugFactory('governance:proposals')
 
@@ -69,9 +71,6 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
-const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
-  tx.contract === 'Governance' && tx.function === 'setConstitution'
-
 const registryRepointArgs = (tx: ProposalTransactionJSON) => {
   if (!isRegistryRepoint(tx)) {
     throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
@@ -81,6 +80,24 @@ const registryRepointArgs = (tx: ProposalTransactionJSON) => {
     address: tx.args[1] as string,
   }
 }
+
+const isRegistryRepointRaw = (tx: ProposalTransaction) =>
+  tx.to === REGISTRY_CONTRACT_ADDRESS && trimLeading0x(tx.input).startsWith('c5865793')
+
+const registryRepointRawArgs = (abiCoder: AbiCoder, tx: ProposalTransaction) => {
+  if (!isRegistryRepointRaw(tx)) {
+    throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
+  }
+  const setAddressAbi = RegistryABI.find((item) => item.name === 'setAddressFor')!
+  const params = abiCoder.decodeParameters(setAddressAbi.inputs!, trimLeading0x(tx.input).slice(8))
+  return {
+    name: params.identifier as CeloContract,
+    address: params.addr,
+  }
+}
+
+const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Governance' && tx.function === 'setConstitution'
 
 const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
   tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
@@ -95,7 +112,14 @@ const isProxySetFunction = (tx: ProposalTransactionJSON) =>
  * @returns The JSON encoding of the proposal.
  */
 export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
-  const contractDetails = await obtainKitContractDetails(kit)
+  let addressOverride: AddressOverride = {}
+  proposal.forEach((tx) => {
+    if (isRegistryRepointRaw(tx)) {
+      const params = registryRepointRawArgs(kit.connection.getAbiCoder(), tx)
+      addressOverride[params.name] = params.address
+    }
+  })
+  const contractDetails = await obtainKitContractDetails(kit, addressOverride)
   const blockExplorer = new BlockExplorer(kit, contractDetails)
 
   const proposalJson: ProposalTransactionJSON[] = []
@@ -243,6 +267,12 @@ export class ProposalBuilder {
     this.getRegistryAddition(contract) !== undefined
 
   fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
+    if (isRegistryRepoint(tx)) {
+      // Update canonical registry addresses
+      const args = registryRepointArgs(tx)
+      this.setRegistryAddition(args.name, args.address)
+    }
+
     // handle sending value to unregistered contracts
     if (!this.isRegistered(tx.contract)) {
       if (!isValidAddress(tx.contract)) {
@@ -261,14 +291,7 @@ export class ProposalBuilder {
     const address =
       this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
 
-    if (isRegistryRepoint(tx)) {
-      // Update canonical registry addresses
-      const args = registryRepointArgs(tx)
-      this.setRegistryAddition(args.name, args.address)
-    } else if (
-      tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
-      Array.isArray(tx.args[1])
-    ) {
+    if (tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name && Array.isArray(tx.args[1])) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.connection
         .getAbiCoder()

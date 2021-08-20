@@ -7,7 +7,7 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:registry')
 
 // Registry contract is always predeployed to this address
-const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
+export const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
 /**
  * Celo Core Contract's Address Registry

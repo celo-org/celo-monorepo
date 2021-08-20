@@ -21,9 +21,13 @@ export const getContractDetailsFromContract = async (
   }
 }
 
-export async function obtainKitContractDetails(kit: ContractKit): Promise<ContractDetails[]> {
+export type AddressOverride = { [key in CeloContract]?: string }
+export async function obtainKitContractDetails(
+  kit: ContractKit,
+  addressOverride: AddressOverride = {}
+): Promise<ContractDetails[]> {
   return concurrentMap(5, RegisteredContracts, (celoContract) =>
-    getContractDetailsFromContract(kit, celoContract)
+    getContractDetailsFromContract(kit, celoContract, addressOverride[celoContract])
   )
 }
 
