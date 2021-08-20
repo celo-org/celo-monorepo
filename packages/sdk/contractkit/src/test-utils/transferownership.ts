@@ -8,7 +8,7 @@ import { Proposal, ProposalTransaction } from '../wrappers/Governance'
 
 const expConfigGovernance = NetworkConfig.governance
 
-export async function assumeOwnership(web3: Web3, to: string, proposalId: number = 1) {
+export async function assumeOwnership(web3: Web3, to: string) {
   const kit = newKitFromWeb3(web3)
   const ONE_CGLD = web3.utils.toWei('1', 'ether')
   const accounts = await web3.eth.getAccounts()
@@ -38,10 +38,11 @@ export async function assumeOwnership(web3: Web3, to: string, proposalId: number
   }
   const proposal: Proposal = [ownershiptx]
 
-  await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
+  const proposalReceipt = await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
     from: accounts[0],
     value: (await governance.getConfig()).minDeposit.toNumber(),
   })
+  const proposalId = proposalReceipt.events!.ProposalQueued.returnValues.proposalId
 
   const tx = await governance.upvote(proposalId, accounts[1])
   await tx.sendAndWaitForReceipt()
