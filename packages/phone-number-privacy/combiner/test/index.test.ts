@@ -118,7 +118,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
       fetchMock.mockImplementation((url) => {
         const primaryUrl =
           JSON.parse(config.odisServices.signers)[0].url + '/getBlindedMessagePartialSig'
-        console.log(url, primaryUrl)
         numberOfCalls += 1
         if (url === primaryUrl) {
           return Promise.reject()
