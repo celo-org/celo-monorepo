@@ -8,7 +8,7 @@ import { enumEntriesDupWithLowercase } from '../../utils/helpers'
 
 const stableTokenOptions = enumEntriesDupWithLowercase(Object.entries(StableToken))
 
-export default class Propse extends BaseCommand {
+export default class Propose extends BaseCommand {
   static description = 'Proposes a Granda Mento exchange'
 
   static flags = {
@@ -34,7 +34,7 @@ export default class Propse extends BaseCommand {
     const celoToken = await this.kit.contracts.getGoldToken()
     const grandaMento = await this.kit.contracts.getGrandaMento()
 
-    const res = this.parse(Propse)
+    const res = this.parse(Propose)
     const signer = res.flags.from
     const sellAmount = res.flags.value
     const stableToken = stableTokenOptions[res.flags.stableToken]
@@ -44,7 +44,7 @@ export default class Propse extends BaseCommand {
 
     const tokenToSell = sellCelo ? celoToken : await this.kit.contracts.getStableToken(stableToken)
 
-    await newCheckBuilder(this, signer).hasEnoughErc20(signer, sellAmount, celoToken.address)
+    await newCheckBuilder(this, signer).hasEnoughErc20(signer, sellAmount, tokenToSell.address)
 
     await displaySendTx(
       'increaseAllowance',

@@ -10,7 +10,6 @@ export default class Show extends BaseCommand {
     ...BaseCommand.flags,
     proposalID: flags.string({
       required: true,
-      exclusive: ['account', 'hotfix'],
       description: 'UUID of proposal to view',
     }),
   }
