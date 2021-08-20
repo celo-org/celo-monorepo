@@ -1,7 +1,7 @@
 import { isVerified } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
-import { VERSION } from '../src/config'
+import config, { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
@@ -110,6 +110,28 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
 
     it('provides signature', (done) => {
       getBlindedMessageSig(req, validResponseExpected(done, 200))
+    })
+
+    it('provides signature from a fallback', (done) => {
+      let numberOfCalls = 0
+      fetchMock.mockClear()
+      fetchMock.mockImplementation((url) => {
+        const primaryUrl =
+          JSON.parse(config.odisServices.signers)[0].url + '/getBlindedMessagePartialSig'
+        console.log(url, primaryUrl)
+        numberOfCalls += 1
+        if (url === primaryUrl) {
+          return Promise.reject()
+        }
+        return Promise.resolve(new FetchResponse(defaultResponseJson))
+      })
+      getBlindedMessageSig(
+        req,
+        validResponseExpected(() => {
+          expect(numberOfCalls).toEqual(2)
+          done()
+        }, 200)
+      )
     })
 
     it('returns 500 on bls error', (done) => {

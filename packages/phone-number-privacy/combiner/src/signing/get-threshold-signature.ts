@@ -16,7 +16,7 @@ import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
-import CircuitBreaker from 'opossum'
+import CircuitBreaker, { Options } from 'opossum'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
@@ -29,7 +29,7 @@ type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface SignerService {
   url: string
-  fallbackUrl: string
+  fallbackUrl?: string
 }
 
 interface SignMsgRespWithStatus {
@@ -312,14 +312,20 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  const signerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest)
-  signerCircuitBreaker.fallback(() =>
-    parametrizedSignatureRequest(service.fallbackUrl, request, controller, logger)
-  )
-  signerCircuitBreaker.on('fallback', () =>
-    logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
-  )
+  const options: Options = {
+    timeout: config.odisServices.timeoutMilliSeconds / 2,
+    resetTimeout: 15,
+  }
 
+  const signerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest, options)
+  if (service.fallbackUrl) {
+    signerCircuitBreaker.fallback(() =>
+      parametrizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
+    )
+    signerCircuitBreaker.on('fallback', () =>
+      logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
+    )
+  }
   return signerCircuitBreaker.fire(service.url, request, controller, logger)
 }
 
