@@ -3,7 +3,7 @@ import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap } from '../../utils/cli'
 
-export default class Propse extends BaseCommand {
+export default class Show extends BaseCommand {
   static description = 'Shows details of a Granda Mento exchange proposal'
 
   static flags = {
@@ -18,7 +18,7 @@ export default class Propse extends BaseCommand {
   async run() {
     const grandaMento = await this.kit.contracts.getGrandaMento()
 
-    const res = this.parse(Propse)
+    const res = this.parse(Show)
     const proposalID = res.flags.proposalID
 
     const proposal = await grandaMento.getExchangeProposal(proposalID)

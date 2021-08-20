@@ -45,7 +45,7 @@ testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
     ])
   })
 
-  describe('cancells', () => {
+  describe('cancell', () => {
     it('left no proposal', async () => {
       await Cancel.run(['--from', accounts[0], '--proposalID', '1'])
       const activeProposals = await grandaMento.getActiveProposalIds()
