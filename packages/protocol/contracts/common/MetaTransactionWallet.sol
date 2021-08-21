@@ -72,7 +72,7 @@ contract MetaTransactionWallet is
     bool success
   );
 
-  event RefundBalanceCheckFailed(address destination, uint256 value, uint256 walletBalance);
+  event StackProtectionCheckFailed(address destination, uint256 value, uint256 walletBalance);
 
   // onlyGuardian functions can only be called when the guardian is not the zero address and
   // the caller is the guardian.
@@ -392,8 +392,10 @@ contract MetaTransactionWallet is
     require(tx.gasprice <= maxGasPrice, "gasprice exceeds limit authorized by signer");
     require(address(this).balance >= gasLimit.mul(tx.gasprice).add(value), "insufficient balance");
     require(msg.sender == tx.origin, "relayer must be EOA");
-    if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
+    //if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
     require(metaGasLimit < gasLimit, "metaGasLimit must be less than gasLimit");
+
+    uint256 CONFIG_GAS_AFTER_REFUND = 8203;
 
     // checking gasCurrency is out of scope, would require pre-compile
     {
@@ -417,14 +419,7 @@ contract MetaTransactionWallet is
     bytes memory returnData;
 
     {
-      // TODO: ask Contracts about a more accurate estimate
-      uint256 gasAfterMTxExecution = 7900; // estimated by emitting gasleft() at desired benchmark times
-
-      if (
-        address(this).balance >=
-        metaGasLimit.add(gasAfterMTxExecution).mul(tx.gasprice).add(value) &&
-        metaGasLimit < (gasleft() * 63) / 64
-      ) {
+      if (metaGasLimit < (gasleft() * 63) / 64) {
         bool success;
         {
           // if value is non-zero, destination.call seems to add 2300 gas to metaGasLimit.
@@ -445,15 +440,12 @@ contract MetaTransactionWallet is
           success
         );
       } else {
-        emit RefundBalanceCheckFailed(destination, value, address(this).balance);
+        emit StackProtectionCheckFailed(destination, value, address(this).balance);
         returnData = "";
       }
     }
 
-    {
-      uint256 gasAfterRefund = 4747; // TODO: determine this constant (gas required for operations after and including msg.sender.transfer)
-      msg.sender.transfer(gasLimit.sub(gasleft()).add(gasAfterRefund).mul(tx.gasprice));
-    }
+    msg.sender.transfer(gasLimit.sub(gasleft()).add(CONFIG_GAS_AFTER_REFUND).mul(tx.gasprice));
 
     return returnData;
   }
