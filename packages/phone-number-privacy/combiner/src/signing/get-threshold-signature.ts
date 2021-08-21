@@ -25,6 +25,8 @@ import { getContractKit } from '../web3/contracts'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 
+const signersCircuitBreaker = new Map<string, CircuitBreaker<any, FetchResponse>>()
+
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface SignerService {
@@ -312,20 +314,27 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  const options: Options = {
-    timeout: config.odisServices.timeoutMilliSeconds / 2,
-    resetTimeout: 15,
+  if (!signersCircuitBreaker.has(service.url)) {
+    const options: Options = {
+      timeout: config.odisServices.timeoutMilliSeconds / 2,
+      resetTimeout: 15,
+    }
+
+    const newSignerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest, options)
+    newSignerCircuitBreaker.on('fallback', () =>
+      logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
+    )
+    signersCircuitBreaker.set(service.url, newSignerCircuitBreaker)
   }
 
-  const signerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest, options)
+  const signerCircuitBreaker = signersCircuitBreaker.get(service.url)!
+
   if (service.fallbackUrl) {
     signerCircuitBreaker.fallback(() =>
       parametrizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
     )
-    signerCircuitBreaker.on('fallback', () =>
-      logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
-    )
   }
+
   return signerCircuitBreaker.fire(service.url, request, controller, logger)
 }
 
