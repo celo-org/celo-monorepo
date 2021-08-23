@@ -51,7 +51,7 @@ export async function getPhoneNumberIdentifier(
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
 
-  let seed: Buffer | undefined = undefined
+  let seed: Buffer | undefined
   if (blindingFactor) {
     seed = Buffer.from(blindingFactor)
   } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
