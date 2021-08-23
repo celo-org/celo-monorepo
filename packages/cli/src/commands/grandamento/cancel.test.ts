@@ -34,10 +34,12 @@ testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
   beforeEach(async () => {
     await assumeOwnership(web3, accounts[0])
     await increaseLimits()
+    // create mock proposal
     await Propose.run([
       '--from',
       accounts[0],
       '--sellCelo',
+      'true',
       '--stableToken',
       'cUSD',
       '--value',
