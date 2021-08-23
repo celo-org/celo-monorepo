@@ -18,6 +18,8 @@ Remember to remove your IP address from the whitelist when finished.
 
 Run the command `yarn config:get:<network>` to fetch the necessary db credentials and add them to `src/config.ts` under the `DEV_MODE` section. DO NOT COMMIT THESE CREDENTIALS TO GITHUB.
 
+Note: When you fill in the `host` field you may need to use the database's public IP, which can be found in the `Overview` section under the link above.
+
 ### Run migrations
 
 Always run migrations in staging first and ensure all e2e tests pass before migrating in alfajores and mainnet.
