@@ -15,7 +15,6 @@
 * [blindedQueryPhoneNumber](_odis_query_.signmessagerequest.md#blindedqueryphonenumber)
 * [hashedPhoneNumber](_odis_query_.signmessagerequest.md#optional-hashedphonenumber)
 * [sessionID](_odis_query_.signmessagerequest.md#optional-sessionid)
-* [timestamp](_odis_query_.signmessagerequest.md#optional-timestamp)
 * [version](_odis_query_.signmessagerequest.md#optional-version)
 
 ## Properties
@@ -52,7 +51,7 @@ ___
 
 • **hashedPhoneNumber**? : *undefined | string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L47)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L46)*
 
 ___
 
@@ -63,14 +62,6 @@ ___
 *Inherited from [PhoneNumberPrivacyRequest](_odis_query_.phonenumberprivacyrequest.md).[sessionID](_odis_query_.phonenumberprivacyrequest.md#optional-sessionid)*
 
 *Defined in [packages/sdk/identity/src/odis/query.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L41)*
-
-___
-
-### `Optional` timestamp
-
-• **timestamp**? : *undefined | number*
-
-*Defined in [packages/sdk/identity/src/odis/query.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L46)*
 
 ___
 
