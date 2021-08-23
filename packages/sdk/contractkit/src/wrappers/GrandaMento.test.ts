@@ -136,7 +136,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
       it('displays human format correctly', async () => {
         const activeProposals = await grandaMento.getActiveProposalIds()
 
-        let proposal = await grandaMento.getHumanRedableExchangeProposal(activeProposals[0])
+        const proposal = await grandaMento.getHumanRedableExchangeProposal(activeProposals[0])
         expect(proposal.exchanger).toEqual(accounts[0])
         expect(proposal.stableToken).toEqual(
           'Celo Dollar (cUSD) at 0x10A736A7b223f1FE1050264249d1aBb975741E75'
