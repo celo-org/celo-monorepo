@@ -19,8 +19,8 @@
   ],
   "dependencies": {
     "@celo/base": "1.1.1",
-    "@celo/contractkit": "1.2.3-dev",
-    "@celo/identity": "1.2.3-dev",
+    "@celo/contractkit": "1.2.0",
+    "@celo/identity": "1.2.0",
     "@celo/utils": "1.0.2",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
