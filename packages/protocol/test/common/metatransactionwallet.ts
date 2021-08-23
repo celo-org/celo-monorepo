@@ -637,14 +637,15 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
     const data = '0x'
     const maxGasPrice = 20
-    const gasLimit = 10000000
-    const metaGasLimit = 100000
+    const gasLimit = 100000000
+    const metaGasLimit = 10000
     let submitter
     let nonce
     let transferSigner
 
     const doTransferWithRefund = async () => {
       //This function is defined in '@celo/protocol/lib/meta-tx-utils', need to be able to pass in refund params
+
       const { v, r, s } = await getSignatureForMetaTransactionWithRefund(
         transferSigner,
         wallet.address,
@@ -656,6 +657,22 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           maxGasPrice,
           gasLimit,
           metaGasLimit,
+        }
+      )
+
+      let gasEstimate = await wallet.executeMetaTransactionWithRefund.estimateGas(
+        destination,
+        value,
+        data,
+        maxGasPrice,
+        gasLimit,
+        metaGasLimit,
+        v,
+        r,
+        s,
+        {
+          from: submitter,
+          gasPrice: 1,
         }
       )
 
@@ -672,7 +689,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         {
           from: submitter,
           gasPrice: 1,
-          gas: gasLimit,
+          gas: gasEstimate,
         }
       )
     }
@@ -789,7 +806,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
               // res = await doTransferWithRefund()
             })
 
-            it('should execute the transaction', async () => {
+            it('should execute meta-transactions', async () => {
               await doTransferWithRefund()
               assert.equal(await web3.eth.getBalance(destination), value)
             })
@@ -817,72 +834,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
               })
             })
 
-            // it('should execute meta-transaction correctly', async () => {
-            //   let recipient = accounts[3]
-
-            //   console.log(await web3.eth.getBalance(submitter))
-            //   console.log(await web3.eth.getBalance(recipient))
-            //   console.log(await web3.eth.getBalance(wallet.address))
-
-            //   const { v: _v, r: _r, s: _s } = await getSignatureForMetaTransaction(
-            //     transferSigner,
-            //     wallet.address,
-            //     {
-            //       destination: recipient,
-            //       value: 0,
-            //       data: '0x',
-            //       nonce: 1
-            //     }
-            //   )
-
-            //   // @ts-ignore
-            //   let innerData = wallet.contract.methods.executeMetaTransaction(recipient, 100, '0x', _v, _r, _s).encodeABI()
-
-            //   const { v, r, s } = await getSignatureForMetaTransactionWithRefund(
-            //     transferSigner,
-            //     wallet.address,
-            //     {
-            //       destination,
-            //       value: 0,
-            //       data: innerData,
-            //       nonce: 0,
-            //       maxGasPrice,
-            //       gasLimit,
-            //       metaGasLimit,
-            //     }
-            //   )
-
-            //   let res = await wallet.executeMetaTransactionWithRefund(
-            //     destination,
-            //     0,
-            //     innerData,
-            //     maxGasPrice,
-            //     gasLimit,
-            //     metaGasLimit,
-            //     v,
-            //     r,
-            //     s,
-            //     {
-            //       from: submitter,
-            //       gasPrice: 1,
-            //       gas: gasLimit
-            //     }
-            //   )
-
-            //   console.log(res.receipt.logs)
-
-            //   console.log(await web3.eth.getBalance(submitter))
-            //   console.log(await web3.eth.getBalance(recipient))
-            //   console.log(await web3.eth.getBalance(wallet.address))
-
-            // })
-
             it('should refund sender', async () => {
-              //maybe check a range since it won't be exact, like within 1%
               let submitterBalanceBefore = await web3.eth.getBalance(submitter)
-
               res = await doTransferWithRefund()
-
               let submitterBalanceAfter = await web3.eth.getBalance(submitter)
 
               assert.equal(submitterBalanceAfter == submitterBalanceBefore, true)
