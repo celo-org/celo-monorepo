@@ -21,7 +21,13 @@
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test\/end-to-end",
     "test:e2e": "jest test/end-to-end --verbose",
-    "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts"
+    "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net yarn test:e2e",
+    "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net yarn test:e2e",
+    "db:migrate": "NODE_ENV=dev FIREBASE_CONFIG=./firebase.json ts-node ./scripts/run-migrations.ts",
+    "db:migrate:staging": "GCLOUD_PROJECT=celo-phone-number-privacy-stg yarn db:migrate",
+    "db:migrate:alfajores": "GCLOUD_PROJECT=celo-phone-number-privacy yarn db:migrate",
+    "db:migrate:mainnet": "GCLOUD_PROJECT=celo-pgpnp-mainnet yarn db:migrate",
+    "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
     "@celo/contractkit": "1.2.0",
