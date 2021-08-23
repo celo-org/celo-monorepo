@@ -23,3 +23,5 @@ Run the command `yarn config:get:<network>` to fetch the necessary db credential
 Always run migrations in staging first and ensure all e2e tests pass before migrating in alfajores and mainnet.
 
 Run `yarn db:migrate:<network>`
+
+TODO: Figure out how to make migrations run automatically on deployment
