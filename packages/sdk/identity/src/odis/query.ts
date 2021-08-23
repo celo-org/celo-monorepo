@@ -50,6 +50,7 @@ export interface MatchmakingRequest extends PhoneNumberPrivacyRequest {
   userPhoneNumber: string
   contactPhoneNumbers: string[]
   hashedPhoneNumber: string
+  signedUserPhoneNumber?: string
 }
 
 export interface SignMessageResponse {
@@ -105,6 +106,18 @@ export function getServiceContext(contextName = 'mainnet') {
   }
 }
 
+export function signWithDEK(message: string, signer: EncryptionKeySigner) {
+  // Sign
+  const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
+  const sig = JSON.stringify(key.sign(message).toDER())
+  // Verify
+  const dek = key.getPublic(true, 'hex')
+  const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
+  const validSignature: boolean = pubkey.verify(message, JSON.parse(sig))
+  debug(`Signature is valid: ${validSignature} signed by ${dek}`)
+  return sig
+}
+
 /**
  * Make a request to lookup the phone number identifier or perform matchmaking
  * @param signer type of key to sign with
@@ -125,14 +138,7 @@ export async function queryOdis<ResponseType>(
 
   let authHeader = ''
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
-    authHeader = JSON.stringify(key.sign(bodyString).toDER())
-
-    // Verify signature before sending
-    const dek = key.getPublic(true, 'hex')
-    const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
-    const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
-    debug(`Signature is valid: ${validSignature} signed by ${dek}`)
+    authHeader = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     authHeader = await signer.contractKit.connection.sign(bodyString, body.account)
   } else {
