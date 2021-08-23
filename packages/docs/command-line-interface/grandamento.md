@@ -56,7 +56,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --sellCelo                                         (required) Sell or buy CELO
+  --sellCelo=(true|false)                            (required) Sell or buy CELO
 
   --stableToken=(cUSD|cusd|cEUR|ceur)                (required) [default: cUSD] Name of
                                                      the stable to receive or send
