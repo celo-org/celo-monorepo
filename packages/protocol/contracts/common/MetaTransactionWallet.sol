@@ -376,9 +376,9 @@ contract MetaTransactionWallet is
     returns (uint256)
   {
     uint256 CONFIG_GAS_AFTER_REFUND = 32441;
-    // uint256 gasUsedSoFar = startGas.sub(gasLeft);
-    // uint256 totalGasUsed = gasUsedSoFar.add(CONFIG_GAS_AFTER_REFUND);
-    // uint256 gasRefund = totalGasUsed.mul(gasPrice);
+    // gasUsedSoFar = startGas.sub(gasLeft);
+    // totalGasUsed = gasUsedSoFar.add(CONFIG_GAS_AFTER_REFUND);
+    // gasRefund = totalGasUsed.mul(gasPrice);
 
     return startGas.sub(gasLeft).add(CONFIG_GAS_AFTER_REFUND).mul(gasPrice);
   }

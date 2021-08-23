@@ -794,7 +794,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
             })
           })
 
-          describe.only('when not a re-entrancy attempt', () => {
+          describe('when not a re-entrancy attempt', () => {
             beforeEach(async () => {
               // submitterBalance = await web3.eth.getBalance(submitter)
               await web3.eth.sendTransaction({
@@ -839,7 +839,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
               res = await doTransferWithRefund()
               let submitterBalanceAfter = await web3.eth.getBalance(submitter)
 
-              assert.equal(submitterBalanceAfter == submitterBalanceBefore, true)
+              assert.equal(submitterBalanceAfter, submitterBalanceBefore)
             })
           })
         })
