@@ -84,7 +84,7 @@ You can view an example of this call in [our mobile project here](https://github
 
 ### Requerying identifiers
 
-When querying phone number identifiers it is recommended that you either provide a deterministic custom blindingFactor parameter or authenticate with the user's DEK. Doing so will allow users to requery identifiers they have queried before without using quota in cases where locally stored identifiers are lost by the client. When no blindingFactor is provided, the user's DEK is used as a deterministic blindingFactor by default. If the user's DEK is also not provided, a random blindingFactor is used. Reqeurying identifiers with a new blindingFactor will consume quota. Note that this may not yet be reflected in the example above.
+When querying phone number identifiers it is recommended that you either provide a deterministic custom `blindingFactor` parameter or authenticate with the user's DEK. Doing so will allow users to requery identifiers they have queried before without using quota. This is useful if the user loses their phone or other record of queried identifiers. When no `blindingFactor` is provided, the user's DEK is used as a deterministic `blindingFactor` by default. If the user's DEK is also not provided, a random `blindingFactor` is used. Reqeurying identifiers with a new `blindingFactor` will consume quota. Note that this may not yet be reflected in the example above.
 
 ## Matchmaking
 
@@ -96,4 +96,4 @@ You can view an example of this call in [our mobile project here](https://github
 
 ### Requerying matches
 
-When querying matches it is highly recommended that you provide the user's DEK signature over their phone number as the optional signedUserPhoneNumber parameter. Doing so will allow users to requery matches so long as they are querying for the same phone number as before. User's cannot query matches for two different phone numbers, and requerying for the same number will fail until signedUserPhoneNumber is provided.
+When querying matches it is highly recommended that you provide the user's DEK via either the `signer` or `dekSigner` parameters. Doing so will add a `signedUserPhoneNumber` field to the request, which ODIS will use to remember the user's number without compromising privacy. This allows users to requery matches so long as they are querying for the same phone number as before. Users cannot query matches for two different phone numbers, and requerying for the same number will fail until `signedUserPhoneNumber` is provided. Note that this may not yet be reflected in the example above.

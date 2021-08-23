@@ -34,7 +34,7 @@ describe('Running against a deployed service', () => {
     ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
   })
 
-  it('Returns error when querying fails with an unauthenticated request', async () => {
+  it('Returns error when querying with an unauthenticated request', async () => {
     await expect(
       OdisUtils.Matchmaking.getContactMatches(
         PHONE_NUMBER,
@@ -47,7 +47,7 @@ describe('Running against a deployed service', () => {
     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
   })
 
-  it('Returns error when querying fails with an unverified account', async () => {
+  it('Returns error when querying with an unverified account', async () => {
     await expect(
       OdisUtils.Matchmaking.getContactMatches(
         PHONE_NUMBER,
@@ -61,7 +61,7 @@ describe('Running against a deployed service', () => {
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
 
-  it('Returns error when querying fails with an invalid signedUserPhoneNumber', async () => {
+  it('Returns error when querying with invalid DEK', async () => {
     await expect(
       OdisUtils.Matchmaking.getContactMatches(
         E2E_TEST_PHONE_NUMBERS_RAW[0],
@@ -75,65 +75,71 @@ describe('Running against a deployed service', () => {
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
 
-  it('Returns error when requerying fails without signedUserPhoneNumber', async () => {
-    await expect(
-      OdisUtils.Matchmaking.getContactMatches(
-        E2E_TEST_PHONE_NUMBERS_RAW[0],
-        CONTACT_PHONE_NUMBERS,
-        E2E_TEST_ACCOUNTS[0],
-        PHONE_HASH_IDENTIFIER,
-        walletAuthSigner,
-        SERVICE_CONTEXT
-      )
-    ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
-  })
+  describe('When requerying matches', () => {
+    beforeAll(async () => {
+      // set DEK
+      const accounts = await contractKit.contracts.getAccounts()
+      await accounts
+        .setAccountDataEncryptionKey(ensureLeading0x(deks[0].publicKey))
+        .sendAndWaitForReceipt()
+    })
 
-  it('Returns success when requerying with same phone number', async () => {
-    const accounts = await contractKit.contracts.getAccounts()
-    await accounts
-      .setAccountDataEncryptionKey(ensureLeading0x(deks[0].publicKey))
-      .sendAndWaitForReceipt()
+    it('Returns success when requerying with same phone number and valid DEK', async () => {
+      await expect(
+        OdisUtils.Matchmaking.getContactMatches(
+          E2E_TEST_PHONE_NUMBERS_RAW[0],
+          CONTACT_PHONE_NUMBERS,
+          E2E_TEST_ACCOUNTS[0],
+          PHONE_HASH_IDENTIFIER,
+          dekAuthSigner(0),
+          SERVICE_CONTEXT
+        )
+      ).resolves.toBeInstanceOf(Array)
+    })
 
-    await expect(
-      OdisUtils.Matchmaking.getContactMatches(
-        E2E_TEST_PHONE_NUMBERS_RAW[0],
-        CONTACT_PHONE_NUMBERS,
-        E2E_TEST_ACCOUNTS[0],
-        PHONE_HASH_IDENTIFIER,
-        dekAuthSigner(0),
-        SERVICE_CONTEXT
-      )
-    ).resolves.toBeInstanceOf(Array)
-  })
+    it('Returns error when requerying with same phone number and no DEK', async () => {
+      await expect(
+        OdisUtils.Matchmaking.getContactMatches(
+          E2E_TEST_PHONE_NUMBERS_RAW[0],
+          CONTACT_PHONE_NUMBERS,
+          E2E_TEST_ACCOUNTS[0],
+          PHONE_HASH_IDENTIFIER,
+          walletAuthSigner,
+          SERVICE_CONTEXT
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
+    })
 
-  it('Returns error when requerying matches with different phone number', async () => {
-    await expect(
-      OdisUtils.Matchmaking.getContactMatches(
-        E2E_TEST_PHONE_NUMBERS_RAW[1],
-        CONTACT_PHONE_NUMBERS,
-        E2E_TEST_ACCOUNTS[0],
-        PHONE_HASH_IDENTIFIER,
-        dekAuthSigner(0),
-        SERVICE_CONTEXT
-      )
-    ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
-  })
+    it('Returns error when requerying with different phone number and valid DEK', async () => {
+      await expect(
+        OdisUtils.Matchmaking.getContactMatches(
+          E2E_TEST_PHONE_NUMBERS_RAW[1],
+          CONTACT_PHONE_NUMBERS,
+          E2E_TEST_ACCOUNTS[0],
+          PHONE_HASH_IDENTIFIER,
+          dekAuthSigner(0),
+          SERVICE_CONTEXT
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
+    })
 
-  it('Returns success when requerying matches with same phone number after key rotation', async () => {
-    const accounts = await contractKit.contracts.getAccounts()
-    await accounts
-      .setAccountDataEncryptionKey(ensureLeading0x(deks[1].publicKey))
-      .sendAndWaitForReceipt()
+    it('Returns success when requerying with same phone number and valid DEK after key rotation', async () => {
+      // Key rotation
+      const accounts = await contractKit.contracts.getAccounts()
+      await accounts
+        .setAccountDataEncryptionKey(ensureLeading0x(deks[1].publicKey))
+        .sendAndWaitForReceipt()
 
-    await expect(
-      OdisUtils.Matchmaking.getContactMatches(
-        E2E_TEST_PHONE_NUMBERS_RAW[0],
-        CONTACT_PHONE_NUMBERS,
-        E2E_TEST_ACCOUNTS[0],
-        PHONE_HASH_IDENTIFIER,
-        dekAuthSigner(1),
-        SERVICE_CONTEXT
-      )
-    ).resolves.toBeInstanceOf(Array)
+      await expect(
+        OdisUtils.Matchmaking.getContactMatches(
+          E2E_TEST_PHONE_NUMBERS_RAW[0],
+          CONTACT_PHONE_NUMBERS,
+          E2E_TEST_ACCOUNTS[0],
+          PHONE_HASH_IDENTIFIER,
+          dekAuthSigner(1),
+          SERVICE_CONTEXT
+        )
+      ).resolves.toBeInstanceOf(Array)
+    })
   })
 })
