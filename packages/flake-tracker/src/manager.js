@@ -11,6 +11,7 @@ class FlakeManager {
       )
     }
     this.github = github
+    this.setup = true
   }
 
   // Called at the beginning of each test suite
@@ -31,6 +32,7 @@ class FlakeManager {
       }
       return new FlakeManager(github)
     } catch (error) {
+      this.setup = false
       console.log('Flake tracker setup failed')
       console.log(error)
     }
@@ -38,6 +40,7 @@ class FlakeManager {
 
   // Called at the end of each test suite
   async finish() {
+    if (!this.setup) return
     try {
       const flakes = db.readNewFlakes()
       let skippedTests = []
