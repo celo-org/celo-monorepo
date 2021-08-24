@@ -15,30 +15,47 @@ class FlakeManager {
 
   // Called at the beginning of each test suite
   static async build() {
-    db.init()
-    let github
-    if (shouldUseGitHub) {
-      github = await GitHub.build()
-      if (shouldSkipKnownFlakes) {
-        db.writeKnownFlakes(await github.fetchKnownFlakesToSkip())
+    try {
+      db.init()
+      let github
+      if (shouldUseGitHub) {
+        github = await GitHub.build()
+        if (shouldSkipKnownFlakes) {
+          db.writeKnownFlakes(
+            await github.fetchKnownFlakesToSkip().catch(() => {
+              console.log('failed to fetch list of known flakey tests')
+              return []
+            })
+          )
+        }
       }
+      return new FlakeManager(github)
+    } catch (error) {
+      console.log('Flake tracker setup failed')
+      console.log(error)
     }
-    return new FlakeManager(github)
   }
 
   // Called at the end of each test suite
   async finish() {
-    const flakes = db.readNewFlakes()
-    let skippedTests = []
-    if (shouldUseGitHub) {
-      let obsoleteIssues = []
-      if (shouldSkipKnownFlakes) {
-        skippedTests = db.readSkippedFlakes()
-        obsoleteIssues = calcObsoleteFlakeIssues(skippedTests, db.readKnownFlakes())
+    try {
+      const flakes = db.readNewFlakes()
+      let skippedTests = []
+      if (shouldUseGitHub) {
+        let obsoleteIssues = []
+        if (shouldSkipKnownFlakes) {
+          skippedTests = db.readSkippedFlakes()
+          obsoleteIssues = calcObsoleteFlakeIssues(skippedTests, db.readKnownFlakes())
+        }
+        await this.github.report(flakes, skippedTests, obsoleteIssues).catch(() => {
+          console.log('failed to report flake tracker results')
+        })
       }
-      await this.github.report(flakes, skippedTests, obsoleteIssues)
+      console.log(fmtSummary(flakes, skippedTests, 3))
+    } catch (error) {
+      console.log('Flake tracker teardown failed')
+      console.log(error)
     }
-    console.log(fmtSummary(flakes, skippedTests, 3))
   }
 }
 
