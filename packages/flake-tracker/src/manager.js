@@ -4,14 +4,16 @@ const GitHub = require('./github')
 const { fmtSummary, calcObsoleteFlakeIssues } = require('./utils')
 
 class FlakeManager {
-  constructor(github) {
+  constructor(github, setup) {
+    this.setup = setup
+    if (!setup) return
+
     if (github === undefined && shouldUseGitHub) {
       throw new Error(
         'FlakeManager constructor should not be called directly. Please use FlakeManager.build()'
       )
     }
     this.github = github
-    this.setup = true
   }
 
   // Called at the beginning of each test suite
@@ -30,11 +32,11 @@ class FlakeManager {
           )
         }
       }
-      return new FlakeManager(github)
+      return new FlakeManager(github, true)
     } catch (error) {
-      this.setup = false
       console.log('Flake tracker setup failed')
       console.log(error)
+      return new FlakeManager(undefined, false)
     }
   }
 
