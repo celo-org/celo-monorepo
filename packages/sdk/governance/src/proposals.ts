@@ -77,6 +77,9 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Governance' && tx.function === 'setConstitution'
+
 const registryRepointArgs = (tx: ProposalTransactionJSON) => {
   if (!isRegistryRepoint(tx)) {
     throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
@@ -103,9 +106,6 @@ const registryRepointRawArgs = (abiCoder: AbiCoder, tx: ProposalTransaction) => 
     address: params.addr,
   }
 }
-
-const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
-  tx.contract === 'Governance' && tx.function === 'setConstitution'
 
 const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
   tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
