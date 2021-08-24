@@ -6,10 +6,16 @@ import {
   CeloTxObject,
   CeloTxPending,
   Contract,
-  getAbiTypes,
+  getAbiByName,
   parseDecodedParams,
 } from '@celo/connect'
-import { CeloContract, ContractKit, RegisteredContracts, RegistryABI } from '@celo/contractkit'
+import {
+  CeloContract,
+  ContractKit,
+  RegisteredContracts,
+  RegistryABI,
+  REGISTRY_CONTRACT_ADDRESS,
+} from '@celo/contractkit'
 import { stripProxy, suffixProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 // tslint:disable: ordered-imports
@@ -26,23 +32,23 @@ import {
   Proposal,
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
-import { AddressOverride, BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
+import { newBlockExplorer } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
-import { REGISTRY_CONTRACT_ADDRESS } from '../../contractkit/lib/address-registry'
 
 const debug = debugFactory('governance:proposals')
 
-export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
+export const hotfixExecuteAbi = getAbiByName(GovernanceABI, 'executeHotfix')
 
 export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  kit.connection
-    .getAbiCoder()
-    .encodeParameters(HOTFIX_PARAM_ABI_TYPES, hotfixToParams(proposal, salt))
+  kit.connection.getAbiCoder().encodeParameters(
+    hotfixExecuteAbi.inputs!.map((input) => input.type),
+    hotfixToParams(proposal, salt)
+  )
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
   keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer
@@ -81,14 +87,16 @@ const registryRepointArgs = (tx: ProposalTransactionJSON) => {
   }
 }
 
-const isRegistryRepointRaw = (tx: ProposalTransaction) =>
-  tx.to === REGISTRY_CONTRACT_ADDRESS && trimLeading0x(tx.input).startsWith('c5865793')
+const setAddressAbi = getAbiByName(RegistryABI, 'setAddressFor')
+
+const isRegistryRepointRaw = (abiCoder: AbiCoder, tx: ProposalTransaction) =>
+  tx.to === REGISTRY_CONTRACT_ADDRESS &&
+  tx.input.startsWith(abiCoder.encodeFunctionSignature(setAddressAbi))
 
 const registryRepointRawArgs = (abiCoder: AbiCoder, tx: ProposalTransaction) => {
-  if (!isRegistryRepointRaw(tx)) {
+  if (!isRegistryRepointRaw(abiCoder, tx)) {
     throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
   }
-  const setAddressAbi = RegistryABI.find((item) => item.name === 'setAddressFor')!
   const params = abiCoder.decodeParameters(setAddressAbi.inputs!, trimLeading0x(tx.input).slice(8))
   return {
     name: params.identifier as CeloContract,
@@ -112,22 +120,21 @@ const isProxySetFunction = (tx: ProposalTransactionJSON) =>
  * @returns The JSON encoding of the proposal.
  */
 export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
-  let addressOverride: AddressOverride = {}
-  proposal.forEach((tx) => {
-    if (isRegistryRepointRaw(tx)) {
-      const params = registryRepointRawArgs(kit.connection.getAbiCoder(), tx)
-      addressOverride[params.name] = params.address
-    }
-  })
-  const contractDetails = await obtainKitContractDetails(kit, addressOverride)
-  const blockExplorer = new BlockExplorer(kit, contractDetails)
+  const blockExplorer = await newBlockExplorer(kit)
 
+  const abiCoder = kit.connection.getAbiCoder()
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
+    if (isRegistryRepointRaw(abiCoder, tx)) {
+      const args = registryRepointRawArgs(abiCoder, tx)
+      debug(`updating registry to reflect ${args.name} => ${args.address}`)
+      await blockExplorer.updateContractDetailsMapping(stripProxy(args.name), args.address)
+    }
+
     debug(`decoding tx ${JSON.stringify(tx)}`)
     const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
-      throw new Error(`Unable to parse ${tx} with block explorer`)
+      throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
     }
 
     const jsonTx: ProposalTransactionJSON = {
@@ -138,10 +145,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
       value: parsedTx.tx.value,
     }
 
-    if (isRegistryRepoint(jsonTx)) {
-      const args = registryRepointArgs(jsonTx)
-      await blockExplorer.updateContractDetailsMapping(stripProxy(args.name), args.address)
-    } else if (isProxySetFunction(jsonTx)) {
+    if (isProxySetFunction(jsonTx)) {
       jsonTx.contract = suffixProxy(jsonTx.contract)
     } else if (isProxySetAndInitFunction(jsonTx)) {
       jsonTx.contract = suffixProxy(jsonTx.contract)
