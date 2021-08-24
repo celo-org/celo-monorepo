@@ -1,6 +1,5 @@
 export { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 export { REGISTRY_CONTRACT_ADDRESS } from './address-registry'
-export { ABI as RegistryABI } from './generated/Registry'
 export {
   AllContracts,
   CeloContract,

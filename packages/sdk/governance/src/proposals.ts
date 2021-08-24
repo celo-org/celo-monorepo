@@ -13,11 +13,11 @@ import {
   CeloContract,
   ContractKit,
   RegisteredContracts,
-  RegistryABI,
   REGISTRY_CONTRACT_ADDRESS,
 } from '@celo/contractkit'
 import { stripProxy, suffixProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
+import { ABI as RegistryABI } from '@celo/contractkit/lib/generated/Registry'
 // tslint:disable: ordered-imports
 import {
   getInitializeAbiOfImplementation,
