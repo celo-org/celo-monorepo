@@ -1,4 +1,3 @@
-import { Proposal } from '@celo/contractkit/src/wrappers/Governance'
 import {
   InteractiveProposalBuilder,
   ProposalBuilder,
