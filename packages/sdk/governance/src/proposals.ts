@@ -193,7 +193,7 @@ export class ProposalBuilder {
   constructor(
     private readonly kit: ContractKit,
     private readonly builders: Array<() => Promise<ProposalTransaction>> = [],
-    private readonly registryAdditions: RegistryAdditions = {}
+    public readonly registryAdditions: RegistryAdditions = {}
   ) {}
 
   /**
