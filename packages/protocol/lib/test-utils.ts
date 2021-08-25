@@ -67,6 +67,11 @@ export async function timeTravel(seconds: number, web3: Web3) {
   await jsonRpc(web3, 'evm_mine', [])
 }
 
+export async function timeTravelEpochs(epochs: number, web3: Web3, epochSize: number = EPOCH) {
+  // simulate epoch propagation
+  mineBlocks(epochs * epochSize, web3)
+}
+
 export async function mineBlocks(blocks: number, web3: Web3) {
   for (let i = 0; i < blocks; i++) {
     await jsonRpc(web3, 'evm_mine', [])
