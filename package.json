@@ -27,7 +27,8 @@
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js",
     "celotool": "yarn --cwd packages/celotool run --silent cli",
-    "celocli": "yarn --cwd packages/cli run --silent celocli"
+    "celocli": "yarn --cwd packages/cli run --silent celocli",
+    "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts"
   },
   "husky": {
     "hooks": {
@@ -116,7 +117,7 @@
     "react-native-ntp-client": "^1.0.0",
     "set-value": "^3.0.2",
     "sha3": "1.2.3",
-    "tar": "4.4.10",
+    "tar": "4.4.15",
     "ua-parser-js": "^0.7.24",
     "underscore": "^1.12.1",
     "url-parse": "^1.5.0",

@@ -16,7 +16,7 @@ Valora is a mobile wallet focused on making global peer-to-peer payments simple 
 
 - [valoraapp.com](https://valoraapp.com)
 - Platforms: iOS, Android
-- Maintainers: [cLabs](https://clabs.co)
+- Maintainers: [Valora](https://valoraapp.com)
 - Ledger support: No
 
 ### CeloWallet.app
@@ -58,6 +58,20 @@ Steakwallet is a non-custodial, multi chain staking wallet. It aims to be the hu
 
 There are currently a few other compatible wallets. When the upcoming [Donut hard-fork](https://github.com/celo-org/celo-proposals/issues/94) is live, Celo transactions will become compatible with Ethereum transactions. This will allow some Ethereum wallets to work with Celo. More updates on this coming soon.
 
+### Metamask
+
+You can learn more about connecting Metamask to the Celo network [here](./using-metamask-with-celo/README.md).
+
+- [metamask.io](https://metamask.io/)
+- Platforms: Browser, iOS, Android
+
+### Wallet Connect
+
+Strictly speaking, wallet connect is not a wallet; it is an open protocol for connecting wallets to Dapps. Celo wallets are implementing Wallet Connect version 2, so dapp developers should use V2 as well. You can learn more about getting started with wallet connect on Celo with [this tutorial](../developer-resources/walkthroughs/wallet-connect.md). 
+
+- [walletconnect.org/](https://walletconnect.org/)
+- Platforms: Browser, iOS, Android
+
 ### Dove Wallet
 
 - [dovewallet.com](https://dovewallet.com)
@@ -67,3 +81,8 @@ There are currently a few other compatible wallets. When the upcoming [Donut har
 
 - [pesabase.com](https://pesabase.com/)
 - Platforms: iOS, Android
+
+### D’CENT
+
+- [https://dcentwallet.com/](https://dcentwallet.com/)
+- Platforms: Browser, iOS, Android

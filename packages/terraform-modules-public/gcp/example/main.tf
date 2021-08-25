@@ -115,6 +115,7 @@ module "celo_cluster" {
   attestation_service_nexmo_unsupported_regions       = var.attestation_service_credentials["nexmo_unsupported_regions"]
   attestation_service_twilio_account_sid              = var.attestation_service_credentials["twilio_account_sid"]
   attestation_service_twilio_messaging_service_sid    = var.attestation_service_credentials["twilio_messaging_service_sid"]
+  attestation_service_twilio_verify_service_sid       = var.attestation_service_credentials["twilio_verify_service_sid"]
   attestation_service_twilio_auth_token               = var.attestation_service_credentials["twilio_auth_token"]
   attestation_service_twilio_blacklist                = var.attestation_service_credentials["twilio_blacklist"]
   attestation_service_twilio_unsupported_regions      = var.attestation_service_credentials["twilio_unsupported_regions"]

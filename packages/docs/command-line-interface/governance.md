@@ -14,8 +14,18 @@ USAGE
   $ celocli governance:build-proposal
 
 OPTIONS
-  --globalHelp     View all available global flags
-  --output=output  (required) Path to output
+  --afterExecutingID=afterExecutingID              Governance proposal identifier which
+                                                   will be executed prior to proposal
+                                                   being built
+
+  --afterExecutingProposal=afterExecutingProposal  Path to proposal which will be
+                                                   executed prior to proposal being
+                                                   built
+
+  --globalHelp                                     View all available global flags
+
+  --output=output                                  [default: proposalTransactions.json]
+                                                   Path to output
 
 EXAMPLE
   build-proposal --output ./transactions.json
@@ -105,6 +115,7 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
+  --force                              Skip execution check
   --globalHelp                         View all available global flags
 
   --jsonTransactions=jsonTransactions  (required) Path to json transactions of the
@@ -188,6 +199,8 @@ OPTIONS
   --descriptionURL=descriptionURL                    (required) A URL where further
                                                      information about the proposal can
                                                      be viewed
+
+  --force                                            Skip execution check
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
 

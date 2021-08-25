@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "1.1.5-dev",
+  "version": "1.1.6-dev",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -21,12 +21,18 @@
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test\/end-to-end",
     "test:e2e": "jest test/end-to-end --verbose",
-    "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts"
+    "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net yarn test:e2e",
+    "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net yarn test:e2e",
+    "db:migrate": "NODE_ENV=dev FIREBASE_CONFIG=./firebase.json ts-node ./scripts/run-migrations.ts",
+    "db:migrate:staging": "GCLOUD_PROJECT=celo-phone-number-privacy-stg yarn db:migrate",
+    "db:migrate:alfajores": "GCLOUD_PROJECT=celo-phone-number-privacy yarn db:migrate",
+    "db:migrate:mainnet": "GCLOUD_PROJECT=celo-pgpnp-mainnet yarn db:migrate",
+    "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.0.2",
-    "@celo/phone-number-privacy-common": "1.0.33",
-    "@celo/identity": "1.0.2",
+    "@celo/contractkit": "1.2.0",
+    "@celo/phone-number-privacy-common": "1.0.34",
+    "@celo/identity": "1.2.0",
     "@celo/utils": "1.0.2",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "^6.5.4",
