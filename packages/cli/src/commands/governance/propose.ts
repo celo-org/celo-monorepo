@@ -2,6 +2,7 @@ import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'
+import { readJsonSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
@@ -24,6 +25,16 @@ export default class Propose extends BaseCommand {
       required: true,
       description: 'A URL where further information about the proposal can be viewed',
     }),
+    afterExecutingProposal: flags.string({
+      required: false,
+      description: 'Path to proposal which will be executed prior to proposal',
+      exclusive: ['afterExecutingID'],
+    }),
+    afterExecutingID: flags.string({
+      required: false,
+      description: 'Governance proposal identifier which will be executed prior to proposal',
+      exclusive: ['afterExecutingProposal'],
+    }),
   }
 
   static examples = [
@@ -43,6 +54,30 @@ export default class Propose extends BaseCommand {
 
     const builder = new ProposalBuilder(this.kit)
 
+    if (res.flags.afterExecutingID || res.flags.afterExecutingProposal) {
+      let preProposal: ProposalTransactionJSON[]
+      if (res.flags.afterExecutingID) {
+        const governance = await this.kit.contracts.getGovernance()
+        const proposalRaw = await governance.getProposal(res.flags.afterExecutingID)
+        preProposal = await proposalToJSON(this.kit, proposalRaw)
+      } else {
+        preProposal = readJsonSync(res.flags.afterExecutingProposal!)
+      }
+
+      // accounts for registry additions and caches in builder
+      for (const tx of preProposal) {
+        await builder.fromJsonTx(tx)
+      }
+
+      console.info(
+        `After executing provided proposal, account for registry remappings: ${JSON.stringify(
+          builder.registryAdditions,
+          null,
+          2
+        )}`
+      )
+    }
+
     // BUILD FROM JSON
     const jsonString = readFileSync(res.flags.jsonTransactions).toString()
     const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
@@ -53,9 +88,8 @@ export default class Propose extends BaseCommand {
     // builder.addTx(params.setMinimumClientVersion(1, 8, 24), { to: params.address })
     // builder.addWeb3Tx()
     // builder.addProxyRepointingTx
-
     const proposal = await builder.build()
-    printValueMapRecursive(await proposalToJSON(this.kit, proposal))
+    printValueMapRecursive(await proposalToJSON(this.kit, proposal, builder.registryAdditions))
 
     const governance = await this.kit.contracts.getGovernance()
 

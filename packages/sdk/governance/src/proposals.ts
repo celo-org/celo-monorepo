@@ -117,18 +117,36 @@ const isProxySetFunction = (tx: ProposalTransactionJSON) =>
  * Convert a compiled proposal to a human-readable JSON form using network information.
  * @param kit Contract kit instance used to resolve addresses to contract names.
  * @param proposal A constructed proposal object.
+ * @param registryAdditions Registry remappings prior to parsing the proposal as a map of name to corresponding contract address.
  * @returns The JSON encoding of the proposal.
  */
-export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
+export const proposalToJSON = async (
+  kit: ContractKit,
+  proposal: Proposal,
+  registryAdditions?: RegistryAdditions
+) => {
   const blockExplorer = await newBlockExplorer(kit)
+
+  const updateRegistryMapping = async (name: CeloContract, address: Address) => {
+    debug(`updating registry to reflect ${name} => ${address}`)
+    await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
+  }
+
+  // Update the registry mapping with registry additions prior to processing the proposal.
+  for (const nameStr in registryAdditions) {
+    const name = nameStr as CeloContract
+    if (!CeloContract[name]) {
+      throw new Error(`Name ${nameStr} in registry additions not a CeloContract`)
+    }
+    await updateRegistryMapping(name, registryAdditions[name])
+  }
 
   const abiCoder = kit.connection.getAbiCoder()
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
     if (isRegistryRepointRaw(abiCoder, tx)) {
       const args = registryRepointRawArgs(abiCoder, tx)
-      debug(`updating registry to reflect ${args.name} => ${args.address}`)
-      await blockExplorer.updateContractDetailsMapping(stripProxy(args.name), args.address)
+      await updateRegistryMapping(args.name, args.address)
     }
 
     debug(`decoding tx ${JSON.stringify(tx)}`)
