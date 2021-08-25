@@ -193,6 +193,13 @@ USAGE
   $ celocli governance:propose
 
 OPTIONS
+  --afterExecutingID=afterExecutingID                Governance proposal identifier
+                                                     which will be executed prior to
+                                                     proposal
+
+  --afterExecutingProposal=afterExecutingProposal    Path to proposal which will be
+                                                     executed prior to proposal
+
   --deposit=deposit                                  (required) Amount of Gold to attach
                                                      to proposal
 
