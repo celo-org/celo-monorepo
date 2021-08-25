@@ -77,7 +77,7 @@ testWithGanache('grandamento:propose cmd', (web3: Web3) => {
       expect(proposal.sellCelo).toEqual(false)
     })
 
-    it("doesn't work without explicitly settint the sellCelo flag", async () => {
+    it("doesn't work without explicitly setting the sellCelo flag", async () => {
       let activeProposals
 
       await expect(

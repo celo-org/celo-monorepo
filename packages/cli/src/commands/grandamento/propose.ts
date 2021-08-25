@@ -28,7 +28,6 @@ export default class Propose extends BaseCommand {
       options: ['true', 'false'],
       required: true,
       description: 'Sell or buy CELO',
-      exclusive: ['buyCelo'],
     }),
   }
 
