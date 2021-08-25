@@ -2,13 +2,15 @@ import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'
-import { readJsonSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { checkProposal } from '../../utils/governance'
-
+import {
+  addExistingProposalIDToBuilder,
+  addExistingProposalJSONFileToBuilder,
+  checkProposal,
+} from '../../utils/governance'
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
 
@@ -54,28 +56,10 @@ export default class Propose extends BaseCommand {
 
     const builder = new ProposalBuilder(this.kit)
 
-    if (res.flags.afterExecutingID || res.flags.afterExecutingProposal) {
-      let preProposal: ProposalTransactionJSON[]
-      if (res.flags.afterExecutingID) {
-        const governance = await this.kit.contracts.getGovernance()
-        const proposalRaw = await governance.getProposal(res.flags.afterExecutingID)
-        preProposal = await proposalToJSON(this.kit, proposalRaw)
-      } else {
-        preProposal = readJsonSync(res.flags.afterExecutingProposal!)
-      }
-
-      // accounts for registry additions and caches in builder
-      for (const tx of preProposal) {
-        await builder.fromJsonTx(tx)
-      }
-
-      console.info(
-        `After executing provided proposal, account for registry remappings: ${JSON.stringify(
-          builder.registryAdditions,
-          null,
-          2
-        )}`
-      )
+    if (res.flags.afterExecutingID) {
+      await addExistingProposalIDToBuilder(this.kit, builder, res.flags.afterExecutingID)
+    } else if (res.flags.afterExecutingProposal) {
+      await addExistingProposalJSONFileToBuilder(builder, res.flags.afterExecutingProposal)
     }
 
     // BUILD FROM JSON
