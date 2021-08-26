@@ -52,7 +52,7 @@ Press both buttons on the device at the same time to continue.
 
 The Celo app is now ready for use and you should see `Application is ready` on the screen.
 
-#### Now that your ledger is all set up, you can start using it with the following wallets:
+### Now that your ledger is all set up, you can start using it with the following wallets:
 
   - [Celo Terminal App](connecting-ledger-celo-terminal-wallet.md)
   - [Celo Web Wallet](connecting-ledger-celo-web-wallet.md)
