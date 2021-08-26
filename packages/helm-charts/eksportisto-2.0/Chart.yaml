@@ -1,0 +1,8 @@
+name: eksportisto
+version: 2.0
+description: Chart which is used to run eksportisto
+keywords:
+- ethereum
+- blockchain
+- monitoring
+appVersion: v1.7.3
