@@ -47,17 +47,8 @@ export async function authenticateUser(
       return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      try {
-        const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
-        const parsedSig = JSON.parse(messageSignature)
-        const validSignature = key.verify(message, parsedSig)
-        if (validSignature) {
-          return true
-        }
-      } catch (err) {
-        logger.error('Failed to verify auth sig with DEK')
-        logger.error({ err, dek: registeredEncryptionKey })
-        return false
+      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
+        return true
       }
     }
   }
@@ -68,6 +59,25 @@ export async function authenticateUser(
     'Message was not authenticated with DEK, attempting to authenticate using wallet key'
   )
   return verifySignature(message, messageSignature, signer)
+}
+
+export function verifyDEKSignature(
+  message: string,
+  messageSignature: string,
+  registeredEncryptionKey: string,
+  logger?: Logger
+) {
+  try {
+    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
+    const parsedSig = JSON.parse(messageSignature)
+    return key.verify(message, parsedSig)
+  } catch (err) {
+    if (logger) {
+      logger.error('Failed to verify signature with DEK')
+      logger.error({ err, dek: registeredEncryptionKey })
+    }
+    return false
+  }
 }
 
 export async function getDataEncryptionKey(
