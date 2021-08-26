@@ -14,8 +14,18 @@ USAGE
   $ celocli governance:build-proposal
 
 OPTIONS
-  --globalHelp     View all available global flags
-  --output=output  (required) Path to output
+  --afterExecutingID=afterExecutingID              Governance proposal identifier which
+                                                   will be executed prior to proposal
+                                                   being built
+
+  --afterExecutingProposal=afterExecutingProposal  Path to proposal which will be
+                                                   executed prior to proposal being
+                                                   built
+
+  --globalHelp                                     View all available global flags
+
+  --output=output                                  [default: proposalTransactions.json]
+                                                   Path to output
 
 EXAMPLE
   build-proposal --output ./transactions.json
