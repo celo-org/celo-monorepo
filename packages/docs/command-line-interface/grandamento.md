@@ -15,7 +15,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address allowed to
-                                                     cancell the proposal
+                                                     cancel the proposal
 
   --globalHelp                                       View all available global flags
 
