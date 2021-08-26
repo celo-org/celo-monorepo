@@ -11,7 +11,7 @@ export default class Cancel extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({
       required: true,
-      description: 'The address allowed to cancell the proposal',
+      description: 'The address allowed to cancel the proposal',
     }),
     proposalID: flags.string({
       required: true,
