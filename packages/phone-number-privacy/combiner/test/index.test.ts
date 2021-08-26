@@ -3,7 +3,7 @@ import { hexToBuffer } from '@celo/utils/lib/address'
 import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
-import config, { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS, VERSION } from '../src/config
+import config, { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS, VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import {
   getAccountSignedUserPhoneNumberRecord,
