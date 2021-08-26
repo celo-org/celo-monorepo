@@ -27,6 +27,7 @@
 
 * [getServiceContext](_odis_query_.md#getservicecontext)
 * [queryOdis](_odis_query_.md#queryodis)
+* [signWithDEK](_odis_query_.md#signwithdek)
 
 ### Object literals
 
@@ -64,7 +65,7 @@ ___
 
 ▸ **queryOdis**<**ResponseType**>(`signer`: [AuthSigner](_odis_query_.md#authsigner), `body`: [PhoneNumberPrivacyRequest](../interfaces/_odis_query_.phonenumberprivacyrequest.md), `context`: [ServiceContext](../interfaces/_odis_query_.servicecontext.md), `endpoint`: string): *Promise‹ResponseType›*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L116)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L128)*
 
 Make a request to lookup the phone number identifier or perform matchmaking
 
@@ -82,6 +83,23 @@ Name | Type | Description |
 `endpoint` | string | endpoint to hit  |
 
 **Returns:** *Promise‹ResponseType›*
+
+___
+
+###  signWithDEK
+
+▸ **signWithDEK**(`message`: string, `signer`: [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md)): *string*
+
+*Defined in [packages/sdk/identity/src/odis/query.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L109)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`message` | string |
+`signer` | [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md) |
+
+**Returns:** *string*
 
 ## Object literals
 
