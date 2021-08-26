@@ -16,11 +16,11 @@ import {
 } from '../scaffold'
 
 export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: StableToken[]) {
-  const celoAmountToFund = ONE.times(61000)
-  const stableTokenAmountToFund = ONE.times(61000)
+  const celoAmountToFund = ONE.times(610000)
+  const stableTokenAmountToFund = ONE.times(610000)
 
-  const celoAmountToSell = ONE.times(60000)
-  const stableTokenAmountToSell = ONE.times(60000)
+  const celoAmountToSell = ONE.times(600000)
+  const stableTokenAmountToSell = ONE.times(600000)
 
   describe('Granda Mento Test', () => {
     beforeAll(async () => {
@@ -249,7 +249,9 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
                 creationInfo.celoFees
               )
             }
-            expect(buyTokenBalanceAfter.toString()).toBe(expectedBuyTokenBalanceAfter.toString())
+            expect(
+              almostEqual(buyTokenBalanceAfter, expectedBuyTokenBalanceAfter, new BigNumber(50000))
+            ).toEqual(true)
           })
         })
       }
@@ -260,4 +262,10 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
 // exchangeRate is the price of the sell token quoted in buy token
 function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
   return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
+}
+
+function almostEqual(a: BigNumber, b: BigNumber, tolerance: BigNumber) {
+  const minValue = b.minus(tolerance)
+  const maxValue = b.plus(tolerance)
+  return a.gte(minValue) && a.lte(maxValue)
 }
