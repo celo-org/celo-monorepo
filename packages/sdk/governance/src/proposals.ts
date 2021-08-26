@@ -132,13 +132,15 @@ export const proposalToJSON = async (
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
 
-  // Update the registry mapping with registry additions prior to processing the proposal.
-  for (const nameStr in registryAdditions) {
-    const name = nameStr as CeloContract
-    if (!CeloContract[name]) {
-      throw new Error(`Name ${nameStr} in registry additions not a CeloContract`)
+  if (registryAdditions) {
+    // Update the registry mapping with registry additions prior to processing the proposal.
+    for (const nameStr of Object.keys(registryAdditions)) {
+      const name = nameStr as CeloContract
+      if (!CeloContract[name]) {
+        throw new Error(`Name ${nameStr} in registry additions not a CeloContract`)
+      }
+      await updateRegistryMapping(name, registryAdditions[name])
     }
-    await updateRegistryMapping(name, registryAdditions[name])
   }
 
   const abiCoder = kit.connection.getAbiCoder()
