@@ -54,7 +54,6 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             const stableTokenWrapper = await context.kit.celoTokens.getWrapper(
               stableToken as StableToken
             )
-            // stableTokenAddress = stableTokenWrapper.address
             if (sellCelo) {
               buyToken = stableTokenWrapper
               sellToken = goldTokenWrapper
