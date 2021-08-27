@@ -1,35 +1,9 @@
 imagePullPolicy: IfNotPresent
-config.yaml: |
-  monitoring:
-    port: 8080
-    address: localhost
-    requestTimeoutSeconds: 25
+configBase64: config.yaml in base64
+sensitiveAccountsBase64: sensitive accounts in base 64
+serviceAccountBase64: service account in base 64
 
-  celoNodeURI: ws://localhost:8546
-  sensitiveAccountsFilePath: ~/sensitiveAccounts.json
-  profiling: true
-
-  redis:
-    address: localhost:6379
-    password: ""
-    db: 5
-
-  publisher:
-    backfill: 
-      enabled: true
-      startBlock: 0
-      batchSize: 100
-      sleepIntervalSeconds: 2
-    chainFollower:
-      enabled: false
-
-  indexer:
-    dest: bigquery
-    bigquery:
-      projectID: celo-testnet-production
-      dataset: rc1_eksportisto_14
-      table: test
-    sleepIntervalMilliseconds: 100
-    celoNodeURI: "http://localhost:8545"
-    workers: 5
-
+redis:
+  cluster:
+    enabled: false
+  usePassword: false

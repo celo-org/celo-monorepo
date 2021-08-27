@@ -4,3 +4,32 @@ metadata:
   name: eksportisto-{{ .Values.deploymentSuffix }}-config
 data:
   sensitive-accounts.json: {{ .Values.sensitiveAccountsBase64 | b64dec | quote }}
+  service-account.json: {{ .Values.serviceAccountBase64 | b64dec | quote }}
+  config.yaml: |
+    monitoring:
+      port: 8080
+      address: 127.0.0.1
+      requestTimeoutSeconds: 25
+
+    celoNodeURI: {{ .Values.web3ProviderWS }}
+    sensitiveAccountsFilePath: /root/.eksportisto/sensitive-accounts.json
+    redis:
+      address: {{ .Release.Name }}-redis-headless:6379
+      password: ""
+      db: 0
+    publisher:
+      backfill: 
+        enabled: true
+        startBlock: 0
+        batchSize: 1000
+        sleepIntervalMilliseconds: 2000
+      chainFollower:
+        enabled: true
+    indexer:
+      bigquery:
+        projectID: celo-testnet-production
+        dataset: {{ .Values.bigquery.dataset }}
+        table: {{ .Values.bigquery.table }}
+      destination: bigquery
+      sleepIntervalMilliseconds: 100
+      celoNodeURI: {{ .Values.web3ProviderHTTP }}
