@@ -1,6 +1,6 @@
 # Stability Algorithm \(Mento\)
 
-This section discusses the mechanism by which the supply of the Celo Dollar is achieved in the Celo protocol - the constant-product decentralized one-to-one mechanism (CP-DOTO). On a high level, Mento (previously known as CP-DOTO) allows user demand to determine the supply of celo stable assets by enabling users to create, for example, a new Celo Dollar by sending 1 US Dollar worth of CELO to the reserve, or to burn a Celo Dollar by redeeming it for 1 US Dollar worth of CELO. The mechanism requires an accurate [Oracle](oracles.md) value of the CELO to US Dollar market rate to work.
+This section discusses the mechanism by which the supply of the Celo Dollar is achieved in the Celo protocol - the constant-product decentralized one-to-one mechanism \(CP-DOTO\). On a high level, Mento \(previously known as CP-DOTO\) allows user demand to determine the supply of celo stable assets by enabling users to create, for example, a new Celo Dollar by sending 1 US Dollar worth of CELO to the reserve, or to burn a Celo Dollar by redeeming it for 1 US Dollar worth of CELO. The mechanism requires an accurate [Oracle](oracles.md) value of the CELO to US Dollar market rate to work.
 
 This creates incentives such that when demand for the Celo Dollar rises and the market price is above the peg, users can profit using their own efforts by buying 1 US Dollar worth of CELO on the market, exchanging it with the protocol for one Celo Dollar, and selling that Celo Dollar for the market price. Similarly, when demand for the Celo Dollar falls and the market price is below the peg, users can profit using their own efforts by purchasing Celo Dollar at the market price, exchanging it with the protocol for 1 US Dollar worth of CELO, and selling the CELO to the market.
 
@@ -20,8 +20,9 @@ for traded amounts that are small relative to the bucket quantities. Whenever th
 
 If the oracle precisely mirrors the market rate, the on-chain CELO to Celo Dollar rate will equal the CELO to US Dollar market rate and no profit opportunity will exist as long as Celo Dollar precisely tracks the US Dollar. If the oracle price is imprecise, the two rates will differ, and a profit opportunity will be present even if Celo Dollar accurately tracks the US Dollar. However, as traders exploit this opportunity, the on-chain price $$P_t$$ will dynamically adjust in response to changes in the tank quantities until the opportunity ceases to exist. This limits the depletion potential in Mento in the case of imprecise or manipulated oracle rates.
 
-For a more detailed explanation, read the article [Zooming in on the Celo Expansion & Contraction Mechanism](https://medium.com/celoorg/zooming-in-on-the-celo-expansion-contraction-mechanism-446ca7abe4f "Zooming in on the Celo Expansion & Contraction Mechanism").
+For a more detailed explanation, read the article [Zooming in on the Celo Expansion & Contraction Mechanism](https://medium.com/celoorg/zooming-in-on-the-celo-expansion-contraction-mechanism-446ca7abe4f).
 
 ## Multi-mento Deployment
 
-Many instances of mento can be deployed in parallel for different stable assets. Currently, `cEUR` and `cUSD` live side-by-side, with independent buckets and oracle reports (although both of them are using the same `SortedOracles` instance). They all fill the CELO bucket with funds from the Reserve, but not necessarily at the same time.
+Many instances of mento can be deployed in parallel for different stable assets. Currently, `cEUR` and `cUSD` live side-by-side, with independent buckets and oracle reports \(although both of them are using the same `SortedOracles` instance\). They all fill the CELO bucket with funds from the Reserve, but not necessarily at the same time.
+

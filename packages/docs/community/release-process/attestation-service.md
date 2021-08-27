@@ -1,4 +1,4 @@
-# Attestation Service Release Process
+# Attestation Service
 
 This release process will be adopted from Attestation Service v1.2.0 onwards.
 
@@ -6,7 +6,7 @@ This release process will be adopted from Attestation Service v1.2.0 onwards.
 
 Releases of Attestation Service are made as needed. Releases are numbered according to semantic versioning, as described at [semver.org](https://semver.org).
 
-All builds are identified as `unstable` (a development build) or `stable` (a commit released as a particular version number). There should only ever exist one commit with a version `x.y.z` for any `(x, y, z)`.
+All builds are identified as `unstable` \(a development build\) or `stable` \(a commit released as a particular version number\). There should only ever exist one commit with a version `x.y.z` for any `(x, y, z)`.
 
 ## Documentation
 
@@ -40,13 +40,13 @@ In addition, each Docker image correspinding to a released version should be tag
 
 The latest image qualified for deployment to various networks are also tagged as follows:
 
-- Alfajores: `attestation-service-alfajores`
-- Baklava: `attestation-service-baklava`
-- Mainnet: `attestation-service-mainnet`
+* Alfajores: `attestation-service-alfajores`
+* Baklava: `attestation-service-baklava`
+* Mainnet: `attestation-service-mainnet`
 
 ### Signatures
 
-Artifacts produced by this build process (e.g. tags, Docker images) will be signed by a [core developer key](https://github.com/celo-org/celo-monorepo/blob/master/developer_key_publishing.md).
+Artifacts produced by this build process \(e.g. tags, Docker images\) will be signed by a [core developer key](https://github.com/celo-org/celo-monorepo/blob/master/developer_key_publishing.md).
 
 Public keys for core developers are hosted on celo.org and can be imported to `gpg` with the following command:
 
@@ -56,7 +56,7 @@ gpg --auto-key-locate wkd --locate-keys $EMAIL
 
 Currently hosted core developer keys used for Attestation Service releases include:
 
-- tim@clabs.co
+* tim@clabs.co
 
 ## Build process
 
@@ -99,47 +99,59 @@ Only one commit should ever have a "stable" tag at any given version number. Whe
 Distribution of an image should occur along the following schedule:
 
 <table>
-  <tr>
-    <td>Date</td>
-    <td>Action</td>
-  </tr>
-  <tr>
-    <td>T-1w</td>
-    <td>
-      <ol>
-        <li>Deploy release candidate build to Alfajores testnet</li>
-      </ol>
-    </td>
-  </tr>  
-  <tr>
-    <td>T</td>
-    <td>
-      <ol>
-        <li>Confirm Valora production and testing builds against Alfajores experience no issues and that e2e verification tests complete successfully</li>
-        <li>Publish the Git release notes and tag, and signature of Docker image</li>
-        <li>Communicate T+1w Baklava upgrade date.</li>
-        <li>Tag released Docker image with <code>attestation-service-alfajores</code></li> and <code>attestation-service-baklava</code> (removing tags from other releases)</li>
-      </ol>
-    </td>
-  </tr>
-  <tr>
-    <td>T+1w</td>
-    <td>
-      <ol>
-        <li>Confirm Baklava users have upgraded without issues and that Baklava attestation bots run successfully</li>
-        <li>Communicate T+2w Mainnet upgrade date</li>
-        <li>Tag released Docker image with <code>attestation-service-mainnet</code> (removing tag from other releases)</li>
-      </ol>
-    </td>
-  </tr>
-  <tr>
-    <td>T+2w</td>
-    <td>
-      <ol>
-        <li>Confirm Mainnet users have upgraded without issues</li>
-      </ol>
-    </td>
-  </tr>
+  <thead>
+    <tr>
+      <th style="text-align:left">Date</th>
+      <th style="text-align:left">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align:left">T-1w</td>
+      <td style="text-align:left">
+        <ol>
+          <li>Deploy release candidate build to Alfajores testnet</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:left">T</td>
+      <td style="text-align:left">
+        <ol>
+          <li>Confirm Valora production and testing builds against Alfajores experience
+            no issues and that e2e verification tests complete successfully</li>
+          <li>Publish the Git release notes and tag, and signature of Docker image</li>
+          <li>Communicate T+1w Baklava upgrade date.</li>
+          <li>Tag released Docker image with <code>attestation-service-alfajores</code>
+          </li>
+          <li>and</li>
+          <li><code>attestation-service-baklava</code>
+          </li>
+          <li>(removing tags from other releases)</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:left">T+1w</td>
+      <td style="text-align:left">
+        <ol>
+          <li>Confirm Baklava users have upgraded without issues and that Baklava attestation
+            bots run successfully</li>
+          <li>Communicate T+2w Mainnet upgrade date</li>
+          <li>Tag released Docker image with <code>attestation-service-mainnet</code> (removing
+            tag from other releases)</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:left">T+2w</td>
+      <td style="text-align:left">
+        <ol>
+          <li>Confirm Mainnet users have upgraded without issues</li>
+        </ol>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 ### Emergency Patches
@@ -153,3 +165,4 @@ If the issue is exploitable and mitigations are not readily available, a patch s
 ## Vulnerability Disclosure
 
 Vulnerabilities in Attestation Service releases should be disclosed according to the [security policy](https://github.com/celo-org/celo-monorepo/blob/master/SECURITY.md).
+
