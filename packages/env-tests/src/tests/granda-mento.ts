@@ -242,7 +242,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
                 creationInfo.celoFees
               )
             }
-            expect(buyTokenBalanceAfter.toString()).toEqual(expectedBuyTokenBalanceAfter.toString)
+            expect(buyTokenBalanceAfter.toString()).toBe(expectedBuyTokenBalanceAfter.toString)
           })
         })
       }
