@@ -50,7 +50,8 @@
     "jest": "^26.6.3",
     "ts-node": "8.3.0",
     "typedoc": "^0.19.2",
-    "typedoc-plugin-markdown": "^2.2.16"
+    "typedoc-plugin-markdown": "^2.2.16",
+    "docusaurus-plugin-typedoc": "^2.2.16"
   },
   "resolutions": {
     "**/elliptic": "^6.5.4"
