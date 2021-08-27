@@ -47,7 +47,6 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
 
           let buyToken: GoldTokenWrapper | StableTokenWrapper
           let sellToken: GoldTokenWrapper | StableTokenWrapper
-          let stableTokenAddress: string
           let sellAmount: BigNumber
 
           beforeEach(async () => {
@@ -55,7 +54,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             const stableTokenWrapper = await context.kit.celoTokens.getWrapper(
               stableToken as StableToken
             )
-            stableTokenAddress = stableTokenWrapper.address
+            // stableTokenAddress = stableTokenWrapper.address
             if (sellCelo) {
               buyToken = stableTokenWrapper
               sellToken = goldTokenWrapper
@@ -234,13 +233,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             }
             expect(sellTokenBalanceAfter.toString()).toBe(expectedSellTokenBalanceAfter.toString())
 
-            const sortedOracles = await context.kit.contracts.getSortedOracles()
-            const celoStableTokenRate = (await sortedOracles.medianRate(stableTokenAddress)).rate
-
-            const exchangeRate = sellCelo
-              ? celoStableTokenRate
-              : new BigNumber(1).div(celoStableTokenRate)
-            const buyAmount = getBuyAmount(exchangeRate, sellAmount, await grandaMento.spread())
+            const { buyAmount } = await grandaMento.getExchangeProposal(creationInfo.proposalId)
 
             const buyTokenBalanceAfter = await buyToken.balanceOf(from.address)
             let expectedBuyTokenBalanceAfter = buyTokenBalanceBefore.plus(buyAmount)
@@ -249,9 +242,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
                 creationInfo.celoFees
               )
             }
-            expect(
-              almostEqual(buyTokenBalanceAfter, expectedBuyTokenBalanceAfter, new BigNumber(50000))
-            ).toEqual(true)
+            expect(buyTokenBalanceAfter.toString()).toEqual(expectedBuyTokenBalanceAfter.toString)
           })
         })
       }
@@ -259,10 +250,10 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
   })
 }
 
-// exchangeRate is the price of the sell token quoted in buy token
-function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
-  return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
-}
+// // exchangeRate is the price of the sell token quoted in buy token
+// function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
+//   return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
+// }
 
 function almostEqual(a: BigNumber, b: BigNumber, tolerance: BigNumber) {
   const minValue = b.minus(tolerance)
