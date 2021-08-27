@@ -249,14 +249,3 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
     }
   })
 }
-
-// // exchangeRate is the price of the sell token quoted in buy token
-// function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
-//   return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
-// }
-
-function almostEqual(a: BigNumber, b: BigNumber, tolerance: BigNumber) {
-  const minValue = b.minus(tolerance)
-  const maxValue = b.plus(tolerance)
-  return a.gte(minValue) && a.lte(maxValue)
-}
