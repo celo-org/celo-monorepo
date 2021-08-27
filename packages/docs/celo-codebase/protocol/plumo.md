@@ -171,6 +171,8 @@ cLabs is running the coordinator server, which has a list of approved participan
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
 
+**Linux Server Note**: If you are running the contribute software on a Linux server and get an error with the message `The name org.freedesktop.ScreenSaver was not provided by any .service files`, run the software with the `--disable-keep-awake` flag. The full command will be `./contribute-linux --disable-keep-awake --keys-file KEYS_FILE`.
+
 Once this is running, you can leave the machine running -- no direct action is needed. This will run for about ~36 hours, after which the software will terminate running and you will have finished contributing to the Plumo setup!
 
 ### Publish your attestation
