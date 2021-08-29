@@ -46,6 +46,8 @@ const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
 const TIMEOUT_FOR_LOAD_BALANCER_POLL = 1000 * 60 * 25 // 25 minutes
 const LOAD_BALANCER_POLL_INTERVAL = 1000 * 10 // 10 seconds
 
+const TESTNET_CHART_DIR = '../helm-charts/testnet'
+
 async function validateExistingCloudSQLInstance(instanceName: string) {
   await ensureAuthenticatedGcloudAccount()
   try {
@@ -957,21 +959,32 @@ export async function removeGenericHelmChart(releaseName: string, namespace: str
   }
 }
 
+function getExtraValuesFile(celoEnv: string) {
+  const extraValuesFile = fs.existsSync(`${TESTNET_CHART_DIR}/values-${celoEnv}.yaml`)
+    ? `${TESTNET_CHART_DIR}/values-${celoEnv}.yaml`
+    : undefined
+  return extraValuesFile
+}
+
 export async function installHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
+  const extraValuesFile = getExtraValuesFile(celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
-    '../helm-charts/testnet',
-    await helmParameters(celoEnv, useExistingGenesis)
+    TESTNET_CHART_DIR,
+    await helmParameters(celoEnv, useExistingGenesis),
+    true,
+    extraValuesFile
   )
 }
 
 export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
   const parameters = await helmParameters(celoEnv, useExistingGenesis)
-  await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
+  const extraValuesFile = getExtraValuesFile(celoEnv)
+  await upgradeGenericHelmChart(celoEnv, celoEnv, TESTNET_CHART_DIR, parameters, extraValuesFile)
 }
 
 export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
