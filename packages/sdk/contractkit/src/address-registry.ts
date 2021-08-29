@@ -7,7 +7,13 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:registry')
 
 // Registry contract is always predeployed to this address
-const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
+export const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
+
+export class UnregisteredError extends Error {
+  constructor(contract: CeloContract) {
+    super(`${contract} not (yet) registered`)
+  }
+}
 
 /**
  * Celo Core Contract's Address Registry
@@ -31,7 +37,7 @@ export class AddressRegistry {
 
       debug('Fetched address %s', address)
       if (!address || address === NULL_ADDRESS) {
-        throw new Error(`Failed to get address for ${contract} from the Registry`)
+        throw new UnregisteredError(contract)
       }
       this.cache.set(contract, address)
     }
@@ -43,24 +49,15 @@ export class AddressRegistry {
    * Get the address mapping for known registered contracts
    */
   async addressMapping() {
-    const allContracts = await this.addressMappingWithNotDeployedContracts()
-    const contracts: Map<CeloContract, string> = new Map()
-    allContracts.forEach((value, key) => (value ? contracts.set(key, value) : undefined))
-    return contracts
-  }
-
-  async addressMappingWithNotDeployedContracts(notDeployedValue?: string) {
-    const contracts: Map<CeloContract, string | undefined> = new Map()
     await Promise.all(
-      RegisteredContracts.map(async (r) => {
+      RegisteredContracts.map(async (contract) => {
         try {
-          const address = await this.addressFor(r)
-          contracts.set(r, address)
-        } catch {
-          contracts.set(r, notDeployedValue)
+          await this.addressFor(contract)
+        } catch (e) {
+          debug(e)
         }
       })
     )
-    return contracts
+    return this.cache
   }
 }

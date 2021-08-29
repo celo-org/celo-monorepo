@@ -7,6 +7,7 @@ import { ERROR } from '@walletconnect/utils'
 import debugConfig from 'debug'
 import { productionEndpoint } from './constants'
 import { SupportedMethods, WalletConnectWalletOptions } from './types'
+import { parseAddress } from './utils'
 import { WalletConnectSigner } from './wc-signer'
 
 const debug = debugConfig('kit:wallet:wallet-connect-wallet')
@@ -152,10 +153,8 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     await waitForTruthy(() => this.session)
 
     const addressToSigner = new Map<string, WalletConnectSigner>()
-    this.session!.state.accounts.forEach((fullyQualifiedAccount) => {
-      // 0x123@celo:1234 = <address>@<chain>:<network_id>
-      const [address, , networkId] = fullyQualifiedAccount.split(/[@:]/)
-
+    this.session!.state.accounts.forEach((addressLike) => {
+      const { address, networkId } = parseAddress(addressLike)
       const signer = new WalletConnectSigner(this.client!, this.session!, address, networkId)
       addressToSigner.set(address, signer)
     })
