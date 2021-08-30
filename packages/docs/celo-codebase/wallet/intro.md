@@ -16,20 +16,20 @@ export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gr
 
 ## Running
 
-1.  If you haven't already, run `yarn` from the monorepo root to install dependencies.
-2.  Attach your device or start an emulated one.
+1. If you haven't already, run `yarn` from the monorepo root to install dependencies.
+2. Attach your device or start an emulated one.
 
-    You can verify if your device is properly connecting to ADB with `adb devices`. More information about running the app on Android devices can be found on the [React Native docs](https://facebook.github.io/react-native/docs/running-on-device).
+   You can verify if your device is properly connecting to ADB with `adb devices`. More information about running the app on Android devices can be found on the [React Native docs](https://facebook.github.io/react-native/docs/running-on-device).
 
-3.  Compile the project and start the bundler with
+3. Compile the project and start the bundler with
 
-    ```bash
-    yarn run dev
-    ```
+   ```bash
+   yarn run dev
+   ```
 
-    This will build the app in a device \(physical or emulated\) and open a terminal with a js server.
+   This will build the app in a device \(physical or emulated\) and open a terminal with a js server.
 
-    **Note:** We've seen some issues running the metro bundler from iTerm
+   **Note:** We've seen some issues running the metro bundler from iTerm
 
 ## Debugging
 
@@ -85,16 +85,16 @@ Please set `123456` as the pin code in the emulator, since the e2e tests rely on
 
 Next, the VM snapshot settings should be modified:
 
-1.  Close all apps and lock the emulator \(go to lock screen\).
-2.  Power off the emulator
-3.  Power it back on and go to emulator settings \(... button\) -&gt; Snapshots -&gt; Settings
-4.  Set Auto-Save to No
+1. Close all apps and lock the emulator \(go to lock screen\).
+2. Power off the emulator
+3. Power it back on and go to emulator settings \(... button\) -&gt; Snapshots -&gt; Settings
+4. Set Auto-Save to No
 
 ## Troubleshooting
 
-1.  Make sure to have watchman installed: `brew install watchman`
-2.  It's a known [detox issue](https://github.com/wix/Detox/issues/1255) that test will fail if a emulator is renamed.
-3.  Make sure the emulator is not running before runing the tests.
+1. Make sure to have watchman installed: `brew install watchman`
+2. It's a known [detox issue](https://github.com/wix/Detox/issues/1255) that test will fail if a emulator is renamed.
+3. Make sure the emulator is not running before runing the tests.
 
 For information on how to run and extend the e2e tests, refer to the [e2e readme](https://github.com/celo-org/wallet/blob/master/packages/mobile/e2e/README.md).
 
@@ -111,3 +111,4 @@ The mobile app can run without putting the Firebase keys in place by changing th
 For Testnet configuration, an env variable called `MNEMONIC` should be set with a seed to generate validators private keys. Remember to make this seed long enough to be secured \(20 words or more\).
 
 **Please keep your keys secret- avoid committing them to github and/or publishing keys for your infrastructure in any way.**
+

@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
 
 export interface BlsBlindingClient {
-  blindMessage: (base64PhoneNumber: string, seed?: Uint8Array) => Promise<string>
+  blindMessage: (base64PhoneNumber: string, seed?: Buffer) => Promise<string>
   unblindAndVerifyMessage: (blindedMessage: string) => Promise<string>
 }
 
@@ -36,15 +36,12 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
     }
   }
 
-  async blindMessage(base64PhoneNumber: string, seed?: Uint8Array): Promise<string> {
-    let userSeed
+  async blindMessage(base64PhoneNumber: string, seed?: Buffer): Promise<string> {
+    const userSeed = seed ?? randomBytes(32)
     if (!seed) {
-      userSeed = randomBytes(32)
       console.warn(
-        'Warning: Use a private deterministic seed (i.e. DEK private key) to preserve user quota when requests are replayed.'
+        'Warning: Use a private deterministic seed (e.g. DEK private key) to preserve user quota when requests are replayed.'
       )
-    } else {
-      userSeed = seed
     }
     this.rawMessage = Buffer.from(base64PhoneNumber, 'base64')
     this.blindedValue = await this.thresholdBls.blind(this.rawMessage, userSeed)
