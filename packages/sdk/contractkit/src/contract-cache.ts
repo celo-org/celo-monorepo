@@ -57,7 +57,7 @@ const WrapperFactories = {
   [CeloContract.Validators]: ValidatorsWrapper,
 }
 
-type CFType = typeof WrapperFactories
+export type CFType = typeof WrapperFactories
 export type ValidWrappers = keyof CFType
 
 interface WrapperCacheMap {
