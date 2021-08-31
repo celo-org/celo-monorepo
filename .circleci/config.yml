@@ -810,7 +810,7 @@ jobs:
     working_directory: ~/app
     docker:
       - image: circleci/openjdk:11-jdk-node
-    parallelism: 4
+    parallelism: 5
     steps:
       - attach_workspace:
           at: ~/app
@@ -866,6 +866,15 @@ jobs:
               chmod +x specs/scripts/*.sh
               ./specs/scripts/applyHarness.sh
               ./specs/scripts/governance.sh
+            fi
+      - run:
+          name: Build and run - Reserve
+          command: |
+            if [ ${CIRCLE_NODE_INDEX} == "4" ];
+            then
+              cd packages/protocol
+              chmod +x specs/scripts/*.sh
+              ./specs/scripts/reserve.sh
             fi
 
   flakey-test-summary:
