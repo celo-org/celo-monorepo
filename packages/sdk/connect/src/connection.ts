@@ -232,8 +232,7 @@ export class Connection {
 
     let gas = tx.gas
     if (gas == null) {
-      console.log(tx)
-      const gasEstimator = (_tx: CeloTx) => txObj.estimateGas(_tx)
+      const gasEstimator = (_tx: CeloTx) => txObj.estimateGas({ ..._tx })
       const getCallTx = (_tx: CeloTx) => {
         // @ts-ignore missing _parent property from TransactionObject type.
         return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
