@@ -333,7 +333,7 @@ export class Connection {
       debugGasEstimation('estimatedGas: %s', gas.toString())
       return gas
     } catch (e) {
-      const called = await caller({ data: tx.data, to: tx.to, from: tx.from })
+      const called = await caller({ data: tx.data, to: tx.to, from: tx.from, value: tx.value })
       let revertReason = 'Could not decode transaction failure reason'
       if (called.startsWith('0x08c379a')) {
         revertReason = decodeStringParameter(this.getAbiCoder(), called.substring(10))
