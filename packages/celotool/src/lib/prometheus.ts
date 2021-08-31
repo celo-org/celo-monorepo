@@ -180,6 +180,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       'apiserver_.+',
       'etcd_.+',
       'nginx_.+',
+      'phoenix_.+',
       'erlang_.+',
       'kubelet_[^v].+',
       'container_tasks_state',
