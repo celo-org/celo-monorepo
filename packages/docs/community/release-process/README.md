@@ -9,3 +9,4 @@ It is critical that updates to the Celo platform can be released on a regular ba
 {% page-ref page="base-cli-contractkit-dappkit-utils.md" %}
 
 {% page-ref page="attestation-service.md" %}
+

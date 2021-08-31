@@ -1,6 +1,6 @@
 # Phone Number Privacy
 
-Celo's [identity protocol](README.md) allows users to associate their phone number with one or more addresses on the Celo blockchain. This allows users to find each other on the Celo network using phone number instead of cumbersome hexadecimal addresses. The Oblivious Decentralized Identifier Service (ODIS) was created to help preserve the privacy of phone numbers and addresses.
+Celo's [identity protocol](./) allows users to associate their phone number with one or more addresses on the Celo blockchain. This allows users to find each other on the Celo network using phone number instead of cumbersome hexadecimal addresses. The Oblivious Decentralized Identifier Service \(ODIS\) was created to help preserve the privacy of phone numbers and addresses.
 
 ## Understanding the problem
 
@@ -8,15 +8,15 @@ When a user sends a payment to someone in their phone's address book, the mobile
 
 ## The solution
 
-The basis of the solution is to derive a user's identifier from both their phone number and a secret pepper that is provided by the Oblivious Decentralized Identifier Service (ODIS). In order to associate a phone number with a Celo blockchain address, the mobile wallet first queries ODIS for the pepper. It then uses the pepper to compute the unique identifier that's used on-chain.
+The basis of the solution is to derive a user's identifier from both their phone number and a secret pepper that is provided by the Oblivious Decentralized Identifier Service \(ODIS\). In order to associate a phone number with a Celo blockchain address, the mobile wallet first queries ODIS for the pepper. It then uses the pepper to compute the unique identifier that's used on-chain.
 
 ### Pepper request quota
 
 ODIS imposes a quota on requests for peppers in order to limit the feasibility of rainbow table attacks. When ODIS receives a request for a pepper, it authenticates the request and ensures the requester has not exceeded their quota. Since blockchain accounts and phone numbers are not naturally Sybil-resistant, ODIS bases request quota on the following factors:
 
-- Requester transaction history
-- Requester phone number attestation count and success rate
-- Requester account balance
+* Requester transaction history
+* Requester phone number attestation count and success rate
+* Requester account balance
 
 The requirements for these factors are configured to make it prohibitively expensive to scrape large quantities of phone numbers while still allowing typical user flows to remain unaffected.
 
@@ -24,11 +24,11 @@ The requirements for these factors are configured to make it prohibitively expen
 
 ### Distributed Key Generation
 
-For the sake of user privacy, no single party should have the ability to unilaterally compute the pepper for a given phone number. To ensure this, ODIS was designed to be decentralized across a set of reputable participants. Before the ODIS was deployed, a set of operators participated in a Distributed Key Generation (DKG) ceremony to generate parts of a shared secret. Details of the the DKG setup can be found [in the Celo Threshold BLS repository](https://github.com/celo-org/celo-threshold-bls-rs). Each ODIS node holds a share of the key which can be used to sign the response to the user. When enough of these signatures are combined, their combination can be used to derive a unique, deterministic phone number pepper. The number of key holders (_m_) and threshold of signatures required (_k_) are both configurable at the time of the DKG ceremony.
+For the sake of user privacy, no single party should have the ability to unilaterally compute the pepper for a given phone number. To ensure this, ODIS was designed to be decentralized across a set of reputable participants. Before the ODIS was deployed, a set of operators participated in a Distributed Key Generation \(DKG\) ceremony to generate parts of a shared secret. Details of the the DKG setup can be found [in the Celo Threshold BLS repository](https://github.com/celo-org/celo-threshold-bls-rs). Each ODIS node holds a share of the key which can be used to sign the response to the user. When enough of these signatures are combined, their combination can be used to derive a unique, deterministic phone number pepper. The number of key holders \(_m_\) and threshold of signatures required \(_k_\) are both configurable at the time of the DKG ceremony.
 
 ### Rotating keys
 
-In the case that a key is compromised or a new ODIS operator is added, it will be necessary to perform a key rotation. Before going over the key rotation process, let's take a look at the implications of a compromised key. If the number of keys compromised at a time is less than the threshold _k_, the attacker will not be able to reach a sufficient threshold to compute the pepper for all phone numbers. Similarly, as long as _k_ other keys remain uncompromised, good users will still be able to perform the pepper lookup as part of the ODIS. Therefore, in the case that a single key is compromised, user data will remain private and the service operational; however, it's important that we can detect and perform a key rotation before the number of keys compromised exceeds _k_ or _m - k + 1_ (whichever is lower). For example, if there are ten ODIS operators and the required threshold is three, then if three of them are compromised an attacker may compute the pepper for all phone numbers. If eight are compromised then an attacker may prevent the rest of the nodes (two in this case) from generating the pepper for users. Note that "compromised" entities in these examples could also be malicious or simply unavailable.
+In the case that a key is compromised or a new ODIS operator is added, it will be necessary to perform a key rotation. Before going over the key rotation process, let's take a look at the implications of a compromised key. If the number of keys compromised at a time is less than the threshold _k_, the attacker will not be able to reach a sufficient threshold to compute the pepper for all phone numbers. Similarly, as long as _k_ other keys remain uncompromised, good users will still be able to perform the pepper lookup as part of the ODIS. Therefore, in the case that a single key is compromised, user data will remain private and the service operational; however, it's important that we can detect and perform a key rotation before the number of keys compromised exceeds _k_ or _m - k + 1_ \(whichever is lower\). For example, if there are ten ODIS operators and the required threshold is three, then if three of them are compromised an attacker may compute the pepper for all phone numbers. If eight are compromised then an attacker may prevent the rest of the nodes \(two in this case\) from generating the pepper for users. Note that "compromised" entities in these examples could also be malicious or simply unavailable.
 
 To rotate keys, a new DKG ceremony must be performed with at least _k_ of the _m_ original keys. These newly generated keys will not be compatible with the old keys; however if _k_ of the old keys are used, an attacker may still reach the necessary threshold.Therefore, it's extremely important that all of the old keys are destroyed after a successful key rotation. Note that a DKG ceremony also provides the opportunity to change the values for _k_ and _m_.
 
@@ -59,3 +59,4 @@ The hosted architecture is divided into two components, the Combiner and the Sig
 The combiner and signers maintain some minimal state in a SQL database, mainly related to quota tracking.
 
 For storage of the BLS signing key, the signers currently support three cloud-based keystores: Azure Key Vault, AWS Secret Manager, and Google Secret Manager.
+
