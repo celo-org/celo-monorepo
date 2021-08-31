@@ -575,9 +575,9 @@ contract('EpochRewards', (accounts: string[]) => {
   })
 
   describe('#updateTargetVotingYield()', () => {
-    // Arbitrary numbers
-    const totalSupply = new BigNumber(web3.utils.toWei('6000000')) //987346298761037469283746 // web3.utils.toWei('600000000')
-    const reserveBalance = new BigNumber(web3.utils.toWei('1000000')) //2397846127684712867321 // web3.utils.toWei('120000000')
+    // test numbers
+    const totalSupply = new BigNumber(web3.utils.toWei('6000000'))
+    const reserveBalance = new BigNumber(web3.utils.toWei('1000000'))
     const floatingSupply = totalSupply.minus(reserveBalance)
     let reserve: ReserveInstance
 
