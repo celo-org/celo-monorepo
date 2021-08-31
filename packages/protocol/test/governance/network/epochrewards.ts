@@ -576,8 +576,8 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#updateTargetVotingYield()', () => {
     // Arbitrary numbers
-    const totalSupply = new BigNumber(web3.utils.toWei('60000000')) //987346298761037469283746 // web3.utils.toWei('600000000')
-    const reserveBalance = new BigNumber(web3.utils.toWei('10000000')) //2397846127684712867321 // web3.utils.toWei('120000000')
+    const totalSupply = new BigNumber(web3.utils.toWei('600000')) //987346298761037469283746 // web3.utils.toWei('600000000')
+    const reserveBalance = new BigNumber(web3.utils.toWei('100000')) //2397846127684712867321 // web3.utils.toWei('120000000')
     const floatingSupply = totalSupply.minus(reserveBalance)
     let reserve: ReserveInstance
 
@@ -732,7 +732,7 @@ contract('EpochRewards', (accounts: string[]) => {
         await epochRewards.updateTargetVotingYield()
       })
 
-      it('should decrease the target voting yield by (votingFraction-target voting gold percentage) times adjustment factor', async () => {
+      it('should decrease the target voting yield by (100 - target voting gold percentage) times adjustment factor', async () => {
         const votingFraction = 1.0
         const expected = fromFixed(
           targetVotingYieldParams.initial.plus(
