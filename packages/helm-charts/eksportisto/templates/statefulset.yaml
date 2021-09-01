@@ -64,9 +64,12 @@ spec:
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
-          - "-nodeUri={{ .Values.web3Provider }}"
-          - "-datadir=/root/.eksportisto"
-          - "-sensitiveAccounts=/root/.eksportisto/sensitive-accounts.json"
+          - "legacy"
+          - "--nodeUri=ws://{{ .Values.celoTipNodeIP }}:8546"
+          - "--datadir=/root/.eksportisto"
+          - "--sensitiveAccounts=/root/.eksportisto/sensitive-accounts.json"
+          - "--profiling"
+          - "--concurrency=28"
         resources:
           requests:
             memory: 100Mi

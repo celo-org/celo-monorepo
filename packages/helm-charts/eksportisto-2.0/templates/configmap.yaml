@@ -8,28 +8,32 @@ data:
   config.yaml: |
     monitoring:
       port: 8080
-      address: 127.0.0.1
+      address: 0.0.0.0
       requestTimeoutSeconds: 25
 
-    celoNodeURI: {{ .Values.web3ProviderWS }}
-    sensitiveAccountsFilePath: /root/.eksportisto/sensitive-accounts.json
     redis:
       address: {{ .Release.Name }}-redis-headless:6379
       password: ""
       db: 0
+
+    sensitiveAccountsFilePath: /var/config/sensitive-accounts.json
+
     publisher:
       backfill: 
         enabled: true
         startBlock: 0
-        batchSize: 1000
+        batchSize: 40000
         sleepIntervalMilliseconds: 2000
       chainFollower:
         enabled: true
+
     indexer:
+      concurrency: 10
       bigquery:
         projectID: celo-testnet-production
         dataset: {{ .Values.bigquery.dataset }}
-        table: {{ .Values.bigquery.table }}
+        table: output
       destination: bigquery
-      sleepIntervalMilliseconds: 100
-      celoNodeURI: {{ .Values.web3ProviderHTTP }}
+      dequeueTimeoutMilliseconds: 5000
+      blockRetryAttempts: 3
+      blockRetryDelayMilliseconds: 1000

@@ -23,14 +23,6 @@ metadata:
     component: eksportisto
 spec:
   serviceName: {{ template "eksportisto.name" . }}-publisher
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
   podManagementPolicy: Parallel
   replicas: 1
   selector:
@@ -48,45 +40,30 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
+        configHash: "{{ .Values.configHash }}"
     spec:
-      initContainers:
-      - name: init-sensitive-accounts
-        image: alpine
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ['cp', '-L', '/var/config/sensitive-accounts.json', 
-                              '/var/config/service-account.json', 
-                              '/var/config/config.yaml',
-                              '/root/.eksportisto']
-        volumeMounts:
-        - name: data
-          mountPath: /root/.eksportisto
-        - name: config
-          mountPath: /var/config
       containers:
       - name: eksportisto-{{ .Values.deploymentSuffix }}
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
           - "publisher"
-          - "--config=/root/.eksportisto/config.yaml"
+          - "--config=/var/config/config.yaml"
+          - "--celo-node-uri=ws://{{ .Values.celoTipNodeIP }}:8546"
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: "/root/.eksportisto/service-account.json"
+          value: "/var/config/service-account.json"
         resources:
           requests:
             memory: 300Mi
-            cpu: 500m
+            cpu: 200m
         ports:
         - name: prometheus
           containerPort: 8080
         volumeMounts:
-        - name: data
-          mountPath: /root/.eksportisto
         - name: config
           mountPath: /var/config
       volumes:
-      - name: data
-        emptyDir: {}
       - name: config
         configMap:
           name: eksportisto-{{ .Values.deploymentSuffix }}-config

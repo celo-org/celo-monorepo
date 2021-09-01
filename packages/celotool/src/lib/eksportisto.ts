@@ -1,7 +1,9 @@
 import fs from 'fs'
-import { execCmd, outputIncludes } from 'src/lib/cmd-utils'
+import { execCmd, execCmdAndParseJson, outputIncludes } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
 import {
+  getConfigMapHashes,
+  HelmAction,
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
@@ -12,7 +14,6 @@ import {
   getServiceAccountKey,
 } from 'src/lib/service-account-utils'
 import { switchToProjectFromEnv } from 'src/lib/utils'
-import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 const yaml = require('js-yaml')
 const chartDirForVersion: Record<number, string> = {
@@ -24,33 +25,52 @@ function releaseName(celoEnv: string, suffix: string) {
   return `${celoEnv}-eksportisto-${suffix}`
 }
 
-export async function installHelmChart(celoEnv: string, version: number) {
+interface Context {
+  releaseName: string
+  suffix: string
+  chartVersion: number
+  chartDir: string
+  celoEnv: string
+}
+
+function buildContext(celoEnv: string): Context {
+  const chartVersion = parseInt(fetchEnv(envVar.EKSPORTISTO_CHART_VERSION), 10)
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  const chartDir = chartDirForVersion[version]
+  const chartDir = chartDirForVersion[chartVersion]
   if (chartDir === undefined) {
     throw new Error('version has to be 1 or 2')
   }
 
-  await installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, suffix),
+  return {
+    releaseName: releaseName(celoEnv, suffix),
     chartDir,
-    await helmParameters(celoEnv)
+    celoEnv,
+    chartVersion,
+    suffix,
+  }
+}
+
+export async function installHelmChart(celoEnv: string) {
+  const context = buildContext(celoEnv)
+  const params = await helmParameters(context)
+
+  await installGenericHelmChart(
+    context.celoEnv,
+    context.releaseName,
+    context.chartDir,
+    params.concat(`--set configHash="${await getConfigMapHash(context, params, 'install')}"`)
   )
 }
 
-export async function upgradeHelmChart(celoEnv: string, version: number) {
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  const chartDir = chartDirForVersion[version]
-  if (chartDir === undefined) {
-    throw new Error('version has to be 1 or 2')
-  }
+export async function upgradeHelmChart(celoEnv: string) {
+  const context = buildContext(celoEnv)
+  const params = await helmParameters(context)
 
   await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, suffix),
-    chartDir,
-    await helmParameters(celoEnv)
+    context.celoEnv,
+    context.releaseName,
+    context.chartDir,
+    params.concat(`--set configHash="${await getConfigMapHash(context, params, 'upgrade')}"`)
   )
 }
 
@@ -127,35 +147,113 @@ async function allowServiceAccountToWriteToBigquery(serviceAccountEmail: string)
   await execCmd(`gcloud projects set-iam-policy ${project} ${fn}`, {}, false, true)
 }
 
-async function helmParameters(celoEnv: string) {
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  const serviceAccountKeyBase64 = await getServiceAccountKeyBase64(celoEnv)
-  const serviceAccountEmail = await getServiceAccountEmail(getServiceAccountName(celoEnv))
-  await allowServiceAccountToWriteToBigquery(serviceAccountEmail)
+async function getConfigMapHash(context: Context, params: string[], action: HelmAction) {
+  const hashes = await getConfigMapHashes(
+    context.celoEnv,
+    context.releaseName,
+    context.chartDir,
+    params,
+    action
+  )
 
+  return hashes['eksportisto/templates/configmap.yaml']
+}
+
+interface NodeInfo {
+  ip: string
+  labels: Record<string, string>
+  status: string
+}
+
+interface CeloNodes {
+  tip: NodeInfo | undefined
+  backfill: NodeInfo[]
+}
+
+export async function getInternalTxNodeIps(context: Context): Promise<CeloNodes> {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  const instanceGroupURIs: string[] = await execCmdAndParseJson(
+    `gcloud compute instance-groups list --project '${project}' --filter="name~'${context.celoEnv}-tx-node-lb-internal-group'"  --format json --uri`
+  )
+
+  if (instanceGroupURIs.length !== 1) {
+    throw Error('Expecting one (and only one) instance group to match filter')
+  }
+
+  const instanceGroupURI = instanceGroupURIs[0]
+  const instanceURIs: string[] = await execCmdAndParseJson(
+    `gcloud compute instance-groups list-instances ${instanceGroupURI} --format json --uri`
+  )
+
+  const runningNodes = (
+    await Promise.all(
+      instanceURIs.map(async (instanceURI) => {
+        const details = await execCmdAndParseJson(
+          `gcloud compute instances describe ${instanceURI} --format json`
+        )
+        return {
+          ip: details.networkInterfaces[0].networkIP,
+          status: details.status,
+          labels: details.labels ?? {},
+        }
+      })
+    )
+  ).filter((node) => node.status === 'RUNNING')
+
+  const tipNodeLabel = `eksportisto-${context.suffix}-tip`
+  const backfillNodeLabel = `eksportisto-${context.suffix}-backfill`
+
+  return {
+    tip: runningNodes.find((node) => node.labels[tipNodeLabel] === 'true'),
+    backfill: runningNodes.filter((node) => node.labels[backfillNodeLabel] === 'true'),
+  }
+}
+
+async function helmParameters(context: Context) {
+  const { celoEnv } = context
+  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
   const params = [
     `--namespace ${celoEnv}`,
     `--set environment="${celoEnv}"`,
     `--set imageRepository="${fetchEnv(envVar.EKSPORTISTO_DOCKER_IMAGE_REPOSITORY)}"`,
     `--set imageTag="${fetchEnv(envVar.EKSPORTISTO_DOCKER_IMAGE_TAG)}"`,
     `--set deploymentSuffix=${suffix}`,
-    `--set bigquery.dataset=${celoEnv}_eksportisto_${suffix}`,
-    `--set bigquery.table=data`,
-    `--set serviceAccountBase64="${serviceAccountKeyBase64}"`,
     `--set sensitiveAccountsBase64=${Buffer.from(fetchSensitiveAccounts())
       .toString('base64')
       .trim()}`,
   ]
-  if (isVmBased()) {
+
+  if (context.chartVersion === 2) {
+    const serviceAccountKeyBase64 = await getServiceAccountKeyBase64(celoEnv)
+    const serviceAccountEmail = await getServiceAccountEmail(getServiceAccountName(celoEnv))
+    await allowServiceAccountToWriteToBigquery(serviceAccountEmail)
     params.push(
-      `--set web3ProviderWS="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`
+      `--set bigquery.dataset=${celoEnv}_eksportisto_${suffix}`,
+      `--set serviceAccountBase64="${serviceAccountKeyBase64}"`
     )
-    params.push(
-      `--set web3ProviderHTTP="http://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8545"`
-    )
-  } else {
-    params.push(`--set web3ProviderWS="ws://tx-nodes:8546"`)
-    params.push(`--set web3ProviderHTTP="http://tx-nodes:8545"`)
   }
+
+  if (isVmBased()) {
+    const nodes = await getInternalTxNodeIps(context)
+    if (nodes.tip === undefined) {
+      throw new Error(`No nodes in the VM group ar labeled as "eksportisto-${context.suffix}-tip"`)
+    }
+
+    params.push(`--set celoTipNodeIP="${nodes.tip.ip}"`)
+    if (context.chartVersion === 2) {
+      if (nodes.backfill.length === 0) {
+        throw new Error(
+          `No nodes in the VM group are labeled as "eksportisto-${context.suffix}-backfill`
+        )
+      }
+      params.push(
+        ...nodes.backfill.map((node, idx) => `--set celoBackfillNodeIPs[${idx}]="${node.ip}"`)
+      )
+    }
+  } else {
+    params.push(`--set celoTipNodeIP="tx-nodes"`)
+    params.push(`--set celoBackfillNodeIPs[0]="tx-nodes"`)
+  }
+
   return params
 }

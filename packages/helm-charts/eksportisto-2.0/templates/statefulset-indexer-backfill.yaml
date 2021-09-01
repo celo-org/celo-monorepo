@@ -23,16 +23,10 @@ metadata:
     component: eksportisto
 spec:
   serviceName: {{ template "eksportisto.name" . }}-idx-backfill
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
   podManagementPolicy: Parallel
-  replicas: 6
+  # n backfill pods per node
+  # replicas: {{ mul (len .Values.celoBackfillNodeIPs) 2 }}
+  replicas: 1
   selector:
     matchLabels:
       app: eksportisto
@@ -48,31 +42,24 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
+        configHash: "{{ .Values.configHash }}"
     spec:
-      initContainers:
-      - name: init-sensitive-accounts
-        image: alpine
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ['cp', '-L', '/var/config/sensitive-accounts.json', 
-                              '/var/config/service-account.json', 
-                              '/var/config/config.yaml',
-                              '/root/.eksportisto']
-        volumeMounts:
-        - name: data
-          mountPath: /root/.eksportisto
-        - name: config
-          mountPath: /var/config
       containers:
       - name: eksportisto-{{ .Values.deploymentSuffix }}
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
           - "indexer"
-          - "--config=/root/.eksportisto/config.yaml"
+          - "--config=/var/config/config.yaml"
           - "--indexer-source=backfill"
+          - "--celo-node-uri=http://{{ template "eksportisto.name" . }}-backfill-node-proxy:8545"
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: "/root/.eksportisto/service-account.json"
+          value: "/var/config/service-account.json"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         resources:
           requests:
             memory: 200Mi
@@ -81,13 +68,9 @@ spec:
         - name: prometheus
           containerPort: 8080
         volumeMounts:
-        - name: data
-          mountPath: /root/.eksportisto
         - name: config
           mountPath: /var/config
       volumes:
-      - name: data
-        emptyDir: {}
       - name: config
         configMap:
           name: eksportisto-{{ .Values.deploymentSuffix }}-config
