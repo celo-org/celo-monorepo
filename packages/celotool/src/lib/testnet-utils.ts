@@ -120,6 +120,7 @@ async function getGitRepoName(): Promise<string> {
       stdout = stdout.substring(0, stdout.length - '.git'.length)
     }
   } catch (error) {
+    // Not running from a git folder
     stdout = 'celo-monorepo'
   }
 
@@ -127,9 +128,14 @@ async function getGitRepoName(): Promise<string> {
 }
 
 async function getCommitHash(): Promise<string> {
-  const cmd = 'git show | head -n 1'
-  const stdout = (await execCmdWithExitOnFailure(cmd))[0]
-  return stdout.split(' ')[1].trim()
+  try {
+    const cmd = 'git show | head -n 1'
+    const stdout = (await execCmdWithExitOnFailure(cmd))[0]
+    return stdout.split(' ')[1].trim()
+  } catch (error) {
+    // Not running from a git folder
+    return 'no-commmit-hash'
+  }
 }
 
 // Writes data to a temporary file & uploads it to GCS
