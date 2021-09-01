@@ -80,11 +80,3 @@ The following are examples for cUSD and cEUR.
 To double-check that the above values are up-to-date, please verify using the `celocli network:contracts` command \([see documentation](https://docs.celo.org/command-line-interface/commands/network#celocli-network-contracts)\).
 {% endhint %}
 
-### Sending assets to Metamask
-
-Celo addresses have the same format as Ethereum addresses, so copying and pasting an address into the "to" field should work for most applications.
-
-{% hint style="warning" %}
-If you are scanning a QR code to populate transaction information some applications may give you an error. For example, Metamask prefixes addresses in QR codes with "ethereum:". This can cause problems when trying to send CELO to Metamask when scanning your Metamask address QR code with the Coinbase mobile application. To avoid this issue, simply copy and paste the address rather than use the QR code scanner.
-{% endhint %}
-
