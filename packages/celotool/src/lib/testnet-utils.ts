@@ -112,11 +112,17 @@ async function getGoogleCloudUserInfo(): Promise<string> {
 
 async function getGitRepoName(): Promise<string> {
   const cmd = 'git config --get remote.origin.url'
-  let stdout = (await execCmdWithExitOnFailure(cmd))[0].trim()
-  stdout = stdout.split(':')[1]
-  if (stdout.endsWith('.git')) {
-    stdout = stdout.substring(0, stdout.length - '.git'.length)
+  let stdout = ''
+  try {
+    stdout = (await execCmdWithExitOnFailure(cmd))[0].trim()
+    stdout = stdout.split(':')[1]
+    if (stdout.endsWith('.git')) {
+      stdout = stdout.substring(0, stdout.length - '.git'.length)
+    }
+  } catch (error) {
+    stdout = 'celo-monorepo'
   }
+
   return stdout
 }
 
