@@ -773,7 +773,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingFraction = 0.89
         const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
         await mockElection.setTotalVotes(totalVotes)
-        // naive time travel: mining takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
         for (let i = 0; i < 800; i++) {
           await epochRewards.updateTargetVotingYield()
         }
@@ -793,7 +793,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingFraction = 0.3
         const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
         await mockElection.setTotalVotes(totalVotes)
-        // naive time travel: mining blocks takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        // naive time travel: mining blocks takes too long, just repeatedly update target voting yield. One call is one epoch travelled
         for (let i = 0; i < 5; i++) {
           await epochRewards.updateTargetVotingYield()
         }
@@ -818,7 +818,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingFraction = 0.8
         const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
         await mockElection.setTotalVotes(totalVotes)
-        // naive time travel: mining blocks takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        // naive time travel: mining blocks takes too long, just repeatedly update target voting yield. One call is one epoch travelled
         for (let i = 0; i < 5; i++) {
           await epochRewards.updateTargetVotingYield()
         }
