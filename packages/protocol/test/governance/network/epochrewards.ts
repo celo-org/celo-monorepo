@@ -872,6 +872,54 @@ contract('EpochRewards', (accounts: string[]) => {
         assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
       })
     })
+
+    describe('When target voting yield is increased over one year by adjustment factor', () => {
+      beforeEach(async () => {
+        const totalVotes = floatingSupply
+          .times(fromFixed(targetVotingGoldFraction).minus(0.1))
+          .integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 365; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('the target voting yield should change as expected', async () => {
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor.times(0.1).times(365)
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('When target voting yield is decreased over one year by adjustment factor', () => {
+      beforeEach(async () => {
+        const totalVotes = floatingSupply
+          .times(fromFixed(targetVotingGoldFraction).plus(0.1))
+          .integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 365; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('the target voting yield should change as expected', async () => {
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.minus(
+            targetVotingYieldParams.adjustmentFactor.times(0.1).times(365)
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
   })
 
   describe('#calculateTargetEpochRewards()', () => {
