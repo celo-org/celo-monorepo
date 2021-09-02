@@ -753,7 +753,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingFraction = 0.1
         const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
         await mockElection.setTotalVotes(totalVotes)
-        // naive time travel: mining takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
         for (let i = 0; i < 600; i++) {
           await epochRewards.updateTargetVotingYield()
         }
