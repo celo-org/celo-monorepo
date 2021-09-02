@@ -77,7 +77,7 @@ async function execWithFallback<T>(
 ): Promise<T> {
   // Decorator to wrap execution of f
   // with an optional prioritization of kit1 and kit2
-  // an retry logic if execution with the first kit fails
+  // and retry logic if execution with the first kit fails
 
   let primaryKit = kit1
   let secondaryKit = kit2
