@@ -24,7 +24,7 @@ Since Celo network's [Donut Hardfork](https://github.com/celo-org/celo-proposals
 
 MetaMask does not natively support Celo compatibility and some features won’t work perfectly. Here are some things to be aware of when using MetaMask with Celo.
 
-### **No Private Key Import**
+### **Importing via Private Key**
 
 Celo and Ethereum use different derivation paths for generating seed phrases. Because MetaMask does not let you specify a derivation path to use:
 
@@ -32,11 +32,11 @@ Celo and Ethereum use different derivation paths for generating seed phrases. Be
 * If you want to import the Celo account you made on MetaMask to a different Celo wallet \(e.g. [Valora](https://valoraapp.com/)\) you'd have to import it using the private key itself, NOT the seed phrase that MetaMask gives you.
 * See these guides if you accidentally sent [ETH to CELO addresses](https://docs.celo.org/celo-owner-guide/celo-recovery) or [CELO to ETH addresses.](https://docs.celo.org/celo-owner-guide/eth-recovery)
 
-### **Gas Fees Require CELO**
+### Gas Fee Currency
 
 While gas on Celo can usually be paid in [many different currencies](https://docs.celo.org/celo-codebase/protocol/transactions/erc20-transaction-fees), when using MetaMask, gas fees will automatically be paid in CELO. This is because MetaMask will be using the [Ethereum-compatible Celo transaction format](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0035.md), which doesn't include the ****`feecurrency` field.
 
-### **Incorrect Logo**
+### Logo
 
 The MetaMask UI might show the ETH logo in places where it's meant to show the CELO logo or no logo at all.
 
