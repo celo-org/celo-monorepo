@@ -577,7 +577,7 @@ export const simulateClient = async (
 
     // randomly choose the recipientAddress if configured
     if (useRandomRecipient === 'true') {
-      recipientAddressFinal = `0x${randomBytes(40).toString('hex')}`
+      recipientAddressFinal = `0x${randomBytes(20).toString('hex')}`
       baseLogMessage.recipient = recipientAddressFinal
     }
 
