@@ -873,7 +873,7 @@ contract('EpochRewards', (accounts: string[]) => {
       })
     })
 
-    describe('When target voting yield is increased over one year by adjustment factor', () => {
+    describe('When target voting yield is increased over 365 epochs by adjustment factor', () => {
       beforeEach(async () => {
         const totalVotes = floatingSupply
           .times(fromFixed(targetVotingGoldFraction).minus(0.1))
@@ -897,7 +897,7 @@ contract('EpochRewards', (accounts: string[]) => {
       })
     })
 
-    describe('When target voting yield is decreased over one year by adjustment factor', () => {
+    describe('When target voting yield is decreased over 365 epochs by adjustment factor', () => {
       beforeEach(async () => {
         const totalVotes = floatingSupply
           .times(fromFixed(targetVotingGoldFraction).plus(0.1))
