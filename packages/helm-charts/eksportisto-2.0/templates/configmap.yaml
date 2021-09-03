@@ -23,8 +23,9 @@ data:
         enabled: true
         startBlock: 0
         batchSize: 40000
+        tipBuffer: 3
         sleepIntervalMilliseconds: 2000
-      chainFollower:
+      chainTip:
         enabled: true
 
     indexer:
@@ -32,7 +33,7 @@ data:
       bigquery:
         projectID: celo-testnet-production
         dataset: {{ .Values.bigquery.dataset }}
-        table: output
+        table: data
       destination: bigquery
       dequeueTimeoutMilliseconds: 5000
       blockRetryAttempts: 3
