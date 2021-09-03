@@ -1116,7 +1116,8 @@ function rollingUpdateHelmVariables() {
 export async function saveHelmValuesFile(
   celoEnv: string,
   valueFilePath: string,
-  useExistingGenesis: boolean
+  useExistingGenesis: boolean,
+  skipGenesisValue = false
 ) {
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
@@ -1124,12 +1125,16 @@ export async function saveHelmValuesFile(
 
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
 
-  const valueFileContent = `
-genesis:
-  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+  let valueFileContent = `
 staticnodes:
   staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
 `
+  if (!skipGenesisValue) {
+    valueFileContent += `
+  genesis:
+    genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+`
+  }
   fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
