@@ -38,5 +38,5 @@
 
 # helm-charts rules.
 /packages/helm-charts/ @nambrot @timmoreton
-/packages/helm-charts/blockscout @celo-org/core-services
+/packages/helm-charts/blockscout/ @celo-org/core-services
 /packages/helm-charts/oracle/ @celo-org/platform-economics
