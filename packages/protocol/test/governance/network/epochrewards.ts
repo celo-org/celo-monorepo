@@ -842,12 +842,11 @@ contract('EpochRewards', (accounts: string[]) => {
     // test over several epochs when voting fraction fluctuates around target
     describe('When votingFraction fluctuates around the target', () => {
       beforeEach(async () => {
-        let votingFractionArray = [0.8, 0.3, 2 / 3]
+        const votingFractionArray = [0.8, 0.3, 2 / 3]
 
-        for (let _i = 0; _i < votingFractionArray.length; _i++) {
-          const votingFraction = votingFractionArray[_i]
+        for (const votingFractionElement of votingFractionArray) {
           const totalVotes = floatingSupply
-            .times(votingFraction)
+            .times(votingFractionElement)
             .integerValue(BigNumber.ROUND_FLOOR)
           await mockElection.setTotalVotes(totalVotes)
           await epochRewards.updateTargetVotingYield()
@@ -855,13 +854,13 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('target voting yield should be adjusted as expected', async () => {
-        let votingFractionArray = [0.8, 0.3, 2 / 3]
+        const votingFractionArray = [0.8, 0.3, 2 / 3]
 
         let expected = targetVotingYieldParams.initial
-        for (let _i = 0; _i < votingFractionArray.length; _i++) {
+        for (const votingFractionElement of votingFractionArray) {
           expected = expected.plus(
             targetVotingYieldParams.adjustmentFactor.times(
-              fromFixed(targetVotingGoldFraction.minus(toFixed(votingFractionArray[_i])))
+              fromFixed(targetVotingGoldFraction.minus(toFixed(votingFractionElement)))
             )
           )
         }
