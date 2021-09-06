@@ -77,7 +77,7 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
       - name: import-geth-account
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -215,6 +215,8 @@ spec:
             memory: 4Gi
             cpu: 2
         env:
+        - name: LOAD_TEST_USE_RANDOM_RECIPIENT
+          value: "{{ default "true" .Values.use_random_recipient }}"
         - name: MNEMONIC
           valueFrom:
             secretKeyRef:
