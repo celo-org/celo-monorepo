@@ -100,7 +100,7 @@ contract Accounts is
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
   event OffchainStorageRootAdded(address indexed account, bytes url);
-  event OffchainStorageRootRemoved(address indexed account, bytes url);
+  event OffchainStorageRootRemoved(address indexed account, bytes url, uint256 index);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -268,7 +268,7 @@ contract Accounts is
     bytes memory url = offchainStorageRoots[msg.sender][index];
     offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
     offchainStorageRoots[msg.sender].length--;
-    emit OffchainStorageRootRemoved(msg.sender, url);
+    emit OffchainStorageRootRemoved(msg.sender, url, index);
   }
 
   /**

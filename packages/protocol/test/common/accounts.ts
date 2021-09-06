@@ -440,7 +440,7 @@ contract('Accounts', (accounts: string[]) => {
           const event = response.logs[0]
           assertLogMatches2(event, {
             event: 'OffchainStorageRootRemoved',
-            args: { account: caller, url: storageRoot },
+            args: { account: caller, url: storageRoot, index: 0 },
           })
         })
       })
