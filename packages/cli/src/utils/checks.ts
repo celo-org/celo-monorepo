@@ -3,6 +3,7 @@ import { Address } from '@celo/connect'
 import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
+import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
@@ -93,6 +94,13 @@ class CheckBuilder {
     }
   }
 
+  withGrandaMento<A>(f: (accounts: GrandaMentoWrapper) => A): () => Promise<Resolve<A>> {
+    return async () => {
+      const accounts = await this.kit.contracts.getGrandaMento()
+      return f(accounts) as Resolve<A>
+    }
+  }
+
   withGovernance<A>(
     f: (governance: GovernanceWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
   ): () => Promise<Resolve<A>> {
@@ -129,6 +137,12 @@ class CheckBuilder {
     this.addCheck(
       `${proposalID} is an existing proposal`,
       this.withGovernance((governance) => governance.proposalExists(proposalID))
+    )
+
+  grandaMentoProposalExists = (proposalID: string) =>
+    this.addCheck(
+      `${proposalID} is an existing proposal`,
+      this.withGrandaMento((grandaMento) => grandaMento.exchangeProposalExists(proposalID))
     )
 
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
