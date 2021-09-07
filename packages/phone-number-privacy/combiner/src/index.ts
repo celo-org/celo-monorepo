@@ -60,7 +60,7 @@ export const getBlindedMessageSig = functions
     // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
     minInstances: 3,
   })
-  .https.onRequest(async (req, res) =>
+  .https.onRequest(async (req: functions.Request, res: functions.Response) =>
     meterResponse(handleGetBlindedMessageSig, req, res, '/getBlindedMessageSig')
   )
 
@@ -72,7 +72,7 @@ export const getContactMatches = functions
     // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
     minInstances: 3,
   })
-  .https.onRequest(async (req, res) =>
+  .https.onRequest(async (req: functions.Request, res: functions.Response) =>
     meterResponse(handleGetContactMatches, req, res, '/getContactMatches')
   )
 
