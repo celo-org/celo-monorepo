@@ -27,30 +27,18 @@
 
 ## CELO Owner Guide
 
-<<<<<<< HEAD
-* [Quick Start](celo-owner-guide/quick-start.md)
-* [cUSD Owner Guide](celo-owner-guide/cusd.md)
-* [Using a Ledger Wallet](celo-holder-guide/ledger.md)
-  * [Celo Terminal App](celo-holder-guide/connecting-ledger-celo-terminal-wallet.md)
-  * [Celo Web Wallet](celo-holder-guide/connecting-ledger-celo-web-wallet.md)
-  * [Celo CLI](celo-holder-guide/connecting-ledger-celocli.md)
-* [Understanding ReleaseGold](celo-owner-guide/release-gold.md)
-* [Voting for Validator Groups](celo-owner-guide/voting-validators.md)
-* [Voting on Governance](celo-owner-guide/voting-governance.md)
-* [Governance Cheat Sheet](celo-owner-guide/governance-cheat-sheet.md)
-* [Recovering CELO from an Ethereum Address](celo-owner-guide/eth-recovery.md)
-* [Recovering ETH from a Celo Address](celo-owner-guide/celo-recovery.md)
-=======
 - [Quick Start](celo-holder-guide/quick-start.md)
 - [cUSD Owner Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
+  - [Celo Terminal App](celo-holder-guide/connecting-ledger-celo-terminal-wallet.md)
+  - [Celo Web Wallet](celo-holder-guide/connecting-ledger-celo-web-wallet.md)
+  - [Celo CLI](celo-holder-guide/connecting-ledger-celocli.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Governance Cheat Sheet](celo-holder-guide/governance-cheat-sheet.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
 - [Recovering ETH from a Celo Address](celo-holder-guide/celo-recovery.md)
->>>>>>> master
 
 ## Validator Guide
 
@@ -998,12 +986,6 @@
 
 ## Important Information
 
-<<<<<<< HEAD
-* [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
-* [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)
-* [Mainnet Disclaimer](important-information/mainnet-network-disclaimer.md)
-=======
 - [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
 - [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)
 - [Mainnet Disclaimer](important-information/mainnet-network-disclaimer.md)
->>>>>>> master
