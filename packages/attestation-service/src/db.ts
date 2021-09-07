@@ -70,15 +70,20 @@ export function isDBOnline() {
 
 const kits = new Array<ContractKit | undefined>(celoProviders.length).fill(undefined)
 
+/**
+ * Decorator to wrap execution of f
+ * with an optional prioritization of kit1 and kit2
+ * and retry logic if execution with the first kit fails
+ * @param f function to execute
+ * @param kit1 primary kit instance
+ * @param kit2 optional secondary kit instance
+ * @returns f(kit)
+ */
 async function execWithFallback<T>(
   f: (kit: ContractKit) => T,
   kit1: ContractKit,
   kit2?: ContractKit | undefined
 ): Promise<T> {
-  // Decorator to wrap execution of f
-  // with an optional prioritization of kit1 and kit2
-  // and retry logic if execution with the first kit fails
-
   let primaryKit = kit1
   let secondaryKit = kit2
   // Check if backup kit is ahead of primary kit; change prioritization as such
@@ -224,6 +229,10 @@ export async function verifyConfigurationAndGetURL() {
   }
 }
 
+/**
+ * Function to initialize each kit in the global array of Contract Kit(s)
+ * @param force if true, reinitialize kit(s) whether or not they already exist
+ */
 export async function initializeKits(force: boolean = false) {
   rootLogger.info('Initializing Contract Kit(s)')
   let keystoreWalletWrapper: KeystoreWalletWrapper | undefined
@@ -241,6 +250,7 @@ export async function initializeKits(force: boolean = false) {
 
   const failedConnections = await Promise.all(
     kits.map(async (kit, i) => {
+      // Return whether kit_i fails to connect to the given provider
       if (kit === undefined || force) {
         try {
           kits[i] = keystoreWalletWrapper
@@ -258,7 +268,7 @@ export async function initializeKits(force: boolean = false) {
       }
     })
   )
-  // No kits successfully reinitialized or existing kits that work
+  // No kits successfully reinitialized nor existing kits that work
   if (failedConnections && failedConnections.filter(Boolean).length === kits.length) {
     throw new Error(`Initializing ContractKit failed for all providers: ${celoProviders}.`)
   }
