@@ -955,6 +955,7 @@
   - [Election](command-line-interface/election.md)
   - [Exchange](command-line-interface/exchange.md)
   - [Governance](command-line-interface/governance.md)
+  - [Granda Mento](command-line-interface/grandamento.md)
   - [Identity](command-line-interface/identity.md)
   - [LockedGold](command-line-interface/lockedgold.md)
   - [Multisig](command-line-interface/multisig.md)
