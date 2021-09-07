@@ -221,9 +221,9 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
 export async function accessSecretVersion() {
   try {
     const client = new SecretManagerServiceClient()
-    const projectId = '253914576835'
-    const secretName = 'grafana-cloud'
-    const secretVersion = '6'
+    const projectId = fetchEnv(envVar.GRAFANA_CLOUD_PROJECT_ID)
+    const secretName = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_NAME)
+    const secretVersion = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_VERSION)
     const [version] = await client.accessSecretVersion({
       name: `projects/${projectId}/secrets/${secretName}/versions/${secretVersion}`,
     })
