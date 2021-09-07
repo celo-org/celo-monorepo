@@ -1,4 +1,6 @@
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import fs from 'fs'
+import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { getCurrentGcloudAccount } from './gcloud_utils'
@@ -214,4 +216,42 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   const command = `kubectl patch --namespace=${celoEnv} ing/${celoEnv}-blockscout-web-ingress --type=json\
    -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
   await execCmdWithExitOnFailure(command)
+}
+
+export async function accessSecretVersion() {
+  try {
+    const client = new SecretManagerServiceClient()
+    const projectId = '253914576835'
+    const secretName = 'grafana-cloud'
+    const secretVersion = '6'
+    const [version] = await client.accessSecretVersion({
+      name: `projects/${projectId}/secrets/${secretName}/versions/${secretVersion}`,
+    })
+
+    const privateKey = JSON.parse(version?.payload?.data?.toString()!).grafana_api_token
+
+    if (!privateKey) {
+      throw new Error('Key is empty or undefined')
+    }
+
+    return privateKey
+  } catch (error) {
+    console.info('Error retrieving key')
+  }
+}
+
+export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, suffix: string) {
+  const token = await accessSecretVersion()
+  await fetch('https://clabs.grafana.net/api/annotations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      text: `Deployed ${celoEnv} ${suffix} with commit: \n \n
+      <a href=\"https://github.com/celo-org/blockscout/commit/${tag}"> ${tag}</a>\n`,
+      tags: ['deployment', celoEnv],
+    }),
+  })
 }
