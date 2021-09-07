@@ -93,8 +93,6 @@ spec:
           set -euo pipefail
           ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress`
           exec geth \
-            --password=/root/.celo/password \
-            --unlock=${ATTESTATION_SIGNER_ADDRESS} \
             --ws \
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
@@ -104,8 +102,7 @@ spec:
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
-            --metrics \
-            --allow-insecure-unlock
+            --metrics
         env:
         - name: NETWORK_ID
           valueFrom:
@@ -136,7 +133,7 @@ spec:
           yarn db:migrate
           sleep 5
           NEXMO_APPLICATIONS={{- range $index, $application := .Values.attestation_service.nexmo.applications -}}{{ $application }},{{- end }}
-          NEXMO_APPLICATION=`echo -n $NEXMO_APPLICATIONS | cut -d ',' -f $((RID + 1))` ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` exec yarn start
+          NEXMO_APPLICATION=`echo -n $NEXMO_APPLICATIONS | cut -d ',' -f $((RID + 1))` ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` ATTESTATION_SIGNER_KEYSTORE_PASSPHRASE=`cat /root/.celo/password` exec yarn start
         ports:
         - name: http
           containerPort: 3000
@@ -153,8 +150,10 @@ spec:
           value: postgres://postgres:password@{{ .Release.Namespace }}-attestation-service-postgresql:5432/
         - name: NODE_ENV
           value: production
-        - name: CELO_PROVIDER
-          value: ws://localhost:8546
+        - name: CELO_PROVIDERS
+          value: ws://localhost:8546{{ .Values.attestation_service.celo_provider_backups_str }}
+        - name: ATTESTATION_SIGNER_KEYSTORE_DIRPATH
+          value: /root/.celo
         - name: LOG_FORMAT
           value: stackdriver
         - name: NEXMO_KEY
