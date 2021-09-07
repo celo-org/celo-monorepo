@@ -1,7 +1,7 @@
 # Using MetaMask with Celo
 
 {% hint style="danger" %}
-Do not send ETH to your Celo address. Do not send CELO assets to your Ethereum address.
+Do not send ETH to your Celo address. Do not send CELO assets to your Ethereum address. Always make sure that you are connected to the correct network.
 {% endhint %}
 
 [MetaMask](https://metamask.io/) is a crypto wallet that can be used in a web browser and on mobile devices to interact with the Ethereum blockchain. Many dApps in the space integrate with MetaMask, and we're excited to bring its functionality to the Celo ecosystem.
