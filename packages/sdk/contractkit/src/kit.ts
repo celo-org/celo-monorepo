@@ -24,6 +24,7 @@ import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
+import { GrandaMentoConfig } from './wrappers/GrandaMento'
 import { LockedGoldConfig } from './wrappers/LockedGold'
 import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
@@ -66,6 +67,7 @@ export interface NetworkConfig {
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
   blockchainParameters: BlockchainParametersConfig
+  grandaMento: GrandaMentoConfig
 }
 
 interface AccountBalance extends EachCeloToken<BigNumber> {
@@ -147,6 +149,7 @@ export class ContractKit {
       contracts[8].getConfig(),
       contracts[9].getConfig(),
       contracts[10].getConfig(),
+      contracts[11].getConfig(),
     ])
     return {
       exchanges: res[0],
@@ -161,6 +164,7 @@ export class ContractKit {
       validators: res[9],
       downtimeSlasher: res[10],
       blockchainParameters: res[11],
+      grandaMento: res[12],
     }
   }
 
