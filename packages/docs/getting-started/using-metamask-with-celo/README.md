@@ -39,6 +39,6 @@ While gas on Celo can usually be paid in [many different currencies](../../celo-
 
 In some cases, the MetaMask UI may display the Ethereum logo in places where it should display a CELO logo or no logo at all.
 
-{% hint style="warning" %}
-MetaMask is primarily used for interacting with the Ethereum blockchain and does not natively support Celo compatibility. Celo recommends only sophisticated users and developers use it. Alternatively, you may choose a Celo native wallet [here](../../getting-started/wallets.md).
+{% hint style="info" %}
+MetaMask is primarily used for interacting with the Ethereum blockchain and does not natively support Celo compatibility. Alternatively, you may choose a Celo native wallet [here](../../getting-started/wallets.md).
 {% endhint %}
