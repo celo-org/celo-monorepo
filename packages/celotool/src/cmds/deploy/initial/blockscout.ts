@@ -1,5 +1,6 @@
 import {
   createDefaultIngressIfNotExists,
+  createGrafanaTagAnnotation,
   getInstanceName,
   getReleaseName,
   installHelmChart,
@@ -59,6 +60,7 @@ export const handler = async (argv: InitialArgv) => {
   )
 
   if (!isCelotoolHelmDryRun()) {
+    await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
     await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
   }
 }
