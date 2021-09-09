@@ -11,14 +11,14 @@ rule nonspenderCantReduceBalance(address a, method f) {
   require(!isSpender(a));
   require(!isExchangeSpender(a));
   require(getExchangeAddress() != a);
-  uint256 balanceBefore = invoke contractBalance();
+  uint256 balanceBefore = contractBalance();
 
   env e;
   require(e.msg.sender == a);
   calldataarg arg;
-  sinvoke f(e, arg);
+  f(e, arg);
 
-  uint256 balanceAfter = invoke contractBalance();
+  uint256 balanceAfter = contractBalance();
   if (f.isFallback) {
     assert balanceAfter >= balanceBefore;
   } else {
