@@ -27,6 +27,18 @@ At a high level, the life of an exchange is:
 
 Processes surrounding Granda Mento exchanges, like how to achieve rough consensus from the community, are outlined in [CIP 46](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0046.md). At the minimum, it takes about 7 days to achieve rough consensus.
 
+The approver multi-sig that is ultimately responsible for approving an exchange proposal that has achieved rough consensus from the community is `0xf10011424A0F35B8411e9abcF120eCF067E4CF27` ([link](https://explorer.celo.org/address/0xf10011424A0F35B8411e9abcF120eCF067E4CF27/transactions)) and has the following signers:
+
+| **Name**        | **Affiliation**                       | **Discord Handle**        | **Address**                                  |
+|-----------------|---------------------------------------|---------------------------|----------------------------------------------|
+| Andrew Shen     | [Bi23 Labs](https://bi23.com/)        | `Shen \| Bi23 Labs #6675` | `0xBecc041a5090cD08AbD3940ab338d4CC94d2Ed3c` |
+| Pinotio         | [Pinotio](https://pinotio.com/)       | `Pinotio.com #5357`       | `0x802FE32083fD341D8e9A35E3a351291d948a83E6` |
+| Serge Kiema     | [DuniaPay](https://www.duniapay.net/) | `serge_duniapay #5152`    | `0xdcac99458a3c5957d8ae7b92e4bafc88a32b80e4` |
+| Will Kraft      | Celo Governance Working Group         | `Will Kraft #2508`        | `0x169E992b3c4BE08c42582DAb1DCFb2549d9C23E1` |
+| Zviad Metreveli | [WOTrust](https://wotrust.us/)        | `zm #1073`                | `0xE267D978037B89db06C6a5FcF82fAd8297E290ff` |
+| human           | [OpenCelo](https://www.opencelo.org/) | `human #6811`             | `0x91f2437f5C8e7A3879e14a75a7C5b4CccC76023a` |
+| Deepak Nuli     | [Kresko](https://www.kresko.fi/)      | `Deepak \| Kresko#3647`   | `0x099f3F5527671594351E30B48ca822cc90778a11` |
+
 ### How to create an exchange proposal
 
 Refer to [CIP 46](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0046.md) for information surrounding processes.
