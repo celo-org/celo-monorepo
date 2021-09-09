@@ -7,18 +7,20 @@ methods {
   contractBalance() returns uint256 envfree
 }
 
-rule nonspenderCantReduceBalance(address a, method f) {
-  require(!isSpender(a));
-  require(!isExchangeSpender(a));
-  require(getExchangeAddress() != a);
+rule nonspenderCantReduceBalance(address nonspender, method f) {
+  require(!isSpender(nonspender));
+  require(!isExchangeSpender(nonspender));
+  require(getExchangeAddress() != nonspender);
+
   uint256 balanceBefore = contractBalance();
 
   env e;
-  require(e.msg.sender == a);
+  require(e.msg.sender == nonspender);
   calldataarg arg;
   f(e, arg);
 
   uint256 balanceAfter = contractBalance();
+
   if (f.isFallback) {
     assert balanceAfter >= balanceBefore;
   } else {
