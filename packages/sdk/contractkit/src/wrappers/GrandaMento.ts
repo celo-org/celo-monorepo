@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { StableTokenContract } from '../base'
-import { StableToken } from '../celo-tokens'
+import { StableToken as StableTokenEnum } from '../celo-tokens'
 import { GrandaMento } from '../generated/GrandaMento'
+import { newStableToken } from '../generated/StableToken'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,
@@ -9,6 +10,7 @@ import {
   proxySend,
   valueToBigNumber,
 } from './BaseWrapper'
+import { StableTokenWrapper } from './StableTokenWrapper'
 
 export enum ExchangeProposalState {
   None,
@@ -38,6 +40,19 @@ export interface ExchangeProposal {
   approvalTimestamp: BigNumber
   state: ExchangeProposalState
   sellCelo: boolean
+  id: string | number
+}
+
+export interface ExchangeProposalReadable {
+  exchanger: string
+  stableToken: string
+  sellAmount: BigNumber
+  buyAmount: BigNumber
+  approvalTimestamp: BigNumber
+  state: string
+  sellCelo: boolean
+  id: string | number
+  implictPricePerCelo: BigNumber
 }
 
 type AllStableConfig = Map<StableTokenContract, StableTokenExchangeLimits>
@@ -83,6 +98,12 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     return createExchangeProposalInner(stableTokenRegistryId, sellAmount.toFixed(), sellCelo)
   }
 
+  async exchangeProposalExists(exchangeProposalID: string | number) {
+    const result = await this.contract.methods.exchangeProposals(exchangeProposalID).call()
+    const state = parseInt(result.state, 10)
+    return !(state === ExchangeProposalState.None)
+  }
+
   async getExchangeProposal(exchangeProposalID: string | number): Promise<ExchangeProposal> {
     const result = await this.contract.methods.exchangeProposals(exchangeProposalID).call()
     const state = parseInt(result.state, 10)
@@ -99,11 +120,34 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
       approvalTimestamp: new BigNumber(result.approvalTimestamp),
       sellCelo: result.sellCelo,
       state,
+      id: exchangeProposalID,
+    }
+  }
+
+  async getHumanRedableExchangeProposal(
+    exchangeProposalID: string | number
+  ): Promise<ExchangeProposalReadable> {
+    const proposal = await this.getExchangeProposal(exchangeProposalID)
+
+    const stableTokenContract = new StableTokenWrapper(
+      this.kit,
+      newStableToken(this.kit.connection.web3, proposal.stableToken)
+    )
+
+    return {
+      ...proposal,
+      stableToken: `${await stableTokenContract.name()} (${await stableTokenContract.symbol()}) at ${
+        proposal.stableToken
+      }`,
+      implictPricePerCelo: proposal.sellCelo
+        ? proposal.buyAmount.div(proposal.sellAmount)
+        : proposal.sellAmount.div(proposal.buyAmount),
+      state: ExchangeProposalState[proposal.state],
     }
   }
 
   async stableTokenExchangeLimits(
-    stableTokenTymbol: StableToken
+    stableTokenTymbol: StableTokenEnum
   ): Promise<StableTokenExchangeLimits> {
     const stableTokenRegistryId = this.kit.celoTokens.getContract(stableTokenTymbol)
     const result = await this.contract.methods
@@ -119,10 +163,10 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     const out: AllStableConfig = new Map()
 
     const res = await Promise.all(
-      Object.values(StableToken).map((key) => this.stableTokenExchangeLimits(key))
+      Object.values(StableTokenEnum).map((key) => this.stableTokenExchangeLimits(key))
     )
 
-    Object.values(StableToken).map((key, index) =>
+    Object.values(StableTokenEnum).map((key, index) =>
       out.set(this.kit.celoTokens.getContract(key), res[index])
     )
 

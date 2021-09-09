@@ -7,6 +7,7 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { checkProposal } from '../../utils/governance'
+
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
 
