@@ -1,9 +1,8 @@
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
-import { getCurrentGcloudAccount } from './gcloud_utils'
+import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
@@ -218,35 +217,17 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   await execCmdWithExitOnFailure(command)
 }
 
-export async function accessSecretVersion() {
-  try {
-    const client = new SecretManagerServiceClient()
-    const projectId = fetchEnv(envVar.GRAFANA_CLOUD_PROJECT_ID)
-    const secretName = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_NAME)
-    const secretVersion = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_VERSION)
-    const [version] = await client.accessSecretVersion({
-      name: `projects/${projectId}/secrets/${secretName}/versions/${secretVersion}`,
-    })
-
-    const privateKey = JSON.parse(version?.payload?.data?.toString()!).grafana_api_token
-
-    if (!privateKey) {
-      throw new Error('Key is empty or undefined')
-    }
-
-    return privateKey
-  } catch (error) {
-    console.info('Error retrieving key')
-  }
-}
-
 export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, suffix: string) {
-  const token = await accessSecretVersion()
-  await fetch('https://clabs.grafana.net/api/annotations', {
+  const projectId = fetchEnv(envVar.GRAFANA_CLOUD_PROJECT_ID)
+  const secretName = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_NAME)
+  const secretVersion = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_VERSION)
+  const secret = await accessSecretVersion(projectId, secretName, secretVersion)
+  const token = JSON.parse(secret!)
+  await fetch(`${token!.grafana_endpoint}/api/annotations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token!.grafana_api_token}`,
     },
     body: JSON.stringify({
       text: `Deployed ${celoEnv} ${suffix} with commit: \n \n
