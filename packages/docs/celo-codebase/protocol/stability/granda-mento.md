@@ -43,7 +43,7 @@ The approver multi-sig that is ultimately responsible for approving an exchange 
 
 Refer to [CIP 46](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0046.md) for information surrounding processes.
 
-The easiest way create an exchange proposal on-chain is using the `celocli grandamento:propose` command ([docs here](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-propose)). For example:
+The easiest way create an exchange proposal on-chain is using the `celocli grandamento:propose` command ([docs](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-propose)). For example:
 
 ```
 celocli grandamento:propose --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --sellCelo=true --stableToken=cUSD --value=20000000000000000000000
@@ -51,15 +51,15 @@ celocli grandamento:propose --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --
 
 ### How to view exchange proposals
 
-Exchange proposal information, including the token and quantities being sold and bought, can be easily viewed using celocli.
+Exchange proposal information, including the tokens and quantities being sold and bought, can be easily viewed using celocli.
 
-To list all exchange proposals that have been proposed and are not yet cancelled, vetoed, or executed, use the `celocli grandamento:list` command ([docs here](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-list)). For example:
+To list all exchange proposals that have been proposed and are not yet cancelled, vetoed, or executed, use the `celocli grandamento:list` command ([docs](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-list)). For example:
 
 ```
 celocli grandamento:list
 ```
 
-To show a specific exchange proposal regardless of it being proposed, cancelled, vetoed, or executed, use the `celocli grandamento:show` command ([docs here](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-show)). For example:
+To show a specific exchange proposal regardless of it being proposed, cancelled, vetoed, or executed, use the `celocli grandamento:show` command ([docs](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-show)). For example:
 
 ```
 celocli grandamento:show --proposalID 1
@@ -67,17 +67,17 @@ celocli grandamento:show --proposalID 1
 
 ### How to cancel an exchange proposal
 
-The exchanger of an exchange proposal can cancel the exchange proposal if the proposal has not yet been approved. This can be done using the `celocli grandamento:cancel` command ([docs here](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-cancel)). For example:
+The exchanger of an exchange proposal can cancel the exchange proposal if the proposal has not yet been approved. This can be done using the `celocli grandamento:cancel` command ([docs](https://docs.celo.org/command-line-interface/commands/grandamento#celocli-grandamento-cancel)). For example:
 
 ```
 celocli grandamento:cancel --proposalID 1
 ```
 
-If an exchange proposal has already been approved or someone other than the exchanger wishes to cancel (or "veto") an exchange proposal, this must be done by a governance proposal. CIP 46 provides information on the exact details of the governance proposal [here](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0046.md#vetoing-an-exchange-proposal).
+If an exchange proposal has already been approved or someone other than the exchanger wishes to cancel (or "veto") an exchange proposal, this must be done by a governance proposal. [CIP 46](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0046.md#vetoing-an-exchange-proposal) provides information on the exact details of the governance proposal.
 
 ### How to view current Granda Mento parameters
 
-Granda Mento's governable parameters can be viewed using the `celocli network:parameters` command ([docs here](https://docs.celo.org/command-line-interface/commands/network#celocli-network-parameters)). For example:
+Granda Mento's governable parameters can be viewed using the `celocli network:parameters` command ([docs](https://docs.celo.org/command-line-interface/commands/network#celocli-network-parameters)). For example:
 
 ```
 celocli network:parameters
