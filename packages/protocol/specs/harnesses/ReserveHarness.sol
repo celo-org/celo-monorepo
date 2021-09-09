@@ -10,6 +10,6 @@ contract ReserveHarness is Reserve {
   }
 
   function getExchangeAddress() public view returns (address) {
-    return registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID);
+    return address(getExchange());
   }
 }
