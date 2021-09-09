@@ -836,7 +836,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "0" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/lockedgold.sh
               ./specs/scripts/lockedgold.sh
             fi
       - run:
@@ -845,7 +844,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "1" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/accounts.sh
               ./specs/scripts/accounts.sh
             fi
       - run:
@@ -854,7 +852,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "2" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/accountsPrivileged.sh
               ./specs/scripts/accountsPrivileged.sh
             fi
       - run:
@@ -863,7 +860,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "3" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/*.sh
               ./specs/scripts/applyHarness.sh
               ./specs/scripts/governance.sh
             fi
@@ -873,7 +869,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "4" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/*.sh
               ./specs/scripts/reserve.sh
             fi
 
