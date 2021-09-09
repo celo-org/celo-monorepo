@@ -3,5 +3,5 @@ certoraRun specs/harnesses/GovernanceHarness.sol contracts/common/Accounts.sol \
 	--cache governance \
 	--optimistic_loop \
 	--solc_args "['--evm-version', 'istanbul']" \
-	--settings -ciMode=true \
+  --short_output \
 	--msg "Governance privilege check" 

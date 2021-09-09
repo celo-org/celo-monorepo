@@ -2,6 +2,6 @@ certoraRun specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarnes
 	--link LockedGoldHarness:goldToken=GoldTokenHarness \
 	--verify LockedGoldHarness:specs/lockedGold.spec \
 	--optimistic_loop \
-	--settings -ciMode=true \
+  --short_output \
 	--msg "LockedGold" \
 	--solc_args "['--evm-version', 'istanbul']"

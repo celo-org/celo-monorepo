@@ -4,5 +4,5 @@ certoraRun specs/harnesses/AccountsHarness.sol \
 	--loop_iter 2 \
 	--cache accounts \
 	--solc_args "['--evm-version', 'istanbul']" \
-	--settings -ciMode=true \
+  --short_output \
 	--msg "Accounts privilege check"
