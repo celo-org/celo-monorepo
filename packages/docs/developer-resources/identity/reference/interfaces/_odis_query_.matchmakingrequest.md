@@ -15,6 +15,7 @@
 * [contactPhoneNumbers](_odis_query_.matchmakingrequest.md#contactphonenumbers)
 * [hashedPhoneNumber](_odis_query_.matchmakingrequest.md#hashedphonenumber)
 * [sessionID](_odis_query_.matchmakingrequest.md#optional-sessionid)
+* [signedUserPhoneNumber](_odis_query_.matchmakingrequest.md#optional-signeduserphonenumber)
 * [userPhoneNumber](_odis_query_.matchmakingrequest.md#userphonenumber)
 * [version](_odis_query_.matchmakingrequest.md#optional-version)
 
@@ -44,7 +45,7 @@ ___
 
 • **contactPhoneNumbers**: *string[]*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L52)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L51)*
 
 ___
 
@@ -52,7 +53,7 @@ ___
 
 • **hashedPhoneNumber**: *string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L53)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L52)*
 
 ___
 
@@ -66,11 +67,19 @@ ___
 
 ___
 
+### `Optional` signedUserPhoneNumber
+
+• **signedUserPhoneNumber**? : *undefined | string*
+
+*Defined in [packages/sdk/identity/src/odis/query.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L53)*
+
+___
+
 ###  userPhoneNumber
 
 • **userPhoneNumber**: *string*
 
-*Defined in [packages/sdk/identity/src/odis/query.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L51)*
+*Defined in [packages/sdk/identity/src/odis/query.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L50)*
 
 ___
 

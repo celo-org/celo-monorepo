@@ -41,7 +41,7 @@ describe('Running against a deployed service', () => {
       }
 
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
@@ -68,7 +68,7 @@ describe('Running against a deployed service', () => {
         version: 'ignore',
       }
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
       ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
     })
   })
