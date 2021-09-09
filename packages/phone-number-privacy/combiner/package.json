@@ -19,7 +19,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "test": "jest --runInBand --testPathIgnorePatterns test\/end-to-end",
+    "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "test:e2e": "jest test/end-to-end --verbose",
     "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net yarn test:e2e",
     "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net yarn test:e2e",
@@ -31,8 +31,8 @@
   },
   "dependencies": {
     "@celo/contractkit": "1.2.0",
-    "@celo/phone-number-privacy-common": "1.0.34",
     "@celo/identity": "1.2.0",
+    "@celo/phone-number-privacy-common": "1.0.34",
     "@celo/utils": "1.0.2",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "^6.5.4",
@@ -40,11 +40,13 @@
     "firebase-functions": "^3.6.0",
     "knex": "^0.21.1",
     "node-fetch": "^2.6.1",
+    "opossum": "^6.2.0",
     "pg": "^8.2.1",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",
+    "@types/opossum": "^4.1.2",
     "@types/uuid": "^7.0.3",
     "dotenv": "^8.2.0",
     "firebase-functions-test": "^0.2.0"

@@ -5274,6 +5274,13 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
+"@types/opossum@^4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@types/opossum/-/opossum-4.1.2.tgz#cea6f498382fd5262ba53d5401280fb906f2c71f"
+  integrity sha512-/t9JaahIqrkA8ZxExHwkLTgSLQ/g8UFPM0rqQK3xKUV7MS19XhHlSHEkQ1izpJLATY09iVL+ZG5xZihncRIwSw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/p-defer@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@types/p-defer/-/p-defer-1.0.3.tgz#786ce79c86f779fcd9e9bec4f1fbd1167aeac064"
@@ -20122,6 +20129,11 @@ openzeppelin-solidity@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/openzeppelin-solidity/-/openzeppelin-solidity-2.5.0.tgz#829a9bcfc928619dd96c44bd893b180044ff51aa"
   integrity sha512-I0yRC3nff9Kn2LDWuz02fuw0EuomVQ9Z8lHzdqh8P9BiOUzIk8frQRxn/a1Kva3StF6hwPP+Dh3/SQ2ily1Pow==
+
+opossum@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/opossum/-/opossum-6.2.0.tgz#19154f934ad656f296e593794d4a8b7e91852aa2"
+  integrity sha512-pqemKjWRvgkhNNRsovfKQ/B3t16OIyOp+VPr+jQCf2U/PhqfyFyvur6LxMxw+1Vrj+Q392YSav6z9wS1wwc+2g==
 
 optimist@0.6.1:
   version "0.6.1"
