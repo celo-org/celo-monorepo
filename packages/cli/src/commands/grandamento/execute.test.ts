@@ -11,7 +11,6 @@ import Propose from './propose'
 testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const kit = newKitFromWeb3(web3)
   let grandaMento: GrandaMentoWrapper
-  const proposalID = 1
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
@@ -54,14 +53,14 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     // create mock proposal
     await createExchangeProposal()
     // Approve it
-    await approveExchangeProposal(proposalID)
+    await approveExchangeProposal(1)
     // Wait the veto period
     await timeTravel((await grandaMento.vetoPeriodSeconds()).toNumber(), web3)
   })
 
   describe('execute', () => {
     it('executes the proposal', async () => {
-      await Execute.run(['--from', accounts[0], '--proposalID', proposalID.toString()])
+      await Execute.run(['--from', accounts[0], '--proposalID', '1'])
       const activeProposals = await grandaMento.getActiveProposalIds()
       expect(activeProposals).toEqual([])
     })
@@ -69,7 +68,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     it('fails if the exchange proposal is not executable', async () => {
       // Create a proposal with proposalID 2, but don't wait the veto period
       await createExchangeProposal()
-      await approveExchangeProposal(proposalID)
+      await approveExchangeProposal(2)
 
       await expect(Execute.run(['--from', accounts[0], '--proposalID', '2'])).rejects.toThrow()
     })
