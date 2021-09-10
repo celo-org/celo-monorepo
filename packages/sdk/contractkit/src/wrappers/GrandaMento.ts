@@ -59,17 +59,36 @@ export interface ExchangeProposalReadable {
 type AllStableConfig = Map<StableTokenContract, StableTokenExchangeLimits>
 
 export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
+  owner = proxyCall(this.contract.methods.owner)
+
   approver = proxyCall(this.contract.methods.approver)
+  setApprover = proxySend(this.kit, this.contract.methods.setApprover)
+
+  maxApprovalExchangeRateChange = proxyCall(
+    this.contract.methods.maxApprovalExchangeRateChange,
+    undefined,
+    fixidityValueToBigNumber
+  )
+  setMaxApprovalExchangeRateChange = proxySend(
+    this.kit,
+    this.contract.methods.setMaxApprovalExchangeRateChange
+  )
 
   spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
+  setSpread = proxySend(this.kit, this.contract.methods.setSpread)
 
   vetoPeriodSeconds = proxyCall(
     this.contract.methods.vetoPeriodSeconds,
     undefined,
     valueToBigNumber
   )
+  setVetoPeriodSeconds = proxySend(this.kit, this.contract.methods.setVetoPeriodSeconds)
 
-  owner = proxyCall(this.contract.methods.owner)
+  exchangeProposalCount = proxyCall(
+    this.contract.methods.exchangeProposalCount,
+    undefined,
+    valueToBigNumber
+  )
 
   async getActiveProposalIds() {
     const unfilteredIds = await this.contract.methods.getActiveProposalIds().call()
