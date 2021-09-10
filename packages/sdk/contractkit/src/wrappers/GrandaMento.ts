@@ -175,6 +175,17 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     return out
   }
 
+  async getBuyAmount(
+    celoStableTokenOracleRate: BigNumber,
+    sellAmount: BigNumber,
+    sellCelo: boolean
+  ): Promise<BigNumber> {
+    const result = await this.contract.methods
+      .getBuyAmount(celoStableTokenOracleRate.toFixed(), sellAmount.toFixed(), sellCelo)
+      .call()
+    return new BigNumber(result)
+  }
+
   async getConfig(): Promise<GrandaMentoConfig> {
     const res = await Promise.all([
       this.approver(),
