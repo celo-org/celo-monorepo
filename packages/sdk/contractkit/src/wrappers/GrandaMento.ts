@@ -37,6 +37,7 @@ export interface ExchangeProposal {
   stableToken: string
   sellAmount: BigNumber
   buyAmount: BigNumber
+  vetoPeriodSeconds: BigNumber
   approvalTimestamp: BigNumber
   state: ExchangeProposalState
   sellCelo: boolean
@@ -117,6 +118,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
       stableToken: result.stableToken,
       sellAmount: new BigNumber(result.sellAmount),
       buyAmount: new BigNumber(result.buyAmount),
+      vetoPeriodSeconds: new BigNumber(result.vetoPeriodSeconds),
       approvalTimestamp: new BigNumber(result.approvalTimestamp),
       sellCelo: result.sellCelo,
       state,

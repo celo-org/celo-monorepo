@@ -20,7 +20,7 @@ export default class Show extends BaseCommand {
     const res = this.parse(Show)
     const proposalID = res.flags.proposalID
 
-    await newCheckBuilder(this).grandaMentoProposalExists(proposalID)
+    await newCheckBuilder(this).grandaMentoProposalExists(proposalID).runChecks()
 
     const proposal = await grandaMento.getHumanRedableExchangeProposal(proposalID)
 
