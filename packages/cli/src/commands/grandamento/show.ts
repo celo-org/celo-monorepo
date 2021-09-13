@@ -22,7 +22,7 @@ export default class Show extends BaseCommand {
 
     await newCheckBuilder(this).grandaMentoProposalExists(proposalID).runChecks()
 
-    const proposal = await grandaMento.getHumanRedableExchangeProposal(proposalID)
+    const proposal = await grandaMento.getHumanReadableExchangeProposal(proposalID)
 
     printValueMap(proposal)
   }

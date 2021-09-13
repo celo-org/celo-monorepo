@@ -24,6 +24,7 @@ export interface GrandaMentoConfig {
   approver: string
   spread: BigNumber
   vetoPeriodSeconds: BigNumber
+  maxApprovalExchangeRateChange: BigNumber
   exchangeLimits: AllStableConfig
 }
 
@@ -145,7 +146,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     }
   }
 
-  async getHumanRedableExchangeProposal(
+  async getHumanReadableExchangeProposal(
     exchangeProposalID: string | number
   ): Promise<ExchangeProposalReadable> {
     const proposal = await this.getExchangeProposal(exchangeProposalID)
@@ -210,13 +211,15 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
       this.approver(),
       this.spread(),
       this.vetoPeriodSeconds(),
+      this.maxApprovalExchangeRateChange(),
       this.getAllStableTokenLimits(),
     ])
     return {
       approver: res[0],
       spread: res[1],
       vetoPeriodSeconds: res[2],
-      exchangeLimits: res[3],
+      maxApprovalExchangeRateChange: res[3],
+      exchangeLimits: res[4],
     }
   }
 }
