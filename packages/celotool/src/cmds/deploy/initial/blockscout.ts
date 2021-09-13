@@ -60,7 +60,7 @@ export const handler = async (argv: InitialArgv) => {
   )
 
   if (!isCelotoolHelmDryRun()) {
-    await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
+    await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix, blockscoutCredentials[0])
     await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
   }
 }

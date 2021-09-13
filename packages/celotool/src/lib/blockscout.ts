@@ -217,7 +217,12 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   await execCmdWithExitOnFailure(command)
 }
 
-export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, suffix: string) {
+export async function createGrafanaTagAnnotation(
+  celoEnv: string,
+  tag: string,
+  suffix: string,
+  author: string
+) {
   const projectId = fetchEnv(envVar.GRAFANA_CLOUD_PROJECT_ID)
   const secretName = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_NAME)
   const secretVersion = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_VERSION)
@@ -230,7 +235,7 @@ export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, s
       Authorization: `Bearer ${token!.grafana_api_token}`,
     },
     body: JSON.stringify({
-      text: `Deployed ${celoEnv} ${suffix} with commit: \n \n
+      text: `Deployed ${celoEnv} ${suffix} by ${author} with commit: \n \n
       <a href=\"https://github.com/celo-org/blockscout/commit/${tag}"> ${tag}</a>\n`,
       tags: ['deployment', celoEnv],
     }),
