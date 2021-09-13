@@ -3,5 +3,5 @@ site_url: https://example.com/
 site_dir: site
 theme: 
     name: readthedocs
-    collapse_navigation: True
+    collapse_navigation: False
     titles_only: True
