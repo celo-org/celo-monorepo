@@ -68,6 +68,8 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
       if (BigNumber.isBigNumber(v)) {
         const extra = v.isGreaterThan(new BigNumber(10).pow(3)) ? `(~${v.toExponential(3)})` : ''
         return `${v.toFixed()} ${extra}`
+      } else if (v instanceof Error) {
+        return '\n' + chalk.red(v.message)
       }
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
     }
