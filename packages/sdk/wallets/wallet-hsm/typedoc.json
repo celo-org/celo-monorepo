@@ -7,7 +7,7 @@
     "includeDeclarations": false,
     "ignoreCompilerErrors": true,
     "hideGenerator": "true",
-    "theme": "gitbook",
-    "out": "../../../docs/developer-resources/wallet-hsm/reference",
-    "gitRevision": "master"
+    "out": "../../../docs/sdk/docs/wallet-hsm",
+    "gitRevision": "master",
+    "readme": "none"
   }

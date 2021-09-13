@@ -20,7 +20,7 @@
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf src/generated",
     "prepublishOnly": "yarn build",
-    "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts contractkit",
+    "docs": "typedoc",
     "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 25",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
