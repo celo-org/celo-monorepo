@@ -1,5 +1,6 @@
 import { Address } from '@celo/base/lib/address'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
+import { fromFixed, toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableToken } from '../celo-tokens'
@@ -154,7 +155,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   it('#getConfig', async () => {
     const config = await grandaMento.getConfig()
-    expect(config.approver).toBe(expConfig.approver) // TODO FIX this tests, for some reason `expConfig.approver` is 0x0000...0 even it's writen on the migrations-override.json
+    expect(config.approver).toBe(expConfig.approver)
     expect(config.spread).toEqBigNumber(expConfig.spread)
     expect(config.maxApprovalExchangeRateChange).toEqBigNumber(
       expConfig.maxApprovalExchangeRateChange
@@ -172,5 +173,17 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     expect(
       config.exchangeLimits.get(kit.celoTokens.getContract(StableToken.cEUR))?.maxExchangeAmount
     ).toEqBigNumber(new BigNumber(0))
+  })
+
+  describe('#getBuyAmount', () => {
+    it('gets the buy amount', async () => {
+      const oracleRate = 1
+      const sellAmount = toFixed(1)
+      expect(await grandaMento.getBuyAmount(toFixed(oracleRate), sellAmount, true)).toEqBigNumber(
+        sellAmount
+          .times(oracleRate)
+          .minus(new BigNumber(1).minus(fromFixed(await grandaMento.spread())))
+      )
+    })
   })
 })

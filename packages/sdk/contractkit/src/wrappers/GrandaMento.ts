@@ -196,7 +196,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
   }
 
   async getBuyAmount(
-    celoStableTokenOracleRate: BigNumber,
+    celoStableTokenOracleRate: BigNumber, // Note this is intended to be a fixed point number
     sellAmount: BigNumber,
     sellCelo: boolean
   ): Promise<BigNumber> {
