@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
+import { setGrandaMentoLimits } from '../test-utils/grandaMento'
 import { assumeOwnership } from '../test-utils/transferownership'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import { ExchangeProposalState, GrandaMentoWrapper } from './GrandaMento'
@@ -40,9 +41,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     min: BigNumber = newLimitMin,
     max: BigNumber = newLimitMax
   ) => {
-    await grandaMento
-      .setStableTokenExchangeLimits(registryId, min.toString(), max.toString())
-      .sendAndWaitForReceipt()
+    await setGrandaMentoLimits(grandaMento, min, max, registryId)
   }
 
   describe('No limits sets', () => {
@@ -132,6 +131,22 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
         proposal = await grandaMento.getExchangeProposal(activeProposals[0])
         expect(proposal.state).toEqual(ExchangeProposalState.Executed)
+      })
+
+      it('displays human format correctly', async () => {
+        const activeProposals = await grandaMento.getActiveProposalIds()
+
+        const proposal = await grandaMento.getHumanRedableExchangeProposal(activeProposals[0])
+        expect(proposal.exchanger).toEqual(accounts[0])
+        expect(proposal.stableToken).toEqual(
+          'Celo Dollar (cUSD) at 0x10A736A7b223f1FE1050264249d1aBb975741E75'
+        )
+        expect(proposal.sellAmount).toEqBigNumber(sellAmount)
+        expect(proposal.buyAmount).toEqBigNumber(new BigNumber('99000000'))
+        expect(proposal.approvalTimestamp).toEqual(new BigNumber(0))
+        expect(proposal.state).toEqual('Proposed')
+        expect(proposal.sellCelo).toEqual(true)
+        expect(proposal.implictPricePerCelo).toEqBigNumber(new BigNumber('0.99'))
       })
 
       it('cancels proposal', async () => {
