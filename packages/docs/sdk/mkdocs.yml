@@ -1,5 +1,6 @@
 site_name: Celo SDK Docs
 site_url: https://example.com/
+site_dir: site
 theme: 
     name: readthedocs
     collapse_navigation: True
