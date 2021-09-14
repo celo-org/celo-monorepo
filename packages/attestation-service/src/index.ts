@@ -23,9 +23,11 @@ import { handleGetAttestationRequest } from './requestHandlers/get_attestation'
 import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
-import { initializeSmsProviders, smsProvidersWithDeliveryStatus } from './sms'
+import { SmsService } from './sms'
 
 async function init() {
+  const smsService = new SmsService()
+
   await initializeDB()
   await initializeKits()
 
@@ -42,7 +44,7 @@ async function init() {
 
   const deliveryStatusURLForProviderType = (t: string) => `${externalURL}/delivery_status_${t}`
 
-  await initializeSmsProviders(deliveryStatusURLForProviderType)
+  await smsService.initializeSmsProviders(deliveryStatusURLForProviderType)
 
   await startPeriodicHealthCheck()
   await startPeriodicKitsCheck()
@@ -63,7 +65,12 @@ async function init() {
   app.get('/metrics', (_req, res) => {
     res.send(PromClient.register.metrics())
   })
-  app.get('/status', createValidatedHandler(StatusRequestType, handleStatusRequest))
+  app.get(
+    '/status',
+    createValidatedHandler(StatusRequestType, (req, res, par) =>
+      handleStatusRequest(req, res, par, smsService)
+    )
+  )
   app.get('/ready', (_req, res) => {
     res.send('Ready').status(200)
   })
@@ -80,10 +87,12 @@ async function init() {
   app.post(
     '/test_attestations',
     express.json(),
-    createValidatedHandler(AttestationServiceTestRequestType, handleTestAttestationRequest)
+    createValidatedHandler(AttestationServiceTestRequestType, (req, res, par) =>
+      handleTestAttestationRequest(req, res, par, smsService)
+    )
   )
 
-  for (const p of smsProvidersWithDeliveryStatus()) {
+  for (const p of smsService.smsProvidersWithDeliveryStatus()) {
     const path = `/delivery_status_${p.type}`
     const method = p.deliveryStatusMethod()
     rootLogger.info(
@@ -91,9 +100,17 @@ async function init() {
       'Registered delivery status handler'
     )
     if (method === 'POST') {
-      app.post(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+      app.post(
+        path,
+        ...p.deliveryStatusHandlers(),
+        handleAttestationDeliveryStatus(smsService, p.type)
+      )
     } else if (method === 'GET') {
-      app.get(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+      app.get(
+        path,
+        ...p.deliveryStatusHandlers(),
+        handleAttestationDeliveryStatus(smsService, p.type)
+      )
     } else {
       throw new Error(`Unknown method ${method} for ${path}`)
     }

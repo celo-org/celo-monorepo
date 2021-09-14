@@ -5,13 +5,14 @@ import { randomBytes } from 'crypto'
 import express from 'express'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { ErrorMessages, respondWithAttestation, respondWithError } from '../request'
-import { startSendSms } from '../sms'
-import { obfuscateNumber } from '../sms/base'
+import { obfuscateNumber } from '../helper/anonymity'
+import { SmsService } from '../sms'
 
 export async function handleTestAttestationRequest(
   _req: express.Request,
   res: express.Response,
-  testRequest: AttestationServiceTestRequest
+  testRequest: AttestationServiceTestRequest,
+  smsService: SmsService
 ) {
   const logger = res.locals.logger.child({
     testProvider: testRequest.provider,
@@ -50,18 +51,18 @@ export async function handleTestAttestationRequest(
     const sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
       logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
 
-    const attestation = await startSendSms(
-      key,
-      testRequest.phoneNumber,
-      testRequest.message,
-      '12345678',
-      testRequest.message,
-      undefined,
-      undefined,
+    const attestation = await smsService.startSendSms({
+      key: key,
+      phoneNumber: testRequest.phoneNumber,
+      messageToSend: testRequest.message,
+      securityCode: '12345678',
+      attestationCode: testRequest.message,
+      appSignature: undefined,
+      language: undefined,
       logger,
       sequelizeLogger,
-      testRequest.provider
-    )
+      onlyUseProvider: testRequest.provider ?? null,
+    })
 
     respondWithAttestation(res, attestation, false, salt)
   } catch (error) {

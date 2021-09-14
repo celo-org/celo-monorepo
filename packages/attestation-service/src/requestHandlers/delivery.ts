@@ -1,10 +1,10 @@
 import express from 'express'
 import { ErrorMessages, respondWithError } from '../request'
-import { smsProviderOfType } from '../sms'
+import { SmsService } from '../sms'
 
-export function handleAttestationDeliveryStatus(providerType: string) {
+export function handleAttestationDeliveryStatus(smsService: SmsService, providerType: string) {
   return async (_req: express.Request, res: express.Response) => {
-    const provider = smsProviderOfType(providerType)
+    const provider = smsService.smsProviderOfType(providerType)
 
     if (provider === undefined) {
       respondWithError(res, 422, ErrorMessages.NO_PROVIDER_SETUP)

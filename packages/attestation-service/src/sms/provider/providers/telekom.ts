@@ -2,21 +2,13 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import fetch from 'node-fetch'
-import { receivedDeliveryReport } from '.'
-import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
-import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
+
+import { receivedDeliveryReport } from '../../index'
+import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { SmsProvider } from '../smsProvider'
+import { SmsProviderType } from '../smsProvider.enum'
 
 export class TelekomSmsProvider extends SmsProvider {
-  static fromEnv() {
-    return new TelekomSmsProvider(
-      fetchEnv('TELEKOM_API_KEY'),
-      fetchEnv('TELEKOM_FROM'),
-      fetchEnvOrDefault('TELEKOM_URL', 'https://developer-api.telekom.com/vms/Messages.json'),
-      readUnsupportedRegionsFromEnv('TELEKOM_UNSUPPORTED_REGIONS')
-    )
-  }
-
   type = SmsProviderType.TELEKOM
   apiKey: string
   deliveryStatusURL: string | undefined

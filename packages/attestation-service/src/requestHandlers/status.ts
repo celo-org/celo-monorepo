@@ -4,7 +4,7 @@ import * as t from 'io-ts'
 import { getAgeOfLatestBlock, isNodeSyncing, useKit } from '../db'
 import { fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress, isYes } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
-import { configuredSmsProviders } from '../sms'
+import { SmsService } from '../sms'
 
 export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
@@ -27,7 +27,8 @@ function produceSignature(message: string | undefined) {
 export async function handleStatusRequest(
   _req: express.Request,
   res: express.Response,
-  statusRequest: StatusRequest
+  statusRequest: StatusRequest,
+  smsService: SmsService
 ) {
   try {
     const { ageOfLatestBlock, number: latestBlock } = await getAgeOfLatestBlock()
@@ -35,7 +36,7 @@ export async function handleStatusRequest(
       .json(
         AttestationServiceStatusResponseType.encode({
           status: 'ok',
-          smsProviders: configuredSmsProviders(),
+          smsProviders: smsService.configuredSmsProviders(),
           blacklistedRegionCodes: [], // for backwards compatibility
           accountAddress: getAccountAddress(),
           signature: await produceSignature(statusRequest.messageToSign),

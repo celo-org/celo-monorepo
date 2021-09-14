@@ -2,25 +2,17 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
-import Nexmo from 'nexmo'
-import { receivedDeliveryReport } from '.'
-import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
-import { Gauges } from '../metrics'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
-import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
+import { Nexmo } from 'nexmo'
+
+import { receivedDeliveryReport } from '../../index'
+import { Gauges } from '../../../metrics'
+import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { SmsProvider } from '../smsProvider'
+import { SmsProviderType } from '../smsProvider.enum'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
 export class NexmoSmsProvider extends SmsProvider {
-  static fromEnv() {
-    return new NexmoSmsProvider(
-      fetchEnv('NEXMO_KEY'),
-      fetchEnv('NEXMO_SECRET'),
-      fetchEnvOrDefault('NEXMO_APPLICATION', ''),
-      readUnsupportedRegionsFromEnv('NEXMO_UNSUPPORTED_REGIONS', 'NEXMO_BLACKLIST'),
-      isYes(fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', ''))
-    )
-  }
   type = SmsProviderType.NEXMO
   client: any
   nexmoNumbers: Array<{

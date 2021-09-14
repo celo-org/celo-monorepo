@@ -5,19 +5,13 @@ import express from 'express'
 import initMB, { MessageBird } from 'messagebird'
 import fetch from 'node-fetch'
 import util from 'util'
-import { fetchEnv } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
-import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
-import { receivedDeliveryReport } from './index'
+
+import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { receivedDeliveryReport } from '../../index'
+import { SmsProvider } from '../smsProvider'
+import { SmsProviderType } from '../smsProvider.enum'
 
 export class MessageBirdSmsProvider extends SmsProvider {
-  static fromEnv() {
-    return new MessageBirdSmsProvider(
-      fetchEnv('MESSAGEBIRD_API_KEY'),
-      readUnsupportedRegionsFromEnv('MESSAGEBIRD_UNSUPPORTED_REGIONS')
-    )
-  }
-
   messagebird: MessageBird
   type = SmsProviderType.MESSAGEBIRD
   deliveryStatusURL: string | undefined

@@ -2,22 +2,13 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
-import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
-import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
-import { receivedDeliveryReport } from './index'
+
+import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { receivedDeliveryReport } from '../../index'
+import { SmsProvider } from '../smsProvider'
+import { SmsProviderType } from '../smsProvider.enum'
 
 export class TwilioSmsProvider extends SmsProvider {
-  static fromEnv() {
-    return new TwilioSmsProvider(
-      fetchEnv('TWILIO_ACCOUNT_SID'),
-      fetchEnv('TWILIO_MESSAGING_SERVICE_SID'),
-      fetchEnvOrDefault('TWILIO_VERIFY_SERVICE_SID', ''),
-      fetchEnv('TWILIO_AUTH_TOKEN'),
-      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST')
-    )
-  }
-
   client: Twilio
   messagingServiceSid: string
   verifyServiceSid: string

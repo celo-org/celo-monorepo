@@ -1,8 +1,8 @@
 import { E164Number } from '@celo/utils/lib/io'
-import Logger from 'bunyan'
+import { AttestationModel } from '../../models/attestation'
 import express from 'express'
-import { fetchEnvOrDefault } from '../env'
-import { AttestationModel } from '../models/attestation'
+import Logger from 'bunyan'
+import { SmsProviderType } from './smsProvider.enum'
 
 export abstract class SmsProvider {
   abstract type: SmsProviderType
@@ -11,6 +11,8 @@ export abstract class SmsProvider {
   canServePhoneNumber(countryCode: string, _: E164Number) {
     return !this.unsupportedRegionCodes.includes(countryCode.toUpperCase())
   }
+  abstract initialize(deliveryStatusURL: string): void
+
   // Should throw Error when unsuccesful, return if successful
   abstract sendSms(attestation: AttestationModel): Promise<string>
 
@@ -21,31 +23,4 @@ export abstract class SmsProvider {
 
   // Should throw Error when unsuccesful, return if successful
   abstract receiveDeliveryStatusReport(req: express.Request, logger: Logger): Promise<void>
-}
-
-export enum SmsProviderType {
-  NEXMO = 'nexmo',
-  UNKNOWN = 'unknown',
-  TWILIO = 'twilio',
-  MESSAGEBIRD = 'messagebird',
-  TELEKOM = 'telekom',
-}
-
-export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {
-  return envVarNames
-    .map((envVarName) =>
-      fetchEnvOrDefault(envVarName, '')
-        .toUpperCase()
-        .split(',')
-        .filter((code) => code !== '')
-    )
-    .reduce((acc, v) => acc.concat(v), [])
-}
-
-export function obfuscateNumber(phoneNumber: string): string {
-  try {
-    return phoneNumber.slice(0, 7) + '...'
-  } catch {
-    return ''
-  }
 }
