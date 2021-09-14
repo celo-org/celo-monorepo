@@ -178,11 +178,13 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
   describe('#getBuyAmount', () => {
     it('gets the buy amount', async () => {
       const oracleRate = 1
-      const sellAmount = toFixed(1)
-      expect(await grandaMento.getBuyAmount(toFixed(oracleRate), sellAmount, true)).toEqBigNumber(
-        sellAmount
+      const hypotheticalSellAmount = toFixed(1)
+      expect(
+        await grandaMento.getBuyAmount(toFixed(oracleRate), hypotheticalSellAmount, true)
+      ).toEqBigNumber(
+        hypotheticalSellAmount
           .times(oracleRate)
-          .minus(new BigNumber(1).minus(fromFixed(await grandaMento.spread())))
+          .times(new BigNumber(1).minus(fromFixed(await grandaMento.spread())))
       )
     })
   })
