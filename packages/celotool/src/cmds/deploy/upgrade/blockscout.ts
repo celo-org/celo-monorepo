@@ -1,6 +1,7 @@
 import sleep from 'sleep-promise'
 import {
   createDefaultIngressIfNotExists,
+  createGrafanaTagAnnotation,
   getInstanceName,
   getReleaseName,
   removeHelmRelease,
@@ -96,6 +97,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   )
 
   if (!isCelotoolHelmDryRun()) {
+    await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
     await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
   }
 }
