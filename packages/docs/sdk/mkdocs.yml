@@ -4,3 +4,4 @@ site_dir: site
 theme: 
     name: readthedocs
     titles_only: True
+    
