@@ -36,7 +36,6 @@
     "bunyan": "1.8.12",
     "bunyan-debug-stream": "2.0.0",
     "bunyan-gke-stackdriver": "0.1.2",
-    "d": "^1.0.1",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "eth-lib": "^0.2.8",
