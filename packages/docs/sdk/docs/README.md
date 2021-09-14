@@ -23,6 +23,15 @@ You can find more information about the specific packages at the following links
 - [Wallet-remote](./wallet-remote)
 - [Wallet-rpc](./wallet-rpc)
 - [Wallet-walletconnect](./wallet-walletconnect)
+
+## Celo Project
+
+You can find the full Celo documentation at [https://docs.celo.org](https://docs.celo.org).
+
+You can find the main project site at [https://celo.org](https://celo.org/).
+
+You can find the Celo project repsitories on the [celo-org page](https://github.com/celo-org) on Github.
+
 ## 📜 <a id="license"></a>License
 
 All packages are licensed under the terms of the [Apache 2.0 License](LICENSE) unless otherwise specified in the LICENSE file at package's root.
