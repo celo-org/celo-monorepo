@@ -311,15 +311,17 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  return parametrizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
+  return parameterizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
+    logger.error(`Signer failed with primary url ${service.url}`, e)
     if (service.fallbackUrl) {
-      return parametrizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
+      logger.warn(`Using fallback url to call signer ${service.fallbackUrl!}`)
+      return parameterizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
     }
     throw e
   })
 }
 
-function parametrizedSignatureRequest(
+function parameterizedSignatureRequest(
   baseUrl: string,
   request: Request,
   controller: AbortController,
