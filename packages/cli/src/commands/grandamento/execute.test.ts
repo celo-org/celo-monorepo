@@ -72,6 +72,14 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     // // Wait the veto period, plus some to be safe
     await timeTravel((await grandaMento.vetoPeriodSeconds()).toNumber() + 10, web3)
     console.log('f')
+    console.log(
+      'await grandaMento.vetoPeriodSeconds().toNumber()',
+      (await grandaMento.vetoPeriodSeconds()).toNumber()
+    )
+    console.log(
+      '(await grandaMento.vetoPeriodSeconds()).toNumber() + 10',
+      (await grandaMento.vetoPeriodSeconds()).toNumber() + 10
+    )
   })
 
   describe('execute', () => {
