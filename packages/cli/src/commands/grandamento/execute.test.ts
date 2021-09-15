@@ -44,9 +44,10 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const timeTravelDateAndChain = async (seconds: number) => {
     await timeTravel(seconds, web3)
-    dateNowSpy = jest
-      .spyOn(Date, 'now')
-      .mockImplementation(() => dateNowOriginal() + seconds * 1000)
+    // dateNowSpy = jest
+    //   .spyOn(Date, 'now')
+    //   .mockImplementation(() => dateNowOriginal() + seconds * 1000)
+    jest.useFakeTimers('modern').setSystemTime(dateNowOriginal() + seconds * 1000)
   }
 
   beforeAll(async () => {
