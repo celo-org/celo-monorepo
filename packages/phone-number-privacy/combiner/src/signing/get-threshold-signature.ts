@@ -16,7 +16,6 @@ import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
-import CircuitBreaker, { Options } from 'opossum'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
@@ -24,8 +23,6 @@ import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
-
-const signersCircuitBreaker = new Map<string, CircuitBreaker<any, FetchResponse>>()
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
@@ -314,28 +311,12 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  if (!signersCircuitBreaker.has(service.url)) {
-    const options: Options = {
-      timeout: config.odisServices.timeoutMilliSeconds / 2,
-      resetTimeout: 15,
+  return parametrizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
+    if (service.fallbackUrl) {
+      return parametrizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
     }
-
-    const newSignerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest, options)
-    newSignerCircuitBreaker.on('fallback', () =>
-      logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
-    )
-    signersCircuitBreaker.set(service.url, newSignerCircuitBreaker)
-  }
-
-  const signerCircuitBreaker = signersCircuitBreaker.get(service.url)!
-
-  if (service.fallbackUrl) {
-    signerCircuitBreaker.fallback(() =>
-      parametrizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
-    )
-  }
-
-  return signerCircuitBreaker.fire(service.url, request, controller, logger)
+    throw e
+  })
 }
 
 function parametrizedSignatureRequest(

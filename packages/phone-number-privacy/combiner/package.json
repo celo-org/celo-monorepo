@@ -40,7 +40,6 @@
     "firebase-functions": "^3.6.0",
     "knex": "^0.21.1",
     "node-fetch": "^2.6.1",
-    "opossum": "^6.2.0",
     "pg": "^8.2.1",
     "uuid": "^7.0.3"
   },
