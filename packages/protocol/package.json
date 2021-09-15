@@ -75,7 +75,7 @@
     "openzeppelin-solidity": "^2.5.0",
     "prompts": "^2.0.1",
     "solhint": "^2.3.1",
-    "solidity-bytes-utils": "0.0.7",
+    "solidity-bytes-utils": "0.0.9",
     "truffle": "5.1.18",
     "truffle-artifactor": "^4.0.30",
     "truffle-contract": "^4.0.31",
