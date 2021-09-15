@@ -69,8 +69,16 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     // Approve it
     await approveExchangeProposal(1)
     console.log('e')
-    // // Wait the veto period, plus some to be safe
-    await timeTravel((await grandaMento.vetoPeriodSeconds()).toNumber() + 10, web3)
+    // Wait the veto period
+    await timeTravel((await grandaMento.vetoPeriodSeconds()).toNumber(), web3)
+    // Send a dummy transaction to have ganache mine a new block with the new
+    // time, therefore causing the check in Execute that the veto period has elapsed
+    // to pass.
+    await web3.eth.sendTransaction({
+      from: accounts[0],
+      to: accounts[0],
+      value: '1',
+    })
     console.log('f')
     console.log(
       'await grandaMento.vetoPeriodSeconds().toNumber()',
