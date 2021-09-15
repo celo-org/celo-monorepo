@@ -14,7 +14,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
-  let dateNowSpy: jest.SpyInstance
+  let dateNowSpy: jest.SpyInstance | undefined
 
   const increaseLimits = () => {
     return grandaMento
@@ -43,18 +43,20 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const timeTravelDateAndChain = async (seconds: number) => {
     await timeTravel(seconds, web3)
-    dateNowSpy.mockImplementation(() => Date.now() + seconds * 1000)
+    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => Date.now() + seconds * 1000)
   }
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     grandaMento = await kit.contracts.getGrandaMento()
-    dateNowSpy = jest.spyOn(Date, 'now')
   })
 
-  afterAll(() => {
-    dateNowSpy.mockRestore()
+  afterEach(() => {
+    if (dateNowSpy) {
+      dateNowSpy.mockRestore()
+      dateNowSpy = undefined
+    }
   })
 
   beforeEach(async () => {
