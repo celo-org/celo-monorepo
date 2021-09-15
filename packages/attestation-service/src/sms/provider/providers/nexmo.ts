@@ -4,11 +4,11 @@ import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import { Nexmo } from 'nexmo'
 
-import { receivedDeliveryReport } from '../../index'
 import { Gauges } from '../../../metrics'
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
+import { SmsService } from '../../sms.service'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -67,10 +67,10 @@ export class NexmoSmsProvider extends SmsProvider {
     }))
   }
 
-  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger, smsService: SmsService) {
     const errCode =
       req.body['err-code'] == null || req.body['err-code'] === '0' ? null : req.body['err-code']
-    await receivedDeliveryReport(
+    await smsService.receivedDeliveryReport(
       req.body.messageId,
       this.deliveryStatus(req.body.status),
       errCode,
@@ -78,7 +78,7 @@ export class NexmoSmsProvider extends SmsProvider {
     )
   }
 
-  deliveryStatus(messageStatus: string | null): AttestationStatus {
+  private deliveryStatus(messageStatus: string | null): AttestationStatus {
     switch (messageStatus) {
       case 'delivered':
         return AttestationStatus.Delivered

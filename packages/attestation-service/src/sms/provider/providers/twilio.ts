@@ -4,9 +4,9 @@ import express from 'express'
 import twilio, { Twilio } from 'twilio'
 
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
-import { receivedDeliveryReport } from '../../index'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
+import { SmsService } from '../../sms.service'
 
 export class TwilioSmsProvider extends SmsProvider {
   client: Twilio
@@ -68,8 +68,8 @@ export class TwilioSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
-    await receivedDeliveryReport(
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger, smsService: SmsService) {
+    await smsService.receivedDeliveryReport(
       req.body.MessageSid,
       this.deliveryStatus(req.body.MessageStatus),
       req.body.ErrorCode,
@@ -77,7 +77,7 @@ export class TwilioSmsProvider extends SmsProvider {
     )
   }
 
-  deliveryStatus(messageStatus: string | null): AttestationStatus {
+  private deliveryStatus(messageStatus: string | null): AttestationStatus {
     switch (messageStatus) {
       case 'delivered':
         return AttestationStatus.Delivered

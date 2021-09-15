@@ -11,7 +11,7 @@ export function handleAttestationDeliveryStatus(smsService: SmsService, provider
       return
     }
 
-    await provider!.receiveDeliveryStatusReport(_req, res.locals.logger)
+    await provider!.receiveDeliveryStatusReport(_req, res.locals.logger, smsService)
     res.json({ success: true }).status(200)
   }
 }

@@ -3,10 +3,10 @@ import Logger from 'bunyan'
 import express from 'express'
 import fetch from 'node-fetch'
 
-import { receivedDeliveryReport } from '../../index'
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
+import { SmsService } from '../../sms.service'
 
 export class TelekomSmsProvider extends SmsProvider {
   type = SmsProviderType.TELEKOM
@@ -28,8 +28,8 @@ export class TelekomSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
-    await receivedDeliveryReport(
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger, smsService: SmsService) {
+    await smsService.receivedDeliveryReport(
       req.body.MessageSid,
       this.deliveryStatus(req.body.MessageStatus),
       req.body.ErrorCode,
@@ -37,7 +37,7 @@ export class TelekomSmsProvider extends SmsProvider {
     )
   }
 
-  deliveryStatus(messageStatus: string | null): AttestationStatus {
+  private deliveryStatus(messageStatus: string | null): AttestationStatus {
     switch (messageStatus) {
       case 'delivered':
         return AttestationStatus.Delivered

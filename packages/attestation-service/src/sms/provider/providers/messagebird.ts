@@ -7,9 +7,9 @@ import fetch from 'node-fetch'
 import util from 'util'
 
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
-import { receivedDeliveryReport } from '../../index'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
+import { SmsService } from '../../sms.service'
 
 export class MessageBirdSmsProvider extends SmsProvider {
   messagebird: MessageBird
@@ -24,9 +24,9 @@ export class MessageBirdSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger, smsService: SmsService) {
     if (typeof req.query.reference === 'string' && typeof req.query.status === 'string') {
-      await receivedDeliveryReport(
+      await smsService.receivedDeliveryReport(
         req.query.reference,
         this.deliveryStatus(req.query.status),
         typeof req.query.statusErrorCode === 'string' ? req.query.statusErrorCode : null,
@@ -35,7 +35,7 @@ export class MessageBirdSmsProvider extends SmsProvider {
     }
   }
 
-  deliveryStatus(status: string | null): AttestationStatus {
+  private deliveryStatus(status: string | null): AttestationStatus {
     switch (status) {
       case 'delivered':
         return AttestationStatus.Delivered
@@ -58,7 +58,7 @@ export class MessageBirdSmsProvider extends SmsProvider {
     return [bodyParser.urlencoded({ extended: false })]
   }
 
-  async getUSNumbers(): Promise<string[]> {
+  private async getUSNumbers(): Promise<string[]> {
     const response = await fetch('https://numbers.messagebird.com/v1/phone-numbers?features=sms', {
       method: 'GET',
       headers: {

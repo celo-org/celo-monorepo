@@ -3,6 +3,7 @@ import { AttestationModel } from '../../models/attestation'
 import express from 'express'
 import Logger from 'bunyan'
 import { SmsProviderType } from './smsProvider.enum'
+import { SmsService } from '../sms.service'
 
 export abstract class SmsProvider {
   abstract type: SmsProviderType
@@ -22,5 +23,9 @@ export abstract class SmsProvider {
   abstract deliveryStatusHandlers(): express.Handler[]
 
   // Should throw Error when unsuccesful, return if successful
-  abstract receiveDeliveryStatusReport(req: express.Request, logger: Logger): Promise<void>
+  abstract receiveDeliveryStatusReport(
+    req: express.Request,
+    logger: Logger,
+    smsService: SmsService
+  ): Promise<void>
 }

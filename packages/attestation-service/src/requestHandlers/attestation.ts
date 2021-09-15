@@ -11,11 +11,12 @@ import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../en
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
-import { rerequestAttestation, startSendSms } from '../sms'
 import { obfuscateNumber } from '../helper/anonymity'
+import { ISmsService, SmsService } from '../sms'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
+const smsService: ISmsService = new SmsService()
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -163,14 +164,14 @@ class AttestationRequestHandler {
 
     if (attestation && attestation.message) {
       // Re-request existing attestation. In this case, security code prefix is ignored (the message sent is the same as before)
-      attestation = await rerequestAttestation(
-        this.key,
-        this.attestationRequest.smsRetrieverAppSig,
-        this.attestationRequest.language,
-        this.attestationRequest.securityCodePrefix,
-        this.logger,
-        this.sequelizeLogger
-      )
+      attestation = await smsService.rerequestAttestation({
+        key: this.key,
+        appSignature: this.attestationRequest.smsRetrieverAppSig,
+        language: this.attestationRequest.language,
+        securityCodePrefix: this.attestationRequest.securityCodePrefix,
+        logger: this.logger,
+        sequelizeLogger: this.sequelizeLogger,
+      })
     } else {
       // New attestation: create new attestation code, new delivery.
       const attestationCode = await this.signAttestation()
@@ -200,17 +201,18 @@ class AttestationRequestHandler {
         textMessage = messageBase
       }
 
-      attestation = await startSendSms(
-        this.key,
-        this.attestationRequest.phoneNumber,
-        textMessage,
-        securityCode,
-        attestationCodeDeeplink,
-        this.attestationRequest.smsRetrieverAppSig,
-        this.attestationRequest.language,
-        this.logger,
-        this.sequelizeLogger
-      )
+      attestation = await smsService.startSendSms({
+        key: this.key,
+        phoneNumber: this.attestationRequest.phoneNumber,
+        messageToSend: textMessage,
+        securityCode: securityCode,
+        attestationCode: attestationCodeDeeplink,
+        appSignature: this.attestationRequest.smsRetrieverAppSig,
+        language: this.attestationRequest.language,
+        logger: this.logger,
+        sequelizeLogger: this.sequelizeLogger,
+        onlyUseProvider: null,
+      })
     }
 
     if (attestation.failure()) {
