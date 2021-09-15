@@ -508,7 +508,7 @@ jobs:
             (cd packages/cli && yarn test:reset)
       - run:
           name: Run Tests
-          command: yarn --cwd=packages/cli test
+          command: yarn --cwd=packages/cli test grandamento/execute
       - run:
           name: Fail if someone forgot to commit CLI docs
           command: |
