@@ -25285,6 +25285,13 @@ ts-jest@^26.5.4:
     semver "7.x"
     yargs-parser "20.x"
 
+ts-mockito@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/ts-mockito/-/ts-mockito-2.6.1.tgz#bc9ee2619033934e6fad1c4455aca5b5ace34e73"
+  integrity sha512-qU9m/oEBQrKq5hwfbJ7MgmVN5Gu6lFnIGWvpxSjrqq6YYEVv+RwVFWySbZMBgazsWqv6ctAyVBpo9TmAxnOEKw==
+  dependencies:
+    lodash "^4.17.5"
+
 ts-node@8.3.0:
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.3.0.tgz#e4059618411371924a1fb5f3b125915f324efb57"
