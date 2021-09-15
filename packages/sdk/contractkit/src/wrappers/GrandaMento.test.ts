@@ -1,6 +1,6 @@
 import { Address } from '@celo/base/lib/address'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import { fromFixed, toFixed } from '@celo/utils/src/fixidity'
+import { toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableToken } from '../celo-tokens'
@@ -184,7 +184,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
       ).toEqBigNumber(
         hypotheticalSellAmount
           .times(oracleRate)
-          .times(new BigNumber(1).minus(fromFixed(await grandaMento.spread())))
+          .times(new BigNumber(1).minus(await grandaMento.spread()))
       )
     })
   })
