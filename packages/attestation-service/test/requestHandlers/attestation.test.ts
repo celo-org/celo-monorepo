@@ -5,7 +5,6 @@ import { Request } from 'express'
 import * as Logger from 'bunyan'
 import { isValidAddress, toChecksumAddress } from 'ethereumjs-util'
 import { findAttestationByKey } from '../../src/db'
-import { rerequestAttestation } from '../../src/sms'
 
 jest.mock('ethereumjs-util')
 const isValidAddressMock = isValidAddress as jest.Mock
@@ -13,9 +12,6 @@ const toChecksumAddressMock = toChecksumAddress as jest.Mock
 
 jest.mock('../../src/db')
 const findAttestationByKeyMock = findAttestationByKey as jest.Mock
-
-jest.mock('../../src/sms')
-const rerequestAttestationMock = rerequestAttestation as jest.Mock
 
 describe('Attestation request handler', () => {
   const requestMock = mock<Request>()
@@ -28,7 +24,6 @@ describe('Attestation request handler', () => {
     isValidAddressMock.mockReset()
     toChecksumAddressMock.mockReset()
     findAttestationByKeyMock.mockReset()
-    rerequestAttestationMock.mockReset()
 
     when(responseMock.locals).thenReturn({
       logger: Logger.createLogger({
@@ -39,33 +34,6 @@ describe('Attestation request handler', () => {
   })
 
   describe('handleAttestationRequest tests', () => {
-    it('Should re-request for existing attestation', async () => {
-      const address = '0x2F015C60E0be116B1f0CD534704Db9c92118FB6A'
-      isValidAddressMock.mockReturnValue(true)
-      toChecksumAddressMock.mockReturnValue(address)
-      const sampleAttestation = {
-        message: 'message',
-        failure: () => false,
-      }
-      findAttestationByKeyMock.mockResolvedValue(sampleAttestation)
-      rerequestAttestationMock.mockResolvedValue(sampleAttestation)
-      when(responseMock.status(anyNumber())).thenReturn(responseMock)
-
-      await handleAttestationRequest(instance(requestMock), instance(responseMock), {
-        phoneNumber: '+14155550000',
-        language: 'en',
-        account: 'account',
-        issuer: address,
-        salt: 'salt',
-        securityCodePrefix: 'p',
-        smsRetrieverAppSig: 'sig',
-      })
-
-      expect(findAttestationByKeyMock).toBeCalledTimes(1)
-      expect(rerequestAttestationMock).toBeCalledTimes(1)
-      verify(responseMock.status(200)).once()
-    })
-
     it('Should fail with 422 code with missing security code', async () => {
       const address = '0x2F015C60E0be116B1f0CD534704Db9c92118FB6A'
       isValidAddressMock.mockReturnValue(true)
@@ -84,7 +52,6 @@ describe('Attestation request handler', () => {
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
-      expect(rerequestAttestationMock).toBeCalledTimes(0)
       verify(responseMock.status(422)).once()
       const [body] = capture(responseMock.json).last()
       expect(body['success']).toBeFalsy()
@@ -109,7 +76,6 @@ describe('Attestation request handler', () => {
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
-      expect(rerequestAttestationMock).toBeCalledTimes(0)
       verify(responseMock.status(422)).once()
       const [body] = capture(responseMock.json).last()
       expect(body['success']).toBeFalsy()
@@ -160,7 +126,6 @@ describe('Attestation request handler', () => {
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
-      expect(rerequestAttestationMock).toBeCalledTimes(0)
       verify(responseMock.status(500)).once()
       const [body] = capture(responseMock.json).last()
       expect(body['success']).toBeFalsy()
