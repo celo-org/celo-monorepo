@@ -1,6 +1,6 @@
-import { AttestationKey } from '../../models/attestation'
 import Logger from 'bunyan'
 import { SequelizeLogger } from '../../db'
+import { AttestationKey } from '../../models/attestation'
 
 export interface RerequestAttestationRequest {
   key: AttestationKey

@@ -7,9 +7,9 @@ import fetch from 'node-fetch'
 import util from 'util'
 
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { SmsService } from '../../sms.service'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
-import { SmsService } from '../../sms.service'
 
 export class MessageBirdSmsProvider extends SmsProvider {
   messagebird: MessageBird
@@ -35,46 +35,10 @@ export class MessageBirdSmsProvider extends SmsProvider {
     }
   }
 
-  private deliveryStatus(status: string | null): AttestationStatus {
-    switch (status) {
-      case 'delivered':
-        return AttestationStatus.Delivered
-      case 'failed':
-      case 'delivery_failed':
-      case 'expired':
-        return AttestationStatus.Failed
-      case 'sent':
-        return AttestationStatus.Upstream
-      case 'buffered':
-      case 'scheduled':
-        return AttestationStatus.Queued
-    }
-    return AttestationStatus.Other
-  }
-
   deliveryStatusMethod = () => 'GET'
 
   deliveryStatusHandlers() {
     return [bodyParser.urlencoded({ extended: false })]
-  }
-
-  private async getUSNumbers(): Promise<string[]> {
-    const response = await fetch('https://numbers.messagebird.com/v1/phone-numbers?features=sms', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `AccessKey ${this.apiKey}`,
-      },
-    })
-    if (!response.ok) {
-      throw new Error('Could not list numbers! ' + response.status)
-    }
-    const body = JSON.parse(await response.text())
-    return body.items
-      ? body.items
-          .filter((n: any) => n.country === 'US' && n.kycStatus === 'ok')
-          .map((n: any) => n.number)
-      : []
   }
 
   async initialize(deliveryStatusURL: string) {
@@ -105,5 +69,41 @@ export class MessageBirdSmsProvider extends SmsProvider {
       throw new Error('Could not send SMS!')
     }
     return reference
+  }
+
+  private deliveryStatus(status: string | null): AttestationStatus {
+    switch (status) {
+      case 'delivered':
+        return AttestationStatus.Delivered
+      case 'failed':
+      case 'delivery_failed':
+      case 'expired':
+        return AttestationStatus.Failed
+      case 'sent':
+        return AttestationStatus.Upstream
+      case 'buffered':
+      case 'scheduled':
+        return AttestationStatus.Queued
+    }
+    return AttestationStatus.Other
+  }
+
+  private async getUSNumbers(): Promise<string[]> {
+    const response = await fetch('https://numbers.messagebird.com/v1/phone-numbers?features=sms', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `AccessKey ${this.apiKey}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Could not list numbers! ' + response.status)
+    }
+    const body = JSON.parse(await response.text())
+    return body.items
+      ? body.items
+          .filter((n: any) => n.country === 'US' && n.kycStatus === 'ok')
+          .map((n: any) => n.number)
+      : []
   }
 }

@@ -1,6 +1,6 @@
-import { AttestationKey } from '../../models/attestation'
 import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
+import { AttestationKey } from '../../models/attestation'
 
 import { SequelizeLogger } from '../../db'
 

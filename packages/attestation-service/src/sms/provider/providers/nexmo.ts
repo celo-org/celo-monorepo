@@ -6,9 +6,9 @@ import { Nexmo } from 'nexmo'
 
 import { Gauges } from '../../../metrics'
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { SmsService } from '../../sms.service'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
-import { SmsService } from '../../sms.service'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -78,22 +78,6 @@ export class NexmoSmsProvider extends SmsProvider {
     )
   }
 
-  private deliveryStatus(messageStatus: string | null): AttestationStatus {
-    switch (messageStatus) {
-      case 'delivered':
-        return AttestationStatus.Delivered
-      case 'failed':
-        return AttestationStatus.Failed
-      case 'rejected':
-        return AttestationStatus.Failed
-      case 'accepted':
-        return AttestationStatus.Upstream
-      case 'buffered':
-        return AttestationStatus.Queued
-    }
-    return AttestationStatus.Other
-  }
-
   deliveryStatusMethod = () => 'POST'
 
   deliveryStatusHandlers = () => [bodyParser.json()]
@@ -127,6 +111,22 @@ export class NexmoSmsProvider extends SmsProvider {
         }
       )
     })
+  }
+
+  private deliveryStatus(messageStatus: string | null): AttestationStatus {
+    switch (messageStatus) {
+      case 'delivered':
+        return AttestationStatus.Delivered
+      case 'failed':
+        return AttestationStatus.Failed
+      case 'rejected':
+        return AttestationStatus.Failed
+      case 'accepted':
+        return AttestationStatus.Upstream
+      case 'buffered':
+        return AttestationStatus.Queued
+    }
+    return AttestationStatus.Other
   }
 
   // The only effect of supplying an applicationId is to select from numbers linked to

@@ -1,9 +1,9 @@
 import { E164Number } from '@celo/utils/lib/io'
-import { AttestationModel } from '../../models/attestation'
-import express from 'express'
 import Logger from 'bunyan'
-import { SmsProviderType } from './smsProvider.enum'
+import express from 'express'
+import { AttestationModel } from '../../models/attestation'
 import { SmsService } from '../sms.service'
+import { SmsProviderType } from './smsProvider.enum'
 
 export abstract class SmsProvider {
   abstract type: SmsProviderType

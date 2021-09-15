@@ -1,10 +1,10 @@
-import { SmsProviderType } from './smsProvider.enum'
-import { SmsProvider } from './smsProvider'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../../env'
 import { MessageBirdSmsProvider } from './providers/messagebird'
 import { NexmoSmsProvider } from './providers/nexmo'
 import { TelekomSmsProvider } from './providers/telekom'
 import { TwilioSmsProvider } from './providers/twilio'
+import { SmsProvider } from './smsProvider'
+import { SmsProviderType } from './smsProvider.enum'
 
 export class SmsProviderFactory {
   public createSmsProvider(smsProviderType: SmsProviderType): SmsProvider {

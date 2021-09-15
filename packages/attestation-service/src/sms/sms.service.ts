@@ -1,15 +1,9 @@
-import { ISmsService } from './sms.interface'
-import { SmsProviderFactory } from './provider/smsProvider.factory'
-import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
-import { SmsProvider } from './provider/smsProvider'
-import { PhoneNumberType, PhoneNumberUtil } from 'google-libphonenumber'
-import { SmsProviderType } from './provider/smsProvider.enum'
+import { intersection, sleep } from '@celo/base'
 import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
+import { PhoneNumberType, PhoneNumberUtil } from 'google-libphonenumber'
 import { shuffle } from 'lodash'
-import { obfuscateNumber } from '../helper/anonymity'
-import { intersection, sleep } from '@celo/base'
-import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
+import { Transaction } from 'sequelize'
 import {
   findAttestationByDeliveryId,
   findAttestationByKey,
@@ -18,11 +12,17 @@ import {
   sequelize,
   SequelizeLogger,
 } from '../db'
-import { Transaction } from 'sequelize'
+import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
+import { obfuscateNumber } from '../helper/anonymity'
 import { Counters } from '../metrics'
+import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
+import { SmsProvider } from './provider/smsProvider'
+import { SmsProviderType } from './provider/smsProvider.enum'
+import { SmsProviderFactory } from './provider/smsProvider.factory'
 import { RerequestAttestationRequest } from './requests/rerequestAttestation.request'
 import { SendSmsRequest } from './requests/sendSms.request'
+import { ISmsService } from './sms.interface'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -59,50 +59,6 @@ export class SmsService implements ISmsService {
       this.smsProviders.push(smsProvider)
       this.smsProvidersByType[configuredSmsProviderType] = smsProvider
     }
-  }
-
-  // Return all SMS providers for the given phone number, in order of preference for that region,
-  // and not including any providers that has that region on its denylist.
-
-  private smsProvidersFor(
-    countryCode: string,
-    phoneNumber: E164Number,
-    logger: Logger
-  ): SmsProvider[] {
-    const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
-      .split(',')
-      .filter((t) => t != null && t !== '')
-    let providers =
-      providersForRegion.length > 0
-        ? providersForRegion.map((name) => this.smsProvidersByType[name])
-        : // Use default list of providers, possibly shuffled (per-country provider lists are never shuffled)
-        isYes(fetchEnvOrDefault('SMS_PROVIDERS_RANDOMIZED', '0'))
-        ? shuffle(this.smsProviders)
-        : this.smsProviders
-    providers = providers.filter(
-      (provider) => provider != null && provider.canServePhoneNumber(countryCode, phoneNumber)
-    )
-    if (providers.length === 0) {
-      logger.warn(
-        {
-          countryCode,
-          phoneNumber: obfuscateNumber(phoneNumber),
-          countryProvidersConfigValue: providersForRegion,
-        },
-        'No providers found that could serve number: check all providers are listed under SMS_PROVIDERS, ' +
-          `check *_UNSUPPORTED_REGIONS are not overly restrictive, and that if provided SMS_PROVIDERS_${countryCode} lists valid providers`
-      )
-    } else {
-      logger.debug(
-        {
-          countryCode,
-          phoneNumber: obfuscateNumber(phoneNumber),
-          providers: providers.map((provider) => provider.type),
-        },
-        'Providers found'
-      )
-    }
-    return providers
   }
 
   // Main entry point for sending SMS.
@@ -194,31 +150,6 @@ export class SmsService implements ISmsService {
     return attestation
   }
 
-  private providersToCsv(providers: SmsProvider[]) {
-    return providers.map((provider) => provider.type).join(',')
-  }
-
-  // This list may be a strict subset of the valid providers (e.g. when forcing a provider for a test),
-  // but cannot require providers not configured or unsupported for this country code.
-  private getProvidersFor(attestation: AttestationModel, logger: Logger) {
-    const validProviders = this.smsProvidersFor(
-      attestation.countryCode,
-      attestation.phoneNumber,
-      logger
-    )
-    const attestationProviders = attestation.providers
-      .split(',')
-      .filter((t) => t != null && t !== '')
-      .map((name) => this.smsProvidersByType[name])
-
-    for (const p of attestationProviders) {
-      if (!validProviders.find((v) => p.type === v.type)) {
-        throw new Error(`Detected inconsistent provider configuration between instances`)
-      }
-    }
-    return attestationProviders
-  }
-
   // Force an existing attestation (could have received a delivery status or not) to be rerequested
   // immediately if there are sufficient attempts remaining.
   async rerequestAttestation({
@@ -294,110 +225,6 @@ export class SmsService implements ISmsService {
     }
 
     return attestation
-  }
-
-  private async findAttestationAndSendSms(
-    key: AttestationKey,
-    logger: Logger,
-    sequelizeLogger: SequelizeLogger
-  ): Promise<AttestationModel> {
-    let shouldRetry = false
-    let attestation: AttestationModel | null = null
-
-    const transaction = await sequelize!.transaction({
-      logging: sequelizeLogger,
-      type: Transaction.TYPES.IMMEDIATE,
-    })
-
-    try {
-      attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
-      if (!attestation) {
-        throw new Error('Cannot retrieve attestation')
-      }
-
-      const providers = this.getProvidersFor(attestation, logger)
-
-      // Parsed number and found providers. Attempt delivery.
-      shouldRetry = await this.doSendSms(attestation, providers, logger)
-
-      await attestation.save({ transaction, logging: sequelizeLogger })
-      await transaction.commit()
-    } catch (err) {
-      logger.error({ err })
-      await transaction.rollback()
-      throw err
-    }
-
-    // If there was an error sending, backoff and retry while holding open client conn.
-    if (shouldRetry && attestation) {
-      await sleep(Math.pow(2, attestation.attempt) * 1000)
-      attestation = await this.findAttestationAndSendSms(key, logger, sequelizeLogger)
-    }
-
-    return attestation
-  }
-
-  // Make first or next delivery attempt -- returns true if we should retry.
-  private async doSendSms(
-    attestation: AttestationModel,
-    providers: SmsProvider[],
-    logger: Logger
-  ): Promise<boolean> {
-    const provider = providers[attestation.attempt % providers.length]
-
-    try {
-      logger.info(
-        {
-          provider: provider.type,
-          attempt: attestation.attempt,
-        },
-        'Attempting to create SMS'
-      )
-
-      const deliveryId = await provider.sendSms(attestation)
-
-      attestation.status = AttestationStatus.Sent
-      attestation.ongoingDeliveryId = deliveryId
-
-      logger.info(
-        {
-          provider: provider.type,
-          attempt: attestation.attempt,
-          deliveryId,
-        },
-        'Sent SMS'
-      )
-
-      Counters.attestationProviderDeliveryStatus
-        .labels(provider.type, attestation.countryCode, AttestationStatus[AttestationStatus.Sent])
-        .inc()
-
-      return false
-    } catch (error) {
-      attestation.status = AttestationStatus.NotSent
-      const errorMsg = `${error.message ?? error}`.slice(0, this.maxErrorLength)
-      attestation.recordError(errorMsg)
-      attestation.ongoingDeliveryId = null
-      attestation.attempt += 1
-
-      logger.info(
-        {
-          provider: provider.type,
-          attempt: attestation.attempt,
-          error: errorMsg,
-        },
-        'SMS creation failed'
-      )
-
-      if (attestation.attempt >= this.maxDeliveryAttempts) {
-        attestation.completedAt = new Date()
-        logger.info('Final failure to send')
-        Counters.attestationRequestsFailedToDeliverSms.inc()
-        return false
-      }
-
-      return true
-    }
   }
 
   // Act on a delivery report for an SMS, scheduling a resend if last one failed.
@@ -516,5 +343,178 @@ export class SmsService implements ISmsService {
 
   unsupportedRegionCodes(): string[] {
     return intersection(this.smsProviders.map((provider) => provider.unsupportedRegionCodes))
+  }
+
+  // Return all SMS providers for the given phone number, in order of preference for that region,
+  // and not including any providers that has that region on its denylist.
+
+  private smsProvidersFor(
+    countryCode: string,
+    phoneNumber: E164Number,
+    logger: Logger
+  ): SmsProvider[] {
+    const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
+      .split(',')
+      .filter((t) => t != null && t !== '')
+    let providers =
+      providersForRegion.length > 0
+        ? providersForRegion.map((name) => this.smsProvidersByType[name])
+        : // Use default list of providers, possibly shuffled (per-country provider lists are never shuffled)
+        isYes(fetchEnvOrDefault('SMS_PROVIDERS_RANDOMIZED', '0'))
+        ? shuffle(this.smsProviders)
+        : this.smsProviders
+    providers = providers.filter(
+      (provider) => provider != null && provider.canServePhoneNumber(countryCode, phoneNumber)
+    )
+    if (providers.length === 0) {
+      logger.warn(
+        {
+          countryCode,
+          phoneNumber: obfuscateNumber(phoneNumber),
+          countryProvidersConfigValue: providersForRegion,
+        },
+        'No providers found that could serve number: check all providers are listed under SMS_PROVIDERS, ' +
+          `check *_UNSUPPORTED_REGIONS are not overly restrictive, and that if provided SMS_PROVIDERS_${countryCode} lists valid providers`
+      )
+    } else {
+      logger.debug(
+        {
+          countryCode,
+          phoneNumber: obfuscateNumber(phoneNumber),
+          providers: providers.map((provider) => provider.type),
+        },
+        'Providers found'
+      )
+    }
+    return providers
+  }
+
+  private providersToCsv(providers: SmsProvider[]) {
+    return providers.map((provider) => provider.type).join(',')
+  }
+
+  // This list may be a strict subset of the valid providers (e.g. when forcing a provider for a test),
+  // but cannot require providers not configured or unsupported for this country code.
+  private getProvidersFor(attestation: AttestationModel, logger: Logger) {
+    const validProviders = this.smsProvidersFor(
+      attestation.countryCode,
+      attestation.phoneNumber,
+      logger
+    )
+    const attestationProviders = attestation.providers
+      .split(',')
+      .filter((t) => t != null && t !== '')
+      .map((name) => this.smsProvidersByType[name])
+
+    for (const p of attestationProviders) {
+      if (!validProviders.find((v) => p.type === v.type)) {
+        throw new Error(`Detected inconsistent provider configuration between instances`)
+      }
+    }
+    return attestationProviders
+  }
+
+  private async findAttestationAndSendSms(
+    key: AttestationKey,
+    logger: Logger,
+    sequelizeLogger: SequelizeLogger
+  ): Promise<AttestationModel> {
+    let shouldRetry = false
+    let attestation: AttestationModel | null = null
+
+    const transaction = await sequelize!.transaction({
+      logging: sequelizeLogger,
+      type: Transaction.TYPES.IMMEDIATE,
+    })
+
+    try {
+      attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
+      if (!attestation) {
+        throw new Error('Cannot retrieve attestation')
+      }
+
+      const providers = this.getProvidersFor(attestation, logger)
+
+      // Parsed number and found providers. Attempt delivery.
+      shouldRetry = await this.doSendSms(attestation, providers, logger)
+
+      await attestation.save({ transaction, logging: sequelizeLogger })
+      await transaction.commit()
+    } catch (err) {
+      logger.error({ err })
+      await transaction.rollback()
+      throw err
+    }
+
+    // If there was an error sending, backoff and retry while holding open client conn.
+    if (shouldRetry && attestation) {
+      await sleep(Math.pow(2, attestation.attempt) * 1000)
+      attestation = await this.findAttestationAndSendSms(key, logger, sequelizeLogger)
+    }
+
+    return attestation
+  }
+
+  // Make first or next delivery attempt -- returns true if we should retry.
+  private async doSendSms(
+    attestation: AttestationModel,
+    providers: SmsProvider[],
+    logger: Logger
+  ): Promise<boolean> {
+    const provider = providers[attestation.attempt % providers.length]
+
+    try {
+      logger.info(
+        {
+          provider: provider.type,
+          attempt: attestation.attempt,
+        },
+        'Attempting to create SMS'
+      )
+
+      const deliveryId = await provider.sendSms(attestation)
+
+      attestation.status = AttestationStatus.Sent
+      attestation.ongoingDeliveryId = deliveryId
+
+      logger.info(
+        {
+          provider: provider.type,
+          attempt: attestation.attempt,
+          deliveryId,
+        },
+        'Sent SMS'
+      )
+
+      Counters.attestationProviderDeliveryStatus
+        .labels(provider.type, attestation.countryCode, AttestationStatus[AttestationStatus.Sent])
+        .inc()
+
+      return false
+    } catch (error) {
+      attestation.status = AttestationStatus.NotSent
+      const errorMsg = `${error.message ?? error}`.slice(0, this.maxErrorLength)
+      attestation.recordError(errorMsg)
+      attestation.ongoingDeliveryId = null
+      attestation.attempt += 1
+
+      logger.info(
+        {
+          provider: provider.type,
+          attempt: attestation.attempt,
+          error: errorMsg,
+        },
+        'SMS creation failed'
+      )
+
+      if (attestation.attempt >= this.maxDeliveryAttempts) {
+        attestation.completedAt = new Date()
+        logger.info('Final failure to send')
+        Counters.attestationRequestsFailedToDeliverSms.inc()
+        return false
+      }
+
+      return true
+    }
   }
 }

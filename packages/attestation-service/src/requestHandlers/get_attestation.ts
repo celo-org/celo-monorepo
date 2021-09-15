@@ -13,9 +13,9 @@ import {
   SequelizeLogger,
   useKit,
 } from '../db'
+import { obfuscateNumber } from '../helper/anonymity'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError } from '../request'
-import { obfuscateNumber } from '../helper/anonymity'
 
 const MAX_SECURITY_CODE_ATTEMPTS = 5
 

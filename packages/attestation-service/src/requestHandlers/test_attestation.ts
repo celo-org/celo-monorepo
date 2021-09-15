@@ -4,8 +4,8 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
-import { ErrorMessages, respondWithAttestation, respondWithError } from '../request'
 import { obfuscateNumber } from '../helper/anonymity'
+import { ErrorMessages, respondWithAttestation, respondWithError } from '../request'
 import { SmsService } from '../sms'
 
 export async function handleTestAttestationRequest(
@@ -52,7 +52,7 @@ export async function handleTestAttestationRequest(
       logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
 
     const attestation = await smsService.startSendSms({
-      key: key,
+      key,
       phoneNumber: testRequest.phoneNumber,
       messageToSend: testRequest.message,
       securityCode: '12345678',

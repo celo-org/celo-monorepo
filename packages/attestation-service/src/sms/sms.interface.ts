@@ -1,7 +1,7 @@
-import { SmsProviderType } from './provider/smsProvider.enum'
-import { SmsProvider } from './provider/smsProvider'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
 import Logger from 'bunyan'
+import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { SmsProvider } from './provider/smsProvider'
+import { SmsProviderType } from './provider/smsProvider.enum'
 import { RerequestAttestationRequest } from './requests/rerequestAttestation.request'
 import { SendSmsRequest } from './requests/sendSms.request'
 

@@ -8,10 +8,10 @@ import { randomBytes } from 'crypto'
 import express from 'express'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger, useKit } from '../db'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
+import { obfuscateNumber } from '../helper/anonymity'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
-import { obfuscateNumber } from '../helper/anonymity'
 import { ISmsService, SmsService } from '../sms'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
@@ -205,7 +205,7 @@ class AttestationRequestHandler {
         key: this.key,
         phoneNumber: this.attestationRequest.phoneNumber,
         messageToSend: textMessage,
-        securityCode: securityCode,
+        securityCode,
         attestationCode: attestationCodeDeeplink,
         appSignature: this.attestationRequest.smsRetrieverAppSig,
         language: this.attestationRequest.language,

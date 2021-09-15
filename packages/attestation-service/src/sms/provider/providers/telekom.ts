@@ -4,9 +4,9 @@ import express from 'express'
 import fetch from 'node-fetch'
 
 import { AttestationModel, AttestationStatus } from '../../../models/attestation'
+import { SmsService } from '../../sms.service'
 import { SmsProvider } from '../smsProvider'
 import { SmsProviderType } from '../smsProvider.enum'
-import { SmsService } from '../../sms.service'
 
 export class TelekomSmsProvider extends SmsProvider {
   type = SmsProviderType.TELEKOM
@@ -35,22 +35,6 @@ export class TelekomSmsProvider extends SmsProvider {
       req.body.ErrorCode,
       logger
     )
-  }
-
-  private deliveryStatus(messageStatus: string | null): AttestationStatus {
-    switch (messageStatus) {
-      case 'delivered':
-        return AttestationStatus.Delivered
-      case 'failed':
-        return AttestationStatus.Failed
-      case 'undelivered':
-        return AttestationStatus.Failed
-      case 'sent':
-        return AttestationStatus.Upstream
-      case 'queued':
-        return AttestationStatus.Queued
-    }
-    return AttestationStatus.Other
   }
 
   deliveryStatusMethod = () => 'POST'
@@ -93,5 +77,21 @@ export class TelekomSmsProvider extends SmsProvider {
     }
 
     return body.sid
+  }
+
+  private deliveryStatus(messageStatus: string | null): AttestationStatus {
+    switch (messageStatus) {
+      case 'delivered':
+        return AttestationStatus.Delivered
+      case 'failed':
+        return AttestationStatus.Failed
+      case 'undelivered':
+        return AttestationStatus.Failed
+      case 'sent':
+        return AttestationStatus.Upstream
+      case 'queued':
+        return AttestationStatus.Queued
+    }
+    return AttestationStatus.Other
   }
 }
