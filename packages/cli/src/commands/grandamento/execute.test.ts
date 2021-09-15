@@ -15,6 +15,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
   let dateNowSpy: jest.SpyInstance | undefined
+  let dateNowOriginal = Date.now
 
   const increaseLimits = () => {
     return grandaMento
@@ -43,7 +44,9 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const timeTravelDateAndChain = async (seconds: number) => {
     await timeTravel(seconds, web3)
-    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => Date.now() + seconds * 1000)
+    dateNowSpy = jest
+      .spyOn(Date, 'now')
+      .mockImplementation(() => dateNowOriginal() + seconds * 1000)
   }
 
   beforeAll(async () => {
@@ -83,7 +86,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     await approveExchangeProposal(1)
     console.log('e')
 
-    console.log('before', await web3.eth.getBlock('latest'))
+    console.log('before', await web3.eth.getBlock('latest'), Date.now(), dateNowOriginal())
     // Wait the veto period
     await timeTravelDateAndChain((await grandaMento.vetoPeriodSeconds()).toNumber())
     // Send a dummy transaction to have ganache mine a new block with the new
@@ -94,7 +97,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     //   to: accounts[0],
     //   value: '1',
     // })
-    console.log('f')
+    console.log('f', Date.now(), dateNowOriginal())
     console.log(
       'await grandaMento.vetoPeriodSeconds().toNumber()',
       (await grandaMento.vetoPeriodSeconds()).toNumber()
@@ -107,7 +110,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   describe('execute', () => {
     it('executes the proposal', async () => {
-      console.log('g')
+      console.log('g', Date.now(), dateNowOriginal())
       await Execute.run(['--from', accounts[0], '--proposalID', '1'])
       console.log('h')
       const activeProposals = await grandaMento.getActiveProposalIds()
