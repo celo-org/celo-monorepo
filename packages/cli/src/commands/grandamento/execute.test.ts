@@ -14,6 +14,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
+  let dateNowSpy: jest.SpyInstance
 
   const increaseLimits = () => {
     return grandaMento
@@ -40,10 +41,20 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     await grandaMento.approveExchangeProposal(proposalID).sendAndWaitForReceipt()
   }
 
+  const timeTravelDateAndChain = async (seconds: number) => {
+    await timeTravel(seconds, web3)
+    dateNowSpy.mockImplementation(() => Date.now() + seconds * 1000)
+  }
+
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     grandaMento = await kit.contracts.getGrandaMento()
+    dateNowSpy = jest.spyOn(Date, 'now')
+  })
+
+  afterAll(() => {
+    dateNowSpy.mockRestore()
   })
 
   beforeEach(async () => {
@@ -69,16 +80,18 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     // Approve it
     await approveExchangeProposal(1)
     console.log('e')
+
+    console.log('before', await web3.eth.getBlock('latest'))
     // Wait the veto period
-    await timeTravel((await grandaMento.vetoPeriodSeconds()).toNumber(), web3)
+    await timeTravelDateAndChain((await grandaMento.vetoPeriodSeconds()).toNumber())
     // Send a dummy transaction to have ganache mine a new block with the new
     // time, therefore causing the check in Execute that the veto period has elapsed
     // to pass.
-    await web3.eth.sendTransaction({
-      from: accounts[0],
-      to: accounts[0],
-      value: '1',
-    })
+    // await web3.eth.sendTransaction({
+    //   from: accounts[0],
+    //   to: accounts[0],
+    //   value: '1',
+    // })
     console.log('f')
     console.log(
       'await grandaMento.vetoPeriodSeconds().toNumber()',
