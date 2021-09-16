@@ -92,8 +92,8 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     console.log('e')
 
     console.log('before', await web3.eth.getBlock('latest'), Date.now(), dateNowOriginal())
-    // Wait the veto period
-    await timeTravelDateAndChain((await grandaMento.vetoPeriodSeconds()).toNumber())
+    // Wait the veto period plus some extra time to be safe
+    await timeTravelDateAndChain((await grandaMento.vetoPeriodSeconds()).toNumber() + 1000)
     // Send a dummy transaction to have ganache mine a new block with the new
     // time, therefore causing the check in Execute that the veto period has elapsed
     // to pass.
