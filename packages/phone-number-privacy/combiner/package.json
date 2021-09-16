@@ -30,13 +30,13 @@
     "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.2.0",
+    "@celo/contractkit": "1.2.2",
     "@celo/identity": "1.2.0",
     "@celo/phone-number-privacy-common": "1.0.34",
-    "@celo/utils": "1.0.2",
+    "@celo/utils": "1.2.2",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "^6.5.4",
-    "firebase-admin": "^8.10.0",
+    "firebase-admin": "^9.2.0",
     "firebase-functions": "^3.6.0",
     "knex": "^0.21.1",
     "node-fetch": "^2.6.1",
