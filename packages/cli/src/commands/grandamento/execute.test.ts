@@ -14,8 +14,6 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
-  let dateNowSpy: jest.SpyInstance | undefined
-  let dateNowOriginal = Date.now
   let originalNoSyncCheck: string | undefined
 
   const increaseLimits = () => {
@@ -45,11 +43,10 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const timeTravelDateAndChain = async (seconds: number) => {
     await timeTravel(seconds, web3)
-    // dateNowSpy = jest
-    //   .spyOn(Date, 'now')
-    //   .mockImplementation(() => dateNowOriginal() + seconds * 1000)
-    jest.useFakeTimers('modern').setSystemTime(dateNowOriginal() + seconds * 1000)
-    originalNoSyncCheck = 'true'
+    jest.useFakeTimers('modern').setSystemTime(Date.now() + seconds * 1000)
+    // Otherwise contractkit complains there is a difference between Date.now()
+    // and the timestamp of the last block
+    process.env.NO_SYNCCHECK = 'true'
   }
 
   beforeAll(async () => {
@@ -60,80 +57,31 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   })
 
   afterEach(() => {
-    if (dateNowSpy) {
-      dateNowSpy.mockRestore()
-      dateNowSpy = undefined
-    }
     process.env.NO_SYNCCHECK = originalNoSyncCheck
   })
 
   beforeEach(async () => {
-    console.log('a')
     await assumeOwnership(web3, accounts[0])
-    console.log('b')
     await increaseLimits()
-    console.log('c')
-
-    // create mock proposal
-    // await Propose.run([
-    //   '--from',
-    //   accounts[0],
-    //   '--sellCelo',
-    //   'true',
-    //   '--stableToken',
-    //   'cUSD',
-    //   '--value',
-    //   '10000',
-    // ])
     await createExchangeProposal()
-    console.log('d')
     // Approve it
     await approveExchangeProposal(1)
-    console.log('e')
-
-    console.log('before', await web3.eth.getBlock('latest'), Date.now(), dateNowOriginal())
     // Wait the veto period plus some extra time to be safe
     await timeTravelDateAndChain((await grandaMento.vetoPeriodSeconds()).toNumber() + 1000)
-    // Send a dummy transaction to have ganache mine a new block with the new
-    // time, therefore causing the check in Execute that the veto period has elapsed
-    // to pass.
-    // await web3.eth.sendTransaction({
-    //   from: accounts[0],
-    //   to: accounts[0],
-    //   value: '1',
-    // })
-    console.log('f', Date.now(), dateNowOriginal())
-    console.log(
-      'await grandaMento.vetoPeriodSeconds().toNumber()',
-      (await grandaMento.vetoPeriodSeconds()).toNumber()
-    )
-    console.log(
-      '(await grandaMento.vetoPeriodSeconds()).toNumber() + 10',
-      (await grandaMento.vetoPeriodSeconds()).toNumber() + 10
-    )
   })
 
   describe('execute', () => {
     it('executes the proposal', async () => {
-      console.log('g', Date.now(), dateNowOriginal())
       await Execute.run(['--from', accounts[0], '--proposalID', '1'])
-      console.log('h')
       const activeProposals = await grandaMento.getActiveProposalIds()
-      console.log('i')
       expect(activeProposals).toEqual([])
-      console.log('j')
     })
 
     it('fails if the exchange proposal is not executable', async () => {
       // Create a proposal with proposalID 2, but don't wait the veto period
-      console.log('ey')
       await createExchangeProposal()
-      console.log('bee')
       await approveExchangeProposal(2)
-      console.log('see')
-
       await expect(Execute.run(['--from', accounts[0], '--proposalID', '2'])).rejects.toThrow()
-      console.log('dee')
     })
   })
 })
