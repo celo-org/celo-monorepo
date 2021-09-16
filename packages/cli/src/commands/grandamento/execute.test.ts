@@ -16,6 +16,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   let accounts: Address[] = []
   let dateNowSpy: jest.SpyInstance | undefined
   let dateNowOriginal = Date.now
+  let originalNoSyncCheck: string | undefined
 
   const increaseLimits = () => {
     return grandaMento
@@ -48,12 +49,14 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     //   .spyOn(Date, 'now')
     //   .mockImplementation(() => dateNowOriginal() + seconds * 1000)
     jest.useFakeTimers('modern').setSystemTime(dateNowOriginal() + seconds * 1000)
+    originalNoSyncCheck = 'true'
   }
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     grandaMento = await kit.contracts.getGrandaMento()
+    originalNoSyncCheck = process.env.NO_SYNCCHECK
   })
 
   afterEach(() => {
@@ -61,6 +64,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
       dateNowSpy.mockRestore()
       dateNowSpy = undefined
     }
+    process.env.NO_SYNCCHECK = originalNoSyncCheck
   })
 
   beforeEach(async () => {
