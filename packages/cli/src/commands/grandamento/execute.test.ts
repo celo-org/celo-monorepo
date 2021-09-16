@@ -24,19 +24,19 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
       .sendAndWaitForReceipt()
   }
 
-  // const createExchangeProposal = () => {
-  //   // create mock proposal
-  //   return Propose.run([
-  //     '--from',
-  //     accounts[0],
-  //     '--sellCelo',
-  //     'true',
-  //     '--stableToken',
-  //     'cUSD',
-  //     '--value',
-  //     '10000',
-  //   ])
-  // }
+  const createExchangeProposal = () => {
+    // create mock proposal
+    return Propose.run([
+      '--from',
+      accounts[0],
+      '--sellCelo',
+      'true',
+      '--stableToken',
+      'cUSD',
+      '--value',
+      '10000',
+    ])
+  }
 
   const approveExchangeProposal = async (proposalID: number | string) => {
     await grandaMento.setApprover(accounts[0]).sendAndWaitForReceipt()
@@ -75,17 +75,17 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
     console.log('c')
 
     // create mock proposal
-    await Propose.run([
-      '--from',
-      accounts[0],
-      '--sellCelo',
-      'true',
-      '--stableToken',
-      'cUSD',
-      '--value',
-      '10000',
-    ])
-    // await createExchangeProposal()
+    // await Propose.run([
+    //   '--from',
+    //   accounts[0],
+    //   '--sellCelo',
+    //   'true',
+    //   '--stableToken',
+    //   'cUSD',
+    //   '--value',
+    //   '10000',
+    // ])
+    await createExchangeProposal()
     console.log('d')
     // Approve it
     await approveExchangeProposal(1)
@@ -124,12 +124,16 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
       console.log('j')
     })
 
-    // it('fails if the exchange proposal is not executable', async () => {
-    //   // Create a proposal with proposalID 2, but don't wait the veto period
-    //   await createExchangeProposal()
-    //   await approveExchangeProposal(2)
+    it('fails if the exchange proposal is not executable', async () => {
+      // Create a proposal with proposalID 2, but don't wait the veto period
+      console.log('ey')
+      await createExchangeProposal()
+      console.log('bee')
+      await approveExchangeProposal(2)
+      console.log('see')
 
-    //   await expect(Execute.run(['--from', accounts[0], '--proposalID', '2'])).rejects.toThrow()
-    // })
+      await expect(Execute.run(['--from', accounts[0], '--proposalID', '2'])).rejects.toThrow()
+      console.log('dee')
+    })
   })
 })
