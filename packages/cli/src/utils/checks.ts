@@ -163,20 +163,6 @@ class CheckBuilder {
       `${proposalID} veto period has elapsed`,
       this.withGrandaMento(async (grandaMento) => {
         const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
-        console.log(
-          'exchangeProposal.approvalTimestamp',
-          exchangeProposal.approvalTimestamp.toString()
-        )
-        console.log(
-          'exchangeProposal.vetoPeriodSeconds',
-          exchangeProposal.vetoPeriodSeconds.toString()
-        )
-        console.log(
-          'exchangeProposal.approvalTimestamp.plus(exchangeProposal.vetoPeriodSeconds)',
-          exchangeProposal.approvalTimestamp.plus(exchangeProposal.vetoPeriodSeconds).toString()
-        )
-        console.log('Date.now()', Date.now())
-        console.log('Date.now() / 1000', Date.now() / 1000)
         return exchangeProposal.approvalTimestamp
           .plus(exchangeProposal.vetoPeriodSeconds)
           .isLessThanOrEqualTo(Date.now() / 1000)

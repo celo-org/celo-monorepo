@@ -14,7 +14,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
-  let dateNowOriginal = Date.now
+  const dateNowOriginal = Date.now
   let originalNoSyncCheck: string | undefined
 
   const increaseLimits = () => {
