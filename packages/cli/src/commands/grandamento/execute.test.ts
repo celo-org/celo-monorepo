@@ -14,6 +14,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
   const newLimitMin = new BigNumber('1000')
   const newLimitMax = new BigNumber('1000000000000')
   let accounts: Address[] = []
+  let dateNowOriginal = Date.now
   let originalNoSyncCheck: string | undefined
 
   const increaseLimits = () => {
@@ -43,7 +44,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const timeTravelDateAndChain = async (seconds: number) => {
     await timeTravel(seconds, web3)
-    jest.useFakeTimers('modern').setSystemTime(Date.now() + seconds * 1000)
+    jest.useFakeTimers('modern').setSystemTime(dateNowOriginal() + seconds * 1000)
     // Otherwise contractkit complains there is a difference between Date.now()
     // and the timestamp of the last block
     process.env.NO_SYNCCHECK = 'true'
