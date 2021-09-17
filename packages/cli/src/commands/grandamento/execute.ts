@@ -4,18 +4,17 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
-export default class Cancel extends BaseCommand {
-  static description = 'Cancels a Granda Mento exchange proposal'
+export default class Execute extends BaseCommand {
+  static description = 'Executes a Granda Mento exchange proposal'
 
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({
       required: true,
-      description: 'The address allowed to cancel the proposal',
+      description: 'The address to execute the exchange proposal',
     }),
     proposalID: flags.string({
       required: true,
-      exclusive: ['account', 'hotfix'],
       description: 'UUID of proposal to view',
     }),
   }
@@ -23,16 +22,19 @@ export default class Cancel extends BaseCommand {
   async run() {
     const grandaMento = await this.kit.contracts.getGrandaMento()
 
-    const res = this.parse(Cancel)
+    const res = this.parse(Execute)
     const proposalID = res.flags.proposalID
 
-    await newCheckBuilder(this).grandaMentoProposalExists(proposalID).runChecks()
+    await newCheckBuilder(this)
+      .grandaMentoProposalExists(proposalID)
+      .grandaMentoProposalIsExecutable(proposalID)
+      .runChecks()
 
     await displaySendTx(
-      'cancelExchangeProposal',
-      grandaMento.cancelExchangeProposal(proposalID),
+      'executeExchangeProposal',
+      grandaMento.executeExchangeProposal(proposalID),
       undefined,
-      'ExchangeProposalCancelled'
+      'ExchangeProposalExecuted'
     )
   }
 }

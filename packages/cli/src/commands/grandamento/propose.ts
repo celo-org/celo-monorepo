@@ -45,7 +45,9 @@ export default class Propose extends BaseCommand {
 
     const tokenToSell = sellCelo ? celoToken : await this.kit.contracts.getStableToken(stableToken)
 
-    await newCheckBuilder(this, signer).hasEnoughErc20(signer, sellAmount, tokenToSell.address)
+    await newCheckBuilder(this, signer)
+      .hasEnoughErc20(signer, sellAmount, tokenToSell.address)
+      .runChecks()
 
     await displaySendTx(
       'increaseAllowance',
@@ -62,7 +64,5 @@ export default class Propose extends BaseCommand {
       undefined,
       'ExchangeProposalCreated'
     )
-
-    // console.log(`ExchangeProposal: ${proposalID}`)
   }
 }
