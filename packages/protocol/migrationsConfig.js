@@ -199,7 +199,7 @@ const DefaultConfig = {
   stableTokenBRL: {
     decimals: 18,
     goldPrice: 2,
-    tokenName: 'Celo Reais',
+    tokenName: 'Celo Real',
     tokenSymbol: 'cBRL',
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
