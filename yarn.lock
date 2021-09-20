@@ -20130,11 +20130,6 @@ openzeppelin-solidity@^2.5.0:
   resolved "https://registry.yarnpkg.com/openzeppelin-solidity/-/openzeppelin-solidity-2.5.0.tgz#829a9bcfc928619dd96c44bd893b180044ff51aa"
   integrity sha512-I0yRC3nff9Kn2LDWuz02fuw0EuomVQ9Z8lHzdqh8P9BiOUzIk8frQRxn/a1Kva3StF6hwPP+Dh3/SQ2ily1Pow==
 
-opossum@^6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/opossum/-/opossum-6.2.0.tgz#19154f934ad656f296e593794d4a8b7e91852aa2"
-  integrity sha512-pqemKjWRvgkhNNRsovfKQ/B3t16OIyOp+VPr+jQCf2U/PhqfyFyvur6LxMxw+1Vrj+Q392YSav6z9wS1wwc+2g==
-
 optimist@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
@@ -25284,6 +25279,13 @@ ts-jest@^26.5.4:
     mkdirp "1.x"
     semver "7.x"
     yargs-parser "20.x"
+
+ts-mockito@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/ts-mockito/-/ts-mockito-2.6.1.tgz#bc9ee2619033934e6fad1c4455aca5b5ace34e73"
+  integrity sha512-qU9m/oEBQrKq5hwfbJ7MgmVN5Gu6lFnIGWvpxSjrqq6YYEVv+RwVFWySbZMBgazsWqv6ctAyVBpo9TmAxnOEKw==
+  dependencies:
+    lodash "^4.17.5"
 
 ts-node@8.3.0:
   version "8.3.0"

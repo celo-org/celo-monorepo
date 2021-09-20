@@ -36,9 +36,7 @@ testWithGanache('grandamento:list cmd', (web3: Web3) => {
   it('shows proposals', async () => {
     // create mock proposal
     const sellAmount = new BigNumber('100000000')
-    await (
-      await celoToken.increaseAllowance(grandaMento.address, sellAmount)
-    ).sendAndWaitForReceipt()
+    await celoToken.increaseAllowance(grandaMento.address, sellAmount).sendAndWaitForReceipt()
     await (
       await grandaMento.createExchangeProposal(
         kit.celoTokens.getContract(StableToken.cUSD),
