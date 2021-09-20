@@ -130,6 +130,10 @@ const DefaultConfig = {
         min: '40000000000000000000000', // 40,000
         max: '40000000000000000000000000', // 40,000,000
       },
+      StableTokenBRL: {
+        min: '40000000000000000000000', // 40,000
+        max: '40000000000000000000000000', // 40,000,000
+      },
     },
   },
   lockedGold: {
@@ -183,6 +187,20 @@ const DefaultConfig = {
     goldPrice: 1.2,
     tokenName: 'Celo Euro',
     tokenSymbol: 'cEUR',
+    inflationRate: 1,
+    inflationPeriod: 1.5 * YEAR,
+    initialBalances: {
+      addresses: [network.from],
+      values: ['5000000000000000000000000'],
+    },
+    oracles: [network.from],
+    frozen: false,
+  },
+  stableTokenBRL: {
+    decimals: 18,
+    goldPrice: 2,
+    tokenName: 'Celo Reais',
+    tokenSymbol: 'cBRL',
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
