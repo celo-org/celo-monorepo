@@ -79,6 +79,7 @@ export class Countries {
         // are fallback languages 'es-US' and 'es-LA' that are not covered
         const names: CountryNames = {
           'en-us': country.name,
+          // @ts-ignore
           'es-419': esData[country.alpha2],
         }
 
