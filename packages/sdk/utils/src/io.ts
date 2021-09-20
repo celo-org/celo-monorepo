@@ -111,6 +111,8 @@ export const AttestationRequestType = t.type({
   issuer: AddressType,
   // io-ts way of defining optional key-value pair
   salt: t.union([t.undefined, SaltType]),
+  // for optional pepper validation
+  blindedPhoneNumberSignature: t.union([t.undefined, t.string]),
   smsRetrieverAppSig: t.union([t.undefined, t.string]),
   // if specified, the message sent will be short random number prefixed by this string
   securityCodePrefix: t.union([t.undefined, t.string]),
