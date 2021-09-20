@@ -39,6 +39,7 @@ export async function requestAttestationsFromIssuers(
         issuer: attestation.issuer,
         salt: pepper,
         smsRetrieverAppSig: undefined,
+        blindedPhoneNumberSignature: undefined,
         securityCodePrefix: securityCode ? getSecurityCodePrefix(attestation.issuer) : undefined,
         language: undefined,
       }
