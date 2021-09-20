@@ -16,13 +16,9 @@ testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
   let accounts: Address[] = []
 
   const increaseLimits = async () => {
-    await (
-      await grandaMento.setStableTokenExchangeLimits(
-        'StableToken',
-        newLimitMin.toString(),
-        newLimitMax.toString()
-      )
-    ).sendAndWaitForReceipt()
+    await grandaMento
+      .setStableTokenExchangeLimits('StableToken', newLimitMin.toString(), newLimitMax.toString())
+      .sendAndWaitForReceipt()
   }
 
   beforeAll(async () => {
