@@ -1,8 +1,7 @@
 import countryData from 'country-data'
-import { getExampleNumber } from './phoneNumbers'
-
 // more countries @ https://github.com/umpirsky/country-list
-const esData = require('../data/countries/es/country.json')
+import esData from './data/countries/es/country.json'
+import { getExampleNumber } from './phoneNumbers'
 
 interface CountryNames {
   [name: string]: string
