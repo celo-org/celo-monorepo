@@ -30,9 +30,9 @@ contract('GoldToken', (accounts: string[]) => {
   const receiver = accounts[1]
 
   beforeEach(async () => {
-    freezer = await Freezer.new()
+    freezer = await Freezer.new(true)
     goldToken = await GoldToken.new(true)
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
   })

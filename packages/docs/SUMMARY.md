@@ -30,6 +30,9 @@
 - [Quick Start](celo-holder-guide/quick-start.md)
 - [cUSD Owner Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
+  - [Celo Terminal App](celo-holder-guide/connecting-ledger-celo-terminal-wallet.md)
+  - [Celo Web Wallet](celo-holder-guide/connecting-ledger-celo-web-wallet.md)
+  - [Celo CLI](celo-holder-guide/connecting-ledger-celocli.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
@@ -64,6 +67,7 @@
   - [Using Windows](developer-resources/develop-on-windows.md)
   - [React based DApp](developer-resources/walkthroughs/web-dapp.md)
   - [WalletConnect](developer-resources/walkthroughs/wallet-connect.md)
+  - [Using Keystores](developer-resources/walkthroughs/using-js-keystores.md)
     <!-- - [Building a dApp with Contracts on Celo]() -->
     <!-- - [The Celo Protocol]()
       - [Architecture]()
@@ -621,6 +625,29 @@
       - [PublicAccessor](developer-resources/identity/reference/interfaces/_offchain_accessors_interfaces_.publicaccessor.md)
     <!-- identity-reference-end -->
 
+  - [Keystores](developer-resources/keystores/reference/../../../SUMMARY.md)
+    <!-- keystores-reference-start -->
+    - [Globals](developer-resources/keystores/reference/globals.md)
+    - [Modules]()
+      - [file-keystore](developer-resources/keystores/reference/modules/_file_keystore_.md)
+      - [FileKeystore](developer-resources/keystores/reference/classes/_file_keystore_.filekeystore.md)
+      - [inmemory-keystore](developer-resources/keystores/reference/modules/_inmemory_keystore_.md)
+      - [InMemoryKeystore](developer-resources/keystores/reference/classes/_inmemory_keystore_.inmemorykeystore.md)
+      - [keystore-base](developer-resources/keystores/reference/modules/_keystore_base_.md)
+      - [ErrorMessages](developer-resources/keystores/reference/enums/_keystore_base_.errormessages.md)
+      - [KeystoreBase](developer-resources/keystores/reference/classes/_keystore_base_.keystorebase.md)
+      - [keystore-wallet-wrapper](developer-resources/keystores/reference/modules/_keystore_wallet_wrapper_.md)
+      - [KeystoreWalletWrapper](developer-resources/keystores/reference/classes/_keystore_wallet_wrapper_.keystorewalletwrapper.md)
+      - [test-constants](developer-resources/keystores/reference/modules/_test_constants_.md)
+    - [Classes]()
+      - [FileKeystore](developer-resources/keystores/reference/classes/_file_keystore_.filekeystore.md)
+      - [InMemoryKeystore](developer-resources/keystores/reference/classes/_inmemory_keystore_.inmemorykeystore.md)
+      - [KeystoreBase](developer-resources/keystores/reference/classes/_keystore_base_.keystorebase.md)
+      - [KeystoreWalletWrapper](developer-resources/keystores/reference/classes/_keystore_wallet_wrapper_.keystorewalletwrapper.md)
+    - [Enums]()
+      - [ErrorMessages](developer-resources/keystores/reference/enums/_keystore_base_.errormessages.md)
+    <!-- keystores-reference-end -->
+
   - [Network-Utils](developer-resources/network-utils/reference/SUMMARY.md)
     <!-- network-utils-reference-start -->
     - [Globals](developer-resources/network-utils/reference/globals.md)
@@ -931,6 +958,7 @@
   - [Election](command-line-interface/election.md)
   - [Exchange](command-line-interface/exchange.md)
   - [Governance](command-line-interface/governance.md)
+  - [Granda Mento](command-line-interface/grandamento.md)
   - [Identity](command-line-interface/identity.md)
   - [LockedGold](command-line-interface/lockedgold.md)
   - [Multisig](command-line-interface/multisig.md)

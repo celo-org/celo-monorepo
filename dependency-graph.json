@@ -7,6 +7,7 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/keystores",
       "@celo/utils"
     ]
   },
@@ -198,6 +199,13 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/utils",
+      "@celo/wallet-local"
+    ]
+  },
+  "@celo/keystores": {
+    "location": "packages/sdk/keystores",
+    "dependencies": [
       "@celo/utils",
       "@celo/wallet-local"
     ]

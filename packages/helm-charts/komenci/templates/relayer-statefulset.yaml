@@ -104,7 +104,7 @@ spec:
             ADDRESSES={{- range $index, $identity := .Values.relayer.identities -}}{{ $identity.address }},{{- end }}
             export WALLET_ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
             
-            node dist/apps/relayer/main.js
+            node packages/apps/relayer/dist/main.js
         env:
         - name: REPLICA_NAME
           valueFrom:
@@ -133,11 +133,3 @@ spec:
             port: 3000
           initialDelaySeconds: 15
           periodSeconds: 20
-        volumeMounts:
-        - name: private-key-volume
-          readOnly: true
-          mountPath: "/private-keys"
-      volumes:
-        - name: private-key-volume
-          secret:
-            secretName: pkey-secret

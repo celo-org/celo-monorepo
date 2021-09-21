@@ -3,11 +3,10 @@ import {
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
-  hasValidQueryPhoneNumberParam,
-  hasValidTimestamp,
+  hasValidBlindedPhoneNumberParam,
+  identifierIsValidIfExists,
   isBodyReasonablySized,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
-  phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -29,6 +28,7 @@ type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface SignerService {
   url: string
+  fallbackUrl?: string
 }
 
 interface SignMsgRespWithStatus {
@@ -158,12 +158,20 @@ async function requestSignatures(request: Request, response: Response) {
 
   logResponseDiscrepancies(responses, logger)
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-  if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
-  } else {
-    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
-    response.json({ success: true, combinedSignature, version: VERSION })
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
+        request.body.blindedQueryPhoneNumber,
+        logger
+      )
+      response.json({ success: true, combinedSignature, version: VERSION })
+      return
+    } catch {
+      // May fail upon combining signatures if too many sigs are invalid
+      // Fallback to handleMissingSignatures
+    }
   }
+  handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
 }
 
 async function handleSuccessResponse(
@@ -195,19 +203,25 @@ async function handleSuccessResponse(
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
   const signatureAdditionStart = Date.now()
-  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber, logger)
+  await blsCryptoClient.addSignature(partialSig)
   logger.info(
     {
       signer: serviceUrl,
-      hasSufficientSignatures: blsCryptoClient.hasSufficientVerifiedSignatures(),
+      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(),
       additionLatency: Date.now() - signatureAdditionStart,
     },
     'Added signature'
   )
   // Send response immediately once we cross threshold
-  if (blsCryptoClient.hasSufficientVerifiedSignatures()) {
-    // Close outstanding requests
-    controller.abort()
+  // BLS threshold signatures can be combined without all partial signatures
+  if (blsCryptoClient.hasSufficientSignatures()) {
+    try {
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      // Close outstanding requests
+      controller.abort()
+    } catch {
+      // Already logged, continue to collect signatures
+    }
   }
 }
 
@@ -297,8 +311,24 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  logger.debug({ signer: service.url }, `Requesting partial sig`)
-  const url = service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT
+  return parameterizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
+    logger.error(`Signer failed with primary url ${service.url}`, e)
+    if (service.fallbackUrl) {
+      logger.warn(`Using fallback url to call signer ${service.fallbackUrl!}`)
+      return parameterizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
+    }
+    throw e
+  })
+}
+
+function parameterizedSignatureRequest(
+  baseUrl: string,
+  request: Request,
+  controller: AbortController,
+  logger: Logger
+): Promise<FetchResponse> {
+  logger.debug({ signer: baseUrl }, `Requesting partial sig`)
+  const url = baseUrl + PARTIAL_SIGN_MESSAGE_ENDPOINT
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -340,10 +370,9 @@ function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
 function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody) &&
-    phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody) &&
-    hasValidTimestamp(requestBody)
+    hasValidBlindedPhoneNumberParam(requestBody) &&
+    identifierIsValidIfExists(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
 }
 

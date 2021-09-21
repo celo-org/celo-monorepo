@@ -26,4 +26,5 @@ export enum WarningMessage {
   INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS = `CELO_ODIS_WARN_08 SIGNER Discrepency found in signers' quota measurements`,
   MISSING_SESSION_ID = `CELO_ODIS_WARN_09 BAD_INPUT Client did not provide sessionID in request`,
   CANCELLED_REQUEST_TO_SIGNER = 'CELO_ODIS_WARN_09 SIGNER Cancelled request to signer',
+  INVALID_USER_PHONE_NUMBER_SIGNATURE = 'CELO_ODIS_WARN_10 BAD_INPUT User phone number signature is invalid',
 }
