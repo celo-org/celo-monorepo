@@ -7,6 +7,7 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
+import { DomainService } from './domain/domain.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
 
@@ -22,6 +23,8 @@ export enum Endpoints {
   DOMAIN_SIGN = '/domain/sign',
   DOMAIN_STATUS = '/domain/status',
 }
+
+const domainService = new DomainService(logger)
 
 export function createServer() {
   logger.info('Creating express server')
@@ -60,9 +63,7 @@ export function createServer() {
   addMeteredEndpoint(Endpoints.DOMAIN_SIGN, async (_, res) => {
     res.sendStatus(501)
   })
-  addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, async (_, res) => {
-    res.sendStatus(501)
-  })
+  addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, domainService.handleDisableDomain)
 
   const sslOptions = getSslOptions()
   if (sslOptions) {
