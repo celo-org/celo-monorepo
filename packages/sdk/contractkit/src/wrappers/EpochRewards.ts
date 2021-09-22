@@ -16,7 +16,7 @@ export class EpochRewardsWrapper extends BaseWrapper<EpochRewards> {
   )
 
   getTargetVotingYieldParameters = proxyCall(
-    this.contract.methods.getRewardsMultiplierParameters,
+    this.contract.methods.getTargetVotingYieldParameters,
     undefined,
     (res) => ({
       target: parseFixidity(res[0]),
