@@ -18,6 +18,7 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
       `--set storage.storageClass=ssd`,
       `--set geth.public_ip_per_node='{${staticIps}}'`,
       `--set geth.create_network_endpoint_group=${this.deploymentConfig.createNEG}`,
+      `--set geth.flags='--txpool.nolocals'`,
     ]
   }
 

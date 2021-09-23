@@ -48,4 +48,4 @@ blockscout:
         memory: 250M
         cpu: 500m
   metrics:
-    enabled: false
+    enabled: true

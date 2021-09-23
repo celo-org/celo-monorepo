@@ -25,13 +25,14 @@
 
 #### Type declaration:
 
-▸ (`base64PhoneNumber`: string): *Promise‹string›*
+▸ (`base64PhoneNumber`: string, `seed?`: Buffer): *Promise‹string›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `base64PhoneNumber` | string |
+`seed?` | Buffer |
 
 ___
 
