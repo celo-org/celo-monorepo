@@ -11,9 +11,9 @@
 
 ###  getContactMatches
 
-▸ **getContactMatches**(`e164NumberCaller`: E164Number, `e164NumberContacts`: E164Number[], `account`: string, `phoneNumberIdentifier`: string, `signer`: [AuthSigner](_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_odis_query_.servicecontext.md), `clientVersion?`: undefined | string, `sessionID?`: undefined | string): *Promise‹E164Number[]›*
+▸ **getContactMatches**(`e164NumberCaller`: E164Number, `e164NumberContacts`: E164Number[], `account`: string, `phoneNumberIdentifier`: string, `signer`: [AuthSigner](_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_odis_query_.servicecontext.md), `dekSigner?`: [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md), `clientVersion?`: undefined | string, `sessionID?`: undefined | string): *Promise‹E164Number[]›*
 
-*Defined in [packages/sdk/identity/src/odis/matchmaking.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/matchmaking.ts#L20)*
+*Defined in [packages/sdk/identity/src/odis/matchmaking.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/matchmaking.ts#L23)*
 
 **Parameters:**
 
@@ -25,6 +25,7 @@ Name | Type |
 `phoneNumberIdentifier` | string |
 `signer` | [AuthSigner](_odis_query_.md#authsigner) |
 `context` | [ServiceContext](../interfaces/_odis_query_.servicecontext.md) |
+`dekSigner?` | [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md) |
 `clientVersion?` | undefined &#124; string |
 `sessionID?` | undefined &#124; string |
 
@@ -36,7 +37,7 @@ ___
 
 ▸ **obfuscateNumberForMatchmaking**(`e164Number`: string): *string*
 
-*Defined in [packages/sdk/identity/src/odis/matchmaking.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/matchmaking.ts#L73)*
+*Defined in [packages/sdk/identity/src/odis/matchmaking.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/matchmaking.ts#L87)*
 
 **Parameters:**
 

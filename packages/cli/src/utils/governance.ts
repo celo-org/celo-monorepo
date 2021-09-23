@@ -1,7 +1,9 @@
 import { toTxResult } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import { ProposalTransaction } from '@celo/contractkit/src/wrappers/Governance'
+import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/governance'
 import chalk from 'chalk'
+import { readJsonSync } from 'fs-extra'
 
 export async function checkProposal(proposal: ProposalTransaction[], kit: ContractKit) {
   const governance = await kit.contracts.getGovernance()
@@ -50,4 +52,39 @@ async function tryProposal(
     }
   }
   return ok
+}
+
+export async function addExistingProposalIDToBuilder(
+  kit: ContractKit,
+  builder: ProposalBuilder,
+  existingProposalID: string
+) {
+  const governance = await kit.contracts.getGovernance()
+  const proposalRaw = await governance.getProposal(existingProposalID)
+  return addProposalToBuilder(builder, await proposalToJSON(kit, proposalRaw))
+}
+
+export function addExistingProposalJSONFileToBuilder(
+  builder: ProposalBuilder,
+  existingProposalPath: string
+) {
+  return addProposalToBuilder(builder, readJsonSync(existingProposalPath))
+}
+
+async function addProposalToBuilder(
+  builder: ProposalBuilder,
+  existingProposal: ProposalTransactionJSON[]
+) {
+  // accounts for registry additions and caches in builder
+  for (const tx of existingProposal) {
+    await builder.fromJsonTx(tx)
+  }
+
+  console.info(
+    `After executing provided proposal, account for registry remappings: ${JSON.stringify(
+      builder.registryAdditions,
+      null,
+      2
+    )}`
+  )
 }

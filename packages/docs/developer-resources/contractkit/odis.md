@@ -82,6 +82,10 @@ The response will be [an object](../identity/reference/interfaces/_odis_phone_nu
 
 You can view an example of this call in [our mobile project here](https://github.com/celo-org/wallet/blob/master/packages/mobile/src/identity/privateHashing.ts).
 
+### Requerying identifiers
+
+When querying phone number identifiers it is recommended that you either provide a deterministic custom `blindingFactor` parameter or authenticate with the user's DEK. Doing so will allow users to requery identifiers they have queried before without using quota. This is useful if the user loses their phone or other record of queried identifiers. When no `blindingFactor` is provided, the user's DEK is used as a deterministic `blindingFactor` by default. If the user's DEK is also not provided, a random `blindingFactor` is used. Reqeurying identifiers with a new `blindingFactor` will consume quota. Note that this may not yet be reflected in the example above.
+
 ## Matchmaking
 
 Instead of querying for all the user's contact's peppers and consuming the user's quota, it's recommended to only query the pepper before it's actually used (ex. just before sending funds). However, sometimes it's helpful to let your users know that they have contacts already using the Celo network. To do this, you can make use of the matchmaking interface. Given two phone numbers, it will let you know whether the other party has also registered on the Celo network with this identifier. `OdisUtils.Matchmaking.getContactMatches` [documentation can be found here](reference/modules/_identity_claims_account_.md).
@@ -89,3 +93,7 @@ Instead of querying for all the user's contact's peppers and consuming the user'
 The response will be a subset of the input `e164NumberContacts` that are matched by the matchmaking service.
 
 You can view an example of this call in [our mobile project here](https://github.com/celo-org/wallet/blob/master/packages/mobile/src/identity/matchmaking.ts).
+
+### Requerying matches
+
+When querying matches it is highly recommended that you provide the user's DEK via either the `signer` or `dekSigner` parameters. Doing so will add a `signedUserPhoneNumber` field to the request, which ODIS will use to remember the user's number without compromising privacy. This allows users to requery matches so long as they are querying for the same phone number as before. Users cannot query matches for two different phone numbers, and requerying for the same number will fail until `signedUserPhoneNumber` is provided. Note that this may not yet be reflected in the example above.

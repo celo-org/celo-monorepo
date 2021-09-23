@@ -108,18 +108,18 @@ Since light clients need not trust full nodes, as they can verify their work, th
 
 ### Stable Cryptocurrencies
 
-Celo enables a family of stable-value tokens whose values can track the value of any asset, including fiat currencies, commodities, and even natural resources.  Stablecoins supported include the Celo Dollar (cUSD) and the Celo Euro (cEUR), which track the value of the U.S. Dollar and Euro respectively.  CELO and a basket of other assets including BTC and ETH serves as the collateral for these stablecoins. These stablecoins are redeemable for CELO, ensuring that transactions can occur quickly, cheaply and reliably on-chain.
+Celo enables a family of stablecoins that track the value of any asset, including fiat currencies, commodities, and even natural resources.  Stablecoins supported include the Celo Dollar (cUSD) and the Celo Euro (cEUR), which track the value of the U.S. Dollar and Euro respectively.  CELO and a basket of other assets including BTC and ETH serves as the collateral for these stablecoins. These stablecoins are redeemable for CELO, ensuring that transactions can occur quickly, cheaply and reliably on-chain.
 
 Celo's stability mechanism allows users to create a new cUSD and cEUR by sending CELO to the reserve, or burn cUSD and cEUR by redeeming it for their equivalent value in CELO.
 
-This mechanism relies on a series of Oracles, or information feeds from exchanges external to the network, to report the CELO to US Dollar or Euro market rate. To minimize the risk of a run on CELO collateral when these reported values are inaccurate or out-of-date, Celo uses an on-chain constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. This mechanism adjusts the redemption price of CELO until either arbitrage occurs (so that the on-chain price dynamically adjusts until the offered rate meets the external rate) or Oracles reset the on-chain price.
+This mechanism relies on a series of Oracles, or information feeds from exchanges external to the network, to report the CELO to US Dollar or Euro market rates. To minimize the risk of a run on CELO collateral when these reported values are inaccurate or out-of-date, Celo uses an on-chain constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. This mechanism adjusts the redemption price of CELO until either arbitrage occurs (so that the on-chain price dynamically adjusts until the offered rate meets the external rate) or Oracles reset the on-chain price.
 
 The Celo protocol ensures that there is sufficient CELO collateral to redeem the amount of CELO in circulation through several sources. These include a [stability fee](celo-codebase/protocol/stability/stability-fees.md) levied on Celo Dollar balances, a transfer from [epoch rewards](celo-codebase/protocol/proof-of-stake/community-fund.md#bolstering-the-reserve), plus the proceeds from the spread when interacting with the on-chain market-maker mechanism.  
 
 In addition, a back-up reserve of cryptocurrencies is held off-chain. This off-chain reserve is managed to preserve value and minimize volatility by maintaining a diversified portfolio of cryptocurrencies through algorithmic rebalancing trading and periodically "topping-up" the CELO collateral available to ensure it exceeds the amount required to redeem Celo Dollars in circulation. The approved cryptocurrencies, distribution ratios, and rebalancing period are all subject to on-chain governance.
 
 {% hint style="success" %}
-**Roadmap**: Celo envisages a number of stable currencies pegged to different fiat currencies as well as natural resources such as forests.  In addition, once bridges between other chains and the Celo blockchain are fully developed, and liquid trading on decentralized exchanges occurs, the rebalancing can be handled transparently on-chain.
+**Roadmap**: Celo envisages a number of stable currencies tracking different fiat currencies as well as natural resources such as forests.  In addition, once bridges between other chains and the Celo blockchain are fully developed, and liquid trading on decentralized exchanges occurs, the rebalancing can be handled transparently on-chain.
 {% endhint %}
 
 ### Lightweight Identity

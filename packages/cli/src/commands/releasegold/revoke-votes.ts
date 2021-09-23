@@ -30,10 +30,7 @@ export default class RevokeVotes extends ReleaseGoldBaseCommand {
     const beneficiary = await this.releaseGoldWrapper.getBeneficiary()
     const releaseOwner = await this.releaseGoldWrapper.getReleaseOwner()
     const votes = new BigNumber(flags.votes)
-    await newCheckBuilder(this)
-      .isAccount(this.releaseGoldWrapper.address)
-      .isValidatorGroup(flags.group)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(this.releaseGoldWrapper.address).runChecks()
 
     this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
     const txos = await this.releaseGoldWrapper.revoke(
