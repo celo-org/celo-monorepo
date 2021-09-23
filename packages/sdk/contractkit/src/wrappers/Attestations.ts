@@ -440,9 +440,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param tokens List of tokens used for attestation fees.
    * @return AttestationsConfig object
    */
-  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
+  async getConfig(tokens?: string[]): Promise<AttestationsConfig> {
+    const feeTokens =
+      tokens ?? (Object.values(await this.kit.celoTokens.getAddresses()) as string[])
     const fees = await Promise.all(
-      tokens.map(async (token) => {
+      feeTokens.map(async (token) => {
         const fee = await this.attestationRequestFees(token)
         return { fee, address: token }
       })
@@ -457,7 +459,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @dev Returns human readable configuration of the attestations contract
    * @return AttestationsConfig object
    */
-  async getHumanReadableConfig(tokens: string[]) {
+  async getHumanReadableConfig(tokens?: string[]) {
     const config = await this.getConfig(tokens)
     return {
       attestationRequestFees: config.attestationRequestFees,

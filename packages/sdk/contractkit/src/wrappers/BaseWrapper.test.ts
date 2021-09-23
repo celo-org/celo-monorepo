@@ -1,7 +1,6 @@
 import { NULL_ADDRESS } from '@celo/base'
 import { CeloTxObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import timezoneMock from 'timezone-mock'
 import Web3 from 'web3'
 import {
   ICeloVersionedContract,
@@ -59,31 +58,43 @@ describe('TestWrapper', () => {
 describe('unixSecondsTimestampToDateString()', () => {
   const date = new BigNumber(1627489780)
 
+  const timezoneMock = (zone: string) => {
+    const DateTimeFormat = Intl.DateTimeFormat
+
+    jest
+      .spyOn(global.Intl, 'DateTimeFormat')
+      .mockImplementation(
+        (locale, options) => new DateTimeFormat(locale, { ...options, timeZone: zone })
+      )
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   describe('when Brazil/East', () => {
     it('returns local time', () => {
-      timezoneMock.register('Brazil/East')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 1:29 PM UTC-03:00')
+      timezoneMock('Brazil/East')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021, 1:29 PM GMT-3')
     })
   })
+
   describe('when UTC', () => {
     it('returns utc time', () => {
-      timezoneMock.register('UTC')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 4:29 PM UTC+00:00')
+      timezoneMock('UTC')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021, 4:29 PM UTC')
     })
   })
   describe('when Australia/Adelaide', () => {
     it('returns local time', () => {
-      timezoneMock.register('Australia/Adelaide')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Thu, Jul 29, 2021 1:59 AM UTC+09:30')
+      timezoneMock('Australia/Adelaide')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Thu, Jul 29, 2021, 1:59 AM GMT+9:30')
     })
   })
   describe('when Europe/London', () => {
     it('returns local time', () => {
-      timezoneMock.register('Europe/London')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021 5:29 PM UTC+01:00')
+      timezoneMock('Europe/London')
+      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021, 5:29 PM GMT+1')
     })
-  })
-  afterEach(() => {
-    timezoneMock.unregister()
   })
 })

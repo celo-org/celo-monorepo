@@ -14,6 +14,7 @@
     "test": "jest --testPathIgnorePatterns test\/end-to-end",
     "test:e2e": "jest --runInBand test/end-to-end",
     "db:migrate": "ts-node scripts/run-migrations.ts",
+    "db:migrate:make": "knex --migrations-directory ./src/migrations migrate:make -x ts",
     "bls:keygen": "ts-node scripts/create-bls-keys.ts",
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },

@@ -107,6 +107,7 @@ Distribution of an image should occur along the following schedule:
     <td>T-1w</td>
     <td>
       <ol>
+        <li>Tag release candidate build image with <code>attestation-service-alfajores</code> (removing tag from previous candidate build)</li>
         <li>Deploy release candidate build to Alfajores testnet</li>
       </ol>
     </td>
@@ -118,7 +119,7 @@ Distribution of an image should occur along the following schedule:
         <li>Confirm Valora production and testing builds against Alfajores experience no issues and that e2e verification tests complete successfully</li>
         <li>Publish the Git release notes and tag, and signature of Docker image</li>
         <li>Communicate T+1w Baklava upgrade date.</li>
-        <li>Tag released Docker image with <code>attestation-service-alfajores</code></li> and <code>attestation-service-baklava</code> (removing tags from other releases)</li>
+        <li>Tag released Docker image with <code>attestation-service-baklava</code> (removing tag from other releases)</li>
       </ol>
     </td>
   </tr>
