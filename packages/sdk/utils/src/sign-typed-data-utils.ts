@@ -1,3 +1,4 @@
+import { trimLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { sha3 } from 'ethereumjs-util'
 import coder from 'web3-eth-abi'
@@ -11,7 +12,7 @@ export interface EIP712Types {
   [key: string]: EIP712Parameter[]
 }
 
-export type EIP712ObjectValue = string | number | EIP712Object
+export type EIP712ObjectValue = string | number | boolean | EIP712Object | EIP712ObjectValue[]
 
 export interface EIP712Object {
   [key: string]: EIP712ObjectValue
@@ -39,6 +40,26 @@ export function generateTypedDataHash(typedData: EIP712TypedData): Buffer {
   ) as Buffer
 }
 
+/** Array of all EIP-712 atomic type names. */
+export const EIP712_ATOMIC_TYPES = [
+  'bytes1',
+  'bytes32',
+  'uint8',
+  'uint256',
+  'int8',
+  'int256',
+  'bool',
+  'address',
+]
+
+// Regular expression used to identify and parse EIP-712 array type strings.
+const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
+
+/**
+ * Given the primary type, and dictionary if types, this function assembles a sorted list
+ * representing the transitive dependency closure of the primary type. (Inclusive of the primary
+ * type itself.)
+ */
 function findDependencies(primaryType: string, types: EIP712Types, found: string[] = []): string[] {
   if (found.includes(primaryType) || types[primaryType] === undefined) {
     return found
@@ -54,6 +75,10 @@ function findDependencies(primaryType: string, types: EIP712Types, found: string
   return found
 }
 
+/**
+ * Creates a string encoding of the primary type, including all dependencies.
+ * E.g. "Mail(address from,address to,string contents)"
+ */
 function encodeType(primaryType: string, types: EIP712Types): string {
   let deps = findDependencies(primaryType, types)
   deps = deps.filter((d) => d !== primaryType)
@@ -65,33 +90,55 @@ function encodeType(primaryType: string, types: EIP712Types): string {
   return result
 }
 
-function encodeData(primaryType: string, data: EIP712Object, types: EIP712Types): string {
-  const encodedTypes = ['bytes32']
-  const encodedValues: Array<Buffer | EIP712ObjectValue> = [typeHash(primaryType, types)]
-  for (const field of types[primaryType]) {
-    const value = data[field.name]
-    if (field.type === 'string' || field.type === 'bytes') {
-      const hashValue = sha3(value as string) as Buffer
-      encodedTypes.push('bytes32')
-      encodedValues.push(hashValue)
-    } else if (types[field.type] !== undefined) {
-      encodedTypes.push('bytes32')
-      const hashValue = sha3(
-        // tslint:disable-next-line:no-unnecessary-type-assertion
-        encodeData(field.type, value as EIP712Object, types)
-      ) as Buffer
-      encodedValues.push(hashValue)
-    } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-      throw new Error('Arrays currently unimplemented in encodeData')
-    } else {
-      encodedTypes.push(field.type)
-      const normalizedValue = normalizeValue(field.type, value)
-      encodedValues.push(normalizedValue)
-    }
+function typeHash(primaryType: string, types: EIP712Types): Buffer {
+  return sha3(encodeType(primaryType, types)) as Buffer
+}
+
+/**
+ * Constructs the struct encoding of the data as the primary type.
+ */
+function encodeData(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
+  const fields = types[primaryType]
+  if (fields === undefined) {
+    throw new Error(`Unrecognized primary type in EIP-712 encoding: ${primaryType}`)
   }
 
-  // @ts-ignore
-  return coder.encodeParameters(encodedTypes, encodedValues)
+  return Buffer.concat(fields.map((field) => encodeValue(field.type, data[field.name], types)))
+}
+
+/** Encodes a single EIP-712 value to a 32-byte buffer */
+function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712Types): Buffer {
+  // Encode the atomic types as their corresponding soldity ABI type.
+  if (EIP712_ATOMIC_TYPES.includes(valueType)) {
+    // @ts-ignore TyppeScript does not believe encodeParameter exists.
+    const hexEncoded = coder.encodeParameter(valueType, normalizeValue(valueType, value))
+    return Buffer.from(trimLeading0x(hexEncoded), 'hex')
+  }
+
+  // Encode `string` and `bytes` types as their keccak hash.
+  if (valueType === 'string' || valueType === 'bytes') {
+    // Note: sha3 throws if the value cannot be converted inot a Buffer,
+    const hashValue = sha3(value as string) as Buffer
+    return hashValue
+  }
+
+  // Encode structs as its hashStruct (e.g. keccak(typeHash || encodeData(struct)) ).
+  if (types[valueType] !== undefined) {
+    // tslint:disable-next-line:no-unnecessary-type-assertion.
+    return structHash(valueType, value as EIP712Object, types)
+  }
+
+  // Encode arrays as the concatenated encoding of the underlying types.
+  if (EIP712_ARRAY_REGEXP.test(valueType)) {
+    // Note: If a fixed length is provided in the type, it is not checked.
+    const match = EIP712_ARRAY_REGEXP.exec(valueType)
+    const memberType: string = match?.groups?.['memberType']!
+    return Buffer.concat(
+      (value as EIP712ObjectValue[]).map((member) => encodeValue(memberType, member, types))
+    )
+  }
+
+  throw new Error(`Unrecognized or unsupported type in EIP-712 encoding: ${valueType}`)
 }
 
 function normalizeValue(type: string, value: any): EIP712ObjectValue {
@@ -100,10 +147,8 @@ function normalizeValue(type: string, value: any): EIP712ObjectValue {
   return normalizedValue
 }
 
-function typeHash(primaryType: string, types: EIP712Types): Buffer {
-  return sha3(encodeType(primaryType, types)) as Buffer
-}
-
 export function structHash(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
-  return sha3(encodeData(primaryType, data, types)) as Buffer
+  return sha3(
+    Buffer.concat([typeHash(primaryType, types), encodeData(primaryType, data, types)])
+  ) as Buffer
 }
