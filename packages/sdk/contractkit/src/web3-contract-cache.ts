@@ -16,6 +16,7 @@ import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
+import { newGrandaMento } from './generated/GrandaMento'
 import { newIerc20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
@@ -50,6 +51,7 @@ export const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.GrandaMento]: newGrandaMento,
   [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
@@ -124,6 +126,9 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
+  getGrandaMento() {
+    return this.getContract(CeloContract.GrandaMento)
+  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
@@ -165,28 +170,17 @@ export class Web3ContractCache {
     if (this.cacheMap[contract] == null || address !== undefined) {
       // core contract in the registry
       if (!address) {
-        try {
-          address = await this.kit.registry.addressFor(contract)
-        } catch (e) {
-          throw new Error(`${contract} not yet deployed for this chain`)
-        }
+        address = await this.kit.registry.addressFor(contract)
       }
       debug('Initiating contract %s', contract)
-      const createFn = ProxyContracts.includes(contract)
-        ? newProxy
-        : ContractFactories[contract]
-        ? (ContractFactories[contract] as CFType[C])
-        : newProxy
-      // @ts-ignore: Too complex union type
-      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as NonNullable<
-        ContractCacheMap[C]
-      >
+      const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
+      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as ContractCacheMap[C]
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!
   }
 
   public invalidateContract<C extends keyof typeof ContractFactories>(contract: C) {
-    ;(this.cacheMap[contract] as any) = null
+    this.cacheMap[contract] = undefined
   }
 }

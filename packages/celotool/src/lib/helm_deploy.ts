@@ -24,7 +24,12 @@ import {
 } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { buildGethAll, checkoutGethRepo, retrieveBootnodeIPAddress } from './geth'
+import {
+  buildGethAll,
+  checkoutGethRepo,
+  getEnodesWithExternalIPAddresses,
+  retrieveBootnodeIPAddress,
+} from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -453,10 +458,9 @@ export async function deleteIPAddress(name: string, zone?: string) {
 }
 
 export async function retrieveIPAddress(name: string, zone?: string) {
+  const regionFlag = zone === 'global' ? '--global' : `--region ${getKubernetesClusterRegion(zone)}`
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses describe ${name} --region ${getKubernetesClusterRegion(
-      zone
-    )} --format="value(address)"`
+    `gcloud compute addresses describe ${name} ${regionFlag} --format="value(address)"`
   )
   return address.replace(/\n*$/, '')
 }
@@ -755,6 +759,9 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
+
   const gethMetricsOverrides =
     fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === 'true'
       ? [
@@ -783,6 +790,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   )
 
   return [
+    `-f ${valueFilePath}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
@@ -862,7 +870,7 @@ function valuesOverrideArg(chartDir: string, filename: string | undefined) {
 }
 
 export async function installGenericHelmChart(
-  celoEnv: string,
+  namespace: string,
   releaseName: string,
   chartDir: string,
   parameters: string[],
@@ -875,7 +883,7 @@ export async function installGenericHelmChart(
 
   if (isCelotoolHelmDryRun()) {
     console.info(
-      `This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${celoEnv} with parameters:`
+      `This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${namespace} with parameters:`
     )
     console.info(parameters)
     if (valuesOverrideFile !== undefined) {
@@ -885,7 +893,7 @@ export async function installGenericHelmChart(
     console.info(`Installing helm release ${releaseName}`)
     const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
     await helmCommand(
-      `helm install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
@@ -893,7 +901,7 @@ export async function installGenericHelmChart(
 }
 
 export async function upgradeGenericHelmChart(
-  celoEnv: string,
+  namespace: string,
   releaseName: string,
   chartDir: string,
   parameters: string[],
@@ -908,7 +916,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -916,7 +924,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
@@ -1102,6 +1110,31 @@ function rollingUpdateHelmVariables() {
       '0'
     )}`,
   ]
+}
+
+export async function saveHelmValuesFile(
+  celoEnv: string,
+  valueFilePath: string,
+  useExistingGenesis: boolean,
+  skipGenesisValue = false
+) {
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
+
+  let valueFileContent = `
+staticnodes:
+  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
+`
+  if (!skipGenesisValue) {
+    valueFileContent += `
+  genesis:
+    genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+`
+  }
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
 const celoBlockchainDir: string = path.join(os.tmpdir(), 'celo-blockchain-celotool')

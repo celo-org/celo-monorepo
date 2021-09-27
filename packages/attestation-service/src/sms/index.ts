@@ -34,6 +34,7 @@ const maxDeliveryAttempts = parseInt(
 // Time within which we allow forcing a retry of completed (or any state) attestations
 const allowRetryWithinCompletedMs =
   1000 * 60 * parseInt(fetchEnvOrDefault('MAX_REREQUEST_MINS', '55'), 10)
+const maxErrorLength = 255
 
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
@@ -205,6 +206,8 @@ export async function startSendSms(
   messageToSend: string,
   securityCode: string | null = null,
   attestationCode: string | null = null,
+  appSignature: string | undefined,
+  language: string | undefined,
   logger: Logger,
   sequelizeLogger: SequelizeLogger,
   onlyUseProvider: string | null = null
@@ -246,6 +249,8 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
+        appSignature,
+        language,
       },
       transaction
     )
@@ -299,6 +304,9 @@ export async function startSendSms(
 // immediately if there are sufficient attempts remaining.
 export async function rerequestAttestation(
   key: AttestationKey,
+  appSignature: string | undefined,
+  language: string | undefined,
+  securityCodePrefix: string,
   logger: Logger,
   sequelizeLogger: SequelizeLogger
 ): Promise<AttestationModel> {
@@ -314,6 +322,18 @@ export async function rerequestAttestation(
     attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
     if (!attestation) {
       throw new Error('Cannot retrieve attestation')
+    }
+    // For backward compatibility
+    // Can be removed after 1.3.0
+    if (!attestation.appSignature) {
+      attestation.appSignature = appSignature
+    }
+    if (!attestation.language) {
+      attestation.language = language
+    }
+    // Old security code approach did not store the prefix
+    if (attestation.securityCode?.length === 7) {
+      attestation.securityCode = `${securityCodePrefix}${attestation.securityCode}`
     }
 
     if (attestation.completedAt) {
@@ -434,7 +454,7 @@ async function doSendSms(
     return false
   } catch (error) {
     attestation.status = AttestationStatus.NotSent
-    const errorMsg = `${error.message ?? error}`
+    const errorMsg = `${error.message ?? error}`.slice(0, maxErrorLength)
     attestation.recordError(errorMsg)
     attestation.ongoingDeliveryId = null
     attestation.attempt += 1

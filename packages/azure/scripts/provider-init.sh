@@ -27,6 +27,7 @@ PROXY_URL="enode://${proxyPublicKey}@${proxyInternalIpAddress}:30503;enode://${p
 SMS_PROVIDERS=twilio
 ATTESTER_TWILIO_ACCOUNT_SID=${attesterTwilioAccountSID}
 ATTESTER_TWILIO_MESSAGE_SERVICE_SID=${attesterTwilioMessageServiceSID}
+ATTESTER_TWILIO_VERIFY_SERVICE_SID=${attesterTwilioVerifyServiceSID}
 ATTESTER_DB_USERNAME="${attesterPostgreSQLUsername}@${attesterDBName}"
 ATTESTER_DB_HOSTNAME="${attesterDBName}.postgres.database.azure.com"
 EOF
