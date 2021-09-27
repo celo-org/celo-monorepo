@@ -35,6 +35,7 @@
   "grandaMento": {
     "approver": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
     "spread": 0.01,
+    "maxApprovalExchangeRateChange": 0.5,
     "vetoPeriodSeconds": 10800
   },
   "oracles": {

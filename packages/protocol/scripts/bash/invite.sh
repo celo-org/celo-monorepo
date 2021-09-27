@@ -33,7 +33,7 @@ else
   yarn run build
   gcloud config set project celo-testnet
   gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
-    --key=github-key --keyring=celo-keyring --location=global
+    --key=github-mnemonic-key --keyring=celo-keyring --location=global
 fi
 
 yarn run truffle exec ./scripts/truffle/invite.js \

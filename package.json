@@ -27,7 +27,8 @@
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js",
     "celotool": "yarn --cwd packages/celotool run --silent cli",
-    "celocli": "yarn --cwd packages/cli run --silent celocli"
+    "celocli": "yarn --cwd packages/cli run --silent celocli",
+    "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts"
   },
   "husky": {
     "hooks": {
@@ -54,7 +55,7 @@
     "@types/jest": "^26.0.21",
     "babel-jest": "^26.6.3",
     "codecov": "^3.6.5",
-    "husky": "^3.0.0",
+    "husky": "^3.1.0",
     "jest": "^26.6.3",
     "jest-circus": "^26.6.3",
     "jest-junit": "^10.0.0",
