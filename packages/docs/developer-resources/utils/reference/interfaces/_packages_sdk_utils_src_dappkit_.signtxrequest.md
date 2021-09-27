@@ -52,7 +52,7 @@ ___
 
 • **txs**: *[TxToSignParam](_packages_sdk_utils_src_dappkit_.txtosignparam.md)[]*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L114)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L117)*
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 *Overrides [DappKitRequestBase](_packages_sdk_utils_src_dappkit_.dappkitrequestbase.md).[type](_packages_sdk_utils_src_dappkit_.dappkitrequestbase.md#type)*
 
-*Defined in [packages/sdk/utils/src/dappkit.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L113)*
+*Defined in [packages/sdk/utils/src/dappkit.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L116)*

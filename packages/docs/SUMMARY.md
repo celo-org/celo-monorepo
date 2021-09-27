@@ -745,6 +745,7 @@
       - [packages/sdk/utils/src/string](developer-resources/utils/reference/modules/_packages_sdk_utils_src_string_.md)
       - [packages/sdk/utils/src/task](developer-resources/utils/reference/modules/_packages_sdk_utils_src_task_.md)
       - [packages/sdk/utils/src/typed-data-constructors](developer-resources/utils/reference/modules/_packages_sdk_utils_src_typed_data_constructors_.md)
+      - [packages/sdk/utils/src/verifiableCredential](developer-resources/utils/reference/modules/_packages_sdk_utils_src_verifiablecredential_.md)
     - [Classes]()
       - [F](developer-resources/utils/reference/classes/_node_modules_bls12377js_src_f_.f.md)
       - [F2](developer-resources/utils/reference/classes/_node_modules_bls12377js_src_f2_.f2.md)

@@ -76,7 +76,7 @@ ___
 
 ▸ **generateDeterministicInviteCode**(`recipientPhoneHash`: string, `recipientPepper`: string, `addressIndex`: number, `changeIndex`: number, `derivationPath`: string): *object*
 
-*Defined in [packages/sdk/utils/src/account.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L139)*
+*Defined in [packages/sdk/utils/src/account.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L136)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **generateKeys**(`mnemonic`: string, `password?`: undefined | string, `changeIndex`: number, `addressIndex`: number, `bip39ToUse`: Bip39, `derivationPath`: string): *Promise‹object›*
 
-*Defined in [packages/sdk/utils/src/account.ts:127](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L127)*
+*Defined in [packages/sdk/utils/src/account.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L124)*
 
 **Parameters:**
 
@@ -121,7 +121,7 @@ ___
 
 ▸ **generateKeysFromSeed**(`seed`: Buffer, `changeIndex`: number, `addressIndex`: number, `derivationPath`: string): *object*
 
-*Defined in [packages/sdk/utils/src/account.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L167)*
+*Defined in [packages/sdk/utils/src/account.ts:164](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L164)*
 
 **Parameters:**
 
@@ -164,7 +164,7 @@ ___
 
 ▸ **generateSeed**(`mnemonic`: string, `password?`: undefined | string, `bip39ToUse`: Bip39, `keyByteLength`: number): *Promise‹Buffer›*
 
-*Defined in [packages/sdk/utils/src/account.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L152)*
+*Defined in [packages/sdk/utils/src/account.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/account.ts#L149)*
 
 **Parameters:**
 
