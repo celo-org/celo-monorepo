@@ -24,7 +24,7 @@ export enum Endpoints {
   DOMAIN_STATUS = '/domain/status/:domain',
 }
 
-const domainService = new DomainService(logger)
+const domainService = new DomainService()
 
 export function createServer() {
   logger.info('Creating express server')

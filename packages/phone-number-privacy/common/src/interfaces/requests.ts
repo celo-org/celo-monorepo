@@ -21,7 +21,7 @@ export interface GetQuotaRequest {
 }
 
 export interface DisableDomainRequestBody {
-  value: boolean
+  value?: boolean
 }
 
 export type OdisRequest = GetBlindedMessageSigRequest | GetQuotaRequest | GetContactMatchesRequest
