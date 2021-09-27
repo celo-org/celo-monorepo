@@ -5,7 +5,7 @@ import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
 import { ClientOptions, ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
 import { ERROR } from '@walletconnect/utils'
 import debugConfig from 'debug'
-import { productionEndpoint } from './constants'
+import { endpoint } from './constants'
 import { SupportedMethods, WalletConnectWalletOptions } from './types'
 import { parseAddress } from './utils'
 import { WalletConnectSigner } from './wc-signer'
@@ -32,7 +32,7 @@ async function waitForTruthy(getValue: () => any, attempts: number = 10) {
 }
 
 const defaultInitOptions: ClientOptions = {
-  relayProvider: productionEndpoint,
+  relayProvider: endpoint,
 }
 const defaultConnectOptions: ClientTypes.ConnectParams = {
   metadata: {
@@ -45,7 +45,14 @@ const defaultConnectOptions: ClientTypes.ConnectParams = {
   permissions: {
     blockchain: {
       // alfajores, mainnet, baklava
-      chains: ['celo:44787', 'celo:42220', 'celo:62320'],
+      chains: [
+        'eip155:44787',
+        'eip155:42220',
+        'eip155:62320',
+        // 'celo',
+        // 'alfajores',
+        // 'baklava',
+      ],
     },
     jsonrpc: {
       methods: Object.values(SupportedMethods),
@@ -100,7 +107,6 @@ export class WalletConnectWallet extends RemoteWallet<WalletConnectSigner> {
     this.client.on(CLIENT_EVENTS.pairing.updated, this.onPairingUpdated)
     this.client.on(CLIENT_EVENTS.pairing.deleted, this.onPairingDeleted)
 
-    // tslint:disable-next-line
     this.client.connect(this.connectOptions)
 
     await waitForTruthy(() => this.pairingProposal)
