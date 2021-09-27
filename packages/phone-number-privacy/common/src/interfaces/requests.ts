@@ -20,9 +20,8 @@ export interface GetQuotaRequest {
   sessionID?: string
 }
 
-export interface DisableDomainRequest {
-  domain: string
-  value?: boolean
+export interface DisableDomainRequestBody {
+  value: boolean
 }
 
 export type OdisRequest = GetBlindedMessageSigRequest | GetQuotaRequest | GetContactMatchesRequest

@@ -31,7 +31,7 @@ export async function setDomainDisabled(
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error(err)
     disableDomainMeter()
-    return false
+    throw err
   }
 }
 
