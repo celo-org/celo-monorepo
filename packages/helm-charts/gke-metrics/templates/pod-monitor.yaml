@@ -12,7 +12,7 @@ spec:
 
   podMetricsEndpoints:
   {{- range $endpoint := $.Values.endpoints }}
-  - targetPort: {{ $endpoint.targetPort }}
+  - port: {{ $endpoint.targetPort }}
     path: {{ $endpoint.path }}
     scheme: http
 
