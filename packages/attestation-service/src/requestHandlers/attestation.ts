@@ -7,15 +7,19 @@ import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger, useKit } from '../db'
-import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
+import { fetchEnv, getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
 import { rerequestAttestation, startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
+import { getPhoneNumberIdentifierFromSignature } from '@celo/identity/lib/odis/phone-number-identifier'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
+
+const blsBlindingClient = new WasmBlsBlindingClient(fetchEnv('ODIS_PUBLIC_KEY'))
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -84,6 +88,8 @@ class AttestationRequestHandler {
       return attestation
     }
 
+    await this.verifyPepperIfApplicable()
+
     if (isDevMode()) {
       return attestation
     }
@@ -109,6 +115,24 @@ class AttestationRequestHandler {
     throw new ErrorWithResponse(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR, 422)
 
     // TODO: Check expiration
+  }
+
+  private async verifyPepperIfApplicable(): Promise<void> {
+    if (this.attestationRequest.blindedPhoneNumberSignature) {
+      try {
+        const phoneNumberHashDetails = await getPhoneNumberIdentifierFromSignature(
+          this.attestationRequest.phoneNumber,
+          this.attestationRequest.blindedPhoneNumberSignature,
+          blsBlindingClient
+        )
+        if (phoneNumberHashDetails.pepper !== this.attestationRequest.salt) {
+          throw new ErrorWithResponse('Pepper is invalid', 422)
+        }
+      } catch (e) {
+        this.logger.error('Cannot get phone number from signature', e)
+        throw new ErrorWithResponse('Signature is invalid', 422)
+      }
+    }
   }
 
   async signAttestation() {

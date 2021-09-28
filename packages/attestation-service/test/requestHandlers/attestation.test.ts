@@ -59,6 +59,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
+        blindedPhoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(1)
@@ -81,6 +82,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: '',
         smsRetrieverAppSig: 'sig',
+        blindedPhoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
@@ -106,6 +108,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
+        blindedPhoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
@@ -116,31 +119,32 @@ describe('Attestation request handler', () => {
       expect(body['error']).toEqual(`Mismatching issuer, I am ${address}`)
     })
 
-    // it("Should fail with 422 code when pepper didn't origin in odis", async () => {
-    //   const address = '0x2F015C60E0be116B1f0CD534704Db9c92118FB6A';
-    //   isValidAddressMock.mockReturnValue(true);
-    //   toChecksumAddressMock.mockReturnValue(address);
-    //   findAttestationByKeyMock.mockResolvedValue(null);
-    //   const responseMockInstance = instance(responseMock);
-    //   when(responseMock.status(anyNumber())).thenReturn(responseMockInstance);
-    //
-    //   await handleAttestationRequest(instance(requestMock), responseMockInstance, {
-    //     phoneNumber: '+14155550000',
-    //     language: 'en',
-    //     account: 'account',
-    //     issuer: address,
-    //     salt: 'salt',
-    //     securityCodePrefix: 'p',
-    //     smsRetrieverAppSig: 'sig'
-    //   });
-    //
-    //   expect(findAttestationByKeyMock).toBeCalledTimes(1);
-    //   expect(rerequestAttestationMock).toBeCalledTimes(0);
-    //   verify(responseMock.status(422)).once();
-    //   const [body] = capture(responseMock.json).last();
-    //   expect(body['success']).toBeFalsy();
-    //   expect(body['error']).toEqual(`Mismatching issuer, I am ${address}`);
-    // })
+    it('Should fail with 422 code with wrong signature', async () => {
+      const address = '0x2F015C60E0be116B1f0CD534704Db9c92118FB6A'
+      isValidAddressMock.mockReturnValue(true)
+      toChecksumAddressMock.mockReturnValue(address)
+      findAttestationByKeyMock.mockResolvedValue(null)
+      const responseMockInstance = instance(responseMock)
+      when(responseMock.status(anyNumber())).thenReturn(responseMockInstance)
+
+      await handleAttestationRequest(instance(requestMock), responseMockInstance, {
+        phoneNumber: '+14155550000',
+        language: 'en',
+        account: 'account',
+        issuer: address,
+        salt: 'salt',
+        securityCodePrefix: 'p',
+        smsRetrieverAppSig: 'sig',
+        blindedPhoneNumberSignature: 'wrongSignature',
+      })
+
+      expect(findAttestationByKeyMock).toBeCalledTimes(1)
+      expect(rerequestAttestationMock).toBeCalledTimes(0)
+      verify(responseMock.status(422)).once()
+      const [body] = capture(responseMock.json).last()
+      expect(body['success']).toBeFalsy()
+      expect(body['error']).toEqual(`Signature is invalid`)
+    })
 
     it('Should fail with 500 code when validator address is invalid', async () => {
       const address = '0x2F015C60E0be116B1f0CD534704Db9c92118FB6A'
@@ -157,6 +161,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
+        blindedPhoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
