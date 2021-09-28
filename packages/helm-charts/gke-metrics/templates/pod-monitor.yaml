@@ -7,26 +7,20 @@ spec:
   namespaceSelector:
     matchNames:
     - {{ .Values.cluster }}
-  # Match on all pods in namespace?
+  # Leave selector empty to match on all.
+  selector:
+
   podMetricsEndpoints:
-  - port: metrics
-    path: /metrics
+  {{ range $endpoint := $.Values.endpoints -}}
+  - port: {{ $endpoint.port }}
+    path: {{ $endpoint.path }}
     scheme: http
-    interval: 60s
+
     metricRelabelings:
-  
-    - sourceLabels: [kubernetes_namespace]
-      regex: lens-metrics
-      action: drop
-
-    # - sourceLabels: [namespace]
-    #   regex: (kube.+|lens-metrics|default|kong|pl)
-    #   action: drop
-
-    - sourceLabels: [namespace]
-      regex: alfajores|baklava|rc1|walletconnect
-      action: keep
-
-    - sourceLabels: [__name__]
-      regex: (apiserver|etcd|erlang|kube|kubelet|nginx|phoenix|rest_client|state|storage)_.*
-      action: drop
+    {{ range $relabel := $.Values.relabels -}}
+    - sourceLabels: {{ $relabel.sourceLabels }}
+      regex: {{ $relabel.regex }}
+      action: {{ $relabel.action }}
+    
+    {{ end -}}
+  {{ end -}}
