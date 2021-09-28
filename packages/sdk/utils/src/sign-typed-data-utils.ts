@@ -69,10 +69,19 @@ function findDependencies(primaryType: string, types: EIP712Types, found: string
   if (found.includes(primaryType) || EIP712_BUILTIN_TYPES.includes(primaryType)) {
     return []
   }
+
+  // If this is an array type, return the results for its member type.
+  if (EIP712_ARRAY_REGEXP.test(primaryType)) {
+    const match = EIP712_ARRAY_REGEXP.exec(primaryType)
+    const memberType: string = match?.groups?.['memberType']!
+    return findDependencies(memberType, types, found)
+  }
+
   // If this is not a builtin and is not defined, we cannot correctly construct a type encoding.
   if (types[primaryType] === undefined) {
     throw new Error(`Unrecognized type ${primaryType} is not included in the EIP-712 type list`)
   }
+
   // Execute a depth-first search to populate the (inclusive) dependencies list.
   // By the first invarient of this function, the resulting list should not contain duplicates.
   const dependencies = [primaryType]
