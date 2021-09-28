@@ -7,8 +7,14 @@ spec:
   namespaceSelector:
     matchNames:
     - {{ .Values.cluster }}
-  # Leave selector empty to match on all.
+
+  # Match on all pods that have a release label, 
+  # which should be the case with Helm managed k8s objects.
+  # This is a dirty hack and doesn't guarantee that all pods will be caught.
   selector:
+    matchExpressions:
+    - key: release
+      operator: Exists
 
   podMetricsEndpoints:
   {{- range $endpoint := $.Values.endpoints }}
