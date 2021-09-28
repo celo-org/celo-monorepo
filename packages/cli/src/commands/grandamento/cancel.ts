@@ -26,11 +26,11 @@ export default class Cancel extends BaseCommand {
     const res = this.parse(Cancel)
     const proposalID = res.flags.proposalID
 
-    await newCheckBuilder(this).grandaMentoProposalExists(proposalID)
+    await newCheckBuilder(this).grandaMentoProposalExists(proposalID).runChecks()
 
     await displaySendTx(
       'cancelExchangeProposal',
-      await grandaMento.cancelExchangeProposal(proposalID),
+      grandaMento.cancelExchangeProposal(proposalID),
       undefined,
       'ExchangeProposalCancelled'
     )
