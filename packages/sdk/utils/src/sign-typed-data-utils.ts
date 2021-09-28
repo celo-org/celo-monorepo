@@ -144,14 +144,16 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
     return structHash(valueType, value as EIP712Object, types)
   }
 
-  // Encode arrays as the concatenated encoding of the underlying types.
+  // Encode arrays as the hash of the concatenated encoding of the underlying types.
   if (EIP712_ARRAY_REGEXP.test(valueType)) {
     // Note: If a fixed length is provided in the type, it is not checked.
     const match = EIP712_ARRAY_REGEXP.exec(valueType)
     const memberType: string = match?.groups?.['memberType']!
-    return Buffer.concat(
-      (value as EIP712ObjectValue[]).map((member) => encodeValue(memberType, member, types))
-    )
+    return keccak(
+      Buffer.concat(
+        (value as EIP712ObjectValue[]).map((member) => encodeValue(memberType, member, types))
+      )
+    ) as Buffer
   }
 
   throw new Error(`Unrecognized or unsupported type in EIP-712 encoding: ${valueType}`)

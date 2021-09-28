@@ -146,11 +146,106 @@ const TEST_TYPES: EIP712TestCase[] = [
         { name: 'bird', type: 'Bird' },
         { name: 'age', type: 'uint256' },
       ],
+      // An orphaned type should have no effect on the encoding.
+      Orphan: [],
     },
     typeEncoding:
       'Nested(Nested nest,Egg[][] eggs)Bird(string species,Color color,Nested nest)Color(uint8 red,uint8 green,uint8 blue)Egg(Bird bird,uint256 age)',
     // Although this recurive type definition can be encoded with EIP-712, no instance of it can.
     examples: [],
+  },
+  {
+    primaryType: 'GameBoard',
+    types: {
+      GameBoard: [{ name: 'grid', type: 'Tile[][]' }],
+      Tile: [
+        { name: 'occupied', type: 'bool' },
+        { name: 'occupantId', type: 'uint8' },
+      ],
+    },
+    typeEncoding: 'GameBoard(Tile[][] grid)Tile(bool occupied,uint8 occupantId)',
+    examples: [
+      {
+        data: {
+          grid: [
+            [
+              { occupied: true, occupantId: 5 },
+              { occupied: false, occupantId: 0 },
+            ],
+            [
+              { occupied: true, occupantId: new BigNumber(160) },
+              { occupied: true, occupantId: 161 },
+            ],
+          ],
+        },
+        dataEncoding: Buffer.concat([
+          keccak(
+            Buffer.concat([
+              keccak(
+                Buffer.concat([
+                  keccak(
+                    Buffer.concat([
+                      keccak('Tile(bool occupied,uint8 occupantId)'),
+                      Buffer.from(
+                        '0000000000000000000000000000000000000000000000000000000000000001',
+                        'hex'
+                      ),
+                      Buffer.from(
+                        '0000000000000000000000000000000000000000000000000000000000000005',
+                        'hex'
+                      ),
+                    ])
+                  ),
+                  keccak(
+                    Buffer.concat([
+                      keccak('Tile(bool occupied,uint8 occupantId)'),
+                      Buffer.from(
+                        '0000000000000000000000000000000000000000000000000000000000000000',
+                        'hex'
+                      ),
+                      Buffer.from(
+                        '0000000000000000000000000000000000000000000000000000000000000000',
+                        'hex'
+                      ),
+                    ])
+                  ),
+                ])
+              ),
+              keccak(
+                Buffer.concat([
+                  keccak(
+                    Buffer.concat([
+                      keccak('Tile(bool occupied,uint8 occupantId)'),
+                      Buffer.from(
+                        '0000000000000000000000000000000000000000000000000000000000000001',
+                        'hex'
+                      ),
+                      Buffer.from(
+                        '00000000000000000000000000000000000000000000000000000000000000a0',
+                        'hex'
+                      ),
+                    ])
+                  ),
+                  keccak(
+                    Buffer.concat([
+                      keccak('Tile(bool occupied,uint8 occupantId)'),
+                      Buffer.from(
+                        '0000000000000000000000000000000000000000000000000000000000000001',
+                        'hex'
+                      ),
+                      Buffer.from(
+                        '00000000000000000000000000000000000000000000000000000000000000a1',
+                        'hex'
+                      ),
+                    ])
+                  ),
+                ])
+              ),
+            ])
+          ),
+        ]),
+      },
+    ],
   },
 ]
 
