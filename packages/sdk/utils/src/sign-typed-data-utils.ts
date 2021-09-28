@@ -12,7 +12,13 @@ export interface EIP712Types {
   [key: string]: EIP712Parameter[]
 }
 
-export type EIP712ObjectValue = string | number | boolean | EIP712Object | EIP712ObjectValue[]
+export type EIP712ObjectValue =
+  | string
+  | number
+  | BigNumber
+  | boolean
+  | EIP712Object
+  | EIP712ObjectValue[]
 
 export interface EIP712Object {
   [key: string]: EIP712ObjectValue
@@ -151,7 +157,7 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
   throw new Error(`Unrecognized or unsupported type in EIP-712 encoding: ${valueType}`)
 }
 
-function normalizeValue(type: string, value: any): EIP712ObjectValue {
+function normalizeValue(type: string, value: EIP712ObjectValue): EIP712ObjectValue {
   const normalizedValue =
     /u?int\d*/.test(type) && BigNumber.isBigNumber(value) ? value.toString() : value
   return normalizedValue
