@@ -8,22 +8,14 @@ function domains() {
   return getDatabase()<Domain>(DOMAINS_TABLE)
 }
 
-const emptyDomain: Domain = {
-  [DOMAINS_COLUMNS.counter]: 0,
-  [DOMAINS_COLUMNS.disabled]: false,
-  [DOMAINS_COLUMNS.domain]: '',
-  [DOMAINS_COLUMNS.timer]: 0,
-}
-
-export async function setDomainDisabled(
-  domain: string,
-  value: boolean,
-  logger: Logger
-): Promise<boolean> {
+export async function setDomainDisabled(domain: string, logger: Logger): Promise<boolean> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
-  logger.debug({ domain, value }, 'Disabling domain')
+  logger.debug({ domain }, 'Disabling domain')
   try {
-    await domains().where(DOMAINS_COLUMNS.domain, domain).update(DOMAINS_COLUMNS.disabled, value)
+    await domains()
+      .where(DOMAINS_COLUMNS.domain, domain)
+      .update(DOMAINS_COLUMNS.disabled, true)
+      .timeout(DB_TIMEOUT)
     disableDomainMeter()
     return true
   } catch (err) {
@@ -37,11 +29,11 @@ export async function setDomainDisabled(
 
 export async function getDomain(domain: string, logger: Logger): Promise<Domain | null> {
   const getDomainMeter = Histograms.dbOpsInstrumentation.labels('getDomain').startTimer()
-  logger.debug({ domain }, 'Get Domain')
+  logger.debug({ domain }, 'Getting domain from db')
   try {
     const result = await domains().where(DOMAINS_COLUMNS.domain, domain).first().timeout(DB_TIMEOUT)
     getDomainMeter()
-    return result ?? { ...emptyDomain }
+    return result ?? null
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
@@ -62,8 +54,8 @@ export async function updateDomain(
   try {
     const result = await domains().where(DOMAINS_COLUMNS.domain, domain).first().timeout(DB_TIMEOUT)
 
-    if (result == null) {
-      await insertRecord(new Domain(domain, counter, timer, false))
+    if (!result) {
+      await insertRecord(new Domain(domain, counter, timer))
     } else {
       await domains()
         .where(DOMAINS_COLUMNS.domain, domain)

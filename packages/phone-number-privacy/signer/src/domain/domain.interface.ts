@@ -1,14 +1,13 @@
-import { DisableDomainRequestBody } from '@celo/phone-number-privacy-common'
+import { DomainRequestBody } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import * as core from 'express-serve-static-core'
 
 export interface IDomainService {
   handleDisableDomain(
-    request: Request<core.ParamsDictionary, {}, DisableDomainRequestBody>,
+    request: Request<{}, {}, DomainRequestBody>,
     response: Response
   ): Promise<void>
   handleGetDomainStatus(
-    request: Request<core.ParamsDictionary, {}, {}>,
+    request: Request<{}, {}, DomainRequestBody>,
     response: Response
   ): Promise<void>
 }

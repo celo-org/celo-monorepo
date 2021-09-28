@@ -11,10 +11,10 @@ export class Domain {
   [DOMAINS_COLUMNS.timer]: number;
   [DOMAINS_COLUMNS.disabled]: boolean
 
-  constructor(domain: string, counter: number, timer: number, disabled: boolean) {
+  constructor(domain: string, counter: number, timer: number) {
     this[DOMAINS_COLUMNS.domain] = domain
     this[DOMAINS_COLUMNS.counter] = counter
     this[DOMAINS_COLUMNS.timer] = timer
-    this[DOMAINS_COLUMNS.disabled] = disabled
+    this[DOMAINS_COLUMNS.disabled] = false
   }
 }
