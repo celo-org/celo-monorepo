@@ -13,7 +13,7 @@ spec:
   podMetricsEndpoints:
   {{ range $endpoint := $.Values.endpoints }}
   - targetPort: {{ $endpoint.targetPort }}
-    path: {{ $endpoint.patargetPortth }}
+    path: {{ $endpoint.path }}
     scheme: http
 
     metricRelabelings:
