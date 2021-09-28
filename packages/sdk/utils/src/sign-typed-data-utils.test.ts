@@ -5,7 +5,7 @@ import {
   encodeType,
   typeHash,
 } from './sign-typed-data-utils'
-import { sha3 } from 'ethereumjs-util'
+import { keccak } from 'ethereumjs-util'
 
 interface EIP712TestCase {
   primaryType: string
@@ -38,7 +38,7 @@ const TEST_TYPES: EIP712TestCase[] = [
         dataEncoding: Buffer.concat([
           Buffer.from('000000000000000000000000000000000000000000000000000000000000a1ce', 'hex'),
           Buffer.from('0000000000000000000000000000000000000000000000000000000000000b0b', 'hex'),
-          sha3('hello bob!'),
+          keccak('hello bob!'),
         ]),
       },
       {
@@ -51,7 +51,7 @@ const TEST_TYPES: EIP712TestCase[] = [
         dataEncoding: Buffer.concat([
           Buffer.from('000000000000000000000000000000000000000000000000000000000000a1ce', 'hex'),
           Buffer.from('0000000000000000000000000000000000000000000000000000000000000b0b', 'hex'),
-          sha3(Buffer.from('0xdeadbeef', 'utf8')),
+          keccak(Buffer.from('0xdeadbeef', 'utf8')),
         ]),
       },
     ],
@@ -118,17 +118,19 @@ describe('encodeType()', () => {
 describe('typeHash()', () => {
   for (const { primaryType, types, typeEncoding } of TEST_TYPES) {
     it(`should hash type ${primaryType} correctly`, () => {
-      expect(typeHash(primaryType, types)).toEqual(sha3(typeEncoding))
+      expect(typeHash(primaryType, types)).toEqual(keccak(typeEncoding))
     })
   }
 })
 
 describe('encodeData()', () => {
   for (const { primaryType, types, examples } of TEST_TYPES) {
-    it(`should encode data ${primaryType} correctly`, () => {
-      for (const { data, dataEncoding } of examples) {
-        expect(encodeData(primaryType, data, types)).toEqual(dataEncoding)
-      }
-    })
+    if (examples.length > 0) {
+      it(`should encode data ${primaryType} correctly`, () => {
+        for (const { data, dataEncoding } of examples) {
+          expect(encodeData(primaryType, data, types)).toEqual(dataEncoding)
+        }
+      })
+    }
   }
 })

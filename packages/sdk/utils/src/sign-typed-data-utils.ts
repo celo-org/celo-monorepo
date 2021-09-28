@@ -1,6 +1,6 @@
 import { trimLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
-import { sha3 } from 'ethereumjs-util'
+import { keccak } from 'ethereumjs-util'
 import coder from 'web3-eth-abi'
 
 export interface EIP712Parameter {
@@ -50,7 +50,7 @@ const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+
  * @return  A Buffer containing the hash of the typed data.
  */
 export function generateTypedDataHash(typedData: EIP712TypedData): Buffer {
-  return sha3(
+  return keccak(
     Buffer.concat([
       Buffer.from('1901', 'hex'),
       structHash('EIP712Domain', typedData.domain, typedData.types),
@@ -107,7 +107,7 @@ export function encodeType(primaryType: string, types: EIP712Types): string {
 }
 
 export function typeHash(primaryType: string, types: EIP712Types): Buffer {
-  return sha3(encodeType(primaryType, types)) as Buffer
+  return keccak(encodeType(primaryType, types)) as Buffer
 }
 
 /** Encodes a single EIP-712 value to a 32-byte buffer */
@@ -121,15 +121,15 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
 
   // Encode `string` and `bytes` types as their keccak hash.
   if (valueType === 'string') {
-    // Converting to Buffer before passing to `sha3` prevents an issue where the string is
+    // Converting to Buffer before passing to `keccak` prevents an issue where the string is
     // interpretted as a hex-encoded string when is starts with 0x.
     // https://github.com/ethereumjs/ethereumjs-util/blob/7e3be1d97b4e11fbc4924836b8c444e644f643ac/index.js#L155-L183
-    return sha3(Buffer.from(value as string, 'utf8')) as Buffer
+    return keccak(Buffer.from(value as string, 'utf8')) as Buffer
   }
   if (valueType === 'bytes') {
     // Allow the user to use either utf8 (plain string) or hex encoding for their bytes.
-    // Note: sha3 throws if the value cannot be converted into a Buffer,
-    return sha3(value as string) as Buffer
+    // Note: keccak throws if the value cannot be converted into a Buffer,
+    return keccak(value as string) as Buffer
   }
 
   // Encode structs as its hashStruct (e.g. keccak(typeHash || encodeData(struct)) ).
@@ -170,7 +170,7 @@ export function encodeData(primaryType: string, data: EIP712Object, types: EIP71
 }
 
 export function structHash(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
-  return sha3(
+  return keccak(
     Buffer.concat([typeHash(primaryType, types), encodeData(primaryType, data, types)])
   ) as Buffer
 }
