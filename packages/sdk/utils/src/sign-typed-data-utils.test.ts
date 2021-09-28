@@ -3,8 +3,10 @@ import {
   EIP712Object,
   encodeData,
   encodeType,
+  structHash,
   typeHash,
 } from './sign-typed-data-utils'
+import { BigNumber } from 'bignumber.js'
 import { keccak } from 'ethereumjs-util'
 
 interface EIP712TestCase {
@@ -75,8 +77,53 @@ const TEST_TYPES: EIP712TestCase[] = [
     },
     typeEncoding:
       'Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)',
-    // DO NOT MERGE: Add some examples.
-    examples: [],
+    examples: [
+      {
+        data: {
+          from: { wallet: '0x000000000000000000000000000000000000a1ce', name: 'Alice' },
+          to: { name: 'Bob', wallet: '0x0000000000000000000000000000000000000b0b' },
+          tx: {
+            token: '0x000000000000000000000000000000000000ce10',
+            amount: new BigNumber('5e+18'),
+          },
+        },
+        dataEncoding: Buffer.concat([
+          keccak(
+            Buffer.concat([
+              keccak('Person(address wallet,string name)'),
+              Buffer.from(
+                '000000000000000000000000000000000000000000000000000000000000a1ce',
+                'hex'
+              ),
+              keccak('Alice'),
+            ])
+          ),
+          keccak(
+            Buffer.concat([
+              keccak('Person(address wallet,string name)'),
+              Buffer.from(
+                '0000000000000000000000000000000000000000000000000000000000000b0b',
+                'hex'
+              ),
+              keccak('Bob'),
+            ])
+          ),
+          keccak(
+            Buffer.concat([
+              keccak('Asset(address token,uint256 amount)'),
+              Buffer.from(
+                '000000000000000000000000000000000000000000000000000000000000ce10',
+                'hex'
+              ),
+              Buffer.from(
+                '0000000000000000000000000000000000000000000000004563918244F40000',
+                'hex'
+              ),
+            ])
+          ),
+        ]),
+      },
+    ],
   },
   {
     primaryType: 'Nested',
@@ -129,6 +176,19 @@ describe('encodeData()', () => {
       it(`should encode data ${primaryType} correctly`, () => {
         for (const { data, dataEncoding } of examples) {
           expect(encodeData(primaryType, data, types)).toEqual(dataEncoding)
+        }
+      })
+    }
+  }
+})
+
+describe('structHash()', () => {
+  for (const { primaryType, types, examples } of TEST_TYPES) {
+    if (examples.length > 0) {
+      it(`should hash data ${primaryType} correctly`, () => {
+        for (const { data, dataEncoding } of examples) {
+          const expected = keccak(Buffer.concat([typeHash(primaryType, types), dataEncoding]))
+          expect(structHash(primaryType, data, types)).toEqual(expected)
         }
       })
     }
