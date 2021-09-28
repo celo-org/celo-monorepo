@@ -134,12 +134,13 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     '__name__!~"container_threads"',
     '__name__!~"container_threads_max"',
     '__name__!~"kube_node_status_condition"',
+    '__name__!~"container_.+"',
+    '__name__!~"kube_pod_.+"',
+    '__name__!~"state_.+"',
   ]
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
-  const clusterName = usingGCP
-    ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
-    : clusterConfig!.clusterName
+  let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
   let gcloudProject
   let gcloudRegion
   if (context) {
@@ -153,13 +154,17 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       { context },
       fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
     )
+    clusterName = getDynamicEnvVarValue(
+      DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+      { context },
+      clusterName
+    )
   } else {
     gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   }
 
   const params = [
-    `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${gcloudProject}`,
     `--set gcloud.region=${gcloudRegion}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
@@ -171,8 +176,12 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     // of k8s resources as metric labels. If some k8s resources have too many labels,
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
+    // Decouple inclusions to include multiple `--include=` args, and
+    // select the `container_` and `kube_pod_` metrics from only some namespaces
+    `--set-string includeFilterExtra='\\{__name__=~"(kube_pod|container)_.+"\\,namespace=~"(alfajores|baklava|rc1|walletconnect)"}'`,
     `--set cluster=${clusterName}`,
     `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
+    `--set namespace=${kubeNamespace}`,
   ]
 
   if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
@@ -208,6 +217,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       'kube_pod_[^cs].+',
       'workqueue_.+',
       'kube_secret_.+',
+      'state_.+',
     ]
     params.push(
       `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,

@@ -38,6 +38,12 @@ data:
         - action: {{ .Values.remote_write.write_relabel_configs.action }}
           regex: {{ .Values.remote_write.write_relabel_configs.regex }}
           source_labels: {{ .Values.remote_write.write_relabel_configs.source_labels }}
+        - action: drop
+          regex: lens-metrics
+          source_labels: [kubernetes_namespace]
+        - action: drop
+          regex: (container_.*|kube_.*);(kube.+|lens-metrics|default|kong|pl)
+          source_labels: [__name__,namespace]
     {{- end }}
 
     scrape_configs:
