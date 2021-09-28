@@ -1,15 +1,15 @@
 cluster: alfajores
 
 endpoints:
-  - port: prometheus
+  - targetPort: prometheus
     path: /metrics
-  - port: metrics
+  - potargetPortrt: metrics
     path: /metrics
-  - port: ""
+  - potargetPortrt: 4000
     path: /metrics/web
-  - port: ""
+  - targetPort: 4000
     path: /metrics/api
-  - port: ""
+  - targetPort: 6060
     path: /debug/metrics/prometheus
 
 namespace: prometheus
