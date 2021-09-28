@@ -201,5 +201,6 @@ function buildAndExecTerraformCmd(
 
 function buildTerraformCmd(command: string, cmdPath: string, ...options: string[]) {
   const optionsStr = options ? options.join(' ') : ''
-  return `terraform ${command} -input=false ${optionsStr} ${cmdPath}`
+  const applyPlanDirStr = command === 'apply' ? cmdPath : ''
+  return `terraform ${command} -input=false ${optionsStr} ${applyPlanDirStr}`
 }
