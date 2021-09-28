@@ -181,6 +181,11 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     `--set-string includeFilterExtra='\\{__name__=~"(kube_pod|container)_.+"\\,namespace=~"(alfajores|baklava|rc1|walletconnect)"}'`,
     `--set cluster=${clusterName}`,
     `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
+    // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
+    `--set disableStackDriverMetrics=${fetchEnvOrFallback(
+      envVar.PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR,
+      'false'
+    )}`,
     `--set namespace=${kubeNamespace}`,
   ]
 
