@@ -153,7 +153,7 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
 
 function normalizeValue(type: string, value: any): EIP712ObjectValue {
   const normalizedValue =
-    type === 'uint256' && BigNumber.isBigNumber(value) ? value.toString() : value
+    /u?int\d*/.test(type) && BigNumber.isBigNumber(value) ? value.toString() : value
   return normalizedValue
 }
 
