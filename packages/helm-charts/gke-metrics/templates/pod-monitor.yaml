@@ -1,0 +1,32 @@
+apiVersion: monitoring.gke.io/v1alpha1
+kind: PodMonitor
+metadata:
+  name: gke-workload-metrics
+  namespace: {{ .Values.namespace }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.cluster }}
+  # Match on all pods in namespace?
+  podMetricsEndpoints:
+  - port: metrics
+    path: /metrics
+    scheme: http
+    interval: 60s
+    metricRelabelings:
+  
+    - sourceLabels: [kubernetes_namespace]
+      regex: lens-metrics
+      action: drop
+
+    # - sourceLabels: [namespace]
+    #   regex: (kube.+|lens-metrics|default|kong|pl)
+    #   action: drop
+
+    - sourceLabels: [namespace]
+      regex: alfajores|baklava|rc1|walletconnect
+      action: keep
+
+    - sourceLabels: [__name__]
+      regex: (apiserver|etcd|erlang|kube|kubelet|nginx|phoenix|rest_client|state|storage)_.*
+      action: drop
