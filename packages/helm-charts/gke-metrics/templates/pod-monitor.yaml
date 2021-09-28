@@ -11,16 +11,16 @@ spec:
   selector:
 
   podMetricsEndpoints:
-  {{ range $endpoint := $.Values.endpoints }}
+  {{- range $endpoint := $.Values.endpoints }}
   - targetPort: {{ $endpoint.targetPort }}
     path: {{ $endpoint.path }}
     scheme: http
 
     metricRelabelings:
-    {{ range $relabel := $.Values.relabels -}}
+    {{- range $relabel := $.Values.relabels }}
     - sourceLabels: {{ $relabel.sourceLabels }}
       regex: {{ $relabel.regex }}
       action: {{ $relabel.action }}
     
-    {{ end -}}
-  {{ end -}}
+    {{- end }}
+  {{ end }}
