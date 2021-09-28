@@ -52,6 +52,10 @@ export const EIP712_ATOMIC_TYPES = [
   'address',
 ]
 
+export const EIP712_DYNAMIC_TYPES = ['bytes', 'string']
+
+export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TYPES)
+
 // Regular expression used to identify and parse EIP-712 array type strings.
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
 
@@ -61,25 +65,28 @@ const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+
  * type itself.)
  */
 function findDependencies(primaryType: string, types: EIP712Types, found: string[] = []): string[] {
-  if (found.includes(primaryType) || types[primaryType] === undefined) {
-    return found
+  // If we have aready found the dependencies of this type, or it is a builtin, return early.
+  if (found.includes(primaryType) || EIP712_BUILTIN_TYPES.includes(primaryType)) {
+    return []
   }
-  found.push(primaryType)
+  // If this is not a builtin and is not defined, we cannot correctly construct a type encoding.
+  if (types[primaryType] === undefined) {
+    throw new Error(`Unrecognized type ${primaryType} is not included in the EIP-712 type list`)
+  }
+  // Execute a depth-first search to populate the (inclusive) dependencies list.
+  // By the first invarient of this function, the resulting list should not contain duplicates.
+  const dependencies = [primaryType]
   for (const field of types[primaryType]) {
-    for (const dep of findDependencies(field.type, types, found)) {
-      if (!found.includes(dep)) {
-        found.push(dep)
-      }
-    }
+    dependencies.push(...findDependencies(field.type, types, found.concat(dependencies)))
   }
-  return found
+  return dependencies
 }
 
 /**
  * Creates a string encoding of the primary type, including all dependencies.
- * E.g. "Mail(address from,address to,string contents)"
+ * E.g. "Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)"
  */
-function encodeType(primaryType: string, types: EIP712Types): string {
+export function encodeType(primaryType: string, types: EIP712Types): string {
   let deps = findDependencies(primaryType, types)
   deps = deps.filter((d) => d !== primaryType)
   deps = [primaryType].concat(deps.sort())
@@ -90,14 +97,14 @@ function encodeType(primaryType: string, types: EIP712Types): string {
   return result
 }
 
-function typeHash(primaryType: string, types: EIP712Types): Buffer {
+export function typeHash(primaryType: string, types: EIP712Types): Buffer {
   return sha3(encodeType(primaryType, types)) as Buffer
 }
 
 /**
  * Constructs the struct encoding of the data as the primary type.
  */
-function encodeData(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
+export function encodeData(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
   const fields = types[primaryType]
   if (fields === undefined) {
     throw new Error(`Unrecognized primary type in EIP-712 encoding: ${primaryType}`)
