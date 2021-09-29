@@ -11,3 +11,4 @@ export { fetchEnv, fetchEnvOrDefault, toBool, toNum } from './utils/config-utils
 export * from './utils/constants'
 export * from './utils/input-validation'
 export { loggerMiddleware, rootLogger } from './utils/logger'
+export * from './utils/sequential-delay'
