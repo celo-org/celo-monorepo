@@ -9,7 +9,7 @@ type TestAttempt = {
 describe('Sequential Delay Test Suite', () => {
   const checkTestAttempts = (t: number, domain: SequentialDelayDomain, attempts: TestAttempt[]) => {
     let result: SequentialDelayResult | undefined
-    attempts.forEach((attempt) => {
+    for (const attempt of attempts) {
       console.log(result)
       console.log(`t + ${attempt.timestamp - t}`)
       result = checkSequentialDelay(domain, attempt.timestamp, result?.state)
