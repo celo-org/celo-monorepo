@@ -14,7 +14,7 @@ export interface SequentialDelayStage {
   // How many seconds each batch of attempts in this stage is delayed with
   // respect to the timer.
   delay: number
-  // Whether the timer should be reset between attempts during this stage.
+  // Whether the timer should be reset after each attempt during this stage.
   // Defaults to true.
   resetTimer?: boolean
   // The number of continuous attempts a user gets before the next delay
