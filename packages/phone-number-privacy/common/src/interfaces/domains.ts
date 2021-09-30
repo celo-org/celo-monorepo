@@ -1,5 +1,5 @@
 export interface SequentialDelayDomain {
-  name: 'Sequential Delay Domain'
+  name: 'ODIS Sequential Delay Domain'
   version: number
   stages: SequentialDelayStage[]
   // Optional public key of a against which signed requests must be authenticated.
