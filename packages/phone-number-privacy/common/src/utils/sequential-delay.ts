@@ -22,6 +22,7 @@ export const checkSequentialDelay = (
   attemptTime: number,
   state?: SequentialDelayState
 ): SequentialDelayResult => {
+  // If no state is available (i.e. this is the first request against the domain) use the initial state.
   const counter = state?.counter ?? 0
   const timer = state?.timer ?? 0
   const stage = getIndexedStage(domain, counter)
