@@ -7,8 +7,6 @@ endpoints:
     path: /metrics
   - port: "4000"
     path: /metrics/web
-  - port: "4000"
-    path: /metrics/api
   - port: "6060"
     path: /debug/metrics/prometheus
 
