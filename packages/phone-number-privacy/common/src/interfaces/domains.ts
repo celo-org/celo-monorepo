@@ -21,6 +21,6 @@ export interface SequentialDelayStage {
   // in each repetition of this stage. Defaults to 1.
   batchSize?: number
   // The number of times this stage repeats before continuing to the next stage
-  // in the RateLimit array. Defaults to 1.
+  // in the sequence. Defaults to 1.
   repetitions?: number
 }
