@@ -1,5 +1,5 @@
+import { checkSequentialDelay, SequentialDelayResult } from '../../src/domains/sequential-delay'
 import { SequentialDelayDomain } from '../../src/interfaces'
-import { checkSequentialDelay, SequentialDelayResult } from '../../src/utils/sequential-delay'
 
 type TestAttempt = {
   timestamp: number
@@ -14,7 +14,7 @@ describe('Sequential Delay Test Suite', () => {
       console.log(`t + ${attempt.timestamp - t}`)
       result = checkSequentialDelay(domain, attempt.timestamp, result?.state)
       expect(result).toEqual(attempt.expectedResult)
-    })
+    }
   }
 
   describe('checkSequentialDelay', () => {
@@ -22,7 +22,7 @@ describe('Sequential Delay Test Suite', () => {
       const t = 0 // initial delay
 
       const domain: SequentialDelayDomain = {
-        name: 'Sequential Delay Domain',
+        name: 'ODIS Sequential Delay Domain',
         version: 1,
         stages: [{ delay: t }],
       }
@@ -51,7 +51,7 @@ describe('Sequential Delay Test Suite', () => {
       const t = 0 // initial delay
 
       const domain: SequentialDelayDomain = {
-        name: 'Sequential Delay Domain',
+        name: 'ODIS Sequential Delay Domain',
         version: 1,
         stages: [{ delay: t, batchSize: 2 }],
       }
@@ -71,16 +71,23 @@ describe('Sequential Delay Test Suite', () => {
             state: { timer: t + 1, counter: 2 },
           },
         },
+        {
+          timestamp: t + 1,
+          expectedResult: {
+            accepted: false,
+            state: { timer: t + 1, counter: 2 },
+          },
+        },
       ]
 
       checkTestAttempts(t, domain, attempts)
     })
 
     it('should accumulate quota when resetTimer is false', () => {
-      const t = 0 // initial delay
+      const t = 10 // initial delay
 
       const domain: SequentialDelayDomain = {
-        name: 'Sequential Delay Domain',
+        name: 'ODIS Sequential Delay Domain',
         version: 1,
         stages: [
           { delay: t, resetTimer: false },
@@ -135,7 +142,7 @@ describe('Sequential Delay Test Suite', () => {
       const t = 0 // initial delay
 
       const domain: SequentialDelayDomain = {
-        name: 'Sequential Delay Domain',
+        name: 'ODIS Sequential Delay Domain',
         version: 1,
         stages: [{ delay: t }, { delay: 1 }],
       }
@@ -171,7 +178,7 @@ describe('Sequential Delay Test Suite', () => {
       const t = 0 // initial delay
 
       const domain: SequentialDelayDomain = {
-        name: 'Sequential Delay Domain',
+        name: 'ODIS Sequential Delay Domain',
         version: 1,
         stages: [
           { delay: t, batchSize: 2 },

@@ -1,6 +1,6 @@
 export interface SequentialDelayDomain {
   name: 'ODIS Sequential Delay Domain'
-  version: number
+  version: 1
   stages: SequentialDelayStage[]
   // Optional public key of a against which signed requests must be authenticated.
   // In the case of Cloud Backup, this will be a one-time key stored with the ciphertext.

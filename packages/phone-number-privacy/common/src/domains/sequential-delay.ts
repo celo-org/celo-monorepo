@@ -1,20 +1,19 @@
 import { SequentialDelayDomain, SequentialDelayStage } from '../interfaces'
-
-interface IndexedSequentialDelayStage extends SequentialDelayStage {
-  // The stage's index in the stage array
-  index: number
-  // The attempt number at which the stage begins
-  start: number
-}
 export interface SequentialDelayResult {
   accepted: boolean
   state?: SequentialDelayState
 }
+
 interface SequentialDelayState {
   // Timestamp used for deciding when the next request will be accepted.
   timer: number
   // Number of queries that have been accepted for the SequentialDelayDomain instance.
   counter: number
+}
+
+interface IndexedSequentialDelayStage extends SequentialDelayStage {
+  // The attempt number at which the stage begins
+  start: number
 }
 
 export const checkSequentialDelay = (
@@ -53,13 +52,13 @@ export const checkSequentialDelay = (
 const getIndexedStage = (
   domain: SequentialDelayDomain,
   counter: number
-): IndexedSequentialDelayStage | null => {
+): IndexedSequentialDelayStage | undefined => {
   let attemptsInStage = 0
   let stage = 0
   let i = 0
   while (i <= counter) {
     if (stage >= domain.stages.length) {
-      return null
+      return undefined
     }
     const repetitions = domain.stages[stage].repetitions ?? 1
     const batchSize = domain.stages[stage].batchSize ?? 1
@@ -71,7 +70,7 @@ const getIndexedStage = (
   i -= attemptsInStage
   stage--
 
-  return { ...domain.stages[stage], index: stage, start: i }
+  return { ...domain.stages[stage], start: i }
 }
 
 const getDelay = (stage: IndexedSequentialDelayStage, counter: number): number => {
