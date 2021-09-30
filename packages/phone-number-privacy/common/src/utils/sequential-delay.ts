@@ -1,4 +1,5 @@
 import { SequentialDelayDomain, SequentialDelayStage } from '../interfaces'
+
 interface IndexedSequentialDelayStage extends SequentialDelayStage {
   // The stage's index in the stage array
   index: number
