@@ -10,7 +10,7 @@
     "@celo/connect": "1.2.5-dev",
     "@celo/contractkit": "1.2.5-dev",
     "@celo/utils": "1.2.5-dev",
-    "react-native": "^0.63.4"
+    "react-native": "^0.65.0"
   },
   "devDependencies": {
     "@types/react-native": "0.63.50"
