@@ -51,10 +51,6 @@
     "location": "packages/dev-utils",
     "dependencies": []
   },
-  "docs": {
-    "location": "packages/docs",
-    "dependencies": []
-  },
   "@celo/env-tests": {
     "location": "packages/env-tests",
     "dependencies": [
