@@ -25,6 +25,7 @@ export const checkSequentialDelay = (
   const timer = state?.timer ?? 0
   const stage = getIndexedStage(domain, counter)
 
+  // If the counter is past the last stage (i.e. the domain is permanently out of quota) return early.
   if (!stage) {
     return { accepted: false, state }
   }
