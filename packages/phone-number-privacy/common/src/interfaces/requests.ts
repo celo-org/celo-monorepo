@@ -1,3 +1,5 @@
+import { EIP712Object } from '@celo/utils/lib/sign-typed-data-utils'
+
 export interface GetBlindedMessageSigRequest {
   account: string
   blindedQueryPhoneNumber: string
@@ -20,7 +22,14 @@ export interface GetQuotaRequest {
   sessionID?: string
 }
 
-export interface DomainRequestBody {
+export interface DomainRestrictedSignatureRequest {
+  domain: string
+  options?: EIP712Object
+  blindedMessage: string
+  sessionID?: string
+}
+
+export interface DisableDomainRequest {
   domain: string
 }
 

@@ -21,7 +21,7 @@ export enum Endpoints {
 
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_SIGN = '/domain/sign/',
-  DOMAIN_STATUS = '/domain/status',
+  DOMAIN_STATUS = '/domain/quotaStatus',
 }
 
 const domainService = new DomainService()

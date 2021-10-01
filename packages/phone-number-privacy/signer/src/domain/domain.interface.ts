@@ -1,13 +1,16 @@
-import { DomainRequestBody } from '@celo/phone-number-privacy-common'
+import {
+  DisableDomainRequest,
+  DomainRestrictedSignatureRequest,
+} from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 
 export interface IDomainService {
   handleDisableDomain(
-    request: Request<{}, {}, DomainRequestBody>,
+    request: Request<{}, {}, DisableDomainRequest>,
     response: Response
   ): Promise<void>
   handleGetDomainStatus(
-    request: Request<{}, {}, DomainRequestBody>,
+    request: Request<{}, {}, DomainRestrictedSignatureRequest>,
     response: Response
   ): Promise<void>
 }

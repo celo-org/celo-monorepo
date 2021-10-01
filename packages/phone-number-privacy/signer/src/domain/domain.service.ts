@@ -1,34 +1,41 @@
 import {
-  DomainRequestBody,
+  DisableDomainRequest,
+  DomainRestrictedSignatureRequest,
   DomainStatusResponse,
   ErrorMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
-import { DOMAINS_COLUMNS } from '../database/models/domain'
-import { getDomain, setDomainDisabled } from '../database/wrappers/domain'
+import { DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
+import { getDomainState, setDomainDisabled } from '../database/wrappers/domainState'
 import { Endpoints } from '../server'
 import { IDomainService } from './domain.interface'
 
 export class DomainService implements IDomainService {
   public async handleDisableDomain(
-    request: Request<{}, {}, DomainRequestBody>,
+    request: Request<{}, {}, DisableDomainRequest>,
     response: Response
   ): Promise<void> {
     const logger = response.locals.logger
     logger.info('Disabling domain', { domain: request.body.domain })
-
-    return setDomainDisabled(request.body.domain, logger)
-      .then((result) => {
-        if (result) {
-          response.sendStatus(200)
-        } else {
+    return getDomainState(request.body.domain, logger)
+      .then((domainState) => {
+        if (!domainState) {
           respondWithError(
             Endpoints.DISABLE_DOMAIN,
             response,
-            500,
-            ErrorMessage.DATABASE_UPDATE_FAILURE
+            422,
+            ErrorMessage.DATABASE_GET_FAILURE
           )
+        } else if (domainState.disabled) {
+          respondWithError(
+            Endpoints.DISABLE_DOMAIN,
+            response,
+            422,
+            ErrorMessage.DOMAIN_ALREADY_DISABLED_FAILURE
+          )
+        } else {
+          return setDomainDisabled(request.body.domain, logger)
         }
       })
       .catch((e) => {
@@ -43,33 +50,34 @@ export class DomainService implements IDomainService {
   }
 
   public async handleGetDomainStatus(
-    request: Request<{}, {}, DomainRequestBody>,
+    request: Request<{}, {}, DomainRestrictedSignatureRequest>,
     response: Response
   ): Promise<void> {
     const logger = response.locals.logger
     logger.info('Getting domain status', { domain: request.body.domain })
-    getDomain(request.body.domain, logger)
+    getDomainState(request.body.domain, logger)
       .then((result) => {
+        let resultResponse: DomainStatusResponse
         if (result) {
-          const resultResponse: DomainStatusResponse = {
-            domain: result[DOMAINS_COLUMNS.domain],
-            counter: result[DOMAINS_COLUMNS.counter],
-            disabled: result[DOMAINS_COLUMNS.disabled],
-            timer: result[DOMAINS_COLUMNS.timer],
+          resultResponse = {
+            domain: result[DOMAINS_STATES_COLUMNS.domain],
+            counter: result[DOMAINS_STATES_COLUMNS.counter],
+            disabled: result[DOMAINS_STATES_COLUMNS.disabled],
+            timer: result[DOMAINS_STATES_COLUMNS.timer],
           }
-          response.status(200).send(resultResponse)
         } else {
-          respondWithError(
-            Endpoints.DOMAIN_STATUS,
-            response,
-            500,
-            ErrorMessage.DATABASE_GET_FAILURE
-          )
+          resultResponse = {
+            domain: request.body.domain,
+            counter: 0,
+            disabled: false,
+            timer: 0,
+          }
         }
+        response.status(200).send(resultResponse)
       })
       .catch((e) => {
         logger.error('Error while getting domain status', e)
-        respondWithError(Endpoints.DISABLE_DOMAIN, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
+        respondWithError(Endpoints.DOMAIN_STATUS, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
       })
   }
 }
