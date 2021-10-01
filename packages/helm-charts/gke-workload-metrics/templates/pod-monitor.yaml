@@ -3,7 +3,7 @@
 apiVersion: monitoring.gke.io/v1alpha1
 kind: PodMonitor
 metadata:
-  name: "gke-workload-metrics-{{ $target.suffix }}"
+  name: "{{ $.Release.Name }}-{{ $target.suffix }}"
   namespace: {{ $.Values.namespace }}
 spec:
   # Namespaces to search for pods.
