@@ -25,6 +25,6 @@ export const handler = async (argv: PrometheusUpgradeArgv) => {
 
   await upgradePrometheus(argv.context, clusterConfig)
   if (argv.deployGrafana) {
-    await upgradeGrafana()
+    await upgradeGrafana(argv.context, clusterConfig)
   }
 }

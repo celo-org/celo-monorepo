@@ -76,6 +76,38 @@ export async function upgradePrometheus(context?: string, clusterConfig?: BaseCl
   )
 }
 
+function getK8sContextVars(
+  clusterConfig?: BaseClusterConfig,
+  context?: string
+): [string, string, string] {
+  const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
+  let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
+  let gcloudProject
+  let gcloudRegion
+  if (context) {
+    gcloudProject = getDynamicEnvVarValue(
+      DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT,
+      { context },
+      fetchEnv(envVar.TESTNET_PROJECT_NAME)
+    )
+    gcloudRegion = getDynamicEnvVarValue(
+      DynamicEnvVar.PROM_SIDECAR_GCP_REGION,
+      { context },
+      fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+    )
+    clusterName = getDynamicEnvVarValue(
+      DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+      { context },
+      clusterName
+    )
+  } else {
+    gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+    gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  }
+
+  return [clusterName, gcloudProject, gcloudRegion]
+}
+
 async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
   // To save $, don't send metrics to SD that probably won't be used
   // nginx metrics currently breaks sidecar
@@ -140,29 +172,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   ]
 
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
-  let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  let gcloudProject
-  let gcloudRegion
-  if (context) {
-    gcloudProject = getDynamicEnvVarValue(
-      DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT,
-      { context },
-      fetchEnv(envVar.TESTNET_PROJECT_NAME)
-    )
-    gcloudRegion = getDynamicEnvVarValue(
-      DynamicEnvVar.PROM_SIDECAR_GCP_REGION,
-      { context },
-      fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-    )
-    clusterName = getDynamicEnvVarValue(
-      DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
-      { context },
-      clusterName
-    )
-  } else {
-    gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-    gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-  }
+  const [clusterName, gcloudProject, gcloudRegion] = getK8sContextVars(clusterConfig, context)
 
   const params = [
     `--set gcloud.project=${gcloudProject}`,
@@ -367,7 +377,10 @@ function getServiceAccountName(clusterName: string, cloudProvider: string) {
     .replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
-export async function installGrafanaIfNotExists() {
+export async function installGrafanaIfNotExists(
+  context?: string,
+  clusterConfig?: BaseClusterConfig
+) {
   const grafanaExists = await outputIncludes(
     `helm list -A`,
     grafanaReleaseName,
@@ -375,22 +388,22 @@ export async function installGrafanaIfNotExists() {
   )
   if (!grafanaExists) {
     console.info('Installing grafana')
-    await installGrafana()
+    await installGrafana(context, clusterConfig)
   }
 }
 
-async function installGrafana() {
+async function installGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
     grafanaHelmChartPath,
-    await grafanaHelmParameters()
+    await grafanaHelmParameters(context, clusterConfig)
   )
 }
 
-async function grafanaHelmParameters() {
-  const k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
+async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
+  const [k8sClusterName] = getK8sContextVars(clusterConfig, context)
   const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   const values = {
     annotations: {
@@ -452,13 +465,13 @@ async function grafanaHelmParameters() {
   return params
 }
 
-export async function upgradeGrafana() {
+export async function upgradeGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
     grafanaHelmChartPath,
-    await grafanaHelmParameters()
+    await grafanaHelmParameters(context, clusterConfig)
   )
 }
 

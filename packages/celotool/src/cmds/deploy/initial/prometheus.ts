@@ -32,6 +32,6 @@ export const handler = async (argv: PrometheusInitialArgv) => {
 
   await installPrometheusIfNotExists(argv.context, clusterConfig)
   if (argv.deployGrafana) {
-    await installGrafanaIfNotExists()
+    await installGrafanaIfNotExists(argv.context, clusterConfig)
   }
 }
