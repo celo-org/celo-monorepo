@@ -1,0 +1,35 @@
+{{- range $target := $.Values.targets }}
+---
+apiVersion: monitoring.gke.io/v1alpha1
+kind: PodMonitor
+metadata:
+  name: "gke-workload-metrics-{{ $target.suffix }}"
+  namespace: {{ $.Values.namespace }}
+spec:
+  # Namespaces to search for pods.
+  namespaceSelector:
+    matchNames:
+    - alfajores
+    - baklava
+    - rc1
+    - walletconnect
+
+  selector:
+    matchLabels:
+    {{- range $key, $val := $target.labels }}
+      {{ $key }}: {{ $val }}
+    {{- end }}
+
+  podMetricsEndpoints:
+  - port: {{ $target.port }}
+    path: {{ $target.path }}
+    scheme: http
+
+    metricRelabelings:
+    {{- range $relabel := $.Values.relabels }}
+    - sourceLabels: {{ $relabel.sourceLabels }}
+      regex: {{ $relabel.regex }}
+      action: {{ $relabel.action }}
+    
+    {{- end }}
+{{ end }}

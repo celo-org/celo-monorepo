@@ -1,0 +1,55 @@
+# Combination of pod labels and endpoints on which to scrape.
+# TODO: simplify this config by adding a 'metric' port to each pod of interest
+namespace: prometheus
+
+targets:
+  # Attestation service
+  - labels:
+      app: attestation-service
+    port: http
+    path: /metrics
+    suffix: attestation-service
+  # Blockscout api
+  - labels:
+      app: blockscout
+      component: blockscout-api
+    port: http
+    path: /metrics/web
+    suffix: blockscout-api
+  # Blockscout web
+  - labels:
+      app: blockscout
+      component: blockscout-web
+    port: http
+    path: /metrics/web
+    suffix: blockscout-web
+  # Blockscout indexer
+  - labels:
+      app: blockscout
+      component: blockscout-indexer
+    port: health
+    path: /metrics/indexer
+    suffix: blockscout-indexer
+    # Eksportisto
+  - labels:
+      app: eksportisto
+    port: prometheus
+    path: /metrics
+    suffix: eksportisto
+  # Full nodes and validators
+  - labels:
+      app: testnet
+    port: metrics
+    path: /debug/metrics/prometheus
+    suffix: testnet
+  # Wallet Connect
+  - labels:
+      app.kubernetes.io/name: walletconnect
+    port: http
+    path: /metrics
+    suffix: walletconnect
+
+relabels:
+  - sourceLabels: [__name__]
+    regex: (apiserver|etcd|erlang|kube|kubelet|nginx|phoenix|rest_client|state|storage)_.*
+    action: drop
