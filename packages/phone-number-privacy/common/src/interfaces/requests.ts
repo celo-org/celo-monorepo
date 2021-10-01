@@ -1,5 +1,5 @@
-import { EIP712Object } from '@celo/utils/lib/sign-typed-data-utils'
-import { Domain } from '@celo/identity/lib/odis/domains'
+import { Optional } from '@celo/utils/lib/sign-typed-data-utils'
+import { Domain, DomainOptions } from '@celo/identity/lib/odis/domains'
 
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
@@ -12,22 +12,29 @@ export interface GetBlindedMessageSigRequest {
   sessionID?: string
 }
 
-export interface DomainRestrictedSignatureRequest {
+interface _DomainRestrictedSignatureRequest<D extends Domain, O extends DomainOptions = never> {
   /**
    * Domain specification. Selects the PRF domain and rate limiting rules.
    */
-  domain: Domain
+  domain: D
   /**
    * Domain-specific options.
    * Used for inputs relevant to the domain, but not part of the domain string.
    * Example: { "authorization": <signature> } for an account-restricted domain.
    */
-  options?: EIP712Object
+  options: O
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedMessage: string
   /** Client-specified session ID. */
-  sessionID?: string
+  sessionID: Optional<string>
 }
+
+export type DomainRestrictedSignatureRequest<
+  D extends Domain,
+  O extends DomainOptions = never
+> = never extends O
+  ? Omit<_DomainRestrictedSignatureRequest<D>, 'options'>
+  : _DomainRestrictedSignatureRequest<D, O>
 
 export interface GetContactMatchesRequest {
   account: string

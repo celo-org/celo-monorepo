@@ -51,6 +51,20 @@ export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TY
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
 
 /**
+ * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
+ * concrete type T is a subtype of EIP712ObjectValue.
+ */
+export type Optional<T extends EIP712ObjectValue> = {
+  defined: boolean
+  value: T
+}
+
+// Compile-time check that Domain can be cast to type EIP712Object
+// DO NOT MERGE: Move this.
+declare let TEST_OPTIONAL_IS_EIP712: EIP712Object
+TEST_OPTIONAL_IS_EIP712 = ({} as unknown) as Optional<EIP712ObjectValue>
+
+/**
  * Generates the EIP712 Typed Data hash for signing
  * @param   typedData An object that conforms to the EIP712TypedData interface
  * @return  A Buffer containing the hash of the typed data.

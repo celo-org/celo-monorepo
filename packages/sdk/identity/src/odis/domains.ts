@@ -1,23 +1,10 @@
-import { EIP712Object, EIP712ObjectValue } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712Object, EIP712ObjectValue, Optional } from '@celo/utils/lib/sign-typed-data-utils'
 
 /**
- * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
- * concrete type T is a subtype of EIP712ObjectValue.
- */
-export type Optional<T> = {
-  defined: boolean
-  value: T
-}
-
-// Compile-time check that Domain can be cast to type EIP712Object
-declare let TEST_OPTIONAL_IS_EIP712: EIP712Object
-TEST_OPTIONAL_IS_EIP712 = ({} as unknown) as Optional<EIP712ObjectValue>
-
-/**
- * ODIS OPRF domain specifier interface as described in CIP-40
+ * ODIS OPRF domain specifier type as described in CIP-40
  * https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md
  */
-export interface Domain {
+export type Domain = {
   /** Unique name of the domain. (e.g. "ODIS Password Domain") */
   name: string
   /** Version number. Allows for backwards incompatible changes. */
