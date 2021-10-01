@@ -1,4 +1,4 @@
-import { Optional } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712Object, Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import { Domain, DomainOptions } from '@celo/identity/lib/odis/domains'
 
 export interface GetBlindedMessageSigRequest {
@@ -12,7 +12,10 @@ export interface GetBlindedMessageSigRequest {
   sessionID?: string
 }
 
-interface _DomainRestrictedSignatureRequest<D extends Domain, O extends DomainOptions = never> {
+// IDomainRestrictedSignatureRequest is the precursor for DomainRestrictedSignatureRequest. It
+// requires the option field, which cannot be provided if a given domain has no options. Below,
+// this options field is removed conditional on the options type being `never`.
+interface IDomainRestrictedSignatureRequest<D extends Domain, O extends DomainOptions = never> {
   /**
    * Domain specification. Selects the PRF domain and rate limiting rules.
    */
@@ -29,12 +32,24 @@ interface _DomainRestrictedSignatureRequest<D extends Domain, O extends DomainOp
   sessionID: Optional<string>
 }
 
+/**
+ * Domain resitricted signature request to get a pOPRF evaluation on the given message in a given
+ * domain, as specified by CIP-40.
+ */
 export type DomainRestrictedSignatureRequest<
   D extends Domain,
   O extends DomainOptions = never
 > = never extends O
-  ? Omit<_DomainRestrictedSignatureRequest<D>, 'options'>
-  : _DomainRestrictedSignatureRequest<D, O>
+  ? Omit<IDomainRestrictedSignatureRequest<D>, 'options'>
+  : IDomainRestrictedSignatureRequest<D, O>
+
+// Compile-time check that Domain can be cast to type EIP712Object
+declare let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
+TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<Domain>
+TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<
+  Domain,
+  DomainOptions
+>
 
 export interface GetContactMatchesRequest {
   account: string
