@@ -59,6 +59,18 @@ export type Optional<T extends EIP712ObjectValue> = {
   value: T
 }
 
+/**
+ * Utility to build Optional<T> types to insert in EIP-712 type arrays.
+ */
+export function optionalEIP712Type(typeName: string): EIP712Types {
+  return {
+    [`Optional<${typeName}>`]: [
+      { name: 'defined', type: 'bool' },
+      { name: 'value', type: 'typeName' },
+    ],
+  }
+}
+
 // Compile-time check that Domain can be cast to type EIP712Object
 // DO NOT MERGE: Move this.
 declare let TEST_OPTIONAL_IS_EIP712: EIP712Object
