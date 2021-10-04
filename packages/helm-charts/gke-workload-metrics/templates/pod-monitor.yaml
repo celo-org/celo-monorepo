@@ -10,10 +10,7 @@ spec:
   # Namespaces to search for pods.
   namespaceSelector:
     matchNames:
-    - alfajores
-    - baklava
-    - rc1
-    - walletconnect
+    - {{ $target.namespace | default $.Values.cluster }}
 
   selector:
     matchLabels:
@@ -35,8 +32,13 @@ spec:
     {{- end }}
 {{ end }}
 
+{{- /*
 {{- if $.Values.kubeStateMetrics.enabled | default false }}
 ---
+# TODO: kube state metrics need to be migrated to 
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics
+# and the pods need to define a port name for the metrics endpoint.
+
 apiVersion: monitoring.gke.io/v1alpha1
 kind: PodMonitor
 metadata:
@@ -53,7 +55,7 @@ spec:
       app: kube-state-metrics
 
   podMetricsEndpoints:
-  - port: http
+  - port: metrics
     path: /metrics
     scheme: http
 
@@ -61,5 +63,5 @@ spec:
     - sourceLabels: [__name__]
       regex: (kube_pod)_.*
       action: keep
-
-{{ end }}
+ {{ end }}
+*/}}

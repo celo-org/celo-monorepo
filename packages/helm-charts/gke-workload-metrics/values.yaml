@@ -1,9 +1,15 @@
 # Combination of pod labels and endpoints on which to scrape.
 # TODO: simplify this config by adding a 'metric' port to each pod of interest
+
+# Which cluster to monitor
+cluster: alfajores
+
+# Where the podmonitor will be installed.
 namespace: prometheus
 
-kubeStateMetrics:
-  enabled: true
+# TODO: enable when kube state metrics pods have port names
+# kubeStateMetrics:
+#   enabled: true
 
 targets:
   # Attestation service
@@ -40,14 +46,16 @@ targets:
     path: /metrics
     suffix: eksportisto
   # Full nodes and validators
+  # TODO: validators need a named port
   - labels:
       app: testnet
-    port: metrics
+    port: pprof
     path: /debug/metrics/prometheus
     suffix: testnet
   # Wallet Connect
   - labels:
       app.kubernetes.io/name: walletconnect
+    namespace: walletconnect
     port: http
     path: /metrics
     suffix: walletconnect
