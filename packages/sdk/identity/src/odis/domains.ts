@@ -120,4 +120,10 @@ export function domainEIP712(domain: KnownDomain): EIP712TypedData {
       message: domain,
     }
   }
+
+  // canary provides a compile-time check that all subtypes of KnownDomain have branches. If a case
+  // was missed, then an error will report that domain cannot be assigned to type `never`.
+  const canary = (x: never) => x
+  canary(domain)
+  throw new Error('Implementation error. Input of type KnownDomain was not recognized')
 }
