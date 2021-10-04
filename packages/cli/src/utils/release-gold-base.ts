@@ -1,5 +1,6 @@
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
+import ReleaseGoldArtifact from '@celo/protocol/build/core-contracts.v5/contracts/ReleaseGold.json'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'
 import { Flags } from './command'
@@ -31,16 +32,16 @@ export abstract class ReleaseGoldBaseCommand extends BaseCommand {
   async init() {
     await super.init()
     if (!this._releaseGoldWrapper) {
+      const runtimeBytecode = await this.web3.eth.getCode(this.contractAddress)
+      if (runtimeBytecode !== ReleaseGoldArtifact.deployedBytecode) {
+        throw new Error(
+          `Contract at ${this.contractAddress} does not match expected ReleaseGold bytecode`
+        )
+      }
       this._releaseGoldWrapper = new ReleaseGoldWrapper(
         this.kit,
-        newReleaseGold(this.kit.connection.web3, this.contractAddress as string)
+        newReleaseGold(this.kit.connection.web3, this.contractAddress)
       )
-      // Call arbitrary release gold fn to verify `contractAddress` is a releasegold contract.
-      try {
-        await this._releaseGoldWrapper.getBeneficiary()
-      } catch (err) {
-        this.error(`Does the provided address point to release gold contract? ${err}`)
-      }
     }
   }
 }

@@ -4,7 +4,8 @@
     "rootDir": "src",
     "outDir": "lib",
     "esModuleInterop": true,
-    "target": "es6"
+    "target": "es6",
+    "resolveJsonModule": true
   },
   "include": ["src", "../contractkit/types", "types/hw-transport-node-hid.d.ts"],
   "references": [{ "path": "../sdk/utils" }, { "path": "../sdk/contractkit" }]
