@@ -5,6 +5,7 @@ kind: PodMonitor
 metadata:
   name: "{{ $.Release.Name }}-{{ $target.suffix }}"
   namespace: {{ $.Values.namespace }}
+
 spec:
   # Namespaces to search for pods.
   namespaceSelector:
@@ -32,4 +33,33 @@ spec:
       action: {{ $relabel.action }}
     
     {{- end }}
+{{ end }}
+
+{{- if $.Values.kubeStateMetrics.enabled | default false }}
+---
+apiVersion: monitoring.gke.io/v1alpha1
+kind: PodMonitor
+metadata:
+  name: "{{ $.Release.Name }}-kube-state"
+  namespace: {{ $.Values.namespace }}
+
+spec:
+  namespaceSelector:
+    matchNames:
+    - default
+
+  selector:
+    matchLabels:
+      app: kube-state-metrics
+
+  podMetricsEndpoints:
+  - port: http
+    path: /metrics
+    scheme: http
+
+    metricRelabelings:
+    - sourceLabels: [__name__]
+      regex: (kube_pod)_.*
+      action: keep
+
 {{ end }}

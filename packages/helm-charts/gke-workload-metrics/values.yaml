@@ -2,6 +2,9 @@
 # TODO: simplify this config by adding a 'metric' port to each pod of interest
 namespace: prometheus
 
+kubeStateMetrics:
+  enabled: true
+
 targets:
   # Attestation service
   - labels:
@@ -30,7 +33,7 @@ targets:
     port: health
     path: /metrics/indexer
     suffix: blockscout-indexer
-    # Eksportisto
+  # Eksportisto
   - labels:
       app: eksportisto
     port: prometheus
