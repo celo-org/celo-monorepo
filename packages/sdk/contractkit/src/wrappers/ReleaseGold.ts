@@ -280,6 +280,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   )
 
   /**
+   * Revoke a vesting CELO schedule from the contract's beneficiary.
+   * @return A CeloTransactionObject
+   */
+  revokeBeneficiary = this.revokeReleasing
+
+  /**
    * Refund `refundAddress` and `beneficiary` after the ReleaseGold schedule has been revoked.
    * @return A CeloTransactionObject
    */
