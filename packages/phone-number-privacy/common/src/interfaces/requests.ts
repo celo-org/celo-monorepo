@@ -75,6 +75,7 @@ export type DisableDomainRequest<D extends Domain, O extends DomainOptions = nev
 }>
 
 // Use distributive conditional types to extract from the keys of T, keys with value type `never`.
+// Eg. KeysOfTypeNever<{ foo: string, bar: never }, 'foo'|'bar'> = 'bar'
 type KeysOfTypeNever<T, K extends keyof T> = K extends (T[K] extends never ? never : K) ? never : K
 
 // Exclude all fields with value type `never` from T.
