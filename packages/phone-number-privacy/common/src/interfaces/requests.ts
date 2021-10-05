@@ -1,4 +1,4 @@
-import { EIP712Object, Optional } from '@celo/utils/lib/sign-typed-data-utils'
+import { Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import { Domain, DomainOptions } from '@celo/identity/lib/odis/domains'
 
 export interface GetBlindedMessageSigRequest {
@@ -55,14 +55,6 @@ export type DomainRestrictedSignatureRequest<
   sessionID: Optional<string>
 }>
 
-// Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
-export let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<Domain>
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<
-  Domain,
-  DomainOptions
->
-
 export type DomainQuotaStatusRequest<
   D extends Domain,
   O extends DomainOptions = never
@@ -75,14 +67,6 @@ export type DomainQuotaStatusRequest<
   sessionID: Optional<string>
 }>
 
-// Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
-export let TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712: EIP712Object
-TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<Domain>
-TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<
-  Domain,
-  DomainOptions
->
-
 export type DisableDomainRequest<D extends Domain, O extends DomainOptions = never> = OmitIfNever<{
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
@@ -91,14 +75,6 @@ export type DisableDomainRequest<D extends Domain, O extends DomainOptions = nev
   /** Client-specified session ID. */
   sessionID: Optional<string>
 }>
-
-// Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
-export let TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712: EIP712Object
-TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<Domain>
-TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<
-  Domain,
-  DomainOptions
->
 
 // Use distributive conditional types to extract from the keys of T, keys with value type `never`.
 type KeysOfTypeNever<T, K extends keyof T> = K extends (T[K] extends never ? never : K) ? never : K
