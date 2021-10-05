@@ -108,6 +108,67 @@ function getK8sContextVars(
   return [clusterName, gcloudProject, gcloudRegion]
 }
 
+function getRemoteWriteParameters(context?: string): string[] {
+  const droppedRemoteWriteSeries = [
+    'apiserver_.+',
+    'etcd_.+',
+    'nginx_.+',
+    'erlang_.+',
+    'kubelet_[^v].+',
+    'container_tasks_state',
+    'storage_.+',
+    'container_memory_[^w].*',
+    'rest_client_.+',
+    'container_fs_.+',
+    'container_file_.+',
+    'container_spec_.+',
+    'container_start_.+',
+    'container_last_.+',
+    'kube_pod_container_status_waiting_reason',
+    'kube_pod_container_status_terminated_reason',
+    'kube_pod_status_phase',
+    'container_network_.+',
+    'container_cpu_user_seconds_total',
+    'container_cpu_load_average_10s',
+    'container_cpu_system_seconds_total',
+    'container_sockets',
+    'container_processes',
+    'container_threads',
+    'container_threads_max',
+    'kube_node_status_condition',
+    'kube_pod_container_status_last_terminated_reason',
+    'kube_pod_container_[^r].+',
+    'kube_pod_[^cs].+',
+    'workqueue_.+',
+    'kube_secret_.+',
+    'state_.+',
+  ]
+
+  const remoteWriteUrl = getDynamicEnvVarValue(
+    DynamicEnvVar.PROM_REMOTE_WRITE_URL,
+    { context },
+    fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)
+  )
+  const remoteWriteUser = getDynamicEnvVarValue(
+    DynamicEnvVar.PROM_REMOTE_WRITE_USERNAME,
+    { context },
+    fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_USERNAME)
+  )
+  const remoteWritePassword = getDynamicEnvVarValue(
+    DynamicEnvVar.PROM_REMOTE_WRITE_PASSWORD,
+    { context },
+    fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD)
+  )
+  return [
+    `--set remote_write.url='${remoteWriteUrl}'`,
+    `--set remote_write.basic_auth.username='${remoteWriteUser}'`,
+    `--set remote_write.basic_auth.password='${remoteWritePassword}'`,
+    `--set remote_write.write_relabel_configs.source_labels='[__name__]'`,
+    `--set remote_write.write_relabel_configs.regex='(${droppedRemoteWriteSeries.join('|')})'`,
+    `--set remote_write.write_relabel_configs.action='drop'`,
+  ]
+}
+
 async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
   // To save $, don't send metrics to SD that probably won't be used
   // nginx metrics currently breaks sidecar
@@ -200,52 +261,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   ]
 
   if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
-    const droppedRemoteWriteSeries = [
-      'apiserver_.+',
-      'etcd_.+',
-      'nginx_.+',
-      'erlang_.+',
-      'kubelet_[^v].+',
-      'container_tasks_state',
-      'storage_.+',
-      'container_memory_[^w].*',
-      'rest_client_.+',
-      'container_fs_.+',
-      'container_file_.+',
-      'container_spec_.+',
-      'container_start_.+',
-      'container_last_.+',
-      'kube_pod_container_status_waiting_reason',
-      'kube_pod_container_status_terminated_reason',
-      'kube_pod_status_phase',
-      'container_network_.+',
-      'container_cpu_user_seconds_total',
-      'container_cpu_load_average_10s',
-      'container_cpu_system_seconds_total',
-      'container_sockets',
-      'container_processes',
-      'container_threads',
-      'container_threads_max',
-      'kube_node_status_condition',
-      'kube_pod_container_status_last_terminated_reason',
-      'kube_pod_container_[^r].+',
-      'kube_pod_[^cs].+',
-      'workqueue_.+',
-      'kube_secret_.+',
-      'state_.+',
-    ]
-    params.push(
-      `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
-      `--set remote_write.basic_auth.username='${fetchEnv(
-        envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
-      )}'`,
-      `--set remote_write.basic_auth.password='${fetchEnv(
-        envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
-      )}'`,
-      `--set remote_write.write_relabel_configs.source_labels='[__name__]'`,
-      `--set remote_write.write_relabel_configs.regex='(${droppedRemoteWriteSeries.join('|')})'`,
-      `--set remote_write.write_relabel_configs.action='drop'`
-    )
+    params.push(...getRemoteWriteParameters(context))
   }
 
   if (!usingGCP) {
