@@ -12,49 +12,6 @@ export interface GetBlindedMessageSigRequest {
   sessionID?: string
 }
 
-// IDomainRestrictedSignatureRequest is the precursor for DomainRestrictedSignatureRequest.
-// It requires the option field, which cannot be provided if a given domain has no options.
-// Below, this options field is removed conditional on the options type being `never`.
-interface IDomainRestrictedSignatureRequest<D extends Domain, O extends DomainOptions = never> {
-  /**
-   * Domain specification. Selects the PRF domain and rate limiting rules.
-   */
-  domain: D
-  /**
-   * Domain-specific options.
-   * Used for inputs relevant to the domain, but not part of the domain string.
-   * Example: { "authorization": <signature> } for an account-restricted domain.
-   */
-  options: O
-  /** Query message. A blinded elliptic curve point encoded in base64. */
-  blindedMessage: string
-  /** Client-specified session ID. */
-  sessionID: Optional<string>
-}
-
-/**
- * Domain resitricted signature request to get a pOPRF evaluation on the given message in a given
- * domain, as specified by CIP-40.
- *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
- * required. If not, it must not be provided.
- */
-export type DomainRestrictedSignatureRequest<
-  D extends Domain,
-  O extends DomainOptions = never
-> = never extends O
-  ? Omit<IDomainRestrictedSignatureRequest<D>, 'options'>
-  : IDomainRestrictedSignatureRequest<D, O>
-
-// Compile-time check that Domain can be cast to type EIP712Object
-export let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<Domain>
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<
-  Domain,
-  DomainOptions
->
-
 export interface GetContactMatchesRequest {
   account: string
   userPhoneNumber: string // obfuscated with deterministic salt
@@ -70,14 +27,82 @@ export interface GetQuotaRequest {
   sessionID?: string
 }
 
-// DO NOT MERGE: Update this to use the Domain type
-export interface DisableDomainRequest {
-  domain: string
-}
+/**
+ * Domain resitricted signature request to get a pOPRF evaluation on the given message in a given
+ * domain, as specified by CIP-40.
+ *
+ * @remarks Concrete request types are created by specifying the type parameters for Domain and
+ * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * required. If not, it must not be provided.
+ */
+export type DomainRestrictedSignatureRequest<
+  D extends Domain,
+  O extends DomainOptions = never
+> = OmitIfNever<{
+  /**
+   * Domain specification. Selects the PRF domain and rate limiting rules.
+   */
+  domain: D
+  /**
+   * Domain-specific options.
+   * Used for inputs relevant to the domain, but not part of the domain string.
+   * Example: { "authorization": <signature> } for an account-restricted domain.
+   */
+  options: O
+  /** Query message. A blinded elliptic curve point encoded in base64. */
+  blindedMessage: string
+  /** Client-specified session ID. */
+  sessionID: Optional<string>
+}>
 
-export type OdisRequest =
-  | GetBlindedMessageSigRequest
-  | GetQuotaRequest
-  | GetContactMatchesRequest
-  | DomainRestrictedSignatureRequest
-  | DisableDomainRequest
+// Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
+export let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
+TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<Domain>
+TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<
+  Domain,
+  DomainOptions
+>
+
+export type DomainQuotaStatusRequest<
+  D extends Domain,
+  O extends DomainOptions = never
+> = OmitIfNever<{
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /** Domain-specific options. */
+  options: O
+  /** Client-specified session ID. */
+  sessionID: Optional<string>
+}>
+
+// Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
+export let TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712: EIP712Object
+TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<Domain>
+TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<
+  Domain,
+  DomainOptions
+>
+
+export type DisableDomainRequest<D extends Domain, O extends DomainOptions = never> = OmitIfNever<{
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /** Domain-specific options. */
+  options: O
+  /** Client-specified session ID. */
+  sessionID: Optional<string>
+}>
+
+// Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
+export let TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712: EIP712Object
+TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<Domain>
+TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<
+  Domain,
+  DomainOptions
+>
+
+// Use distributive conditional types to extract from the keys of T, keys with value type `never`.
+type KeysOfTypeNever<T, K extends keyof T> = K extends (T[K] extends never ? never : K) ? never : K
+
+// Exclude all fields with value type `never` from T.
+// Used above to exclude the 'option' field if its type is specified as `never` (i.e. no options).
+type OmitIfNever<T> = Omit<T, KeysOfTypeNever<T, keyof T>>
