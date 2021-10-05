@@ -12,53 +12,46 @@ namespace: prometheus
 #   enabled: true
 
 targets:
-  # Attestation service
-  - labels:
+  - suffix: attestation-service
+    labels:
       app: attestation-service
-    port: http
-    path: /metrics
-    suffix: attestation-service
-  # Blockscout api
-  - labels:
+    endpoints:
+      - port: http
+        path: /metrics
+
+  - suffix: blockscout
+    labels:
       app: blockscout
       component: blockscout-api
-    port: http
-    path: /metrics/web
-    suffix: blockscout-api
-  # Blockscout web
-  - labels:
-      app: blockscout
-      component: blockscout-web
-    port: http
-    path: /metrics/web
-    suffix: blockscout-web
-  # Blockscout indexer
-  - labels:
-      app: blockscout
-      component: blockscout-indexer
-    port: health
-    path: /metrics/indexer
-    suffix: blockscout-indexer
-  # Eksportisto
-  - labels:
+    endpoints:
+      - port: http
+        path: /metrics/web  # Web & API
+      - port: health
+        path: /metrics/indexer  # Indexer
+ 
+  - suffix: eksportisto
+    labels:
       app: eksportisto
-    port: prometheus
-    path: /metrics
-    suffix: eksportisto
-  # Full nodes and validators
-  # TODO: validators need a named port
-  - labels:
+    endpoints:
+      - port: prometheus
+        path: /metrics
+
+  - suffix: testnet
+    labels:
       app: testnet
-    port: pprof
-    path: /debug/metrics/prometheus
-    suffix: testnet
-  # Wallet Connect
-  - labels:
+    endpoints:
+      - port: pprof
+        path: /debug/metrics/prometheus
+      - port: metrics
+        path: /debug/metrics/prometheus
+
+  - suffix: walletconnect
+    labels:
       app.kubernetes.io/name: walletconnect
+    endpoints:
+      - port: http
+        path: /metrics
     namespace: walletconnect
-    port: http
-    path: /metrics
-    suffix: walletconnect
 
 relabels:
   - sourceLabels: [__name__]

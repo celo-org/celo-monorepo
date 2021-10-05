@@ -19,8 +19,9 @@ spec:
     {{- end }}
 
   podMetricsEndpoints:
-  - port: {{ $target.port }}
-    path: {{ $target.path }}
+  {{- range $endpoint := $target.endpoints }}
+  - port: {{ $endpoint.port }}
+    path: {{ $endpoint.path }}
     scheme: http
 
     metricRelabelings:
@@ -28,8 +29,9 @@ spec:
     - sourceLabels: {{ $relabel.sourceLabels }}
       regex: {{ $relabel.regex }}
       action: {{ $relabel.action }}
-    
     {{- end }}
+  {{ end }}
+
 {{ end }}
 
 {{- /*
