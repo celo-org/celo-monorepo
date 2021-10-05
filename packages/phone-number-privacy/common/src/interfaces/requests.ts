@@ -70,4 +70,14 @@ export interface GetQuotaRequest {
   sessionID?: string
 }
 
-export type OdisRequest = GetBlindedMessageSigRequest | GetQuotaRequest | GetContactMatchesRequest
+// DO NOT MERGE: Update this to use the Domain type
+export interface DisableDomainRequest {
+  domain: string
+}
+
+export type OdisRequest =
+  | GetBlindedMessageSigRequest
+  | GetQuotaRequest
+  | GetContactMatchesRequest
+  | DomainRestrictedSignatureRequest
+  | DisableDomainRequest
