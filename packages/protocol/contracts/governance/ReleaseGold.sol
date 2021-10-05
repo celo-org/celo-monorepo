@@ -180,6 +180,22 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Wrapper function for any ERC-20 transfer function.
+   * @dev Protects against celo/locked celo balance changes.
+   */
+  function genericTransfer(address erc20, address to, uint256 value)
+    external
+    onlyWhenInProperState
+  {
+    uint256 balanceBefore = address(this).balance +
+      getLockedGold().getTotalLockedGold(address(this));
+    IERC20(erc20).transfer(to, value);
+    uint256 balanceAfter = address(this).balance +
+      getLockedGold().getTotalLockedGold(address(this));
+    require(balanceBefore == balanceAfter, "Transfer must not modify celo or locked celo balances");
+  }
+
+  /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
    * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
