@@ -117,6 +117,7 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
       )
     }
 
+    // rescue any cUSD balance
     const stabletoken = await this.kit.contracts.getStableToken()
     const cusdBalance = await stabletoken.balanceOf(this.contractAddress)
     if (cusdBalance.isGreaterThan(0)) {
@@ -128,6 +129,7 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
       )
     }
 
+    // attempt to refund and finalize, surface pending withdrawals
     const remainingLockedGold = await this.releaseGoldWrapper.getRemainingLockedBalance()
     if (remainingLockedGold.isZero()) {
       await displaySendTx(
