@@ -39,9 +39,7 @@ export type DomainRestrictedSignatureRequest<
   D extends Domain,
   O extends DomainOptions = never
 > = OmitIfNever<{
-  /**
-   * Domain specification. Selects the PRF domain and rate limiting rules.
-   */
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /**
    * Domain-specific options.
