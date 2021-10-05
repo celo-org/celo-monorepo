@@ -193,23 +193,23 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-          name: ${ingressName}-web
-          port:
-            number: 4000
+            name: ${ingressName}-web
+            port:
+              number: 4000
       - path: /(graphql|graphiql|api)
         pathType: ImplementationSpecific
         backend:
           service:
-          name: ${ingressName}-api
-          port:
-            number: 4000
+            name: ${ingressName}-api
+            port:
+              number: 4000
       - path: /
         pathType: ImplementationSpecific
         backend:
           service:
-          name: ${ingressName}-web
-          port:
-            number: 4000
+            name: ${ingressName}-web
+            port:
+              number: 4000
   tls:
   - hosts:
     - ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org

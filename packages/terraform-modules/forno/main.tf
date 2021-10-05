@@ -123,16 +123,6 @@ resource "google_compute_url_map" "url_map" {
     path_rule {
       paths   = ["/ws"]
       service = module.ws_backends.backend_service_id
-      route_action {
-        url_rewrite {
-          path_prefix_rewrite = "/"
-        }
-      }
-    }
-
-    path_rule {
-      paths   = ["/kong", "/kong/*"]
-      service = module.kong.backend_service_id
     }
 
     path_rule {
