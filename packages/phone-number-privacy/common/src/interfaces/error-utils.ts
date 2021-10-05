@@ -13,6 +13,7 @@ export enum ErrorMessage {
   CONTRACT_GET_FAILURE = `CELO_ODIS_ERR_11 SIG_ERR Failed to read contract state`,
   FAILURE_TO_STORE_REQUEST = `CELO_ODIS_ERR_12 DB_ERR Failed to store partial sig request`,
   FAILURE_TO_INCREMENT_QUERY_COUNT = `CELO_ODIS_ERR_13 DB_ERR Failed to increment user query count`,
+  DOMAIN_ALREADY_DISABLED_FAILURE = `CELO_ODIS_ERR_14 DB_ERR Domain is already disabled`,
 }
 
 export enum WarningMessage {
