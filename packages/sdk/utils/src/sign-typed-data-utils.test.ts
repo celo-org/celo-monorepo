@@ -1,18 +1,26 @@
 import {
   EIP712Types,
   EIP712Object,
+  EIP712ObjectValue,
+  Optional,
   encodeData,
   encodeType,
   structHash,
   typeHash,
+  zeroValue,
 } from './sign-typed-data-utils'
 import { BigNumber } from 'bignumber.js'
 import { keccak } from 'ethereumjs-util'
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+
+// Compile-time check that Domain can be cast to type EIP712Object
+export const TEST_OPTIONAL_IS_EIP712: EIP712Object = ({} as unknown) as Optional<EIP712ObjectValue>
 
 interface EIP712TestCase {
   primaryType: string
   types: EIP712Types
   typeEncoding: string
+  zero?: EIP712Object
   examples: Array<{
     data: EIP712Object
     dataEncoding: Buffer
@@ -30,6 +38,11 @@ const TEST_TYPES: EIP712TestCase[] = [
       ],
     },
     typeEncoding: 'Mail(address from,address to,string contents)',
+    zero: {
+      from: NULL_ADDRESS,
+      to: NULL_ADDRESS,
+      contents: '',
+    },
     examples: [
       {
         data: {
@@ -77,6 +90,11 @@ const TEST_TYPES: EIP712TestCase[] = [
     },
     typeEncoding:
       'Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)',
+    zero: {
+      from: { wallet: NULL_ADDRESS, name: '' },
+      to: { wallet: NULL_ADDRESS, name: '' },
+      tx: { token: NULL_ADDRESS, amount: 0 },
+    },
     examples: [
       {
         data: {
@@ -164,6 +182,9 @@ const TEST_TYPES: EIP712TestCase[] = [
       ],
     },
     typeEncoding: 'GameBoard(Tile[][] grid)Tile(bool occupied,uint8 occupantId)',
+    zero: {
+      grid: [],
+    },
     examples: [
       {
         data: {
@@ -285,6 +306,16 @@ describe('structHash()', () => {
           const expected = keccak(Buffer.concat([typeHash(primaryType, types), dataEncoding]))
           expect(structHash(primaryType, data, types)).toEqual(expected)
         }
+      })
+    }
+  }
+})
+
+describe('zeroValue()', () => {
+  for (const { primaryType, types, zero } of TEST_TYPES) {
+    if (zero !== undefined) {
+      it(`should return zero value for ${primaryType} correctly`, () => {
+        expect(zeroValue(primaryType, types)).toEqual(zero)
       })
     }
   }

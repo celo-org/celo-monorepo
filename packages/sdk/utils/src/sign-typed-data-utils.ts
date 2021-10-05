@@ -1,4 +1,4 @@
-import { trimLeading0x } from '@celo/base/lib/address'
+import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { keccak } from 'ethereumjs-util'
 import coder from 'web3-eth-abi'
@@ -17,11 +17,23 @@ export type EIP712ObjectValue =
   | number
   | BigNumber
   | boolean
+  | Buffer
   | EIP712Object
   | EIP712ObjectValue[]
 
 export interface EIP712Object {
   [key: string]: EIP712ObjectValue
+}
+
+// Non-standard EIP-712 object allowing for undefined fields, to be filled by `defaultDataToZero`
+export type PartialEIP712ObjectValue =
+  | EIP712ObjectValue
+  | PartialEIP712Object
+  | PartialEIP712ObjectValue[]
+  | undefined
+
+export interface PartialEIP712Object {
+  [key: string]: PartialEIP712ObjectValue
 }
 
 export interface EIP712TypedData {
@@ -62,19 +74,12 @@ export type Optional<T extends EIP712ObjectValue> = {
 /**
  * Utility to build Optional<T> types to insert in EIP-712 type arrays.
  */
-export function optionalEIP712Type(typeName: string): EIP712Types {
-  return {
-    [`Optional<${typeName}>`]: [
-      { name: 'defined', type: 'bool' },
-      { name: 'value', type: 'typeName' },
-    ],
-  }
-}
-
-// Compile-time check that Domain can be cast to type EIP712Object
-// DO NOT MERGE: Move this.
-declare let TEST_OPTIONAL_IS_EIP712: EIP712Object
-TEST_OPTIONAL_IS_EIP712 = ({} as unknown) as Optional<EIP712ObjectValue>
+export const optionalEIP712Type = (typeName: string): EIP712Types => ({
+  [`Optional<${typeName}>`]: [
+    { name: 'defined', type: 'bool' },
+    { name: 'value', type: 'typeName' },
+  ],
+})
 
 /**
  * Generates the EIP712 Typed Data hash for signing
@@ -207,4 +212,104 @@ export function structHash(primaryType: string, data: EIP712Object, types: EIP71
   return keccak(
     Buffer.concat([typeHash(primaryType, types), encodeData(primaryType, data, types)])
   ) as Buffer
+}
+
+/**
+ * Produce the zero value for a given type.
+ *
+ * @remarks
+ * All atomic types will encode as the 32-byte zero value. Dynamic types as an empty hash.
+ * Dynamic arrays will return an empty array. Fixed length arrays will have members set to zero.
+ * Structs will have the values of all fields set to zero recursively.
+ *
+ * Note that EIP-712 does not specify zero values, and so this is non-standard.
+ */
+export function zeroValue(primaryType: string, types: EIP712Types = {}): EIP712ObjectValue {
+  // If the type is a built-in, return a pre-defined zero value.
+  if (['bytes', 'bytes1', 'bytes32'].includes(primaryType)) {
+    return Buffer.alloc(0)
+  }
+  if (['uint8', 'uint256', 'int8', 'int256'].includes(primaryType)) {
+    return 0
+  }
+  if (primaryType === 'bool') {
+    return false
+  }
+  if (primaryType === 'address') {
+    return NULL_ADDRESS
+  }
+  if (primaryType === 'string') {
+    return ''
+  }
+
+  // If the type is an array, return an empty array or an array of the given fixed length.
+  if (EIP712_ARRAY_REGEXP.test(primaryType)) {
+    const match = EIP712_ARRAY_REGEXP.exec(primaryType)
+    const memberType: string = match?.groups?.['memberType']!
+    const fixedLengthStr: string | undefined = match?.groups?.['fixedLength']
+    const fixedLength: number = fixedLengthStr === undefined ? 0 : parseInt(fixedLengthStr)
+    return [...Array(fixedLength).keys()].map(() => zeroValue(memberType, types))
+  }
+
+  // Must be user-defined type. Return an object with all fields set to their zero value.
+  const fields = types[primaryType]
+  if (fields === undefined) {
+    throw new Error(`Unrecognized primary type for EIP-712 zero value: ${primaryType}`)
+  }
+  return fields.reduce((obj, field) => ({ ...obj, [field.name]: zeroValue(field.type, types) }), {})
+}
+
+function defaultValueToZero(
+  primaryType: string,
+  value: PartialEIP712ObjectValue,
+  types: EIP712Types
+): EIP712ObjectValue {
+  // If the value is undefined, return the zero value for the given type instead.
+  if (value === undefined) {
+    return zeroValue(primaryType, types)
+  }
+
+  // If it's a builtin type or array, return the value as is.
+  if (EIP712_BUILTIN_TYPES.includes(primaryType)) {
+    return value as EIP712ObjectValue
+  }
+
+  // If its an array, recurse on each member value.
+  if (EIP712_ARRAY_REGEXP.test(primaryType)) {
+    const match = EIP712_ARRAY_REGEXP.exec(primaryType)
+    const memberType: string = match?.groups?.['memberType']!
+    return (value as PartialEIP712ObjectValue[]).map((member) =>
+      defaultValueToZero(memberType, member, types)
+    )
+  }
+
+  // Otherwise its a partial object and we should descend to examine its fields.
+  const fields = types[primaryType]
+  if (fields === undefined) {
+    throw new Error(`Unrecognized primary type in EIP-712 defaulting to zero: ${primaryType}`)
+  }
+
+  return fields.reduce(
+    (obj, field) => ({
+      ...obj,
+      [field.name]: defaultValueToZero(
+        field.type,
+        (value as PartialEIP712Object)[field.name],
+        types
+      ),
+    }),
+    {}
+  )
+}
+
+/**
+ * DO NOT MERGE: Is this needed?
+ */
+export function defaultDataToZero(
+  primaryType: string,
+  data: PartialEIP712Object,
+  types: EIP712Types
+): EIP712Object {
+  // If the input is an object, the output is guaranteed to be a populated object.
+  return defaultValueToZero(primaryType, data, types) as EIP712Object
 }
