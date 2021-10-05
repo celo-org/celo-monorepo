@@ -1,50 +1,69 @@
 # Combination of pod labels and endpoints on which to scrape.
-# TODO: simplify this config by adding a 'metric' port to each pod of interest
 
-# Which cluster to monitor
+# Which cluster to monitor: alfajores, baklava, or rc1
 cluster: alfajores
 
-# Where the podmonitor will be installed.
+# Namespace where the podmonitor will be installed.
 namespace: prometheus
 
 # TODO: enable when kube state metrics pods have port names
 # kubeStateMetrics:
 #   enabled: true
 
+# Each target specifies
+# - service: the suffix used for the PodMonitor config
+# - labels: how to find the right pods
+# - clusters: where it is deployed (alfajores, baklava, and/or rc1)
+# - endpoints: where to find the Prometheus metrics to scrape
+# - namespace: OPTIONAL if different from the cluster name
+# TODO: simplify the config by renaming all ports of interest to 'metric'
 targets:
-  - suffix: attestation-service
+  - service: attestation-service
     labels:
       app: attestation-service
+    clusters: [alfajores, baklava]
     endpoints:
       - port: http
         path: /metrics
 
-  - suffix: blockscout
+  - service: blockscout
     labels:
       app: blockscout
+    clusters: [alfajores, baklava, rc1]
     endpoints:
       - port: http
         path: /metrics/web  # Web & API
       - port: health
         path: /metrics/indexer  # Indexer
+
+  - service: celo-fullnode
+    labels:
+      app: celo-fullnode
+    clusters: [rc1]
+    endpoints:
+      - port: pprof
+        path: /debug/metrics/prometheus
  
-  - suffix: eksportisto
+  - service: eksportisto
     labels:
       app: eksportisto
+    clusters: [alfajores, rc1]
     endpoints:
       - port: prometheus
         path: /metrics
 
-  - suffix: testnet
+  - service: testnet
     labels:
       app: testnet
+    clusters: [alfajores, baklava]
     endpoints:
       - port: pprof
         path: /debug/metrics/prometheus
       - port: metrics
         path: /debug/metrics/prometheus
 
-  - suffix: walletconnect
+  - service: walletconnect
+    clusters: [alfajores, rc1]
     labels:
       app.kubernetes.io/name: walletconnect
     endpoints:

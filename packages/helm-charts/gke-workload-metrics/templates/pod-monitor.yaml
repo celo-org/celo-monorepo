@@ -1,9 +1,10 @@
 {{- range $target := $.Values.targets }}
+{{- if has $.Values.cluster $target.clusters }}
 ---
 apiVersion: monitoring.gke.io/v1alpha1
 kind: PodMonitor
 metadata:
-  name: "{{ $.Release.Name }}-{{ $target.suffix }}"
+  name: "{{ $.Release.Name }}-{{ $target.service }}"
   namespace: {{ $.Values.namespace }}
 
 spec:
@@ -31,7 +32,7 @@ spec:
       action: {{ $relabel.action }}
     {{- end }}
   {{ end }}
-
+{{ end }}
 {{ end }}
 
 {{- /*
