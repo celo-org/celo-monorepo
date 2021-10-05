@@ -26,10 +26,6 @@ export type Domain = {
  */
 export type DomainOptions = EIP712Object
 
-// Compile-time check that Domain can be cast to type EIP712Object
-declare let TEST_DOMAIN_IS_EIP712: EIP712Object
-TEST_DOMAIN_IS_EIP712 = ({} as unknown) as Domain
-
 export type SequentialDelayStage = {
   // How many seconds each batch of attempts in this stage is delayed with
   // respect to the timer.
@@ -69,14 +65,6 @@ export type SequentialDelayDomainOptions = {
 export function isSequentialDelayDomain(domain: Domain): domain is SequentialDelayDomain {
   return domain.name === 'ODIS Sequential Delay Domain' && domain.version === '1'
 }
-
-// Compile-time check that SequentialDelayDomain can be cast to type Domain
-declare let TEST_SEQUENTIAL_DELAY_DOMAIN_IS_DOMAIN: Domain
-TEST_SEQUENTIAL_DELAY_DOMAIN_IS_DOMAIN = ({} as unknown) as SequentialDelayDomain
-
-// Compile-time check that SequentialDelayDomainOptions can be cast to type EIP712Object
-declare let TEST_SEQUENTIAL_DELAY_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS: DomainOptions
-TEST_SEQUENTIAL_DELAY_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as SequentialDelayDomainOptions
 
 /**
  * Union type of domains which are currently implmented and standardized for use with ODIS.

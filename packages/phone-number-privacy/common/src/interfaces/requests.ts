@@ -12,9 +12,9 @@ export interface GetBlindedMessageSigRequest {
   sessionID?: string
 }
 
-// IDomainRestrictedSignatureRequest is the precursor for DomainRestrictedSignatureRequest. It
-// requires the option field, which cannot be provided if a given domain has no options. Below,
-// this options field is removed conditional on the options type being `never`.
+// IDomainRestrictedSignatureRequest is the precursor for DomainRestrictedSignatureRequest.
+// It requires the option field, which cannot be provided if a given domain has no options.
+// Below, this options field is removed conditional on the options type being `never`.
 interface IDomainRestrictedSignatureRequest<D extends Domain, O extends DomainOptions = never> {
   /**
    * Domain specification. Selects the PRF domain and rate limiting rules.
@@ -35,6 +35,10 @@ interface IDomainRestrictedSignatureRequest<D extends Domain, O extends DomainOp
 /**
  * Domain resitricted signature request to get a pOPRF evaluation on the given message in a given
  * domain, as specified by CIP-40.
+ *
+ * @remarks Concrete request types are created by specifying the type parameters for Domain and
+ * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * required. If not, it must not be provided.
  */
 export type DomainRestrictedSignatureRequest<
   D extends Domain,

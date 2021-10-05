@@ -25,17 +25,6 @@ export interface EIP712Object {
   [key: string]: EIP712ObjectValue
 }
 
-// Non-standard EIP-712 object allowing for undefined fields, to be filled by `defaultDataToZero`
-export type PartialEIP712ObjectValue =
-  | EIP712ObjectValue
-  | PartialEIP712Object
-  | PartialEIP712ObjectValue[]
-  | undefined
-
-export interface PartialEIP712Object {
-  [key: string]: PartialEIP712ObjectValue
-}
-
 export interface EIP712TypedData {
   types: EIP712Types & { EIP712Domain: EIP712Parameter[] }
   domain: EIP712Object
@@ -77,9 +66,29 @@ export type Optional<T extends EIP712ObjectValue> = {
 export const optionalEIP712Type = (typeName: string): EIP712Types => ({
   [`Optional<${typeName}>`]: [
     { name: 'defined', type: 'bool' },
-    { name: 'value', type: 'typeName' },
+    { name: 'value', type: typeName },
   ],
 })
+
+export const some = <T extends EIP712ObjectValue>(value: T): Optional<T> => ({
+  defined: true,
+  value,
+})
+
+export const noBool: Optional<boolean> = {
+  defined: false,
+  value: false,
+}
+
+export const noNumber: Optional<number> = {
+  defined: false,
+  value: 0,
+}
+
+export const noString: Optional<string> = {
+  defined: false,
+  value: '',
+}
 
 /**
  * Generates the EIP712 Typed Data hash for signing
@@ -257,59 +266,4 @@ export function zeroValue(primaryType: string, types: EIP712Types = {}): EIP712O
     throw new Error(`Unrecognized primary type for EIP-712 zero value: ${primaryType}`)
   }
   return fields.reduce((obj, field) => ({ ...obj, [field.name]: zeroValue(field.type, types) }), {})
-}
-
-function defaultValueToZero(
-  primaryType: string,
-  value: PartialEIP712ObjectValue,
-  types: EIP712Types
-): EIP712ObjectValue {
-  // If the value is undefined, return the zero value for the given type instead.
-  if (value === undefined) {
-    return zeroValue(primaryType, types)
-  }
-
-  // If it's a builtin type or array, return the value as is.
-  if (EIP712_BUILTIN_TYPES.includes(primaryType)) {
-    return value as EIP712ObjectValue
-  }
-
-  // If its an array, recurse on each member value.
-  if (EIP712_ARRAY_REGEXP.test(primaryType)) {
-    const match = EIP712_ARRAY_REGEXP.exec(primaryType)
-    const memberType: string = match?.groups?.['memberType']!
-    return (value as PartialEIP712ObjectValue[]).map((member) =>
-      defaultValueToZero(memberType, member, types)
-    )
-  }
-
-  // Otherwise its a partial object and we should descend to examine its fields.
-  const fields = types[primaryType]
-  if (fields === undefined) {
-    throw new Error(`Unrecognized primary type in EIP-712 defaulting to zero: ${primaryType}`)
-  }
-
-  return fields.reduce(
-    (obj, field) => ({
-      ...obj,
-      [field.name]: defaultValueToZero(
-        field.type,
-        (value as PartialEIP712Object)[field.name],
-        types
-      ),
-    }),
-    {}
-  )
-}
-
-/**
- * DO NOT MERGE: Is this needed?
- */
-export function defaultDataToZero(
-  primaryType: string,
-  data: PartialEIP712Object,
-  types: EIP712Types
-): EIP712Object {
-  // If the input is an object, the output is guaranteed to be a populated object.
-  return defaultValueToZero(primaryType, data, types) as EIP712Object
 }
