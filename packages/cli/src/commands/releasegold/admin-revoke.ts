@@ -19,10 +19,9 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
   static examples = ['admin-revoke --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631']
 
   async run() {
-    // tslint:disable-next-line
-    const { flags } = this.parse(AdminRevoke)
+    const { flags: _flags } = this.parse(AdminRevoke)
 
-    if (!flags.yesreally) {
+    if (!_flags.yesreally) {
       const response = await prompts({
         type: 'confirm',
         name: 'confirmation',
