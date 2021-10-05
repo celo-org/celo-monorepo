@@ -320,6 +320,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     tupleParser(valueToString)
   )
 
+  async unlockAllGold() {
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const amount = await lockedGold.getAccountTotalLockedGold(this.address)
+    return this.unlockGold(amount)
+  }
+
   /**
    * Relocks gold in the ReleaseGold instance that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock from.
