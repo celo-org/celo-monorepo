@@ -3,7 +3,10 @@ import { Address } from '@celo/connect'
 import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
-import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
+import {
+  ExchangeProposalState,
+  GrandaMentoWrapper,
+} from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
@@ -144,6 +147,28 @@ class CheckBuilder {
       `${proposalID} is an existing proposal`,
       this.withGrandaMento((grandaMento) => grandaMento.exchangeProposalExists(proposalID))
     )
+
+  grandaMentoProposalHasState = (proposalID: string, state: ExchangeProposalState) =>
+    this.addCheck(
+      `${proposalID} has state ${ExchangeProposalState[state]}`,
+      this.withGrandaMento(async (grandaMento) => {
+        const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
+        return exchangeProposal.state === state
+      })
+    )
+
+  grandaMentoProposalIsExecutable = (proposalID: string) => {
+    this.grandaMentoProposalHasState(proposalID, ExchangeProposalState.Approved)
+    return this.addCheck(
+      `${proposalID} veto period has elapsed`,
+      this.withGrandaMento(async (grandaMento) => {
+        const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
+        return exchangeProposal.approvalTimestamp
+          .plus(exchangeProposal.vetoPeriodSeconds)
+          .isLessThanOrEqualTo(Date.now() / 1000)
+      })
+    )
+  }
 
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
     this.addCheck(

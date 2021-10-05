@@ -24,6 +24,7 @@ export interface GrandaMentoConfig {
   approver: string
   spread: BigNumber
   vetoPeriodSeconds: BigNumber
+  maxApprovalExchangeRateChange: BigNumber
   exchangeLimits: AllStableConfig
 }
 
@@ -37,6 +38,7 @@ export interface ExchangeProposal {
   stableToken: string
   sellAmount: BigNumber
   buyAmount: BigNumber
+  vetoPeriodSeconds: BigNumber
   approvalTimestamp: BigNumber
   state: ExchangeProposalState
   sellCelo: boolean
@@ -58,17 +60,36 @@ export interface ExchangeProposalReadable {
 type AllStableConfig = Map<StableTokenContract, StableTokenExchangeLimits>
 
 export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
+  owner = proxyCall(this.contract.methods.owner)
+
   approver = proxyCall(this.contract.methods.approver)
+  setApprover = proxySend(this.kit, this.contract.methods.setApprover)
+
+  maxApprovalExchangeRateChange = proxyCall(
+    this.contract.methods.maxApprovalExchangeRateChange,
+    undefined,
+    fixidityValueToBigNumber
+  )
+  setMaxApprovalExchangeRateChange = proxySend(
+    this.kit,
+    this.contract.methods.setMaxApprovalExchangeRateChange
+  )
 
   spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
+  setSpread = proxySend(this.kit, this.contract.methods.setSpread)
 
   vetoPeriodSeconds = proxyCall(
     this.contract.methods.vetoPeriodSeconds,
     undefined,
     valueToBigNumber
   )
+  setVetoPeriodSeconds = proxySend(this.kit, this.contract.methods.setVetoPeriodSeconds)
 
-  owner = proxyCall(this.contract.methods.owner)
+  exchangeProposalCount = proxyCall(
+    this.contract.methods.exchangeProposalCount,
+    undefined,
+    valueToBigNumber
+  )
 
   async getActiveProposalIds() {
     const unfilteredIds = await this.contract.methods.getActiveProposalIds().call()
@@ -117,6 +138,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
       stableToken: result.stableToken,
       sellAmount: new BigNumber(result.sellAmount),
       buyAmount: new BigNumber(result.buyAmount),
+      vetoPeriodSeconds: new BigNumber(result.vetoPeriodSeconds),
       approvalTimestamp: new BigNumber(result.approvalTimestamp),
       sellCelo: result.sellCelo,
       state,
@@ -124,7 +146,7 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     }
   }
 
-  async getHumanRedableExchangeProposal(
+  async getHumanReadableExchangeProposal(
     exchangeProposalID: string | number
   ): Promise<ExchangeProposalReadable> {
     const proposal = await this.getExchangeProposal(exchangeProposalID)
@@ -173,18 +195,31 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     return out
   }
 
+  async getBuyAmount(
+    celoStableTokenOracleRate: BigNumber, // Note this is intended to be a fixed point number
+    sellAmount: BigNumber,
+    sellCelo: boolean
+  ): Promise<BigNumber> {
+    const result = await this.contract.methods
+      .getBuyAmount(celoStableTokenOracleRate.toFixed(), sellAmount.toFixed(), sellCelo)
+      .call()
+    return new BigNumber(result)
+  }
+
   async getConfig(): Promise<GrandaMentoConfig> {
     const res = await Promise.all([
       this.approver(),
       this.spread(),
       this.vetoPeriodSeconds(),
+      this.maxApprovalExchangeRateChange(),
       this.getAllStableTokenLimits(),
     ])
     return {
       approver: res[0],
       spread: res[1],
       vetoPeriodSeconds: res[2],
-      exchangeLimits: res[3],
+      maxApprovalExchangeRateChange: res[3],
+      exchangeLimits: res[4],
     }
   }
 }
