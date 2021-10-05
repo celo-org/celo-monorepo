@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: komenci-onboarding-ingress
@@ -15,10 +15,16 @@ spec:
     http:
       paths:
       - path: /rewards
+        pathType: ImplementationSpecific
         backend:
-          serviceName: {{ .Release.Namespace }}-rewards
-          servicePort: 3000
+          service:
+            name: {{ .Release.Namespace }}-rewards
+            port:
+              number: 3000
       - path: /
+        pathType: ImplementationSpecific
         backend:
-          serviceName: {{ .Release.Namespace }}-onboarding
-          servicePort: 3000
+          service:
+            name: {{ .Release.Namespace }}-onboarding
+            port:
+              number: 3000

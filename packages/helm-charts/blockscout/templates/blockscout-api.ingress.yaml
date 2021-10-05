@@ -1,8 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{ else }}
-apiVersion: extensions/v1beta1
-{{ end -}}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-api-ingress
@@ -26,6 +22,11 @@ spec:
     http:
       paths:
       - path: /
+        pathType: ImplementationSpecific
         backend:
+          service:
+            name: {{ .Release.Name }}-api
+            port:
+              number: 4000
           serviceName: {{ .Release.Name }}-api
           servicePort: 4000

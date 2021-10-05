@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: odis-signer-ingress
@@ -12,6 +12,9 @@ spec:
   - http:
       paths:
       - path: /
+        pathType: ImplementationSpecific
         backend:
-          serviceName: {{ include "name" . }}
-          servicePort: 3000
+          service:
+            name: {{ include "name" . }}
+            port:
+              number: 3000
