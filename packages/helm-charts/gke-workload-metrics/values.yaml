@@ -63,9 +63,9 @@ targets:
         path: /debug/metrics/prometheus
 
   - service: walletconnect
-    clusters: [alfajores, rc1]
     labels:
       app.kubernetes.io/name: walletconnect
+    clusters: [alfajores, rc1]
     endpoints:
       - port: http
         path: /metrics
