@@ -9,7 +9,11 @@ import {
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
 import { DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
-import { getDomainState, setDomainDisabled } from '../database/wrappers/domainState'
+import {
+  getDomainState,
+  setDomainDisabled,
+  updateDomainState,
+} from '../database/wrappers/domainState'
 import { Endpoints } from '../server'
 import { IDomainService } from './domain.interface'
 
@@ -34,21 +38,15 @@ export class DomainService implements IDomainService {
     })
     try {
       const domainState = await getDomainState(request.body.domain, logger)
-      // FIXME(victor): It is technically possible to disable a domain that has never been used,
-      // and there are some circustances in which is might be good to be able to do so. This
-      // should be fixed such that it is possible.
       if (!domainState) {
-        respondWithError(Endpoints.DISABLE_DOMAIN, response, 422, ErrorMessage.DATABASE_GET_FAILURE)
+        // If the domain is not currently recorded in the state database, add it now.
+        await updateDomainState(request.body.domain, 0, 0, logger)
       } else if (domainState.disabled) {
-        respondWithError(
-          Endpoints.DISABLE_DOMAIN,
-          response,
-          422,
-          ErrorMessage.DOMAIN_ALREADY_DISABLED_FAILURE
-        )
-      } else {
-        return setDomainDisabled(request.body.domain, logger)
+        // If the domain is already diabled, nothing needs to be done. Return 200 OK.
+        return
       }
+
+      return setDomainDisabled(request.body.domain, logger)
     } catch (error) {
       logger.error('Error while disabling domain', error)
       respondWithError(
