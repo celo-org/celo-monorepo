@@ -1,9 +1,11 @@
 import {
   DisableDomainRequest,
-  DomainRestrictedSignatureRequest,
+  DomainQuotaStatusRequest,
   DomainStatusResponse,
   ErrorMessage,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { isKnownDomain, domainHash } from '@celo/identity/lib/odis/domains'
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
 import { DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
@@ -17,67 +19,92 @@ export class DomainService implements IDomainService {
     response: Response
   ): Promise<void> {
     const logger = response.locals.logger
-    logger.info('Disabling domain', { domain: request.body.domain })
-    return getDomainState(request.body.domain, logger)
-      .then((domainState) => {
-        if (!domainState) {
-          respondWithError(
-            Endpoints.DISABLE_DOMAIN,
-            response,
-            422,
-            ErrorMessage.DATABASE_GET_FAILURE
-          )
-        } else if (domainState.disabled) {
-          respondWithError(
-            Endpoints.DISABLE_DOMAIN,
-            response,
-            422,
-            ErrorMessage.DOMAIN_ALREADY_DISABLED_FAILURE
-          )
-        } else {
-          return setDomainDisabled(request.body.domain, logger)
-        }
+    if (!isKnownDomain(request.body.domain)) {
+      logger.warn('Received request to disable an unknown domain', {
+        name: request.body.domain.name,
+        version: request.body.domain.version,
       })
-      .catch((e) => {
-        logger.error('Error while disabling domain', e)
+      respondWithError(Endpoints.DISABLE_DOMAIN, response, 404, WarningMessage.UNKNOWN_DOMAIN)
+      return
+    }
+    logger.info('Processing request to disable domain', {
+      name: request.body.domain.name,
+      version: request.body.domain.version,
+      hash: domainHash(request.body.domain),
+    })
+    try {
+      const domainState = await getDomainState(request.body.domain, logger)
+      // FIXME(victor): It is technically possible to disable a domain that has never been used,
+      // and there are some circustances in which is might be good to be able to do so. This
+      // should be fixed such that it is possible.
+      if (!domainState) {
+        respondWithError(Endpoints.DISABLE_DOMAIN, response, 422, ErrorMessage.DATABASE_GET_FAILURE)
+      } else if (domainState.disabled) {
         respondWithError(
           Endpoints.DISABLE_DOMAIN,
           response,
-          500,
-          ErrorMessage.DATABASE_UPDATE_FAILURE
+          422,
+          ErrorMessage.DOMAIN_ALREADY_DISABLED_FAILURE
         )
-      })
+      } else {
+        return setDomainDisabled(request.body.domain, logger)
+      }
+    } catch (error) {
+      logger.error('Error while disabling domain', error)
+      respondWithError(
+        Endpoints.DISABLE_DOMAIN,
+        response,
+        500,
+        ErrorMessage.DATABASE_UPDATE_FAILURE
+      )
+    }
   }
 
-  public async handleGetDomainStatus(
-    request: Request<{}, {}, DomainRestrictedSignatureRequest>,
+  public async handleGetDomainQuotaStatus(
+    request: Request<{}, {}, DomainQuotaStatusRequest>,
     response: Response
   ): Promise<void> {
     const logger = response.locals.logger
-    logger.info('Getting domain status', { domain: request.body.domain })
-    getDomainState(request.body.domain, logger)
-      .then((result) => {
-        let resultResponse: DomainStatusResponse
-        if (result) {
-          resultResponse = {
-            domain: result[DOMAINS_STATES_COLUMNS.domain],
-            counter: result[DOMAINS_STATES_COLUMNS.counter],
-            disabled: result[DOMAINS_STATES_COLUMNS.disabled],
-            timer: result[DOMAINS_STATES_COLUMNS.timer],
-          }
-        } else {
-          resultResponse = {
-            domain: request.body.domain,
-            counter: 0,
-            disabled: false,
-            timer: 0,
-          }
+    if (!isKnownDomain(request.body.domain)) {
+      logger.warn('Received request to get quota status for an unknown domain', {
+        name: request.body.domain.name,
+        version: request.body.domain.version,
+      })
+      respondWithError(Endpoints.DOMAIN_QUOTA_STATUS, response, 404, WarningMessage.UNKNOWN_DOMAIN)
+      return
+    }
+    logger.info('Processing request to get domain quota status', {
+      name: request.body.domain.name,
+      version: request.body.domain.version,
+      hash: domainHash(request.body.domain),
+    })
+    try {
+      const domainState = await getDomainState(request.body.domain, logger)
+      let resultResponse: DomainStatusResponse
+      if (domainState) {
+        resultResponse = {
+          domain: request.body.domain,
+          counter: domainState[DOMAINS_STATES_COLUMNS.counter],
+          disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
+          timer: domainState[DOMAINS_STATES_COLUMNS.timer],
         }
-        response.status(200).send(resultResponse)
-      })
-      .catch((e) => {
-        logger.error('Error while getting domain status', e)
-        respondWithError(Endpoints.DOMAIN_STATUS, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
-      })
+      } else {
+        resultResponse = {
+          domain: request.body.domain,
+          counter: 0,
+          disabled: false,
+          timer: 0,
+        }
+      }
+      response.status(200).send(resultResponse)
+    } catch (error) {
+      logger.error('Error while getting domain status', error)
+      respondWithError(
+        Endpoints.DOMAIN_QUOTA_STATUS,
+        response,
+        500,
+        ErrorMessage.DATABASE_GET_FAILURE
+      )
+    }
   }
 }
