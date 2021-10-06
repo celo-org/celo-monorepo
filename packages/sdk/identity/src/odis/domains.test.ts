@@ -23,7 +23,7 @@ export const TEST_SEQUENTIAL_DELAY_DOMAIN_IS_DOMAIN: Domain = ({} as unknown) as
 // Compile-time check that SequentialDelayDomainOptions can be cast to type EIP712Object
 export const TEST_SEQUENTIAL_DELAY_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS: DomainOptions = ({} as unknown) as SequentialDelayDomainOptions
 
-describe('domainEIP712()', () => {
+describe('domainHash()', () => {
   it('should generate the correct type data for SequentialDelyaDomain instance', () => {
     const domain: SequentialDelayDomain = {
       name: 'ODIS Sequential Delay Domain',

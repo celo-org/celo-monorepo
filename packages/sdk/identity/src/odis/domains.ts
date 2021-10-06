@@ -3,6 +3,7 @@ import {
   EIP712ObjectValue,
   EIP712TypedData,
   Optional,
+  generateTypedDataHash,
   optionalEIP712Type,
 } from '@celo/utils/lib/sign-typed-data-utils'
 
@@ -72,6 +73,10 @@ export function isSequentialDelayDomain(domain: Domain): domain is SequentialDel
  */
 export type KnownDomain = SequentialDelayDomain
 
+export function isKnownDomain(domain: Domain): domain is KnownDomain {
+  return isSequentialDelayDomain(domain)
+}
+
 /**
  * Wraps a domain instance of a standardized type into an EIP-712 typed data structure, including
  * the EIP-712 type signature specififed by the mapping from TypeScript types in CIP-40.
@@ -114,4 +119,15 @@ export function domainEIP712(domain: KnownDomain): EIP712TypedData {
   const canary = (x: never) => x
   canary(domain)
   throw new Error('Implementation error. Input of type KnownDomain was not recognized')
+}
+
+/**
+ * Produces the canonical 256-bit EIP-712 typed hash of the given domain.
+ *
+ * @remarks Note that this is a simple wraper to get the EIP-712 hash after encoding it to an
+ * EIP-712 typed data format. If a signature over the domain is needed, enocide to EIP-712 format
+ * and pass that into a signTypedData function.
+ */
+export function domainHash(domain: KnownDomain): Buffer {
+  return generateTypedDataHash(domainEIP712(domain))
 }
