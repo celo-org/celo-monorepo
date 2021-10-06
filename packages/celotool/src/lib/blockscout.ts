@@ -179,6 +179,12 @@ metadata:
       location ~ /wobserver/.* {
         deny all;
       }
+      location ~ /address/(.*)/token_transfers {
+        return 301 /address/$1/token-transfers;
+      }
+      location ~ /address/(.*)/coin_balances {
+        return 301 /address/$1/coin-balances;
+      }
   labels:
     app: blockscout
     chart: blockscout
