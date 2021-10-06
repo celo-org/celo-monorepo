@@ -75,6 +75,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   // Indicates if this schedule's unreleased gold can be used for voting.
   bool public canVote;
 
+  // Indicates if this schedule has received the initial gold for funding.
+  bool public funded = false;
+
   // Public struct housing params pertaining to releasing gold.
   ReleaseSchedule public releaseSchedule;
 
@@ -162,7 +165,22 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   constructor(bool test) public Initializable(test) {}
 
-  function() external payable {} // solhint-disable no-empty-blocks
+  function isFunded() public view returns (bool) {
+    // grants which have already released are considered funded for backwards compatibility
+    return getCurrentReleasedTotalAmount() > 0 || funded;
+  }
+
+  function updateFunded() private {
+    if (!isFunded()) {
+      funded =
+        address(this).balance >=
+        releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
+    }
+  }
+
+  function() external payable {
+    updateFunded();
+  }
 
   /**
    * @notice Wrapper function for stable token transfer function.
@@ -228,11 +246,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "The release schedule beneficiary cannot be the zero addresss"
     );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
-    require(
-      address(this).balance ==
-        releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
-      "Contract balance must equal the entire grant amount"
-    );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
@@ -240,6 +253,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "If contract is revocable there must be an address to refund"
     );
 
+    updateFunded(); // for backwards compatible usage of funding at deployment or init time
     setRegistry(registryAddress);
     _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;
