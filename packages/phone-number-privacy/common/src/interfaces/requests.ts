@@ -36,7 +36,7 @@ export interface GetQuotaRequest {
  * required. If not, it must not be provided.
  */
 export type DomainRestrictedSignatureRequest<
-  D extends Domain,
+  D extends Domain = Domain,
   O extends DomainOptions = never
 > = OmitIfNever<{
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
@@ -54,7 +54,7 @@ export type DomainRestrictedSignatureRequest<
 }>
 
 export type DomainQuotaStatusRequest<
-  D extends Domain,
+  D extends Domain = Domain,
   O extends DomainOptions = never
 > = OmitIfNever<{
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
@@ -65,7 +65,10 @@ export type DomainQuotaStatusRequest<
   sessionID: Optional<string>
 }>
 
-export type DisableDomainRequest<D extends Domain, O extends DomainOptions = never> = OmitIfNever<{
+export type DisableDomainRequest<
+  D extends Domain = Domain,
+  O extends DomainOptions = never
+> = OmitIfNever<{
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /** Domain-specific options. */

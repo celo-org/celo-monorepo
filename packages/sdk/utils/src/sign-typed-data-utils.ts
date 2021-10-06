@@ -55,7 +55,7 @@ const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+
  * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
  * concrete type T is a subtype of EIP712ObjectValue.
  */
-export interface Optional<T extends EIP712ObjectValue> {
+export type Optional<T extends EIP712ObjectValue> = {
   defined: boolean
   value: T
 }
