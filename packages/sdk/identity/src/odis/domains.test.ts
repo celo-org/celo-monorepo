@@ -8,10 +8,10 @@ import {
 } from '@celo/utils/lib/sign-typed-data-utils'
 import {
   Domain,
+  domainEIP712,
   DomainOptions,
   SequentialDelayDomain,
   SequentialDelayDomainOptions,
-  domainEIP712,
 } from './domains'
 
 // Compile-time check that Domain can be cast to type EIP712Object

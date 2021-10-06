@@ -1,3 +1,4 @@
+import { domainHash, isKnownDomain } from '@celo/identity/lib/odis/domains'
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
@@ -5,7 +6,6 @@ import {
   ErrorMessage,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { isKnownDomain, domainHash } from '@celo/identity/lib/odis/domains'
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
 import { DOMAINS_STATES_COLUMNS } from '../database/models/domainState'

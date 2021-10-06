@@ -1,5 +1,5 @@
-import { Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import { Domain, DomainOptions } from '@celo/identity/lib/odis/domains'
+import { Optional } from '@celo/utils/lib/sign-typed-data-utils'
 
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */

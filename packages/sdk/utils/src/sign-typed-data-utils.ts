@@ -55,6 +55,7 @@ const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+
  * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
  * concrete type T is a subtype of EIP712ObjectValue.
  */
+// tslint:disable-next-line:interface-over-type-literal Only builds when defined as type literal.
 export type Optional<T extends EIP712ObjectValue> = {
   defined: boolean
   value: T
@@ -119,7 +120,7 @@ function findDependencies(primaryType: string, types: EIP712Types, found: string
   // If this is an array type, return the results for its member type.
   if (EIP712_ARRAY_REGEXP.test(primaryType)) {
     const match = EIP712_ARRAY_REGEXP.exec(primaryType)
-    const memberType: string = match?.groups?.['memberType']!
+    const memberType: string = match?.groups?.memberType!
     return findDependencies(memberType, types, found)
   }
 
@@ -188,7 +189,7 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
   if (EIP712_ARRAY_REGEXP.test(valueType)) {
     // Note: If a fixed length is provided in the type, it is not checked.
     const match = EIP712_ARRAY_REGEXP.exec(valueType)
-    const memberType: string = match?.groups?.['memberType']!
+    const memberType: string = match?.groups?.memberType!
     return keccak(
       Buffer.concat(
         (value as EIP712ObjectValue[]).map((member) => encodeValue(memberType, member, types))
@@ -254,8 +255,8 @@ export function zeroValue(primaryType: string, types: EIP712Types = {}): EIP712O
   // If the type is an array, return an empty array or an array of the given fixed length.
   if (EIP712_ARRAY_REGEXP.test(primaryType)) {
     const match = EIP712_ARRAY_REGEXP.exec(primaryType)
-    const memberType: string = match?.groups?.['memberType']!
-    const fixedLengthStr: string | undefined = match?.groups?.['fixedLength']
+    const memberType: string = match?.groups?.memberType!
+    const fixedLengthStr: string | undefined = match?.groups?.fixedLength
     const fixedLength: number = fixedLengthStr === undefined ? 0 : parseInt(fixedLengthStr, 10)
     return [...Array(fixedLength).keys()].map(() => zeroValue(memberType, types))
   }

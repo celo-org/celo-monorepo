@@ -2,16 +2,20 @@ import {
   EIP712Object,
   EIP712ObjectValue,
   EIP712TypedData,
-  Optional,
   generateTypedDataHash,
+  Optional,
   optionalEIP712Type,
 } from '@celo/utils/lib/sign-typed-data-utils'
+
+// Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
+// of interface. Otherwise the compiler complains about a missing index signature.
+// tslint:disable:interface-over-type-literal
 
 /**
  * ODIS OPRF domain specifier type as described in CIP-40
  * https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md
  */
-export type Domain = {
+export interface Domain {
   /** Unique name of the domain. (e.g. "ODIS Password Domain") */
   name: string
   /** Version number. Allows for backwards incompatible changes. */
@@ -23,7 +27,8 @@ export type Domain = {
 /**
  * Options that accompany a Domain in a request to ODIS. Concrete subtype is determined by the
  * concrete subtype of Domain.
- * Note: DomainOptions is simply an alias of EIP712Object.
+ *
+ * @remarks DomainOptions is simply an alias of EIP712Object.
  */
 export type DomainOptions = EIP712Object
 

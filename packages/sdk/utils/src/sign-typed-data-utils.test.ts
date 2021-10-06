@@ -1,17 +1,17 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { BigNumber } from 'bignumber.js'
+import { keccak } from 'ethereumjs-util'
 import {
-  EIP712Types,
   EIP712Object,
   EIP712ObjectValue,
-  Optional,
+  EIP712Types,
   encodeData,
   encodeType,
+  Optional,
   structHash,
   typeHash,
   zeroValue,
 } from './sign-typed-data-utils'
-import { BigNumber } from 'bignumber.js'
-import { keccak } from 'ethereumjs-util'
-import { NULL_ADDRESS } from '@celo/base/lib/address'
 
 // Compile-time check that Domain can be cast to type EIP712Object
 export const TEST_OPTIONAL_IS_EIP712: EIP712Object = ({} as unknown) as Optional<EIP712ObjectValue>
