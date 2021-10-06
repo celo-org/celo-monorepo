@@ -4,7 +4,7 @@ import {
   DomainRestrictedSignatureRequest,
   DomainQuotaStatusRequest,
   DisableDomainRequest,
-} from './requests'
+} from '../../src/interfaces/requests'
 
 // Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
 export let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
@@ -29,3 +29,8 @@ TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<
   Domain,
   DomainOptions
 >
+
+// Required to have at least one test or the runner complains.
+describe('requests.test.ts', () => {
+  it('should compile', () => {})
+})
