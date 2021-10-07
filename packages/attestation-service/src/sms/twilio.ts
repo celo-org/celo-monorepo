@@ -13,6 +13,7 @@ export class TwilioSmsProvider extends SmsProvider {
       fetchEnv('TWILIO_ACCOUNT_SID'),
       fetchEnv('TWILIO_MESSAGING_SERVICE_SID'),
       fetchEnvOrDefault('TWILIO_VERIFY_SERVICE_SID', ''),
+      readUnsupportedRegionsFromEnv('TWILIO_VERIFY_DISABLED_REGIONS'),
       fetchEnv('TWILIO_AUTH_TOKEN'),
       readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST')
     )
@@ -21,6 +22,7 @@ export class TwilioSmsProvider extends SmsProvider {
   client: Twilio
   messagingServiceSid: string
   verifyServiceSid: string
+  verifyDisabledRegionCodes: string[]
   type = SmsProviderType.TWILIO
   deliveryStatusURL: string | undefined
   // https://www.twilio.com/docs/verify/api/verification#start-new-verification
@@ -67,6 +69,7 @@ export class TwilioSmsProvider extends SmsProvider {
     twilioSid: string,
     messagingServiceSid: string,
     verifyServiceSid: string,
+    verifyDisabledRegionCodes: string[],
     twilioAuthToken: string,
     unsupportedRegionCodes: string[]
   ) {
@@ -74,6 +77,7 @@ export class TwilioSmsProvider extends SmsProvider {
     this.client = twilio(twilioSid, twilioAuthToken)
     this.messagingServiceSid = messagingServiceSid
     this.verifyServiceSid = verifyServiceSid
+    this.verifyDisabledRegionCodes = verifyDisabledRegionCodes
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
@@ -139,8 +143,11 @@ export class TwilioSmsProvider extends SmsProvider {
   }
 
   async sendSms(attestation: AttestationModel) {
-    // Prefer Verify API if Verify Service is present
-    if (this.verifyServiceSid) {
+    // Prefer Verify API if Verify Service is present and not disabled for region
+    if (
+      this.verifyServiceSid &&
+      !this.verifyDisabledRegionCodes.includes(attestation.countryCode)
+    ) {
       const requestParams: any = {
         to: attestation.phoneNumber,
         channel: 'sms',
