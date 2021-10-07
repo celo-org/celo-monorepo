@@ -75,9 +75,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   // Indicates if this schedule's unreleased gold can be used for voting.
   bool public canVote;
 
-  // Indicates if this schedule has received the initial gold for funding.
-  bool internal funded = false;
-
   // Public struct housing params pertaining to releasing gold.
   ReleaseSchedule public releaseSchedule;
 
@@ -167,20 +164,13 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   function isFunded() public view returns (bool) {
     // grants which have already released are considered funded for backwards compatibility
-    return getCurrentReleasedTotalAmount() > 0 || funded;
+    return
+      getCurrentReleasedTotalAmount() > 0 ||
+      address(this).balance >=
+      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
   }
 
-  function updateFunded() private {
-    if (!isFunded()) {
-      funded =
-        address(this).balance >=
-        releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
-    }
-  }
-
-  function() external payable {
-    updateFunded();
-  }
+  function() external payable {}
 
   /**
    * @notice Wrapper function for stable token transfer function.
@@ -252,8 +242,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
-
-    updateFunded(); // for backwards compatible usage of funding at deployment or init time
     setRegistry(registryAddress);
     _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;
