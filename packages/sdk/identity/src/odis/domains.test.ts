@@ -33,7 +33,7 @@ export let TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS: DomainOptions
 TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as KnownDomainOptions
 TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as KnownDomainOptions<SequentialDelayDomain>
 
-describe('domainHash()', () => {
+describe('domainEIP712()', () => {
   it('should generate the correct type data for SequentialDelayDomain instance', () => {
     const domain: SequentialDelayDomain = {
       name: 'ODIS Sequential Delay Domain',
@@ -48,7 +48,9 @@ describe('domainHash()', () => {
       publicKey: some('0x0000000000000000000000000000000000000b0b'),
       salt: noString,
     }
-    const expectedHash = 'a61adacd0ed363bc13f01a993a49f20a6ff0d9d5f577b1496b6f31ae122182f9'
-    expect(generateTypedDataHash(domainEIP712(domain)).toString('hex')).toEqual(expectedHash)
+    const expectedHash = 'f14fc73e1ec49f3b010d683f6c0933fe5e0cc9f17178ff2c66b76690abc7e387'
+    const typedData = domainEIP712(domain)
+    // console.debug(JSON.stringify(typedData, null, 2))
+    expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
   })
 })

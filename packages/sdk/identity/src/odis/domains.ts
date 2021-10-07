@@ -74,6 +74,8 @@ export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDel
 
 export const sequentialDelayDomainEIP712Types: EIP712Types = {
   SequentialDelayDomain: [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
     { name: 'publicKey', type: 'Optional<string>' },
     { name: 'salt', type: 'Optional<string>' },
     { name: 'stages', type: 'SequentialDelayStage[]' },
@@ -141,11 +143,7 @@ export function domainEIP712(domain: KnownDomain): EIP712TypedData {
         name: domain.name,
         version: domain.version,
       },
-      message: {
-        stages: domain.stages,
-        publicKey: domain.publicKey,
-        salt: domain.salt,
-      } as Omit<SequentialDelayDomain, 'name' | 'version'>,
+      message: domain,
     }
   }
 
