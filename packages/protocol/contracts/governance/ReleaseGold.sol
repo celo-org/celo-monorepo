@@ -181,18 +181,17 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @notice Wrapper function for any ERC-20 transfer function.
-   * @dev Protects against celo/locked celo balance changes.
+   * @dev Protects against celo balance changes.
    */
   function genericTransfer(address erc20, address to, uint256 value)
     external
     onlyWhenInProperState
   {
-    uint256 balanceBefore = address(this).balance +
-      getLockedGold().getTotalLockedGold(address(this));
+    require(
+      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Transfer must not target celo balance"
+    );
     IERC20(erc20).transfer(to, value);
-    uint256 balanceAfter = address(this).balance +
-      getLockedGold().getTotalLockedGold(address(this));
-    require(balanceBefore == balanceAfter, "Transfer must not modify celo or locked celo balances");
   }
 
   /**
