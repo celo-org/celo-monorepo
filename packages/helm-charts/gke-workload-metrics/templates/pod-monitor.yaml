@@ -1,5 +1,5 @@
 {{- range $target := $.Values.targets }}
-{{- if has $.Values.cluster $target.clusters }}
+{{- if hasKey $target.k8sClustersToNamespace $.Values.cluster  }}
 ---
 apiVersion: monitoring.gke.io/v1alpha1
 kind: PodMonitor
@@ -11,7 +11,7 @@ spec:
   # Namespaces to search for pods.
   namespaceSelector:
     matchNames:
-    - {{ $target.namespace | default $.Values.cluster }}
+    - {{ get $target.k8sClustersToNamespace $.Values.cluster | default $.Values.cluster }}
 
   selector:
     matchLabels:

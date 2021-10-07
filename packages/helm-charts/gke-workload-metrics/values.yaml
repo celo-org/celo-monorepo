@@ -1,7 +1,7 @@
 # Combination of pod labels and endpoints on which to scrape.
 
-# Which cluster to monitor: alfajores, baklava, or rc1
-cluster: alfajores
+# Which k8s cluster to monitor.
+cluster: baklavastaging
 
 # Namespace where the podmonitor will be installed.
 namespace: prometheus
@@ -13,15 +13,16 @@ namespace: prometheus
 # Each target specifies
 # - service: the suffix used for the PodMonitor config
 # - labels: how to find the right pods
-# - clusters: where it is deployed (alfajores, baklava, and/or rc1)
+# - k8sClustersToNamespace: where in k8s it is deployeds
 # - endpoints: where to find the Prometheus metrics to scrape
-# - namespace: OPTIONAL if different from the cluster name
 # TODO: simplify the config by renaming all ports of interest to 'metric'
 targets:
   - service: attestation-service
     labels:
       app: attestation-service
-    clusters: [alfajores, baklava]
+    k8sClustersToNamespace:
+      alfajores: alfajores
+      baklavastaging: baklava
     endpoints:
       - port: http
         path: /metrics
@@ -29,7 +30,10 @@ targets:
   - service: blockscout
     labels:
       app: blockscout
-    clusters: [alfajores, baklava, rc1]
+    k8sClustersToNamespace:
+      alfajores: alfajores
+      baklavastaging: baklava
+      mainnet: rc1
     endpoints:
       - port: http
         path: /metrics/web  # Web & API
@@ -39,7 +43,14 @@ targets:
   - service: celo-fullnode
     labels:
       app: celo-fullnode
-    clusters: [rc1]
+    k8sClustersToNamespace:
+      baklava-europe-west1: baklava
+      mainnet: rc1
+      rc1-asia-east1: rc1
+      rc1-europe-west1: rc1
+      rc1-southamerica-east1: rc1
+      rc1-us-east1: rc1
+      rc1-us-west1: rc1
     endpoints:
       - port: pprof
         path: /debug/metrics/prometheus
@@ -47,7 +58,9 @@ targets:
   - service: eksportisto
     labels:
       app: eksportisto
-    clusters: [alfajores, rc1]
+    k8sClustersToNamespace:
+      alfajores: alfajores
+      mainnet: rc1
     endpoints:
       - port: prometheus
         path: /metrics
@@ -55,7 +68,9 @@ targets:
   - service: testnet
     labels:
       app: testnet
-    clusters: [alfajores, baklava]
+    k8sClustersToNamespace:
+      alfajores: alfajores
+      baklavastaging: baklava
     endpoints:
       - port: pprof
         path: /debug/metrics/prometheus
@@ -65,11 +80,12 @@ targets:
   - service: walletconnect
     labels:
       app.kubernetes.io/name: walletconnect
-    clusters: [alfajores, rc1]
+    k8sClustersToNamespace:
+      alfajores: walletconnect
+      mainnet: walletconnect
     endpoints:
       - port: http
         path: /metrics
-    namespace: walletconnect
 
 relabels:
   - sourceLabels: [__name__]
