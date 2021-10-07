@@ -2,7 +2,7 @@ import {
   EIP712Object,
   EIP712ObjectValue,
   EIP712TypedData,
-  EIP712Types,
+  EIP712TypesWithPrimary,
   generateTypedDataHash,
   Optional,
   optionalEIP712Type,
@@ -72,32 +72,38 @@ export type SequentialDelayDomainOptions = {
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
   domain.name === 'ODIS Sequential Delay Domain' && domain.version === '1'
 
-export const sequentialDelayDomainEIP712Types: EIP712Types = {
-  SequentialDelayDomain: [
-    { name: 'name', type: 'string' },
-    { name: 'version', type: 'string' },
-    { name: 'publicKey', type: 'Optional<string>' },
-    { name: 'salt', type: 'Optional<string>' },
-    { name: 'stages', type: 'SequentialDelayStage[]' },
-  ],
-  SequentialDelayStage: [
-    { name: 'batchSize', type: 'Optional<uint256>' },
-    { name: 'delay', type: 'uint256' },
-    { name: 'repetitions', type: 'Optional<uint256>' },
-    { name: 'resetTimer', type: 'Optional<bool>' },
-  ],
-  ...optionalEIP712Type('string'),
-  ...optionalEIP712Type('uint256'),
-  ...optionalEIP712Type('bool'),
+export const sequentialDelayDomainEIP712Types: EIP712TypesWithPrimary = {
+  types: {
+    SequentialDelayDomain: [
+      { name: 'name', type: 'string' },
+      { name: 'publicKey', type: 'Optional<string>' },
+      { name: 'salt', type: 'Optional<string>' },
+      { name: 'stages', type: 'SequentialDelayStage[]' },
+      { name: 'version', type: 'string' },
+    ],
+    SequentialDelayStage: [
+      { name: 'batchSize', type: 'Optional<uint256>' },
+      { name: 'delay', type: 'uint256' },
+      { name: 'repetitions', type: 'Optional<uint256>' },
+      { name: 'resetTimer', type: 'Optional<bool>' },
+    ],
+    ...optionalEIP712Type('string'),
+    ...optionalEIP712Type('uint256'),
+    ...optionalEIP712Type('bool'),
+  },
+  primaryType: 'SequentialDelayDomain',
 }
 
-export const sequentialDelayDomainOptionsEIP712Types: EIP712Types = {
-  SequentialDelayDomainOptions: [
-    { name: 'signature', type: 'Optional<string>' },
-    { name: 'nonce', type: 'Optional<uint256>' },
-  ],
-  ...optionalEIP712Type('string'),
-  ...optionalEIP712Type('uint256'),
+export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
+  types: {
+    SequentialDelayDomainOptions: [
+      { name: 'nonce', type: 'Optional<uint256>' },
+      { name: 'signature', type: 'Optional<string>' },
+    ],
+    ...optionalEIP712Type('string'),
+    ...optionalEIP712Type('uint256'),
+  },
+  primaryType: 'SequentialDelayDomainOptions',
 }
 
 /**
@@ -121,30 +127,9 @@ export type KnownDomainOptions<
   D extends KnownDomain = KnownDomain
 > = D extends SequentialDelayDomain ? SequentialDelayDomainOptions : never
 
-/**
- * Wraps a domain instance of a standardized type into an EIP-712 typed data structure, including
- * the EIP-712 type signature specififed by the mapping from TypeScript types in CIP-40.
- * https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md#mapping-typescript-to-eip-712-types
- */
-export function domainEIP712(domain: KnownDomain): EIP712TypedData {
-  // TODO(victor): When more domains are added, the logic in this if statement can be generalized to
-  // avoid repeating it for each domain. Leaving as is until then.
+export function domainEIP712Types(domain: KnownDomain): EIP712TypesWithPrimary {
   if (isSequentialDelayDomain(domain)) {
-    return {
-      types: {
-        ...sequentialDelayDomainEIP712Types,
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-        ],
-      },
-      primaryType: 'SequentialDelayDomain',
-      domain: {
-        name: domain.name,
-        version: domain.version,
-      },
-      message: domain,
-    }
+    return sequentialDelayDomainEIP712Types
   }
 
   // canary provides a compile-time check that all subtypes of KnownDomain have branches. If a case
@@ -153,6 +138,39 @@ export function domainEIP712(domain: KnownDomain): EIP712TypedData {
   canary(domain)
   throw new Error('Implementation error. Input of type KnownDomain was not recognized')
 }
+
+export function domainOptionsEIP712Types(domain: KnownDomain): EIP712TypesWithPrimary | undefined {
+  if (isSequentialDelayDomain(domain)) {
+    return sequentialDelayDomainOptionsEIP712Types
+  }
+
+  // canary provides a compile-time check that all subtypes of KnownDomain have branches. If a case
+  // was missed, then an error will report that domain cannot be assigned to type `never`.
+  const canary = (x: never) => x
+  canary(domain)
+  throw new Error('Implementation error. Input of type KnownDomain was not recognized')
+}
+
+/**
+ * Wraps a domain instance of a standardized type into an EIP-712 typed data structure, including
+ * the EIP-712 type signature specififed by the mapping from TypeScript types in CIP-40.
+ * https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md#mapping-typescript-to-eip-712-types
+ */
+export const domainEIP712 = (domain: KnownDomain): EIP712TypedData => ({
+  types: {
+    ...domainEIP712Types(domain).types,
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+    ],
+  },
+  primaryType: domainEIP712Types(domain).primaryType,
+  domain: {
+    name: domain.name,
+    version: domain.version,
+  },
+  message: domain,
+})
 
 /**
  * Produces the canonical 256-bit EIP-712 typed hash of the given domain.
@@ -164,6 +182,3 @@ export function domainEIP712(domain: KnownDomain): EIP712TypedData {
 export function domainHash(domain: KnownDomain): Buffer {
   return generateTypedDataHash(domainEIP712(domain))
 }
-
-//export function domainOptionsEIP712(options: KnownDomainOptions): EIP712TypedData {
-//}

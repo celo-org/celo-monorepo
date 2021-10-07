@@ -12,6 +12,11 @@ export interface EIP712Types {
   [key: string]: EIP712Parameter[]
 }
 
+export interface EIP712TypesWithPrimary {
+  types: EIP712Types
+  primaryType: string
+}
+
 export type EIP712ObjectValue =
   | string
   | number

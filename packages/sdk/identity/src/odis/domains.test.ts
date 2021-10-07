@@ -48,7 +48,7 @@ describe('domainEIP712()', () => {
       publicKey: some('0x0000000000000000000000000000000000000b0b'),
       salt: noString,
     }
-    const expectedHash = 'f14fc73e1ec49f3b010d683f6c0933fe5e0cc9f17178ff2c66b76690abc7e387'
+    const expectedHash = '1d9385faf17f40f93e6b4081a8ddfb1ea88a6a8ce36d10f9fd17236a6724c7a9'
     const typedData = domainEIP712(domain)
     // console.debug(JSON.stringify(typedData, null, 2))
     expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
