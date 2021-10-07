@@ -2,6 +2,7 @@ import {
   EIP712Object,
   EIP712ObjectValue,
   EIP712TypedData,
+  EIP712Types,
   generateTypedDataHash,
   Optional,
   optionalEIP712Type,
@@ -68,13 +69,40 @@ export type SequentialDelayDomainOptions = {
   nonce: Optional<number>
 }
 
-export function isSequentialDelayDomain(domain: Domain): domain is SequentialDelayDomain {
-  return domain.name === 'ODIS Sequential Delay Domain' && domain.version === '1'
+export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
+  domain.name === 'ODIS Sequential Delay Domain' && domain.version === '1'
+
+export const sequentialDelayDomainEIP712Types: EIP712Types = {
+  SequentialDelayDomain: [
+    { name: 'publicKey', type: 'Optional<string>' },
+    { name: 'salt', type: 'Optional<string>' },
+    { name: 'stages', type: 'SequentialDelayStage[]' },
+  ],
+  SequentialDelayStage: [
+    { name: 'batchSize', type: 'Optional<uint256>' },
+    { name: 'delay', type: 'uint256' },
+    { name: 'repetitions', type: 'Optional<uint256>' },
+    { name: 'resetTimer', type: 'Optional<bool>' },
+  ],
+  ...optionalEIP712Type('string'),
+  ...optionalEIP712Type('uint256'),
+  ...optionalEIP712Type('bool'),
+}
+
+export const sequentialDelayDomainOptionsEIP712Types: EIP712Types = {
+  SequentialDelayDomainOptions: [
+    { name: 'signature', type: 'Optional<string>' },
+    { name: 'nonce', type: 'Optional<uint256>' },
+  ],
+  ...optionalEIP712Type('string'),
+  ...optionalEIP712Type('uint256'),
 }
 
 /**
  * Union type of domains which are currently implmented and standardized for use with ODIS.
  * Domains should be added to the union type as they are implemented.
+ *
+ * @remarks Additional domain types should be added to this type union as the are standardized.
  */
 export type KnownDomain = SequentialDelayDomain
 
@@ -83,39 +111,41 @@ export function isKnownDomain(domain: Domain): domain is KnownDomain {
 }
 
 /**
+ * Parameterized union type of currently implemented and standarized domain options. If the type
+ * parameter is specified to be a concrete Domain subtype, then only its associated DomainOptions is
+ * selected and assignable to the parameterized type.
+ */
+export type KnownDomainOptions<
+  D extends KnownDomain = KnownDomain
+> = D extends SequentialDelayDomain ? SequentialDelayDomainOptions : never
+
+/**
  * Wraps a domain instance of a standardized type into an EIP-712 typed data structure, including
  * the EIP-712 type signature specififed by the mapping from TypeScript types in CIP-40.
  * https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md#mapping-typescript-to-eip-712-types
  */
 export function domainEIP712(domain: KnownDomain): EIP712TypedData {
+  // TODO(victor): When more domains are added, the logic in this if statement can be generalized to
+  // avoid repeating it for each domain. Leaving as is until then.
   if (isSequentialDelayDomain(domain)) {
     return {
       types: {
+        ...sequentialDelayDomainEIP712Types,
         EIP712Domain: [
           { name: 'name', type: 'string' },
           { name: 'version', type: 'string' },
         ],
-        SequentialDelayDomain: [
-          { name: 'publicKey', type: 'Optional<string>' },
-          { name: 'salt', type: 'Optional<string>' },
-          { name: 'stages', type: 'SequentialDelayStage[]' },
-        ],
-        SequentialDelayStage: [
-          { name: 'batchSize', type: 'Optional<uint256>' },
-          { name: 'delay', type: 'uint256' },
-          { name: 'repetitions', type: 'Optional<uint256>' },
-          { name: 'resetTimer', type: 'Optional<bool>' },
-        ],
-        ...optionalEIP712Type('string'),
-        ...optionalEIP712Type('uint256'),
-        ...optionalEIP712Type('bool'),
       },
       primaryType: 'SequentialDelayDomain',
       domain: {
-        name: 'ODIS Sequential Delay Domain',
-        version: '1',
+        name: domain.name,
+        version: domain.version,
       },
-      message: domain,
+      message: {
+        stages: domain.stages,
+        publicKey: domain.publicKey,
+        salt: domain.salt,
+      } as Omit<SequentialDelayDomain, 'name' | 'version'>,
     }
   }
 
@@ -136,3 +166,6 @@ export function domainEIP712(domain: KnownDomain): EIP712TypedData {
 export function domainHash(domain: KnownDomain): Buffer {
   return generateTypedDataHash(domainEIP712(domain))
 }
+
+//export function domainOptionsEIP712(options: KnownDomainOptions): EIP712TypedData {
+//}

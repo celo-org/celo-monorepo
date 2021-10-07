@@ -10,6 +10,8 @@ import {
   Domain,
   domainEIP712,
   DomainOptions,
+  KnownDomain,
+  KnownDomainOptions,
   SequentialDelayDomain,
   SequentialDelayDomainOptions,
 } from './domains'
@@ -20,11 +22,19 @@ export const TEST_DOMAIN_IS_EIP712: EIP712Object = ({} as unknown) as Domain
 // Compile-time check that SequentialDelayDomain can be cast to type Domain
 export const TEST_SEQUENTIAL_DELAY_DOMAIN_IS_DOMAIN: Domain = ({} as unknown) as SequentialDelayDomain
 
-// Compile-time check that SequentialDelayDomainOptions can be cast to type EIP712Object
+// Compile-time check that SequentialDelayDomainOptions can be cast to type DomainOptions.
 export const TEST_SEQUENTIAL_DELAY_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS: DomainOptions = ({} as unknown) as SequentialDelayDomainOptions
 
+// Compile-time check that KnownDomain can be cast to type Domain.
+export const TEST_KNOWN_DOMAIN_IS_DOMAIN: Domain = ({} as unknown) as KnownDomain
+
+// Compile-time check that KnownDomainOptions can be cast to type DomainOptions.
+export let TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS: DomainOptions
+TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as KnownDomainOptions
+TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as KnownDomainOptions<SequentialDelayDomain>
+
 describe('domainHash()', () => {
-  it('should generate the correct type data for SequentialDelyaDomain instance', () => {
+  it('should generate the correct type data for SequentialDelayDomain instance', () => {
     const domain: SequentialDelayDomain = {
       name: 'ODIS Sequential Delay Domain',
       version: '1',
