@@ -67,38 +67,6 @@ export type DomainRestrictedSignatureRequest<
   'options'
 >
 
-export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
-  request: DomainRestrictedSignatureRequest<D, KnownDomainOptions<D>>
-): EIP712TypedData {
-  console.log(request.blindedMessage)
-  const domainTypes = domainEIP712Types(request.domain)
-  const optionsTypes = domainOptionsEIP712Types(request.domain)
-  return {
-    types: {
-      DomainRestrictedSignatureRequest: [
-        { name: 'blindedMessage', type: 'string' },
-        { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
-        { name: 'sessionID', type: 'Optional<string>' },
-      ],
-      ...domainTypes.types,
-      ...optionsTypes?.types,
-      ...optionalEIP712Type('string'),
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-      ],
-    },
-    primaryType: 'DomainRestrictedSignatureRequest',
-    domain: {
-      name: 'ODIS Domain Restricted Signature Request',
-      version: '1',
-    },
-    message: request,
-  }
-}
-
 export type DomainQuotaStatusRequest<
   D extends Domain = Domain,
   O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
@@ -128,6 +96,97 @@ export type DisableDomainRequest<
   },
   'options'
 >
+
+export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
+  request: DomainRestrictedSignatureRequest<D, KnownDomainOptions<D>>
+): EIP712TypedData {
+  const domainTypes = domainEIP712Types(request.domain)
+  const optionsTypes = domainOptionsEIP712Types(request.domain)
+  return {
+    types: {
+      DomainRestrictedSignatureRequest: [
+        { name: 'blindedMessage', type: 'string' },
+        { name: 'domain', type: domainTypes.primaryType },
+        // Only include the `options` field in the EIP-712 type if there are options.
+        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'sessionID', type: 'Optional<string>' },
+      ],
+      ...domainTypes.types,
+      ...optionsTypes?.types,
+      ...optionalEIP712Type('string'),
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+      ],
+    },
+    primaryType: 'DomainRestrictedSignatureRequest',
+    domain: {
+      name: 'ODIS Domain Restricted Signature Request',
+      version: '1',
+    },
+    message: request,
+  }
+}
+
+export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
+  request: DomainQuotaStatusRequest<D, KnownDomainOptions<D>>
+): EIP712TypedData {
+  const domainTypes = domainEIP712Types(request.domain)
+  const optionsTypes = domainOptionsEIP712Types(request.domain)
+  return {
+    types: {
+      DomainQuotaStatusRequest: [
+        { name: 'domain', type: domainTypes.primaryType },
+        // Only include the `options` field in the EIP-712 type if there are options.
+        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'sessionID', type: 'Optional<string>' },
+      ],
+      ...domainTypes.types,
+      ...optionsTypes?.types,
+      ...optionalEIP712Type('string'),
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+      ],
+    },
+    primaryType: 'DomainQuotaStatusRequest',
+    domain: {
+      name: 'ODIS Domain Quota Status',
+      version: '1',
+    },
+    message: request,
+  }
+}
+
+export function disableDomainRequestEIP712<D extends KnownDomain>(
+  request: DisableDomainRequest<D, KnownDomainOptions<D>>
+): EIP712TypedData {
+  const domainTypes = domainEIP712Types(request.domain)
+  const optionsTypes = domainOptionsEIP712Types(request.domain)
+  return {
+    types: {
+      DisableDomainRequest: [
+        { name: 'domain', type: domainTypes.primaryType },
+        // Only include the `options` field in the EIP-712 type if there are options.
+        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'sessionID', type: 'Optional<string>' },
+      ],
+      ...domainTypes.types,
+      ...optionsTypes?.types,
+      ...optionalEIP712Type('string'),
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+      ],
+    },
+    primaryType: 'DisableDomainRequest',
+    domain: {
+      name: 'ODIS Disable Domain Request',
+      version: '1',
+    },
+    message: request,
+  }
+}
 
 // Use distributive conditional types to extract from the keys of T, keys with value type != never.
 // Eg. AssignableKeys<{ foo: string, bar: never }, 'foo'|'bar'> = 'foo'
