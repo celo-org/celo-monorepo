@@ -76,7 +76,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   bool public canVote;
 
   // Indicates if this schedule has received the initial gold for funding.
-  bool private funded = false;
+  bool internal funded = false;
 
   // Public struct housing params pertaining to releasing gold.
   ReleaseSchedule public releaseSchedule;
