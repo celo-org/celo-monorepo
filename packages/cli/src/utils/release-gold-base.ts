@@ -1,9 +1,6 @@
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { ParserOutput } from '@oclif/parser/lib/parse'
-// import { flags } from '@oclif/command'
-// import { readJsonSync } from 'fs-extra'
-// import ReleaseGoldArtifactfrom '../../ReleaseGold.json'
 import { BaseCommand } from '../base'
 import { Flags } from './command'
 
@@ -11,8 +8,6 @@ export abstract class ReleaseGoldBaseCommand extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
-    // verifyBytecode: flags.boolean({ required: false, default: false, description: 'Verify bytecode of contract'}),
-    // verifyStorage: flags.string({ required: false, description: 'Path to json where grant is specified'}),
   }
 
   private _contractAddress: string | null = null
@@ -21,7 +16,7 @@ export abstract class ReleaseGoldBaseCommand extends BaseCommand {
   get contractAddress() {
     if (!this._contractAddress) {
       const res: ParserOutput<any, any> = this.parse()
-      this._contractAddress = res.flags.contract as string
+      this._contractAddress = String(res.flags.contract)
     }
     return this._contractAddress
   }
@@ -36,22 +31,16 @@ export abstract class ReleaseGoldBaseCommand extends BaseCommand {
   async init() {
     await super.init()
     if (!this._releaseGoldWrapper) {
-      // const res: ParserOutput<any, any> = this.parse()
-      // if (res.flags.verifyBytecode as boolean) {
-      //   const runtimeBytecode = await this.web3.eth.getCode(this.contractAddress)
-      //   if (runtimeBytecode !== ReleaseGoldArtifact.deployedBytecode) {
-      //     throw new Error(
-      //       `Contract at ${this.contractAddress} does not match expected ReleaseGold bytecode`
-      //     )
-      //   }
-      // }
       this._releaseGoldWrapper = new ReleaseGoldWrapper(
         this.kit,
-        newReleaseGold(this.kit.connection.web3, this.contractAddress)
+        newReleaseGold(this.kit.connection.web3, this.contractAddress as string)
       )
-      // if (res.flags.verifyStorage) {
-      //   const grant = readJsonSync(res.flags.verifyStorage, {})
-      // }
+      // Call arbitrary release gold fn to verify `contractAddress` is a releasegold contract.
+      try {
+        await this._releaseGoldWrapper.getBeneficiary()
+      } catch (err) {
+        this.error(`Does the provided address point to release gold contract? ${err}`)
+      }
     }
   }
 }
