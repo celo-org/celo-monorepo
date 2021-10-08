@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import {
@@ -487,7 +488,7 @@ async function enableGKESystemAndWorkloadMetrics(
 async function GKEWorkloadMetricsHelmParameters(clusterConfig?: BaseClusterConfig) {
   // Abandon if not using GCP, it's GKE specific.
   if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
-    console.error('Cannote create gke-workload-metrics in a non GCP k8s cluster, skipping')
+    console.error('Cannot create gke-workload-metrics in a non GCP k8s cluster, skipping')
     process.exit(1)
   }
 
@@ -512,11 +513,25 @@ export async function installGKEWorkloadMetricsIfNotExists(clusterConfig?: BaseC
 }
 
 async function installGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
-  const k8clusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
-  const k8sclusterZone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-  const gcpProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  // Abandon if not using GCP, it's GKE specific.
+  if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
+    console.error('Cannot create gke-workload-metrics in a non GCP k8s cluster, skipping')
+    process.exit(1)
+  }
 
-  await enableGKESystemAndWorkloadMetrics(k8clusterName, k8sclusterZone, gcpProjectName)
+  let k8sClusterName, k8sClusterZone, gcpProjectName
+  if (clusterConfig) {
+    const configGCP = clusterConfig as GCPClusterConfig
+    k8sClusterName = configGCP!.clusterName
+    k8sClusterZone = configGCP!.zone
+    gcpProjectName = configGCP!.projectName
+  } else {
+    k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
+    k8sClusterZone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+    gcpProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  }
+
+  await enableGKESystemAndWorkloadMetrics(k8sClusterName, k8sClusterZone, gcpProjectName)
 
   const params = await GKEWorkloadMetricsHelmParameters(clusterConfig)
 
