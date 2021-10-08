@@ -134,6 +134,11 @@ resource "google_compute_url_map" "url_map" {
       paths   = ["/kong", "/kong/*"]
       service = module.kong.backend_service_id
     }
+
+    path_rule {
+      paths   = ["/kong", "/kong/*"]
+      service = module.kong.backend_service_id
+    }
   }
 }
 
