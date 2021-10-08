@@ -14,15 +14,16 @@ import {
 } from '../request'
 
 export class VerifiableCredentialHandler {
-  constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {}
+  constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {} // TODO(Alec): what's the point of this?
 
   async signVerifiableCredential(signingInput: string) {
+    // TODO(Alec): where is this used?
     return useKit((kit) =>
       kit.connection.sign(signingInput, getAttestationSignerAddress().toLowerCase())
     )
   }
 
-  async validateRequest(issuer: string, issuers: string[]) {
+  validateRequest(issuer: string, issuers: string[]) {
     const address = getAccountAddress()
     if (!eqAddress(address, issuer)) {
       throw new ErrorWithResponse(`Mismatching issuer, I am ${address}`, 422)
@@ -36,17 +37,15 @@ export class VerifiableCredentialHandler {
   async doCredential(account: string, issuer: string, identifier: string, logger: Logger) {
     const attestations = await useKit((kit) => kit.contracts.getAttestations())
 
-    const issuers = await attestations.getAttestationIssuers(identifier, account)
-
     // Checks if the attestation service is an authorized issuer
-    await this.validateRequest(issuer, issuers)
+    this.validateRequest(issuer, await attestations.getAttestationIssuers(identifier, account))
 
     const state = await attestations.getAttestationState(identifier, account, issuer)
 
     // Checks if the attestation is marked as completed
-    if (state.attestationState === AttestationState.Complete) {
+    if (state.attestationState !== AttestationState.Complete) {
       throw new ErrorWithResponse(`Can't issue a credential for an incomplete attestation`, 422)
-    }
+    } // TODO(Alec): Does this happen before the attestation completes?
 
     const attestation = await findAttestationByKey({
       identifier,
@@ -54,11 +53,11 @@ export class VerifiableCredentialHandler {
       account,
     })
 
-    if (attestation) {
-      return JSON.parse(await issueAttestationPhoneNumberTypeCredential(attestation, logger))
-    } else {
-      throw new Error('Unable to find attestation')
+    if (!attestation) {
+      throw new Error('Unable to find attestation in db')
     }
+
+    return JSON.parse(await issueAttestationPhoneNumberTypeCredential(attestation, logger))
   }
 }
 

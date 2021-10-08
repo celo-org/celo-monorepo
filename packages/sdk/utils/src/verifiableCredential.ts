@@ -6,7 +6,7 @@ import { completeIssueCredential, prepareIssueCredential, verifyCredential } fro
  * @param phoneNumberTypeProvider The lookup provider of the phone number type
  * @param subject Subject of the verifiable credential, usually a Valora user
  * @param issuer Address of whom is issuing this credential, usually getAttestationSignerAddress()
- * @param identifier Transaction identifier
+ * @param identifier ODIS identifier for the phone number
  */
 export const getPhoneNumberTypeJSONLD = (
   phoneNumberType: string,
@@ -19,7 +19,7 @@ export const getPhoneNumberTypeJSONLD = (
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       {
-        phoneNumberType: 'https://docs.celo.org/phone_types',
+        phoneNumberType: 'https://docs.celo.org/phone_types', // TODO(Alec): do we need to add docs for these pages?
         phoneNumberTypeProvider: 'https://docs.celo.org/phone_type_providers',
         identifier: 'https://docs.celo.org/identifier',
         PhoneNumberType: 'https://docs.celo.org/PhoneNumberType',
