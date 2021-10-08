@@ -25,17 +25,10 @@ export class VonageLookupProvider extends LookupProvider {
   constructor(apiKey: string, apiSecret: string, applicationId: string) {
     super()
     this.applicationId = applicationId
-    if (applicationId) {
-      this.client = new Vonage({
-        apiKey,
-        apiSecret,
-      })
-    } else {
-      this.client = new Vonage({
-        apiKey,
-        apiSecret,
-      })
-    }
+    this.client = new Vonage({
+      apiKey,
+      apiSecret,
+    })
   }
 
   lookup = async (number: string) =>

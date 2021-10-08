@@ -13,41 +13,33 @@ const phoneUtil = PhoneNumberUtil.getInstance()
 
 export class VonageSmsProvider extends SmsProvider {
   static fromEnv() {
+    const _unsupportedRegionCodes = readUnsupportedRegionsFromEnv(
+      'VONAGE_UNSUPPORTED_REGIONS',
+      'VONAGE_BLACKLIST',
+      'NEXMO_UNSUPPORTED_REGIONS',
+      'NEXMO_BLACKLIST'
+    )
+    const _balanceMetric = isYes(
+      fetchEnvOrDefault(
+        'VONAGE_ACCOUNT_BALANCE_METRIC',
+        fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', '')
+      )
+    )
     try {
       return new VonageSmsProvider(
         fetchEnv('VONAGE_KEY'),
         fetchEnv('VONAGE_SECRET'),
         fetchEnvOrDefault('VONAGE_APPLICATION', ''),
-        readUnsupportedRegionsFromEnv(
-          'VONAGE_UNSUPPORTED_REGIONS',
-          'VONAGE_BLACKLIST',
-          'NEXMO_UNSUPPORTED_REGIONS',
-          'NEXMO_BLACKLIST'
-        ),
-        isYes(
-          fetchEnvOrDefault(
-            'VONAGE_ACCOUNT_BALANCE_METRIC',
-            fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', '')
-          )
-        )
+        _unsupportedRegionCodes,
+        _balanceMetric
       )
     } catch (e) {
       return new VonageSmsProvider(
         fetchEnv('NEXMO_KEY'),
         fetchEnv('NEXMO_SECRET'),
         fetchEnvOrDefault('NEXMO_APPLICATION', ''),
-        readUnsupportedRegionsFromEnv(
-          'VONAGE_UNSUPPORTED_REGIONS',
-          'VONAGE_BLACKLIST',
-          'NEXMO_UNSUPPORTED_REGIONS',
-          'NEXMO_BLACKLIST'
-        ),
-        isYes(
-          fetchEnvOrDefault(
-            'VONAGE_ACCOUNT_BALANCE_METRIC',
-            fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', '')
-          )
-        )
+        _unsupportedRegionCodes,
+        _balanceMetric
       )
     }
   }

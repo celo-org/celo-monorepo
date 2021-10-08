@@ -263,7 +263,7 @@ export async function startSendSms(
       )
       attestation.credentials = `[${verifiableCredential}]`
     } catch (e) {
-      logger.error({ e: e.message })
+      logger.error({ e: e.message }, 'Error issuing phone-number-type credential')
     }
 
     if (!countryCode) {
