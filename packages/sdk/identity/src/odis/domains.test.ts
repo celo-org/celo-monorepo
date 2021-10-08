@@ -45,10 +45,10 @@ describe('domainEIP712()', () => {
         { delay: 2, resetTimer: some(false), batchSize: noNumber, repetitions: some(1) },
         { delay: 4, resetTimer: noBool, batchSize: some(2), repetitions: some(2) },
       ],
-      publicKey: some('0x0000000000000000000000000000000000000b0b'),
+      address: some('0x0000000000000000000000000000000000000b0b'),
       salt: noString,
     }
-    const expectedHash = '1d9385faf17f40f93e6b4081a8ddfb1ea88a6a8ce36d10f9fd17236a6724c7a9'
+    const expectedHash = '966edacc6cdf76b4536da958e82e360213b957508767a393ccf5c6b73db241d1'
     const typedData = domainEIP712(domain)
     // console.debug(JSON.stringify(typedData, null, 2))
     expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)

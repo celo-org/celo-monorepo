@@ -49,7 +49,7 @@ describe('domainRestrictedSignatureRequestEIP712()', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: some(10) }],
-        publicKey: some('0x0000000000000000000000000000000000000b0b'),
+        address: some('0x0000000000000000000000000000000000000b0b'),
         salt: noString,
       },
       options: {
@@ -59,7 +59,7 @@ describe('domainRestrictedSignatureRequestEIP712()', () => {
       blindedMessage: '<blinded message>',
       sessionID: noString,
     }
-    const expectedHash = 'cffd7418d08525974200e82ba7c97096aeb72bcedcf37973b362db61b32597aa'
+    const expectedHash = 'bc958fdbf83dfa7253b9ad1d9a8c5a803617f7acbed9684ff4fda669647956b5'
     const typedData = domainRestrictedSignatureRequestEIP712(request)
     // console.debug(JSON.stringify(typedData, null, 2))
     expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
@@ -73,7 +73,7 @@ describe('domainQuotaStatusRequestEIP712()', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: some(10) }],
-        publicKey: some('0x0000000000000000000000000000000000000b0b'),
+        address: some('0x0000000000000000000000000000000000000b0b'),
         salt: noString,
       },
       options: {
@@ -82,7 +82,7 @@ describe('domainQuotaStatusRequestEIP712()', () => {
       },
       sessionID: noString,
     }
-    const expectedHash = '2630b7fb6ed7699c13269aaa6305202071da5adf773870441986aed41a99bdd5'
+    const expectedHash = '7fcd55bc848bb89bb14cee5f5b08a4ae3224b26fbffb86385e2b64056862de62'
     const typedData = domainQuotaStatusRequestEIP712(request)
     //console.debug(JSON.stringify(typedData, null, 2))
     expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
@@ -96,7 +96,7 @@ describe('disableDomainRequestEIP712()', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: some(10) }],
-        publicKey: some('0x0000000000000000000000000000000000000b0b'),
+        address: some('0x0000000000000000000000000000000000000b0b'),
         salt: noString,
       },
       options: {
@@ -105,7 +105,7 @@ describe('disableDomainRequestEIP712()', () => {
       },
       sessionID: noString,
     }
-    const expectedHash = '57e7a118b00482f4e56e43d3d3e185a45a3ccae0bfb8c84a9ee0e36e4b659635'
+    const expectedHash = '150d96add3ad0c9ec4f72638fd1e452fb477c7aedde09bc3c67fa2611cbdc581'
     const typedData = disableDomainRequestEIP712(request)
     console.debug(JSON.stringify(typedData, null, 2))
     expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)

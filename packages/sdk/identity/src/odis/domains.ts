@@ -52,17 +52,17 @@ export type SequentialDelayDomain = {
   name: 'ODIS Sequential Delay Domain'
   version: '1'
   stages: SequentialDelayStage[]
-  // Optional public key of a against which signed requests must be authenticated.
-  // In the case of Cloud Backup, this will be a one-time key stored with the ciphertext.
-  publicKey: Optional<string>
+  // Optional Celo address against which signed requests must be authenticated.
+  // In the case of Cloud Backup, this will be derived from a one-time key stored with the ciphertext.
+  address: Optional<string>
   // Optional string to distinguish the output of this domain instance from
   // other SequentialDelayDomain instances
   salt: Optional<string>
 }
 
 export type SequentialDelayDomainOptions = {
-  // EIP-712 signature over the entire request by the key specified in the domain.
-  // Required if `publicKey` is defined in the domain instance. If `publicKey` is
+  // EIP-712 signature over the entire request by the address specified in the domain.
+  // Required if `address` is defined in the domain instance. If `address` is
   // not defined in the domain instance, then a signature must not be provided.
   signature: Optional<string>
   // Used to prevent replay attacks. Required if a signature is provided.
@@ -75,8 +75,8 @@ export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDel
 export const sequentialDelayDomainEIP712Types: EIP712TypesWithPrimary = {
   types: {
     SequentialDelayDomain: [
+      { name: 'address', type: 'Optional<address>' },
       { name: 'name', type: 'string' },
-      { name: 'publicKey', type: 'Optional<string>' },
       { name: 'salt', type: 'Optional<string>' },
       { name: 'stages', type: 'SequentialDelayStage[]' },
       { name: 'version', type: 'string' },
@@ -87,6 +87,7 @@ export const sequentialDelayDomainEIP712Types: EIP712TypesWithPrimary = {
       { name: 'repetitions', type: 'Optional<uint256>' },
       { name: 'resetTimer', type: 'Optional<bool>' },
     ],
+    ...optionalEIP712Type('address'),
     ...optionalEIP712Type('string'),
     ...optionalEIP712Type('uint256'),
     ...optionalEIP712Type('bool'),
