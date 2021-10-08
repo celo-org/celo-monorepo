@@ -34,7 +34,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.0",
     "node-fetch": "^2.6.1",
-    "prompts": "1.2.0",
+    "prompts": "2.4.2",
     "read-last-lines": "^1.7.2",
     "sleep-promise": "^8.0.1",
     "string-hash": "^1.1.3",
