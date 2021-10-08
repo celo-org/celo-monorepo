@@ -1,7 +1,7 @@
 # Combination of pod labels and endpoints on which to scrape.
 
 # Which k8s cluster to monitor.
-cluster: baklavastaging
+cluster: give-me-a-cluster-name
 
 # Namespace where the podmonitor will be installed.
 namespace: prometheus
