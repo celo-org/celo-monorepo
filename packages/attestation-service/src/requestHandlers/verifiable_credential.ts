@@ -14,10 +14,9 @@ import {
 } from '../request'
 
 export class VerifiableCredentialHandler {
-  constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {} // TODO(Alec): what's the point of this?
+  constructor(public readonly verifiableCredentialRequest: VerifiableCredentialRequest) {}
 
   async signVerifiableCredential(signingInput: string) {
-    // TODO(Alec): where is this used?
     return useKit((kit) =>
       kit.connection.sign(signingInput, getAttestationSignerAddress().toLowerCase())
     )
