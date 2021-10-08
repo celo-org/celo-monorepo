@@ -468,13 +468,13 @@ async function enableGKESystemAndWorkloadMetrics(
   const GKEWMEnabled = await outputIncludes(
     `gcloud beta container clusters describe ${clusterID} --zone=${zone} --project=${gcloudProjectName} --format="value(monitoringConfig.componentConfig.enableComponents)"`,
     'WORKLOADS',
-    'GKE cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} has GKE workload metrics enabled, skipping update'
+    `GKE cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} has GKE workload metrics enabled, skipping update`
   )
 
   if (!GKEWMEnabled) {
     if (isCelotoolHelmDryRun()) {
       console.info(
-        'Skipping enabling GKE workload metrics for cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} due to --helmdryrun'
+        `Skipping enabling GKE workload metrics for cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} due to --helmdryrun`
       )
     } else {
       await execCmdWithExitOnFailure(
@@ -515,7 +515,8 @@ async function installGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
   const k8clusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
   const k8sclusterZone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   const gcpProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  enableGKESystemAndWorkloadMetrics(k8clusterName, k8sclusterZone, gcpProjectName)
+
+  await enableGKESystemAndWorkloadMetrics(k8clusterName, k8sclusterZone, gcpProjectName)
 
   const params = await GKEWorkloadMetricsHelmParameters(clusterConfig)
 
