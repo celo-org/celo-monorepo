@@ -68,7 +68,7 @@ export const issueAttestationPhoneNumberTypeCredential = async (
     const attestationSignerAddress = getAttestationSignerAddress().toLowerCase()
 
     const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
-      attestation.phoneNumberType, // TODO(Alec): does setting this value in lookupPhoneNumber actually work?
+      attestation.phoneNumberType,
       attestation.account.toLowerCase(),
       attestationSignerAddress,
       attestation.identifier,
@@ -120,7 +120,7 @@ async function lookupPhoneNumber(
     logger.info(
       {
         provider: provider.type,
-        attempt: attestation.attempt, // TODO(Alec): Shouldn't we increment attempt here?
+        attempt: attestation.attempt,
         error: errorMsg,
       },
       'Phone number lookup failed'

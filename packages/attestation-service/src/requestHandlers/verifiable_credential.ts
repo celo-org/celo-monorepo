@@ -44,7 +44,7 @@ export class VerifiableCredentialHandler {
     // Checks if the attestation is marked as completed
     if (state.attestationState !== AttestationState.Complete) {
       throw new ErrorWithResponse(`Can't issue a credential for an incomplete attestation`, 422)
-    } // TODO(Alec): Does this happen before the attestation completes?
+    }
 
     const attestation = await findAttestationByKey({
       identifier,
