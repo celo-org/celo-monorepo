@@ -49,63 +49,61 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
     const accounts = await this.kit.contracts.getAccounts()
     const isAccount = await accounts.isAccount(this.contractAddress)
     if (isAccount) {
+      // rotate vote signers
+      const voteSigner = await accounts.getVoteSigner(this.contractAddress)
+      if (voteSigner !== this.contractAddress) {
+        const keys = await generateKeys(await generateMnemonic())
+        const pop = await accounts.generateProofOfKeyPossessionLocally(
+          this.contractAddress,
+          keys.address,
+          keys.privateKey
+        )
+        await displaySendTx(
+          'accounts: rotateVoteSigner',
+          await this.releaseGoldWrapper.authorizeVoteSigner(keys.address, pop),
+          undefined,
+          'VoteSignerAuthorized'
+        )
+      }
+
       const election = await this.kit.contracts.getElection()
       const electionVotes = await election.getTotalVotesByAccount(this.contractAddress)
       const isElectionVoting = electionVotes.isGreaterThan(0)
 
+      // handle election votes
+      if (isElectionVoting) {
+        const txos = await this.releaseGoldWrapper.revokeAllVotesForAllGroups()
+        for (const txo of txos) {
+          await displaySendTx('election: revokeVotes', txo, undefined, [
+            'ValidatorGroupPendingVoteRevoked',
+            'ValidatorGroupActiveVoteRevoked',
+          ])
+        }
+      }
+
       const governance = await this.kit.contracts.getGovernance()
       const isGovernanceVoting = await governance.isVoting(this.contractAddress)
 
-      if (isElectionVoting || isGovernanceVoting) {
-        // rotate vote signers
-        const voteSigner = await accounts.getVoteSigner(this.contractAddress)
-        if (voteSigner !== this.contractAddress) {
-          const keys = await generateKeys(await generateMnemonic())
-          const pop = await accounts.generateProofOfKeyPossessionLocally(
-            this.contractAddress,
-            keys.address,
-            keys.privateKey
-          )
+      // handle governance votes
+      if (isGovernanceVoting) {
+        const isUpvoting = await governance.isUpvoting(this.contractAddress)
+        if (isUpvoting) {
           await displaySendTx(
-            'accounts: rotateVoteSigner',
-            await this.releaseGoldWrapper.authorizeVoteSigner(keys.address, pop),
+            'governance: revokeUpvote',
+            await governance.revokeUpvote(this.contractAddress),
             undefined,
-            'VoteSignerAuthorized'
+            'ProposalUpvoteRevoked'
           )
         }
 
-        // handle governance votes
-        if (isGovernanceVoting) {
-          const isUpvoting = await governance.isUpvoting(this.contractAddress)
-          if (isUpvoting) {
-            await displaySendTx(
-              'governance: revokeUpvote',
-              await governance.revokeUpvote(this.contractAddress),
-              undefined,
-              'ProposalUpvoteRevoked'
-            )
-          }
-
-          const isVotingReferendum = await governance.isVotingReferendum(this.contractAddress)
-          if (isVotingReferendum) {
-            await displaySendTx(
-              'governance: revokeVotes',
-              governance.revokeVotes(),
-              undefined,
-              'ProposalVoteRevoked'
-            )
-          }
-        }
-
-        // handle election votes
-        if (isElectionVoting) {
-          const txos = await this.releaseGoldWrapper.revokeAllVotesForAllGroups()
-          for (const txo of txos) {
-            await displaySendTx('election: revokeVotes', txo, undefined, [
-              'ValidatorGroupPendingVoteRevoked',
-              'ValidatorGroupActiveVoteRevoked',
-            ])
-          }
+        const isVotingReferendum = await governance.isVotingReferendum(this.contractAddress)
+        if (isVotingReferendum) {
+          await displaySendTx(
+            'governance: revokeVotes',
+            governance.revokeVotes(),
+            undefined,
+            'ProposalVoteRevoked'
+          )
         }
       }
 
