@@ -176,8 +176,8 @@ export const domainEIP712 = (domain: KnownDomain): EIP712TypedData => ({
 /**
  * Produces the canonical 256-bit EIP-712 typed hash of the given domain.
  *
- * @remarks Note that this is a simple wraper to get the EIP-712 hash after encoding it to an
- * EIP-712 typed data format. If a signature over the domain is needed, enocide to EIP-712 format
+ * @remarks Note that this is a simple wrapper to get the EIP-712 hash after encoding it to an
+ * EIP-712 typed data format. If a signature over the domain is needed, encode to EIP-712 format
  * and pass that into a signTypedData function.
  */
 export function domainHash(domain: KnownDomain): Buffer {
