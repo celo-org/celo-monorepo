@@ -469,7 +469,7 @@ async function enableGKESystemAndWorkloadMetrics(
   const GKEWMEnabled = await outputIncludes(
     `gcloud beta container clusters describe ${clusterID} --zone=${zone} --project=${gcloudProjectName} --format="value(monitoringConfig.componentConfig.enableComponents)"`,
     'WORKLOADS',
-    `GKE cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} has GKE workload metrics enabled, skipping update`
+    `GKE cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} has GKE workload metrics enabled, skipping gcloud beta container clusters update`
   )
 
   if (!GKEWMEnabled) {
@@ -533,14 +533,12 @@ async function installGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
 
   await enableGKESystemAndWorkloadMetrics(k8sClusterName, k8sClusterZone, gcpProjectName)
 
-  const params = await GKEWorkloadMetricsHelmParameters(clusterConfig)
-
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(
+  return installGenericHelmChart(
     kubeNamespace,
     GKEWorkloadMetricsReleaseName,
     GKEWorkloadMetricsHelmChartPath,
-    params
+    await GKEWorkloadMetricsHelmParameters(clusterConfig)
   )
 }
 
