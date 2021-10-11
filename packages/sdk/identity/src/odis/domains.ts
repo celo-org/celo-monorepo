@@ -1,11 +1,11 @@
 import {
   EIP712Object,
   EIP712ObjectValue,
+  EIP712Optional,
+  eip712OptionalType,
   EIP712TypedData,
   EIP712TypesWithPrimary,
   generateTypedDataHash,
-  Optional,
-  optionalEIP712Type,
 } from '@celo/utils/lib/sign-typed-data-utils'
 
 // Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
@@ -39,13 +39,13 @@ export type SequentialDelayStage = {
   delay: number
   // Whether the timer should be reset between attempts during this stage.
   // Defaults to true.
-  resetTimer: Optional<boolean>
+  resetTimer: EIP712Optional<boolean>
   // The number of continuous attempts a user gets before the next delay
   // in each repetition of this stage. Defaults to 1.
-  batchSize: Optional<number>
+  batchSize: EIP712Optional<number>
   // The number of times this stage repeats before continuing to the next stage
   // in the RateLimit array. Defaults to 1.
-  repetitions: Optional<number>
+  repetitions: EIP712Optional<number>
 }
 
 export type SequentialDelayDomain = {
@@ -54,19 +54,19 @@ export type SequentialDelayDomain = {
   stages: SequentialDelayStage[]
   // Optional Celo address against which signed requests must be authenticated.
   // In the case of Cloud Backup, this will be derived from a one-time key stored with the ciphertext.
-  address: Optional<string>
+  address: EIP712Optional<string>
   // Optional string to distinguish the output of this domain instance from
   // other SequentialDelayDomain instances
-  salt: Optional<string>
+  salt: EIP712Optional<string>
 }
 
 export type SequentialDelayDomainOptions = {
   // EIP-712 signature over the entire request by the address specified in the domain.
   // Required if `address` is defined in the domain instance. If `address` is
   // not defined in the domain instance, then a signature must not be provided.
-  signature: Optional<string>
+  signature: EIP712Optional<string>
   // Used to prevent replay attacks. Required if a signature is provided.
-  nonce: Optional<number>
+  nonce: EIP712Optional<number>
 }
 
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
@@ -87,10 +87,10 @@ export const sequentialDelayDomainEIP712Types: EIP712TypesWithPrimary = {
       { name: 'repetitions', type: 'Optional<uint256>' },
       { name: 'resetTimer', type: 'Optional<bool>' },
     ],
-    ...optionalEIP712Type('address'),
-    ...optionalEIP712Type('string'),
-    ...optionalEIP712Type('uint256'),
-    ...optionalEIP712Type('bool'),
+    ...eip712OptionalType('address'),
+    ...eip712OptionalType('string'),
+    ...eip712OptionalType('uint256'),
+    ...eip712OptionalType('bool'),
   },
   primaryType: 'SequentialDelayDomain',
 }
@@ -101,8 +101,8 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
       { name: 'nonce', type: 'Optional<uint256>' },
       { name: 'signature', type: 'Optional<string>' },
     ],
-    ...optionalEIP712Type('string'),
-    ...optionalEIP712Type('uint256'),
+    ...eip712OptionalType('string'),
+    ...eip712OptionalType('uint256'),
   },
   primaryType: 'SequentialDelayDomainOptions',
 }

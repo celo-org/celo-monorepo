@@ -7,9 +7,9 @@ import {
   KnownDomainOptions,
 } from '@celo/identity/lib/odis/domains'
 import {
+  EIP712Optional,
+  eip712OptionalType,
   EIP712TypedData,
-  Optional,
-  optionalEIP712Type,
 } from '@celo/utils/lib/sign-typed-data-utils'
 
 export interface GetBlindedMessageSigRequest {
@@ -62,7 +62,7 @@ export type DomainRestrictedSignatureRequest<
     /** Query message. A blinded elliptic curve point encoded in base64. */
     blindedMessage: string
     /** Client-specified session ID. */
-    sessionID: Optional<string>
+    sessionID: EIP712Optional<string>
   },
   'options'
 >
@@ -77,7 +77,7 @@ export type DomainQuotaStatusRequest<
     /** Domain-specific options. */
     options: O
     /** Client-specified session ID. */
-    sessionID: Optional<string>
+    sessionID: EIP712Optional<string>
   },
   'options'
 >
@@ -92,7 +92,7 @@ export type DisableDomainRequest<
     /** Domain-specific options. */
     options: O
     /** Client-specified session ID. */
-    sessionID: Optional<string>
+    sessionID: EIP712Optional<string>
   },
   'options'
 >
@@ -113,7 +113,7 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
       ],
       ...domainTypes.types,
       ...optionsTypes?.types,
-      ...optionalEIP712Type('string'),
+      ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
@@ -143,7 +143,7 @@ export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
       ],
       ...domainTypes.types,
       ...optionsTypes?.types,
-      ...optionalEIP712Type('string'),
+      ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
@@ -173,7 +173,7 @@ export function disableDomainRequestEIP712<D extends KnownDomain>(
       ],
       ...domainTypes.types,
       ...optionsTypes?.types,
-      ...optionalEIP712Type('string'),
+      ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },

@@ -1,4 +1,4 @@
-import { noBool, noNumber, noString, some } from '@celo/utils/lib/sign-typed-data-utils'
+import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { checkSequentialDelay, SequentialDelayResult } from '../../src/domains/sequential-delay'
 import { SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
 
@@ -56,7 +56,7 @@ describe('Sequential Delay Test Suite', () => {
       const domain: SequentialDelayDomain = {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
-        stages: [{ delay: t, batchSize: some(2), resetTimer: noBool, repetitions: noNumber }],
+        stages: [{ delay: t, batchSize: defined(2), resetTimer: noBool, repetitions: noNumber }],
         publicKey: noString,
         salt: noString,
       }
@@ -95,10 +95,10 @@ describe('Sequential Delay Test Suite', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [
-          { delay: t, resetTimer: some(false), batchSize: noNumber, repetitions: noNumber },
-          { delay: 1, resetTimer: some(false), batchSize: noNumber, repetitions: noNumber },
-          { delay: 1, resetTimer: some(false), batchSize: noNumber, repetitions: noNumber },
-          { delay: 1, resetTimer: some(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: t, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
         ],
         publicKey: noString,
         salt: noString,
@@ -193,11 +193,11 @@ describe('Sequential Delay Test Suite', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [
-          { delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: noNumber },
-          { delay: 1, resetTimer: some(false), batchSize: noNumber, repetitions: noNumber },
-          { delay: 1, resetTimer: some(true), batchSize: noNumber, repetitions: noNumber },
-          { delay: 2, resetTimer: some(false), batchSize: noNumber, repetitions: some(1) },
-          { delay: 4, resetTimer: noBool, batchSize: some(2), repetitions: some(2) },
+          { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(true), batchSize: noNumber, repetitions: noNumber },
+          { delay: 2, resetTimer: defined(false), batchSize: noNumber, repetitions: defined(1) },
+          { delay: 4, resetTimer: noBool, batchSize: defined(2), repetitions: defined(2) },
         ],
         publicKey: noString,
         salt: noString,

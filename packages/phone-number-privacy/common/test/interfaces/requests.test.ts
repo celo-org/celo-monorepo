@@ -1,9 +1,9 @@
 import {
+  defined,
   EIP712Object,
   generateTypedDataHash,
   noBool,
   noString,
-  some,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { Domain, DomainOptions, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
 import {
@@ -48,13 +48,13 @@ describe('domainRestrictedSignatureRequestEIP712()', () => {
       domain: {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: some(10) }],
-        address: some('0x0000000000000000000000000000000000000b0b'),
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined('0x0000000000000000000000000000000000000b0b'),
         salt: noString,
       },
       options: {
-        signature: some('<signature>'),
-        nonce: some(1),
+        signature: defined('<signature>'),
+        nonce: defined(1),
       },
       blindedMessage: '<blinded message>',
       sessionID: noString,
@@ -72,13 +72,13 @@ describe('domainQuotaStatusRequestEIP712()', () => {
       domain: {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: some(10) }],
-        address: some('0x0000000000000000000000000000000000000b0b'),
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined('0x0000000000000000000000000000000000000b0b'),
         salt: noString,
       },
       options: {
-        signature: some('<signature>'),
-        nonce: some(2),
+        signature: defined('<signature>'),
+        nonce: defined(2),
       },
       sessionID: noString,
     }
@@ -95,13 +95,13 @@ describe('disableDomainRequestEIP712()', () => {
       domain: {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: some(2), repetitions: some(10) }],
-        address: some('0x0000000000000000000000000000000000000b0b'),
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined('0x0000000000000000000000000000000000000b0b'),
         salt: noString,
       },
       options: {
-        signature: some('<signature>'),
-        nonce: some(2),
+        signature: defined('<signature>'),
+        nonce: defined(2),
       },
       sessionID: noString,
     }
