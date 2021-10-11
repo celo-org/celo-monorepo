@@ -26,7 +26,7 @@ describe('Sequential Delay Test Suite', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: t, resetTimer: noBool, batchSize: noNumber, repetitions: noNumber }],
-        publicKey: noString,
+        address: noString,
         salt: noString,
       }
 
@@ -57,7 +57,7 @@ describe('Sequential Delay Test Suite', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: t, batchSize: defined(2), resetTimer: noBool, repetitions: noNumber }],
-        publicKey: noString,
+        address: noString,
         salt: noString,
       }
 
@@ -100,7 +100,7 @@ describe('Sequential Delay Test Suite', () => {
           { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
           { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
         ],
-        publicKey: noString,
+        address: noString,
         salt: noString,
       }
 
@@ -155,7 +155,7 @@ describe('Sequential Delay Test Suite', () => {
           { delay: t, resetTimer: noBool, batchSize: noNumber, repetitions: noNumber },
           { delay: 1, resetTimer: noBool, batchSize: noNumber, repetitions: noNumber },
         ],
-        publicKey: noString,
+        address: noString,
         salt: noString,
       }
 
@@ -199,7 +199,7 @@ describe('Sequential Delay Test Suite', () => {
           { delay: 2, resetTimer: defined(false), batchSize: noNumber, repetitions: defined(1) },
           { delay: 4, resetTimer: noBool, batchSize: defined(2), repetitions: defined(2) },
         ],
-        publicKey: noString,
+        address: noString,
         salt: noString,
       }
 
