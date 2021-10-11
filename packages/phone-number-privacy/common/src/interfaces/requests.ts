@@ -18,7 +18,7 @@ export interface GetBlindedMessageSigRequest {
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
-  hashedPhoneNumber?: string // on-chain identifier
+  hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
   sessionID?: string
 }

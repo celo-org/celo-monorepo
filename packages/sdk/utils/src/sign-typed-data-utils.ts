@@ -112,7 +112,7 @@ export function generateTypedDataHash(typedData: EIP712TypedData): Buffer {
 }
 
 /**
- * Given the primary type, and dictionary if types, this function assembles a sorted list
+ * Given the primary type, and dictionary of types, this function assembles a sorted list
  * representing the transitive dependency closure of the primary type. (Inclusive of the primary
  * type itself.)
  */
