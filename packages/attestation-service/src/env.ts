@@ -13,7 +13,7 @@ export function fetchEnv(name: string): string {
     console.error(`ENV var '${name}' was not defined`)
     throw new Error(`ENV var '${name}' was not defined`)
   }
-  return env as string
+  return env
 }
 
 export function fetchEnvOrDefault(name: string, defaultValue: string): string {

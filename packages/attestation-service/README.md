@@ -12,7 +12,7 @@ You can use the following environment variables to configure the attestation ser
 - `ATTESTATION_SIGNER_ADDRESS` - The address of the key with which attestations should be signed.
 - `SMS_PROVIDERS` - A comma-separated list of providers you want to configure, we currently support:
 
-`vonage`
+`vonage` (previously `nexmo`)
 
 - `VONAGE_KEY` - The API key to the Vonage API
 - `VONAGE_SECRET` - The API secret to the Vonage API
