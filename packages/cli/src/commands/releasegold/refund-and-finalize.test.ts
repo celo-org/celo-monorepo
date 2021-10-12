@@ -16,7 +16,8 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   beforeEach(async () => {
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
-      web3
+      web3,
+      { index: 1 } // revocable = true
     )
     kit = newKitFromWeb3(web3)
   })
