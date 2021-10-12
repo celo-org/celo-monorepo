@@ -78,11 +78,15 @@ export function signedMessageToPublicKey(message: string, v: number, r: string, 
 }
 
 export function signMessage(message: string, privateKey: string, address: string) {
-  return signMessageWithoutPrefix(hashMessageWithPrefix(message), privateKey, address)
+  return signMessageWithoutPrefix(
+    hashMessageWithPrefix(message),
+    ensureLeading0x(privateKey),
+    address
+  )
 }
 
 export function signMessageWithoutPrefix(messageHash: string, privateKey: string, address: string) {
-  const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(ensureLeading0x(privateKey)))
+  const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(privateKey))
   const derivedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
   if (derivedAddress.toLowerCase() !== address.toLowerCase()) {
     throw new Error('Provided private key does not match address of intended signer')

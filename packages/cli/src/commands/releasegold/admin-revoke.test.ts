@@ -11,8 +11,8 @@ import {
   timeTravel,
 } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
-// import ElectionVote from '../election/vote'
 import Approve from '../governance/approve'
+import GovernanceUpvote from '../governance/upvote'
 import GovernanceVote from '../governance/vote'
 import AdminRevoke from './admin-revoke'
 import Authorize from './authorize'
@@ -35,8 +35,6 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     )
     kit = newKitFromWeb3(web3)
     releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
-    const amt = await releaseGoldWrapper.getCurrentReleasedTotalAmount()
-    console.log('released', amt)
     accounts = await web3.eth.getAccounts()
   })
 
@@ -49,8 +47,27 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     expect(revokedContract).toBe(contractAddress)
   })
 
+  test('will rescue all cUSD balance', async () => {
+    const stableToken = await kit.contracts.getStableToken()
+    await stableToken.transfer(contractAddress, 100).send({
+      from: accounts[0],
+    })
+    await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+    const balance = await stableToken.balanceOf(contractAddress)
+    expect(balance.isZero()).toBeTruthy()
+  })
+
+  test('will refund and finalize', async () => {
+    await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+    const destroyedContract = await getContractFromEvent(
+      'ReleaseGoldInstanceDestroyed(address,address)',
+      web3
+    )
+    expect(destroyedContract).toBe(contractAddress)
+  })
+
   describe('#when account exists with locked gold', () => {
-    const value = '1'
+    const value = '10'
 
     beforeEach(async () => {
       await CreateAccount.run(['--contract', contractAddress])
@@ -99,7 +116,6 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
       })
 
       describe('#when account has voted', () => {
-        const proposalID = '1'
         let governance: GovernanceWrapper
 
         beforeEach(async () => {
@@ -111,26 +127,42 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
             .propose([], 'URL')
             .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
           await timeTravel(expConfig.dequeueFrequency, web3)
-          await Approve.run(['--from', accounts[0], '--proposalID', proposalID, '--useMultiSig'])
-          await GovernanceVote.run([
-            '--from',
-            voteSigner,
-            '--proposalID',
-            proposalID,
-            '--value',
-            'Yes',
-          ])
+          await Approve.run(['--from', accounts[0], '--proposalID', '1', '--useMultiSig'])
+          await timeTravel(expConfig.approvalStageDuration, web3)
+          await GovernanceVote.run(['--from', voteSigner, '--proposalID', '1', '--value', 'Yes'])
+          await governance
+            .propose([], 'URL')
+            .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
+          await GovernanceUpvote.run(['--from', voteSigner, '--proposalID', '2'])
 
-          // const election = await kit.contracts.getElection()
-          // election.
-          // await ElectionVote.run(['--from', voteSigner, '--value', value, '--for', ])
+          // const validators = await kit.contracts.getValidators()
+          // const groups = await validators.getRegisteredValidatorGroupsAddresses()
+          // await ElectionVote.run([
+          //   '--from',
+          //   voteSigner,
+          //   '--for',
+          //   groups[0],
+          //   '--value',
+          //   value
+          // ])
         })
 
-        test('will revoke governance votes', async () => {
+        test('will revoke governance votes and upvotes', async () => {
+          const isVotingBefore = await governance.isVoting(contractAddress)
+          expect(isVotingBefore).toBeTruthy()
           await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
-          const isVoting = await governance.isVoting(contractAddress)
-          expect(isVoting).toBeFalsy()
+          const isVotingAfter = await governance.isVoting(contractAddress)
+          expect(isVotingAfter).toBeFalsy()
         })
+
+        // test.only('will revoke election votes', async () => {
+        //   const election = await kit.contracts.getElection()
+        //   const votesBefore = await election.getTotalVotesByAccount(contractAddress)
+        //   expect(votesBefore.isZero).toBeFalsy()
+        //   await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+        //   const votesAfter = await election.getTotalVotesByAccount(contractAddress)
+        //   expect(votesAfter.isZero()).toBeTruthy()
+        // })
       })
     })
   })

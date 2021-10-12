@@ -1,4 +1,3 @@
-import { generateKeys, generateMnemonic } from '@celo/utils/lib/account'
 import { flags } from '@oclif/command'
 import prompts from 'prompts'
 import { displaySendTx, printValueMap } from '../../utils/cli'
@@ -50,17 +49,15 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
     const isAccount = await accounts.isAccount(this.contractAddress)
     if (isAccount) {
       // rotate vote signers
-      const voteSigner = await accounts.getVoteSigner(this.contractAddress)
+      let voteSigner = await accounts.getVoteSigner(this.contractAddress)
       if (voteSigner !== this.contractAddress) {
-        const keys = await generateKeys(await generateMnemonic())
-        const pop = await accounts.generateProofOfKeyPossessionLocally(
-          this.contractAddress,
-          keys.address,
-          keys.privateKey
-        )
+        const password = 'bad_password'
+        voteSigner = await this.web3.eth.personal.newAccount(password)
+        await this.web3.eth.personal.unlockAccount(voteSigner, password, 1000)
+        const pop = await accounts.generateProofOfKeyPossession(this.contractAddress, voteSigner)
         await displaySendTx(
           'accounts: rotateVoteSigner',
-          await this.releaseGoldWrapper.authorizeVoteSigner(keys.address, pop),
+          await this.releaseGoldWrapper.authorizeVoteSigner(voteSigner, pop),
           undefined,
           'VoteSignerAuthorized'
         )
@@ -74,7 +71,7 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
       if (isElectionVoting) {
         const txos = await this.releaseGoldWrapper.revokeAllVotesForAllGroups()
         for (const txo of txos) {
-          await displaySendTx('election: revokeVotes', txo, undefined, [
+          await displaySendTx('election: revokeVotes', txo, { from: voteSigner }, [
             'ValidatorGroupPendingVoteRevoked',
             'ValidatorGroupActiveVoteRevoked',
           ])
@@ -91,7 +88,7 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
           await displaySendTx(
             'governance: revokeUpvote',
             await governance.revokeUpvote(this.contractAddress),
-            undefined,
+            { from: voteSigner },
             'ProposalUpvoteRevoked'
           )
         }
@@ -101,7 +98,7 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
           await displaySendTx(
             'governance: revokeVotes',
             governance.revokeVotes(),
-            undefined,
+            { from: voteSigner },
             'ProposalVoteRevoked'
           )
         }
