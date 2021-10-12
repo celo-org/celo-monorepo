@@ -30,8 +30,8 @@
     "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.2.5",
-    "@celo/identity": "1.2.5",
+    "@celo/contractkit": "1.2.0",
+    "@celo/identity": "1.2.0",
     "@celo/phone-number-privacy-common": "1.0.34",
     "@celo/utils": "1.0.2",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
