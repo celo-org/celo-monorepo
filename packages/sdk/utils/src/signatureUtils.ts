@@ -1,6 +1,6 @@
 import { NativeSigner, serializeSignature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
-import { eqAddress, privateKeyToAddress } from './address'
+import { ensureLeading0x, eqAddress, privateKeyToAddress } from './address'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 // Exports moved to @celo/base, forwarding them
@@ -82,7 +82,7 @@ export function signMessage(message: string, privateKey: string, address: string
 }
 
 export function signMessageWithoutPrefix(messageHash: string, privateKey: string, address: string) {
-  const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(privateKey))
+  const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(ensureLeading0x(privateKey)))
   const derivedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
   if (derivedAddress.toLowerCase() !== address.toLowerCase()) {
     throw new Error('Provided private key does not match address of intended signer')
