@@ -58,7 +58,7 @@ export const getBlindedMessageSig = functions
   .runWith({
     // Keep instances warm for this latency-critical function
     // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
+    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 5 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
     meterResponse(handleGetBlindedMessageSig, req, res, '/getBlindedMessageSig')
@@ -70,7 +70,7 @@ export const getContactMatches = functions
   .runWith({
     // Keep instances warm for this latency-critical function
     // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
+    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 5 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
     meterResponse(handleGetContactMatches, req, res, '/getContactMatches')
