@@ -19,7 +19,7 @@ export const getPhoneNumberTypeJSONLD = (
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
       {
-        phoneNumberType: 'https://docs.celo.org/phone_types', // TODO(Alec): do we need to add docs for these pages?
+        phoneNumberType: 'https://docs.celo.org/phone_types',
         phoneNumberTypeProvider: 'https://docs.celo.org/phone_type_providers',
         identifier: 'https://docs.celo.org/identifier',
         PhoneNumberType: 'https://docs.celo.org/PhoneNumberType',
