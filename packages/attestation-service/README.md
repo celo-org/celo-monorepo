@@ -12,11 +12,11 @@ You can use the following environment variables to configure the attestation ser
 - `ATTESTATION_SIGNER_ADDRESS` - The address of the key with which attestations should be signed.
 - `SMS_PROVIDERS` - A comma-separated list of providers you want to configure, we currently support:
 
-`nexmo`
+`vonage` (previously `nexmo`)
 
-- `NEXMO_KEY` - The API key to the Nexmo API
-- `NEXMO_SECRET` - The API secret to the Nexmo API
-- `NEXMO_BLACKLIST` - A comma-sperated list of country codes you do not want to serve
+- `VONAGE_KEY` - The API key to the Vonage API
+- `VONAGE_SECRET` - The API secret to the Vonage API
+- `VONAGE_BLACKLIST` - A comma-sperated list of country codes you do not want to serve
 
 `twilio`
 
@@ -55,6 +55,8 @@ Here is a list of the error codes and messages returned by the Attestation Servi
 
 - `Mismatching issuer, I am ${address}` - The attestation request references an issuer address that does not match that of the AS that actually received the request.
 - `NO_INCOMPLETE_ATTESTATION_FOUND_ERROR / 'No incomplete attestation found'` - The Attestations contract has no record that this AS was randomly assigned as an issuer for the given account/identifier pair.
+- `I am not an authorized issuer for this account` - The AS is not authorized to issue a PhoneNumberType VerifiableCredential for this user. This means the Attestations contract has no record that this AS was randomly assigned as an issuer for the given account/identifier pair.
+- `Can't issue a credential for an incomplete attestation` - The user has requested a PhoneNumberType VerifiableCredential from an issuer with whom the user has not completed a phone number ownership attestation.
 - `ATTESTATION_ERROR / 'Valid attestation could not be provided'` - A call to validateAttestationCode in the Attestations contract has failed. This method checks that (1) there is a non-expired incomplete attestation assigned to the issuer whose signature constitutes the given attestation code.
 - `'Invalid securityCodePrefix'` - A security code prefix with an incorrect length was provided in the attestation request.
 - `'Invalid smsRetrieverAppSig'` - The provided smsRetrieverAppSig does not match the regex `'^[\\w+]{5,12}$'`

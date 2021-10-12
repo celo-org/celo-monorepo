@@ -61,32 +61,29 @@ export function configuredLookupProviders() {
 
 export const issueAttestationPhoneNumberTypeCredential = async (
   attestation: AttestationModel,
-  logger: any
+  logger: Logger
 ) => {
   try {
     const phoneNumberTypeProvider = await lookupPhoneNumber(attestation, logger)
+    const attestationSignerAddress = getAttestationSignerAddress().toLowerCase()
 
     const credential = VerifiableCredentialUtils.getPhoneNumberTypeJSONLD(
       attestation.phoneNumberType,
       attestation.account.toLowerCase(),
-      getAttestationSignerAddress().toLowerCase(),
+      attestationSignerAddress,
       attestation.identifier,
       phoneNumberTypeProvider
     )
 
-    const proofOptions = VerifiableCredentialUtils.getProofOptions(
-      getAttestationSignerAddress().toLowerCase()
-    )
+    const proofOptions = VerifiableCredentialUtils.getProofOptions(attestationSignerAddress)
+
     return await VerifiableCredentialUtils.issueCredential(
       credential,
       proofOptions,
       async (signInput) =>
         useKit(async (kit) =>
           SignatureUtils.serializeSignature(
-            await kit.connection.signTypedData(
-              getAttestationSignerAddress().toLowerCase(),
-              signInput
-            )
+            await kit.connection.signTypedData(attestationSignerAddress, signInput)
           )
         )
     )
@@ -106,7 +103,7 @@ async function lookupPhoneNumber(
     logger.info(
       {
         provider: provider.type,
-        phoneNumber: obfuscateNumber(attestation.phoneNumber),
+        obfuscatedPhoneNumber: obfuscateNumber(attestation.phoneNumber),
       },
       'Lookup phoneNumber'
     )

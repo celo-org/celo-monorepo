@@ -29,6 +29,7 @@ export class VonageLookupProvider extends LookupProvider {
       this.client = new Vonage({
         apiKey,
         apiSecret,
+        applicationId,
       })
     } else {
       this.client = new Vonage({

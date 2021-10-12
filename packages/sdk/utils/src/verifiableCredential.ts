@@ -6,7 +6,7 @@ import { completeIssueCredential, prepareIssueCredential, verifyCredential } fro
  * @param phoneNumberTypeProvider The lookup provider of the phone number type
  * @param subject Subject of the verifiable credential, usually a Valora user
  * @param issuer Address of whom is issuing this credential, usually getAttestationSignerAddress()
- * @param identifier Transaction identifier
+ * @param identifier ODIS identifier for the phone number
  */
 export const getPhoneNumberTypeJSONLD = (
   phoneNumberType: string,
