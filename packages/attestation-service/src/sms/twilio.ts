@@ -3,7 +3,8 @@ import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
 import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { rootLogger } from '../logger'
+import { AttestationStatus, SmsAttestation } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
 
@@ -142,7 +143,7 @@ export class TwilioSmsProvider extends SmsProvider {
     }
   }
 
-  async sendSms(attestation: AttestationModel) {
+  async sendSms(attestation: SmsAttestation) {
     // Prefer Verify API if Verify Service is present and not disabled for region
     if (
       this.verifyServiceSid &&
