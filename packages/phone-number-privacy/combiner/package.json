@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",
-    "@types/opossum": "^4.1.2",
     "@types/uuid": "^7.0.3",
     "dotenv": "^8.2.0",
     "firebase-functions-test": "^0.2.0"
