@@ -17,7 +17,7 @@ export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
   tx?: Omit<CeloTx, 'data'>,
-  displayEventName?: string
+  displayEventName?: string | string[]
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
   try {
@@ -33,7 +33,11 @@ export async function displaySendTx<A>(
 
     if (displayEventName && txReceipt.events) {
       Object.entries(txReceipt.events)
-        .filter(([eventName]) => eventName === displayEventName)
+        .filter(
+          ([eventName]) =>
+            (typeof displayEventName === 'string' && eventName === displayEventName) ||
+            displayEventName.includes(eventName)
+        )
         .forEach(([eventName, log]) => {
           const { params } = parseDecodedParams((log as EventLog).returnValues)
           console.log(chalk.magenta.bold(`${eventName}:`))
