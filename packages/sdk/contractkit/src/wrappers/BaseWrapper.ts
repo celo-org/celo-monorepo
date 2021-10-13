@@ -10,8 +10,9 @@ import {
 } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import moment from 'moment'
+import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
 import { ContractKit } from '../kit'
+import { ContractVersion } from '../versions'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
@@ -24,11 +25,30 @@ type EventsEnum<T extends Contract> = {
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
+  protected _version?: T['methods'] extends ICeloVersionedContract['methods']
+    ? ContractVersion
+    : never
+
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
 
   /** Contract address */
   get address(): string {
     return this.contract.options.address
+  }
+
+  async version() {
+    if (!this._version) {
+      const raw = await this.contract.methods.getVersionNumber().call()
+      // @ts-ignore conditional type
+      this._version = ContractVersion.fromRaw(raw)
+    }
+    return this._version!
+  }
+
+  protected async onlyVersionOrGreater(version: ContractVersion) {
+    if (!(await this.version()).isAtLeast(version)) {
+      throw new Error(`Bytecode version ${this._version} is not compatible with ${version} yet`)
+    }
   }
 
   /** Contract getPastEvents */
@@ -123,11 +143,23 @@ export function secondsToDurationString(
 export const blocksToDurationString = (input: BigNumber.Value) =>
   secondsToDurationString(valueToBigNumber(input).times(5)) // TODO: fetch blocktime
 
-export const unixSecondsTimestampToDateString = (input: BigNumber.Value) =>
-  moment.unix(valueToInt(input)).local().format('llll [UTC]Z')
+const DATE_TIME_OPTIONS = {
+  year: 'numeric',
+  month: 'short',
+  weekday: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  timeZoneName: 'short',
+} as const
 
-// Type of bytes in solidity gets repesented as a string of number array by typechain and web3
-// Hopefull this will improve in the future, at which point we can make improvements here
+export const unixSecondsTimestampToDateString = (input: BigNumber.Value) => {
+  const date = new Date(valueToInt(input) * TimeDurations.second)
+  return Intl.DateTimeFormat('default', DATE_TIME_OPTIONS).format(date)
+}
+
+// Type of bytes in solidity gets represented as a string of number array by typechain and web3
+// Hopefully this will improve in the future, at which point we can make improvements here
 type SolidityBytes = string | number[]
 export const stringToSolidityBytes = (input: string) => ensureLeading0x(input) as SolidityBytes
 export const bufferToSolidityBytes = (input: Buffer) => stringToSolidityBytes(bufferToHex(input))

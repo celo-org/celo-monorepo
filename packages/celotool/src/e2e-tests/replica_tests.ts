@@ -35,7 +35,7 @@ const verbose = false
 
 describe('replica swap tests', () => {
   const gethConfig: GethRunConfig = {
-    useMycelo: true,
+    migrate: true,
     runPath: TMP_PATH,
     verbosity: 4,
     networkId: 1101,

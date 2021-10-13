@@ -5,13 +5,14 @@ resource "google_compute_health_check" "http_health_check" {
     port = var.health_check_destination_port
     # For NetworkEndpointGroup, the port specified for each network endpoint is used for health checking
     port_specification = "USE_FIXED_PORT"
+    request_path       = var.health_check_request_path
   }
 }
 
-# This is a reference to the ClusterIP RPC service inside this region's k8s cluster.
+# This is a reference to the ClusterIP service inside this region's k8s cluster.
 # We get the NEG for each context.
-data "google_compute_network_endpoint_group" "rpc_service_network_endpoint_group" {
-  name = each.value.rpc_service_network_endpoint_group_name
+data "google_compute_network_endpoint_group" "service_network_endpoint_group" {
+  name = each.value.service_network_endpoint_group_name
   zone = each.value.zone
 
   for_each = var.context_info
@@ -32,15 +33,14 @@ resource "google_compute_backend_service" "backend_service" {
     "Access-Control-Expose-Headers:Content-Length,Content-Range"
   ]
 
-  security_policy = google_compute_security_policy.forno.self_link
+  security_policy = var.security_policy_id
 
   dynamic "backend" {
     for_each = var.context_info
     content {
       balancing_mode        = "RATE"
-      max_utilization       = 0
       max_rate_per_endpoint = var.backend_max_requests_per_second
-      group                 = data.google_compute_network_endpoint_group.rpc_service_network_endpoint_group[backend.key].self_link
+      group                 = data.google_compute_network_endpoint_group.service_network_endpoint_group[backend.key].self_link
     }
   }
 }

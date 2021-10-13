@@ -21,7 +21,7 @@ spec:
       component: blockscout-indexer
   template:
     metadata:
-      {{- if .Values.blockscout.indexer.metrics.enabled}}
+      {{- if .Values.blockscout.metrics.enabled}}
       annotations:
         prometheus.io/path: /metrics/indexer
         prometheus.io/port: "4001"
@@ -50,7 +50,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app indexer "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix"
+           exec mix cmd --app indexer "iex --name {{ .Values.blockscout.indexer.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix run --no-compile"
         ports:
         - name: health
           containerPort: {{ .Values.blockscout.indexer.port }}
@@ -87,6 +87,8 @@ spec:
           value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.indexer.pool_size | quote }}
+        - name: METRICS_ENABLED
+          value: "{{.Values.blockscout.metrics.enabled}}"
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

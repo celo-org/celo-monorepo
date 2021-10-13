@@ -57,8 +57,11 @@ spec:
   ports:
   - port: 8545
     name: rpc
-  - port: {{ .ws_port | default .Values.geth.ws_port }}
+{{- $wsPort := ((.ws_port | default .Values.geth.ws_port) | int) -}}
+{{- if ne $wsPort 8545 }}
+  - port: {{ $wsPort }}
     name: ws
+{{- end }}
   selector:
 {{- if .proxy | default false }}
 {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
@@ -82,8 +85,10 @@ spec:
   ports:
   - port: 8545
     name: rpc
+{{- if ne $wsPort 8545 }}
   - port: {{ .ws_port | default .Values.geth.ws_port }}
     name: ws
+{{- end }}
   selector:
 {{- if .proxy | default false }}
 {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
@@ -150,7 +155,7 @@ spec:
 {{ include "common.import-geth-account-container" .  | indent 6 }}
 {{ end }}
       containers:
-{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "rpc_apis" .rpc_apis "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
       terminationGracePeriodSeconds:  {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
       volumes:
       - name: data

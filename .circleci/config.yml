@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v4
+    RELEASE_TAG: core-contracts.v5
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -810,7 +810,7 @@ jobs:
     working_directory: ~/app
     docker:
       - image: circleci/openjdk:11-jdk-node
-    parallelism: 4
+    parallelism: 5
     steps:
       - attach_workspace:
           at: ~/app
@@ -836,7 +836,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "0" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/lockedgold.sh
               ./specs/scripts/lockedgold.sh
             fi
       - run:
@@ -845,7 +844,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "1" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/accounts.sh
               ./specs/scripts/accounts.sh
             fi
       - run:
@@ -854,7 +852,6 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "2" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/accountsPrivileged.sh
               ./specs/scripts/accountsPrivileged.sh
             fi
       - run:
@@ -863,9 +860,16 @@ jobs:
             if [ ${CIRCLE_NODE_INDEX} == "3" ];
             then
               cd packages/protocol
-              chmod +x specs/scripts/*.sh
               ./specs/scripts/applyHarness.sh
               ./specs/scripts/governance.sh
+            fi
+      - run:
+          name: Build and run - Reserve
+          command: |
+            if [ ${CIRCLE_NODE_INDEX} == "4" ];
+            then
+              cd packages/protocol
+              ./specs/scripts/reserve.sh
             fi
 
   flakey-test-summary:

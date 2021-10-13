@@ -207,6 +207,7 @@ spec:
           {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
+{{ .Values.geth.validatorExtraSnippet | indent  10 }}
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \

@@ -25,6 +25,12 @@ The service currently supports Postgres, MSSQL, and MySQL.
 - `DB_DATABASE` - DB configuration: The DB database name (phoneNumberPrivacy by default).
 - `DB_USE_SSL` - DB configuration: Use SSL connection to the database (true by default).
 
+#### DB Migrations
+
+To update the signer DB schema, first run `yarn db:migrate:make <migration_name>` to create a new migrations file. Then, fill in the new migration file as needed using the previous migration files as references.
+
+Migrations will run automatically on startup.
+
 ### Blockchain provider
 
 The service needs a connection to a full node in order to access chain state. The `BLOCKCHAIN_PROVIDER` config should be a url to a node with its JSON RPC enabled.
