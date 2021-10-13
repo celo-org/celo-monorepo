@@ -1,8 +1,7 @@
 import { E164Number } from '@celo/utils/lib/io'
 import { BuildOptions, DataTypes, Model, Sequelize } from 'sequelize'
 
-export interface AttestationModel extends Model {
-  readonly id: number
+export interface SmsAttestation {
   account: string
   identifier: string
   issuer: string
@@ -16,6 +15,12 @@ export interface AttestationModel extends Model {
   providers: string
   attempt: number
   status: AttestationStatus
+  appSignature: string | undefined
+  language: string | undefined
+}
+
+export interface AttestationModel extends Model, SmsAttestation {
+  readonly id: number
   errors: string | null
   createdAt: Date
   completedAt: Date | null
@@ -24,8 +29,6 @@ export interface AttestationModel extends Model {
   recordError: (error: string) => void
   failure: () => boolean
   currentError: () => string | undefined
-  appSignature: string | undefined
-  language: string | undefined
 }
 
 export interface AttestationKey {
