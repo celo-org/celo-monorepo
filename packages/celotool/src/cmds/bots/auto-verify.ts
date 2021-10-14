@@ -116,7 +116,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         attestations,
         twilioClient,
         argv.attestationMax,
-        argv.salt
+        argv.salt,
+        clientAddress
       )
       const { identifier, pepper } = await getIdentifierAndPepper(
         kit,
