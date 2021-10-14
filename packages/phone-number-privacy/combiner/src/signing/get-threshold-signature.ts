@@ -37,7 +37,10 @@ interface SignMsgRespWithStatus {
   status: number
 }
 
-export async function handleGetBlindedMessageSig(request: Request, response: Response) {
+export async function handleGetBlindedMessageSig(
+  request: Request<{}, {}, GetBlindedMessageSigRequest>,
+  response: Response
+) {
   const logger: Logger = response.locals.logger
 
   try {
