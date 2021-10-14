@@ -1,6 +1,7 @@
 import { E164Number } from '@celo/utils/lib/io'
 import { BuildOptions, DataTypes, Model, Sequelize } from 'sequelize'
 
+// Split out SmsAttestation from the underlying data model
 export interface SmsAttestation {
   account: string
   identifier: string
