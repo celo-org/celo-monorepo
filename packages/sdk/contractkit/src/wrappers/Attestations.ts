@@ -711,6 +711,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       maxDeliveryAttempts: null,
       maxRerequestMins: null,
       twilioVerifySidProvided: null,
+      twilioVerifyDisabledRegions: null,
     }
 
     if (!hasAttestationSigner) {
@@ -771,6 +772,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.maxDeliveryAttempts = statusResponseBody.maxDeliveryAttempts
       ret.maxRerequestMins = statusResponseBody.maxRerequestMins
       ret.twilioVerifySidProvided = statusResponseBody.twilioVerifySidProvided
+      ret.twilioVerifyDisabledRegions = statusResponseBody.twilioVerifyDisabledRegions
 
       // Healthcheck was added in 1.0.1, same time version started being reported.
       if (statusResponseBody.version) {
@@ -858,4 +860,5 @@ export interface AttestationServiceStatusResponse {
   maxDeliveryAttempts: number | null
   maxRerequestMins: number | null
   twilioVerifySidProvided: boolean | null
+  twilioVerifyDisabledRegions: string | null
 }
