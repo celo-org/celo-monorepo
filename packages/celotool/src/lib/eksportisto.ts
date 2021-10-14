@@ -17,7 +17,7 @@ import { switchToProjectFromEnv } from 'src/lib/utils'
 
 const yaml = require('js-yaml')
 const chartDirForVersion: Record<number, string> = {
-  1: '../helm-charts/eksportisto',
+  1: '../helm-charts/eksportisto_11',
   2: '../helm-charts/eksportisto-2.0',
 }
 
