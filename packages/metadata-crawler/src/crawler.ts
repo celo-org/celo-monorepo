@@ -194,6 +194,7 @@ async function processAttestationServiceStatusForValidator(
     maxDeliveryAttempts,
     maxRerequestMins,
     twilioVerifySidProvided,
+    twilioVerifyDisabledRegions,
   } = status
   const isElected = electedValidators.has(validator.address)
   dataLogger.info(
@@ -216,6 +217,7 @@ async function processAttestationServiceStatusForValidator(
       maxDeliveryAttempts,
       maxRerequestMins,
       twilioVerifySidProvided,
+      twilioVerifyDisabledRegions,
     },
     'checked_attestation_service_status'
   )
