@@ -1,5 +1,8 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
 import { PhoneNumberUtils } from '@celo/utils'
+import { sample } from 'lodash'
+import { Twilio } from 'twilio'
 
 const DUMMY_SMS_URL = 'https://enzyutth0wxme.x.pipedream.net/'
 
