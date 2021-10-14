@@ -54,6 +54,7 @@ export async function handleStatusRequest(
           ),
           maxRerequestMins: parseInt(fetchEnvOrDefault('MAX_REREQUEST_MINS', '55'), 10),
           twilioVerifySidProvided: !!fetchEnvOrDefault('TWILIO_VERIFY_SERVICE_SID', ''),
+          twilioVerifyDisabledRegions: fetchEnvOrDefault('TWILIO_VERIFY_DISABLED_REGIONS', ''),
         })
       )
       .status(200)

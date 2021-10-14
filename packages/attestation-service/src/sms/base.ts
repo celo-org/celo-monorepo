@@ -2,7 +2,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { fetchEnvOrDefault } from '../env'
-import { SmsAttestation } from '../models/attestation'
+import { SmsFields } from '../models/attestation'
 
 export abstract class SmsProvider {
   abstract type: SmsProviderType
@@ -12,7 +12,7 @@ export abstract class SmsProvider {
     return !this.unsupportedRegionCodes.includes(countryCode.toUpperCase())
   }
   // Should throw Error when unsuccesful, return if successful
-  abstract sendSms(attestation: SmsAttestation): Promise<string>
+  abstract sendSms(attestation: SmsFields): Promise<string>
 
   // if this provider supports delivery status updates to an endpoint delivery_<providername>/, should return 'GET' or 'POST'
   abstract deliveryStatusMethod(): string | null

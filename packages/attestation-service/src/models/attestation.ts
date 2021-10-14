@@ -1,8 +1,10 @@
 import { E164Number } from '@celo/utils/lib/io'
 import { BuildOptions, DataTypes, Model, Sequelize } from 'sequelize'
 
-// Split out SmsAttestation from the underlying data model
-export interface SmsAttestation {
+// Split out SmsFields from the underlying data model;
+// Contains fields relevant to the message itself, not to meta-info
+// about how/when the message was sent.
+export interface SmsFields {
   account: string
   identifier: string
   issuer: string
@@ -10,18 +12,18 @@ export interface SmsAttestation {
   phoneNumber: E164Number
   message: string
   securityCode: string | null
-  securityCodeAttempt: number
   attestationCode: string | null
-  ongoingDeliveryId: string | null
-  providers: string
-  attempt: number
-  status: AttestationStatus
   appSignature: string | undefined
   language: string | undefined
 }
 
-export interface AttestationModel extends Model, SmsAttestation {
+export interface AttestationModel extends Model, SmsFields {
   readonly id: number
+  securityCodeAttempt: number
+  ongoingDeliveryId: string | null
+  providers: string
+  attempt: number
+  status: AttestationStatus
   errors: string | null
   createdAt: Date
   completedAt: Date | null
