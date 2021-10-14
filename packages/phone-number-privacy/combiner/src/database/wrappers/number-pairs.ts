@@ -46,7 +46,7 @@ export async function setNumberPairContacts(
   }
   try {
     await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
-  } catch (err) {
+  } catch (err: any) {
     // ignore duplicate insertion error (23505)
     if (err.code !== '23505') {
       logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)

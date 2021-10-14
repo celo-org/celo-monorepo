@@ -121,8 +121,8 @@ export class BasicDataWrapper implements OffchainDataWrapper {
         this.storageWriter.write(data, dataPath),
         this.storageWriter.write(signature, `${dataPath}.signature`),
       ])
-    } catch (e) {
-      return new FetchError(e)
+    } catch (e: any) {
+      return new FetchError(e instanceof Error ? e : new Error(e))
     }
   }
 }
@@ -146,8 +146,9 @@ class StorageRoot {
         fetch(resolvePath(this.root, dataPath)),
         fetch(resolvePath(this.root, `${dataPath}.signature`)),
       ])
-    } catch (error) {
-      return Err(new FetchError(error))
+    } catch (error: any) {
+      const fetchError = error instanceof Error ? error : new Error(error)
+      return Err(new FetchError(fetchError))
     }
 
     if (!dataResponse.ok) {

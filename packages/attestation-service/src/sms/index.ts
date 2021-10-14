@@ -438,7 +438,7 @@ async function doSendSms(
       .inc()
 
     return false
-  } catch (error) {
+  } catch (error: any) {
     attestation.status = AttestationStatus.NotSent
     const errorMsg = `${error.message ?? error}`.slice(0, maxErrorLength)
     attestation.recordError(errorMsg)
