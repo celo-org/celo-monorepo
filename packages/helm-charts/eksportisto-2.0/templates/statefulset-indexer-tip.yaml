@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "eksportisto.name" . }}
+  name: {{ template "eksportisto.name" . }}-idx-tip
   labels:
     component: eksportisto
     release: {{ .Release.Name }}
@@ -14,7 +14,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "eksportisto.name" . }}
+  name: {{ template "eksportisto.name" . }}-idx-tip
   labels:
     app: eksportisto
     chart: eksportisto
@@ -22,15 +22,7 @@ metadata:
     heritage: {{ .Release.Service }}
     component: eksportisto
 spec:
-  serviceName: {{ template "eksportisto.name" . }}
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
+  serviceName: {{ template "eksportisto.name" . }}-idx-tip
   podManagementPolicy: Parallel
   replicas: 1
   selector:
@@ -48,43 +40,33 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
+        configHash: "{{ .Values.configHash }}"
     spec:
-      initContainers:
-      - name: init-sensitive-accounts
-        image: alpine
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ['cp', '-L', '/var/config/sensitive-accounts.json', '/root/.eksportisto/']
-        volumeMounts:
-        - name: data
-          mountPath: /root/.eksportisto
-        - name: config
-          mountPath: /var/config
       containers:
       - name: eksportisto-{{ .Values.deploymentSuffix }}
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
-          - "legacy"
-          - "--nodeUri=ws://{{ .Values.celoTipNodeIP }}:8546"
-          - "--datadir=/root/.eksportisto"
-          - "--sensitiveAccounts=/root/.eksportisto/sensitive-accounts.json"
-          - "--profiling"
-          - "--concurrency=28"
+          - "indexer"
+          - "--config=/var/config/config.yaml"
+          - "--indexer-source=tip"
+          - "--celo-node-uri=ws://{{ .Values.celoTipNodeIP }}:8546"
+        env:
+        - name: GOGC
+          value: "11300"
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/var/config/service-account.json"
         resources:
           requests:
-            memory: 100Mi
-            cpu: 1700m
+            memory: 200Mi
+            cpu: 500m
         ports:
         - name: prometheus
           containerPort: 8080
         volumeMounts:
-        - name: data
-          mountPath: /root/.eksportisto
         - name: config
           mountPath: /var/config
       volumes:
-      - name: data
-        emptyDir: {}
       - name: config
         configMap:
           name: eksportisto-{{ .Values.deploymentSuffix }}-config
