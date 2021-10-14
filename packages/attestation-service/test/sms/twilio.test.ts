@@ -1,18 +1,18 @@
-import { AttestationStatus, SmsAttestation } from '../../src/models/attestation'
+import { SmsFields } from '../../src/models/attestation'
 import { TwilioSmsProvider } from '../../src/sms/twilio'
 import { mockMessagesCreate, mockVerifyCreate } from '../__mocks__/twilio'
 
 jest.mock('../__mocks__/twilio')
 
 describe('TwilioSmsProvider tests', () => {
-  describe('sendSMS', () => {
+  describe('sendSms', () => {
     const twilioSid = 'twilioSid-123!'
     const messagingServiceSid = 'messagingId-123!'
     const verifyServiceSid = 'verify-sid-123!'
     const verifyDisabledRegionCodes = ['CD', 'EF']
     const twilioAuthToken = 'fakeAuth-123!'
     const unsupportedRegionCodes = ['GH', 'IJ', 'KL']
-    let attestation: SmsAttestation
+    let attestation: SmsFields
 
     beforeEach(() => {
       jest.clearAllMocks()
@@ -25,11 +25,6 @@ describe('TwilioSmsProvider tests', () => {
         message: 'test-message',
         securityCode: '01234',
         attestationCode: '56789',
-        ongoingDeliveryId: null,
-        securityCodeAttempt: 0,
-        providers: 'twilio',
-        attempt: 0,
-        status: AttestationStatus.NotSent,
         appSignature: undefined,
         language: 'en',
       }
