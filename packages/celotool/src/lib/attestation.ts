@@ -16,7 +16,11 @@ export async function findSuitableNumber(
   return numbers.find(async (number) => {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
     const stats = await attestations.getAttestationStat(phoneHash, clientAddress)
-    console.info(`Comparing ${stats.total} with ${maximumNumberOfAttestations}`)
+    console.info(
+      `Comparing ${stats.total} with ${maximumNumberOfAttestations}: ${
+        stats.total < maximumNumberOfAttestations
+      }`
+    )
     return stats.total < maximumNumberOfAttestations
   })
 }
@@ -48,7 +52,7 @@ export async function createPhoneNumber(
       salt,
       clientAddress
     )
-
+    console.info(`Found suitable number ${usableNumber}`)
     if (!usableNumber) {
       if (attempts > 10) {
         throw new Error('Could not find suitable number')
