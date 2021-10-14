@@ -135,6 +135,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
 
       let stat = await attestations.getAttestationStat(identifier, clientAddress)
 
+      logger.info(`Starting with attestation count of ${stat.total}`)
       while (stat.total < argv.attestationMax) {
         logger.info({ ...stat }, 'Start Attestation')
 

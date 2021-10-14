@@ -1,8 +1,5 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
 import { PhoneNumberUtils } from '@celo/utils'
-import { sample } from 'lodash'
-import { Twilio } from 'twilio'
 
 const DUMMY_SMS_URL = 'https://enzyutth0wxme.x.pipedream.net/'
 
@@ -16,6 +13,7 @@ export async function findSuitableNumber(
   return numbers.find(async (number) => {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
     const stats = await attestations.getAttestationStat(phoneHash, clientAddress)
+    console.info(`Comparing ${stats.total} with ${maximumNumberOfAttestations}`)
     return stats.total < maximumNumberOfAttestations
   })
 }
@@ -73,7 +71,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
     if (possibleError) {
       if (possibleError.known) {
         console.info(
-          `Error while requesting from issuer ${possibleError.issuer} ${
+          `Error while requesting { from } issuer ${possibleError.issuer} ${
             possibleError.name ? `(Name: ${possibleError.name})` : ''
           }. Returned status ${possibleError.status} with response: ${
             possibleError.text
@@ -81,7 +79,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
         )
       } else {
         console.info(
-          `Unknown error while requesting from ${
+          `Unknown error while requesting { from } ${
             possibleError.issuer
           }: ${possibleError.error.toString()}. Ignoring.`
         )
