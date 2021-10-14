@@ -3,7 +3,6 @@ import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
 import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { rootLogger } from '../logger'
 import { AttestationStatus, SmsFields } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
@@ -116,7 +115,7 @@ export class TwilioSmsProvider extends SmsProvider {
     ]
   }
 
-  async initialize(deliveryStatusURL: string) {
+  async initialize(deliveryStatusURL?: string) {
     // Ensure the messaging service exists
     try {
       await this.client.messaging.services.get(this.messagingServiceSid).fetch()
