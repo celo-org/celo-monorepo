@@ -79,10 +79,6 @@ export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv, suffix), celoEnv)
 }
 
-function fetchSensitiveAccounts() {
-  return JSON.stringify({})
-}
-
 async function getServiceAccountKeyBase64FromHelm(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
   const relName = releaseName(celoEnv, suffix)
@@ -218,9 +214,6 @@ async function helmParameters(context: Context) {
     `--set imageRepository="${fetchEnv(envVar.EKSPORTISTO_DOCKER_IMAGE_REPOSITORY)}"`,
     `--set imageTag="${fetchEnv(envVar.EKSPORTISTO_DOCKER_IMAGE_TAG)}"`,
     `--set deploymentSuffix=${suffix}`,
-    `--set sensitiveAccountsBase64=${Buffer.from(fetchSensitiveAccounts())
-      .toString('base64')
-      .trim()}`,
   ]
 
   if (context.chartVersion === 2) {
