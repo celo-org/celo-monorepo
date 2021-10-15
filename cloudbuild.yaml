@@ -37,7 +37,7 @@ steps:
   args: [
     "--dockerfile=dockerfiles/phone-number-privacy/Dockerfile",
     "--cache=true",
-    "--build-arg=ONLY_PUBLISHED_DEPENDENCIES=" # Use unpublished dependencies.
+    "--build-arg=ONLY_PUBLISHED_DEPENDENCIES=", # Use unpublished dependencies.
     "--destination=us.gcr.io/$PROJECT_ID/celo-monorepo:phone-number-privacy-$COMMIT_SHA"
   ]
   waitFor: ['-']
