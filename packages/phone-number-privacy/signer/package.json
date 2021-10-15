@@ -24,7 +24,7 @@
     "@celo/phone-number-privacy-common": "1.0.36-dev",
     "@celo/identity": "1.2.5",
     "@celo/utils": "1.0.2",
-    "@celo/wallet-hsm-azure": "1.0.0-beta3",
+    "@celo/wallet-hsm-azure": "1.0.0",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/bunyan": "^1.8.6",
     "@types/elliptic": "^6.4.12",
