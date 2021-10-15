@@ -13,13 +13,13 @@ import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
 import { rerequestAttestation, startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
-import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
-import { getPhoneNumberIdentifierFromSignature } from '@celo/identity/lib/odis/phone-number-identifier'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
+export const INVALID_SIGNATURE_ERROR = 'Signature is invalid'
 
-const blsBlindingClient = new WasmBlsBlindingClient(fetchEnv('ODIS_PUBLIC_KEY'))
+const odisPubKey = fetchEnv('ODIS_PUBLIC_KEY')
+const thresholdBls = require('blind-threshold-bls')
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -82,13 +82,13 @@ class AttestationRequestHandler {
       logging: this.sequelizeLogger,
     })
 
+    await this.verifyPepperIfApplicable()
+
     // Re-requests for existing attestations skip the on-chain check.
     if (attestation) {
       Counters.attestationRequestsRerequest.inc()
       return attestation
     }
-
-    await this.verifyPepperIfApplicable()
 
     if (isDevMode()) {
       return attestation
@@ -119,18 +119,17 @@ class AttestationRequestHandler {
 
   private async verifyPepperIfApplicable(): Promise<void> {
     if (this.attestationRequest.blindedPhoneNumberSignature) {
+      Counters.attestationRequestsProvidedBlindedSignature.inc()
+
       try {
-        const phoneNumberHashDetails = await getPhoneNumberIdentifierFromSignature(
+        await thresholdBls.verify(
+          odisPubKey,
           this.attestationRequest.phoneNumber,
-          this.attestationRequest.blindedPhoneNumberSignature,
-          blsBlindingClient
+          this.attestationRequest.blindedPhoneNumberSignature
         )
-        if (phoneNumberHashDetails.pepper !== this.attestationRequest.salt) {
-          throw new ErrorWithResponse('Pepper is invalid', 422)
-        }
       } catch (e) {
         this.logger.error('Cannot get phone number from signature', e)
-        throw new ErrorWithResponse('Signature is invalid', 422)
+        throw new ErrorWithResponse(INVALID_SIGNATURE_ERROR, 422)
       }
     }
   }

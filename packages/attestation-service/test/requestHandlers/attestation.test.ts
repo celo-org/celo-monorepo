@@ -1,4 +1,7 @@
-import { handleAttestationRequest } from '../../src/requestHandlers/attestation'
+import {
+  handleAttestationRequest,
+  INVALID_SIGNATURE_ERROR,
+} from '../../src/requestHandlers/attestation'
 import { anyNumber, capture, instance, mock, reset, verify, when } from 'ts-mockito'
 import { Response } from '../../src/request'
 import { Request } from 'express'
@@ -143,7 +146,36 @@ describe('Attestation request handler', () => {
       verify(responseMock.status(422)).once()
       const [body] = capture(responseMock.json).last()
       expect(body['success']).toBeFalsy()
-      expect(body['error']).toEqual(`Signature is invalid`)
+      expect(body['error']).toEqual(INVALID_SIGNATURE_ERROR)
+    })
+
+    it('Should verify correctly blinded signature and return attestation', async () => {
+      const address = '0x2F015C60E0be116B1f0CD534704Db9c92118FB6A'
+      isValidAddressMock.mockReturnValue(true)
+      toChecksumAddressMock.mockReturnValue(address)
+      const sampleAttestation = {
+        message: 'message',
+        failure: () => false,
+      }
+      findAttestationByKeyMock.mockResolvedValue(sampleAttestation)
+      rerequestAttestationMock.mockResolvedValue(sampleAttestation)
+      when(responseMock.status(anyNumber())).thenReturn(responseMock)
+
+      await handleAttestationRequest(instance(requestMock), instance(responseMock), {
+        phoneNumber: '+14155550000',
+        language: 'en',
+        account: 'account',
+        issuer: address,
+        salt: 'salt',
+        securityCodePrefix: 'p',
+        smsRetrieverAppSig: 'sig',
+        blindedPhoneNumberSignature:
+          '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+      })
+
+      expect(findAttestationByKeyMock).toBeCalledTimes(1)
+      expect(rerequestAttestationMock).toBeCalledTimes(1)
+      verify(responseMock.status(200)).once()
     })
 
     it('Should fail with 500 code when validator address is invalid', async () => {

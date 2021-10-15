@@ -41,6 +41,7 @@ export async function requestAttestationsFromIssuers(
         smsRetrieverAppSig: undefined,
         securityCodePrefix: securityCode ? getSecurityCodePrefix(attestation.issuer) : undefined,
         language: undefined,
+        blindedPhoneNumberSignature: undefined,
       }
 
       const response = await attestations.revealPhoneNumberToIssuer(
