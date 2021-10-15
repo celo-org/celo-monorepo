@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { execCmd, execCmdAndParseJson, outputIncludes } from 'src/lib/cmd-utils'
+import { execCmd, execCmdAndParseJson } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
 import {
   getConfigMapHashes,
@@ -82,7 +82,8 @@ export async function removeHelmRelease(celoEnv: string) {
 async function getServiceAccountKeyBase64FromHelm(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
   const relName = releaseName(celoEnv, suffix)
-  const chartInstalled = await outputIncludes(`helm list -n ${celoEnv}`, `${relName}`)
+  const installedCharts = await execCmdAndParseJson(`helm list --short -o json -n ${celoEnv}`)
+  const chartInstalled = installedCharts.includes(relName)
   if (chartInstalled) {
     const [output] = await execCmd(`helm get values -n ${celoEnv} ${relName}`)
     const values: any = yaml.safeLoad(output)
