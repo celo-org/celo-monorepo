@@ -33,7 +33,7 @@ const shouldTrackFlakes =
   process.env.FLAKEY === 'true'
 
 // shouldLogRetryErrorsOnFailure => log raw test error immediately after every retry.
-const shouldLogRetryErrorsOnFailure = shouldTrackFlakes && process.env.LOG_ALL_RETRY_ERRORS
+const shouldLogRetryErrorsOnFailure = true
 
 // numRetries === times test is run after the initial failure
 const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : defaultNumRetries
