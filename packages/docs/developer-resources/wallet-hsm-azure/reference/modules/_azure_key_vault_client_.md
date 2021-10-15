@@ -1,7 +1,0 @@
-# Module: "azure-key-vault-client"
-
-## Index
-
-### Classes
-
-* [AzureKeyVaultClient](../classes/_azure_key_vault_client_.azurekeyvaultclient.md)

@@ -12,7 +12,8 @@ import { newKit } from '@celo/contractkit'
 //   verifySignature,
 // } from '@celo/utils/src/signatureUtils'
 import { WalletConnectWallet } from '../src'
-import { stagingEndpoint } from '../src/constants'
+import { endpoint } from '../src/constants'
+
 async function main() {
   const name = `CLI DApp ${Math.random().toString().substring(12)}`
 
@@ -26,7 +27,7 @@ async function main() {
       },
     },
     init: {
-      relayProvider: stagingEndpoint,
+      relayProvider: endpoint,
       logger: 'error',
     },
   })
