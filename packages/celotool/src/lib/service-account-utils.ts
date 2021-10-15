@@ -27,7 +27,7 @@ export async function createServiceAccountIfNotExists(name: string, gcloudProjec
 // given name
 export async function getServiceAccountEmail(serviceAccountName: string) {
   const [output] = await execCmdWithExitOnFailure(
-    `gcloud iam service-accounts list --filter="displayName:${serviceAccountName}" --format='value[terminator=""](email)'`
+    `gcloud iam service-accounts list --filter="displayName<=${serviceAccountName} AND displayName>=${serviceAccountName}" --format='value[terminator=""](email)'`
   )
   return output
 }
