@@ -16,11 +16,6 @@ export async function findSuitableNumber(
   for (const number of numbers) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
     const stats = await attestations.getAttestationStat(phoneHash, clientAddress)
-    console.info(
-      `Comparing ${number} ${stats.total} with ${maximumNumberOfAttestations}: ${
-        stats.total < maximumNumberOfAttestations
-      }`
-    )
     if (stats.total < maximumNumberOfAttestations) {
       return number
     }
@@ -55,7 +50,6 @@ export async function createPhoneNumber(
       salt,
       clientAddress
     )
-    console.info(`Found suitable number ${usableNumber}`)
     if (!usableNumber) {
       if (attempts > 10) {
         throw new Error('Could not find suitable number')
@@ -81,7 +75,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
     if (possibleError) {
       if (possibleError.known) {
         console.info(
-          `Error while requesting { from } issuer ${possibleError.issuer} ${
+          `Error while requesting from issuer ${possibleError.issuer} ${
             possibleError.name ? `(Name: ${possibleError.name})` : ''
           }. Returned status ${possibleError.status} with response: ${
             possibleError.text
@@ -89,7 +83,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
         )
       } else {
         console.info(
-          `Unknown error while requesting { from } ${
+          `Unknown error while requesting from ${
             possibleError.issuer
           }: ${possibleError.error.toString()}. Ignoring.`
         )
