@@ -421,7 +421,13 @@ async function installGrafana(context?: string, clusterConfig?: BaseClusterConfi
 async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
   const [k8sClusterName] = getK8sContextVars(clusterConfig, context)
   const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
+  // Rename baklavastaging -> baklava
+  const grafanaUrl =
+    k8sClusterName !== 'baklavastaging'
+      ? `${k8sClusterName}-grafana.${k8sDomainName}.org`
+      : `baklava-grafana.${k8sDomainName}.org`
   const values = {
+    adminPassword: fetchEnv(envVar.GRAFANA_LOCAL_ADMIN_PASSWORD),
     annotations: {
       'prometheus.io/scrape': 'false',
       'prometheus.io/path': '/metrics',
@@ -444,14 +450,17 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
         'kubernetes.io/ingress.class': 'nginx',
         'kubernetes.io/tls-acme': 'true',
       },
-      hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],
+      hosts: [grafanaUrl],
       path: '/',
       tls: [
         {
           secretName: `${k8sClusterName}-grafana-tls`,
-          hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],
+          hosts: [grafanaUrl],
         },
       ],
+    },
+    deploymentStrategy: {
+      type: 'Recreate',
     },
     persistence: {
       enabled: true,
@@ -470,6 +479,22 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
             isDefault: true,
           },
         ],
+      },
+    },
+    'grafana.ini': {
+      server: {
+        root_url: `https://${grafanaUrl}`,
+      },
+      'auth.google': {
+        enabled: true,
+        client_id: fetchEnv(envVar.GRAFANA_LOCAL_OAUTH2_CLIENT_ID),
+        client_secret: fetchEnv(envVar.GRAFANA_LOCAL_OAUTH2_CLIENT_SECRET),
+        scopes:
+          'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        auth_url: 'https://accounts.google.com/o/oauth2/auth',
+        token_url: 'https://accounts.google.com/o/oauth2/token',
+        allowed_domains: 'clabs.co',
+        allow_sign_up: 'true',
       },
     },
   }
