@@ -6,6 +6,7 @@ import os from 'os'
 import path from 'path'
 import sleep from 'sleep-promise'
 import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
+import stringHash from 'string-hash'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import {
   execCmd,
@@ -45,6 +46,8 @@ const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
 const TIMEOUT_FOR_LOAD_BALANCER_POLL = 1000 * 60 * 25 // 25 minutes
 const LOAD_BALANCER_POLL_INTERVAL = 1000 * 10 // 10 seconds
+
+export type HelmAction = 'install' | 'upgrade'
 
 async function validateExistingCloudSQLInstance(instanceName: string) {
   await ensureAuthenticatedGcloudAccount()
@@ -930,6 +933,40 @@ export async function upgradeGenericHelmChart(
     )
     console.info(`Upgraded helm release ${releaseName} successful`)
   }
+}
+
+export async function getConfigMapHashes(
+  celoEnv: string,
+  releaseName: string,
+  chartDir: string,
+  parameters: string[],
+  action: HelmAction,
+  valuesOverrideFile?: string
+): Promise<Record<string, string>> {
+  const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
+  const [output] = await execCmd(
+    `helm ${action} -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      ' '
+    )} --dry-run`,
+    {},
+    false,
+    false
+  )
+
+  return output
+    .split('---')
+    .filter((section) => {
+      return /kind: ConfigMap/.exec(section)
+    })
+    .reduce<Record<string, string>>((configHashes, section) => {
+      const matchSource = /Source: (.*)/.exec(section)
+      if (matchSource === null) {
+        throw new Error('Can not extract Source from config section')
+      }
+
+      configHashes[matchSource[1]] = stringHash(section).toString()
+      return configHashes
+    }, {})
 }
 
 export function isCelotoolVerbose() {
