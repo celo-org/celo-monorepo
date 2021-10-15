@@ -21,7 +21,7 @@
   "dependencies": {
     "@celo/base": "1.1.1",
     "@celo/contractkit": "1.2.5",
-    "@celo/phone-number-privacy-common": "1.0.35-dev",
+    "@celo/phone-number-privacy-common": "1.0.36-dev",
     "@celo/identity": "1.2.5-dev",
     "@celo/utils": "1.2.5-dev",
     "@celo/wallet-hsm-azure": "1.0.0-beta3",
