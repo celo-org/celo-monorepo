@@ -19,9 +19,9 @@ describe('identity:get-attetstations', () => {
     })
 
     it('Successfully prints identifier when given pepper and number', async () => {
-      console.log = jest.fn()
+      const consoleLog = jest.spyOn(console, 'log').mockImplementationOnce((s) => console.log(s))
       await GetAttestations.run(['--phoneNumber', '+15555555555', '--pepper', 'XQke2bjvN7mPt'])
-      expect(console.log).toHaveBeenCalledWith(
+      expect(consoleLog).toHaveBeenCalledWith(
         'Identifier: 0xd9460ae529b2889716c8f1ccebb5efec945adc46fe1e9cd16f6242463e81f37c'
       )
     })
