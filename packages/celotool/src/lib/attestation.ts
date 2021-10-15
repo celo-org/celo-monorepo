@@ -13,16 +13,19 @@ export async function findSuitableNumber(
   salt: string,
   clientAddress: string
 ) {
-  return numbers.find(async (number) => {
+  for (const number of numbers) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
     const stats = await attestations.getAttestationStat(phoneHash, clientAddress)
     console.info(
-      `Comparing ${stats.total} with ${maximumNumberOfAttestations}: ${
+      `Comparing ${number} ${stats.total} with ${maximumNumberOfAttestations}: ${
         stats.total < maximumNumberOfAttestations
       }`
     )
-    return stats.total < maximumNumberOfAttestations
-  })
+    if (stats.total < maximumNumberOfAttestations) {
+      return number
+    }
+  }
+  return undefined
 }
 
 export async function createPhoneNumber(
