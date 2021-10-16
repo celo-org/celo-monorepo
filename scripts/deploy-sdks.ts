@@ -2,6 +2,7 @@
 
 /*
  * deploy-sdks script
+ * THIS SCRIPT MUST BE RUN WITH NPM TO PUBLISH - `npm run deploy-sdks`
  * From the monorepo root run `yarn deploy-sdks`
  * You'll first be asked which version to update the sdks to.
  * You can pick major, minor, patch, a semantic version,
@@ -123,11 +124,6 @@ type Answers = {
     },
   ]
 
-  sdkPackagePaths.forEach((path, index) => {
-    const packageJson = sdkJsons[index]
-    writePackageJson(path, packageJson)
-  })
-
   let successfulPackages = []
   if (shouldPublish) {
     // Here we build and publish all the sdk packages
@@ -199,18 +195,24 @@ type Answers = {
   // to use the most recent sdk packages.
   allPackagePaths.forEach((path) => {
     const json: PackageJson = JSON.parse(fs.readFileSync(path).toString())
-
     let packageChanged = false
+    const isSdk = sdkNames.includes(json.name)
+
+    if (isSdk) {
+      json.version = `${newVersion}-dev`
+      packageChanged = true
+    }
+
     for (const depName in json.dependencies) {
       if (sdkNames.includes(depName)) {
-        const suffix = json.dependencies[depName].includes('-dev') ? '-dev' : ''
+        const suffix = json.dependencies[depName].includes('-dev') || isSdk ? '-dev' : ''
         json.dependencies[depName] = `${newVersion}${suffix}`
         packageChanged = true
       }
     }
     for (const depName in json.devDependencies) {
       if (sdkNames.includes(depName)) {
-        const suffix = json.devDependencies[depName].includes('-dev') ? '-dev' : ''
+        const suffix = json.devDependencies[depName].includes('-dev') || isSdk ? '-dev' : ''
         json.devDependencies[depName] = `${newVersion}${suffix}`
         packageChanged = true
       }
