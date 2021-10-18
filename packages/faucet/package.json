@@ -37,7 +37,6 @@
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
     "firebase-tools": "^8.4.2",
-    "rimraf": "2.6.3",
     "yargs": "14.0.0"
   },
   "engines": {
