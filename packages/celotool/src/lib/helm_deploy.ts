@@ -6,6 +6,7 @@ import os from 'os'
 import path from 'path'
 import sleep from 'sleep-promise'
 import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
+import { string } from 'yargs'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import {
   execCmd,
@@ -244,7 +245,7 @@ export async function installCertManagerAndNginx(
     const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
     await nginxHelmParameters(valueFilePath, celoEnv, clusterConfig)
 
-    await helmUpdateNginxRepo()
+    await helmAddAndUpdateRepos()
     await execCmdWithExitOnFailure(`helm install \
       -n ${nginxChartNamespace} \
       --version ${nginxChartVersion} \
@@ -316,11 +317,12 @@ async function getOrCreateNginxStaticIp(celoEnv: string, clusterConfig?: BaseClu
   return staticIpAddress
 }
 
-export async function helmUpdateNginxRepo() {
+export async function helmAddAndUpdateRepos() {
   await execCmdWithExitOnFailure(
     `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
   )
   await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
+  await execCmdWithExitOnFailure(`helm repo add grafana https://grafana.github.io/helm-charts`)
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
