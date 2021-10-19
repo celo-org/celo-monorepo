@@ -1,5 +1,6 @@
+import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { checkSequentialDelay, SequentialDelayResult } from '../../src/domains/sequential-delay'
-import { SequentialDelayDomain } from '../../src/interfaces'
+import { SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
 
 type TestAttempt = {
   timestamp: number
@@ -23,8 +24,10 @@ describe('Sequential Delay Test Suite', () => {
 
       const domain: SequentialDelayDomain = {
         name: 'ODIS Sequential Delay Domain',
-        version: 1,
-        stages: [{ delay: t }],
+        version: '1',
+        stages: [{ delay: t, resetTimer: noBool, batchSize: noNumber, repetitions: noNumber }],
+        address: noString,
+        salt: noString,
       }
 
       const attempts: TestAttempt[] = [
@@ -52,8 +55,10 @@ describe('Sequential Delay Test Suite', () => {
 
       const domain: SequentialDelayDomain = {
         name: 'ODIS Sequential Delay Domain',
-        version: 1,
-        stages: [{ delay: t, batchSize: 2 }],
+        version: '1',
+        stages: [{ delay: t, batchSize: defined(2), resetTimer: noBool, repetitions: noNumber }],
+        address: noString,
+        salt: noString,
       }
 
       const attempts: TestAttempt[] = [
@@ -88,13 +93,15 @@ describe('Sequential Delay Test Suite', () => {
 
       const domain: SequentialDelayDomain = {
         name: 'ODIS Sequential Delay Domain',
-        version: 1,
+        version: '1',
         stages: [
-          { delay: t, resetTimer: false },
-          { delay: 1, resetTimer: false },
-          { delay: 1, resetTimer: false },
-          { delay: 1, resetTimer: false },
+          { delay: t, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
         ],
+        address: noString,
+        salt: noString,
       }
 
       const attempts: TestAttempt[] = [
@@ -143,8 +150,13 @@ describe('Sequential Delay Test Suite', () => {
 
       const domain: SequentialDelayDomain = {
         name: 'ODIS Sequential Delay Domain',
-        version: 1,
-        stages: [{ delay: t }, { delay: 1 }],
+        version: '1',
+        stages: [
+          { delay: t, resetTimer: noBool, batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: noBool, batchSize: noNumber, repetitions: noNumber },
+        ],
+        address: noString,
+        salt: noString,
       }
 
       const attempts: TestAttempt[] = [
@@ -179,14 +191,16 @@ describe('Sequential Delay Test Suite', () => {
 
       const domain: SequentialDelayDomain = {
         name: 'ODIS Sequential Delay Domain',
-        version: 1,
+        version: '1',
         stages: [
-          { delay: t, batchSize: 2 },
-          { delay: 1, resetTimer: false },
-          { delay: 1 },
-          { delay: 2, resetTimer: false },
-          { delay: 4, batchSize: 2, repetitions: 2 },
+          { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: noNumber },
+          { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
+          { delay: 1, resetTimer: defined(true), batchSize: noNumber, repetitions: noNumber },
+          { delay: 2, resetTimer: defined(false), batchSize: noNumber, repetitions: defined(1) },
+          { delay: 4, resetTimer: noBool, batchSize: defined(2), repetitions: defined(2) },
         ],
+        address: noString,
+        salt: noString,
       }
 
       const attempts: TestAttempt[] = [
