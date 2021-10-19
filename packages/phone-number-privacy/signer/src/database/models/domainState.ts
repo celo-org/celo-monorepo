@@ -9,7 +9,7 @@ export class DomainState {
   [DOMAINS_STATES_COLUMNS.domainHash]: string;
   [DOMAINS_STATES_COLUMNS.counter]: number | null;
   [DOMAINS_STATES_COLUMNS.timer]: number | null;
-  [DOMAINS_STATES_COLUMNS.disabled]: boolean | null
+  [DOMAINS_STATES_COLUMNS.disabled]: boolean
 
   constructor(domainHash: string, counter: number, timer: number) {
     this[DOMAINS_STATES_COLUMNS.domainHash] = domainHash
