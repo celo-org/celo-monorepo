@@ -1,10 +1,10 @@
 import { domainHash, KnownDomain } from '@celo/identity/lib/odis/domains'
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { DOMAINS_STATES_COLUMNS, DOMAINS_STATES_TABLE, DomainState } from '../models/domainState'
-import { Transaction } from 'knex'
 
 function domainsStates() {
   return getDatabase()<DomainState>(DOMAINS_STATES_TABLE)
