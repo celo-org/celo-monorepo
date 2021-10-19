@@ -1,7 +1,4 @@
-import {
-  DisableDomainRequest,
-  DomainRestrictedSignatureRequest,
-} from '@celo/phone-number-privacy-common'
+import { DisableDomainRequest, DomainQuotaStatusRequest } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 
 export interface IDomainService {
@@ -9,8 +6,8 @@ export interface IDomainService {
     request: Request<{}, {}, DisableDomainRequest>,
     response: Response
   ): Promise<void>
-  handleGetDomainStatus(
-    request: Request<{}, {}, DomainRestrictedSignatureRequest>,
+  handleGetDomainQuotaStatus(
+    request: Request<{}, {}, DomainQuotaStatusRequest>,
     response: Response
   ): Promise<void>
 }
