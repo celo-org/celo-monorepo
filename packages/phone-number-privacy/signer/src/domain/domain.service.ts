@@ -10,7 +10,9 @@ import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
 import { DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
+  domainsStatesTransaction,
   getDomainState,
+  getDomainStateWithLock,
   setDomainDisabled,
   updateDomainState,
 } from '../database/wrappers/domainState'
@@ -37,12 +39,14 @@ export class DomainService implements IDomainService {
       hash: domainHash(request.body.domain),
     })
     try {
-      const domainState = await getDomainState(request.body.domain, logger)
+      const trx = await domainsStatesTransaction()
+      const domainState = await getDomainStateWithLock(request.body.domain, trx, logger)
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
-        await updateDomainState(request.body.domain, 0, 0, logger)
+        await updateDomainState(request.body.domain, trx, 0, 0, logger)
+        await trx.commit()
       } else if (domainState.disabled) {
-        // If the domain is already diabled, nothing needs to be done. Return 200 OK.
+        // If the domain is already disabled, nothing needs to be done. Return 200 OK.
         return
       }
 
@@ -82,9 +86,9 @@ export class DomainService implements IDomainService {
       if (domainState) {
         resultResponse = {
           domain: request.body.domain,
-          counter: domainState[DOMAINS_STATES_COLUMNS.counter],
-          disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
-          timer: domainState[DOMAINS_STATES_COLUMNS.timer],
+          counter: domainState[DOMAINS_STATES_COLUMNS.counter]!,
+          disabled: domainState[DOMAINS_STATES_COLUMNS.disabled]!,
+          timer: domainState[DOMAINS_STATES_COLUMNS.timer]!,
         }
       } else {
         resultResponse = {

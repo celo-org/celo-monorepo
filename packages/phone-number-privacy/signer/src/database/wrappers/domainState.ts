@@ -4,9 +4,14 @@ import Logger from 'bunyan'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { DOMAINS_STATES_COLUMNS, DOMAINS_STATES_TABLE, DomainState } from '../models/domainState'
+import { Transaction } from 'knex'
 
 function domainsStates() {
   return getDatabase()<DomainState>(DOMAINS_STATES_TABLE)
+}
+
+export function domainsStatesTransaction() {
+  return getDatabase().transaction()
 }
 
 export async function setDomainDisabled(domain: KnownDomain, logger: Logger): Promise<void> {
@@ -55,8 +60,39 @@ export async function getDomainState(
   }
 }
 
+export async function getDomainStateWithLock(
+  domain: KnownDomain,
+  trx: Transaction<DomainState>,
+  logger: Logger
+): Promise<DomainState | null> {
+  const getDomainStateWithLockMeter = Histograms.dbOpsInstrumentation
+    .labels('getDomainStateWithLock')
+    .startTimer()
+  const hash = domainHash(domain).toString('hex')
+  logger.debug('Getting domain state from db with lock', { domain, hash })
+  try {
+    const result = await domainsStates()
+      .transacting(trx)
+      .forUpdate()
+      .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
+      .first()
+      .timeout(DB_TIMEOUT)
+    getDomainStateWithLockMeter()
+    return result ?? null
+  } catch (err) {
+    Counters.databaseErrors.labels(Labels.read).inc()
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(err)
+    getDomainStateWithLockMeter()
+    throw err
+  } finally {
+    getDomainStateWithLockMeter()
+  }
+}
+
 export async function updateDomainState(
   domain: KnownDomain,
+  trx: Transaction<DomainState>,
   counter: number,
   timer: number,
   logger: Logger
@@ -68,14 +104,16 @@ export async function updateDomainState(
   logger.debug('Update domain state', { domain, hash, timer, counter })
   try {
     const result = await domainsStates()
+      .transacting(trx)
       .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
       .first()
       .timeout(DB_TIMEOUT)
 
     if (!result) {
-      await insertRecord(new DomainState(hash, counter, timer))
+      await insertRecord(new DomainState(hash, counter, timer), trx)
     } else {
       await domainsStates()
+        .transacting(trx)
         .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
         .update({ timer, counter })
         .timeout(DB_TIMEOUT)
@@ -92,6 +130,6 @@ export async function updateDomainState(
   }
 }
 
-async function insertRecord(data: DomainState) {
-  return getDatabase().insert(data).timeout(DB_TIMEOUT)
+async function insertRecord(data: DomainState, trx: Transaction<DomainState>) {
+  return domainsStates().transacting(trx).insert(data).timeout(DB_TIMEOUT)
 }
