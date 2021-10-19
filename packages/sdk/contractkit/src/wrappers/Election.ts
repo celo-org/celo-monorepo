@@ -252,6 +252,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return { address: account, votes }
   }
 
+  getTotalVotesByAccount = proxyCall(
+    this.contract.methods.getTotalVotesByAccount,
+    undefined,
+    valueToBigNumber
+  )
+
   /**
    * Returns whether or not the account has any pending votes.
    * @param account The address of the account casting votes.

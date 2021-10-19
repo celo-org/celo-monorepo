@@ -2,7 +2,11 @@ import { DestroyArgv } from 'src/cmds/deploy/destroy'
 import { switchToClusterFromEnvOrContext } from 'src/lib/cluster'
 import { addContextMiddleware, ContextArgv } from 'src/lib/context-utils'
 import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
-import { removeGrafanaHelmRelease, removePrometheus } from 'src/lib/prometheus'
+import {
+  removeGKEWorkloadMetrics,
+  removeGrafanaHelmRelease,
+  removePrometheus,
+} from 'src/lib/prometheus'
 
 export const command = 'prometheus'
 
@@ -18,6 +22,7 @@ export const handler = async (argv: PrometheusDestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnvOrContext(argv, true)
 
-  await removePrometheus()
   await removeGrafanaHelmRelease()
+  await removeGKEWorkloadMetrics()
+  await removePrometheus()
 }
