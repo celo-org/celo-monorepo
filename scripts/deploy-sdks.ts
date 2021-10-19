@@ -90,7 +90,7 @@ type Answers = {
   let newVersion: string
   // Here we update the sdk `package.json` objects with updated
   // versions and dependencies.
-  sdkJsons.forEach((json) => {
+  sdkJsons.forEach((json, index) => {
     if (!newVersion) {
       if (!version) {
         newVersion = removeDevSuffix(json.version)
@@ -115,6 +115,8 @@ type Answers = {
         }
       }
     }
+
+    writePackageJson(sdkPackagePaths[index], json)
   })
 
   const otpPrompt = [
