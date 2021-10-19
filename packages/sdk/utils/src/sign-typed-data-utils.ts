@@ -56,42 +56,53 @@ export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TY
 // Regular expression used to identify and parse EIP-712 array type strings.
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
 
+// Regular experssion used to identity EIP-712 integer types (e.g. int256, uint256, uint8).
+const EIP712_INT_REGEXP = /^u?int\d*$/
+
 /**
  * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
  * concrete type T is a subtype of EIP712ObjectValue.
+ *
+ * @remarks EIP712Optonal is not part of the EIP712 standard, but is fully compatible with it.
  */
 // tslint:disable-next-line:interface-over-type-literal Only builds when defined as type literal.
-export type Optional<T extends EIP712ObjectValue> = {
+export type EIP712Optional<T extends EIP712ObjectValue> = {
   defined: boolean
   value: T
 }
 
 /**
- * Utility to build Optional<T> types to insert in EIP-712 type arrays.
+ * Utility to build EIP712Optional<T> types to insert in EIP-712 type arrays.
+ * @param typeName EIP-712 string type name. Should be builtin or defined in the EIP712Types
+ * structure into which this type will be merged.
  */
-export const optionalEIP712Type = (typeName: string): EIP712Types => ({
+export const eip712OptionalType = (typeName: string): EIP712Types => ({
   [`Optional<${typeName}>`]: [
     { name: 'defined', type: 'bool' },
     { name: 'value', type: typeName },
   ],
 })
 
-export const some = <T extends EIP712ObjectValue>(value: T): Optional<T> => ({
+/** Utility to construct an defined EIP712Optional value with inferred type. */
+export const defined = <T extends EIP712ObjectValue>(value: T): EIP712Optional<T> => ({
   defined: true,
   value,
 })
 
-export const noBool: Optional<boolean> = {
+/** Undefined EIP712Optional type with value type boolean. */
+export const noBool: EIP712Optional<boolean> = {
   defined: false,
   value: false,
 }
 
-export const noNumber: Optional<number> = {
+/** Undefined EIP712Optional type with value type number. */
+export const noNumber: EIP712Optional<number> = {
   defined: false,
   value: 0,
 }
 
-export const noString: Optional<string> = {
+/** Undefined EIP712Optional type with value type string. */
+export const noString: EIP712Optional<string> = {
   defined: false,
   value: '',
 }
@@ -112,7 +123,7 @@ export function generateTypedDataHash(typedData: EIP712TypedData): Buffer {
 }
 
 /**
- * Given the primary type, and dictionary if types, this function assembles a sorted list
+ * Given the primary type, and dictionary of types, this function assembles a sorted list
  * representing the transitive dependency closure of the primary type. (Inclusive of the primary
  * type itself.)
  */
@@ -207,7 +218,7 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
 
 function normalizeValue(type: string, value: EIP712ObjectValue): EIP712ObjectValue {
   const normalizedValue =
-    /u?int\d*/.test(type) && BigNumber.isBigNumber(value) ? value.toString() : value
+    EIP712_INT_REGEXP.test(type) && BigNumber.isBigNumber(value) ? value.toString() : value
   return normalizedValue
 }
 

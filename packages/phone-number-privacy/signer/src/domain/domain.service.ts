@@ -25,6 +25,7 @@ export class DomainService implements IDomainService {
     response: Response
   ): Promise<void> {
     const logger = response.locals.logger
+    // TODO: add authentication check
     if (!isKnownDomain(request.body.domain)) {
       logger.warn('Received request to disable an unknown domain', {
         name: request.body.domain.name,
