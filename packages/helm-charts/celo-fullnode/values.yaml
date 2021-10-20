@@ -56,7 +56,7 @@ geth:
     imagePullPolicy: IfNotPresent
   resources:
     requests:
-      memory: "8Gi"
+      memory: "6Gi"
       cpu: "3"
     # limits:
     #   memory: "1Gi"
@@ -93,6 +93,7 @@ geth:
     maxpeers: 1000
     serve: 90
   fullnodeCheckBlockAge: true
+  ws_port: 8546
 
 genesis:
   networkId: 31418

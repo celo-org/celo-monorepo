@@ -8,6 +8,12 @@ import "./interfaces/IFreezer.sol";
 contract Freezer is Ownable, Initializable, IFreezer {
   mapping(address => bool) public isFrozen;
 
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }

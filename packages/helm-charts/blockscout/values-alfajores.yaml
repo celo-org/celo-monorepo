@@ -5,9 +5,9 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 500Mi
-            cpu: 500m
-    pool_size: 30
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 20
     resources:
       requests:
         memory: 700Mi
@@ -23,7 +23,7 @@ blockscout:
         resources:
           requests:
             memory: 250Mi
-            cpu: 500m
+            cpu: 200m
     pool_size: 10
     resources:
       requests:
@@ -41,13 +41,11 @@ blockscout:
         resources:
           requests:
             memory: 250Mi
-            cpu: 500m
+            cpu: 200m
     pool_size: 10
-    sourcify:
-      enabled: true
-      serverUrl: https://sourcify.dev/server
-      repoUrl: https://repo.sourcify.dev/contracts/full_match/
     resources:
       requests:
         memory: 250M
         cpu: 500m
+  metrics:
+    enabled: true

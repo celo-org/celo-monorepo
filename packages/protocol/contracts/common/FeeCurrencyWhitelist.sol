@@ -24,6 +24,12 @@ contract FeeCurrencyWhitelist is
   constructor(bool test) public InitializableV2(test) {}
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize() external initializer {

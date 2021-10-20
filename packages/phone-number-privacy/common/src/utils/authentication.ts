@@ -8,6 +8,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
+import { ErrorMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 const ec = new EC('secp256k1')
@@ -36,9 +37,8 @@ export async function authenticateUser(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit)
+      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
     } catch (error) {
-      logger.error('Failed to retrieve DEK: ' + error.message)
       logger.warn('Assuming request is authenticated')
       return true
     }
@@ -47,17 +47,8 @@ export async function authenticateUser(
       return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      try {
-        const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
-        const parsedSig = JSON.parse(messageSignature)
-        const validSignature = key.verify(message, parsedSig)
-        if (validSignature) {
-          return true
-        }
-      } catch (err) {
-        logger.error('Failed to verify auth sig with DEK')
-        logger.error({ err, dek: registeredEncryptionKey })
-        return false
+      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
+        return true
       }
     }
   }
@@ -70,9 +61,29 @@ export async function authenticateUser(
   return verifySignature(message, messageSignature, signer)
 }
 
+export function verifyDEKSignature(
+  message: string,
+  messageSignature: string,
+  registeredEncryptionKey: string,
+  logger?: Logger
+) {
+  try {
+    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
+    const parsedSig = JSON.parse(messageSignature)
+    return key.verify(message, parsedSig)
+  } catch (err) {
+    if (logger) {
+      logger.error('Failed to verify signature with DEK')
+      logger.error({ err, dek: registeredEncryptionKey })
+    }
+    return false
+  }
+}
+
 export async function getDataEncryptionKey(
   address: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  logger: Logger
 ): Promise<string> {
   return retryAsyncWithBackOffAndTimeout(
     async () => {
@@ -84,7 +95,11 @@ export async function getDataEncryptionKey(
     RETRY_DELAY_IN_MS,
     1.5,
     FULL_NODE_TIMEOUT_IN_MS
-  )
+  ).catch((error) => {
+    logger.error('Failed to retrieve DEK: ' + error.message)
+    logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+    throw error
+  })
 }
 
 export async function isVerified(

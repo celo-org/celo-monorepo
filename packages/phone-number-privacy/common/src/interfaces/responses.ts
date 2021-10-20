@@ -1,3 +1,5 @@
+import { Domain } from '@celo/identity/lib/odis/domains'
+
 export interface SignMessageResponse {
   success: boolean
   version?: string
@@ -21,4 +23,11 @@ export interface GetQuotaResponse {
   version: string
   performedQueryCount: number
   totalQuota: number
+}
+
+export interface DomainStatusResponse {
+  domain: Domain
+  counter: number
+  disabled: boolean
+  timer: number
 }

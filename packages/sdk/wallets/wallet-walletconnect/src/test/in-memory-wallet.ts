@@ -1,8 +1,8 @@
 import { newKit } from '@celo/contractkit'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import WalletConnect, { CLIENT_EVENTS } from '@walletconnect/client'
-import { PairingTypes, SessionTypes } from '@walletconnect/types'
-import { ERROR, getError } from '@walletconnect/utils'
+import { ClientTypes, PairingTypes, SessionTypes } from '@walletconnect/types'
+import { ERROR } from '@walletconnect/utils'
 import debugConfig from 'debug'
 import { SupportedMethods } from '../types'
 import {
@@ -30,18 +30,21 @@ export function getTestWallet() {
   let pairingTopic: string
 
   const onSessionProposal = (proposal: SessionTypes.Proposal) => {
-    const response: SessionTypes.Response = {
-      metadata: {
-        name: 'Wallet',
-        description: 'A mobile payments wallet that works worldwide',
-        url: 'https://wallet.com',
-        icons: ['https://wallet.com/favicon.ico'],
+    const response: ClientTypes.ApproveParams = {
+      response: {
+        metadata: {
+          name: 'Wallet',
+          description: 'A mobile payments wallet that works worldwide',
+          url: 'https://wallet.com',
+          icons: ['https://wallet.com/favicon.ico'],
+        },
+        state: {
+          accounts: [`${account}@celo:44787`],
+        },
       },
-      state: {
-        accounts: [`${account}@celo:44787`],
-      },
+      proposal,
     }
-    return client.approve({ proposal, response })
+    return client.approve(response)
   }
   const onSessionCreated = (session: SessionTypes.Created) => {
     sessionTopic = session.topic
@@ -134,7 +137,7 @@ export function getTestWallet() {
       await client.pair({ uri })
     },
     async close() {
-      const reason = getError(ERROR.USER_DISCONNECTED)
+      const reason = ERROR.USER_DISCONNECTED.format()
       await client.disconnect({ topic: sessionTopic, reason })
       await client.pairing.delete({ topic: pairingTopic, reason })
     },
