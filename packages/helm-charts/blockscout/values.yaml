@@ -150,7 +150,7 @@ blockscout:
     sourcify:
       enabled: true
       serverUrl: https://sourcify.dev/server
-      repoUrl: https://repo.sourcify.dev/contracts/full_match/
+      repoUrl: https://repo.sourcify.dev/contracts
     resources:
       requests:
         memory: 250M

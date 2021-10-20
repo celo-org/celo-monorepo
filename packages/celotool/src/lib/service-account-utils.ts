@@ -1,6 +1,6 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
-import { outputIncludes, switchToGCPProject, switchToProjectFromEnv } from 'src/lib/utils'
+import { execCmdAndParseJson, execCmdWithExitOnFailure } from './cmd-utils'
+import { isCelotoolHelmDryRun } from './helm_deploy'
+import { switchToGCPProject, switchToProjectFromEnv } from './utils'
 
 // createServiceAccountIfNotExists creates a service account with the given name
 // if it does not exist. Returns if the account was created.
@@ -15,11 +15,10 @@ export async function createServiceAccountIfNotExists(
     await switchToProjectFromEnv()
   }
   // TODO: add permissions for cloudsql editor to service account
-  const serviceAccountExists = await outputIncludes(
-    `gcloud iam service-accounts list`,
-    name,
-    `GCP Service account ${name} exists, skipping creation`
+  const serviceAccounts = await execCmdAndParseJson(
+    `gcloud iam service-accounts list --quiet --format json`
   )
+  const serviceAccountExists = serviceAccounts.some((account: any) => account.displayName === name)
   if (!serviceAccountExists) {
     let cmd = `gcloud iam service-accounts create ${name} --display-name="${name}" `
     if (description) {
@@ -38,7 +37,7 @@ export async function createServiceAccountIfNotExists(
 // given name
 export async function getServiceAccountEmail(serviceAccountName: string) {
   const [output] = await execCmdWithExitOnFailure(
-    `gcloud iam service-accounts list --filter="displayName:${serviceAccountName}" --format='value[terminator=""](email)'`
+    `gcloud iam service-accounts list --filter="displayName<=${serviceAccountName} AND displayName>=${serviceAccountName}" --format='value[terminator=""](email)'`
   )
   return output
 }

@@ -34,6 +34,8 @@ export enum AuthenticationMethod {
   CUSTOM_SIGNER = 'custom_signer',
 }
 
+// TODO(victor) Requests here are duplicated in. They should be deduplicated.
+// https://github.com/celo-org/celo-monorepo/blob/d5a275b56ca62360d1da9d00d38870888c9dbada/packages/phone-number-privacy/common/src/interfaces/requests.ts#L4
 export interface PhoneNumberPrivacyRequest {
   account: string
   authenticationMethod: AuthenticationMethod

@@ -1,6 +1,6 @@
 import { NativeSigner, serializeSignature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
-import { eqAddress, privateKeyToAddress } from './address'
+import { ensureLeading0x, eqAddress, privateKeyToAddress } from './address'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 // Exports moved to @celo/base, forwarding them
@@ -78,7 +78,11 @@ export function signedMessageToPublicKey(message: string, v: number, r: string, 
 }
 
 export function signMessage(message: string, privateKey: string, address: string) {
-  return signMessageWithoutPrefix(hashMessageWithPrefix(message), privateKey, address)
+  return signMessageWithoutPrefix(
+    hashMessageWithPrefix(message),
+    ensureLeading0x(privateKey),
+    address
+  )
 }
 
 export function signMessageWithoutPrefix(messageHash: string, privateKey: string, address: string) {
