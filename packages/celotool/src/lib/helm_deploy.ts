@@ -7,7 +7,11 @@ import path from 'path'
 import sleep from 'sleep-promise'
 import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
 import stringHash from 'string-hash'
-import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
+import {
+  createNamespaceIfNotExists,
+  getKubernetesClusterRegion,
+  switchToClusterFromEnv,
+} from './cluster'
 import {
   execCmd,
   execCmdWithExitOnFailure,
@@ -222,7 +226,7 @@ export async function installCertManagerAndNginx(
   celoEnv: string,
   clusterConfig?: BaseClusterConfig
 ) {
-  const nginxChartVersion = '3.9.0'
+  const nginxChartVersion = '4.0.6'
   const nginxChartNamespace = 'default'
 
   // Check if cert-manager is installed in any namespace
@@ -323,7 +327,9 @@ export async function helmUpdateNginxRepo() {
   await execCmdWithExitOnFailure(
     `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
   )
-  await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
+  await execCmdWithExitOnFailure(
+    `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
+  )
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
@@ -331,11 +337,11 @@ export async function installCertManager() {
   const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
 
   console.info('Create the namespace for cert-manager')
-  await execCmdWithExitOnFailure(`kubectl create namespace cert-manager`)
+  await createNamespaceIfNotExists('cert-manager')
 
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
-    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
+    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.crds.yaml`
   )
   console.info('Updating cert-manager-cluster-issuers chart dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)

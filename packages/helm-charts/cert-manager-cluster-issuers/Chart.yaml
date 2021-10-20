@@ -7,5 +7,5 @@ keywords:
 appVersion: v1.7.3
 dependencies:
   - name: cert-manager
-    version: v1.2.0
+    version: v1.5.4
     repository: https://charts.jetstack.io
