@@ -1,0 +1,34 @@
+annotations:
+  # Enable Prometheus scraping of log based metrics,
+  # see https://grafana.com/docs/loki/latest/clients/promtail/configuration/#pipeline_stages: metrics
+  prometheus.io/scrape: 'true'
+  prometheus.io/port: 'http-metrics'
+
+config:
+  # add a destination for the logs ingestion
+  # lokiAddress:
+
+  snippets:
+    pipelineStages:
+      - cri: {}
+      - docker: {}
+
+    extraRelabelConfigs:
+    # Keep Kubernetes pod labels.
+    - action: labelmap
+      regex: __meta_kubernetes_pod_label_(.+)
+    # Only keep logs from these namespaces.
+    - action: keep
+      source_labels:
+        - namespace
+      # TODO: reconsider what should be kept from the default namespace
+      # eg: ingress controller
+      regex: (alfajores|baklava|default|rc1|walletconnect)
+
+serviceAccount:
+  # add a iam.gke.io/gcp-service-account, see
+  # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#gcloud
+  annotations: {}
+
+updateStrategy:
+  type: RollingUpdate
