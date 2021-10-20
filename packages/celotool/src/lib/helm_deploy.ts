@@ -6,7 +6,6 @@ import os from 'os'
 import path from 'path'
 import sleep from 'sleep-promise'
 import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
-import { string } from 'yargs'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import {
   execCmd,
