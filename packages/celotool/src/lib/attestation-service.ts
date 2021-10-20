@@ -51,7 +51,9 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.twilio.verifyDisabledRegions="${fetchEnvOrFallback(
       envVar.TWILIO_VERIFY_DISABLED_REGIONS,
       ''
-    )}"`,
+    )
+      .split(',')
+      .join('\\,')}"`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
     `--set attestation_service.telekom.apiKey="${fetchEnv(envVar.TELEKOM_API_KEY)}"`,
