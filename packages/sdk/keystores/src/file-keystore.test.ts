@@ -1,6 +1,7 @@
 import { trimLeading0x } from '@celo/utils/lib/address'
-import { mkdirSync, readdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
+import rimraf from 'rimraf'
 import { FileKeystore } from './file-keystore'
 import { ADDRESS1, GETH_GEN_KEYSTORE1, KEYSTORE_NAME1, PASSPHRASE1, PK1 } from './test-constants'
 
@@ -19,8 +20,10 @@ describe('FileKeystore tests', () => {
     mkdirSync(testWorkdir)
   })
 
-  afterAll(() => {
-    rmdirSync(parentWorkdir, { recursive: true })
+  afterAll((done) => {
+    rimraf(parentWorkdir, () => {
+      done()
+    })
   })
   it('initializes keystore, imports key into keystore file, and deletes', async () => {
     const keystore = new FileKeystore(testWorkdir)
