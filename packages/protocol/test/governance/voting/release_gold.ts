@@ -138,19 +138,26 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   const createNewReleaseGoldInstance = async (
     releaseGoldSchedule: ReleaseGoldConfig,
-    web3: Web3
+    web3: Web3,
+    override = {
+      prefund: true,
+      startReleasing: false,
+    }
   ) => {
-    releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
+    const startDelay = 5 * MINUTE
+    releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + startDelay
     releaseGoldInstance = await ReleaseGold.new(isTest)
-    await goldTokenInstance.transfer(
-      releaseGoldInstance.address,
-      releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
-        releaseGoldSchedule.numReleasePeriods
-      ),
-      {
-        from: owner,
-      }
-    )
+    if (override.prefund) {
+      await goldTokenInstance.transfer(
+        releaseGoldInstance.address,
+        releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+          releaseGoldSchedule.numReleasePeriods
+        ),
+        {
+          from: owner,
+        }
+      )
+    }
     await releaseGoldInstance.initialize(
       releaseGoldSchedule.releaseStartTime,
       releaseGoldSchedule.releaseCliffTime,
@@ -168,6 +175,12 @@ contract('ReleaseGold', (accounts: string[]) => {
       registry.address,
       { from: owner }
     )
+    if (override.startReleasing) {
+      await timeTravel(
+        startDelay + releaseGoldSchedule.releaseCliffTime + releaseGoldSchedule.releasePeriod,
+        web3
+      )
+    }
   }
 
   const getCurrentBlockchainTimestamp = (web3: Web3): Promise<number> =>
@@ -198,12 +211,77 @@ contract('ReleaseGold', (accounts: string[]) => {
     await accountsInstance.createAccount({ from: beneficiary })
   })
 
+  describe('#initialize', () => {
+    it('should indicate isFunded() if deployment is prefunded', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: true,
+        startReleasing: false,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isTrue(isFunded)
+    })
+
+    it('should not indicate isFunded() (and not revert) if deployment is not prefunded', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: false,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isFalse(isFunded)
+    })
+  })
+
   describe('#payable', () => {
     it('should accept gold transfer by default from anyone', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
       await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.times(2), {
         from: accounts[8],
       })
+    })
+
+    it('should not update isFunded() if schedule principle not fulfilled', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: false,
+      })
+      const insufficientPrinciple = releaseGoldDefaultSchedule.amountReleasedPerPeriod
+        .multipliedBy(releaseGoldDefaultSchedule.numReleasePeriods)
+        .minus(1)
+      await goldTokenInstance.transfer(releaseGoldInstance.address, insufficientPrinciple, {
+        from: owner,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isFalse(isFunded)
+    })
+
+    it('should update isFunded() if schedule principle is fulfilled after deployment', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: false,
+      })
+      const sufficientPrinciple = releaseGoldDefaultSchedule.amountReleasedPerPeriod.multipliedBy(
+        releaseGoldDefaultSchedule.numReleasePeriods
+      )
+      await goldTokenInstance.transfer(releaseGoldInstance.address, sufficientPrinciple, {
+        from: owner,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isTrue(isFunded)
+    })
+
+    it('should update isFunded() if schedule principle not fulfilled but has begun releasing', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: true,
+      })
+      const insufficientPrinciple = releaseGoldDefaultSchedule.amountReleasedPerPeriod
+        .multipliedBy(releaseGoldDefaultSchedule.numReleasePeriods)
+        .minus(1)
+      await goldTokenInstance.transfer(releaseGoldInstance.address, insufficientPrinciple, {
+        from: owner,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isTrue(isFunded)
     })
   })
 

@@ -4,11 +4,10 @@ import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetQuotaRequest,
-  OdisRequest,
 } from '../interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT } from './constants'
 
-export function hasValidAccountParam(requestBody: OdisRequest): boolean {
+export function hasValidAccountParam(requestBody: { account: string }): boolean {
   return !!requestBody.account && isValidAddress(requestBody.account)
 }
 
