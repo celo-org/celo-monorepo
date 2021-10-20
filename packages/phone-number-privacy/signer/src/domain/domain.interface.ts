@@ -10,4 +10,8 @@ export interface IDomainService {
     request: Request<{}, {}, DomainQuotaStatusRequest>,
     response: Response
   ): Promise<void>
+  handleGetBlindedMessagePartialSig(
+    request: Request<{}, {}, DomainQuotaStatusRequest>,
+    response: Response
+  ): Promise<void>
 }
