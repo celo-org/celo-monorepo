@@ -19,3 +19,11 @@ Helm chart values to manage the Promtail deployment used to ingest k8s logs into
 
 Head to <https://clabs.grafana.net/explore> and select the logs datasource.
 Have a look at the LogQL specs: <https://grafana.com/docs/loki/latest/logql/>.
+
+## Deployment
+
+Use `celotool`:
+
+```sh
+celotool deploy {initial,upgrade,destroy} promtail -e <ENV> [--context <CONTEXT>]
+```

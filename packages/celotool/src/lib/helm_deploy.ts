@@ -853,7 +853,7 @@ function buildHelmChartDependencies(chartDir: string) {
   return helmCommand(`helm dep build ${chartDir}`)
 }
 
-async function installHelmDiffPlugin() {
+export async function installHelmDiffPlugin() {
   try {
     await execCmd(`helm diff version`, {}, false)
   } catch (error) {

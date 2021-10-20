@@ -1,28 +1,28 @@
 import fs from 'fs'
-import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
-import { createNamespaceIfNotExists } from './cluster'
-import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
+import { createNamespaceIfNotExists } from 'src/lib/cluster'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import {
   DynamicEnvVar,
   envVar,
   fetchEnv,
   fetchEnvOrFallback,
   getDynamicEnvVarValue,
-} from './env-utils'
+} from 'src/lib/env-utils'
 import {
   installGenericHelmChart,
   isCelotoolHelmDryRun,
   removeGenericHelmChart,
   setHelmArray,
   upgradeGenericHelmChart,
-} from './helm_deploy'
-import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
+} from 'src/lib/helm_deploy'
+import { BaseClusterConfig, CloudProvider } from 'src/lib/k8s-cluster/base'
+import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey,
   setupGKEWorkloadIdentities,
-} from './service-account-utils'
+} from 'src/lib/service-account-utils'
 import { outputIncludes, switchToGCPProject } from './utils'
 const yaml = require('js-yaml')
 
@@ -336,6 +336,11 @@ async function createPrometheusGcloudServiceAccount(
     await execCmdWithExitOnFailure(
       `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
     )
+    // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
+    await execCmdWithExitOnFailure(
+      `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
+    )
+
     // Setup workload identity IAM permissions
     await setupGKEWorkloadIdentities(
       serviceAccountName,

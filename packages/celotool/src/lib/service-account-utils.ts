@@ -1,5 +1,6 @@
-import { execCmdWithExitOnFailure } from './cmd-utils'
-import { outputIncludes, switchToGCPProject, switchToProjectFromEnv } from './utils'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { isCelotoolHelmDryRun } from 'src/lib/helm_deploy'
+import { outputIncludes, switchToGCPProject, switchToProjectFromEnv } from 'src/lib/utils'
 
 // createServiceAccountIfNotExists creates a service account with the given name
 // if it does not exist. Returns if the account was created.
@@ -22,9 +23,13 @@ export async function createServiceAccountIfNotExists(
   if (!serviceAccountExists) {
     let cmd = `gcloud iam service-accounts create ${name} --display-name="${name}" `
     if (description) {
-      cmd = cmd.concat(`--description=${description}`)
+      cmd = cmd.concat(`--description="${description}"`)
     }
-    await execCmdWithExitOnFailure(cmd)
+    if (isCelotoolHelmDryRun()) {
+      console.info(`This would run the following command:\n${cmd}\n`)
+    } else {
+      await execCmdWithExitOnFailure(cmd)
+    }
   }
   return !serviceAccountExists
 }
@@ -57,17 +62,17 @@ export async function setupGKEWorkloadIdentities(
     return
   }
 
-  // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
   const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  await execCmdWithExitOnFailure(
-    `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
-  )
 
   // Allow the Kubernetes service account to impersonate the Google service account
-  await execCmdWithExitOnFailure(
-    `gcloud iam --project ${gcloudProjectName} service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
-    ${serviceAccountEmail}`
-  )
+  const roleIamWorkloadIdentityUserCmd = `gcloud iam --project ${gcloudProjectName} service-accounts add-iam-policy-binding \
+  --role roles/iam.workloadIdentityUser \
+  --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
+  ${serviceAccountEmail}`
+
+  if (isCelotoolHelmDryRun()) {
+    console.info(`This would run the following: ${roleIamWorkloadIdentityUserCmd}\n`)
+  } else {
+    await execCmdWithExitOnFailure(roleIamWorkloadIdentityUserCmd)
+  }
 }
