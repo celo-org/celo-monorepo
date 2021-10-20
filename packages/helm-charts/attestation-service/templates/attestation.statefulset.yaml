@@ -146,7 +146,7 @@ spec:
               name: {{ .Release.Name }}
               key: NEXMO_SECRET
         - name: TWILIO_VERIFY_DISABLED_REGIONS
-          value: '{{ .Values.attestation_service.verifyDisabledRegions }}'
+          value: '{{ .Values.attestation_service.twilio.verifyDisabledRegions }}'
         - name: SMS_PROVIDERS
           value: '{{ .Values.attestation_service.sms_providers }}'
         - name: SMS_PROVIDERS_RANDOMIZED
