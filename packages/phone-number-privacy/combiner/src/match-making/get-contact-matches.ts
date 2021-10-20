@@ -40,10 +40,7 @@ export interface VerifiedPhoneNumberDekSignature {
   dekSigner: string
 }
 
-export async function handleGetContactMatches(
-  request: Request<{}, {}, GetContactMatchesRequest>,
-  response: Response
-) {
+export async function handleGetContactMatches(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
