@@ -105,7 +105,7 @@ export async function createNamespaceIfNotExists(namespace: string) {
   }
 }
 
-export async function seqqtupCluster(celoEnv: string, createdCluster: boolean) {
+export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   const envType = fetchEnv(envVar.ENV_TYPE)
 
   await checkHelmVersion()
