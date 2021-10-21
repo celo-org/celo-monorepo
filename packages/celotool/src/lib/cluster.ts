@@ -101,11 +101,11 @@ export async function createNamespaceIfNotExists(namespace: string) {
     const cmd = `kubectl create namespace ${namespace} ${
       isCelotoolHelmDryRun() ? ' --dry-run=server' : ''
     }`
-    execCmdWithExitOnFailure(cmd)
+    await execCmdWithExitOnFailure(cmd)
   }
 }
 
-export async function setupCluster(celoEnv: string, createdCluster: boolean) {
+export async function seqqtupCluster(celoEnv: string, createdCluster: boolean) {
   const envType = fetchEnv(envVar.ENV_TYPE)
 
   await checkHelmVersion()
