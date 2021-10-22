@@ -1,7 +1,7 @@
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import {getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -454,50 +454,74 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0) {
-	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
-	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
-	const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
-		'GovernanceApproverMultiSig',
-		artifacts
-	)
-	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+export async function assumeOwnership(contractsToOwn: string[], to: string) {
+  const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
+  const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
+  const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
+    'GovernanceApproverMultiSig',
+    artifacts
+  )
+  const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
   // Enough to pass the governance proposal unilaterally (and then some).
   const tenMillionCELO = '10000000000000000000000000'
-	// @ts-ignore
-	await lockedGold.lock({ value: tenMillionCELO })
+  // @ts-ignore
+  await lockedGold.lock({ value: tenMillionCELO })
   // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
-	// @ts-ignore
-  const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
-	const proposalTransactions = await Promise.all(
-		contractsToOwn.map(async (contractName: string) => {
-			return {
-				value: 0,
-				destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
-				data: transferOwnershipData,
-			}
-		})
-	)
-	await governance.propose(
-		proposalTransactions.map((tx: any) => tx.value),
-		proposalTransactions.map((tx: any) => tx.destination),
-		// @ts-ignore
-		Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
-		proposalTransactions.map((tx: any) => tx.data.length),
-		'URL',
-		// @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
-	)
+  const transferOwnershipData = Buffer.from(
+    // @ts-ignore
+    stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()),
+    'hex'
+  )
+  const proposalTransactions = await Promise.all(
+    contractsToOwn.map(async (contractName: string) => {
+      return {
+        value: 0,
+        destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
+        data: transferOwnershipData,
+      }
+    })
+  )
+  const proposeResponse = await governance.propose(
+    proposalTransactions.map((tx: any) => tx.value),
+    proposalTransactions.map((tx: any) => tx.destination),
+    // @ts-ignore
+    Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
+    proposalTransactions.map((tx: any) => tx.data.length),
+    'URL',
+    // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+    { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+  )
 
-	await governance.upvote(proposalId, 0, 0)
-	await timeTravel(config.governance.dequeueFrequency, web3)
-	// @ts-ignore
-	const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-	await multiSig.submitTransaction(governance.address, 0, txData)
-	await timeTravel(config.governance.approvalStageDuration, web3)
-	await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
-	await timeTravel(config.governance.referendumStageDuration, web3)
-	await governance.execute(proposalId, dequeuedIndex)
+  const proposalId = proposeResponse.receipt.events.ProposalQueued.returnValues.proposalId
+  const upvoteResponse = await governance.upvote(proposalId, 0, 0)
+  const getDequeueIndex = async (
+    txResponse: Truffle.TransactionResponse
+  ): Promise<number | undefined> => {
+    if (!txResponse.receipt.events.ProposalDequeued) {
+      return undefined
+    }
+    let index = 0
+    while (index < proposalId) {
+      const dequeuedProposal = await governance.dequeued(index)
+      if (dequeuedProposal.isZero()) {
+        return undefined
+      }
+      if (dequeuedProposal.isEqualTo(proposalId)) {
+        return index
+      }
+      index += 1
+    }
+  }
+  let dequeuedIndex = await getDequeueIndex(upvoteResponse)
+  await timeTravel(config.governance.dequeueFrequency, web3)
+  // @ts-ignore
+  const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+  const approveResponse = await multiSig.submitTransaction(governance.address, 0, txData)
+  dequeuedIndex = dequeuedIndex ?? (await getDequeueIndex(approveResponse))
+  await timeTravel(config.governance.approvalStageDuration, web3)
+  await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+  await timeTravel(config.governance.referendumStageDuration, web3)
+  await governance.execute(proposalId, dequeuedIndex)
 }
 
 /*

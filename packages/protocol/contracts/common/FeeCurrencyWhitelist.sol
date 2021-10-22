@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 
-import "./InitializableV2.sol";
+import "./Initializable.sol";
 
 import "./UsingRegistryV2.sol";
 import "../stability/interfaces/ISortedOracles.sol";
@@ -15,13 +15,11 @@ import "../stability/interfaces/ISortedOracles.sol";
 contract FeeCurrencyWhitelist is
   IFeeCurrencyWhitelist,
   Ownable,
-  InitializableV2,
+  Initializable,
   UsingRegistryV2,
   ICeloVersionedContract
 {
   address[] public whitelist;
-
-  constructor(bool test) public InitializableV2(test) {}
 
   /**
    * @notice Sets initialized == true on implementation contracts
