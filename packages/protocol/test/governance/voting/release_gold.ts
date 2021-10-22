@@ -295,13 +295,11 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should transfer stable token from the release gold instance', async () => {
-      const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
-      const startBalanceTo = await mockStableToken.balanceOf(receiver)
       await releaseGoldInstance.transfer(receiver, transferAmount, { from: beneficiary })
-      const endBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
-      const endBalanceTo = await mockStableToken.balanceOf(receiver)
-      assertEqualBN(endBalanceFrom, startBalanceFrom.minus(transferAmount))
-      assertEqualBN(endBalanceTo, startBalanceTo.plus(transferAmount))
+      const contractBalance = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      const recipientBalance = await mockStableToken.balanceOf(receiver)
+      assertEqualBN(contractBalance, 0)
+      assertEqualBN(recipientBalance, transferAmount)
     })
   })
 
