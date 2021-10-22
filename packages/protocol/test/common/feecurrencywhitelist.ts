@@ -23,7 +23,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
   const nonOwner = accounts[1]
 
-  beforeAll(async () => {
+  before(async () => {
     mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
 
@@ -48,6 +48,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       await assertRevert(feeCurrencyWhitelist.initialize())
     })
   })
+
   describe('#addToken()', () => {
     it('should revert when token has no oracle price', async () => {
       await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
