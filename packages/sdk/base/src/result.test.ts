@@ -1,7 +1,7 @@
 import { Err, isOk, Ok, Result } from '.'
 
 // These tests are just to check the typescript compiler
-describe('discrminated collection functions', () => {
+describe('discriminated collection functions', () => {
   const trueValue = Ok(true)
   const falseValue = Err(new Error())
   let collection: Result<boolean, Error>[] = [trueValue, falseValue]

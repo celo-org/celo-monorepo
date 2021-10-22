@@ -1,8 +1,9 @@
 import { ethers } from 'ethers'
+import { celoAbiFetchers } from './abiFetcher'
 import { Parser } from './parser'
 
 async function main() {
-  const parser = new Parser(42220)
+  const parser = new Parser(celoAbiFetchers)
   const provider = new ethers.providers.JsonRpcProvider('https://forno.celo.org')
   if (process.argv.length > 3) {
     const txDescription = await parser.parse({

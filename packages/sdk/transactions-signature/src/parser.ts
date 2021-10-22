@@ -40,6 +40,10 @@ interface Transaction {
 }
 
 export class Parser {
+  /**
+   * Creates a new instance of the parser
+   * @param abiFetchers Array of AbiFetchers, order matters as priority (i.e. proxy fetcher before plain fetcher)
+   */
   constructor(public readonly abiFetchers: AbiFetcher[]) {}
 
   async parseAsResult(tx: Transaction): Promise<Result<TransactionDescription, ParserErrors>> {

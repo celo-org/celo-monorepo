@@ -107,14 +107,15 @@ export class ProxyAbiFetcher implements AbiFetcher {
   }
 }
 
+// This method fetches ABIs from all fetchers and returns either all successful ones, or the error from the first one
 export const getAbisFromFetchers = async (abiFetchers: AbiFetcher[], address: Address) => {
   const abis = await Promise.all(abiFetchers.map((f) => f.fetchAbiForAddress(address)))
   const successFullAbis = abis.filter(isOk)
   if (successFullAbis.length > 0) {
     return Ok(successFullAbis.map((_) => _.result))
   } else {
-    const failedAbis = abis.filter(isErr)
-    return Err(failedAbis[0].error)
+    const failedAbis = abis.find(isErr)
+    return Err(failedAbis!.error)
   }
 }
 
