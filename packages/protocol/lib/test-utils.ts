@@ -493,7 +493,7 @@ export async function assumeOwnership(contractsToOwn: string[], to: string) {
   )
 
   const proposalId = proposeResponse.receipt.events.ProposalQueued.returnValues.proposalId
-  const upvoteResponse = await governance.upvote(proposalId, 0, 0)
+
   const getDequeueIndex = async (
     txResponse: Truffle.TransactionResponse
   ): Promise<number | undefined> => {
@@ -512,8 +512,13 @@ export async function assumeOwnership(contractsToOwn: string[], to: string) {
       index += 1
     }
   }
-  let dequeuedIndex = await getDequeueIndex(upvoteResponse)
-  await timeTravel(config.governance.dequeueFrequency, web3)
+
+  let dequeuedIndex = await getDequeueIndex(proposeResponse)
+  if (!dequeuedIndex) {
+    await timeTravel(config.governance.dequeueFrequency, web3)
+    const dequeueResponse = await governance.dequeueProposalsIfReady()
+    dequeuedIndex = await getDequeueIndex(dequeueResponse)
+  }
   // @ts-ignore
   const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
   const approveResponse = await multiSig.submitTransaction(governance.address, 0, txData)

@@ -23,7 +23,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
   const nonOwner = accounts[1]
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
 
@@ -31,7 +31,9 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     // Take ownership of the registry contract to point it to the mocks
     await assumeOwnership(['Registry'], accounts[0])
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+  })
 
+  beforeEach(async () => {
     feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
     await feeCurrencyWhitelist.initialize()
   })
