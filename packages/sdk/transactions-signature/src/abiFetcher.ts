@@ -10,6 +10,7 @@ import { Address, KnownProxy } from './types'
 export enum FetchAbiErrorTypes {
   FetchAbiError = 'FetchAbiError',
   NoProxy = 'NoProxy',
+  NotFound = 'NotFound',
 }
 
 export class FetchingAbiError extends RootError<FetchAbiErrorTypes.FetchAbiError> {
@@ -26,7 +27,14 @@ export class NoProxyError extends RootError<FetchAbiErrorTypes.NoProxy> {
   }
 }
 
-export type FetchAbiError = FetchingAbiError | NoProxyError
+export class NotFoundError extends RootError<FetchAbiErrorTypes.NotFound> {
+  constructor(public readonly errors: FetchAbiError[]) {
+    super(FetchAbiErrorTypes.NotFound)
+    this.message = 'No ABIs could be found'
+  }
+}
+
+export type FetchAbiError = FetchingAbiError | NoProxyError | NotFoundError
 
 export interface AbiFetcher {
   fetchAbiForAddress: (address: Address) => Promise<Result<JsonFragment[], FetchAbiError>>
@@ -63,9 +71,12 @@ export class ExplorerAbiFetcher implements AbiFetcher {
     }
 
     const data = await request.json()
-
     if (data.status != '1') {
-      return Err(new FetchingAbiError(new Error(`Error from ${this.baseUrl}: $${data.result}`)))
+      return Err(
+        new FetchingAbiError(
+          new Error(`Error from ${this.baseUrl}: ${data.result || data.message}`)
+        )
+      )
     }
     const abi = JSON.parse(data.result)
     return Ok(abi)
@@ -107,15 +118,14 @@ export class ProxyAbiFetcher implements AbiFetcher {
   }
 }
 
-// This method fetches ABIs from all fetchers and returns either all successful ones, or the error from the first one
 export const getAbisFromFetchers = async (abiFetchers: AbiFetcher[], address: Address) => {
   const abis = await Promise.all(abiFetchers.map((f) => f.fetchAbiForAddress(address)))
   const successFullAbis = abis.filter(isOk)
   if (successFullAbis.length > 0) {
     return Ok(successFullAbis.map((_) => _.result))
   } else {
-    const failedAbis = abis.find(isErr)
-    return Err(failedAbis!.error)
+    const failedAbis = abis.filter(isErr)
+    return Err(new NotFoundError(failedAbis.map((_) => _.error)))
   }
 }
 
