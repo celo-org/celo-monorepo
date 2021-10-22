@@ -1,23 +1,22 @@
 import { isSequentialDelayDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
 import { ErrorMessage, SequentialDelayDomainState } from '@celo/phone-number-privacy-common'
 import { checkSequentialDelay } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
-import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { toSequentialDelayDomainState } from '../../common/domain/domainState.mapper'
 import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { updateDomainState } from '../../database/wrappers/domainState'
 import { IDomainQuotaService } from './domainQuota.interface'
+import Logger from 'bunyan'
 
 export class DomainQuotaService implements IDomainQuotaService {
-  constructor(private logger: Logger) {}
-
   public async checkAndUpdateQuota(
     domain: KnownDomain,
     domainState: DomainState,
-    trx: Transaction<DomainState>
+    trx: Transaction<DomainState>,
+    logger: Logger
   ): Promise<{ sufficient: boolean; newState: DomainState }> {
     if (isSequentialDelayDomain(domain)) {
-      return this.handleSequentialDelayDomain(domain, domainState, trx)
+      return this.handleSequentialDelayDomain(domain, domainState, trx, logger)
     } else {
       throw new Error(ErrorMessage.UNSUPPORTED_DOMAIN)
     }
@@ -26,7 +25,8 @@ export class DomainQuotaService implements IDomainQuotaService {
   private async handleSequentialDelayDomain(
     domain: KnownDomain,
     domainState: DomainState,
-    trx: Transaction<DomainState>
+    trx: Transaction<DomainState>,
+    logger: Logger
   ) {
     const result = checkSequentialDelay(
       domain,
@@ -42,7 +42,7 @@ export class DomainQuotaService implements IDomainQuotaService {
       domainHash: domainState[DOMAINS_STATES_COLUMNS.domainHash],
       disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
     }
-    await updateDomainState(domain, newState, trx, this.logger)
+    await updateDomainState(domain, newState, trx, logger)
     return {
       sufficient: true,
       newState,

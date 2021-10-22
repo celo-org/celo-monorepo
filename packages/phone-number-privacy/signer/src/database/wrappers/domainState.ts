@@ -1,5 +1,5 @@
 import { domainHash, KnownDomain } from '@celo/identity/lib/odis/domains'
-import { DB_TIMEOUT, ErrorMessage, KnownDomainState } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
@@ -88,7 +88,7 @@ export async function getDomainStateWithLock(
 
 export async function updateDomainState(
   domain: KnownDomain,
-  domainState: KnownDomainState,
+  domainState: DomainState,
   trx: Transaction<DomainState>,
   logger: Logger
 ): Promise<void> {

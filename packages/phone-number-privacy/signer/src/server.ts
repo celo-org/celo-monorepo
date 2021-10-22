@@ -10,6 +10,8 @@ import config, { getVersion } from './config'
 import { DomainService } from './domain/domain.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
+import { DomainAuthService } from './domain/auth/domainAuth.service'
+import { DomainQuotaService } from './domain/quota/domainQuota.service'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -24,7 +26,7 @@ export enum Endpoints {
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
 
-const domainService = new DomainService()
+const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
 
 export function createServer() {
   logger.info('Creating express server')

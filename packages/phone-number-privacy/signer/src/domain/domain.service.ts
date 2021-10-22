@@ -48,8 +48,8 @@ export class DomainService implements IDomainService {
   }
 
   public constructor(
-    private readonly authService: IDomainAuthService,
-    private readonly quotaService: IDomainQuotaService
+    private authService: IDomainAuthService,
+    private quotaService: IDomainQuotaService
   ) {}
 
   public async handleDisableDomain(
@@ -161,7 +161,7 @@ export class DomainService implements IDomainService {
       )
     }
 
-    const quotaState = await this.quotaService.checkAndUpdateQuota(domain, domainState, trx)
+    const quotaState = await this.quotaService.checkAndUpdateQuota(domain, domainState, trx, logger)
 
     if (!quotaState.sufficient) {
       trx.rollback()
