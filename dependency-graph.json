@@ -214,6 +214,14 @@
       "@celo/flake-tracker"
     ]
   },
+  "@celo/transactions-signature": {
+    "location": "packages/sdk/transactions-signature",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript"
+    ]
+  },
   "@celo/transactions-uri": {
     "location": "packages/sdk/transactions-uri",
     "dependencies": [
