@@ -85,9 +85,10 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
       break
 
     case CloudProvider.AZURE:
-    // TODO
+      // Nothing special to be done.
+      break
+
     case CloudProvider.AWS:
-    // TODO
     default:
       console.error(`Unrecognised or unsupported cloud provider: ${cloudProvider}`)
       process.exit(1)
