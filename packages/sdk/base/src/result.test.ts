@@ -4,7 +4,7 @@ import { Err, isOk, Ok, Result } from '.'
 describe('discriminated collection functions', () => {
   const trueValue = Ok(true)
   const falseValue = Err(new Error())
-  let collection: Result<boolean, Error>[] = [trueValue, falseValue]
+  const collection: Array<Result<boolean, Error>> = [trueValue, falseValue]
 
   it('can filter to the true value', () => {
     const ok = collection.filter(isOk)
